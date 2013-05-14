@@ -69,10 +69,6 @@ def generateChart(hero_name_list, stats_list):
     robjects.r(cmd)
     robjects.r("df.all = cbind(df.all,df.thing)")
 
-    print "###"
-    print settings.MEDIA_ROOT, settings.STATICFILES_DIRS[0]
-    print "###"
-
     #Make a file
     imagefile = File(open(settings.MEDIA_ROOT+'/temp/file2.png', 'w'))
     grdevices.png(file=imagefile.name)
