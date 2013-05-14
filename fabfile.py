@@ -1,6 +1,10 @@
 from fabric.api import local
 
 
+def hp():
+    local('heroku push -b https://github.com/ddollar/heroku-buildpack-multi.git')
+
+
 def scrape_valve_heroes():
     local('python datadrivendota/manage.py scrapeheroes')
 
