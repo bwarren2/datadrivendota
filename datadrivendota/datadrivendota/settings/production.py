@@ -61,14 +61,9 @@ CACHES = {}
 ########## END CACHE CONFIGURATION
 
 
-########## SECRET CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
-SECRET_KEY = get_env_setting('SECRET_KEY')
-########## END SECRET CONFIGURATION
-
 ####STORAGES####
 STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_ACCESS_KEY_ID = 'AKIAI34PVYFXKMFKILPQ'
 AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'datadrivendota'
+AWS_STORAGE_BUCKET_NAME = 'ddd_media_static'

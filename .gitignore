@@ -19,7 +19,6 @@ build
 
 #Media
 media/
-static/
 assets/
 
 #Tempfiles
