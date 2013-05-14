@@ -1,1 +1,1 @@
-web: python datadrivendota/manage.py runserver 0.0.0.0:$PORT --noreload
+web: gunicorn hellodjango.wsgi -b 0.0.0.0:$PORT
