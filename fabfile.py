@@ -6,18 +6,28 @@ def hp():
 
 
 def scrape_valve_heroes():
-    local('python datadrivendota/manage.py scrapeheroes')
+    return 'python datadrivendota/manage.py scrapeheroes'
 
 
 def scrape_hero_faces():
-    local('python datadrivendota/manage.py scrapeloreandmugshot')
+    return 'python datadrivendota/manage.py scrapeloreandmugshot'
 
 
 def scrape_dossiers():
-    local('python datadrivendota/manage.py importHeroStats')
+    return 'python datadrivendota/manage.py importHeroStats'
 
 
-def get_hero_seed():
-    scrape_valve_heroes()
-    scrape_hero_faces()
-    scrape_dossiers()
+def get_hero_seed_local():
+    local(scrape_valve_heroes())
+    local(scrape_hero_faces())
+    local(scrape_dossiers())
+
+
+def heroku_run(str):
+    return "heroku run "+str
+
+
+def get_hero_seed_heroku():
+    local(heroku_run(scrape_valve_heroes()))
+    local(heroku_run(scrape_hero_faces()))
+    local(heroku_run(scrape_dossiers()))
