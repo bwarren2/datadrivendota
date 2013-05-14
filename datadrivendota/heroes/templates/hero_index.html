@@ -1,0 +1,21 @@
+{% extends "hero_base.html" %}
+
+{% block title %}Hero List{% endblock %}
+{% block page_title %}Hero Index{% endblock %}
+{% block content %}
+<div align='left'>
+{% for hero in hero_list %}
+    {% if hero.thumbshot %}
+    <a href = "heroes/{{hero.machine_name}}">
+    <img src="{{ hero.thumbshot.url}}">
+        
+    {% endif %}
+    {% comment %}
+        {{ hero.name }}
+    {% endcomment %}
+</a>
+
+{% endfor %}
+</div>
+
+{% endblock %}

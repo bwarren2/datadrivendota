@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% comment %}
+Main page to authenticate users
+{% endcomment %}
+
+{% block title %}
+Login!
+{%endblock title %}
+
+{% block page_title %}
+This is a login page
+{%endblock page_title %}
+
+
+{% block content %}
+
+
+Login with <a href="{% url 'socialauth_begin' 'steam' %}">Steam</a>
+<section>
+<form method='POST' action='.'>
+    {% csrf_token %}
+    <p>
+        <label for="id_username">Username:</label>
+        {{form.username}}
+    </p>
+    <p>
+        <label for="id_password">Password:</label>
+        {{form.password}}
+    </p>
+    {% if next %}
+        <input type='hidden' name='next' value='{{next}}'/>
+    {% else %}
+        <input type='hidden' name='next' value='/'>  
+    {% endif %}
+        <input type='submit' value='login'>
+
+</form>
+</section>
+{%endblock content %}

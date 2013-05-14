@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ hero.name }}{% endblock %}
+
+{% block page_title %}{% endblock %}
+
+{% block extra_css %}
+    <style type="text/css">
+    img {
+  float: right;
+  margin: 0 0 1em 1em;
+}
+.lore{
+    font-style: italic;
+}</style>
+{% endblock extra_css %}
+
+
+{% block content %}
+<h1>{{ hero.name }}</h1>
+<img src='{{ hero.mugshot.url }}'</img>
+<p class="lore">
+    {{ hero.lore }}
+</p>
+{% endblock %}
