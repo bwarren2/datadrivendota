@@ -5,7 +5,6 @@ from os.path import join, normpath
 from base import *
 
 
-INSTALLED_APPS += ('django.contrib.admin',)
 ########## DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = True
