@@ -71,7 +71,7 @@ def generateChart(hero_name_list, stats_list):
 
     #Make a file
     imagefile = File(open(settings.MEDIA_ROOT+'/temp/file2.png', 'w'))
-    grdevices.png(file=imagefile.name)
+    grdevices.bitmap(file=imagefile.name)
     robjects.r("""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
                 auto.key=T,pch=2,cex=3,lwd=4,scales=list(y=list(relation='free'))
