@@ -49,6 +49,8 @@ EMAIL_USE_TLS = True
 SERVER_EMAIL = EMAIL_HOST_USER
 ########## END EMAIL CONFIGURATION
 
+###Setting allowed hosts for security.  Only needed when debug = false
+ALLOWED_HOSTS = ['datadrivendota.herokuapp.com']
 
 ########## DATABASE CONFIGURATION
 """DATABASES = {}"""
