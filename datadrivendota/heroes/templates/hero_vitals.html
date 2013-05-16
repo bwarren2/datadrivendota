@@ -1,5 +1,5 @@
 {% extends "hero_base.html" %}
-{{ form.media }}
+{% block extra_css %}{{ form.media }}{% endblock extra_css %}
 {% block title %}Hero Vital Stats{% endblock title %}
 {% block page_title %}Hero Stat Charts{% endblock page_title %}
 {% block content %}
