@@ -1,3 +1,4 @@
+from uuid import uuid4
 from heroes.models import HeroDossier
 from rpy2 import robjects
 #from rpy2 import rinterface
@@ -70,11 +71,12 @@ def generateChart(hero_name_list, stats_list):
     robjects.r("df.all = cbind(df.all,df.thing)")
 
     #Make a file
-    imagefile = File(open(settings.MEDIA_ROOT+'/temp/file2.png', 'w'))
+    imagefile = File(open(settings.MEDIA_ROOT+'/temp/1d_%s.bmp' % str(uuid4()), 'w'))
     grdevices.bitmap(file=imagefile.name)
     robjects.r("""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
-                auto.key=T,pch=2,cex=3,lwd=4,scales=list(y=list(relation='free'))
+                auto.key=T,pch=2,cex=3,lwd=4,ylab='Value',
+                scales=list(y=list(relation='free'))
                 )
     )""" % "+".join(stats_list))
     #relation='free' in scales for independent axes

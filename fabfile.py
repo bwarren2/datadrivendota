@@ -3,6 +3,11 @@ from fabric.api import local
 
 def hp():
     local('heroku push -b https://github.com/ddollar/heroku-buildpack-multi.git')
+    local(heroku_run(collect_static()))
+
+
+def collect_static():
+    return 'python datadrivendota/manage.py collectstatic'
 
 
 def scrape_valve_heroes():
