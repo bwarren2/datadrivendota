@@ -71,7 +71,7 @@ CACHES = {
 ####STORAGES####
 AWS_ACCESS_KEY_ID = 'AKIAI34PVYFXKMFKILPQ'
 AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'datedrivendota'
+AWS_STORAGE_BUCKET_NAME = 'datadrivendota'
 DEFAULT_FILE_STORAGE = 'datadrivendota.s3utils.MediaRootS3BotoStorage'
 STATICFILES_STORAGE = 'datadrivendota.s3utils.StaticRootS3BotoStorage'
 
