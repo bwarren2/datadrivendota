@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-#from django.core.files import File
+from django.core.files import File
 #from django.conf import settings
 from django.core.files.storage import default_storage
 
@@ -81,7 +81,7 @@ def generateChart(hero_name_list, stats_list):
     file.close()
 
     #Make a file
-    imagefile = default_storage.open('1d_%s.bmp' % str(uuid4()), 'w')
+    imagefile = File(open('1d_%s.bmp' % str(uuid4()), 'w'))
     grdevices.bitmap(file=imagefile.name)
     robjects.r("""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
@@ -93,4 +93,11 @@ def generateChart(hero_name_list, stats_list):
     grdevices.dev_off()
     imagefile.close()
 
-    return imagefile
+    #Try making a new file and sending that to s3
+    s3file = default_storage.open('1d_%s.bmp' % str(uuid4()), 'w')
+    s3file.write(imagefile.read)
+    s3file.close
+
+    imagefile.delete
+
+    return s3file
