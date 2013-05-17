@@ -100,7 +100,7 @@ def generateChart(hero_name_list, stats_list):
     #Try making a new file and sending that to s3
     s3file = default_storage.open('1d_%s.bmp' % str(uuid4()), 'w')
     s3file.write(imagefile2.read())
-    s3file.close
+    s3file.close()
     imagefile2.close()
 
     return s3file
