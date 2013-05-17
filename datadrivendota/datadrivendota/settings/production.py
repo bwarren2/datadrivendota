@@ -69,13 +69,14 @@ CACHES = {
 
 
 ####STORAGES####
-STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_ACCESS_KEY_ID = 'AKIAI34PVYFXKMFKILPQ'
 AWS_SECRET_ACCESS_KEY = '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'
-AWS_STATIC_BUCKET_NAME = 'ddd_static'
-AWS_MEDIA_BUCKET_NAME = 'ddd_media'
-STATIC_S3_URL = 'http://%s.s3.amazonaws.com/' % AWS_STATIC_BUCKET_NAME
-STATIC_URL = STATIC_S3_URL
-MEDIA_S3_URL = 'http://%s.s3.amazonaws.com/' % AWS_MEDIA_BUCKET_NAME
-MEDIA_URL = MEDIA_S3_URL
+AWS_STORAGE_BUCKET_NAME = 'datedrivendota'
+DEFAULT_FILE_STORAGE = 'datadrivendota.s3utils.MediaRootS3BotoStorage'
+STATICFILES_STORAGE = 'datadrivendota.s3utils.StaticRootS3BotoStorage'
+
+S3_URL = 'http://%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+STATIC_DIRECTORY = '/static/'
+MEDIA_DIRECTORY = '/media/'
+STATIC_URL = S3_URL + STATIC_DIRECTORY
+MEDIA_URL = S3_URL + MEDIA_DIRECTORY
