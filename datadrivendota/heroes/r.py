@@ -93,11 +93,14 @@ def generateChart(hero_name_list, stats_list):
     grdevices.dev_off()
     imagefile.close()
 
+    # This is a goofy hack.  I do not know why putting the plot between open
+    # and write does not work here.
+    imagefile2 = open(imagefile.name, 'r')
+
     #Try making a new file and sending that to s3
     s3file = default_storage.open('1d_%s.bmp' % str(uuid4()), 'w')
-    s3file.write(imagefile.read)
+    s3file.write(imagefile2.read())
     s3file.close
-
-    imagefile.delete
+    imagefile2.close()
 
     return s3file
