@@ -1,10 +1,14 @@
 from uuid import uuid4
-from heroes.models import HeroDossier
+
+from django.core.files import File
+from django.conf import settings
+from django.core.files.storage import default_storage
+
 from rpy2 import robjects
 #from rpy2 import rinterface
 from rpy2.robjects.packages import importr
-from django.core.files import File
-from django.conf import settings
+
+from heroes.models import HeroDossier
 
 
 def generateChart(hero_name_list, stats_list):
@@ -71,7 +75,7 @@ def generateChart(hero_name_list, stats_list):
     robjects.r("df.all = cbind(df.all,df.thing)")
 
     #Make a file
-    imagefile = File(open(settings.MEDIA_ROOT+'/temp/1d_%s.bmp' % str(uuid4()), 'w'))
+    imagefile = default_storage.open('/temp/1d_%s.bmp' % str(uuid4()), 'w')
     grdevices.bitmap(file=imagefile.name)
     robjects.r("""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
@@ -81,5 +85,6 @@ def generateChart(hero_name_list, stats_list):
     )""" % "+".join(stats_list))
     #relation='free' in scales for independent axes
     grdevices.dev_off()
+    imagefile.close()
 
     return imagefile

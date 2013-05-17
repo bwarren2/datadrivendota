@@ -12,6 +12,7 @@ from django.core.exceptions import ImproperlyConfigured
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = environ.get('EMAIL_HOST', 'FALSE')
 
+
 def get_env_setting(setting):
     """ Get the environment setting or return exception """
     try:
@@ -69,9 +70,9 @@ CACHES = {
 
 
 ####STORAGES####
-AWS_ACCESS_KEY_ID = 'AKIAI34PVYFXKMFKILPQ'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'datadrivendota'
+AWS_ACCESS_KEY_ID = environ.get('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = environ.get('AWS_SECRET_ACCESS_KEY', '')
+AWS_STORAGE_BUCKET_NAME = environ.get('AWS_STORAGE_BUCKET_NAME', '')
 DEFAULT_FILE_STORAGE = 'datadrivendota.s3utils.MediaRootS3BotoStorage'
 STATICFILES_STORAGE = 'datadrivendota.s3utils.StaticRootS3BotoStorage'
 
