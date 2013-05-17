@@ -8,6 +8,9 @@ from base import *
 # into your settings, but ImproperlyConfigured is an exception.
 from django.core.exceptions import ImproperlyConfigured
 
+########## DEBUG CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
+DEBUG = environ.get('EMAIL_HOST', 'FALSE')
 
 def get_env_setting(setting):
     """ Get the environment setting or return exception """
@@ -19,9 +22,6 @@ def get_env_setting(setting):
 
 INSTALLED_APPS += ('gunicorn',)
 
-########## DEBUG CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = False
 
 ########## EMAIL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
