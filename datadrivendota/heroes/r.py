@@ -75,11 +75,6 @@ def generateChart(hero_name_list, stats_list):
     robjects.r(cmd)
     robjects.r("df.all = cbind(df.all,df.thing)")
 
-    #test AWS
-    file = default_storage.open('storage_test', 'w')
-    file.write('Did a thing')
-    file.close()
-
     #Make a file
     imagefile = File(open('1d_%s.bmp' % str(uuid4()), 'w'))
     grdevices.bitmap(file=imagefile.name)
