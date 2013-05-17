@@ -1,11 +1,10 @@
 from uuid import uuid4
 
-from django.core.files import File
-from django.conf import settings
+#from django.core.files import File
+#from django.conf import settings
 from django.core.files.storage import default_storage
 
 from rpy2 import robjects
-#from rpy2 import rinterface
 from rpy2.robjects.packages import importr
 
 from heroes.models import HeroDossier
@@ -31,6 +30,8 @@ def generateChart(hero_name_list, stats_list):
     # dubbed "base_".  A number inclusive of gains from stat growth is prefixless.
     # Modifiers (from stat points or items, w/e) will go into a "modified_"
     # variable, and final values (for plotting) are "final_")
+    # NOTE: this convention is wrong with the numbers being imported as level 1
+    # right now.
     for hero in selected_heroes:
 
         cmd = """
@@ -73,6 +74,11 @@ def generateChart(hero_name_list, stats_list):
     #print cmd
     robjects.r(cmd)
     robjects.r("df.all = cbind(df.all,df.thing)")
+
+    #test AWS
+    file = default_storage.open('storage_test', 'w')
+    file.write('Did a thing')
+    file.close()
 
     #Make a file
     imagefile = default_storage.open('1d_%s.bmp' % str(uuid4()), 'w')
