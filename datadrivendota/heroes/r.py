@@ -76,8 +76,8 @@ def generateChart(hero_name_list, stats_list):
     robjects.r("df.all = cbind(df.all,df.thing)")
 
     #Make a file
-    imagefile = File(open('1d_%s.bmp' % str(uuid4()), 'w'))
-    grdevices.bitmap(file=imagefile.name)
+    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
+    grdevices.png(file=imagefile.name, type='cairo')
     robjects.r("""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
                 auto.key=T,pch=2,cex=3,lwd=4,ylab='Value',
