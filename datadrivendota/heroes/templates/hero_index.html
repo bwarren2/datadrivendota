@@ -3,17 +3,16 @@
 {% block title %}Hero List{% endblock %}
 {% block page_title %}Hero Index{% endblock %}
 {% block content %}
-<div align='left'>
+<div class "thumbnails">
 {% for hero in hero_list %}
     {% if hero.thumbshot %}
-    <a href = "heroes/{{hero.machine_name}}">
-    <img src="{{ hero.thumbshot.url}}">
-
+    <li class="span1">
+        <a href = "heroes/{{hero.machine_name}}">
+        <img src="{{ hero.thumbshot.url}}">
+        </a>
+    </li>
     {% endif %}
-    {% comment %}
-        {{ hero.name }}
-    {% endcomment %}
-</a>
+
 
 {% endfor %}
 </div>

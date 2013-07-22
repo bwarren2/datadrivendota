@@ -9,10 +9,9 @@
 
     <!-- Le styles -->
     <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
-    <style>
-      body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-      }
+    <!-- Why is that h there?  TO get rid of whitespace at the top.  I do not know why it works.-->
+    <style type="text/css">h
+      body { padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */}
     </style>
     <link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
 
@@ -28,10 +27,9 @@
         then move to project.css -->
     {% block extra_css %}{% endblock extra_css %}
   </head>
-
   <body>
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-static-top">
       <div class="navbar-inner">
         <div class="container">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -41,7 +39,7 @@
           </a>
           <a class="brand" href="/">datadrivendota</a>
           <div class="nav-collapse collapse">
-            <ul class="nav">
+              <ul class="nav">
               <li><a href="/heroes">Heroes</a></li>
               <li><a href="/items">Items</a></li>
               <li><a href="#about">About</a></li>
