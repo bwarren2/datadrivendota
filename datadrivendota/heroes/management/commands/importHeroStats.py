@@ -29,7 +29,7 @@ class Command(BaseCommand):
             url = "http://dotaheroes.herokuapp.com/heroes/all"
             datafile = urllib.urlretrieve(url)[0]
         else:
-            datafile = open(options['source_file'])
+            datafile = options['source_file']
 
         data = json.loads(open(datafile).read())
 
