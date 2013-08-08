@@ -1,6 +1,6 @@
 from django import forms
 from heroes.models import HeroDossier
-#from django.contrib.admin.widgets import FilteredSelectMultiple
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 
 heroes = HeroDossier.objects.all().order_by('hero__name')
@@ -13,5 +13,6 @@ vital_stats = [(item, item) for item in vital_stats]
 
 class HeroVitalsMultiSelect(forms.Form):
 
-    heroes = forms.MultipleChoiceField(choices=hero_list)
-    stats = forms.MultipleChoiceField(choices=vital_stats)
+    heroes = forms.MultipleChoiceField(choices=hero_list, widget=FilteredSelectMultiple("verbose name", is_stacked=False))
+    stats = forms.MultipleChoiceField(choices=vital_stats, widget=FilteredSelectMultiple("verbose name", is_stacked=False))
+

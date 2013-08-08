@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import HeroVitalsMultiSelect
 from .r import generateChart
 
+
 def index(request):
     hero_list = Hero.objects.all().order_by('name')
 

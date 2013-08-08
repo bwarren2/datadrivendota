@@ -19,7 +19,6 @@ class Match(models.Model):
     first_blood_time = models.IntegerField()
     human_players = models.IntegerField()
     league_id = models.IntegerField()
-    season = models.IntegerField()
     positive_votes = models.IntegerField()
     negative_votes = models.IntegerField()
     lobby_type = models.ForeignKey('LobbyType', help_text='How the game was queued')
@@ -82,13 +81,18 @@ class PlayerMatchSummary(models.Model):
     tower_damage = models.IntegerField()
     hero_healing = models.IntegerField()
     level = models.IntegerField()
+    is_win = models.BooleanField()
 
-    def is_win(self):
+    def save(self, *args, **kwargs):
+        self.is_win = self.determine_win()
+        super(PlayerMatchSummary, self).save(*args, **kwargs)
+
+    def determine_win(self):
         """Tells you whether this player was on the winning side of the match.
         5 is a magic number because the left-most bit being set in the returned
         data indicated that the player was dire, the right most bits indicating
-        position (0-4).
-        """
+        position (0-4)."""
+
         if self.match.radiant_win is True and self.player_slot < 5:
             return True
         if self.match.radiant_win is False and self.player_slot > 5:

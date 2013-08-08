@@ -7,6 +7,22 @@ from sys import path
 
 import dj_database_url
 
+#Celery
+import djcelery
+djcelery.setup_loader()
+
+#BROKER_URL = 'amqp://'+getenv('RABBITMQ_USER')+':'+getenv('RABBITMQ_PASS')+'@localhost//'+getenv('RABBITMQ_VHOST')
+BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+# List of modules to import when celery starts.
+CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls", "matches.management.tasks.celeryexperiment",)
+
+## Using the database to store task state and results.
+CELERY_RESULT_BACKEND = "amqp"
+CELERY_RESULT_DBURI = "ampq:///datadrivendota.db"
+
+#CELERY_ANNOTATIONS = {"tasks.add": {"rate_limit": "10/s"}}
+
+
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
 DJANGO_ROOT = dirname(dirname(abspath(__file__)))
@@ -189,6 +205,7 @@ THIRD_PARTY_APPS = (
     'south',
     'social_auth',
     'storages',
+    'djcelery',
 )
 
 # Apps specific for this project go here.

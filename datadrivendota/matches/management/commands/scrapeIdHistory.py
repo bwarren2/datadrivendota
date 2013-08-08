@@ -20,6 +20,7 @@ class Command(BaseCommand):
                 dest='steam_id',
                 default='0',
                 help='The Steam ID to get the match history for.'),
+
     make_option('--startingMatch',
                 action='store',
                 dest='starting_match',
@@ -43,8 +44,7 @@ class Command(BaseCommand):
 
             URL = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?' + \
                 urlencode(optionsDict)
-            print URL
-            exit
+
             #slow things down for the API call regs
             time.sleep(1)
             data = json.loads(urllib2.urlopen(URL).read())['result']
