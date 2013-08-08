@@ -11,7 +11,7 @@ import dj_database_url
 import djcelery
 djcelery.setup_loader()
 
-BROKER_POOL_LIMIT = getenv('BROKER_POOL_LIMIT', 1)
+BROKER_POOL_LIMIT = int(getenv('BROKER_POOL_LIMIT', 1))
 #BROKER_URL = 'amqp://'+getenv('RABBITMQ_USER')+':'+getenv('RABBITMQ_PASS')+'@localhost//'+getenv('RABBITMQ_VHOST')
 BROKER_URL = getenv('CLOUDAMQP_URL')
 
