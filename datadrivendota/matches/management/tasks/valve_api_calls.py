@@ -68,7 +68,7 @@ def valve_api_call(mode, optionsDict={}):
     return data
 
 @task
-def retreive_player_records(urldata):
+def retrieve_player_records(urldata):
         """
         Recursively pings the valve API and spawns new tasks to deal with the
         downloaded match IDs.
@@ -88,7 +88,7 @@ def retreive_player_records(urldata):
 
         if urldata['results_remaining'] != 0:
             chain(valve_api_call.s('GetMatchHistory',optionsDict), \
-                  retreive_player_records.s()).delay()
+                  retrieve_player_records.s()).delay()
 
         if urldata['status'] != 1:
             raise Exception("No Data for that call")
@@ -133,56 +133,56 @@ def upload_match(data):
 
 @task
 def upload_match_summary(players, parent_match):
-        """
-        Populates the endgame summary data that is associated with a match
-        and invokes the build parser.  This needs to be fixed for players that
-        unanonymize by checking on hero_slot, ignoring steam_user, and updating
-        if new data has been included (in particular, which steamuser we are
-        talking about).
-        """
-        for player in players:
-            kwargs = {
-                'match': parent_match,
-                'steam_user': SteamUser.objects.get_or_create(
-                    steam_id=player['account_id'])[0],
-                'leaver': LeaverStatus.objects.get_or_create(
-                    steam_id=player['leaver_status'])[0],
-                'player_slot': player['player_slot'],
-                'hero': Hero.objects.get_or_create(
-                    steam_id=player['hero_id'])[0],
-                'item_0': player['item_0'],
-                'item_1': player['item_1'],
-                'item_2': player['item_2'],
-                'item_3': player['item_3'],
-                'item_4': player['item_4'],
-                'item_5': player['item_5'],
-                'kills': player['kills'],
-                'deaths': player['deaths'],
-                'assists': player['assists'],
-                'gold': player['gold'],
-                'last_hits': player['last_hits'],
-                'denies': player['denies'],
-                'gold_per_min': player['gold_per_min'],
-                'xp_per_min': player['xp_per_min'],
-                'gold_spent': player['gold_spent'],
-                'hero_damage': player['hero_damage'],
-                'tower_damage': player['tower_damage'],
-                'hero_healing': player['hero_healing'],
-                'level': player['level'],
-            }
-            playermatchsummary = PlayerMatchSummary.objects.get_or_create(**kwargs)[0]
+    """
+    Populates the endgame summary data that is associated with a match
+    and invokes the build parser.  This needs to be fixed for players that
+    unanonymize by checking on hero_slot, ignoring steam_user, and updating
+    if new data has been included (in particular, which steamuser we are
+    talking about).
+    """
+    for player in players:
+        kwargs = {
+            'match': parent_match,
+            'steam_user': SteamUser.objects.get_or_create(
+                steam_id=player['account_id'])[0],
+            'leaver': LeaverStatus.objects.get_or_create(
+                steam_id=player['leaver_status'])[0],
+            'player_slot': player['player_slot'],
+            'hero': Hero.objects.get_or_create(
+                steam_id=player['hero_id'])[0],
+            'item_0': player['item_0'],
+            'item_1': player['item_1'],
+            'item_2': player['item_2'],
+            'item_3': player['item_3'],
+            'item_4': player['item_4'],
+            'item_5': player['item_5'],
+            'kills': player['kills'],
+            'deaths': player['deaths'],
+            'assists': player['assists'],
+            'gold': player['gold'],
+            'last_hits': player['last_hits'],
+            'denies': player['denies'],
+            'gold_per_min': player['gold_per_min'],
+            'xp_per_min': player['xp_per_min'],
+            'gold_spent': player['gold_spent'],
+            'hero_damage': player['hero_damage'],
+            'tower_damage': player['tower_damage'],
+            'hero_healing': player['hero_healing'],
+            'level': player['level'],
+        }
+        playermatchsummary = PlayerMatchSummary.objects.get_or_create(**kwargs)[0]
 
-            if 'ability_upgrades' in player.keys():
-                for skillpick in player['ability_upgrades']:
-                    kwargs = {
-                        'player_match_summary': playermatchsummary,
-                        'ability': Ability.objects.get_or_create(steam_id=
-                        skillpick['ability'])[0],
-                        'time': skillpick['time'],
-                        'level': skillpick['level'],
-                    }
-                    SkillBuild.objects.get_or_create(**kwargs)
-        print "Finished a replay"
+        if 'ability_upgrades' in player.keys():
+            for skillpick in player['ability_upgrades']:
+                kwargs = {
+                    'player_match_summary': playermatchsummary,
+                    'ability': Ability.objects.get_or_create(steam_id=
+                    skillpick['ability'])[0],
+                    'time': skillpick['time'],
+                    'level': skillpick['level'],
+                }
+                SkillBuild.objects.get_or_create(**kwargs)
+    print "Finished a replay"
 
 def exceptionPrint(str):
     print str

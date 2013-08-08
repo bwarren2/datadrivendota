@@ -13,7 +13,7 @@ djcelery.setup_loader()
 
 BROKER_POOL_LIMIT = 1
 #BROKER_URL = 'amqp://'+getenv('RABBITMQ_USER')+':'+getenv('RABBITMQ_PASS')+'@localhost//'+getenv('RABBITMQ_VHOST')
-BROKER_URL = getenv('CLOUDAMQP_URL:')
+BROKER_URL = getenv('CLOUDAMQP_URL')
 
 # List of modules to import when celery starts.
 CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls", "matches.management.tasks.celeryexperiment",)
