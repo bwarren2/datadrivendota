@@ -3,7 +3,7 @@ from matches.models import Match, LobbyType, GameMode,\
 from datadrivendota.settings.base import STEAM_API_KEY
 from steamusers.models import SteamUser
 from heroes.models import Ability, Hero
-
+from settings.base import VALVE_RATE
 
 import urllib2
 import json
@@ -14,7 +14,7 @@ from celery import task, chain
 #from heroes.models import Ability, Hero
 
 
-@task(rate_limit='1/s')
+@task(rate_limit=VALVE_RATE)
 def valve_api_call(mode, optionsDict={}):
     """ Ping the valve API for downloading results.  Only enumeratd modes are
     acceptable; check the code.  There is a natural rate limit here at 1/s
@@ -57,6 +57,9 @@ def valve_api_call(mode, optionsDict={}):
             exceptionPrint(error)
         if err.code == 500:
             error = "Server Error! "+URL
+            exceptionPrint(error)
+        if err.code == 503:
+            error = "Server busy or limit exceeded "+URL
             exceptionPrint(error)
 
     # If everything is kosher, import the result and return it.

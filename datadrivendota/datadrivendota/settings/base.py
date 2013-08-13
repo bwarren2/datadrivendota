@@ -22,8 +22,8 @@ CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls", "matches.managemen
 CELERY_RESULT_BACKEND = "amqp"
 CELERY_RESULT_DBURI = "ampq:///datadrivendota.db"
 
-#CELERY_ANNOTATIONS = {"tasks.add": {"rate_limit": "10/s"}}
-
+# Valve's rate limiting.
+VALVE_RATE=getenv('VALVE_RATE')
 
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
