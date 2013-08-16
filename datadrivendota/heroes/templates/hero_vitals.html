@@ -4,14 +4,17 @@
 {% block page_title %}Hero Stat Charts{% endblock page_title %}
 {% block content %}
     <div>
+    <div style='float:left'>
     <form action="" method='POST'>
         {% csrf_token %}
         {{ form }}
+        <br>
         <input type='submit' value='Submit'>
     </form>
     </div>
     {% if image %}
         <img src="{{MEDIA_URL}}{{imagebase}}">
     {% endif %}
+    </div>
 {% endblock content %}
 
