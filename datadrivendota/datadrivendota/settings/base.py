@@ -25,6 +25,7 @@ CELERY_RESULT_DBURI = "ampq:///datadrivendota.db"
 # Valve's rate limiting.
 VALVE_RATE=getenv('VALVE_RATE')
 
+
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
 DJANGO_ROOT = dirname(dirname(abspath(__file__)))

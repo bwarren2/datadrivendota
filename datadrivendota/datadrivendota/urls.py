@@ -11,6 +11,8 @@ urlpatterns = patterns('',
     url(r'^/?$', views.base, name='base'),
     url(r'^heroes/?', include('heroes.urls')),
     url(r'^items/?', include('items.urls')),
+    url(r'^matches/?', include('matches.urls')),
+
     #url(r'^/?$', TemplateView.as_view(template_name='base.html')),
     # Examples:
     # url(r'^$', 'datadrivendota.views.home', name='home'),

@@ -1,4 +1,5 @@
 #from django.views.generic.detail import DetailView
+from os.path import basename
 from django.shortcuts import get_object_or_404, render_to_response
 from .models import Hero
 from django.utils.text import slugify
@@ -34,17 +35,15 @@ def vitals(request):
             hero_list = hero_form.data.getlist('heroes')
             stat_list = hero_form.data.getlist('stats')
             image = generateChart(hero_list, stat_list)
-
-            from os.path import basename
-            basename = basename(image.name)
+            imagebase = basename(image.name)
 
     else:
         hero_form = HeroVitalsMultiSelect()
         hero_list = []
         image = ''
-        basename = ''
+        imagebase = ''
 
     return render_to_response('hero_vitals.html', {'form': hero_form,
                               'hero_list': hero_list, 'image': image,
-                              'basename': basename},
+                              'imagebase': imagebase},
                               context_instance=RequestContext(request))
