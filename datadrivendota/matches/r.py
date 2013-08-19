@@ -35,6 +35,10 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
         x_vector_list = [summary.match.duration/60.0 for summary in selected_summaries]
         #60 seconds in a minute
         xlab='Game length (m)'
+    elif x_var[0]=='K-D+.5*A':
+        x_vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in selected_summaries]
+        xlab='Kills - Death + .5*Assists'
+
     else:
         x_vector_list = [getattr(summary, x_var[0]) for summary in selected_summaries]
         xlab=x_var[0]
@@ -87,7 +91,6 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
                 scales=list(y=list(relation='free'))
                 )
     )"""% (grouplab, ylab, xlab)
-    print rcmd
     robjects.r(rcmd )
 
 
