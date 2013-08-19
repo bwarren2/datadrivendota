@@ -4,25 +4,27 @@ from django.core.files.storage import default_storage
 from rpy2 import robjects
 from rpy2.robjects import Formula, FloatVector, StrVector
 from rpy2.robjects.packages import importr
-from matches.models import PlayerMatchSummary
+from matches.models import PlayerMatchSummary, GameMode
 from steamusers.models import SteamUser
 
 
-def EndgameChart(player_list,x_var,y_var,split_var,group_var):
+def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
 
     player_obj_list = []
     for id in player_list:
         player_obj_list.append(SteamUser.objects.get(steam_id=id))
 
+    game_mode_list = []
+    for id in mode_list:
+        game_mode_list.append(GameMode.objects.get(steam_id=id))
     grdevices = importr('grDevices')
 
     #rprint = robjects.globalenv.get("print")
 
     lattice = importr('lattice')
 
-    selected_summaries = PlayerMatchSummary.objects.select_related().filter(steam_user__in=player_obj_list)
-
+    selected_summaries = PlayerMatchSummary.objects.select_related().filter(steam_user__in=player_obj_list,match__game_mode__in=game_mode_list)
     cmd = """
         df.all = data.frame(
             )
@@ -69,13 +71,7 @@ def EndgameChart(player_list,x_var,y_var,split_var,group_var):
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
-    """
-    formula = Formula('yvec ~ xvec | splitvar')
-    formula.getenvironment()['yvec'] = y_vec
-    formula.getenvironment()['xvec'] = x_vec
-    formula.getenvironment()['splitvar'] = StrVector(split_vector_list)
-    p = lattice.xyplot(formula,xlab=xlab,ylab=ylab,groups=group_vector_list)
-"""
+
     robjects.globalenv["xvec"] = x_vec
     robjects.globalenv["yvec"] = y_vec
     robjects.globalenv["splitvar"] = StrVector(split_vector_list)

@@ -1,6 +1,5 @@
 from django import forms
 from heroes.models import HeroDossier
-from django.contrib.admin.widgets import FilteredSelectMultiple
 
 
 heroes = HeroDossier.objects.all().order_by('hero__name')

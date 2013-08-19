@@ -1,7 +1,10 @@
 from django import forms
 from django.db.models import Q
 from steamusers.models import SteamUser
+from matches.models import GameMode
 
+game_modes = GameMode.objects.all()
+game_mode_choices = [(gm.steam_id, gm.description) for gm in game_modes]
 users = SteamUser.objects.filter(Q(steam_id=66289584)| #Me
                                  Q(steam_id=68083913)| #Nath
                                  Q(steam_id=85045426)| #mig
@@ -26,6 +29,7 @@ doubled_param_list = [(item,item) for item in split_params]
 
 class EndgameSelect(forms.Form):
     players = forms.MultipleChoiceField(choices=user_list, required=True)
+    game_modes = forms.MultipleChoiceField(choices=game_mode_choices, required=True)
     x_var = forms.ChoiceField(choices=x_list, required=True)
     y_var = forms.ChoiceField(choices=y_list, required=True)
     split_var = forms.ChoiceField(choices=doubled_param_list, required=True)
