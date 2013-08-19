@@ -81,7 +81,7 @@ def generateChart(hero_name_list, stats_list):
     robjects.r("""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
                 auto.key=list(lines=T,points=F,space='right'),
-                par.settings=simpleTheme(cex=3,lwd=4,col=rainbow(n=length(unique(df.all$hero)))),
+                par.settings=simpleTheme(lwd=4,col=rainbow(n=length(unique(df.all$hero)))),
                 ylab='Value',
                 scales=list(y=list(relation='free'))
                 )

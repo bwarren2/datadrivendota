@@ -35,7 +35,7 @@ def EndgameChart(player_list,x_var,y_var,split_var,group_var):
         xlab='Game length (m)'
     else:
         x_vector_list = [getattr(summary, x_var[0]) for summary in selected_summaries]
-        xlab=x_var
+        xlab=x_var[0]
 
 
     if y_var[0]=='K-D+.5*A':
@@ -44,7 +44,7 @@ def EndgameChart(player_list,x_var,y_var,split_var,group_var):
 
     else:
         y_vector_list = [getattr(summary, y_var[0]) for summary in selected_summaries]
-        ylab=y_var
+        ylab=y_var[0]
 
 
     x_vec = FloatVector(x_vector_list)
@@ -58,13 +58,13 @@ def EndgameChart(player_list,x_var,y_var,split_var,group_var):
     else:
         split_vector_list = [summary.match.game_mode.description for summary in selected_summaries]
 
-
     if group_var[0] == 'player':
         group_vector_list = [summary.steam_user.steam_id for summary in selected_summaries]
     elif group_var[0] == 'is_win':
         group_vector_list = [summary.is_win for summary in selected_summaries]
     else:
         group_vector_list = [summary.match.game_mode.description for summary in selected_summaries]
+    grouplab=group_var[0]
 
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
@@ -81,14 +81,18 @@ def EndgameChart(player_list,x_var,y_var,split_var,group_var):
     robjects.globalenv["splitvar"] = StrVector(split_vector_list)
     robjects.globalenv["groupvar"] = StrVector(group_vector_list)
 
-    robjects.r("""print(
+    rcmd="""print(
         xyplot(yvec~xvec|splitvar,groups=groupvar,type=c('p','r'),
-                auto.key=list(rectangles=F,points=T,lines=T,space='right'),
-                ylab='Value',
-                par.settings=simpleTheme(pch=20,lwd=4,col=rainbow(n=length(unique(groupvar)))),
+                auto.key=list(rectangles=F,points=T,lines=T,space='right',title='%s'),
+                ylab='%s',xlab='%s',
+                par.settings=simpleTheme(pch=20,lwd=4,
+                    col=rainbow(n=length(unique(groupvar))),
+                    ),
                 scales=list(y=list(relation='free'))
                 )
-    )""")
+    )"""% (grouplab, ylab, xlab)
+    print rcmd
+    robjects.r(rcmd )
 
 
     grdevices.dev_off()
