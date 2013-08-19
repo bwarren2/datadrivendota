@@ -77,10 +77,12 @@ def generateChart(hero_name_list, stats_list):
 
     #Make a file
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo')
+    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
     robjects.r("""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
-                auto.key=T,pch=2,cex=3,lwd=4,ylab='Value',
+                auto.key=list(lines=T,points=F,space='right'),
+                par.settings=simpleTheme(cex=3,lwd=4,col=rainbow(n=length(unique(df.all$hero)))),
+                ylab='Value',
                 scales=list(y=list(relation='free'))
                 )
     )""" % "+".join(stats_list))

@@ -37,8 +37,15 @@ def EndgameChart(player_list,x_var,y_var,split_var,group_var):
         x_vector_list = [getattr(summary, x_var[0]) for summary in selected_summaries]
         xlab=x_var
 
-    y_vector_list = [getattr(summary, y_var[0]) for summary in selected_summaries]
-    ylab=y_var
+
+    if y_var[0]=='K-D+.5*A':
+        y_vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in selected_summaries]
+        ylab='Kills - Death + .5*Assists'
+
+    else:
+        y_vector_list = [getattr(summary, y_var[0]) for summary in selected_summaries]
+        ylab=y_var
+
 
     x_vec = FloatVector(x_vector_list)
     y_vec = FloatVector(y_vector_list)
@@ -61,7 +68,7 @@ def EndgameChart(player_list,x_var,y_var,split_var,group_var):
 
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo')
+    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
     """
     formula = Formula('yvec ~ xvec | splitvar')
     formula.getenvironment()['yvec'] = y_vec
@@ -76,7 +83,9 @@ def EndgameChart(player_list,x_var,y_var,split_var,group_var):
 
     robjects.r("""print(
         xyplot(yvec~xvec|splitvar,groups=groupvar,type=c('p','r'),
-                auto.key=T,ylab='Value',pch=20,lwd=2,
+                auto.key=list(rectangles=F,points=T,lines=T,space='right'),
+                ylab='Value',
+                par.settings=simpleTheme(pch=20,lwd=4,col=rainbow(n=length(unique(groupvar)))),
                 scales=list(y=list(relation='free'))
                 )
     )""")

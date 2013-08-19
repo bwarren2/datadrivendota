@@ -28,15 +28,16 @@ def detail(request, hero_name):
 def vitals(request):
 
     if request.method == 'POST':
-
         hero_form = HeroVitalsMultiSelect(request.POST)
-
-        if hero_form.is_valid:
-            hero_list = hero_form.data.getlist('heroes')
-            stat_list = hero_form.data.getlist('stats')
-            image = generateChart(hero_list, stat_list)
-            imagebase = basename(image.name)
-
+        if HeroVitalsMultiSelect(request.POST).is_valid():
+          hero_list = hero_form.data.getlist('heroes')
+          stat_list = hero_form.data.getlist('stats')
+          image = generateChart(hero_list, stat_list)
+          imagebase = basename(image.name)
+        else:
+          hero_list = []
+          image = ''
+          imagebase = ''
     else:
         hero_form = HeroVitalsMultiSelect()
         hero_list = []

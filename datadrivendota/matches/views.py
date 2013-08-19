@@ -14,8 +14,7 @@ def index(request):
 def endgame(request):
     if request.method == 'POST':
         select_form = EndgameSelect(request.POST)
-        if select_form.is_valid:
-
+        if select_form.is_valid():
             player_list = select_form.data.getlist('players')
             x_var = select_form.data.getlist('x_var')
             y_var = select_form.data.getlist('y_var')
@@ -23,6 +22,14 @@ def endgame(request):
             group_var = select_form.data.getlist('group_var')
             image = EndgameChart(player_list,x_var,y_var,split_var,group_var)
             imagebase = basename(image.name)
+        else:
+            image = ''
+            imagebase = ''
+            player_list = ''
+            x_var = ''
+            y_var = ''
+            split_var = ''
+            group_var = ''
 
     else:
         select_form = EndgameSelect()

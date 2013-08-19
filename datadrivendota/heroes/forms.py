@@ -13,6 +13,6 @@ vital_stats = [(item, item) for item in vital_stats]
 
 class HeroVitalsMultiSelect(forms.Form):
 
-    heroes = forms.MultipleChoiceField(choices=hero_list, widget=FilteredSelectMultiple("verbose name", is_stacked=False))
-    stats = forms.MultipleChoiceField(choices=vital_stats, widget=FilteredSelectMultiple("verbose name", is_stacked=False))
+    heroes = forms.MultipleChoiceField(choices=hero_list, required=True)
+    stats = forms.MultipleChoiceField(choices=vital_stats, required=True)
 

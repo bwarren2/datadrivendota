@@ -12,17 +12,21 @@ user_list = [(66289584,'Ben: 66289584'),
              (68083913,'Nath: 68083913'),
              (85045426,'Mig: 85045426'),
              (103611462,'Meg: 103611462')]
-parameters = ['duration','kills','deaths','assists','gold',
+shared_parameters = ['kills','deaths','assists','gold',
               'last_hits','denies','hero_damage','tower_damage','hero_healing',
-              'level','is_win']
-doubled_list = [(item, item) for item in parameters]
+              'level','K-D+.5*A']
+x_parameters = list(shared_parameters)
+x_parameters.insert(0,'duration')
+
+x_list = [(item, item) for item in x_parameters]
+y_list = [(item, item) for item in shared_parameters]
 
 split_params = ['player','is_win','game_mode']
 doubled_param_list = [(item,item) for item in split_params]
 
 class EndgameSelect(forms.Form):
-    players = forms.MultipleChoiceField(choices=user_list)
-    x_var = forms.ChoiceField(choices=doubled_list)
-    y_var = forms.ChoiceField(choices=doubled_list)
-    split_var = forms.ChoiceField(choices=doubled_param_list)
-    group_var = forms.ChoiceField(choices=doubled_param_list)
+    players = forms.MultipleChoiceField(choices=user_list, required=True)
+    x_var = forms.ChoiceField(choices=x_list, required=True)
+    y_var = forms.ChoiceField(choices=y_list, required=True)
+    split_var = forms.ChoiceField(choices=doubled_param_list, required=True)
+    group_var = forms.ChoiceField(choices=doubled_param_list, required=True)
