@@ -22,6 +22,9 @@ CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls", "matches.managemen
 CELERY_RESULT_BACKEND = "amqp"
 CELERY_RESULT_DBURI = "ampq:///datadrivendota.db"
 
+#Stop a bazillion fake queues from being made with results.  Time in sec.
+CELERY_AMQP_TASK_RESULT_EXPIRES = 600
+
 # Valve's rate limiting.
 VALVE_RATE=getenv('VALVE_RATE')
 
