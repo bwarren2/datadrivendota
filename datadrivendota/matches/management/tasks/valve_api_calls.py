@@ -41,7 +41,7 @@ def valve_api_call(mode, optionsDict={}):
         raise KeyError('That mode ('+str(mode)+") is not supported")
 
     URL = url + '?' + urlencode(optionsDict)
-    print URL
+
     # Exception handling for the URL opening.
     try:
         pageaccess = urllib2.urlopen(URL)
