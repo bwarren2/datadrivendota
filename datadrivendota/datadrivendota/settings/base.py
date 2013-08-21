@@ -16,15 +16,15 @@ BROKER_POOL_LIMIT = int(getenv('BROKER_POOL_LIMIT', 1))
 BROKER_URL = getenv('CLOUDAMQP_URL')
 
 # List of modules to import when celery starts.
-CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls", "matches.management.tasks.celeryexperiment",)
+CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls",)
 
 ## Using the database to store task state and results.
 CELERY_RESULT_BACKEND = "amqp"
 CELERY_RESULT_DBURI = "ampq:///datadrivendota.db"
 
 #Stop a bazillion fake queues from being made with results.  Time in sec.
-CELERY_AMQP_TASK_RESULT_EXPIRES = 600
-
+CELERY_AMQP_TASK_RESULT_EXPIRES = int(getenv('AMQP_EXPIRY_RATE'))
+CELERY_TASK_RESULT_EXPIRES = CELERY_AMQP_TASK_RESULT_EXPIRES
 # Valve's rate limiting.
 VALVE_RATE=getenv('VALVE_RATE')
 
@@ -277,6 +277,10 @@ AUTHENTICATION_BACKENDS = (
 LOGIN_REDIRECT_URL = '/'
 
 STEAM_API_KEY = getenv('STEAM_API_KEY')
+# This is valve's magic number for moving between 32 and 64 bit steam ids.
+ADDER_32_BIT = 76561197960265728
+#This is Valve's ID for anonymized players
+ANONYMOUS_ID = 4294967295
 
 SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.social.social_auth_user',

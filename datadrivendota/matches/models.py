@@ -4,7 +4,7 @@ from django.db import models
 # Create your models here.
 class Match(models.Model):
 
-    match_id = models.IntegerField(help_text="Valve's id field", unique=True, )
+    match_id = models.IntegerField(help_text="Valve's id field", unique=True)
     match_seq_num = models.IntegerField(help_text="ID valve's play sequence")
     cluster = models.IntegerField()
     start_time = models.IntegerField(help_text='Start time in UTC seconds')

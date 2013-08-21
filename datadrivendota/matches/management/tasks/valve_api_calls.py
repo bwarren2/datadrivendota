@@ -3,13 +3,14 @@ from matches.models import Match, LobbyType, GameMode,\
 from datadrivendota.settings.base import STEAM_API_KEY
 from steamusers.models import SteamUser
 from heroes.models import Ability, Hero
-from settings.base import VALVE_RATE
+from settings.base import VALVE_RATE, ADDER_32_BIT
 
 import urllib2
 import json
 from urllib import urlencode
 from celery import task, chain
 
+from httplib import BadStatusLine
 #from steamusers.models import SteamUser
 #from heroes.models import Ability, Hero
 
@@ -49,21 +50,27 @@ def valve_api_call(mode, optionsDict={}):
         if err.code == 404:
             error = "Page not found! "+URL
             exceptionPrint(error)
-        if err.code == 403:
+        elif err.code == 403:
             error = "Your access was denied. "+URL
             exceptionPrint(error)
-        if err.code == 401:
+        elif err.code == 401:
             error =  "Unauth'd! "+URL
             exceptionPrint(error)
-        if err.code == 500:
+        elif err.code == 500:
             error = "Server Error! "+URL
             exceptionPrint(error)
-        if err.code == 503:
+        elif err.code == 503:
             error = "Server busy or limit exceeded "+URL
             exceptionPrint(error)
+        else:
+            error = "Got error "+str(err)+" with URL "+URL
+            exceptionPrint(error)
+    except BadStatusLine:
+        error = "Bad status line for url %s" % URL
+        exceptionPrint(error)
 
     # If everything is kosher, import the result and return it.
-    data = json.loads(pageaccess.read())['result']
+    data = json.loads(pageaccess.read())
     # Append the options given so we can tell what the invocation was.
     # For example, it is not straightforward to deduce the calling account_id
     # unless you do this.
@@ -76,9 +83,11 @@ def retrieve_player_records(urldata):
         Recursively pings the valve API and spawns new tasks to deal with the
         downloaded match IDs.
         """
+        optionsGiven = urldata['optionsGiven']
+        urldata = urldata['result']
 
         #The API call needs to know what options to use, in this case acct id.
-        optionsDict = {'account_id': urldata['optionsGiven']['account_id']}
+        optionsDict = {'account_id': optionsGiven['account_id']}
 
         #This function is recursive, and starts at the beginning unless it knows
         #to start in the middle.
@@ -106,6 +115,9 @@ def upload_match(data):
     searching for, see if it is anonymous, update if so" is needed;
     right now this just trawls for overall match data.
     """
+    data = data['result']
+    #optionsGiven = urldata['optionsGiven']
+
     kwargs = {
         'radiant_win': data['radiant_win'],
         'duration': data['duration'],
@@ -186,6 +198,44 @@ def upload_match_summary(players, parent_match):
                 }
                 SkillBuild.objects.get_or_create(**kwargs)
     print "Finished a replay"
+
+@task
+def refresh_updating_steam_users():
+    """ Go through the users for whom update is True and group them into lists
+    of 50.  The profile update API actually supports up to 100"""
+    list_send_length = 50
+    users = SteamUser.objects.filter(updated=True)
+    querylist = []
+
+    for counter, user in enumerate(users, start = 1):
+        id_64_bit =  str(user.get_64_bit_id())
+        querylist.append(id_64_bit)
+
+        # if our list is list_send_length long or we have reached the end
+        if counter % list_send_length == 0 or counter == len(users):
+            steamids = ",".join(querylist)
+            chain(valve_api_call.s('GetPlayerSummaries',\
+                                 {'steamids': steamids}), \
+                  update_steam_users.s()).delay()
+            querylist = []
+
+@task
+def update_steam_users(urldata):
+    """Make the avatar and persona facts of a profile match current."""
+    #This options is present in the return code, but not needed here.
+    #optionsGiven = urldata['optionsGiven']
+    response = urldata['response']
+
+    for player in response['players']:
+        #The PlayerSummaries call returns 64 bit ids.  It is super annoying.
+        id_32bit = int(player['steamid']) - ADDER_32_BIT
+        steam_user = SteamUser.objects.get_or_create(steam_id=id_32bit)[0]
+        steam_user.persona_name = player['personaname']
+        steam_user.profile_url = player['profileurl']
+        steam_user.avatar = player['avatar']
+        steam_user.avatar_medium = player['avatarmedium']
+        steam_user.avatar_full = player['avatarfull']
+        steam_user.save()
 
 def exceptionPrint(str):
     print str
