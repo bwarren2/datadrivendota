@@ -3,7 +3,7 @@ from .validators import validate_32bit
 from settings.base import ADDER_32_BIT, ANONYMOUS_ID
 
 # Create your models here.
-class SteamUser(models.Model):
+class Player(models.Model):
     steam_id = models.BigIntegerField(help_text="Valve's internal map",
                unique=True, validators=[validate_32bit])
     persona_name = models.TextField(help_text='Your name on steam')
@@ -18,7 +18,7 @@ class SteamUser(models.Model):
         # That magic number is the valve 32bit -64bit adder.
         # Steam ids are 32 bit by convention.
         self.steam_id = self.steam_id % ADDER_32_BIT
-        super(SteamUser, self).save(*args, **kwargs)
+        super(Player, self).save(*args, **kwargs)
 
     def is_masked(self):
         #That's the magic number for anonymous data

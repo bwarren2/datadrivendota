@@ -31,9 +31,9 @@
     <tbody>
     {% for summary in summaries %}
         <tr style='background-color:{{summary.color}}; outline: thin solid {{summary.win_color}}'>
-            <td>{{summary.steam_user.steam_id}}</td>
-            <td><img src="{{summary.steam_user.avatar}}"></td>
-            <td>{{summary.steam_user.persona_name}}</td>
+            <td>{{summary.player.steam_id}}</td>
+            <td><img src="{{summary.player.avatar}}"></td>
+            <td>{{summary.player.persona_name}}</td>
             <td>{{summary.kills}}</td>
             <td>{{summary.deaths}}</td>
             <td>{{summary.assists}}</td>

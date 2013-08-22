@@ -8,7 +8,7 @@ from .models import Match, PlayerMatchSummary
 # Create your views here.
 
 def match(request, match_id):
-    match = get_object_or_404(Match, match_id=match_id)
+    match = get_object_or_404(Match, steam_id=match_id)
     summaries = get_list_or_404(PlayerMatchSummary, match=match)
     for summary in summaries:
         summary.kda = summary.kills - summary.deaths + .5*summary.assists

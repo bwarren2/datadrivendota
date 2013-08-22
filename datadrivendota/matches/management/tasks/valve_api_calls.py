@@ -1,7 +1,7 @@
 from matches.models import Match, LobbyType, GameMode,\
  LeaverStatus, PlayerMatchSummary, SkillBuild
 from datadrivendota.settings.base import STEAM_API_KEY
-from steamusers.models import SteamUser
+from players.models import Player
 from heroes.models import Ability, Hero
 from settings.base import VALVE_RATE, ADDER_32_BIT
 
@@ -11,7 +11,6 @@ from urllib import urlencode
 from celery import task, chain
 
 from httplib import BadStatusLine
-#from steamusers.models import SteamUser
 #from heroes.models import Ability, Hero
 
 
@@ -122,7 +121,7 @@ def upload_match(data):
         'radiant_win': data['radiant_win'],
         'duration': data['duration'],
         'start_time': data['start_time'],
-        'match_id': data['match_id'],
+        'steam_id': data['match_id'],
         'match_seq_num': data['match_seq_num'],
         'tower_status_radiant': data['tower_status_radiant'],
         'tower_status_dire': data['tower_status_dire'],
@@ -139,7 +138,7 @@ def upload_match(data):
     }
 
     try:
-        match = Match.objects.get(match_id=data['match_id'])
+        match = Match.objects.get(steam_id=data['match_id'])
     except Match.DoesNotExist:
         match = Match.objects.create(**kwargs)
         match.save()
@@ -151,14 +150,14 @@ def upload_match_summary(players, parent_match):
     """
     Populates the endgame summary data that is associated with a match
     and invokes the build parser.  This needs to be fixed for players that
-    unanonymize by checking on hero_slot, ignoring steam_user, and updating
-    if new data has been included (in particular, which steamuser we are
+    unanonymize by checking on hero_slot, ignoring player, and updating
+    if new data has been included (in particular, which player we are
     talking about).
     """
     for player in players:
         kwargs = {
             'match': parent_match,
-            'steam_user': SteamUser.objects.get_or_create(
+            'player': Player.objects.get_or_create(
                 steam_id=player['account_id'])[0],
             'leaver': LeaverStatus.objects.get_or_create(
                 steam_id=player['leaver_status'])[0],
@@ -197,14 +196,13 @@ def upload_match_summary(players, parent_match):
                     'level': skillpick['level'],
                 }
                 SkillBuild.objects.get_or_create(**kwargs)
-    print "Finished a replay"
 
 @task
-def refresh_updating_steam_users():
+def refresh_updating_players():
     """ Go through the users for whom update is True and group them into lists
     of 50.  The profile update API actually supports up to 100"""
     list_send_length = 50
-    users = SteamUser.objects.filter(updated=True)
+    users = Player.objects.filter(updated=True)
     querylist = []
 
     for counter, user in enumerate(users, start = 1):
@@ -216,11 +214,11 @@ def refresh_updating_steam_users():
             steamids = ",".join(querylist)
             chain(valve_api_call.s('GetPlayerSummaries',\
                                  {'steamids': steamids}), \
-                  update_steam_users.s()).delay()
+                  update_players.s()).delay()
             querylist = []
 
 @task
-def update_steam_users(urldata):
+def update_players(urldata):
     """Make the avatar and persona facts of a profile match current."""
     #This options is present in the return code, but not needed here.
     #optionsGiven = urldata['optionsGiven']
@@ -229,13 +227,13 @@ def update_steam_users(urldata):
     for player in response['players']:
         #The PlayerSummaries call returns 64 bit ids.  It is super annoying.
         id_32bit = int(player['steamid']) - ADDER_32_BIT
-        steam_user = SteamUser.objects.get_or_create(steam_id=id_32bit)[0]
-        steam_user.persona_name = player['personaname']
-        steam_user.profile_url = player['profileurl']
-        steam_user.avatar = player['avatar']
-        steam_user.avatar_medium = player['avatarmedium']
-        steam_user.avatar_full = player['avatarfull']
-        steam_user.save()
+        player = Player.objects.get_or_create(steam_id=id_32bit)[0]
+        player.persona_name = player['personaname']
+        player.profile_url = player['profileurl']
+        player.avatar = player['avatar']
+        player.avatar_medium = player['avatarmedium']
+        player.avatar_full = player['avatarfull']
+        player.save()
 
 def exceptionPrint(str):
     print str

@@ -219,7 +219,7 @@ LOCAL_APPS = (
     #My custom stuff
     'heroes',
     'items',
-    'steamusers',
+    'players',
     'matches',
 )
 

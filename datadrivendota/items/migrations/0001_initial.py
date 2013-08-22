@@ -11,8 +11,13 @@ class Migration(SchemaMigration):
         # Adding model 'Item'
         db.create_table(u'items_item', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('steam_id', self.gf('django.db.models.fields.IntegerField')()),
+            ('steam_id', self.gf('django.db.models.fields.IntegerField')(unique=True)),
             ('internal_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('image', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
+            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('lore', self.gf('django.db.models.fields.TextField')()),
+            ('external_name', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('slug_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
         ))
         db.send_create_signal(u'items', ['Item'])
 
@@ -25,9 +30,14 @@ class Migration(SchemaMigration):
     models = {
         u'items.item': {
             'Meta': {'object_name': 'Item'},
+            'description': ('django.db.models.fields.TextField', [], {}),
+            'external_name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
             'internal_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'steam_id': ('django.db.models.fields.IntegerField', [], {})
+            'lore': ('django.db.models.fields.TextField', [], {}),
+            'slug_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'steam_id': ('django.db.models.fields.IntegerField', [], {'unique': 'True'})
         }
     }
 

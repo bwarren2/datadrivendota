@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from datadrivendota.settings.base import STEAM_API_KEY
 from matches.models import Match, LobbyType, GameMode, LeaverStatus,\
     PlayerMatchSummary, SkillBuild
-from steamusers.models import SteamUser
+from players.models import Player
 from heroes.models import Ability, Hero
 
 
@@ -100,7 +100,7 @@ class Command(BaseCommand):
             'radiant_win': data['radiant_win'],
             'duration': data['duration'],
             'start_time': data['start_time'],
-            'match_id': data['match_id'],
+            'steam_id': data['match_id'],
             'match_seq_num': data['match_seq_num'],
             'tower_status_radiant': data['tower_status_radiant'],
             'tower_status_dire': data['tower_status_dire'],
@@ -117,7 +117,7 @@ class Command(BaseCommand):
         }
 
         try:
-            match = Match.objects.get(match_id=data['match_id'])
+            match = Match.objects.get(steam_id=data['match_id'])
         except Match.DoesNotExist:
             match = Match.objects.create(**kwargs)
             match.save()
@@ -131,7 +131,7 @@ class Command(BaseCommand):
         for player in players:
             kwargs = {
                 'match': parent_match,
-                'steam_user': SteamUser.objects.get_or_create(
+                'player': Player.objects.get_or_create(
                     steam_id=player['account_id'])[0],
                 'leaver': LeaverStatus.objects.get_or_create(
                     steam_id=player['leaver_status'])[0],

@@ -4,7 +4,7 @@ from django.db import models
 # Create your models here.
 class Match(models.Model):
 
-    match_id = models.IntegerField(help_text="Valve's id field", unique=True)
+    steam_id = models.IntegerField(help_text="Valve's id field", unique=True)
     match_seq_num = models.IntegerField(help_text="ID valve's play sequence")
     cluster = models.IntegerField()
     start_time = models.IntegerField(help_text='Start time in UTC seconds')
@@ -26,10 +26,10 @@ class Match(models.Model):
 
     class Meta:
         verbose_name_plural = 'matches'
-        ordering = ['match_id']
+        ordering = ['steam_id']
 
     def __unicode__(self):
-        return unicode(self.match_id)
+        return unicode(self.steam_id)
 
 
 class GameMode(models.Model):
@@ -58,7 +58,7 @@ class LobbyType(models.Model):
 
 class PlayerMatchSummary(models.Model):
     match = models.ForeignKey('Match')
-    steam_user = models.ForeignKey('steamusers.SteamUser')
+    player = models.ForeignKey('players.Player')
     hero = models.ForeignKey('heroes.Hero')
     player_slot = models.IntegerField()
     leaver = models.ForeignKey('LeaverStatus')
@@ -100,7 +100,7 @@ class PlayerMatchSummary(models.Model):
         return False
 
     def __unicode__(self):
-        return "Match "+str(self.match.match_id)+", User "+str(self.steam_user.steam_id)
+        return "Match "+str(self.match.steam_id)+", User "+str(self.player.steam_id)
 
     def which_side(self):
         """ Returns radiant or dire based on player slot."""

@@ -19,7 +19,7 @@ def scrape_hero_faces():
 
 
 def scrape_dossiers():
-    return 'python datadrivendota/manage.py importHeroStats'
+    return 'python datadrivendota/manage.py importHeroStats --file hero_stats.txt'
 
 
 def get_hero_seed_local():

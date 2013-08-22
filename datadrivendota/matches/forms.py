@@ -1,11 +1,11 @@
 from django import forms
 from django.db.models import Q
-from steamusers.models import SteamUser
+from players.models import Player
 from matches.models import GameMode
 
 game_modes = GameMode.objects.all()
 game_mode_choices = [(gm.steam_id, gm.description) for gm in game_modes]
-users = SteamUser.objects.filter(Q(steam_id=66289584)| #Me
+users = Player.objects.filter(Q(steam_id=66289584)| #Me
                                  Q(steam_id=68083913)| #Nath
                                  Q(steam_id=85045426)| #mig
                                  Q(steam_id=103611462) #meg

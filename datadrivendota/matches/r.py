@@ -5,7 +5,7 @@ from rpy2 import robjects
 from rpy2.robjects import Formula, FloatVector, StrVector
 from rpy2.robjects.packages import importr
 from matches.models import PlayerMatchSummary, GameMode
-from steamusers.models import SteamUser
+from players.models import Player
 
 
 def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
@@ -13,7 +13,7 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
     player_obj_list = []
     for id in player_list:
-        player_obj_list.append(SteamUser.objects.get(steam_id=id))
+        player_obj_list.append(Player.objects.get(steam_id=id))
 
     game_mode_list = []
     for id in mode_list:
@@ -24,7 +24,7 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
     lattice = importr('lattice')
 
-    selected_summaries = PlayerMatchSummary.objects.select_related().filter(steam_user__in=player_obj_list,match__game_mode__in=game_mode_list)
+    selected_summaries = PlayerMatchSummary.objects.select_related().filter(player__in=player_obj_list,match__game_mode__in=game_mode_list)
     cmd = """
         df.all = data.frame(
             )
@@ -58,14 +58,14 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
 
     if split_var[0] == 'player':
-        split_vector_list = [summary.steam_user.steam_id for summary in selected_summaries]
+        split_vector_list = [summary.player.steam_id for summary in selected_summaries]
     elif split_var[0] == 'is_win':
         split_vector_list = [summary.is_win for summary in selected_summaries]
     else:
         split_vector_list = [summary.match.game_mode.description for summary in selected_summaries]
 
     if group_var[0] == 'player':
-        group_vector_list = [summary.steam_user.steam_id for summary in selected_summaries]
+        group_vector_list = [summary.player.steam_id for summary in selected_summaries]
     elif group_var[0] == 'is_win':
         group_vector_list = [summary.is_win for summary in selected_summaries]
     else:
