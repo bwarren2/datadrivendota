@@ -1,11 +1,31 @@
+import datetime
 from os.path import basename
 from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from .forms import EndgameSelect
-from .r import EndgameChart
+from .r import EndgameChart, TestChart
+from .models import Match, PlayerMatchSummary
 # Create your views here.
 
-
+def match(request, match_id):
+    match = get_object_or_404(Match, match_id=match_id)
+    summaries = get_list_or_404(PlayerMatchSummary, match=match)
+    for summary in summaries:
+        summary.kda = summary.kills - summary.deaths + .5*summary.assists
+        if summary.which_side()=='Dire':
+            summary.color = '#FFBEBE'
+        else:
+            summary.color = '#C8FFC9'
+        if summary.is_win:
+            summary.win_color='black'
+        else:
+            summary.win_color='white'
+    match.hms_duration = datetime.timedelta(seconds=match.duration)
+    match.hms_start_time = datetime.datetime.fromtimestamp(match.start_time).strftime('%H:%M:%S %Y-%m-%d')
+    return render_to_response('match_detail.html', {'match':match,
+                              'summaries':summaries
+                              },
+                              context_instance=RequestContext(request))
 
 def index(request):
     return render_to_response('matches_index.html', {},

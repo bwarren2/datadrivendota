@@ -102,6 +102,12 @@ class PlayerMatchSummary(models.Model):
     def __unicode__(self):
         return "Match "+str(self.match.match_id)+", User "+str(self.steam_user.steam_id)
 
+    def which_side(self):
+        """ Returns radiant or dire based on player slot."""
+        if self.player_slot < 5:
+            return 'Radiant'
+        else:
+            return 'Dire'
 
 class LeaverStatus(models.Model):
     steam_id = models.IntegerField(unique=True)

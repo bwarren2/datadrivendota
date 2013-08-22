@@ -1,0 +1,68 @@
+{% extends "matches_base.html" %}
+{% block extra_css %}{{form.media}}{% endblock extra_css %}
+{% block title %}Match Detail{% endblock title %}
+{% block page_title %}Match #{{match.match_id}}:
+{{match.game_mode.description}} {{match.lobby_type.description}},
+{{match.hms_duration}} @ {{match.hms_start_time}}
+{% endblock page_title %}
+
+{% block content %}
+    <div>
+    <table class="table  table-condensed" id='myTable'>
+    <thead>
+    <tr>
+    <th colspan=3>Player</th>
+    <th>K</th>
+    <th>D</th>
+    <th>A</th>
+    <th>K-D+A/2</th>
+    <th>Level</th>
+    <th>Last Hits</th>
+    <th>Denies</th>
+    <th colspan=2>Hero</th>
+    <th>Gold/min</th>
+    <th>XP/min</th>
+    <th>Hero Dmg</th>
+    <th>Tower Dmg</th>
+    <th>Hero Heal</th>
+    <th>Side</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for summary in summaries %}
+        <tr style='background-color:{{summary.color}}; outline: thin solid {{summary.win_color}}'>
+            <td>{{summary.steam_user.steam_id}}</td>
+            <td><img src="{{summary.steam_user.avatar}}"></td>
+            <td>{{summary.steam_user.persona_name}}</td>
+            <td>{{summary.kills}}</td>
+            <td>{{summary.deaths}}</td>
+            <td>{{summary.assists}}</td>
+            <td>{{summary.kda}}</td>
+            <td>{{summary.level}}</td>
+            <td>{{summary.last_hits}}</td>
+            <td>{{summary.denies}}</td>
+            <td>{{summary.hero.name}}</td>
+            <td><img src="{{summary.hero.thumbshot.url}}"></td>
+            <td>{{summary.gold_per_min}}</td>
+            <td>{{summary.xp_per_min}}</td>
+            <td>{{summary.hero_damage}}</td>
+            <td>{{summary.tower_damage}}</td>
+            <td>{{summary.hero_healing}}</td>
+            <td>{{summary.which_side}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    </div>
+{% endblock content %}
+{% block extra_js %}
+    <script>
+    $(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+    );
+    </script>
+
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.tablesorter.js"></script>
+{% endblock extra_js %}
