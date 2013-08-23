@@ -1,7 +1,7 @@
 {% extends "matches_base.html" %}
 {% block extra_css %}{{form.media}}{% endblock extra_css %}
 {% block title %}Match Detail{% endblock title %}
-{% block page_title %}Match #{{match.match_id}}:
+{% block page_title %}Match #{{match.steam_id}}:
 {{match.game_mode.description}} {{match.lobby_type.description}},
 {{match.hms_duration}} @ {{match.hms_start_time}}
 {% endblock page_title %}
@@ -42,7 +42,7 @@
             <td>{{summary.last_hits}}</td>
             <td>{{summary.denies}}</td>
             <td>{{summary.hero.name}}</td>
-            <td><img src="{{summary.hero.thumbshot.url}}"></td>
+            <td><img src="{{summary.hero.thumbshot.url}}" width="50%" height="50%"></td>
             <td>{{summary.gold_per_min}}</td>
             <td>{{summary.xp_per_min}}</td>
             <td>{{summary.hero_damage}}</td>

@@ -3,7 +3,7 @@ from os.path import basename
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from .forms import EndgameSelect
-from .r import EndgameChart, TestChart
+from .r import EndgameChart
 from .models import Match, PlayerMatchSummary
 # Create your views here.
 
@@ -28,7 +28,9 @@ def match(request, match_id):
                               context_instance=RequestContext(request))
 
 def index(request):
-    return render_to_response('matches_index.html', {},
+    match_list = Match.objects.all().order_by('start_time')
+    match_list = match_list[:10]
+    return render_to_response('matches_index.html', {'match_list': match_list},
                               context_instance=RequestContext(request))
 
 def endgame(request):
