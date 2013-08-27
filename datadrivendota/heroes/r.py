@@ -77,7 +77,7 @@ def generateChart(hero_list, stats_list):
     robjects.r("df.all = cbind(df.all,df.thing)")
 
     #Make a file
-    imagefile = File(open('media/1d_%s.png' % str(uuid4()), 'w'))
+    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
     robjects.r("""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
@@ -201,7 +201,7 @@ def lineupChart(heroes, stat, level):
     robjects.r(cmd)
 
     #Make a file
-    imagefile = File(open('media/1d_%s.png' % str(uuid4()), 'w'))
+    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
     robjects.r("""print(
         barchart({0}~hero,data=df.all,type='l',
