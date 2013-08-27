@@ -5,8 +5,8 @@ from .models import Hero
 from django.utils.text import slugify
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from .forms import HeroVitalsMultiSelect
-from .r import generateChart
+from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect
+from .r import generateChart, lineupChart
 
 
 def index(request):
@@ -45,6 +45,32 @@ def vitals(request):
         imagebase = ''
 
     return render_to_response('hero_vitals.html', {'form': hero_form,
+                              'hero_list': hero_list, 'image': image,
+                              'imagebase': imagebase},
+                              context_instance=RequestContext(request))
+
+def lineup(request):
+
+    if request.method == 'POST':
+        hero_form = HeroLineupMultiSelect(request.POST)
+        if HeroLineupMultiSelect(request.POST).is_valid():
+          hero_list = hero_form.data.getlist('heroes')
+          stat_list = hero_form.data.getlist('stats')
+          level =  hero_form.data.getlist('level')
+          image = lineupChart(hero_list, stat_list, level)
+          imagebase = basename(image.name)
+          pass
+        else:
+          hero_list = []
+          image = ''
+          imagebase = ''
+    else:
+        hero_form = HeroLineupMultiSelect()
+        hero_list = []
+        image = ''
+        imagebase = ''
+
+    return render_to_response('hero_lineups.html', {'form': hero_form,
                               'hero_list': hero_list, 'image': image,
                               'imagebase': imagebase},
                               context_instance=RequestContext(request))

@@ -4,6 +4,7 @@ from heroes import views
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
     url(r'^vitals/?$', views.vitals, name='vitals'),
+    url(r'^lineups/?$', views.lineup, name='lineup'),
     url(r'^(?P<hero_name>[a-zA-Z0-9\-]*)/?$', views.detail, name="detail"),
 )
     # Examples:

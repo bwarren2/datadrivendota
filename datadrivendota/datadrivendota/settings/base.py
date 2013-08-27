@@ -212,6 +212,7 @@ THIRD_PARTY_APPS = (
     'social_auth',
     'storages',
     'djcelery',
+    'django_select2'
 )
 
 # Apps specific for this project go here.
@@ -300,3 +301,6 @@ SOCIAL_AUTH_EXTRA_DATA = False
 SOCIAL_AUTH_CHANGE_SIGNAL_ONLY = True
 SOCIAL_AUTH_ASSOCIATE_BY_EMAIL = True
 ########## END LOGIN CONFIGURATION
+
+
+AUTO_RENDER_SELECT2_STATICS = False

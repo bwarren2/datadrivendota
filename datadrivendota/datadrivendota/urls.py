@@ -24,6 +24,8 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('social_auth.urls')),
+    url(r'^djs2/', include('django_select2.urls')),
     url(r'^login/?', 'django.contrib.auth.views.login'),
     url(r'^logout/?', 'django.contrib.auth.views.logout', {'next_page': '/'})
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

@@ -21,10 +21,11 @@ class Hero(models.Model):
 
     class Meta:
         verbose_name_plural = 'heroes'
-
+        ordering = ['name']
     def __unicode__(self):
-        return self.name+", (id:"+str(self.steam_id)+")"
-
+        return self.name
+    def safe_name(self):
+        return self.machine_name.replace('-',' ').title()
 
 class Role(models.Model):
     ROLES = (

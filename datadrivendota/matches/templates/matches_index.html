@@ -9,6 +9,8 @@
                 <th>Match ID</th>
                 <th>Duration</th>
                 <th>Start Time</th>
+                <th>Lobby Type</th>
+                <th>Game Mode</th>
             </tr>
         </thead>
         <tbody>
@@ -17,6 +19,8 @@
                     <td><a href="matches/{{match.steam_id}}">{{match.steam_id}}</a></td>
                     <td>{{match.duration}}</td>
                     <td>{{match.start_time}}</td>
+                    <td>{{match.lobby_type.description}}</td>
+                    <td>{{match.game_mode.description}}</td>
                 </tr>
             {% endfor %}
         </tbody>

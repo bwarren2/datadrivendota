@@ -28,8 +28,7 @@ def match(request, match_id):
                               context_instance=RequestContext(request))
 
 def index(request):
-    match_list = Match.objects.all().order_by('start_time')
-    match_list = match_list[:10]
+    match_list = Match.objects.all()[:10]
     return render_to_response('matches_index.html', {'match_list': match_list},
                               context_instance=RequestContext(request))
 

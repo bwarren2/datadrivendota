@@ -26,7 +26,7 @@ class Match(models.Model):
 
     class Meta:
         verbose_name_plural = 'matches'
-        ordering = ['start_time']
+        ordering = ['-start_time']
 
     def __unicode__(self):
         return unicode(self.steam_id)
