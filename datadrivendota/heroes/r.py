@@ -91,21 +91,21 @@ def generateChart(hero_list, stats_list):
     grdevices.dev_off()
     imagefile.close()
 
-    return imagefile
+#    return imagefile
 
 
 
     # This is a goofy hack.  I do not know why putting the plot between open
     # and write does not work here.
-    #imagefile2 = open(imagefile.name, 'r')
+    imagefile2 = open(imagefile.name, 'r')
 
     #Try making a new file and sending that to s3
-    #s3file = default_storage.open('1d_%s.bmp' % str(uuid4()), 'w')
-    #s3file.write(imagefile2.read())
-    #s3file.close()
-    #imagefile2.close()
+    s3file = default_storage.open('1d_%s.bmp' % str(uuid4()), 'w')
+    s3file.write(imagefile2.read())
+    s3file.close()
+    imagefile2.close()
 
-    #return s3file
+    return s3file
 
 def lineupChart(heroes, stat, level):
 
@@ -180,7 +180,7 @@ def lineupChart(heroes, stat, level):
         mana=df.all$base_mana+df.all$intelligence*13
     )
     """
-#print cmd
+    #print cmd
     robjects.r(cmd)
     hero_names = list()
     for hero in selected_heroes:
@@ -217,5 +217,14 @@ def lineupChart(heroes, stat, level):
     grdevices.dev_off()
     imagefile.close()
 
-    return imagefile
+#    return imagefile
 
+    imagefile2 = open(imagefile.name, 'r')
+
+    #Try making a new file and sending that to s3
+    s3file = default_storage.open('1d_%s.bmp' % str(uuid4()), 'w')
+    s3file.write(imagefile2.read())
+    s3file.close()
+    imagefile2.close()
+
+    return s3file
