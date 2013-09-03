@@ -1,0 +1,24 @@
+{% extends "player_base.html" %}
+{% block extra_css %}{% endblock extra_css %}
+{% block title %}Player Summary{% endblock title %}
+{% block page_title %}Steam ID:{{player.steam_id}}{% endblock page_title %}
+{% block content %}
+    <div>
+        <div style='float:left'>
+        <img src="{{player.avatar_full}}">
+        {{player.persona_name}}
+
+
+        </div><br>
+
+        <div style='float:right'>
+            {% if kda %}
+                <img src="{{MEDIA_URL}}{{kdabase}}">
+            {% endif %}
+            {% if winrate %}
+                <img src="{{MEDIA_URL}}{{winratebase}}">
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}
+
