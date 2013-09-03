@@ -224,15 +224,16 @@ def update_players(urldata):
     #optionsGiven = urldata['optionsGiven']
     response = urldata['response']
 
-    for player in response['players']:
+    for pulled_player in response['players']:
         #The PlayerSummaries call returns 64 bit ids.  It is super annoying.
-        id_32bit = int(player['steamid']) - ADDER_32_BIT
-        player = Player.objects.get_or_create(steam_id=id_32bit)[0]
-        player.persona_name = player['personaname']
-        player.profile_url = player['profileurl']
-        player.avatar = player['avatar']
-        player.avatar_medium = player['avatarmedium']
-        player.avatar_full = player['avatarfull']
+        id_32bit = int(pulled_player['steamid']) - ADDER_32_BIT
+
+        player, created = Player.objects.get_or_create(steam_id=id_32bit)
+        player.persona_name = pulled_player['personaname']
+        player.profile_url = pulled_player['profileurl']
+        player.avatar = pulled_player['avatar']
+        player.avatar_medium = pulled_player['avatarmedium']
+        player.avatar_full = pulled_player['avatarfull']
         player.save()
 
 def exceptionPrint(str):

@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^heroes/?', include('heroes.urls')),
     url(r'^items/?', include('items.urls')),
     url(r'^matches/?', include('matches.urls')),
+    url(r'^players/?', include('players.urls')),
 
     #url(r'^/?$', TemplateView.as_view(template_name='base.html')),
     # Examples:

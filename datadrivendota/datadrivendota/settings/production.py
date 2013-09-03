@@ -10,7 +10,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 ########## DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = environ.get('EMAIL_HOST', 'FALSE')
+DEBUG = environ.get('DEBUG', 'FALSE')
 
 
 def get_env_setting(setting):

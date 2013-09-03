@@ -88,7 +88,7 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
                 par.settings=simpleTheme(pch=20,lwd=4,
                     col=rainbow(n=length(unique(groupvar))),
                     ),
-                scales=list(y=list(relation='free'))
+                scales=list()
                 )
     )"""% (grouplab, ylab, xlab)
     robjects.r(rcmd )
@@ -110,31 +110,3 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
     return s3file
 
-
-def TestChart():
-    grdevices = importr('grDevices')
-
-    #rprint = robjects.globalenv.get("print")
-
-    lattice = importr('lattice')
-    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
-    cmd = """
-        print(xyplot(c(1,2,3,4,5)~c(1,2,3,4,5)))
-        """
-    robjects.r(cmd)
-    grdevices.dev_off()
-
-    imagefile.close()
-
-    # This is a goofy hack.  I do not know why putting the plot between open
-    # and write does not work here.
-    imagefile2 = open(imagefile.name, 'r')
-
-    #Try making a new file and sending that to s3
-    s3file = default_storage.open('1d_%s.bmp' % str(uuid4()), 'w')
-    s3file.write(imagefile2.read())
-    s3file.close()
-    imagefile2.close()
-
-    return imagefile

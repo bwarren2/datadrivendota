@@ -6,7 +6,7 @@ from django.utils.text import slugify
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect
-from .r import generateChart, lineupChart
+from .r import generateChart, fastlineupChart
 
 
 def index(request):
@@ -57,7 +57,7 @@ def lineup(request):
           hero_list = hero_form.data.getlist('heroes')
           stat_list = hero_form.data.getlist('stats')
           level =  hero_form.data.getlist('level')
-          image = lineupChart(hero_list, stat_list, level)
+          image = fastlineupChart(hero_list, stat_list, level)
           imagebase = basename(image.name)
           pass
         else:

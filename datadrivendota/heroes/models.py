@@ -25,7 +25,7 @@ class Hero(models.Model):
     def __unicode__(self):
         return self.name
     def safe_name(self):
-        return self.machine_name.replace('-',' ').title()
+        return safen(self.machine_name)
 
 class Role(models.Model):
     ROLES = (
@@ -100,3 +100,6 @@ class HeroDossier(models.Model):
 
     def __unicode__(self):
         return self.hero.name
+
+def safen(machine_name):
+    return machine_name.replace('-',' ').title()

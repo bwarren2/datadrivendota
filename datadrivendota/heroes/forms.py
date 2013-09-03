@@ -14,6 +14,7 @@ lineup_stat_pool.extend(['day_vision','night_vision','atk_point',
     'range','base_atk_time'])
 lineup_stats = [(item, item.replace("_"," ").title()) for item in lineup_stat_pool]
 
+
 class HeroMultiSelect(AutoModelSelect2MultipleField):
     queryset = Hero.objects
     search_fields = ['name__icontains']
