@@ -79,7 +79,7 @@ def CountWinrate(player_id):
                 xlab='Games Played',
                 panel=function(x, y, ...) {
                   panel.xyplot(x, y, ...);
-                  ltext(x=x, y=y, labels=labels, pos=1, offset=1, cex=0.8)
+                  ltext(x=x, y=y, labels=labels, pos=1, offset=.1, cex=0.8)
                   panel.abline(h=50,lty=3,col='darkgray')
                   panel.abline(v=10,lty=3,col='darkgray')
                 }
