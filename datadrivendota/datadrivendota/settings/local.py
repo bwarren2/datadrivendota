@@ -59,3 +59,9 @@ MIDDLEWARE_CLASSES += (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 ########## END TOOLBAR CONFIGURATION
+
+
+########## STATIC CONFIGURATION
+STATIC_URL = '/static/'
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'

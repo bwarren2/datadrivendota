@@ -305,3 +305,55 @@ SOCIAL_AUTH_ASSOCIATE_BY_EMAIL = True
 
 
 AUTO_RENDER_SELECT2_STATICS = False
+
+
+
+
+########## PIPELINE CONFIGURATION
+PIPELINE_CSS = {
+    'all': {
+        'source_filenames': (
+            'css/bootstrap.css',
+            'css/bootstrap-responsive.css',
+            'css/project.css'
+        ),
+        'output_filename': 'css/all.css',
+        'extra_context': {
+            'media': 'screen,projection',
+        },
+    },
+}
+
+PIPELINE_JS = {
+    'all': {
+        'source_filenames': (
+            'js/bootstrap.min.js',
+            'js/jquery-latest.js',
+            'js/jquery.metadata.js',
+            'js/jquery.tablesorter.js',
+            'js/jquery.tablesorter.min.js',
+            'js/project.js',
+        ),
+        'output_filename': 'js/all.js',
+    }
+}
+########## END PIPELINE CONFIGURATION
+
+
+
+####STORAGES####
+AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY', '')
+AWS_STORAGE_BUCKET_NAME = getenv('AWS_STORAGE_BUCKET_NAME', '')
+DEFAULT_FILE_STORAGE = 'datadrivendota.s3utils.MediaRootS3BotoStorage'
+STATICFILES_STORAGE = 'datadrivendota.s3utils.S3PipelineStorage'
+
+S3_URL = 'http://%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+STATIC_DIRECTORY = '/static/'
+MEDIA_DIRECTORY = '/media/'
+STATIC_URL = S3_URL + STATIC_DIRECTORY
+MEDIA_URL = S3_URL + MEDIA_DIRECTORY
+
+
+PIPELINE_JS_COMPRESSOR = None
+PIPELINE_CSS_COMPRESSOR = None
