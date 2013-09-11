@@ -1,15 +1,8 @@
 {% extends "base.html" %}
+
 {% block extra_nav %}
-<div class='navbar navbar-inverse navbar-static-top'>
-    <div class='navbar-inner'>
-        <div class='container'>
-            <a class='brand' href="/">Matches</a>
-            <div class='nav-collapse collapse'>
-                <ul class='nav'>
-                    <li><a href="/matches/endgame">Endgame Charts</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+<ul class="nav nav-tabs">
+  <li class="{% if active == "matches" %}active{% endif %}"><a href="/matches/">Matches</a></li>
+  <li class="{% if active == "matches-endgame" %}active{% endif %}"><a href="/matches/endgame">Endgame Charts</a></li>
+</ul>
 {% endblock extra_nav %}

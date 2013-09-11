@@ -12,7 +12,8 @@ import djcelery
 djcelery.setup_loader()
 
 BROKER_POOL_LIMIT = int(getenv('BROKER_POOL_LIMIT', 1))
-#BROKER_URL = 'amqp://'+getenv('RABBITMQ_USER')+':'+getenv('RABBITMQ_PASS')+'@localhost//'+getenv('RABBITMQ_VHOST')
+#BROKER_URL = 'amqp://'+getenv('RABBITMQ_USER')+':'+getenv('RABBITMQ_PASS')+'@
+#localhost//'+getenv('RABBITMQ_VHOST')
 BROKER_URL = getenv('CLOUDAMQP_URL')
 
 # List of modules to import when celery starts.
@@ -26,7 +27,7 @@ CELERY_RESULT_DBURI = "ampq:///datadrivendota.db"
 CELERY_AMQP_TASK_RESULT_EXPIRES = int(getenv('AMQP_EXPIRY_RATE'))
 CELERY_TASK_RESULT_EXPIRES = CELERY_AMQP_TASK_RESULT_EXPIRES
 # Valve's rate limiting.
-VALVE_RATE=getenv('VALVE_RATE')
+VALVE_RATE = getenv('VALVE_RATE')
 
 
 ########## PATH CONFIGURATION
@@ -69,7 +70,9 @@ MANAGERS = ADMINS
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 # Database settings for Heroku
 DATABASES = {}
-DATABASES['default'] = dj_database_url.config(default='postgres://localhost/datadrivendota')
+DATABASES['default'] = dj_database_url.config(
+    default='postgres://localhost/datadrivendota'
+)
 ########## END DATABASE CONFIGURATION
 
 
@@ -121,6 +124,8 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
+
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 ########## END STATIC FILE CONFIGURATION
 
@@ -307,15 +312,12 @@ SOCIAL_AUTH_ASSOCIATE_BY_EMAIL = True
 AUTO_RENDER_SELECT2_STATICS = False
 
 
-
-
 ########## PIPELINE CONFIGURATION
 PIPELINE_CSS = {
     'all': {
         'source_filenames': (
-            'css/bootstrap.css',
-            'css/bootstrap-responsive.css',
-            'css/project.css'
+            'css/custom_bootstrap_compilation.less',
+            'css/project.less'
         ),
         'output_filename': 'css/all.css',
         'extra_context': {
@@ -327,19 +329,32 @@ PIPELINE_CSS = {
 PIPELINE_JS = {
     'all': {
         'source_filenames': (
-            'js/bootstrap.min.js',
-            'js/jquery-latest.js',
+            'js/jquery-1.10.2.js',
             'js/jquery.metadata.js',
             'js/jquery.tablesorter.js',
             'js/jquery.tablesorter.min.js',
+            'bootstrap/js/transition.js',
+            'bootstrap/js/modal.js',
+            'bootstrap/js/dropdown.js',
+            'bootstrap/js/scrollspy.js',
+            'bootstrap/js/tab.js',
+            'bootstrap/js/tooltip.js',
+            'bootstrap/js/popover.js',
+            'bootstrap/js/alert.js',
+            'bootstrap/js/button.js',
+            'bootstrap/js/collapse.js',
+            'bootstrap/js/carousel.js',
+            'bootstrap/js/affix.js',
             'js/project.js',
         ),
         'output_filename': 'js/all.js',
     }
 }
+
+PIPELINE_COMPILERS = (
+    'pipeline.compilers.less.LessCompiler',
+)
 ########## END PIPELINE CONFIGURATION
-
-
 
 ####STORAGES####
 AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID', '')

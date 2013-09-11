@@ -23,3 +23,9 @@ assets/
 
 #Tempfiles
 datadrivendota/static/temp
+
+# Twelve-factor secret settings in the environment:
+.env
+
+# Byproducts of LESS compilation:
+datadrivendota/static/css/*.css
