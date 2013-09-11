@@ -80,8 +80,13 @@ def CountWinrate(player_id):
                 panel=function(x, y, ...) {
                   panel.xyplot(x, y, ...);
                   ltext(x=x, y=y, labels=labels, pos=1, offset=.1, cex=0.8)
-                  panel.abline(h=50,lty=3,col='darkgray')
-                  panel.abline(v=10,lty=3,col='darkgray')
+                  panel.abline(h=50,lty=3,col='blue')
+                  panel.lines(x=seq(0,100,1),y=100*(.5+(1/(2*sqrt(seq(0,100,1))))),lty=3,col='darkgray')
+                  panel.lines(x=seq(0,100,1),y=100*(.5-(1/(2*sqrt(seq(0,100,1))))),lty=3,col='darkgray')
+                  panel.lines(x=seq(0,100,1),y=100*(.5+2*(1/(2*sqrt(seq(0,100,1))))),lty=3,col='red')
+                  panel.lines(x=seq(0,100,1),y=100*(.5-2*(1/(2*sqrt(seq(0,100,1))))),lty=3,col='red')
+
+                  panel.abline(v=10,lty=3,col='blue')
                 }
 
         )
