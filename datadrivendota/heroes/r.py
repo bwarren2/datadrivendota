@@ -90,7 +90,7 @@ def generateChart(hero_list, stats_list):
     #relation='free' in scales for independent axes
     grdevices.dev_off()
     imagefile.close()
-    return imagefile
+
     hosted_file = s3File(imagefile)
     return hosted_file
 
