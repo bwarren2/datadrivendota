@@ -147,8 +147,8 @@ def lineupChart(heroes, stat, level):
     grdevices.dev_off()
     imagefile.close()
 
-
     hosted_file = s3File(imagefile)
+    print imagefile, hosted_file
     return hosted_file
 
 
