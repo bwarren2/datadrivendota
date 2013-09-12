@@ -7,7 +7,7 @@
 {% for hero in hero_list %}
     {% if hero.thumbshot %}
     <li class="span1">
-        <a href = "heroes/{{hero.machine_name}}">
+        <a href = "/heroes/{{hero.machine_name}}">
         <img src="{{ hero.thumbshot.url}}">
         </a>
     </li>
