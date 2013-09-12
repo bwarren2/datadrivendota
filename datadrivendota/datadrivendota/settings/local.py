@@ -63,5 +63,9 @@ MIDDLEWARE_CLASSES += (
 
 ########## STATIC CONFIGURATION
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+MEDIA_DIRECTORY = '/media/'
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+

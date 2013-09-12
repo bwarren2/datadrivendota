@@ -10,6 +10,8 @@ from rpy2.robjects.packages import importr
 from heroes.models import HeroDossier, Hero
 from datadrivendota.r import s3File
 
+from django.conf import settings
+
 def generateChart(hero_list, stats_list):
     # Currently, we are violating DRY with the available field listing from the form
     # and the R space being in different places and requiring that they are the same.
@@ -76,8 +78,9 @@ def generateChart(hero_list, stats_list):
     robjects.r(cmd)
     robjects.r("df.all = cbind(df.all,df.thing)")
 
+    print settings.MEDIA_ROOT
     #Make a file
-    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
+    imagefile = File(open(settings.MEDIA_ROOT+'/1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
     robjects.r("""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
@@ -90,7 +93,7 @@ def generateChart(hero_list, stats_list):
     #relation='free' in scales for independent axes
     grdevices.dev_off()
     imagefile.close()
-
+    return imagefile
     hosted_file = s3File(imagefile)
     return hosted_file
 
