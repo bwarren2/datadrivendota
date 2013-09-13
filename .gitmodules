@@ -1,4 +1,6 @@
+[submodule "bootstrap"]
+	path = bootstrap
+	url = git://github.com/twbs/bootstrap.git
 [submodule "datadrivendota/static/bootstrap"]
 	path = datadrivendota/static/bootstrap
 	url = git://github.com/twbs/bootstrap.git
-    ignore = all

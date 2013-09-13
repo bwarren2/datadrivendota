@@ -4,11 +4,11 @@ from django.core.files import File
 #from django.conf import settings
 
 from rpy2 import robjects
-from rpy2.robjects import Formula, Environment
 from rpy2.robjects.packages import importr
 
 from heroes.models import HeroDossier, Hero
 from datadrivendota.r import s3File
+
 
 def generateChart(hero_list, stats_list):
     # Currently, we are violating DRY with the available field listing from the form
@@ -147,8 +147,8 @@ def lineupChart(heroes, stat, level):
     grdevices.dev_off()
     imagefile.close()
 
-
     hosted_file = s3File(imagefile)
+    print imagefile, hosted_file
     return hosted_file
 
 
