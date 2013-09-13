@@ -14,8 +14,8 @@
     <tbody>
     {% for player in player_list %}
         <tr>
-            <td>{{player.steam_id}}</td>
-            <td>{{player.persona_name}}</td>
+            <td><a href="./pid:{{player.steam_id}}/">{{player.steam_id}}</a></td>
+            <td><a href="./p:{{player.persona_name}}/">{{player.persona_name}}</a></td>
             <td><img src="{{player.avatar}}"></td>
         </tr>
     {% endfor %}

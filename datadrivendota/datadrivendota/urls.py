@@ -9,6 +9,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^/?$', views.base, name='base'),
+    url(r'^about/?$', views.about, name='about'),
     url(r'^heroes/?', include('heroes.urls')),
     url(r'^items/?', include('items.urls')),
     url(r'^matches/?', include('matches.urls')),
