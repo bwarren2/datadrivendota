@@ -1,4 +1,26 @@
+{% extends "player_base.html" %}
+{% block page_title %}
+    Player Index!
+{% endblock page_title %}
 {% block content %}
-    {{ words }}
-    {{ player }}
+<div>
+    <table class="table  table-condensed" id='myTable'>
+    <thead>
+    <tr>
+    <th>Steam ID</th>
+    <th>Persona Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for player in player_list %}
+        <tr>
+            <td>{{player.steam_id}}</td>
+            <td>{{player.persona_name}}</td>
+            <td><img src="{{player.avatar}}"></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    </div>
+
 {% endblock content %}

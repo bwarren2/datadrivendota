@@ -7,7 +7,8 @@ from .models import Player
 from .r import KDADensity, CountWinrate
 
 def index(request):
-    return render_to_response('player_index.html', {'words':"Nope."},
+    player_list = Player.objects.filter(updated=True)
+    return render_to_response('player_index.html', {'player_list':player_list},
                               context_instance = RequestContext(request))
 
 def detail(request, player_name=None, player_id=None):
