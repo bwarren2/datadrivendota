@@ -16,7 +16,7 @@
         <tbody>
             {% for match in match_list %}
                 <tr>
-                    <td><a href="{{match.steam_id}}">{{match.steam_id}}</a></td>
+                    <td><a href="matches/{{match.steam_id}}">{{match.steam_id}}</a></td>
                     <td>{{match.duration}}</td>
                     <td>{{match.start_time}}</td>
                     <td>{{match.lobby_type.description}}</td>

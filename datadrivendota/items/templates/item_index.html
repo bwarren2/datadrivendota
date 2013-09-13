@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}Item List{% endblock title %}
-{% block page_title %}Item Index{% endblock page_title %}
+{% block page_title %}Item Index{% endblock page_title %} 
 {% block content %}
 {% for item in item_list %}
     <div>
@@ -9,8 +9,8 @@
     <a href="items/{{item.slug_name}}">
     {% if item.image %}
         <img src="
-        {{item.image.url}}
-        ">
+        {{item.image.url}}        
+        "> 
     {% endif %}
     {{item.external_name}}
     </a>
