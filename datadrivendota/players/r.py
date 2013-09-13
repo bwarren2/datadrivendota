@@ -18,19 +18,26 @@ def KDADensity(player_id):
     player = Player.objects.get(steam_id=player_id)
 
     summaries = PlayerMatchSummary.objects.filter(player=player)
+
+
     data_list = [summary.kills for summary in summaries]
     label_list = ['kills'] * len(data_list)
+
     data_list.extend([summary.deaths for summary in summaries])
     label_list.extend(['deaths'] * (len(data_list)-len(label_list)))
+
     data_list.extend([summary.assists for summary in summaries])
     label_list.extend(['assists'] * (len(data_list)-len(label_list)))
-    data_list.extend([summary.kills-summary.deaths+summary.assists/2 for summary in summaries])
+
+    KDA2 = [summary.kills-summary.deaths+summary.assists/2 for summary in summaries]
+    data_list.extend(KDA2)
     label_list.extend(['K-D+A/2'] * (len(data_list)-len(label_list)))
 
     x_vector = robjects.FloatVector(data_list)
     category_vector = robjects.StrVector(label_list)
     robjects.globalenv['cat_vec'] = category_vector
     robjects.globalenv['x_vec'] = x_vector
+    robjects.globalenv['KDA2_median'] = sorted(KDA2)[int(len(KDA2)/2.0)]
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=600,height=500)
@@ -39,6 +46,11 @@ def KDADensity(player_id):
         densityplot(~x_vec,groups=cat_vec,
                 auto.key=list(lines=T,points=F,space='right'),
                 par.settings=simpleTheme(lwd=2,),
+                xlab='',
+                panel=function(x,...){
+                    panel.densityplot(x,...);
+                    panel.abline(v=KDA2_median)
+                }
         )
     )""")
     #relation='free' in scales for independent axes
