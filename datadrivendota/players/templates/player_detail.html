@@ -12,11 +12,11 @@
         </div><br>
 
         <div style='float:right'>
-            {% if kda %}
-                <img src="{{MEDIA_URL}}{{kdabase}}">
-            {% endif %}
             {% if winrate %}
                 <img src="{{MEDIA_URL}}{{winratebase}}">
+            {% endif %}
+            {% if kda %}
+                <img src="{{MEDIA_URL}}{{kdabase}}">
             {% endif %}
         </div>
     </div>

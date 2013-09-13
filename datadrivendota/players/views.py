@@ -5,6 +5,7 @@ from django.template import RequestContext
 from os.path import basename
 from .models import Player
 from .r import KDADensity, CountWinrate
+from urllib import unquote
 
 def index(request):
     player_list = Player.objects.filter(updated=True)
@@ -12,11 +13,13 @@ def index(request):
                               context_instance = RequestContext(request))
 
 def detail(request, player_name=None, player_id=None):
+    print player_name
     if player_name == None and player_id == None:
         return HttpResponseNotFound('<h1>I need either a player name or player id.</h1>')
     elif player_id != None:
         player = get_object_or_404(Player, steam_id=player_id)
     else:
+        player_name = unquote(player_name).decode('utf-8')[:-1]
         player = get_object_or_404(Player, persona_name=player_name)
 
     kda = KDADensity(player.steam_id)
