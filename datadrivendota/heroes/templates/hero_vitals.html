@@ -7,9 +7,14 @@
     <div style='float:left'>
     <form action="" method='POST'>
         {% csrf_token %}
-        {{ form }}
-        <br>
-        <input type='submit' value='Submit'>
+
+        {% include "_form.html" %}
+
+        <div class="control-group">
+            <div class="controls pull-right">
+                <button type="submit" class="btn btn-small btn-primary">Submit</button>
+            </div>
+        </div>
     </form>
     </div>
     {% if image %}
