@@ -29,3 +29,6 @@ datadrivendota/static/temp
 
 # Byproducts of LESS compilation:
 datadrivendota/static/css/*.css
+
+#Ignore artifacts of local image construction
+1d_*
