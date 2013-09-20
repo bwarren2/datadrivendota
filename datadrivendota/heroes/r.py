@@ -7,7 +7,7 @@ from rpy2 import robjects
 from rpy2.robjects.packages import importr
 
 from heroes.models import HeroDossier, Hero
-from datadrivendota.r import s3File
+from datadrivendota.r import s3File, enforceTheme
 
 
 def generateChart(hero_list, stats_list):
@@ -79,6 +79,7 @@ def generateChart(hero_list, stats_list):
     #Make a file
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    enforceTheme(robjects)
     robjects.r("""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
                 auto.key=list(lines=T,points=F,space='right'),

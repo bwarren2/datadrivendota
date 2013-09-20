@@ -12,14 +12,6 @@ def match(request, match_id):
     summaries = get_list_or_404(PlayerMatchSummary, match=match)
     for summary in summaries:
         summary.kda = summary.kills - summary.deaths + .5*summary.assists
-        if summary.which_side()=='Dire':
-            summary.color = '#FFBEBE'
-        else:
-            summary.color = '#C8FFC9'
-        if summary.is_win:
-            summary.win_color='black'
-        else:
-            summary.win_color='white'
     match.hms_duration = datetime.timedelta(seconds=match.duration)
     match.hms_start_time = datetime.datetime.fromtimestamp(match.start_time).strftime('%H:%M:%S %Y-%m-%d')
     return render_to_response('match_detail.html', {'match':match,

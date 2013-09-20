@@ -2,11 +2,11 @@ from uuid import uuid4
 from django.core.files import File
 from django.core.files.storage import default_storage
 from rpy2 import robjects
-from rpy2.robjects import Formula, FloatVector, StrVector
+from rpy2.robjects import FloatVector, StrVector
 from rpy2.robjects.packages import importr
 from matches.models import PlayerMatchSummary, GameMode
 from players.models import Player
-
+from datadrivendota.r import enforceTheme, s3File
 
 def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
@@ -75,6 +75,7 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    enforceTheme(robjects)
 
     robjects.globalenv["xvec"] = x_vec
     robjects.globalenv["yvec"] = y_vec
@@ -98,15 +99,6 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
     imagefile.close()
 
-    # This is a goofy hack.  I do not know why putting the plot between open
-    # and write does not work here.
-    imagefile2 = open(imagefile.name, 'r')
-
-    #Try making a new file and sending that to s3
-    s3file = default_storage.open('1d_%s.bmp' % str(uuid4()), 'w')
-    s3file.write(imagefile2.read())
-    s3file.close()
-    imagefile2.close()
-
-    return s3file
+    hosted_file = s3File(imagefile)
+    return hosted_file
 

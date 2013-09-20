@@ -12,3 +12,11 @@ def s3File(imagefile):
     imagefile2.close()
 
     return s3file
+
+
+def enforceTheme(robjects):
+    cmd = """
+    source('datadrivendota/datadrivendota/theme.r')
+    trellis.par.set(theme=ddd.theme)"""
+    robjects.r(cmd)
+    return True

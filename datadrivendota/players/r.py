@@ -7,9 +7,9 @@ from rpy2.robjects.packages import importr
 
 from matches.models import PlayerMatchSummary
 from .models import Player
-from datadrivendota.r import s3File
+from datadrivendota.r import s3File, enforceTheme
 from heroes.models import safen
-
+from django.conf import settings
 def KDADensity(player_id):
 
     grdevices = importr('grDevices')
@@ -41,16 +41,18 @@ def KDADensity(player_id):
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=600,height=500)
+    enforceTheme(robjects)
+
     robjects.r("""
     print(
         densityplot(~x_vec,groups=cat_vec,
-                auto.key=list(lines=T,points=F,space='right'),
-                par.settings=simpleTheme(lwd=2,),
                 xlab='',
                 panel=function(x,...){
                     panel.densityplot(x,...);
                     panel.abline(v=KDA2_median)
-                }
+                },
+                auto.key= list(lines=T,points=F,
+                    corner=c(0,.99),background='white')
         )
     )""")
     #relation='free' in scales for independent axes
@@ -82,11 +84,12 @@ def CountWinrate(player_id):
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=500,height=500)
-    robjects.r("""
+
+    enforceTheme(robjects)
+    cmd = """
     print(
         xyplot(win_rates~games,labels=labels,
-                auto.key=list(lines=F,points=T,space='right'),
-                par.settings=simpleTheme(lwd=2),
+                auto.key=list(lines=F,points=T,corner=c(0,.9)),
                 ylab='Win %',
                 xlab='Games Played',
                 panel=function(x, y, ...) {
@@ -99,10 +102,11 @@ def CountWinrate(player_id):
                   panel.lines(x=seq(0,100,1),y=100*(.5-2*(1/(2*sqrt(seq(0,100,1))))),lty=3,col='red')
 
                   panel.abline(v=10,lty=3,col='blue')
-                }
+                },
 
         )
-    )""")
+    )"""
+    robjects.r(cmd)
     #relation='free' in scales for independent axes
     grdevices.dev_off()
     imagefile.close()
