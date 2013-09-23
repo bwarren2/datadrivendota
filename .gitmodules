@@ -5,3 +5,6 @@
 	path = datadrivendota/static/bootstrap
 	url = git://github.com/twbs/bootstrap.git
     ignore = all
+[submodule "datadrivendota/static/js/tags"]
+	path = datadrivendota/static/js/tags
+	url = https://github.com/xoxco/jQuery-Tags-Input
