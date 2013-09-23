@@ -32,9 +32,17 @@ def vitals(request):
     if request.method == 'POST':
         hero_form = HeroVitalsMultiSelect(request.POST)
         if HeroVitalsMultiSelect(request.POST).is_valid():
-          hero_list = hero_form.data.getlist('heroes')
+          hero_list = hero_form.data.getlist('heroes')[0].split(',')
           stat_list = hero_form.data.getlist('stats')
-          image = generateChart(hero_list, stat_list)
+          linked_scales = hero_form.data.getlist('unlinked_scales')
+          print linked_scales
+          display_options = {}
+          if linked_scales==[u'on']:
+              display_options['linked_scales']="relation='free'"
+          else:
+              display_options['linked_scales']=''
+          print display_options
+          image = generateChart(hero_list, stat_list, display_options)
           imagebase = basename(image.name)
         else:
           hero_list = []
@@ -56,7 +64,7 @@ def lineup(request):
     if request.method == 'POST':
         hero_form = HeroLineupMultiSelect(request.POST)
         if HeroLineupMultiSelect(request.POST).is_valid():
-          hero_list = hero_form.data.getlist('heroes')
+          hero_list = hero_form.data.getlist('heroes')[0].split(',')
           stat_list = hero_form.data.getlist('stats')
           level =  hero_form.data.getlist('level')
           image = lineupChart(hero_list, stat_list, level)
@@ -78,22 +86,6 @@ def lineup(request):
                               context_instance=RequestContext(request))
 
 def hero_list(request):
-
-    hero_json = {}
-    results = []
-
-    heroes = Hero.objects.all()[:10]
-    results = []
-    for hero in heroes:
-        hero_json = {}
-        hero_json['id'] = hero.steam_id
-        hero_json['label'] = hero.name
-        hero_json['value'] = hero.name
-        results.append(hero_json)
-    data = json.dumps(results)
-
-    mimetype = 'application/json'
-    return HttpResponse(data, mimetype)
 
     if request.is_ajax():
         q = request.GET.get('term', '')

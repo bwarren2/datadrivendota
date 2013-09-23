@@ -10,14 +10,14 @@ from heroes.models import HeroDossier, Hero
 from datadrivendota.r import s3File, enforceTheme
 
 
-def generateChart(hero_list, stats_list):
+def generateChart(hero_list, stats_list, display_options):
     # Currently, we are violating DRY with the available field listing from the form
     # and the R space being in different places and requiring that they are the same.
 
     grdevices = importr('grDevices')
 
     importr('lattice')
-    selected_heroes = HeroDossier.objects.filter(hero__id__in=hero_list)
+    selected_heroes = HeroDossier.objects.filter(hero__name__in=hero_list)
 
     cmd = """
         df.all = data.frame(
@@ -80,14 +80,16 @@ def generateChart(hero_list, stats_list):
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
     enforceTheme(robjects)
-    robjects.r("""print(
+    cmd="""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
                 auto.key=list(lines=T,points=F,space='right'),
                 par.settings=simpleTheme(lwd=4,col=rainbow(n=length(unique(df.all$hero)))),
                 ylab='Value',
-                scales=list(y=list(relation='free'))
+                scales=list(y=list(%s))
                 )
-    )""" % "+".join(stats_list))
+    )""" % ("+".join(stats_list),display_options['linked_scales'])
+    print cmd
+    robjects.r(cmd)
     #relation='free' in scales for independent axes
     grdevices.dev_off()
     imagefile.close()
@@ -106,7 +108,7 @@ def lineupChart(heroes, stat, level):
 
     #Database pulls and format python objects to go to R
     all_heroes = HeroDossier.objects.all().select_related()
-    selected_heroes = Hero.objects.filter(id__in=heroes)
+    selected_heroes = Hero.objects.filter(name__in=heroes)
     selected_names = [hero.safe_name() for hero in selected_heroes]
 
     hero_value = dict((dossier.hero.safe_name(), fetch_value(dossier, stat, level)) for dossier in all_heroes)
@@ -134,16 +136,17 @@ def lineupChart(heroes, stat, level):
     #Make a file
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    enforceTheme(robjects)
     robjects.r("""print(
         barchart(val~name,data=df,type='l',horizontal=F,
                 auto.key=list(lines=T,points=F,space='right'),
                 par.settings=simpleTheme(lwd=2,),
                 scales=list(y=list(relation='free'),x=list(rot=90)),
-                ylab='Value',
+                ylab='%s',
                 col=colors,
                 origin = 0
                 )
-    )""")
+    )""" % stat.title())
     #relation='free' in scales for independent axes
     grdevices.dev_off()
     imagefile.close()

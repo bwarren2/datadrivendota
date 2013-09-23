@@ -23,3 +23,12 @@
     </div>
 {% endblock content %}
 
+{% block extra_js %}
+    <script type="text/javascript">
+    $('.tags').tagsInput({
+        autocomplete_url:'http://127.0.0.1:8000/heroes/api/getheroes',
+
+    });
+    </script>
+{% endblock extra_js %}
+
