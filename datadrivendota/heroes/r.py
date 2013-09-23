@@ -82,7 +82,7 @@ def generateChart(hero_list, stats_list, display_options):
     enforceTheme(robjects)
     cmd="""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
-                auto.key=list(lines=T,points=F,space='right'),
+                auto.key=list(lines=T,points=F,corner=c(0,.9),background='white'),
                 par.settings=simpleTheme(lwd=4,col=rainbow(n=length(unique(df.all$hero)))),
                 ylab='Value',
                 scales=list(y=list(%s))
@@ -139,7 +139,7 @@ def lineupChart(heroes, stat, level):
     enforceTheme(robjects)
     robjects.r("""print(
         barchart(val~name,data=df,type='l',horizontal=F,
-                auto.key=list(lines=T,points=F,space='right'),
+                auto.key=list(lines=T,points=F,corner=c(0,.9),background='white'),
                 par.settings=simpleTheme(lwd=2,),
                 scales=list(y=list(relation='free'),x=list(rot=90)),
                 ylab='%s',

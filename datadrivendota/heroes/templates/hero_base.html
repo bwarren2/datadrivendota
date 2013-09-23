@@ -6,3 +6,12 @@
   <li class="{% if active == "heroes-lineups" %}active{% endif %}"><a href="/heroes/lineups">Lineups</a></li>
 </ul>
 {% endblock extra_nav %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+    $('.tags').tagsInput({
+        autocomplete_url:'http://127.0.0.1:8000/heroes/api/getheroes',
+        defaultText:'Name'
+    });
+    </script>
+{% endblock extra_js %}
