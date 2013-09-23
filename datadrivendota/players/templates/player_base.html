@@ -1,1 +1,25 @@
 {% extends "base.html" %}
+
+{% block extra_nav %}
+    <ul class='nav nav-tabs'>
+        <li class="{% if active == "players-index" %}active{% endif %}"><a href="/players/">Index</a></li>
+        <li class="{% if active == "players-winrate" %}active{% endif %}"><a href="/players/winrate">Winrate</a></li>
+    </ul>
+{% endblock extra_nav %}
+
+
+{% block extra_js %}
+    <script type="text/javascript">
+    $('.playertags').tagsInput({
+        autocomplete_url:'/players/api/getplayers',
+        defaultText:'Name'
+    });
+    </script>
+    <script>
+    $(function() {
+        $( ".datepicker" ).datepicker(
+            { dateFormat: 'yy-mm-dd' }
+            );
+    });
+  </script>
+{% endblock extra_js %}

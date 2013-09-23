@@ -1,15 +1,18 @@
 from uuid import uuid4
-
+import datetime
+from time import mktime
 from django.core.files import File
 from django.db.models import Count
 from rpy2 import robjects
 from rpy2.robjects.packages import importr
 
-from matches.models import PlayerMatchSummary
+from matches.models import PlayerMatchSummary, GameMode
 from .models import Player
 from datadrivendota.r import s3File, enforceTheme
 from heroes.models import safen
 from django.conf import settings
+
+
 def KDADensity(player_id):
 
     grdevices = importr('grDevices')
@@ -62,13 +65,30 @@ def KDADensity(player_id):
     hosted_file = s3File(imagefile)
     return hosted_file
 
-def CountWinrate(player_id):
+def CountWinrate(player_id, min_date='2009-01-01', max_date=None, game_mode_list='Competitive' ):
+
+    if max_date==None:
+        max_date_utc = mktime(datetime.datetime.now().timetuple())
+    else:
+        max_date_utc = mktime(datetime.datetime.strptime(max_date,"%Y-%m-%d").timetuple())
+
+    min_dt_utc = mktime(datetime.datetime.strptime(min_date,"%Y-%m-%d").timetuple())
+
+    if game_mode_list=='Competitive':
+        game_mode_list = GameMode.objects.filter(is_competitive=True)
+    else:
+        game_mode_list = GameMode.objects.filter(steam_id__in=game_mode_list)
     grdevices = importr('grDevices')
     importr('lattice')
 
     player = Player.objects.get(steam_id=player_id)
-
     annotations = PlayerMatchSummary.objects.filter(player=player).values('hero__machine_name','is_win').annotate(Count('is_win'))
+    annotations = annotations.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
+    annotations = annotations.filter(match__start_time__gte=min_dt_utc)
+    annotations = annotations.filter(match__start_time__lte=max_date_utc)
+    annotations = annotations.filter(match__game_mode__in=game_mode_list)
+
+
     heroes = list(set([row['hero__machine_name'] for row in annotations]))
     wins = {row['hero__machine_name']: row['is_win__count'] for row in annotations if row['is_win']==True}
     losses = {row['hero__machine_name']: row['is_win__count'] for row in annotations if row['is_win']==False}

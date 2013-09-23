@@ -1,19 +1,19 @@
 # Create your views here.
-from django.http import HttpResponseNotFound
+import json
+from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from os.path import basename
 from .models import Player
 from .r import KDADensity, CountWinrate
 from urllib import unquote
-
+from .forms import PlayerWinrateLevers
 def index(request):
     player_list = Player.objects.filter(updated=True)
     return render_to_response('player_index.html', {'player_list':player_list},
                               context_instance = RequestContext(request))
 
 def detail(request, player_name=None, player_id=None):
-    print player_name
     if player_name == None and player_id == None:
         return HttpResponseNotFound('<h1>I need either a player name or player id.</h1>')
     elif player_id != None:
@@ -33,3 +33,46 @@ def detail(request, player_name=None, player_id=None):
                                'winrate':winrate},
                               context_instance = RequestContext(request))
 
+def winrate(request):
+
+    if request.method == 'POST':
+        winrate_form = PlayerWinrateLevers(request.POST)
+        if winrate_form.is_valid():
+            player_name = winrate_form.data.getlist('player')[0]
+            min_date = winrate_form.data.getlist('min_date')[0]
+            max_date = winrate_form.data.getlist('max_date')[0]
+            game_modes = winrate_form.data.getlist('game_modes')
+            player = Player.objects.filter(persona_name=player_name)
+            image = CountWinrate(player[0].steam_id, min_date, max_date, game_modes)
+            imagebase = basename(image.name)
+
+        else:
+          image = ''
+          imagebase = ''
+    else:
+        winrate_form = PlayerWinrateLevers()
+        image = ''
+        imagebase = ''
+
+    return render_to_response('winrate_chart.html', {'form': winrate_form,
+                              'image': image,
+                              'imagebase': imagebase},
+                              context_instance=RequestContext(request))
+
+def player_list(request):
+
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+        players = Player.objects.filter(persona_name__icontains = q )[:20]
+        results = []
+        for player in players:
+            player_json = {}
+            player_json['id'] = player.steam_id
+            player_json['label'] = player.persona_name
+            player_json['value'] = player.persona_name
+            results.append(player_json)
+        data = json.dumps(results)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)

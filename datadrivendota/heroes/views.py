@@ -35,13 +35,11 @@ def vitals(request):
           hero_list = hero_form.data.getlist('heroes')[0].split(',')
           stat_list = hero_form.data.getlist('stats')
           linked_scales = hero_form.data.getlist('unlinked_scales')
-          print linked_scales
           display_options = {}
           if linked_scales==[u'on']:
               display_options['linked_scales']="relation='free'"
           else:
               display_options['linked_scales']=''
-          print display_options
           image = generateChart(hero_list, stat_list, display_options)
           imagebase = basename(image.name)
         else:
@@ -69,7 +67,6 @@ def lineup(request):
           level =  hero_form.data.getlist('level')
           image = lineupChart(hero_list, stat_list, level)
           imagebase = basename(image.name)
-          pass
         else:
           hero_list = []
           image = ''

@@ -295,11 +295,15 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_REDIRECT_URL = '/'
 
+###############MAGIC NUMBERS
 STEAM_API_KEY = getenv('STEAM_API_KEY')
 # This is valve's magic number for moving between 32 and 64 bit steam ids.
 ADDER_32_BIT = 76561197960265728
 #This is Valve's ID for anonymized players
 ANONYMOUS_ID = 4294967295
+#Min length for a match to count in seconds.
+MIN_MATCH_LENGTH = 600
+
 
 SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.social.social_auth_user',

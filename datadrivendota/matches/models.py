@@ -36,7 +36,8 @@ class GameMode(models.Model):
     steam_id = models.IntegerField(help_text="Valve's id field", unique=True)
     description = models.CharField(help_text='Game mode, ie. captains',
                                    max_length=50)
-
+    is_competitive = models.BooleanField(help_text="""Whether charts should
+        show this mode by default""", default=False)
     def __unicode__(self):
         return self.description+', ('+str(self.steam_id)+')'
 
