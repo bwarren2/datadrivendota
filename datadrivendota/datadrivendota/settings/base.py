@@ -11,6 +11,7 @@ import dj_database_url
 import djcelery
 djcelery.setup_loader()
 
+
 BROKER_POOL_LIMIT = int(getenv('BROKER_POOL_LIMIT', 1))
 #BROKER_URL = 'amqp://'+getenv('RABBITMQ_USER')+':'+getenv('RABBITMQ_PASS')+'@
 #localhost//'+getenv('RABBITMQ_VHOST')
@@ -96,13 +97,26 @@ USE_L10N = True
 USE_TZ = True
 ########## END GENERAL CONFIGURATION
 
+####STORAGES####
+AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY', '')
+AWS_STORAGE_BUCKET_NAME = getenv('AWS_STORAGE_BUCKET_NAME', '')
+DEFAULT_FILE_STORAGE = 'datadrivendota.s3utils.MediaRootS3BotoStorage'
+STATICFILES_STORAGE = 'datadrivendota.s3utils.S3PipelineStorage'
+
+S3_URL = 'http://%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+STATIC_DIRECTORY = '/assets/'
+MEDIA_DIRECTORY = '/media/'
+
+
+
 
 ########## MEDIA CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
 MEDIA_ROOT = normpath(join(SITE_ROOT, 'media'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = '/media/'
+MEDIA_URL = S3_URL + MEDIA_DIRECTORY
 ########## END MEDIA CONFIGURATION
 
 
@@ -111,7 +125,7 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = normpath(join(SITE_ROOT, 'assets'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
-STATIC_URL = '/static/'
+STATIC_URL = S3_URL + STATIC_DIRECTORY
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 # Note: There is a presumption that the first entry here is 'static' so that trash dirs work.
@@ -217,7 +231,6 @@ THIRD_PARTY_APPS = (
     'social_auth',
     'storages',
     'djcelery',
-    'django_select2',
     'pipeline'
 )
 
@@ -317,6 +330,7 @@ PIPELINE_CSS = {
     'all': {
         'source_filenames': (
             'css/custom_bootstrap_compilation.less',
+            'js/tags/jquery.tagsinput.css',
             'css/project.less'
         ),
         'output_filename': 'css/all.css',
@@ -345,6 +359,7 @@ PIPELINE_JS = {
             'bootstrap/js/collapse.js',
             'bootstrap/js/carousel.js',
             'bootstrap/js/affix.js',
+            'js/tags/jquery.tagsinput.js',
             'js/project.js',
         ),
         'output_filename': 'js/all.js',
@@ -355,17 +370,4 @@ PIPELINE_COMPILERS = (
     'pipeline.compilers.less.LessCompiler',
 )
 ########## END PIPELINE CONFIGURATION
-
-####STORAGES####
-AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID', '')
-AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY', '')
-AWS_STORAGE_BUCKET_NAME = getenv('AWS_STORAGE_BUCKET_NAME', '')
-DEFAULT_FILE_STORAGE = 'datadrivendota.s3utils.MediaRootS3BotoStorage'
-STATICFILES_STORAGE = 'datadrivendota.s3utils.S3PipelineStorage'
-
-S3_URL = 'http://%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-STATIC_DIRECTORY = '/static/'
-MEDIA_DIRECTORY = '/media/'
-STATIC_URL = S3_URL + STATIC_DIRECTORY
-MEDIA_URL = S3_URL + MEDIA_DIRECTORY
 

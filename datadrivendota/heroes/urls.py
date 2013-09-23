@@ -6,6 +6,7 @@ urlpatterns = patterns('',
     url(r'^vitals/?$', views.vitals, name='vitals'),
     url(r'^lineups/?$', views.lineup, name='lineup'),
     url(r'^(?P<hero_name>[a-zA-Z0-9\-]*)/?$', views.detail, name="detail"),
+    url(r'^api/getheroes/?',views.hero_list,name='hero_list'),
 )
     # Examples:
     # url(r'^$', 'datadrivendota.views.home', name='home'),

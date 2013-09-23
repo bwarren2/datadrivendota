@@ -31,7 +31,8 @@ class HeroVitalsMultiSelect(forms.Form):
 
 
 class HeroLineupMultiSelect(forms.Form):
-    heroes = HeroMultiSelect(required=True)
+    heroes = forms.MultipleChoiceField(choices=hero_list, required=True)
+    heroes.widget=forms.TextInput(attrs={'class': 'tags',})
     stats = forms.ChoiceField(choices=lineup_stats, required=True)
     level = forms.ChoiceField(choices=[(i,i) for i in range(1,26)], required=True)
 

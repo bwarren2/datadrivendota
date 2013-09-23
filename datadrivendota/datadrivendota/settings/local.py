@@ -60,13 +60,9 @@ MIDDLEWARE_CLASSES += (
 )
 ########## END TOOLBAR CONFIGURATION
 
-
-########## STATIC CONFIGURATION
-STATIC_URL = '/static/'
+####### STATIC CONFIGURATION
+STATIC_URL = '/assets/'
 MEDIA_URL = '/media/'
-MEDIA_DIRECTORY = '/media/'
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
+STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-

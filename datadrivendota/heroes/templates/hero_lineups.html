@@ -21,7 +21,29 @@
         <img src="{{MEDIA_URL}}{{imagebase}}">
     {% endif %}
     </div>
+
+<input type='text' name="tags" id="tags" class="tags" value="foo,bar,baz" />
+
 {% endblock content %}
 
+{% block extra_js %}
 
+ <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+    href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/start/jquery-ui.css" />
+
+    <script type="text/javascript">
+    $('.tags').tagsInput({
+        autocomplete_url:'http://127.0.0.1:8000/heroes/api/getheroes',
+
+    });
+    </script>
+{% comment %}
+    <script type="text/javascript">
+    $('.tags').tagsInput({
+        autocomplete_url:'http://myserver.com/api/autocomplete'
+    });
+    </script>
+{% endcomment %}
+{% endblock extra_js %}
 

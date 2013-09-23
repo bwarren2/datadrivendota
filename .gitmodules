@@ -8,3 +8,4 @@
 [submodule "datadrivendota/static/js/tags"]
 	path = datadrivendota/static/js/tags
 	url = https://github.com/xoxco/jQuery-Tags-Input
+    ignore = all

@@ -1,5 +1,7 @@
 #from django.views.generic.detail import DetailView
 from os.path import basename
+import json
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from .models import Hero
 from django.utils.text import slugify
@@ -74,3 +76,37 @@ def lineup(request):
                               'hero_list': hero_list, 'image': image,
                               'imagebase': imagebase},
                               context_instance=RequestContext(request))
+
+def hero_list(request):
+
+    hero_json = {}
+    results = []
+
+    heroes = Hero.objects.all()[:10]
+    results = []
+    for hero in heroes:
+        hero_json = {}
+        hero_json['id'] = hero.steam_id
+        hero_json['label'] = hero.name
+        hero_json['value'] = hero.name
+        results.append(hero_json)
+    data = json.dumps(results)
+
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
+
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+        heroes = Hero.objects.filter(name__icontains = q )[:20]
+        results = []
+        for hero in heroes:
+            hero_json = {}
+            hero_json['id'] = hero.steam_id
+            hero_json['label'] = hero.name
+            hero_json['value'] = hero.name
+            results.append(hero_json)
+        data = json.dumps(results)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
