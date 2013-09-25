@@ -24,7 +24,7 @@ CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls",)
 CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
 
 #Stop a bazillion fake queues from being made with results.  Time in sec.
-CELERY_AMQP_TASK_RESULT_EXPIRES = int(getenv('AMQP_EXPIRY_RATE'))
+CELERY_AMQP_TASK_RESULT_EXPIRES = int(getenv('RESULT_EXPIRY_RATE'))
 CELERY_TASK_RESULT_EXPIRES = CELERY_AMQP_TASK_RESULT_EXPIRES
 
 # Valve's rate limiting.
