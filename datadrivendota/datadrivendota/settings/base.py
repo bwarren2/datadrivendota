@@ -21,7 +21,7 @@ BROKER_URL = getenv('CLOUDAMQP_URL')
 CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls",)
 
 ## Using the database to store task state and results.
-CELERY_RESULT_BACKEND = GETENV('CELERY_RESULT_BACKEND')
+CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
 
 #Stop a bazillion fake queues from being made with results.  Time in sec.
 CELERY_AMQP_TASK_RESULT_EXPIRES = int(getenv('AMQP_EXPIRY_RATE'))
