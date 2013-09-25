@@ -41,7 +41,7 @@ def valve_api_call(mode, optionsDict={}):
         raise KeyError('That mode ('+str(mode)+") is not supported")
 
     URL = url + '?' + urlencode(optionsDict)
-
+    print "URL: "+ URL
     # Exception handling for the URL opening.
     try:
         pageaccess = urllib2.urlopen(URL)
@@ -76,7 +76,7 @@ def valve_api_call(mode, optionsDict={}):
     data['optionsGiven'] = optionsDict
     return data
 
-@task
+@task()
 def retrieve_player_records(urldata):
         """
         Recursively pings the valve API and spawns new tasks to deal with the
@@ -104,7 +104,7 @@ def retrieve_player_records(urldata):
         if urldata['status'] != 1:
             raise Exception("No Data for that call")
 
-@task
+@task()
 def upload_match(data):
     """
     Uploads a match given the return of an API call.
@@ -145,7 +145,7 @@ def upload_match(data):
         upload_match_summary.s(players=data['players'],
                                parent_match=match).delay()
 
-@task
+@task()
 def upload_match_summary(players, parent_match):
     """
     Populates the endgame summary data that is associated with a match
@@ -197,7 +197,7 @@ def upload_match_summary(players, parent_match):
                 }
                 SkillBuild.objects.get_or_create(**kwargs)
 
-@task
+@task()
 def refresh_updating_players():
     """ Go through the users for whom update is True and group them into lists
     of 50.  The profile update API actually supports up to 100"""
@@ -217,7 +217,7 @@ def refresh_updating_players():
                   update_players.s()).delay()
             querylist = []
 
-@task
+@task()
 def update_players(urldata):
     """Make the avatar and persona facts of a profile match current."""
     #This options is present in the return code, but not needed here.

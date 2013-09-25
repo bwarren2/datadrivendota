@@ -12,23 +12,35 @@ import djcelery
 djcelery.setup_loader()
 
 
+
+########## CELERY CONFIG
 BROKER_POOL_LIMIT = int(getenv('BROKER_POOL_LIMIT', 1))
-#BROKER_URL = 'amqp://'+getenv('RABBITMQ_USER')+':'+getenv('RABBITMQ_PASS')+'@
-#localhost//'+getenv('RABBITMQ_VHOST')
 BROKER_URL = getenv('CLOUDAMQP_URL')
 
 # List of modules to import when celery starts.
 CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls",)
 
 ## Using the database to store task state and results.
-CELERY_RESULT_BACKEND = "amqp"
-CELERY_RESULT_DBURI = "ampq:///datadrivendota.db"
+CELERY_RESULT_BACKEND = GETENV('CELERY_RESULT_BACKEND')
 
 #Stop a bazillion fake queues from being made with results.  Time in sec.
 CELERY_AMQP_TASK_RESULT_EXPIRES = int(getenv('AMQP_EXPIRY_RATE'))
 CELERY_TASK_RESULT_EXPIRES = CELERY_AMQP_TASK_RESULT_EXPIRES
+
 # Valve's rate limiting.
 VALVE_RATE = getenv('VALVE_RATE')
+
+CELERY_SEND_TASK_ERROR_EMAILS = True
+
+# Name and email addresses of recipients
+ADMINS = (
+    ("Ben Warren", "datadrivendota@gmail.com"),
+)
+
+# Email address used as sender (From field).
+SERVER_EMAIL = "celery@datadrivendota.com"
+
+
 
 
 ########## PATH CONFIGURATION
@@ -303,6 +315,7 @@ ADDER_32_BIT = 76561197960265728
 ANONYMOUS_ID = 4294967295
 #Min length for a match to count in seconds.
 MIN_MATCH_LENGTH = 600
+
 
 
 SOCIAL_AUTH_PIPELINE = (
