@@ -4,6 +4,8 @@
 from os.path import abspath, basename, dirname, join, normpath
 from os import getenv
 from sys import path
+from kombu import Exchange, Queue
+
 
 import dj_database_url
 
@@ -24,8 +26,7 @@ CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls",)
 CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
 
 #Stop a bazillion fake queues from being made with results.  Time in sec.
-CELERY_AMQP_TASK_RESULT_EXPIRES = int(getenv('RESULT_EXPIRY_RATE'))
-CELERY_TASK_RESULT_EXPIRES = CELERY_AMQP_TASK_RESULT_EXPIRES
+CELERY_TASK_RESULT_EXPIRES = int(getenv('RESULT_EXPIRY_RATE'))
 
 # Valve's rate limiting.
 VALVE_RATE = getenv('VALVE_RATE')
@@ -40,6 +41,25 @@ ADMINS = (
 # Email address used as sender (From field).
 SERVER_EMAIL = "celery@datadrivendota.com"
 
+
+CELERY_QUEUES = (
+    Queue('default', Exchange('default'), routing_key='default'),
+    Queue('api_call',  Exchange('valve_api'),   routing_key='valve_api_call'),
+    Queue('db_upload',  Exchange('db'),   routing_key='db'),
+)
+
+CELERY_ROUTES = {
+    'matches.management.tasks.valve_api_calls.valve_api_call': {'exchange': 'valve_api','routing_key':'valve_api_call'},
+    'matches.management.tasks.valve_api_calls.upload_match': {'exchange': 'db','routing_key':'db'},
+    'matches.management.tasks.valve_api_calls.update_players': {'exchange': 'db','routing_key':'db'},
+    'matches.management.tasks.valve_api_calls.upload_match_summary': {'exchange': 'db','routing_key':'db'},
+    'matches.management.tasks.valve_api_calls.retrieve_player_records': {'exchange': 'default'},
+    'matches.management.tasks.valve_api_calls.refresh_updating_players': {'exchange': 'default'},
+}
+
+CELERY_DEFAULT_EXCHANGE = 'default'
+CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
+CELERY_DEFAULT_ROUTING_KEY = 'default'
 
 
 
