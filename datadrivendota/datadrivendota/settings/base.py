@@ -6,7 +6,6 @@ from os import getenv
 from sys import path
 from kombu import Exchange, Queue
 
-
 import dj_database_url
 
 #Celery
@@ -49,19 +48,21 @@ CELERY_QUEUES = (
 )
 
 CELERY_ROUTES = {
-    'matches.management.tasks.valve_api_calls.valve_api_call': {'exchange': 'valve_api','routing_key':'valve_api_call'},
-    'matches.management.tasks.valve_api_calls.upload_match': {'exchange': 'db','routing_key':'db'},
-    'matches.management.tasks.valve_api_calls.update_players': {'exchange': 'db','routing_key':'db'},
-    'matches.management.tasks.valve_api_calls.upload_match_summary': {'exchange': 'db','routing_key':'db'},
-    'matches.management.tasks.valve_api_calls.retrieve_player_records': {'exchange': 'default'},
-    'matches.management.tasks.valve_api_calls.refresh_updating_players': {'exchange': 'default'},
+    'matches.management.tasks.valve_api_calls.ValveApiCall': {'exchange': 'valve_api','routing_key':'valve_api_call'},
+    'matches.management.tasks.valve_api_calls.UploadMatch': {'exchange': 'db','routing_key':'db'},
+    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'exchange': 'db','routing_key':'db'},
+    'matches.management.tasks.valve_api_calls.UploadMatchSummary': {'exchange': 'db','routing_key':'db'},
+    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'exchange': 'default'},
+    'matches.management.tasks.valve_api_calls.RefreshUpdatingPlayerRecords': {'exchange': 'default'},
 }
 
 CELERY_DEFAULT_EXCHANGE = 'default'
 CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 CELERY_DEFAULT_ROUTING_KEY = 'default'
+CELERY_DEFAULT_QUEUE = 'default'
 
-
+CELERY_ANNOTATIONS = {"matches.management.tasks.valve_api_calls.ValveApiCall":
+                        {"rate_limit": VALVE_RATE}}
 
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:

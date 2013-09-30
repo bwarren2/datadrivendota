@@ -32,3 +32,6 @@ datadrivendota/static/css/*.css
 
 #Ignore artifacts of local image construction
 1d_*
+
+#Rabbit reset bash script
+rabbit_reset

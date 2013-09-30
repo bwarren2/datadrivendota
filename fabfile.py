@@ -2,12 +2,15 @@ from fabric.api import local
 
 
 def hp():
-    local('heroku push -b https://github.com/ddollar/heroku-buildpack-multi.git')
-    local(heroku_run(collect_static()))
+    local('git push heroku master')
+    local(collect_static())
+    local(heroku_run(migrate))
 
+def migrate():
+    return "python datadrivendota/manage.py migrate"
 
 def collect_static():
-    return 'python datadrivendota/manage.py collectstatic'
+    return 'python datadrivendota/manage.py collectstatic --settings=datadrivendota.settings.production'
 
 
 def scrape_valve_heroes():

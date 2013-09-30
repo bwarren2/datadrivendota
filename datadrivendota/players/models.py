@@ -13,6 +13,8 @@ class Player(models.Model):
     avatar_full = models.TextField(help_text="Big avatar image url")
     updated = models.BooleanField(help_text='Do we update this person \
               and scrape them?', default=False)
+    last_scrape_time = models.IntegerField(help_text='Unix time of last match scrape start', default=0)
+
 
     def save(self, *args, **kwargs):
         # That magic number is the valve 32bit -64bit adder.
