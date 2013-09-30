@@ -10,7 +10,7 @@ def migrate():
     return "python datadrivendota/manage.py migrate"
 
 def collect_static():
-    return 'python datadrivendota/manage.py collectstatic --settings=datadrivendota.settings.production'
+    return 'python datadrivendota/manage.py collectstatic --settings=datadrivendota.settings.production --noinput'
 
 
 def scrape_valve_heroes():
