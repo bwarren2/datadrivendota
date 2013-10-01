@@ -4,7 +4,7 @@ from fabric.api import local
 def hp():
     local('git push heroku master')
     local(collect_static())
-    local(heroku_run(migrate))
+    local(heroku_run(migrate()))
 
 def migrate():
     return "python datadrivendota/manage.py migrate"
