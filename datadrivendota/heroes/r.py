@@ -88,7 +88,6 @@ def generateChart(hero_list, stats_list, display_options):
                 scales=list(y=list(%s))
                 )
     )""" % ("+".join(stats_list),display_options['linked_scales'])
-    print cmd
     robjects.r(cmd)
     #relation='free' in scales for independent axes
     grdevices.dev_off()
