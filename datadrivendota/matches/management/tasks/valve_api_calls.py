@@ -291,15 +291,16 @@ class RefreshUpdatePlayerPersonas(BaseTask):
             if counter % list_send_length == 0 or counter == len(users):
                 steamids = ",".join(querylist)
                 vac = ValveApiCall()
+                upp = UpdatePlayerPersonas()
                 chain(vac.s('GetPlayerSummaries',\
                                      {'steamids': steamids}), \
-                      UpdatePlayerPersonas.s()).delay()
+                      upp.s()).delay()
                 querylist = []
 
 tasks.register(RefreshUpdatePlayerPersonas)
 
 
-class UpdatePlayerPersonas(BaseTask):
+class UpdatePlayerPersonas(ApiFollower):
 
     def run(self, urldata):
         """Make the avatar and persona facts of a profile match current."""
