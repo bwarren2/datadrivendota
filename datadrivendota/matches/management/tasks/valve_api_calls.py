@@ -50,6 +50,10 @@ class ApiFollower(BaseTask):
         #logger.info("Ending run")
         pass
 
+    def moreResultsLeft(self):
+        return self.result['results_remaining'] != 0 \
+          and self.internalOpts['last_scrape_time'] < \
+            self.result['matches'][-1]['start_time']
 
 #Descendants
 class ValveApiCall(BaseTask):
@@ -87,6 +91,9 @@ class ValveApiCall(BaseTask):
             if err.code == 104:
                 logger.info("Got error 104 (connection reset by peer) for mode " + str(mode) + valveOpts + ".  Retrying.")
                 self.retry(mode, valveOpts, internalOpts)
+            elif err.code == 111:
+                logger.info("Connection Refused! "+URL+ ".  Retrying.")
+                self.retry(mode, valveOpts, internalOpts)
             elif err.code == 404:
                 logger.info("Page not found! "+URL+ ".  Retrying.")
                 self.retry(mode, valveOpts, internalOpts)
@@ -118,7 +125,6 @@ class ValveApiCall(BaseTask):
         data['valveOpts'] = valveOpts
         data['internalOpts'] = internalOpts
         return data
-
 tasks.register(ValveApiCall)
 
 
@@ -129,42 +135,41 @@ class RetrievePlayerRecords(ApiFollower):
         Recursively pings the valve API to get match data and spawns new tasks
         to deal with the downloaded match IDs.
         """
-        urldata = self.result
-
         #Validate
-        if urldata['status'] != 1:
+        if self.result['status'] == 15:
+            logger.error("Could not pull data. "+str(self.valveOpts['account_id'])+" disallowed it. ")
+        elif self.result['status'] == 1:
+            #Spawn a bunch of match detail queries
+            self.spawnDetailCalls()
+            #Go around again if there are more records and the last one was before last scrape.
+            if self.moreResultsLeft():
+                self.rebound()
+            #Successful closeout
+            else:
+                self.cleanup()
+        else:
+            logger.error("Unhandled status: "+str(self.result['status']))
             raise Exception("No Data for that call")
 
-        #Spawn a bunch of match detail queries
-        for result in urldata['matches']:
+    def rebound(self):
+        self.valveOpts['start_at_match_id'] = self.result['matches'][-1]['match_id']
+        vac = ValveApiCall()
+        rpr = RetrievePlayerRecords()
+        chain(vac.s('GetMatchHistory',self.valveOpts,self.internalOpts), rpr.s()).delay()
+
+    def cleanup(self):
+        player = Player.objects.get(steam_id=self.valveOpts['account_id'])
+        new_last_scrape = self.internalOpts['start_scrape_time'] if self.internalOpts['start_scrape_time'] else now()
+        player.last_scrape_time = new_last_scrape
+        player.save()
+
+    def spawnDetailCalls(self):
+        for result in self.result['matches']:
             vac = ValveApiCall()
             um = UploadMatch()
             chain(vac.s('GetMatchDetails',\
                                  {'match_id': result['match_id']},
-                                 self.internalOpts), \
-                  um.s()).delay()
-
-
-        #This function is recursive, and starts at the beginning unless it knows
-        #to start in the middle.
-        self.valveOpts['start_at_match_id'] = urldata['matches'][-1]['match_id']
-
-
-        #Go around again if there are more records and the last one was before last scrape.
-        if urldata['results_remaining'] != 0 \
-         and self.internalOpts['last_scrape_time']<urldata['matches'][-1]['start_time']:
-            vac = ValveApiCall()
-            rpr = RetrievePlayerRecords()
-            chain(vac.s('GetMatchHistory',self.valveOpts,self.internalOpts), \
-                  rpr.s()).delay()
-
-        #Successful closeout
-        else:
-            player = Player.objects.get(steam_id=self.valveOpts['account_id'])
-            new_last_scrape = self.internalOpts['start_scrape_time'] if self.internalOpts['start_scrape_time'] else now()
-            player.last_scrape_time = new_last_scrape
-            player.save()
-
+                                 self.internalOpts), um.s()).delay()
 tasks.register(RetrievePlayerRecords)
 
 
@@ -177,6 +182,7 @@ class UploadMatch(ApiFollower):
         this will not correctly account for players that unanonymize their data.
         More code to the effect of "Look in the hero slot of the player you are
         searching for, see if it is anonymous, update if so" is needed;
+        if urldata['status'] == 1:
         right now this just trawls for overall match data.
         """
         data = self.result
