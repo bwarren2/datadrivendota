@@ -22,12 +22,75 @@ from httplib import BadStatusLine
 
 logger = logging.getLogger(__name__)
 
+class ApiContext(object):
+    #Things we send to Valve
+    account_id=None
+    matches_requested=100
+    skill=None
+    date_max=None
+    start_at_match_id=None
+    key=None
+    match_id=None
+    #There are magic lists of teh above in the URL constructor.
+
+    #Things we care about internally
+    start_scrape_time=now()
+    matches_desired=None
+    skill_levels=[0]  #This only works for heroes.
+    deepcopy=False
+    last_scrape_time=0
+    player_steam_ids = None
+    processed=0
+
+    def toUrlDict(self, mode):
+        if mode == 'GetPlayerSummaries':
+            valve_URL_vars=['steamids','key']
+            return self.dictVars(valve_URL_vars)
+        elif mode == 'GetMatchDetails':
+            valve_URL_vars=['match_id','key']
+            return self.dictVars(valve_URL_vars)
+        elif mode == 'GetMatchHistory':
+            valve_URL_vars=['account_id','hero_id','matches_requested',
+            'skill','date_max','date_max','start_at_match_id','key']
+            return self.dictVars(valve_URL_vars)
+        else:
+            logger.error("I did not understand mode: "+mode)
+
+    def dictVars(self, url_vars):
+        return_dict={}
+        for var in url_vars:
+            if getattr(self,var):
+                return_dict[var]=getattr(self,var)
+        return return_dict
+
+
+    def __str__(self):
+        strng =  "Acct id: "+str(self.account_id)+"\n"
+        strng += "matches requested: "+str(self.matches_requested)+"\n"
+        strng += "Skill: "+str(self.skill)+"\n"
+        strng += "date max: "+str(self.date_max)+"\n"
+        strng += "start_at_match_id: "+str(self.start_at_match_id)+"\n"
+        strng += "key: "+str(self.key)+"\n"
+        #This is a magic list of the above.
+        strng += "url vars: "+str(self.valve_URL_vars)+"\n"
+
+        #Things we care about internally
+        strng += "start scrape time: "+str(self.start_scrape_time)+"\n"
+        strng += "matches desired: "+str(self.matches_desired)+"\n"
+        strng += "skill_levels: "+str(self.skill_levels)+"\n"
+        strng += "deepcopy: "+str(self.deepcopy)+"\n"
+        strng += "last scrape time: "+str(self.last_scrape_time)+"\n"
+        return strng
+
+
 #Parents
 class BaseTask(Task):
 
     abstract=True
     def __call__(self, *args, **kwargs):
         #logger.info("Starting to run")
+        self.api_context = kwargs['api_context']
+        del kwargs['api_context']
         return self.run(*args, **kwargs)
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
@@ -39,32 +102,32 @@ class ApiFollower(BaseTask):
 
     abstract=True
     def __call__(self, *args, **kwargs):
-        self.valveOpts = args[0].get('valveOpts',{})
-        self.internalOpts = args[0].get('internalOpts',{})
         self.result = args[0].get('result',{})
-        #logger.info("I think I assigned things.")
+        self.api_context = args[0].get('api_context',{})
         return self.run(*args, **kwargs)
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         #exit point of the task whatever is the state
-        #logger.info("Ending run")
         pass
 
     def moreResultsLeft(self):
-        return self.result['results_remaining'] != 0 \
-          and self.internalOpts['last_scrape_time'] < \
-            self.result['matches'][-1]['start_time']
+        if self.result['results_remaining'] == 0:
+            return False
+        elif self.api_context.processed >= self.api_context.matches_desired:
+            return False
+        else:
+            return self.api_context.last_scrape_time < self.result['matches'][-1]['start_time']
+
 
 #Descendants
 class ValveApiCall(BaseTask):
-
-    def run(self, mode, valveOpts={}, internalOpts={}, **kwargs):
+    def run(self, mode, **kwargs):
         """ Ping the valve API for downloading results.  Only enumeratd modes are
         acceptable; check the code.  There is a natural rate limit here at 1/s
         per valve specifications.  There should be a monthly one too.
         For lots more docs, see http://dev.dota2.com/showthread.php?t=58317 """
         # The steam API accepts a limited set of URLs, and requires a key
-        valveOpts['key'] = STEAM_API_KEY
+        self.api_context.key = STEAM_API_KEY
         modeDict = {'GetMatchHistory':              'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v001/',
                     'GetMatchDetails':              'https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v001/',
                     'GetHeroes':                    'https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/',
@@ -82,39 +145,39 @@ class ValveApiCall(BaseTask):
         except KeyError:
             raise KeyError('That mode ('+str(mode)+") is not supported")
 
-        URL = url + '?' + urlencode(valveOpts)
+        URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
         logger.info("URL: "+ URL)
         # Exception handling for the URL opening.
         try:
             pageaccess = urllib2.urlopen(URL)
         except urllib2.HTTPError, err:
             if err.code == 104:
-                logger.info("Got error 104 (connection reset by peer) for mode " + str(mode) + valveOpts + ".  Retrying.")
-                self.retry(mode, valveOpts, internalOpts)
+                logger.error("Got error 104 (connection reset by peer) for mode " + str(mode) + self.api_context.toUrlDict() + ".  Retrying.")
+                self.retry(mode)
             elif err.code == 111:
-                logger.info("Connection Refused! "+URL+ ".  Retrying.")
-                self.retry(mode, valveOpts, internalOpts)
+                logger.error("Connection Refused! "+URL+ ".  Retrying.")
+                self.retry(mode)
             elif err.code == 404:
-                logger.info("Page not found! "+URL+ ".  Retrying.")
-                self.retry(mode, valveOpts, internalOpts)
+                logger.error("Page not found! "+URL+ ".  Retrying.")
+                self.retry(mode)
             elif err.code == 403:
-                logger.info("Your access was denied. "+URL+ ".  Retrying.")
-                self.retry(mode, valveOpts, internalOpts)
+                logger.error("Your access was denied. "+URL+ ".  Retrying.")
+                self.retry(mode)
             elif err.code == 401:
-                logger.info("Unauth'd! "+URL+ ".  Retrying.")
-                self.retry(mode, valveOpts, internalOpts)
+                logger.error("Unauth'd! "+URL+ ".  Retrying.")
+                self.retry(mode)
             elif err.code == 500:
-                print "Server Error! "+URL+ ".  Retrying."
-                self.retry(mode, valveOpts, internalOpts)
+                logger.error("Server Error! "+URL+ ".  Retrying.")
+                self.retry(mode)
             elif err.code == 503:
-                print "Server busy or limit exceeded "+URL+ ".  Retrying."
-                self.retry(mode, valveOpts, internalOpts)
+                logger.error("Server busy or limit exceeded "+URL+ ".  Retrying.")
+                self.retry(mode)
             else:
-                print "Got error "+str(err)+" with URL "+URL+ ".  Retrying."
-                self.retry(mode, valveOpts, internalOpts)
+                logger.error("Got error "+str(err)+" with URL "+URL+ ".  Retrying.")
+                self.retry(mode)
         except BadStatusLine:
-            print "Bad status line for url %s" % URL+ ".  Retrying."
-            self.retry(mode, valveOpts, internalOpts)
+            logger.error("Bad status line for url %s" % URL+ ".  Retrying.")
+            self.retry(mode)
 
 
         # If everything is kosher, import the result and return it.
@@ -122,9 +185,9 @@ class ValveApiCall(BaseTask):
         # Append the options given so we can tell what the invocation was.
         # For example, it is not straightforward to deduce the calling account_id
         # unless you do this.
-        data['valveOpts'] = valveOpts
-        data['internalOpts'] = internalOpts
+        data['api_context'] = self.api_context
         return data
+
 tasks.register(ValveApiCall)
 
 
@@ -152,24 +215,30 @@ class RetrievePlayerRecords(ApiFollower):
             raise Exception("No Data for that call")
 
     def rebound(self):
-        self.valveOpts['start_at_match_id'] = self.result['matches'][-1]['match_id']
+        self.api_context.start_at_match_id = self.result['matches'][-1]['match_id']
+        # If we want to poll more than 500 results deep, we need to reset the
+        # valve api's date bounding
+        if self.api_context.deepcopy==True:
+            self.api_context.date_max = self.result['matches'][-1]['start_time']
         vac = ValveApiCall()
         rpr = RetrievePlayerRecords()
-        chain(vac.s('GetMatchHistory',self.valveOpts,self.internalOpts), rpr.s()).delay()
+        chain(vac.s(mode='GetMatchHistory',api_context=self.api_context), rpr.s()).delay()
 
     def cleanup(self):
-        player = Player.objects.get(steam_id=self.valveOpts['account_id'])
-        new_last_scrape = self.internalOpts['start_scrape_time'] if self.internalOpts['start_scrape_time'] else now()
-        player.last_scrape_time = new_last_scrape
-        player.save()
-
+        try:
+            player = Player.objects.get(steam_id=self.api_context.account_id)
+            new_last_scrape = self.api_context.start_scrape_time if self.api_context.start_scrape_time else now()
+            player.last_scrape_time = new_last_scrape
+            player.save()
+        except Player.DoesNotExist:
+            pass
     def spawnDetailCalls(self):
         for result in self.result['matches']:
             vac = ValveApiCall()
             um = UploadMatch()
-            chain(vac.s('GetMatchDetails',\
-                                 {'match_id': result['match_id']},
-                                 self.internalOpts), um.s()).delay()
+            self.api_context.match_id=result['match_id']
+            chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
+            self.api_context.processed+=1
 tasks.register(RetrievePlayerRecords)
 
 
@@ -205,6 +274,7 @@ class UploadMatch(ApiFollower):
             'positive_votes': data['positive_votes'],
             'negative_votes': data['negative_votes'],
             'game_mode': GameMode.objects.get_or_create(steam_id=data['game_mode'])[0],
+            'skill': self.api_context.skill,
         }
 
         try:
@@ -213,7 +283,7 @@ class UploadMatch(ApiFollower):
             match = Match.objects.create(**kwargs)
             match.save()
             ums = UploadMatchSummary()
-            ums.s(players=data['players'], parent_match=match).delay()
+            ums.s(players=data['players'], parent_match=match,api_context=self.api_context).delay()
 
 tasks.register(UploadMatch)
 
@@ -292,8 +362,8 @@ class RefreshUpdatePlayerPersonas(BaseTask):
                 steamids = ",".join(querylist)
                 vac = ValveApiCall()
                 upp = UpdatePlayerPersonas()
-                chain(vac.s('GetPlayerSummaries',\
-                                     {'steamids': steamids}), \
+                self.api_context.player_steam_ids=steamids
+                chain(vac.s(mode='GetPlayerSummaries',api_context=self.api_context), \
                       upp.s()).delay()
                 querylist = []
 
@@ -332,12 +402,54 @@ class RefreshPlayerMatchDetail(BaseTask):
         users = Player.objects.filter(updated=True)
 
         for counter, user in enumerate(users, start = 1):
-            valveOpts = {'account_id': user.steam_id}
-            internalOpts = {'start_scrape_time':now(),
-                        'last_scrape_time':user.last_scrape_time}
+            context = ApiContext()
+            context.account_id=user.steam_id
+            context.matches_requested=10
+            context.start_scrape_time=now()
+            context.last_scrape_time=user.last_scrape_time
             vac = ValveApiCall()
             rpr = RetrievePlayerRecords()
-            chain(vac.s('GetMatchHistory',valveOpts,internalOpts),
-                rpr.s()).delay()
+            chain(vac.s(mode='GetMatchHistory',api_context=self.api_context),rpr.s()).delay()
 
 tasks.register(RefreshPlayerMatchDetail)
+
+
+class AcquirePlayerData(BaseTask):
+
+    def run(self):
+        if self.api_context.account_id is None:
+            logger.error("Needed an account id, had none, failed.")
+        player = Player.objects.get_or_create(steam_id=self.api_context.account_id)[0]
+        if self.api_context.matches_requested is None:
+            self.api_context.matches_requested=100
+        self.api_context.start_scrape_time=now()
+        self.api_context.last_scrape_time=player.last_scrape_time
+        self.api_context.deepycopy=True
+        if self.api_context.matches_desired is None:
+            self.api_context.matches_desired = 500
+        for skill in self.api_context.skill_levels:
+            self.api_context.skill=skill
+
+            vac = ValveApiCall()
+            rpr = RetrievePlayerRecords()
+            chain(vac.s(mode='GetMatchHistory',api_context=self.api_context),rpr.s()).delay()
+
+class AcquireHeroSkillData(BaseTask):
+
+    def run(self):
+        if self.api_context.account_id is not None or self.api_context.hero_id is None:
+            logger.error("Not allowed to have an account_id for this, and need a Hero.")
+        else:
+            if self.api_context.matches_requested is None:
+                self.api_context.matches_requested=100
+            self.api_context.deepycopy=False
+            if self.api_context.matches_desired is None:
+                self.api_context.matches_desired = 100
+            self.api_context.skill_levels=[1,2,3]
+            for skill in self.api_context.skill_levels:
+                self.api_context.skill=skill
+
+                vac = ValveApiCall()
+                rpr = RetrievePlayerRecords()
+                chain(vac.s(mode='GetMatchHistory',api_context=self.api_context),rpr.s()).delay()
+

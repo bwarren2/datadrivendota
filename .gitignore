@@ -35,3 +35,6 @@ datadrivendota/static/css/*.css
 
 #Rabbit reset bash script
 rabbit_reset
+
+#Folder of management things
+convenience files/

@@ -23,7 +23,8 @@ class Match(models.Model):
     negative_votes = models.IntegerField()
     lobby_type = models.ForeignKey('LobbyType', help_text='How the game was queued')
     game_mode = models.ForeignKey('GameMode')
-
+    skill=models.IntegerField(default=0,
+        help_text='How valve denotes skill bracket.  1 is normal, 2 is high, 3 is very high, 0 is my not-assigned')
     class Meta:
         verbose_name_plural = 'matches'
         ordering = ['-start_time']
