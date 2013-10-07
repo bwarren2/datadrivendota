@@ -19,59 +19,16 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
     for id in mode_list:
         game_mode_list.append(GameMode.objects.get(steam_id=id))
     grdevices = importr('grDevices')
-
-    #rprint = robjects.globalenv.get("print")
-
     lattice = importr('lattice')
 
     selected_summaries = PlayerMatchSummary.objects.select_related().filter(player__in=player_obj_list,match__game_mode__in=game_mode_list)
-    cmd = """
-        df.all = data.frame(
-            )
-        """
-    robjects.r(cmd)
-
-    if x_var[0]=='duration':
-        x_vector_list = [summary.match.duration/60.0 for summary in selected_summaries]
-        #60 seconds in a minute
-        xlab='Game length (m)'
-    elif x_var[0]=='K-D+.5*A':
-        x_vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in selected_summaries]
-        xlab='Kills - Death + .5*Assists'
-
-    else:
-        x_vector_list = [getattr(summary, x_var[0]) for summary in selected_summaries]
-        xlab=x_var[0]
-
-
-    if y_var[0]=='K-D+.5*A':
-        y_vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in selected_summaries]
-        ylab='Kills - Death + .5*Assists'
-
-    else:
-        y_vector_list = [getattr(summary, y_var[0]) for summary in selected_summaries]
-        ylab=y_var[0]
-
+    x_vector_list, xlab = fetch_match_attributes(selected_summaries, x_var)
+    y_vector_list, ylab = fetch_match_attributes(selected_summaries, y_var)
+    split_vector_list, split_lab = fetch_match_attributes(selected_summaries, split_var)
+    group_vector_list, grouplab = fetch_match_attributes(selected_summaries, group_var)
 
     x_vec = FloatVector(x_vector_list)
     y_vec = FloatVector(y_vector_list)
-
-
-    if split_var[0] == 'player':
-        split_vector_list = [summary.player.steam_id for summary in selected_summaries]
-    elif split_var[0] == 'is_win':
-        split_vector_list = [summary.is_win for summary in selected_summaries]
-    else:
-        split_vector_list = [summary.match.game_mode.description for summary in selected_summaries]
-
-    if group_var[0] == 'player':
-        group_vector_list = [summary.player.steam_id for summary in selected_summaries]
-    elif group_var[0] == 'is_win':
-        group_vector_list = [summary.is_win for summary in selected_summaries]
-    else:
-        group_vector_list = [summary.match.game_mode.description for summary in selected_summaries]
-    grouplab=group_var[0]
-
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
@@ -101,4 +58,31 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
     hosted_file = s3File(imagefile)
     return hosted_file
+
+
+def fetch_match_attributes(summaries,attribute):
+    if attribute=='duration':
+        vector_list = [summary.match.duration/60.0 for summary in summaries]
+        label='Game length (m)'
+    elif attribute=='K-D+.5*A':
+        vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in summaries]
+        label='Kills - Death + .5*Assists'
+    elif attribute == 'player':
+        vector_list = [summary.player.steam_id for summary in summaries]
+        label=attribute.title()
+    elif attribute == 'is_win':
+        vector_list = [summary.is_win for summary in summaries]
+        label='Won Game?'
+    elif attribute == 'game_mode':
+        vector_list = [summary.match.game_mode.description for summary in summaries]
+        label='Game Mode'
+    elif attribute == 'skill':
+        vector_list = [summary.match.skill for summary in summaries]
+        label='Skill Bracket'
+    else:
+        vector_list = [getattr(summary, attribute) for summary in summaries]
+        label=attribute.title()
+
+
+    return vector_list, label
 

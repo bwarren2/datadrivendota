@@ -59,7 +59,7 @@ class ApiContext(object):
     def dictVars(self, url_vars):
         return_dict={}
         for var in url_vars:
-            if getattr(self,var):
+            if getattr(self,var,None) is not None:
                 return_dict[var]=getattr(self,var)
         return return_dict
 
@@ -299,12 +299,20 @@ class UploadMatchSummary(BaseTask):
         talking about).
         """
         for player in players:
+            # Bots do not have data assigned to them.  We have a fictitious
+            # player and leaver status to hold this data.
+            try:
+                account_id = player['account_id']
+                leaver_status = player['leaver_status']
+            except KeyError:
+                account_id=0 #No acct ID means the player is a bot.
+                leaver_status=-1
             kwargs = {
                 'match': parent_match,
                 'player': Player.objects.get_or_create(
-                    steam_id=player['account_id'])[0],
+                    steam_id=account_id)[0],
                 'leaver': LeaverStatus.objects.get_or_create(
-                    steam_id=player['leaver_status'])[0],
+                    steam_id=leaver_status)[0],
                 'player_slot': player['player_slot'],
                 'hero': Hero.objects.get_or_create(
                     steam_id=player['hero_id'])[0],
@@ -420,6 +428,8 @@ class AcquirePlayerData(BaseTask):
         if self.api_context.account_id is None:
             logger.error("Needed an account id, had none, failed.")
         player = Player.objects.get_or_create(steam_id=self.api_context.account_id)[0]
+        player.updated = True
+        player.save()
         if self.api_context.matches_requested is None:
             self.api_context.matches_requested=100
         self.api_context.start_scrape_time=now()

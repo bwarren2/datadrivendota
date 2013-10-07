@@ -1,15 +1,18 @@
 from uuid import uuid4
 
+from itertools import chain
+
 from django.core.files import File
 #from django.conf import settings
 
 from rpy2 import robjects
+from rpy2.robjects import FloatVector, StrVector
 from rpy2.robjects.packages import importr
 
 from heroes.models import HeroDossier, Hero
 from datadrivendota.r import s3File, enforceTheme
-
-
+from matches.models import PlayerMatchSummary
+from matches.r import fetch_match_attributes
 def generateChart(hero_list, stats_list, display_options):
     # Currently, we are violating DRY with the available field listing from the form
     # and the R space being in different places and requiring that they are the same.
@@ -103,7 +106,7 @@ def lineupChart(heroes, stat, level):
     level = int(level[0])
     #Get the right stuff loaded in R
     grdevices = importr('grDevices')
-    lattice = importr('lattice')
+    importr('lattice')
 
     #Database pulls and format python objects to go to R
     all_heroes = HeroDossier.objects.all().select_related()
@@ -153,6 +156,60 @@ def lineupChart(heroes, stat, level):
     hosted_file = s3File(imagefile)
     print imagefile, hosted_file
     return hosted_file
+
+def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, split_var):
+
+    #Get the right stuff loaded in R
+    grdevices = importr('grDevices')
+    importr('lattice')
+
+    #Database pulls and format python objects to go to R
+    matches = PlayerMatchSummary.objects.filter(match__game_mode__in=game_mode_list)
+    matches = matches.filter(hero__steam_id=hero)
+    skill1 = matches.filter(match__skill=1)[:30]
+    skill2 = matches.filter(match__skill=2)[:30]
+    skill3 = matches.filter(match__skill=3)[:30]
+
+    match_pool = list(chain(skill1, skill2, skill3))
+
+    x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
+    y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
+    split_vector_list, split_lab = fetch_match_attributes(match_pool, split_var)
+    group_vector_list, grouplab = fetch_match_attributes(match_pool, group_var)
+
+    #Register in the environment
+    x_vec = FloatVector(x_vector_list)
+    y_vec = FloatVector(y_vector_list)
+
+    robjects.globalenv["xvec"] = x_vec
+    robjects.globalenv["yvec"] = y_vec
+    robjects.globalenv["splitvar"] = StrVector(split_vector_list)
+    robjects.globalenv["groupvar"] = StrVector(group_vector_list)
+
+    #robjects.globalenv["y"] = y
+    #Some in-R formatting
+
+    #Make a file
+    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
+    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    enforceTheme(robjects)
+    rcmd="""print(
+        xyplot(yvec~xvec|splitvar,groups=groupvar,type=c('p','r'),
+                ylab='%s',xlab='%s',
+                auto.key=list(lines=T,points=T,corner=c(0,.9),background='white',
+                    title='%s',cex=.8),
+                par.settings=simpleTheme(lwd=2,pch=20)
+                )
+    )"""% (ylab, xlab, grouplab)
+    robjects.r(rcmd )
+    #relation='free' in scales for independent axes
+    grdevices.dev_off()
+    imagefile.close()
+
+    hosted_file = s3File(imagefile)
+    print imagefile, hosted_file
+    return hosted_file
+
 
 
 def fetch_value(dossier, stat, level):

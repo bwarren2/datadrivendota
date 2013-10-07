@@ -5,6 +5,7 @@ urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
     url(r'^vitals/?$', views.vitals, name='vitals'),
     url(r'^lineups/?$', views.lineup, name='lineup'),
+    url(r'^performance/?$', views.hero_performance, name='hero_performance'),
     url(r'^(?P<hero_name>[a-zA-Z0-9\-]*)/?$', views.detail, name="detail"),
     url(r'^api/getheroes/?',views.hero_list,name='hero_list'),
 )

@@ -7,8 +7,8 @@ from .models import Hero
 from django.utils.text import slugify
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect
-from .r import generateChart, lineupChart
+from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, HeroPlayerPerformance
+from .r import generateChart, lineupChart, HeroPerformanceChart
 
 
 def index(request):
@@ -79,6 +79,36 @@ def lineup(request):
 
     return render_to_response('hero_lineups.html', {'form': hero_form,
                               'hero_list': hero_list, 'image': image,
+                              'imagebase': imagebase},
+                              context_instance=RequestContext(request))
+
+def hero_performance(request):
+    if request.method=='POST':
+        hero_form = HeroPlayerPerformance(request.POST)
+        if hero_form.is_valid():
+            print hero_form.cleaned_data
+            hero = Hero.objects.get(name=hero_form.cleaned_data['hero']).steam_id
+            player = hero_form.cleaned_data['player']
+            game_mode_list = hero_form.cleaned_data['game_modes']
+            x_var= hero_form.cleaned_data['x_var']
+            y_var = hero_form.cleaned_data['y_var']
+            split_var = hero_form.cleaned_data['split_var']
+            group_var = hero_form.cleaned_data['group_var']
+            image = HeroPerformanceChart(hero, player, game_mode_list,
+              x_var, y_var, group_var, split_var)
+            imagebase = basename(image.name)
+        else:
+            hero_form = HeroPlayerPerformance
+            hero = []
+            image = ''
+            imagebase=''
+    else:
+      hero_form = HeroPlayerPerformance
+      hero = []
+      image = ''
+      imagebase=''
+    return render_to_response('hero_performance.html',{'form': hero_form,
+                              'hero': hero, 'image': image,
                               'imagebase': imagebase},
                               context_instance=RequestContext(request))
 

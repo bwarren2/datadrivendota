@@ -28,12 +28,13 @@ def endgame(request):
     if request.method == 'POST':
         select_form = EndgameSelect(request.POST)
         if select_form.is_valid():
-            player_list = select_form.data.getlist('players')
-            mode_list = select_form.data.getlist('game_modes')
-            x_var = select_form.data.getlist('x_var')
-            y_var = select_form.data.getlist('y_var')
-            split_var = select_form.data.getlist('split_var')
-            group_var = select_form.data.getlist('group_var')
+            print select_form.cleaned_data
+            player_list = select_form.cleaned_data['players']
+            mode_list = select_form.cleaned_data['game_modes']
+            x_var = select_form.cleaned_data['x_var']
+            y_var = select_form.cleaned_data['y_var']
+            split_var = select_form.cleaned_data['split_var']
+            group_var = select_form.cleaned_data['group_var']
             image = EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var)
             imagebase = basename(image.name)
         else:
