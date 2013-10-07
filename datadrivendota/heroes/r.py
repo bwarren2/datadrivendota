@@ -165,6 +165,7 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
 
     #Database pulls and format python objects to go to R
     matches = PlayerMatchSummary.objects.filter(match__game_mode__in=game_mode_list)
+    matches = PlayerMatchSummary.objects.filter(match__duration__gte=600) #Ignore <10 min games
     matches = matches.filter(hero__steam_id=hero)
     skill1 = matches.filter(match__skill=1)[:30]
     skill2 = matches.filter(match__skill=2)[:30]
