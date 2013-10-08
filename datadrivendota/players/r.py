@@ -70,9 +70,8 @@ def CountWinrate(player_id, min_date='2009-01-01', max_date=None, game_mode_list
     if max_date==None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
-        max_date_utc = mktime(datetime.datetime.strptime(max_date,"%Y-%m-%d").timetuple())
-
-    min_dt_utc = mktime(datetime.datetime.strptime(min_date,"%Y-%m-%d").timetuple())
+        max_date_utc = mktime(max_date.timetuple())
+    min_dt_utc = mktime(min_date.timetuple())
 
     if game_mode_list=='Competitive':
         game_mode_list = GameMode.objects.filter(is_competitive=True)
@@ -132,4 +131,134 @@ def CountWinrate(player_id, min_date='2009-01-01', max_date=None, game_mode_list
     imagefile.close()
 
     hosted_file = s3File(imagefile)
+    return hosted_file
+
+def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
+
+    grdevices = importr('grDevices')
+    importr('lattice')
+
+    if max_date==None:
+        max_date_utc = mktime(datetime.datetime.now().timetuple())
+    else:
+        max_date_utc = mktime(max_date.timetuple())
+    min_dt_utc = mktime(min_date.timetuple())
+    player = Player.objects.get(steam_id=player_id)
+    pms = PlayerMatchSummary.objects.filter(player=player).select_related()
+    pms = pms.filter()
+    pms = pms.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
+    pms = pms.filter(match__start_time__gte=min_dt_utc)
+    pms = pms.filter(match__start_time__lte=max_date_utc)
+
+    wins = [1 if m.is_win else 0 for m in pms]
+    start_times = [m.match.start_time for m in pms]
+
+    wins_vec = robjects.IntVector(wins)
+    start_times_vec = robjects.IntVector(start_times)
+
+    robjects.globalenv['wins_vec']=wins_vec
+    robjects.globalenv['start_times_vec']=start_times_vec
+
+    if plot_var == 'winrate':
+        plot_func = 'winrate'
+    else:
+        plot_func = 'length'
+    optionsDict = { 'date':
+                        {'collapse_dt_format':r'%Y-%m-%d',
+                         'present_dt_format':r'%Y-%m-%d'},
+                    'hour_of_day':
+                        {'collapse_dt_format':r'%H',
+                         'present_dt_format':r'%Y-%m-%d'},
+                    'month':
+                        {'collapse_dt_format':r'%Y-%m',
+                         'present_dt_format':r'%Y-%m-%d'},
+                    'week':
+                        {'collapse_dt_format':r'%Y-%W',
+                         'present_dt_format':r'%Y-%m-%d'},}
+
+    if bucket_var == 'hour_of_day':
+        cmd = """
+            collapse_date_format = '%s'
+            local_timezone ='America/New_York'
+            winrate = function(x){
+                return(sum(x)/length(x));
+            }
+
+            df.spine=data.frame('x_spine'=seq(1,24),render_x=seq(1,24))
+
+            time_var = format(as.POSIXct(start_times_vec, origin="1970-01-01", tz="GMT"),tz=local_timezone,collapse_date_format)
+            df.agg = aggregate(x=wins_vec,by=list(time_var),FUN=%s)
+            colnames(df.agg) = c('group','var')
+            df.plot2 = merge(x=df.spine,y=df.agg,all.x=T,by.x='x_spine',by.y='group')
+            df.plot2[is.na(df.plot2$var),'var']=0
+
+            """ % (optionsDict[bucket_var]['collapse_dt_format'], plot_func)
+    else:
+        cmd = """
+
+            winrate = function(x){
+                return(sum(x)/length(x));
+            }
+
+            collapse_date_format = '%s'
+            present_date_format = '%s'
+
+            start_dt = min( format(as.POSIXct(start_times_vec, origin="1970-01-01", tz="GMT"),'%%Y-%%m-%%d') )
+            end_dt = max( format(as.POSIXct(start_times_vec, origin="1970-01-01", tz="GMT"),'%%Y-%%m-%%d') )
+            local_timezone ='America/New_York'
+            days = seq(as.Date(start_dt), as.Date(end_dt), by="1 day")
+            spine_psx_days = as.POSIXct(strptime(as.character(days), '%%Y-%%m-%%d'), origin="1970-01-01", tz=local_timezone)
+
+            df.match = data.frame('present_dts'=format(spine_psx_days,present_date_format),'collapse_dts'=format(spine_psx_days,collapse_date_format))
+
+            spine_x_vec = unique(format(spine_psx_days,collapse_date_format))
+            df.spine =data.frame(x_spine=as.character(spine_x_vec))
+            df.spine$x_spine= as.character(df.spine$x_spine)
+            df.spine$render_x= df.match[match(x=df.spine$x_spine,table=df.match$collapse_dts),'present_dts']
+
+            time_var = format(as.POSIXct(start_times_vec, origin="1970-01-01", tz="GMT"),tz=local_timezone,collapse_date_format)
+            df.agg = aggregate(x=wins_vec,by=list(time_var),FUN=%s)
+            colnames(df.agg) = c('group','var')
+            df.plot2 = merge(x=df.spine,y=df.agg,all.x=T,by.x='x_spine',by.y='group')
+            df.plot2[is.na(df.plot2$var),'var']=0
+
+            """ % (optionsDict[bucket_var]['collapse_dt_format'], optionsDict[bucket_var]['present_dt_format'], plot_func)
+    robjects.r(cmd)
+
+    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
+    grdevices.png(file=imagefile.name, type='cairo', width=800,height=500)
+
+    enforceTheme(robjects)
+    if plot_var == 'winrate':
+        cmd = """
+            print(
+                 barchart(var~render_x,data=df.plot2,type='h',horizontal=F,
+                    scales=list(x=list(rot=90)),col='purple',
+                    origin=0,xlab='%s',ylab='%s',
+                    panel=function(x, y, ...) {
+                      panel.barchart(x, y, ...);
+                      panel.abline(h=.5,lty=3,col='blue')
+                    }, ylim=c(0,1)
+                )
+            )
+        """ % (bucket_var.replace("_"," ").title(),plot_var.replace("_"," ").title())
+    else:
+            cmd = """
+        print(
+             barchart(var~render_x,data=df.plot2,type='h',horizontal=F,
+                scales=list(x=list(rot=90)),col='purple',
+                origin=0,xlab='%s',ylab='%s',
+            )
+        )
+    """ % (bucket_var.replace("_"," ").title(),plot_var.replace("_"," ").title())
+
+    #
+    robjects.r(cmd)
+    grdevices.dev_off()
+    imagefile.close()
+
+
+
+    hosted_file = s3File(imagefile)
+    print imagefile, hosted_file
     return hosted_file
