@@ -26,7 +26,7 @@ class ApiContext(object):
     #Things we send to Valve
     account_id=None
     matches_requested=100
-    skill=None
+    skill=0
     date_max=None
     start_at_match_id=None
     key=None
@@ -41,6 +41,7 @@ class ApiContext(object):
     last_scrape_time=0
     player_steam_ids = None
     processed=0
+    refresh_records = False
 
     def toUrlDict(self, mode):
         if mode == 'GetPlayerSummaries':
@@ -279,6 +280,13 @@ class UploadMatch(ApiFollower):
 
         try:
             match = Match.objects.get(steam_id=data['match_id'])
+            if self.api_context.refresh_records:
+                for key, value in kwargs.iteritems():
+                    setattr(match,key,value)
+                match.save()
+                ums = UploadMatchSummary()
+                ums.s(players=data['players'], parent_match=match,api_context=self.api_context).delay()
+
         except Match.DoesNotExist:
             match = Match.objects.create(**kwargs)
             match.save()
@@ -336,7 +344,16 @@ class UploadMatchSummary(BaseTask):
                 'hero_healing': player['hero_healing'],
                 'level': player['level'],
             }
-            playermatchsummary = PlayerMatchSummary.objects.get_or_create(**kwargs)[0]
+            try:
+                pms = PlayerMatchSummary.objects.get(player_slot=player['player_slot'],match=parent_match)
+                if self.api_context.refresh_records:
+                    for key, value in kwargs.iteritems():
+                        setattr(pms,key,value)
+                    pms.save()
+                playermatchsummary = pms
+            except PlayerMatchSummary.DoesNotExist:
+                playermatchsummary = PlayerMatchSummary.objects.get_or_create(**kwargs)[0]
+
 
             if 'ability_upgrades' in player.keys():
                 for skillpick in player['ability_upgrades']:
