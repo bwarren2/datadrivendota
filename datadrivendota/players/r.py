@@ -186,6 +186,19 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
 
             df.spine=data.frame('x_spine'=seq(1,24),render_x=seq(1,24))
 
+            xscale.components.A <- function(...) {
+                # get default axes definition list; print user.value
+                ans <- xscale.components.default(...)
+
+                # - bottom labels
+                ans$bottom$labels$labels <- df.spine$render_x
+                ans$bottom$labels$at <- seq(0,length(ans$bottom$labels$labels),by=1)
+
+                # return axes definition list
+                return(ans)
+            }
+
+
             time_var = format(as.POSIXct(start_times_vec, origin="1970-01-01", tz="GMT"),tz=local_timezone,collapse_date_format)
             df.agg = aggregate(x=wins_vec,by=list(time_var),FUN=%s)
             colnames(df.agg) = c('group','var')
@@ -216,12 +229,27 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
             df.spine$x_spine= as.character(df.spine$x_spine)
             df.spine$render_x= df.match[match(x=df.spine$x_spine,table=df.match$collapse_dts),'present_dts']
 
+
             time_var = format(as.POSIXct(start_times_vec, origin="1970-01-01", tz="GMT"),tz=local_timezone,collapse_date_format)
             df.agg = aggregate(x=wins_vec,by=list(time_var),FUN=%s)
             colnames(df.agg) = c('group','var')
             df.plot2 = merge(x=df.spine,y=df.agg,all.x=T,by.x='x_spine',by.y='group')
             df.plot2[is.na(df.plot2$var),'var']=0
 
+            if(length(df.plot2$render_x)>40){
+                sq = seq(1,length(df.spine$render_x),1)
+                d = ifelse(sq%%%%(round(length(df.spine$render_x)/25,0))==1,as.character(df.spine$render_x),'');
+            }
+            xscale.components.A <- function(...) {
+                # get default axes definition list; print user.value
+                ans <- xscale.components.default(...)
+
+                # - bottom labels
+                ans$bottom$labels$labels <- d
+                ans$bottom$labels$at <- seq(1,length(ans$bottom$labels$labels),by=1)
+                # return axes definition list
+                return(ans)
+            }
             """ % (optionsDict[bucket_var]['collapse_dt_format'], optionsDict[bucket_var]['present_dt_format'], plot_func)
     robjects.r(cmd)
 
@@ -238,7 +266,9 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
                     panel=function(x, y, ...) {
                       panel.barchart(x, y, ...);
                       panel.abline(h=.5,lty=3,col='blue')
-                    }, ylim=c(0,1)
+                    }, ylim=c(0,1),
+                    xscale.components=xscale.components.A
+
                 )
             )
         """ % (bucket_var.replace("_"," ").title(),plot_var.replace("_"," ").title())
@@ -248,6 +278,7 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
              barchart(var~render_x,data=df.plot2,type='h',horizontal=F,
                 scales=list(x=list(rot=90)),col='purple',
                 origin=0,xlab='%s',ylab='%s',
+                xscale.components=xscale.components.A
             )
         )
     """ % (bucket_var.replace("_"," ").title(),plot_var.replace("_"," ").title())
