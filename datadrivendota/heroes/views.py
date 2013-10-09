@@ -9,7 +9,7 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, HeroPlayerPerformance
 from .r import generateChart, lineupChart, HeroPerformanceChart
-
+from players.models import Player
 
 def index(request):
     hero_list = Hero.objects.all().order_by('name')
@@ -86,9 +86,12 @@ def hero_performance(request):
     if request.method=='POST':
         hero_form = HeroPlayerPerformance(request.POST)
         if hero_form.is_valid():
-            print hero_form.cleaned_data
             hero = Hero.objects.get(name=hero_form.cleaned_data['hero']).steam_id
-            player = hero_form.cleaned_data['player']
+            player_name = hero_form.cleaned_data['player']
+            if player_name is not None and player_name != '':
+              player = Player.objects.get(persona_name=player_name).steam_id
+            else:
+              player=None
             game_mode_list = hero_form.cleaned_data['game_modes']
             x_var= hero_form.cleaned_data['x_var']
             y_var = hero_form.cleaned_data['y_var']

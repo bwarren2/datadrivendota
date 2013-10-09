@@ -3,7 +3,7 @@ from uuid import uuid4
 from itertools import chain
 
 from django.core.files import File
-#from django.conf import settings
+from django.conf import settings
 
 from rpy2 import robjects
 from rpy2.robjects import FloatVector, StrVector
@@ -165,13 +165,19 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
 
     #Database pulls and format python objects to go to R
     matches = PlayerMatchSummary.objects.filter(match__game_mode__in=game_mode_list)
-    matches = PlayerMatchSummary.objects.filter(match__duration__gte=600) #Ignore <10 min games
+    matches = PlayerMatchSummary.objects.filter(match__duration__gte=settings.MIN_MATCH_LENGTH) #Ignore <10 min games
     matches = matches.filter(hero__steam_id=hero)
-    skill1 = matches.filter(match__skill=1)[:30]
-    skill2 = matches.filter(match__skill=2)[:30]
-    skill3 = matches.filter(match__skill=3)[:30]
+    skill1 = matches.filter(match__skill=1).select_related()[:30]
+    skill2 = matches.filter(match__skill=2).select_related()[:30]
+    skill3 = matches.filter(match__skill=3).select_related()[:30]
+    for game in chain(skill1, skill2, skill3): game.skill_level=game.match.skill
 
-    match_pool = list(chain(skill1, skill2, skill3))
+    if player is not None:
+        player_games = matches.filter(player__steam_id=player).select_related()
+        for game in player_games: game.skill_level='Player'
+        match_pool = list(chain(skill1, skill2, skill3, player_games))
+    else:
+        match_pool = list(chain(skill1, skill2, skill3))
 
     x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
     y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
@@ -208,7 +214,6 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     imagefile.close()
 
     hosted_file = s3File(imagefile)
-    print imagefile, hosted_file
     return hosted_file
 
 

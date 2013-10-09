@@ -44,7 +44,7 @@ x_parameters.insert(0,'duration')
 x_list = [(item, item) for item in x_parameters]
 y_list = [(item, item) for item in shared_parameters]
 
-split_params = ['is_win','game_mode','skill']
+split_params = ['is_win','game_mode','skill_level']
 doubled_param_list = [(item,item) for item in split_params]
 
 class HeroPlayerPerformance(forms.Form):
