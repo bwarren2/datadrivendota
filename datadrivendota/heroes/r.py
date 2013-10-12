@@ -6,12 +6,12 @@ from django.core.files import File
 from django.conf import settings
 
 from rpy2 import robjects
-from rpy2.robjects import FloatVector, StrVector
+from rpy2.robjects import FloatVector, StrVector, IntVector
 from rpy2.robjects.packages import importr
 
 from heroes.models import HeroDossier, Hero
 from datadrivendota.r import s3File, enforceTheme
-from matches.models import PlayerMatchSummary
+from matches.models import PlayerMatchSummary, SkillBuild
 from matches.r import fetch_match_attributes
 def generateChart(hero_list, stats_list, display_options):
     # Currently, we are violating DRY with the available field listing from the form
@@ -165,7 +165,7 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
 
     #Database pulls and format python objects to go to R
     matches = PlayerMatchSummary.objects.filter(match__game_mode__in=game_mode_list)
-    matches = PlayerMatchSummary.objects.filter(match__duration__gte=settings.MIN_MATCH_LENGTH) #Ignore <10 min games
+    matches = matches.filter(match__duration__gte=settings.MIN_MATCH_LENGTH) #Ignore <10 min games
     matches = matches.filter(hero__steam_id=hero)
     skill1 = matches.filter(match__skill=1).select_related()[:30]
     skill2 = matches.filter(match__skill=2).select_related()[:30]
@@ -216,6 +216,66 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     hosted_file = s3File(imagefile)
     return hosted_file
 
+
+def HeroSkillLevelBwChart(hero, player, game_mode_list, levels):
+    print hero, player, game_mode_list, levels
+    #Get the right stuff loaded in R
+    grdevices = importr('grDevices')
+    importr('lattice')
+
+    #Database pulls and format python objects to go to R
+    pms = PlayerMatchSummary.objects.filter(match__game_mode__in=game_mode_list)
+    pms = pms.filter(match__duration__gte=settings.MIN_MATCH_LENGTH) #Ignore <10 min games
+    pms = pms.filter(hero__steam_id=hero)
+    skill1 = pms.filter(match__skill=1).select_related()[:30]
+    skill2 = pms.filter(match__skill=2).select_related()[:30]
+    skill3 = pms.filter(match__skill=3).select_related()[:30]
+
+    pms_pool = list(chain(skill1, skill2, skill3))
+
+    match_builds = SkillBuild.objects.filter(player_match_summary__hero__steam_id=hero,
+        player_match_summary__in=pms_pool, level__in=levels).select_related()
+    for build in match_builds: build.skill_level=build.player_match_summary.match.skill
+
+    if player is not None:
+        player_pool = pms.filter(player__steam_id=player).select_related()
+        player_builds = SkillBuild.objects.filter(player_match_summary__hero__steam_id=hero,
+            player_match_summary__in=player_pool, level__in=levels).select_related()
+        for build in player_builds: build.skill_level='Player'
+        chart_pool = list(chain(match_builds, player_builds))
+    else:
+        chart_pool = match_builds
+
+
+    y_vector_list = [build.time for build in chart_pool]
+    x_vector_list = [build.skill_level for build in chart_pool]
+    split_var_list = [build.level for build in chart_pool]
+    #Register in the environment
+    x_vec = StrVector(x_vector_list)
+    y_vec = FloatVector(y_vector_list)
+    split_var_vec = IntVector(split_var_list)
+
+    robjects.globalenv["xvec"] = x_vec
+    robjects.globalenv["yvec"] = y_vec
+    robjects.globalenv["splitvec"] = split_var_vec
+
+    #robjects.globalenv["y"] = y
+    #Some in-R formatting
+
+    #Make a file
+    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
+    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    enforceTheme(robjects)
+    rcmd="""print(
+        bwplot(yvec/60~xvec|as.factor(splitvec))
+    )"""
+    robjects.r(rcmd )
+    #relation='free' in scales for independent axes
+    grdevices.dev_off()
+    imagefile.close()
+
+    hosted_file = s3File(imagefile)
+    return hosted_file
 
 
 def fetch_value(dossier, stat, level):

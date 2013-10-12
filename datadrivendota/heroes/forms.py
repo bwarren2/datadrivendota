@@ -34,6 +34,9 @@ class HeroLineupMultiSelect(forms.Form):
 game_modes = GameMode.objects.all()
 game_mode_choices = [(gm.steam_id, gm.description) for gm in game_modes]
 
+game_modes = GameMode.objects.filter(is_competitive=True)
+game_mode_defaults = [gm.steam_id for gm in game_modes]
+
 
 shared_parameters = ['kills','deaths','assists','gold',
               'last_hits','denies','hero_damage','tower_damage','hero_healing',
@@ -53,8 +56,20 @@ class HeroPlayerPerformance(forms.Form):
     hero.widget=forms.TextInput(attrs={'class': 'hero-tags',})
     player = forms.CharField(required=False)
     player.widget=forms.TextInput(attrs={'class': 'player-tags',})
-    game_modes = forms.MultipleChoiceField(choices=game_mode_choices, required=True)
+    game_modes = forms.MultipleChoiceField(choices=game_mode_choices, required=True,initial=game_mode_defaults)
     x_var = forms.ChoiceField(choices=x_list, required=True)
     y_var = forms.ChoiceField(choices=y_list, required=True)
     split_var = forms.ChoiceField(choices=doubled_param_list, required=True)
     group_var = forms.ChoiceField(choices=doubled_param_list, required=True)
+
+
+class HeroPlayerSkillBarsForm(forms.Form):
+
+    hero = forms.CharField(required=True)
+    hero.widget=forms.TextInput(attrs={'class': 'hero-tags',})
+    player = forms.CharField(required=False)
+    player.widget=forms.TextInput(attrs={'class': 'player-tags',})
+    game_modes = forms.MultipleChoiceField(choices=game_mode_choices,
+        required=True, initial=game_mode_defaults)
+    levels = forms.MultipleChoiceField(choices=[(i,i) for i in range(1,26)],
+        required=True, initial=[6,11,16])

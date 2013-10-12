@@ -7,8 +7,10 @@ from .models import Hero
 from django.utils.text import slugify
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, HeroPlayerPerformance
-from .r import generateChart, lineupChart, HeroPerformanceChart
+from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, \
+  HeroPlayerPerformance, HeroPlayerSkillBarsForm
+from .r import generateChart, lineupChart, HeroPerformanceChart,\
+ HeroSkillLevelBwChart
 from players.models import Player
 
 def index(request):
@@ -107,6 +109,35 @@ def hero_performance(request):
             imagebase=''
     else:
       hero_form = HeroPlayerPerformance
+      hero = []
+      image = ''
+      imagebase=''
+    return render_to_response('hero_performance.html',{'form': hero_form,
+                              'hero': hero, 'image': image,
+                              'imagebase': imagebase},
+                              context_instance=RequestContext(request))
+
+def hero_skill_bars(request):
+    if request.method=='POST':
+        hero_form = HeroPlayerSkillBarsForm(request.POST)
+        if hero_form.is_valid():
+            hero = Hero.objects.get(name=hero_form.cleaned_data['hero']).steam_id
+            player_name = hero_form.cleaned_data['player']
+            if player_name is not None and player_name != '':
+              player = Player.objects.get(persona_name=player_name).steam_id
+            else:
+              player=None
+            game_mode_list = hero_form.cleaned_data['game_modes']
+            levels= hero_form.cleaned_data['levels']
+            image = HeroSkillLevelBwChart(hero, player, game_mode_list, levels)
+            imagebase = basename(image.name)
+        else:
+            hero_form = HeroPlayerSkillBars
+            hero = []
+            image = ''
+            imagebase=''
+    else:
+      hero_form = HeroPlayerSkillBarsForm
       hero = []
       image = ''
       imagebase=''

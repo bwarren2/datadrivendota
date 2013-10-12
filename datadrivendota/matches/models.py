@@ -39,6 +39,8 @@ class GameMode(models.Model):
                                    max_length=50)
     is_competitive = models.BooleanField(help_text="""Whether charts should
         show this mode by default""", default=False)
+    class Meta:
+        ordering = ['steam_id']
     def __unicode__(self):
         return self.description+', ('+str(self.steam_id)+')'
 
@@ -48,11 +50,11 @@ class LobbyType(models.Model):
     steam_id = models.IntegerField(help_text='How the queue occurred', unique=True)
     description = models.CharField(help_text='Queue type', max_length=50)
 
-    """
+
     class Meta:
-        verbose_name = _('LobbyType')
-        verbose_name_plural = _('LobbyTypes')
-    """
+        verbose_name = 'LobbyType'
+        verbose_name_plural = 'LobbyTypes'
+        ordering=['steam_id']
 
     def __unicode__(self):
         return self.description+', ('+str(self.steam_id)+')'
@@ -115,10 +117,10 @@ class LeaverStatus(models.Model):
     steam_id = models.IntegerField(unique=True)
     description = models.CharField(max_length=50)
 
-    """class Meta:
+    class Meta:
         verbose_name = 'LeaverStatus'
         verbose_name_plural = 'LeaverStatuses'
-    """
+        ordering=['steam_id']
     def __unicode__(self):
         return self.description+', ('+str(self.steam_id)+')'
 
