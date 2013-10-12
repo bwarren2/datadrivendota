@@ -2,6 +2,7 @@
 # sudo aptitude install libxml2-dev
 #gridSVG
 install.packages("RJSONIO", repos = "http://cran.rstudio.com/")
+
 #install.packages("gridSVG",repos='http://cran.rstudio.com/')
 
 #rcharts
