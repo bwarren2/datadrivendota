@@ -65,8 +65,7 @@ def KDADensity(player_id):
     hosted_file = s3File(imagefile)
     return hosted_file
 
-def CountWinrate(player_id, min_date='2009-01-01', max_date=None, game_mode_list='Competitive' ):
-
+def CountWinrate(player_id, min_date=datetime.date(2009,1,1), max_date=None, game_mode_list='Competitive' ):
     if max_date==None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
