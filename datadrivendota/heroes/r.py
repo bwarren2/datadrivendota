@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 from itertools import chain
-
 from django.core.files import File
 from django.conf import settings
 
@@ -13,6 +12,8 @@ from heroes.models import HeroDossier, Hero
 from datadrivendota.r import s3File, enforceTheme
 from matches.models import PlayerMatchSummary, SkillBuild
 from matches.r import fetch_match_attributes
+
+
 def generateChart(hero_list, stats_list, display_options):
     # Currently, we are violating DRY with the available field listing from the form
     # and the R space being in different places and requiring that they are the same.
@@ -154,7 +155,6 @@ def lineupChart(heroes, stat, level):
     imagefile.close()
 
     hosted_file = s3File(imagefile)
-    print imagefile, hosted_file
     return hosted_file
 
 def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, split_var):

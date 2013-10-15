@@ -1,0 +1,26 @@
+{% extends "hero_base.html" %}
+{% block extra_css %}{% endblock extra_css %}
+{% block title %}Hero Skill Times{% endblock title %}
+{% block page_title %}Hero Skill Times{% endblock page_title %}
+{% block content %}
+    <div>
+    <div style='float:left'>
+    <form class='chart-form' action="" method='POST'>
+        {% csrf_token %}
+
+        {% include "_form.html" %}
+
+        <div class="control-group">
+            <div class="controls pull-right">
+                <button type="submit" class="btn btn-small btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+    </div>
+    {% if image %}
+        <img src="{{MEDIA_URL}}{{imagebase}}">
+    {% endif %}
+    </div>
+{% endblock content %}
+
+

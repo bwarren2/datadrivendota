@@ -1,6 +1,9 @@
 #from django.views.generic.detail import DetailView
 from os.path import basename
 import json
+from functools import wraps
+
+
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from .models import Hero
@@ -12,6 +15,22 @@ from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, \
 from .r import generateChart, lineupChart, HeroPerformanceChart,\
  HeroSkillLevelBwChart
 from players.models import Player
+from django.conf import settings
+
+try:
+    if 'devserver' not in settings.INSTALLED_APPS:
+        raise ImportError
+    from devserver.modules.profile import devserver_profile
+except ImportError:
+    class devserver_profile(object):
+        def __init__(self, *args, **kwargs):
+            pass
+        def __call__(self, func):
+            def nothing(*args, **kwargs):
+                return func(*args, **kwargs)
+            return wraps(func)(nothing)
+
+
 
 def index(request):
     hero_list = Hero.objects.all().order_by('name')
@@ -28,7 +47,7 @@ def detail(request, hero_name):
     return render_to_response('heroes_detail.html', {'hero': current_hero},
                               context_instance=RequestContext(request))
 
-
+@devserver_profile(follow=[generateChart])
 def vitals(request):
 
     if request.method == 'POST':
@@ -59,6 +78,7 @@ def vitals(request):
                               'imagebase': imagebase},
                               context_instance=RequestContext(request))
 
+@devserver_profile(follow=[lineupChart])
 def lineup(request):
 
     if request.method == 'POST':
@@ -84,6 +104,7 @@ def lineup(request):
                               'imagebase': imagebase},
                               context_instance=RequestContext(request))
 
+@devserver_profile(follow=[HeroPerformanceChart])
 def hero_performance(request):
     if request.method=='POST':
         hero_form = HeroPlayerPerformance(request.POST)
@@ -117,6 +138,7 @@ def hero_performance(request):
                               'imagebase': imagebase},
                               context_instance=RequestContext(request))
 
+@devserver_profile(follow=[HeroSkillLevelBwChart])
 def hero_skill_bars(request):
     if request.method=='POST':
         hero_form = HeroPlayerSkillBarsForm(request.POST)
@@ -132,7 +154,7 @@ def hero_skill_bars(request):
             image = HeroSkillLevelBwChart(hero, player, game_mode_list, levels)
             imagebase = basename(image.name)
         else:
-            hero_form = HeroPlayerSkillBars
+            hero_form = HeroSkillLevelBwChart
             hero = []
             image = ''
             imagebase=''
@@ -141,7 +163,7 @@ def hero_skill_bars(request):
       hero = []
       image = ''
       imagebase=''
-    return render_to_response('hero_performance.html',{'form': hero_form,
+    return render_to_response('hero_skill_time_bars.html',{'form': hero_form,
                               'hero': hero, 'image': image,
                               'imagebase': imagebase},
                               context_instance=RequestContext(request))
