@@ -65,7 +65,7 @@ def KDADensity(player_id):
     hosted_file = s3File(imagefile)
     return hosted_file
 
-def CountWinrate(player_id, min_date=datetime.date(2009,1,1), max_date=None):
+def CountWinrate(player_id, game_mode_list, min_date=datetime.date(2009,1,1), max_date=None):
     if max_date==None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
@@ -80,7 +80,7 @@ def CountWinrate(player_id, min_date=datetime.date(2009,1,1), max_date=None):
     annotations = annotations.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
     annotations = annotations.filter(match__start_time__gte=min_dt_utc)
     annotations = annotations.filter(match__start_time__lte=max_date_utc)
-    annotations = annotations.filter(match__game_mode__in=game_mode_list)
+    annotations = annotations.filter(match__game_mode__steam_id__in=game_mode_list)
 
 
     heroes = list(set([row['hero__machine_name'] for row in annotations]))
@@ -138,9 +138,10 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
     else:
         max_date_utc = mktime(max_date.timetuple())
     min_dt_utc = mktime(min_date.timetuple())
+
+
     player = Player.objects.get(steam_id=player_id)
     pms = PlayerMatchSummary.objects.filter(player=player).select_related()
-    pms = pms.filter()
     pms = pms.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
     pms = pms.filter(match__start_time__gte=min_dt_utc)
     pms = pms.filter(match__start_time__lte=max_date_utc)
@@ -234,7 +235,8 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
             if(length(df.plot2$render_x)>40){
                 sq = seq(1,length(df.spine$render_x),1)
                 d = ifelse(sq%%%%(round(length(df.spine$render_x)/25,0))==1,as.character(df.spine$render_x),'');
-            }
+            } else { d = as.character(df.spine$render_x) }
+
             xscale.components.A <- function(...) {
                 # get default axes definition list; print user.value
                 ans <- xscale.components.default(...)

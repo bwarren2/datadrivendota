@@ -42,7 +42,7 @@ def winrate(request):
             min_date = winrate_form.cleaned_data['min_date']
             max_date = winrate_form.cleaned_data['max_date']
             game_modes = winrate_form.cleaned_data['game_modes']
-            image = CountWinrate(player_id, min_date, max_date, game_modes)
+            image = CountWinrate(player_id, game_modes, min_date, max_date)
             imagebase = basename(image.name)
 
         else:
@@ -63,9 +63,9 @@ def timeline(request):
     if request.method == 'POST':
         timeline_form = PlayerTimelineForm(request.POST)
         if timeline_form.is_valid():
-            player_name=timeline_form.cleaned_data['player']
-            player_id=get_object_or_404(Player,persona_name=player_name).steam_id
+            player_id=timeline_form.cleaned_data['player']
             min_date=timeline_form.cleaned_data['min_date']
+            print timeline_form.cleaned_data['min_date'], dir(timeline_form.fields.get('min_date'))
             max_date=timeline_form.cleaned_data['max_date']
             bucket_var=timeline_form.cleaned_data['bucket_var']
             plot_var=timeline_form.cleaned_data['plot_var']
