@@ -21,7 +21,7 @@ def generateChart(hero_list, stats_list, display_options):
     grdevices = importr('grDevices')
 
     importr('lattice')
-    selected_heroes = HeroDossier.objects.filter(hero__name__in=hero_list)
+    selected_heroes = HeroDossier.objects.filter(hero__steam_id__in=hero_list)
 
     cmd = """
         df.all = data.frame(
@@ -103,15 +103,13 @@ def generateChart(hero_list, stats_list, display_options):
 
 def lineupChart(heroes, stat, level):
 
-    stat = stat[0]
-    level = int(level[0])
     #Get the right stuff loaded in R
     grdevices = importr('grDevices')
     importr('lattice')
 
     #Database pulls and format python objects to go to R
     all_heroes = HeroDossier.objects.all().select_related()
-    selected_heroes = Hero.objects.filter(name__in=heroes)
+    selected_heroes = Hero.objects.filter(steam_id__in=heroes)
     selected_names = [hero.safe_name() for hero in selected_heroes]
 
     hero_value = dict((dossier.hero.safe_name(), fetch_value(dossier, stat, level)) for dossier in all_heroes)

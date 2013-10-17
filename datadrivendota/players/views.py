@@ -38,12 +38,11 @@ def winrate(request):
     if request.method == 'POST':
         winrate_form = PlayerWinrateLevers(request.POST)
         if winrate_form.is_valid():
-            player_name = winrate_form.cleaned_data['player']
+            player_id = winrate_form.cleaned_data['player']
             min_date = winrate_form.cleaned_data['min_date']
             max_date = winrate_form.cleaned_data['max_date']
             game_modes = winrate_form.cleaned_data['game_modes']
-            player = Player.objects.filter(persona_name=player_name)
-            image = CountWinrate(player[0].steam_id, min_date, max_date, game_modes)
+            image = CountWinrate(player_id, min_date, max_date, game_modes)
             imagebase = basename(image.name)
 
         else:

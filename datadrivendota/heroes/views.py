@@ -4,18 +4,18 @@ import json
 from functools import wraps
 
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from .models import Hero
 from django.utils.text import slugify
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+
 from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, \
   HeroPlayerPerformance, HeroPlayerSkillBarsForm
 from .r import generateChart, lineupChart, HeroPerformanceChart,\
  HeroSkillLevelBwChart
-from players.models import Player
-from django.conf import settings
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -52,9 +52,9 @@ def vitals(request):
 
     if request.method == 'POST':
         hero_form = HeroVitalsMultiSelect(request.POST)
-        if HeroVitalsMultiSelect(request.POST).is_valid():
-          hero_list = hero_form.data.getlist('heroes')[0].split(',')
-          stat_list = hero_form.data.getlist('stats')
+        if hero_form.is_valid():
+          hero_list = hero_form.cleaned_data['heroes']
+          stat_list = hero_form.cleaned_data['stats']
           linked_scales = hero_form.data.getlist('unlinked_scales')
           display_options = {}
           if linked_scales==[u'on']:
@@ -63,45 +63,36 @@ def vitals(request):
               display_options['linked_scales']=''
           image = generateChart(hero_list, stat_list, display_options)
           imagebase = basename(image.name)
-        else:
-          hero_list = []
-          image = ''
-          imagebase = ''
+          return render_to_response('hero_vitals.html', {'form': hero_form,
+                                    'hero_list': hero_list, 'image': image,
+                                    'imagebase': imagebase},
+                                    context_instance=RequestContext(request))
     else:
         hero_form = HeroVitalsMultiSelect()
-        hero_list = []
-        image = ''
-        imagebase = ''
-
-    return render_to_response('hero_vitals.html', {'form': hero_form,
-                              'hero_list': hero_list, 'image': image,
-                              'imagebase': imagebase},
-                              context_instance=RequestContext(request))
+    return render_to_response('hero_vitals.html', {'form': hero_form},
+                               context_instance=RequestContext(request))
 
 @devserver_profile(follow=[lineupChart])
 def lineup(request):
 
     if request.method == 'POST':
         hero_form = HeroLineupMultiSelect(request.POST)
-        if HeroLineupMultiSelect(request.POST).is_valid():
-          hero_list = hero_form.data.getlist('heroes')[0].split(',')
-          stat_list = hero_form.data.getlist('stats')
-          level =  hero_form.data.getlist('level')
-          image = lineupChart(hero_list, stat_list, level)
+        if hero_form.is_valid():
+          image = lineupChart(
+            heroes = hero_form.cleaned_data['heroes'],
+            stat = hero_form.cleaned_data['stats'],
+            level =  hero_form.cleaned_data['level']
+          )
+
           imagebase = basename(image.name)
-        else:
-          hero_list = []
-          image = ''
-          imagebase = ''
+          return render_to_response('hero_lineups.html', {'form': hero_form,
+                                    'image': image,
+                                    'imagebase': imagebase},
+                                    context_instance=RequestContext(request))
     else:
         hero_form = HeroLineupMultiSelect()
-        hero_list = []
-        image = ''
-        imagebase = ''
 
-    return render_to_response('hero_lineups.html', {'form': hero_form,
-                              'hero_list': hero_list, 'image': image,
-                              'imagebase': imagebase},
+    return render_to_response('hero_lineups.html', {'form': hero_form},
                               context_instance=RequestContext(request))
 
 @devserver_profile(follow=[HeroPerformanceChart])
@@ -109,33 +100,23 @@ def hero_performance(request):
     if request.method=='POST':
         hero_form = HeroPlayerPerformance(request.POST)
         if hero_form.is_valid():
-            hero = Hero.objects.get(name=hero_form.cleaned_data['hero']).steam_id
-            player_name = hero_form.cleaned_data['player']
-            if player_name is not None and player_name != '':
-              player = Player.objects.get(persona_name=player_name).steam_id
-            else:
-              player=None
-            game_mode_list = hero_form.cleaned_data['game_modes']
-            x_var= hero_form.cleaned_data['x_var']
-            y_var = hero_form.cleaned_data['y_var']
-            split_var = hero_form.cleaned_data['split_var']
-            group_var = hero_form.cleaned_data['group_var']
-            image = HeroPerformanceChart(hero, player, game_mode_list,
-              x_var, y_var, group_var, split_var)
+            image = HeroPerformanceChart(
+              player_name = hero_form.cleaned_data['player'],
+              game_mode_list = hero_form.cleaned_data['game_modes'],
+              x_var= hero_form.cleaned_data['x_var'],
+              y_var = hero_form.cleaned_data['y_var'],
+              group_var = hero_form.cleaned_data['group_var'],
+              split_var = hero_form.cleaned_data['split_var'],
+            )
             imagebase = basename(image.name)
-        else:
-            hero_form = HeroPlayerPerformance
-            hero = []
-            image = ''
-            imagebase=''
+            return render_to_response('hero_performance.html',{'form': hero_form,
+                                      'image': image,
+                                      'imagebase': imagebase},
+                                      context_instance=RequestContext(request))
     else:
-      hero_form = HeroPlayerPerformance
-      hero = []
-      image = ''
-      imagebase=''
-    return render_to_response('hero_performance.html',{'form': hero_form,
-                              'hero': hero, 'image': image,
-                              'imagebase': imagebase},
+      hero_form = HeroPlayerPerformance()
+
+    return render_to_response('hero_performance.html',{'form': hero_form},
                               context_instance=RequestContext(request))
 
 @devserver_profile(follow=[HeroSkillLevelBwChart])
@@ -143,29 +124,20 @@ def hero_skill_bars(request):
     if request.method=='POST':
         hero_form = HeroPlayerSkillBarsForm(request.POST)
         if hero_form.is_valid():
-            hero = Hero.objects.get(name=hero_form.cleaned_data['hero']).steam_id
-            player_name = hero_form.cleaned_data['player']
-            if player_name is not None and player_name != '':
-              player = Player.objects.get(persona_name=player_name).steam_id
-            else:
-              player=None
-            game_mode_list = hero_form.cleaned_data['game_modes']
-            levels= hero_form.cleaned_data['levels']
-            image = HeroSkillLevelBwChart(hero, player, game_mode_list, levels)
+            image = HeroSkillLevelBwChart(
+              hero = hero_form.cleaned_data['hero'],
+              player = hero_form.cleaned_data['player'],
+              game_mode_list = hero_form.cleaned_data['game_modes'],
+              levels= hero_form.cleaned_data['levels'],
+            )
             imagebase = basename(image.name)
-        else:
-            hero_form = HeroSkillLevelBwChart
-            hero = []
-            image = ''
-            imagebase=''
+            return render_to_response('hero_skill_time_bars.html',{'form': hero_form,
+                                      'image': image,
+                                      'imagebase': imagebase},
+                                      context_instance=RequestContext(request))
     else:
       hero_form = HeroPlayerSkillBarsForm
-      hero = []
-      image = ''
-      imagebase=''
-    return render_to_response('hero_skill_time_bars.html',{'form': hero_form,
-                              'hero': hero, 'image': image,
-                              'imagebase': imagebase},
+    return render_to_response('hero_skill_time_bars.html',{'form': hero_form},
                               context_instance=RequestContext(request))
 
 def hero_list(request):
