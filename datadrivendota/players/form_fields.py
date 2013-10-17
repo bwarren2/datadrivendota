@@ -4,7 +4,6 @@ from .models import Player
 
 class SinglePlayerField(forms.CharField):
     widget=forms.TextInput(attrs={'class':'playertags'})
-
     def clean(self, player):
         player_name = player
         if player_name is None or player_name == '':

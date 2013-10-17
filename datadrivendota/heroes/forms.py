@@ -12,9 +12,9 @@ class HeroVitalsMultiSelect(forms.Form):
                    'hp', 'mana']
     VITAL_STATS = [(item, item.replace("_"," ").title()) for item in VITAL_STAT_POOL]
 
-    heroes = MultiHeroSelect(required=True)
-    stats = forms.MultipleChoiceField(choices=VITAL_STATS, required=True)
-    unlinked_scales = forms.BooleanField(required=False)
+    heroes = MultiHeroSelect(required=True, help_text='Pick one or more heroes')
+    stats = forms.MultipleChoiceField(choices=VITAL_STATS, required=True, help_text='Pick one or more stats to graph')
+    unlinked_scales = forms.BooleanField(required=False, help_text='The graph scales match across panels by default.  Want them to render independently?')
 
 
 class HeroLineupMultiSelect(forms.Form):
@@ -25,9 +25,9 @@ class HeroLineupMultiSelect(forms.Form):
         'range','base_atk_time']
 
     LINEUP_STATS = [(item, item.replace("_"," ").title()) for item in VITAL_STAT_POOL]
-    heroes = MultiHeroSelect(required=True)
-    stats = forms.ChoiceField(choices=LINEUP_STATS, required=True)
-    level = forms.ChoiceField(choices=[(i,i) for i in range(1,26)], required=True)
+    heroes = MultiHeroSelect(required=True, help_text='Pick one or more heroes')
+    stats = forms.ChoiceField(choices=LINEUP_STATS, required=True, help_text='Pick one or more stats to graph')
+    level = forms.ChoiceField(choices=[(i,i) for i in range(1,26)], required=True, help_text='Pick which level to graph')
 
 
     def clean_level(self):
@@ -50,22 +50,28 @@ class HeroPlayerPerformance(forms.Form):
     SPLIT_PARAMS = ['is_win','game_mode','skill_level']
     DOUBLE_PARAMS = [(item,item) for item in SPLIT_PARAMS]
 
-    hero = SingleHeroSelect(required=True)
-    player = SinglePlayerField(required=False)
-    game_modes = MultiGameModeSelect()
-    x_var = forms.ChoiceField(choices=X_LIST, required=True)
-    y_var = forms.ChoiceField(choices=Y_LIST, required=True)
-    split_var = forms.ChoiceField(choices=DOUBLE_PARAMS, required=True)
-    group_var = forms.ChoiceField(choices=DOUBLE_PARAMS, required=True)
+    hero = SingleHeroSelect(required=True, help_text='Pick only one hero')
+    player = SinglePlayerField(required=False,
+        help_text='Optionally, pick one player')
+    game_modes = MultiGameModeSelect(help_text='Which game modes would you like to sample?')
+    x_var = forms.ChoiceField(choices=X_LIST, initial='duration',
+        required=True, help_text='What goes on the x axis?')
+    y_var = forms.ChoiceField(choices=Y_LIST, required=True,
+        help_text='What goes on the Y axis?')
+    split_var = forms.ChoiceField(choices=DOUBLE_PARAMS, initial='is_win',
+        required=True, help_text='Which variable breaks out the panels?')
+    group_var = forms.ChoiceField(choices=DOUBLE_PARAMS, initial='skill_level',
+        required=True, help_text='Which variable groups within a panel?')
 
 
 class HeroPlayerSkillBarsForm(forms.Form):
 
-    hero = SingleHeroSelect()
-    player = SinglePlayerField(required=False)
-    game_modes = MultiGameModeSelect()
+    hero = SingleHeroSelect(help_text='Pick exactly one hero')
+    player = SinglePlayerField(required=False,
+        help_text='Optionally, pick one player')
+    game_modes = MultiGameModeSelect(help_text='Which game modes would you like to sample?')
     levels = forms.MultipleChoiceField(choices=[(i,i) for i in range(1,26)],
-        required=True, initial=[6,11,16])
+        required=True, initial=[6,11,16], help_text='Levels would you like to see?')
 
     def clean_levels(self):
         lvls = self.cleaned_data['level']

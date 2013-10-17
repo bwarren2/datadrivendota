@@ -5,7 +5,6 @@ from heroes.models import Hero
 
 class SingleHeroSelect(forms.CharField):
     widget=forms.TextInput(attrs={'class': 'hero-tags',})
-
     def clean(self, hero):
         print hero
         try:
@@ -18,7 +17,6 @@ class SingleHeroSelect(forms.CharField):
 
 class MultiHeroSelect(forms.CharField):
     widget=forms.TextInput(attrs={'class': 'hero-tags',})
-
     def clean(self, hero_str):
         print hero_str, "," in hero_str
         if ',' not in hero_str:

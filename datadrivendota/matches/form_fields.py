@@ -11,5 +11,8 @@ game_mode_defaults = [gm.steam_id for gm in game_modes]
 
 class MultiGameModeSelect(forms.MultipleChoiceField):
 
-    choices=game_mode_choices
-    initial=game_mode_defaults
+    def __init__(self, *args, **kwargs):
+        super(MultiGameModeSelect, self).__init__(*args,**kwargs)
+
+        self.choices=game_mode_choices
+        self.initial=game_mode_defaults

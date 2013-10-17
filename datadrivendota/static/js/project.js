@@ -1,5 +1,7 @@
 /* Project specific Javascript goes here. */
 
+$('.info').tooltip()
+
 /* gettext library */
 
 var catalog = new Array();

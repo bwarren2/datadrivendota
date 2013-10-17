@@ -16,10 +16,12 @@ class EndgameSelect(forms.Form):
     SPLIT_PARAMS = ['player','is_win','game_mode']
     DOUBLED_PARAM_LIST = [(item,item) for item in SPLIT_PARAMS]
 
-    players = SinglePlayerField(required=True)
-    game_modes = MultiGameModeSelect(required=True)
-    x_var = forms.ChoiceField(choices=X_LIST, required=True)
-    y_var = forms.ChoiceField(choices=Y_LIST, required=True)
-    split_var = forms.ChoiceField(choices=DOUBLED_PARAM_LIST, required=True)
-    group_var = forms.ChoiceField(choices=DOUBLED_PARAM_LIST, required=True)
+    players = SinglePlayerField(required=True, help_text='Pick one player.  Use the autocomplete.')
+    game_modes = MultiGameModeSelect(required=True, help_text='Which game modes would you like to sample?')
+    x_var = forms.ChoiceField(choices=X_LIST, required=True, help_text='What goes on the x axis?')
+    y_var = forms.ChoiceField(choices=Y_LIST, required=True, help_text='What goes on the y axis?')
+    split_var = forms.ChoiceField(choices=DOUBLED_PARAM_LIST, required=True,
+        help_text='Which variable splits data between panels?')
+    group_var = forms.ChoiceField(choices=DOUBLED_PARAM_LIST, required=True,
+        help_text='Which variable colors data within a panel?')
 
