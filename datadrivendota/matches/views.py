@@ -28,36 +28,25 @@ def endgame(request):
     if request.method == 'POST':
         select_form = EndgameSelect(request.POST)
         if select_form.is_valid():
-            print select_form.cleaned_data
-            player_list = select_form.cleaned_data['players']
-            mode_list = select_form.cleaned_data['game_modes']
-            x_var = select_form.cleaned_data['x_var']
-            y_var = select_form.cleaned_data['y_var']
-            split_var = select_form.cleaned_data['split_var']
-            group_var = select_form.cleaned_data['group_var']
-            image = EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var)
+
+            image = EndgameChart(
+                player_list = select_form.cleaned_data['players'],
+                mode_list = select_form.cleaned_data['game_modes'],
+                x_var = select_form.cleaned_data['x_var'],
+                y_var = select_form.cleaned_data['y_var'],
+                split_var = select_form.cleaned_data['split_var'],
+                group_var = select_form.cleaned_data['group_var'],
+            )
             imagebase = basename(image.name)
-        else:
-            image = ''
-            imagebase = ''
-            player_list = ''
-            x_var = ''
-            y_var = ''
-            split_var = ''
-            group_var = ''
+            return render_to_response('endgames.html',
+                                     {'form':select_form,'image':image,
+                                      'imagebase':imagebase
+                                     },
+                                    context_instance=RequestContext(request))
 
     else:
         select_form = EndgameSelect()
-        image = ''
-        imagebase = ''
-        player_list = ''
-        x_var = ''
-        y_var = ''
-        split_var = ''
-        group_var = ''
     return render_to_response('endgames.html',
-                             {'form':select_form,'image':image,
-                              'imagebase':imagebase
-                             },
+                             {'form':select_form},
                             context_instance=RequestContext(request))
 

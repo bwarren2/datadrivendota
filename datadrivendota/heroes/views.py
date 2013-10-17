@@ -53,15 +53,19 @@ def vitals(request):
     if request.method == 'POST':
         hero_form = HeroVitalsMultiSelect(request.POST)
         if hero_form.is_valid():
-          hero_list = hero_form.cleaned_data['heroes']
-          stat_list = hero_form.cleaned_data['stats']
+
           linked_scales = hero_form.data.getlist('unlinked_scales')
           display_options = {}
           if linked_scales==[u'on']:
               display_options['linked_scales']="relation='free'"
           else:
               display_options['linked_scales']=''
-          image = generateChart(hero_list, stat_list, display_options)
+
+          image = generateChart(
+             hero_list = hero_form.cleaned_data['heroes'],
+              stat_list = hero_form.cleaned_data['stats'],
+              display_options=display_options
+          )
           imagebase = basename(image.name)
           return render_to_response('hero_vitals.html', {'form': hero_form,
                                     'hero_list': hero_list, 'image': image,

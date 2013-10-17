@@ -1,6 +1,5 @@
 from uuid import uuid4
 from django.core.files import File
-from django.core.files.storage import default_storage
 from rpy2 import robjects
 from rpy2.robjects import FloatVector, StrVector
 from rpy2.robjects.packages import importr
@@ -11,13 +10,9 @@ from datadrivendota.r import enforceTheme, s3File
 def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
 
-    player_obj_list = []
-    for id in player_list:
-        player_obj_list.append(Player.objects.get(steam_id=id))
+    player_obj_list = Player.objects.filter(steam_id__in=player_list)
+    game_mode_list = GameMode.objects.filter(steam_id__in=mode_list)
 
-    game_mode_list = []
-    for id in mode_list:
-        game_mode_list.append(GameMode.objects.get(steam_id=id))
     grdevices = importr('grDevices')
     lattice = importr('lattice')
 

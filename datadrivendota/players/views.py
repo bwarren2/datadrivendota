@@ -38,24 +38,22 @@ def winrate(request):
     if request.method == 'POST':
         winrate_form = PlayerWinrateLevers(request.POST)
         if winrate_form.is_valid():
-            player_id = winrate_form.cleaned_data['player']
-            min_date = winrate_form.cleaned_data['min_date']
-            max_date = winrate_form.cleaned_data['max_date']
-            game_modes = winrate_form.cleaned_data['game_modes']
-            image = CountWinrate(player_id, game_modes, min_date, max_date)
+            image = CountWinrate(
+              player_id = winrate_form.cleaned_data['player'],
+              game_modes = winrate_form.cleaned_data['game_modes'],
+              min_date = winrate_form.cleaned_data['min_date'],
+              max_date = winrate_form.cleaned_data['max_date'],
+            )
             imagebase = basename(image.name)
+            return render_to_response('winrate_chart.html', {'form': winrate_form,
+                                      'image': image,
+                                      'imagebase': imagebase},
+                                      context_instance=RequestContext(request))
 
-        else:
-          image = ''
-          imagebase = ''
     else:
         winrate_form = PlayerWinrateLevers()
-        image = ''
-        imagebase = ''
 
-    return render_to_response('winrate_chart.html', {'form': winrate_form,
-                              'image': image,
-                              'imagebase': imagebase},
+    return render_to_response('winrate_chart.html', {'form': winrate_form},
                               context_instance=RequestContext(request))
 
 def timeline(request):
@@ -63,26 +61,25 @@ def timeline(request):
     if request.method == 'POST':
         timeline_form = PlayerTimelineForm(request.POST)
         if timeline_form.is_valid():
-            player_id=timeline_form.cleaned_data['player']
-            min_date=timeline_form.cleaned_data['min_date']
-            print timeline_form.cleaned_data['min_date'], dir(timeline_form.fields.get('min_date'))
-            max_date=timeline_form.cleaned_data['max_date']
-            bucket_var=timeline_form.cleaned_data['bucket_var']
-            plot_var=timeline_form.cleaned_data['plot_var']
-            image = PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var)
+            image = PlayerTimeline(
+              player_id=timeline_form.cleaned_data['player'],
+              min_date=timeline_form.cleaned_data['min_date'],
+              max_date=timeline_form.cleaned_data['max_date'],
+              bucket_var=timeline_form.cleaned_data['bucket_var'],
+              plot_var=timeline_form.cleaned_data['plot_var']
+            )
             imagebase = basename(image.name)
+            return render_to_response('player_timeline_chart.html', {'form': timeline_form,
+                                      'image': image,
+                                      'imagebase': imagebase,
+                                      'title':'Player Timeline',
+                                      'page_title':'Player Timeline'},
+                                      context_instance=RequestContext(request))
 
-        else:
-          image = ''
-          imagebase = ''
     else:
         timeline_form = PlayerTimelineForm()
-        image = ''
-        imagebase = ''
 
     return render_to_response('player_timeline_chart.html', {'form': timeline_form,
-                              'image': image,
-                              'imagebase': imagebase,
                               'title':'Player Timeline',
                               'page_title':'Player Timeline'},
                               context_instance=RequestContext(request))

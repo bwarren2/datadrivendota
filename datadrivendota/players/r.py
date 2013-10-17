@@ -288,5 +288,4 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
 
 
     hosted_file = s3File(imagefile)
-    print imagefile, hosted_file
     return hosted_file

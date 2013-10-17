@@ -8,11 +8,3 @@ urlpatterns = patterns('',
     url(r'^timeline/?', views.timeline, name='timeline'),
     url(r'^api/getplayers/?',views.player_list,name='player_list')
 )
-    # Examples:
-    # url(r'^$', 'datadrivendota.views.home', name='home'),
-    # url(r'^datadrivendota/', include('datadrivendota.foo.urls')),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
