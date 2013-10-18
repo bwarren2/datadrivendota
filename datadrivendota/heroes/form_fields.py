@@ -6,12 +6,12 @@ from heroes.models import Hero
 class SingleHeroSelect(forms.CharField):
     widget=forms.TextInput(attrs={'class': 'single-hero-tags',})
     def clean(self, hero):
-        print hero
+        if ',' in hero:
+            raise ValidationError("Only one hero at a time.")
         try:
             hero = Hero.objects.get(name=hero)
-            print hero
         except Hero.DoesNotExist:
-            raise ValidationError("WTF")
+            raise ValidationError("No hero by that name.")
 
         return hero.steam_id
 
@@ -21,10 +21,8 @@ class MultiHeroSelect(forms.CharField):
         print hero_str, "," in hero_str
         if ',' not in hero_str:
             try:
-                print "Trying"
                 hero = Hero.objects.get(name=hero_str)
             except Hero.DoesNotExist:
-                print "Failing"
                 raise ValidationError("%s is not a valid hero name" % hero)
             return [hero.steam_id]
 
