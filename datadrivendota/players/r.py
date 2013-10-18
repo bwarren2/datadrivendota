@@ -212,8 +212,8 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
             collapse_date_format = '%s'
             present_date_format = '%s'
 
-            start_dt = min( format(as.POSIXct(start_times_vec, origin="1970-01-01", tz="GMT"),'%%Y-%%m-%%d') )
-            end_dt = max( format(as.POSIXct(start_times_vec, origin="1970-01-01", tz="GMT"),'%%Y-%%m-%%d') )
+            start_dt = format(as.POSIXct('%s', origin="1970-01-01", tz="GMT"),'%%Y-%%m-%%d')
+            end_dt = format(as.POSIXct('%s', origin="1970-01-01", tz="GMT"),'%%Y-%%m-%%d')
             local_timezone ='America/New_York'
             days = seq(as.Date(start_dt), as.Date(end_dt), by="1 day")
             spine_psx_days = as.POSIXct(strptime(as.character(days), '%%Y-%%m-%%d'), origin="1970-01-01", tz=local_timezone)
@@ -247,7 +247,11 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
                 # return axes definition list
                 return(ans)
             }
-            """ % (optionsDict[bucket_var]['collapse_dt_format'], optionsDict[bucket_var]['present_dt_format'], plot_func)
+            """ % (optionsDict[bucket_var]['collapse_dt_format'],
+                optionsDict[bucket_var]['present_dt_format'],
+                min_date,
+                max_date,
+                plot_func)
     robjects.r(cmd)
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))

@@ -12,10 +12,10 @@ class PlayerWinrateLevers(forms.Form):
     game_modes = MultiGameModeSelect(required=True,
         help_text='Which modes would you like to include?')
     min_date = forms.DateField(required=False, initial=thirty_days_ago,
-        help_text='Start times for included games must be after this')
+        help_text='Start times for included games must be on or after this')
     min_date.widget=forms.TextInput(attrs={'class':'datepicker'})
     max_date = forms.DateField(required=False, initial=datetime.date.today,
-        help_text='Start times for included dates must be before this')
+        help_text='Start times for included dates must be on or before this')
     max_date.widget=forms.TextInput(attrs={'class':'datepicker'})
 
 
@@ -31,8 +31,8 @@ class PlayerTimelineForm(forms.Form):
     plot_var = forms.ChoiceField(choices=PLOT_CHOICES, required=True,
         help_text='What would you like to chart?')
     min_date = forms.DateField(required=False, initial=thirty_days_ago,
-        help_text='Start times for included games must be after this')
+        help_text='Start times for included games must be on or after this')
     min_date.widget=forms.TextInput(attrs={'class':'datepicker'})
     max_date = forms.DateField(required=False, initial=datetime.date.today,
-        help_text='Start times for included dates must be before this')
+        help_text='Start times for included dates must be on or before this')
     max_date.widget=forms.TextInput(attrs={'class':'datepicker'})

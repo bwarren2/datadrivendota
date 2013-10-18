@@ -40,7 +40,7 @@ def winrate(request):
         if winrate_form.is_valid():
             image = CountWinrate(
               player_id = winrate_form.cleaned_data['player'],
-              game_modes = winrate_form.cleaned_data['game_modes'],
+              game_mode_list = winrate_form.cleaned_data['game_modes'],
               min_date = winrate_form.cleaned_data['min_date'],
               max_date = winrate_form.cleaned_data['max_date'],
             )
