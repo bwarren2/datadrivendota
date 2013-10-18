@@ -1,6 +1,8 @@
 /* Project specific Javascript goes here. */
 
-$('.info').tooltip()
+$('.info').tooltip();
+
+
 
 /* gettext library */
 

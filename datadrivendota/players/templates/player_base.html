@@ -9,18 +9,3 @@
 {% endblock extra_nav %}
 
 
-{% block extra_js %}
-    <script type="text/javascript">
-    $('.playertags').tagsInput({
-        autocomplete_url:'/players/api/getplayers',
-        defaultText:'Name'
-    });
-    </script>
-    <script>
-    $(function() {
-        $( ".datepicker" ).datepicker(
-            { dateFormat: 'yy-mm-dd' }
-            );
-    });
-  </script>
-{% endblock extra_js %}

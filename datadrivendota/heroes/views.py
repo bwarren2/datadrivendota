@@ -105,7 +105,8 @@ def hero_performance(request):
         hero_form = HeroPlayerPerformance(request.POST)
         if hero_form.is_valid():
             image = HeroPerformanceChart(
-              player_name = hero_form.cleaned_data['player'],
+              hero = hero_form.cleaned_data['hero'],
+              player = hero_form.cleaned_data['player'],
               game_mode_list = hero_form.cleaned_data['game_modes'],
               x_var= hero_form.cleaned_data['x_var'],
               y_var = hero_form.cleaned_data['y_var'],

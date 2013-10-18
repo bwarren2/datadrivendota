@@ -73,6 +73,36 @@
     <link rel="stylesheet" type="text/css"
     href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/start/jquery-ui.css" />
 
-    {% block extra_js %}{% endblock extra_js %}
+    {% block extra_js %}
+    <script type="text/javascript">
+    $(function() {
+    $( ".datepicker" ).datepicker(
+        { dateFormat: 'yy-mm-dd' }
+        );
+});
+
+$('.single-hero-tags').tagsInput({
+    autocomplete_url:'/heroes/api/getheroes',
+    defaultText:'One Hero',
+    height:'75px',
+    width:'200px',
+});
+$('.multi-hero-tags').tagsInput({
+    autocomplete_url:'/heroes/api/getheroes',
+    defaultText:'One or more Heroes'
+});
+$('.single-player-tags').tagsInput({
+    autocomplete_url:'/players/api/getplayers',
+    defaultText:'One Player',
+    height:'75px',
+    width:'200px',
+});
+$('.multi-player-tags').tagsInput({
+    autocomplete_url:'/players/api/getplayers',
+    defaultText:'One or more Players'
+});
+
+</script>
+    {% endblock extra_js %}
   </body>
 </html>

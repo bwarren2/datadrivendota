@@ -3,7 +3,7 @@ from .models import Player
 
 
 class SinglePlayerField(forms.CharField):
-    widget=forms.TextInput(attrs={'class':'playertags'})
+    widget=forms.TextInput(attrs={'class':'single-player-tags'})
     def clean(self, player):
         player_name = player
         if player_name is None or player_name == '':

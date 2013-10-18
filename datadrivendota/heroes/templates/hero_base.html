@@ -9,18 +9,3 @@
 </ul>
 {% endblock extra_nav %}
 
-{% block extra_js %}
-    <script type="text/javascript">
-        $('.hero-tags').tagsInput({
-            autocomplete_url:'/heroes/api/getheroes',
-            defaultText:'Name'
-        });
-    </script>
-    <script type="text/javascript">
-        $('.player-tags').tagsInput({
-            autocomplete_url:'/players/api/getplayers',
-            defaultText:'Name'
-        });
-    </script>
-
-{% endblock extra_js %}

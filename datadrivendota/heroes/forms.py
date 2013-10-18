@@ -51,17 +51,16 @@ class HeroPlayerPerformance(forms.Form):
     DOUBLE_PARAMS = [(item,item) for item in SPLIT_PARAMS]
 
     hero = SingleHeroSelect(required=True, help_text='Pick only one hero')
-    player = SinglePlayerField(required=False,
-        help_text='Optionally, pick one player')
+    player = SinglePlayerField(required=False, help_text='Pick only one hero')
     game_modes = MultiGameModeSelect(help_text='Which game modes would you like to sample?')
     x_var = forms.ChoiceField(choices=X_LIST, initial='duration',
         required=True, help_text='What goes on the x axis?')
     y_var = forms.ChoiceField(choices=Y_LIST, required=True,
         help_text='What goes on the Y axis?')
     split_var = forms.ChoiceField(choices=DOUBLE_PARAMS, initial='is_win',
-        required=True, help_text='Which variable breaks out the panels?')
+        required=True, help_text="Which variable breaks out the panels?   Skill is valve's estimation of skill for teams in that match.  1 is normal, 2 is high, 3 is very high.")
     group_var = forms.ChoiceField(choices=DOUBLE_PARAMS, initial='skill_level',
-        required=True, help_text='Which variable groups within a panel?')
+        required=True, help_text="Which variable groups within a panel?  Skill is valve's estimation of skill for teams in that match.  1 is normal, 2 is high, 3 is very high.")
 
 
 class HeroPlayerSkillBarsForm(forms.Form):
