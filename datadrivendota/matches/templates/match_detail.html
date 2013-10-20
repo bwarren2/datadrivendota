@@ -54,6 +54,13 @@
     </tbody>
     </table>
     </div>
+
+    {% if kdc_basename %}
+        <img src="{{MEDIA_URL}}{{kdc_basename}}">
+    {% endif %}
+    {% if xg_basename %}
+        <img src="{{MEDIA_URL}}{{xg_basename}}">
+    {% endif %}
 {% endblock content %}
 {% block extra_js %}
     <script>

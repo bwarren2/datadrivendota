@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.core.files.storage import default_storage
 
 
+
 def s3File(imagefile):
     imagefile2 = open(imagefile.name, 'r')
 

@@ -201,7 +201,7 @@ class RetrievePlayerRecords(ApiFollower):
         """
         #Validate
         if self.result['status'] == 15:
-            logger.error("Could not pull data. "+str(self.valveOpts['account_id'])+" disallowed it. ")
+            logger.error("Could not pull data. "+str(self.api_context.account_id)+" disallowed it. ")
         elif self.result['status'] == 1:
             #Spawn a bunch of match detail queries
             self.spawnDetailCalls()

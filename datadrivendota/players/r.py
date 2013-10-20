@@ -65,12 +65,15 @@ def KDADensity(player_id):
     hosted_file = s3File(imagefile)
     return hosted_file
 
-def CountWinrate(player_id, game_mode_list, min_date=datetime.date(2009,1,1), max_date=None):
+def CountWinrate(player_id, game_mode_list=None, min_date=datetime.date(2009,1,1), max_date=None):
     if max_date==None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
         max_date_utc = mktime(max_date.timetuple())
     min_dt_utc = mktime(min_date.timetuple())
+
+    if game_mode_list is None:
+        game_mode_list = [gm.steam_id for gm in GameMode.objects.filter(is_competitive=True)]
 
     grdevices = importr('grDevices')
     importr('lattice')

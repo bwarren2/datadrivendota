@@ -1,5 +1,6 @@
-# Create your views here.
 import json
+from functools import wraps
+from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
@@ -8,6 +9,21 @@ from .models import Player
 from .r import KDADensity, CountWinrate, PlayerTimeline
 from urllib import unquote
 from .forms import PlayerWinrateLevers, PlayerTimelineForm
+
+try:
+    if 'devserver' not in settings.INSTALLED_APPS:
+        raise ImportError
+    from devserver.modules.profile import devserver_profile
+except ImportError:
+    class devserver_profile(object):
+        def __init__(self, *args, **kwargs):
+            pass
+        def __call__(self, func):
+            def nothing(*args, **kwargs):
+                return func(*args, **kwargs)
+            return wraps(func)(nothing)
+
+
 def index(request):
     player_list = Player.objects.filter(updated=True)
     return render_to_response('player_index.html', {'player_list':player_list},
@@ -33,8 +49,9 @@ def detail(request, player_name=None, player_id=None):
                                'winrate':winrate},
                               context_instance = RequestContext(request))
 
-def winrate(request):
 
+@devserver_profile(follow=[PlayerWinrateLevers])
+def winrate(request):
     if request.method == 'POST':
         winrate_form = PlayerWinrateLevers(request.POST)
         if winrate_form.is_valid():
@@ -56,8 +73,8 @@ def winrate(request):
     return render_to_response('winrate_chart.html', {'form': winrate_form},
                               context_instance=RequestContext(request))
 
+@devserver_profile(follow=[PlayerTimeline])
 def timeline(request):
-
     if request.method == 'POST':
         timeline_form = PlayerTimelineForm(request.POST)
         if timeline_form.is_valid():
@@ -86,7 +103,6 @@ def timeline(request):
 
 
 def player_list(request):
-
     if request.is_ajax():
         q = request.GET.get('term', '')
         players = Player.objects.filter(persona_name__icontains = q )[:20]

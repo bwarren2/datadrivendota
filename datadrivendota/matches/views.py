@@ -1,11 +1,26 @@
 import datetime
+from functools import wraps
 from os.path import basename
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from .forms import EndgameSelect
-from .r import EndgameChart
+from .r import EndgameChart, MatchParameterScatterplot
 from .models import Match, PlayerMatchSummary
-# Create your views here.
+from django.conf import settings
+
+try:
+    if 'devserver' not in settings.INSTALLED_APPS:
+        raise ImportError
+    from devserver.modules.profile import devserver_profile
+except ImportError:
+    class devserver_profile(object):
+        def __init__(self, *args, **kwargs):
+            pass
+        def __call__(self, func):
+            def nothing(*args, **kwargs):
+                return func(*args, **kwargs)
+            return wraps(func)(nothing)
+
 
 def match(request, match_id):
     match = get_object_or_404(Match, steam_id=match_id)
@@ -14,8 +29,16 @@ def match(request, match_id):
         summary.kda = summary.kills - summary.deaths + .5*summary.assists
     match.hms_duration = datetime.timedelta(seconds=match.duration)
     match.hms_start_time = datetime.datetime.fromtimestamp(match.start_time).strftime('%H:%M:%S %Y-%m-%d')
+    kill_dmg_chart = MatchParameterScatterplot(match_id, 'kills', 'hero_damage')
+    kdc_basename = basename(kill_dmg_chart.name)
+    xp_gold_chart = MatchParameterScatterplot(match_id, 'gold_per_min', 'xp_per_min')
+    xg_basename = basename(xp_gold_chart.name)
     return render_to_response('match_detail.html', {'match':match,
-                              'summaries':summaries
+                              'summaries':summaries,
+                              'kill_dmg_chart': kill_dmg_chart,
+                              'kdc_basename': kdc_basename,
+                              'xp_gold_chart': xp_gold_chart,
+                              'xg_basename': xg_basename,
                               },
                               context_instance=RequestContext(request))
 
@@ -24,6 +47,7 @@ def index(request):
     return render_to_response('matches_index.html', {'match_list': match_list},
                               context_instance=RequestContext(request))
 
+@devserver_profile(follow=[EndgameChart])
 def endgame(request):
     if request.method == 'POST':
         select_form = EndgameSelect(request.POST)

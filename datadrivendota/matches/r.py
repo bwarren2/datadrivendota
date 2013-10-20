@@ -6,6 +6,7 @@ from rpy2.robjects.packages import importr
 from matches.models import PlayerMatchSummary, GameMode
 from players.models import Player
 from datadrivendota.r import enforceTheme, s3File
+from datadrivendota.utilities import safen
 
 def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
@@ -14,7 +15,7 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
     game_mode_list = GameMode.objects.filter(steam_id__in=mode_list)
 
     grdevices = importr('grDevices')
-    lattice = importr('lattice')
+    importr('lattice')
 
     selected_summaries = PlayerMatchSummary.objects.select_related().filter(player__in=player_obj_list,match__game_mode__in=game_mode_list)
     x_vector_list, xlab = fetch_match_attributes(selected_summaries, x_var)
@@ -54,6 +55,41 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
     hosted_file = s3File(imagefile)
     return hosted_file
 
+def MatchParameterScatterplot(match_id, x_var, y_var):
+    pms = PlayerMatchSummary.objects.filter(match__steam_id=match_id)
+    x, x_lab =  fetch_match_attributes(pms, x_var)
+    y, y_lab =  fetch_match_attributes(pms, y_var)
+    labels, blank =  fetch_match_attributes(pms, 'hero_name')
+    x_vec = FloatVector(x)
+    y_vec = FloatVector(y)
+    labels = robjects.StrVector(fetch_match_attributes(pms, 'hero_name')[0])
+
+    robjects.globalenv["xvec"] = x_vec
+    robjects.globalenv["yvec"] = y_vec
+    robjects.globalenv["labels"] = labels
+
+    grdevices = importr('grDevices')
+    importr('lattice')
+
+    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
+    grdevices.png(file=imagefile.name, type='cairo',width=400,height=350)
+    enforceTheme(robjects)
+
+
+    rcmd="""
+    print(
+        xyplot(yvec~xvec,labels=labels,type=c('p','r'),
+                ylab='%s',xlab='%s'
+                )
+    )"""% (y_lab, x_lab)
+    robjects.r(rcmd)
+    grdevices.dev_off()
+
+    imagefile.close()
+
+    hosted_file = s3File(imagefile)
+    return hosted_file
+
 
 def fetch_match_attributes(summaries,attribute):
     if attribute=='duration':
@@ -74,9 +110,12 @@ def fetch_match_attributes(summaries,attribute):
     elif attribute == 'skill':
         vector_list = [summary.match.skill for summary in summaries]
         label='Skill Bracket'
+    elif attribute == 'hero_name':
+        vector_list = [summary.hero.name for summary in summaries]
+        label='Hero Name'
     else:
         vector_list = [getattr(summary, attribute) for summary in summaries]
-        label=attribute.title()
+        label=safen(attribute)
 
 
     return vector_list, label

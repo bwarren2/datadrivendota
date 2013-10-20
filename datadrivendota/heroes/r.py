@@ -216,7 +216,7 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
 
 
 def HeroSkillLevelBwChart(hero, player, game_mode_list, levels):
-    print hero, player, game_mode_list, levels
+
     #Get the right stuff loaded in R
     grdevices = importr('grDevices')
     importr('lattice')

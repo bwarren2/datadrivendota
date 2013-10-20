@@ -101,5 +101,5 @@ class HeroDossier(models.Model):
     def __unicode__(self):
         return self.hero.name
 
-def safen(machine_name):
-    return machine_name.replace('-',' ').title()
+def safen(str):
+    return str.replace('-',' ').replace('_',' ').title()
