@@ -39,7 +39,7 @@ class ApiContext(object):
     skill_levels=[0]  #This only works for heroes.
     deepcopy=False
     last_scrape_time=0
-    player_steam_ids = None
+    steamids = None
     processed=0
     refresh_records = False
 
@@ -387,7 +387,7 @@ class RefreshUpdatePlayerPersonas(BaseTask):
                 steamids = ",".join(querylist)
                 vac = ValveApiCall()
                 upp = UpdatePlayerPersonas()
-                self.api_context.player_steam_ids=steamids
+                self.api_context.steamids=steamids
                 chain(vac.s(mode='GetPlayerSummaries',api_context=self.api_context), \
                       upp.s()).delay()
                 querylist = []
