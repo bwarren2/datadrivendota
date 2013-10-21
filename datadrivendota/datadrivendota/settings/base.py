@@ -31,6 +31,10 @@ CELERY_TASK_RESULT_EXPIRES = int(getenv('RESULT_EXPIRY_RATE'))
 CELERY_IGNORE_RESULT = True
 CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
 
+BROKER_CONNECTION_TIMEOUT = 10
+CELERYD_TASK_TIME_LIMIT = 60
+CELERYD_FORCE_EXECV = True
+
 # Valve's rate limiting.
 VALVE_RATE = getenv('VALVE_RATE')
 
@@ -66,10 +70,16 @@ CELERY_DEFAULT_ROUTING_KEY = 'default'
 CELERY_DEFAULT_QUEUE = 'default'
 
 CELERY_ANNOTATIONS = {
-    "matches.management.tasks.valve_api_calls.ValveApiCall": {"rate_limit": VALVE_RATE},
+    "matches.management.tasks.valve_api_calls.ValveApiCall": {"rate_limit": VALVE_RATE,
+                                                              'acks_late': True},
     'matches.management.tasks.valve_api_calls.UploadMatch': {'acks_late': True},
     'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'acks_late': True},
     'matches.management.tasks.valve_api_calls.UploadMatchSummary': {'acks_late': True},
+    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'acks_late': True},
+    'matches.management.tasks.valve_api_calls.RefreshUpdatingPlayerRecords': {'acks_late': True},
+    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'acks_late': True},
+    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'acks_late': True},
+
 }
 
 ########## PATH CONFIGURATION
