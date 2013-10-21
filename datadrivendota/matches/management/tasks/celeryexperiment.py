@@ -1,25 +1,37 @@
-from celery import task, Task
 from time import sleep
-from celery.registry import tasks
 
 import logging
 import celery
+from celery import task, Task
 
 logger = logging.getLogger(__name__)
+"""Notes: In order to make things work correctly, you must:
+    1: make sure this module is in your celery imports in the django settings.
+    2: Start a fresh dj shell
+    3: Start a fresh celery worker.
+    2 & 3 are there because of the preloading that both of those tasks do
+        (by looking in 1)
+    """
+@task
+def hello():
+    """Returns a string literal."""
+    return "Hi!"
+
 
 @task
 def parent():
     print "In parent"
-    child.s().delay()
+    c = child.s().delay() #Both delay and apply_async() allow for parent release
+    child.s().delay() #Catching the result and not both allow release
     print "Out of parent"
-
 @task
 def child():
     print "In child"
-    sleep(10)
+    sleep(.1)
     print "Out of child"
+#.s() forms a subtask that allows the parent to be freed before the child starts.
 
-
+#Returns nonetype error.  I do n
 class PingerPonger(Task):
     abstract=True
 
@@ -58,14 +70,3 @@ class ApiFollower(celery.Task):
         logger.info(self.y)
         pass
 
-class AddTask(MyCoolTask):
-
-    def run(self,x,y):
-        if x and y:
-            result=x+y
-            logger.info('result = %d' % result)
-            return result
-        else:
-            logger.error('No x or y in arguments')
-
-tasks.register(AddTask)

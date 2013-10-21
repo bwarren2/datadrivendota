@@ -27,6 +27,10 @@ CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
 #Stop a bazillion fake queues from being made with results.  Time in sec.
 CELERY_TASK_RESULT_EXPIRES = int(getenv('RESULT_EXPIRY_RATE'))
 
+#Only store errors.
+CELERY_IGNORE_RESULT = True
+CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+
 # Valve's rate limiting.
 VALVE_RATE = getenv('VALVE_RATE')
 
