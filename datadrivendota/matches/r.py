@@ -38,7 +38,7 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
                 auto.key=list(lines=T,points=T,corner=c(0,.9),background='white',title='%s'),
                 ylab='%s',xlab='%s',
                 par.settings=simpleTheme(pch=20,lwd=4),
-                scales=list()
+                scales=list(),
                 )
     )"""% (grouplab, ylab, xlab)
     robjects.r(rcmd )

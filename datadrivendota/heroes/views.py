@@ -63,7 +63,7 @@ def vitals(request):
 
           image = generateChart(
              hero_list = hero_form.cleaned_data['heroes'],
-              stat_list = hero_form.cleaned_data['stats'],
+              stats_list = hero_form.cleaned_data['stats'],
               display_options=display_options
           )
           imagebase = basename(image.name)
