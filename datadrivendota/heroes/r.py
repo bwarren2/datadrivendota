@@ -269,7 +269,7 @@ def HeroSkillLevelBwChart(hero, player, game_mode_list, levels):
     grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
     enforceTheme(robjects)
     rcmd="""print(
-        bwplot(yvec/60~xvec|as.factor(splitvec))
+        bwplot(yvec/60~xvec|as.factor(splitvec),ylab='Skill Acquisition Time (m)')
     )"""
     robjects.r(rcmd )
     #relation='free' in scales for independent axes

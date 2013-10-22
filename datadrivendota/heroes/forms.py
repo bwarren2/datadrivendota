@@ -73,7 +73,7 @@ class HeroPlayerSkillBarsForm(forms.Form):
         required=True, initial=[6,11,16], help_text='Levels would you like to see?')
 
     def clean_levels(self):
-        lvls = self.cleaned_data['level']
+        lvls = self.cleaned_data['levels']
         return_lvl_list = []
         for lvl in lvls:
             try:
