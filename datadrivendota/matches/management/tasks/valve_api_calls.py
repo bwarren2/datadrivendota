@@ -188,7 +188,6 @@ class ValveApiCall(BaseTask):
         # unless you do this.
         data['api_context'] = self.api_context
         return data
-
 tasks.register(ValveApiCall)
 
 

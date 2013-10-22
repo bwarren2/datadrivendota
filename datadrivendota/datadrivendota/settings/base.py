@@ -70,8 +70,7 @@ CELERY_DEFAULT_ROUTING_KEY = 'default'
 CELERY_DEFAULT_QUEUE = 'default'
 
 CELERY_ANNOTATIONS = {
-    "matches.management.tasks.valve_api_calls.ValveApiCall": {"rate_limit": VALVE_RATE,
-                                                              'acks_late': True},
+    "matches.management.tasks.valve_api_calls.ValveApiCall": {"rate_limit": VALVE_RATE},
     'matches.management.tasks.valve_api_calls.UploadMatch': {'acks_late': True},
     'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'acks_late': True},
     'matches.management.tasks.valve_api_calls.UploadMatchSummary': {'acks_late': True},
