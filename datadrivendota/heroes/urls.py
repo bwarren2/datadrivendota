@@ -7,8 +7,10 @@ urlpatterns = patterns('',
     url(r'^lineups/?$', views.lineup, name='lineup'),
     url(r'^performance/?$', views.hero_performance, name='hero_performance'),
     url(r'^skill_bars/?$', views.hero_skill_bars, name='hero_skill_bars'),
-    url(r'^(?P<hero_name>[a-zA-Z0-9\-]*)/?$', views.detail, name="detail"),
+    url(r'^speedtest1/?',views.speedtest1,name='speedtest1'),
+    url(r'^speedtest2/?',views.speedtest2,name='speedtest2'),
     url(r'^api/getheroes/?',views.hero_list,name='hero_list'),
+    url(r'^(?P<hero_name>[a-zA-Z0-9\-]*)/?$', views.detail, name="detail"),
 )
     # Examples:
     # url(r'^$', 'datadrivendota.views.home', name='home'),

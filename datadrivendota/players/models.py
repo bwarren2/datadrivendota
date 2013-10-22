@@ -5,7 +5,7 @@ from settings.base import ADDER_32_BIT, ANONYMOUS_ID
 # Create your models here.
 class Player(models.Model):
     steam_id = models.BigIntegerField(help_text="Valve's internal map",
-               unique=True, validators=[validate_32bit])
+               unique=True, validators=[validate_32bit], db_index=True)
     persona_name = models.TextField(help_text='Your name on steam')
     profile_url = models.TextField(help_text='Steam profile URL')
     avatar = models.TextField(help_text='Tiny avatar image url')

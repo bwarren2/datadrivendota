@@ -1,5 +1,5 @@
 from django import forms
-from players.form_fields import SinglePlayerField
+from players.form_fields import MultiPlayerField
 from .form_fields import MultiGameModeSelect
 
 
@@ -16,7 +16,7 @@ class EndgameSelect(forms.Form):
     SPLIT_PARAMS = ['player','is_win','game_mode']
     DOUBLED_PARAM_LIST = [(item,item) for item in SPLIT_PARAMS]
 
-    players = SinglePlayerField(required=True, help_text='Pick one player.  Use the autocomplete.')
+    players = MultiPlayerField(required=True, help_text='Pick one player.  Use the autocomplete.')
     game_modes = MultiGameModeSelect(required=True, help_text='Which game modes would you like to sample?')
     x_var = forms.ChoiceField(choices=X_LIST, required=True, help_text='What goes on the x axis?')
     y_var = forms.ChoiceField(choices=Y_LIST, required=True, help_text='What goes on the y axis?')

@@ -3,21 +3,19 @@ from django.core.files import File
 from rpy2 import robjects
 from rpy2.robjects import FloatVector, StrVector
 from rpy2.robjects.packages import importr
-from matches.models import PlayerMatchSummary, GameMode
-from players.models import Player
+from matches.models import PlayerMatchSummary
 from datadrivendota.r import enforceTheme, s3File
 from datadrivendota.utilities import safen
 
 def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
-
-    player_obj_list = Player.objects.filter(steam_id__in=player_list)
-    game_mode_list = GameMode.objects.filter(steam_id__in=mode_list)
-
     grdevices = importr('grDevices')
     importr('lattice')
 
-    selected_summaries = PlayerMatchSummary.objects.select_related().filter(player__in=player_obj_list,match__game_mode__in=game_mode_list)
+    selected_summaries = PlayerMatchSummary.objects.filter(
+        player__steam_id__in=player_list,
+        match__game_mode__steam_id__in=mode_list)
+    selected_summaries = selected_summaries.select_related()
     x_vector_list, xlab = fetch_match_attributes(selected_summaries, x_var)
     y_vector_list, ylab = fetch_match_attributes(selected_summaries, y_var)
     split_vector_list, split_lab = fetch_match_attributes(selected_summaries, split_var)
@@ -37,21 +35,16 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
     rcmd="""print(
         xyplot(yvec~xvec|splitvar,groups=groupvar,type=c('p','r'),
-                auto.key=list(rectangles=F,points=T,lines=T,space='right',title='%s'),
+                auto.key=list(lines=T,points=T,corner=c(0,.9),background='white',title='%s'),
                 ylab='%s',xlab='%s',
-                par.settings=simpleTheme(pch=20,lwd=4,
-                    col=rainbow(n=length(unique(groupvar))),
-                    ),
+                par.settings=simpleTheme(pch=20,lwd=4),
                 scales=list()
                 )
     )"""% (grouplab, ylab, xlab)
     robjects.r(rcmd )
 
-
     grdevices.dev_off()
-
     imagefile.close()
-
     hosted_file = s3File(imagefile)
     return hosted_file
 
@@ -75,11 +68,11 @@ def MatchParameterScatterplot(match_id, x_var, y_var):
     grdevices.png(file=imagefile.name, type='cairo',width=400,height=350)
     enforceTheme(robjects)
 
-
     rcmd="""
     print(
         xyplot(yvec~xvec,labels=labels,type=c('p','r'),
-                ylab='%s',xlab='%s'
+                ylab='%s',xlab='%s',
+                auto.key=list(lines=T,points=T,corner=c(0,.9),background='white'),
                 )
     )"""% (y_lab, x_lab)
     robjects.r(rcmd)
@@ -99,7 +92,7 @@ def fetch_match_attributes(summaries,attribute):
         vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in summaries]
         label='Kills - Death + .5*Assists'
     elif attribute == 'player':
-        vector_list = [summary.player.steam_id for summary in summaries]
+        vector_list = [summary.player.persona_name for summary in summaries]
         label=attribute.title()
     elif attribute == 'is_win':
         vector_list = [summary.is_win for summary in summaries]

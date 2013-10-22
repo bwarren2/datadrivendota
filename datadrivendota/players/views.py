@@ -50,7 +50,7 @@ def detail(request, player_name=None, player_id=None):
                               context_instance = RequestContext(request))
 
 
-@devserver_profile(follow=[PlayerWinrateLevers])
+@devserver_profile(follow=[CountWinrate])
 def winrate(request):
     if request.method == 'POST':
         winrate_form = PlayerWinrateLevers(request.POST)
@@ -63,7 +63,6 @@ def winrate(request):
             )
             imagebase = basename(image.name)
             return render_to_response('winrate_chart.html', {'form': winrate_form,
-                                      'image': image,
                                       'imagebase': imagebase},
                                       context_instance=RequestContext(request))
 
@@ -87,12 +86,10 @@ def timeline(request):
             )
             imagebase = basename(image.name)
             return render_to_response('player_timeline_chart.html', {'form': timeline_form,
-                                      'image': image,
                                       'imagebase': imagebase,
                                       'title':'Player Timeline',
                                       'page_title':'Player Timeline'},
                                       context_instance=RequestContext(request))
-
     else:
         timeline_form = PlayerTimelineForm()
 

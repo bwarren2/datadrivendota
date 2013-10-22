@@ -7,6 +7,10 @@ from django.conf import settings
 from rpy2 import robjects
 from rpy2.robjects import FloatVector, StrVector, IntVector
 from rpy2.robjects.packages import importr
+import rpy2.rinterface as rinterface
+
+#rinterface.set_initoptions(('rpy2', '--verbose', '--no-save'))
+
 
 from heroes.models import HeroDossier, Hero
 from datadrivendota.r import s3File, enforceTheme
@@ -272,6 +276,67 @@ def HeroSkillLevelBwChart(hero, player, game_mode_list, levels):
     grdevices.dev_off()
     imagefile.close()
 
+    hosted_file = s3File(imagefile)
+    return hosted_file
+
+def speedtest1Chart():
+
+    #Get the right stuff loaded in R
+    grdevices = importr('grDevices')
+    importr('lattice')
+
+    x_vec = IntVector([i for i in range(1,10)])
+    y_vec = IntVector([i for i in range(1,10)])
+
+    robjects.globalenv["xvec"] = x_vec
+    robjects.globalenv["yvec"] = y_vec
+
+    #robjects.globalenv["y"] = y
+    #Some in-R formatting
+
+    #Make a file
+    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
+    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    enforceTheme(robjects)
+    rcmd="""print(
+        xyplot(yvec~xvec)
+    )"""
+    robjects.r(rcmd )
+    #relation='free' in scales for independent axes
+    grdevices.dev_off()
+    imagefile.close()
+
+    hosted_file = s3File(imagefile)
+    return hosted_file
+
+def speedtest2Chart():
+    """There is no benefit to taking the direct route with importing grDevices.
+    There is to doing so with lattice.  parsing the print call fails to finish the file.
+    Overall speedup: .6s
+    """
+
+    grdevices = importr('grDevices')
+
+    x_vec = rinterface.IntSexpVector([i for i in range(1,10)])
+    y_vec = rinterface.IntSexpVector([i for i in range(1,10)])
+
+    rinterface.globalenv["xvec"] = x_vec
+    rinterface.globalenv["yvec"] = y_vec
+
+
+    #Make a file
+    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
+    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+
+    enforceTheme(robjects)
+    rcmd="""
+    print(xyplot(yvec~xvec))
+    """
+    print(rcmd)
+    robjects.r(rcmd)
+    #rinterface.parse(rcmd)
+    grdevices.dev_off()
+    imagefile.close()
     hosted_file = s3File(imagefile)
     return hosted_file
 

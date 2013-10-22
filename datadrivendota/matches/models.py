@@ -34,7 +34,7 @@ class Match(models.Model):
 
 
 class GameMode(models.Model):
-    steam_id = models.IntegerField(help_text="Valve's id field", unique=True)
+    steam_id = models.IntegerField(help_text="Valve's id field", unique=True, db_index=True)
     description = models.CharField(help_text='Game mode, ie. captains',
                                    max_length=50)
     is_competitive = models.BooleanField(help_text="""Whether charts should

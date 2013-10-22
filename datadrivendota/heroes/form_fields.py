@@ -18,7 +18,6 @@ class SingleHeroSelect(forms.CharField):
 class MultiHeroSelect(forms.CharField):
     widget=forms.TextInput(attrs={'class': 'multi-hero-tags',})
     def clean(self, hero_str):
-        print hero_str, "," in hero_str
         if ',' not in hero_str:
             try:
                 hero = Hero.objects.get(name=hero_str)

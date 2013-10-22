@@ -6,7 +6,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response, render
 from .models import Hero
 from django.utils.text import slugify
 from django.template import RequestContext
@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, \
   HeroPlayerPerformance, HeroPlayerSkillBarsForm
 from .r import generateChart, lineupChart, HeroPerformanceChart,\
- HeroSkillLevelBwChart
+ HeroSkillLevelBwChart, speedtest1Chart, speedtest2Chart
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -68,7 +68,7 @@ def vitals(request):
           )
           imagebase = basename(image.name)
           return render_to_response('hero_vitals.html', {'form': hero_form,
-                                    'hero_list': hero_list, 'image': image,
+                                    'hero_list': hero_list,
                                     'imagebase': imagebase},
                                     context_instance=RequestContext(request))
     else:
@@ -90,7 +90,6 @@ def lineup(request):
 
           imagebase = basename(image.name)
           return render_to_response('hero_lineups.html', {'form': hero_form,
-                                    'image': image,
                                     'imagebase': imagebase},
                                     context_instance=RequestContext(request))
     else:
@@ -115,7 +114,6 @@ def hero_performance(request):
             )
             imagebase = basename(image.name)
             return render_to_response('hero_performance.html',{'form': hero_form,
-                                      'image': image,
                                       'imagebase': imagebase},
                                       context_instance=RequestContext(request))
     else:
@@ -137,13 +135,27 @@ def hero_skill_bars(request):
             )
             imagebase = basename(image.name)
             return render_to_response('hero_skill_time_bars.html',{'form': hero_form,
-                                      'image': image,
                                       'imagebase': imagebase},
                                       context_instance=RequestContext(request))
     else:
       hero_form = HeroPlayerSkillBarsForm
     return render_to_response('hero_skill_time_bars.html',{'form': hero_form},
                               context_instance=RequestContext(request))
+
+@devserver_profile(follow=[speedtest1Chart])
+def speedtest1(request):
+    image = speedtest1Chart()
+    imagebase = basename(image.name)
+    return render(request, 'speedtest.html',
+                              {'imagebase': imagebase})
+
+@devserver_profile(follow=[speedtest2Chart, render])
+def speedtest2(request):
+    image = speedtest2Chart()
+    imagebase = basename(image.name)
+    return render(request, 'speedtest.html',
+                              {'imagebase': imagebase})
+
 
 def hero_list(request):
 

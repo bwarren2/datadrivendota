@@ -63,7 +63,7 @@ def endgame(request):
             )
             imagebase = basename(image.name)
             return render_to_response('endgames.html',
-                                     {'form':select_form,'image':image,
+                                     {'form':select_form,
                                       'imagebase':imagebase
                                      },
                                     context_instance=RequestContext(request))
