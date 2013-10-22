@@ -95,7 +95,7 @@ def fetch_match_attributes(summaries,attribute):
         vector_list = [summary.player.persona_name for summary in summaries]
         label=attribute.title()
     elif attribute == 'is_win':
-        vector_list = [summary.is_win for summary in summaries]
+        vector_list = ['Won' if summary.is_win==True else 'Lost' for summary in summaries]
         label='Won Game?'
     elif attribute == 'game_mode':
         vector_list = [summary.match.game_mode.description for summary in summaries]

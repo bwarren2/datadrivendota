@@ -21,7 +21,9 @@ class EndgameSelect(forms.Form):
     x_var = forms.ChoiceField(choices=X_LIST, required=True, help_text='What goes on the x axis?')
     y_var = forms.ChoiceField(choices=Y_LIST, required=True, help_text='What goes on the y axis?')
     split_var = forms.ChoiceField(choices=DOUBLED_PARAM_LIST, required=True,
-        help_text='Which variable splits data between panels?')
+        help_text='Which variable splits data between panels?',
+        initial='is_win')
     group_var = forms.ChoiceField(choices=DOUBLED_PARAM_LIST, required=True,
-        help_text='Which variable colors data within a panel?')
+        help_text='Which variable colors data within a panel?',
+        initial='player')
 
