@@ -39,6 +39,7 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
                 ylab='%s',xlab='%s',
                 par.settings=simpleTheme(pch=20,lwd=4),
                 scales=list(),
+
                 )
     )"""% (grouplab, ylab, xlab)
     robjects.r(rcmd )
@@ -70,9 +71,13 @@ def MatchParameterScatterplot(match_id, x_var, y_var):
 
     rcmd="""
     print(
-        xyplot(yvec~xvec,labels=labels,type=c('p','r'),
+        xyplot(yvec~xvec,type=c('p','r'),
                 ylab='%s',xlab='%s',
                 auto.key=list(lines=T,points=T,corner=c(0,.9),background='white'),
+                panel=function(x, y, ...) {
+                    panel.xyplot(x, y, ...);
+                    ltext(x=x, y=y, labels=labels, pos=1, offset=0, cex=0.8)
+                }
                 )
     )"""% (y_lab, x_lab)
     robjects.r(rcmd)
