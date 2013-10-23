@@ -1,0 +1,18 @@
+<div>
+    <div style='float:left'>
+        <form class='chart-form' action="" method='POST'>
+            {% csrf_token %}
+
+            {% include "_form.html" %}
+
+            <div class="control-group">
+                <div class="controls pull-right">
+                    <button type="submit" class="btn btn-small btn-primary">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% if imagebase %}
+        <img src="{{MEDIA_URL}}{{imagebase}}">
+    {% endif %}
+</div>
