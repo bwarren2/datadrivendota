@@ -62,14 +62,16 @@ def winrate(request):
               max_date = winrate_form.cleaned_data['max_date'],
             )
             imagebase = basename(image.name)
-            return render_to_response('winrate_chart.html', {'form': winrate_form,
-                                      'imagebase': imagebase},
+            return render_to_response('player_form.html', {'form': winrate_form,
+                                      'imagebase': imagebase,
+                                      'title':'Hero Winrate'},
                                       context_instance=RequestContext(request))
 
     else:
         winrate_form = PlayerWinrateLevers()
 
-    return render_to_response('winrate_chart.html', {'form': winrate_form},
+    return render_to_response('player_form.html', {'form': winrate_form,
+                                                    'title':'Hero Winrate'},
                               context_instance=RequestContext(request))
 
 @devserver_profile(follow=[PlayerTimeline])
@@ -85,17 +87,15 @@ def timeline(request):
               plot_var=timeline_form.cleaned_data['plot_var']
             )
             imagebase = basename(image.name)
-            return render_to_response('player_timeline_chart.html', {'form': timeline_form,
+            return render_to_response('player_form.html', {'form': timeline_form,
                                       'imagebase': imagebase,
-                                      'title':'Player Timeline',
-                                      'page_title':'Player Timeline'},
+                                      'title':'Player Timeline',},
                                       context_instance=RequestContext(request))
     else:
         timeline_form = PlayerTimelineForm()
 
-    return render_to_response('player_timeline_chart.html', {'form': timeline_form,
-                              'title':'Player Timeline',
-                              'page_title':'Player Timeline'},
+    return render_to_response('player_form.html', {'form': timeline_form,
+                              'title':'Player Timeline'},
                               context_instance=RequestContext(request))
 
 

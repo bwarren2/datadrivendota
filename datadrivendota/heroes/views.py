@@ -62,18 +62,20 @@ def vitals(request):
               display_options['linked_scales']=''
 
           image = generateChart(
-             hero_list = hero_form.cleaned_data['heroes'],
+              hero_list = hero_form.cleaned_data['heroes'],
               stats_list = hero_form.cleaned_data['stats'],
               display_options=display_options
           )
           imagebase = basename(image.name)
-          return render_to_response('hero_vitals.html', {'form': hero_form,
+          return render_to_response('hero_form.html', {'form': hero_form,
                                     'hero_list': hero_list,
-                                    'imagebase': imagebase},
+                                    'imagebase': imagebase,
+                                    'title':"Hero Vitals"},
                                     context_instance=RequestContext(request))
     else:
         hero_form = HeroVitalsMultiSelect()
-    return render_to_response('hero_vitals.html', {'form': hero_form},
+    return render_to_response('hero_form.html', {'form': hero_form,
+                                                'title':"Hero Vitals"},
                                context_instance=RequestContext(request))
 
 @devserver_profile(follow=[lineupChart])
@@ -89,13 +91,15 @@ def lineup(request):
           )
 
           imagebase = basename(image.name)
-          return render_to_response('hero_lineups.html', {'form': hero_form,
-                                    'imagebase': imagebase},
+          return render_to_response('hero_form.html', {'form': hero_form,
+                                    'imagebase': imagebase,
+                                    'title':'Hero Lineups'},
                                     context_instance=RequestContext(request))
     else:
         hero_form = HeroLineupMultiSelect()
 
-    return render_to_response('hero_lineups.html', {'form': hero_form},
+    return render_to_response('hero_form.html', {'form': hero_form,
+                                                 'title':'Hero Lineups'},
                               context_instance=RequestContext(request))
 
 @devserver_profile(follow=[HeroPerformanceChart])
@@ -113,13 +117,15 @@ def hero_performance(request):
               split_var = hero_form.cleaned_data['split_var'],
             )
             imagebase = basename(image.name)
-            return render_to_response('hero_performance.html',{'form': hero_form,
-                                      'imagebase': imagebase},
+            return render_to_response('hero_form.html',{'form': hero_form,
+                                      'imagebase': imagebase,
+                                      'title':'Hero Performance'},
                                       context_instance=RequestContext(request))
     else:
       hero_form = HeroPlayerPerformance()
 
-    return render_to_response('hero_performance.html',{'form': hero_form},
+    return render_to_response('hero_form.html',{'form': hero_form,
+                                                'title':'Hero Performance'},
                               context_instance=RequestContext(request))
 
 @devserver_profile(follow=[HeroSkillLevelBwChart])
@@ -134,12 +140,14 @@ def hero_skill_bars(request):
               levels= hero_form.cleaned_data['levels'],
             )
             imagebase = basename(image.name)
-            return render_to_response('hero_skill_time_bars.html',{'form': hero_form,
-                                      'imagebase': imagebase},
+            return render_to_response('hero_form.html',{'form': hero_form,
+                                      'imagebase': imagebase,
+                                      'title': 'Hero Skill Times'},
                                       context_instance=RequestContext(request))
     else:
       hero_form = HeroPlayerSkillBarsForm
-    return render_to_response('hero_skill_time_bars.html',{'form': hero_form},
+    return render_to_response('hero_form.html',{'form': hero_form,
+                                                'title': 'Hero Skill Times'},
                               context_instance=RequestContext(request))
 
 @devserver_profile(follow=[speedtest1Chart])

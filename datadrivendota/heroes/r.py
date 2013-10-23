@@ -13,7 +13,7 @@ import rpy2.rinterface as rinterface
 
 
 from heroes.models import HeroDossier, Hero
-from datadrivendota.r import s3File, enforceTheme
+from datadrivendota.r import s3File, enforceTheme, FailFace
 from matches.models import PlayerMatchSummary, SkillBuild
 from matches.r import fetch_match_attributes
 
@@ -22,10 +22,14 @@ def generateChart(hero_list, stats_list, display_options):
     # Currently, we are violating DRY with the available field listing from the form
     # and the R space being in different places and requiring that they are the same.
 
+    selected_heroes = HeroDossier.objects.filter(hero__steam_id__in=hero_list)
+
+    if len(selected_heroes) == 0:
+        return FailFace()
+
     grdevices = importr('grDevices')
 
     importr('lattice')
-    selected_heroes = HeroDossier.objects.filter(hero__steam_id__in=hero_list)
 
     cmd = """
         df.all = data.frame(
@@ -121,10 +125,13 @@ def lineupChart(heroes, stat, level):
     y_vals = [hero_value[key] for key in sorted(hero_value, key=hero_value.get, reverse=True)]
     col_vec = ['red' if name in selected_names else 'green' for name in x_vals ]
 
+
     x = robjects.FactorVector(x_vals)
     y = robjects.FloatVector(y_vals)
     colors = robjects.StrVector(col_vec)
     df = robjects.DataFrame({'name':x, 'val':y})
+    if len(x)==0 or len(y)==0:
+        return FailFace()
 
     #Register in the environment
 
@@ -155,7 +162,6 @@ def lineupChart(heroes, stat, level):
     #relation='free' in scales for independent axes
     grdevices.dev_off()
     imagefile.close()
-
     hosted_file = s3File(imagefile)
     return hosted_file
 
@@ -185,6 +191,10 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
     split_vector_list, split_lab = fetch_match_attributes(match_pool, split_var)
     group_vector_list, grouplab = fetch_match_attributes(match_pool, group_var)
+
+    if len(x_vector_list)==0 or len(y_vector_list)==0 or \
+        len(split_vector_list)==0 or len(group_vector_list)==0:
+            return FailFace()
 
     #Register in the environment
     x_vec = FloatVector(x_vector_list)

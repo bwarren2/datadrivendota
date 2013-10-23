@@ -43,7 +43,7 @@ def match(request, match_id):
                               context_instance=RequestContext(request))
 
 def index(request):
-    match_list = Match.objects.all()[:10]
+    match_list = Match.objects.filter(duration__gte=1500)[:10]
     return render_to_response('matches_index.html', {'match_list': match_list},
                               context_instance=RequestContext(request))
 
@@ -62,15 +62,16 @@ def endgame(request):
                 group_var = select_form.cleaned_data['group_var'],
             )
             imagebase = basename(image.name)
-            return render_to_response('endgames.html',
+            return render_to_response('match_form.html',
                                      {'form':select_form,
-                                      'imagebase':imagebase
+                                      'imagebase':imagebase,
+                                      'title':'Endgame Charts'
                                      },
                                     context_instance=RequestContext(request))
 
     else:
         select_form = EndgameSelect()
-    return render_to_response('endgames.html',
-                             {'form':select_form},
+    return render_to_response('match_form.html',
+                             {'form':select_form,'title':'Endgame Charts'},
                             context_instance=RequestContext(request))
 
