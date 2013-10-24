@@ -5,4 +5,4 @@ def active(request):
             'active': ac
         }
     except AttributeError:
-        pass
+        return {}
