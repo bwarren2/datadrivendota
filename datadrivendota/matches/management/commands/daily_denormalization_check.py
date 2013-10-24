@@ -9,10 +9,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
 
-        c = ApiContext()
-        RefreshUpdatePlayerPersonas().delay(api_context=c)
-#        c = ApiContext()
-#        RefreshPlayerMatchDetail().delay(api_context=c)
 
         #Denoramlization Checks
         radiant_badness = PlayerMatchSummary.objects.filter(
