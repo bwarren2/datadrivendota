@@ -435,7 +435,7 @@ class RefreshPlayerMatchDetail(BaseTask):
             context.last_scrape_time=user.last_scrape_time
             vac = ValveApiCall()
             rpr = RetrievePlayerRecords()
-            chain(vac.s(mode='GetMatchHistory',api_context=self.api_context),rpr.s()).delay()
+            chain(vac.s(mode='GetMatchHistory',api_context=context),rpr.s()).delay()
 
 tasks.register(RefreshPlayerMatchDetail)
 
