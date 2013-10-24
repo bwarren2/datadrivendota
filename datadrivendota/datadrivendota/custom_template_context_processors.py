@@ -1,4 +1,8 @@
 def active(request):
-    return {
-        'active': request.resolver_match.url_name
-    }
+    try:
+        ac = request.resolver_match.url_name
+        return {
+            'active': ac
+        }
+    except AttributeError:
+        pass
