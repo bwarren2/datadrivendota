@@ -21,19 +21,20 @@ BROKER_URL = getenv('CLOUDAMQP_URL')
 # List of modules to import when celery starts.
 CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls",)
 
-## Using the database to store task state and results.
-CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
+## What happens if we do not use redis?.
+#CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
 
 #Stop a bazillion fake queues from being made with results.  Time in sec.
 CELERY_TASK_RESULT_EXPIRES = int(getenv('RESULT_EXPIRY_RATE'))
 
 #Only store errors.
 CELERY_IGNORE_RESULT = True
-CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+#CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
 
 BROKER_CONNECTION_TIMEOUT = 10
 CELERYD_TASK_TIME_LIMIT = 60
 #CELERYD_FORCE_EXECV = True
+CELERY_ACKS_LATE = True
 
 # Valve's rate limiting.
 VALVE_RATE = getenv('VALVE_RATE')
@@ -72,9 +73,9 @@ CELERY_DEFAULT_QUEUE = 'default'
 CELERY_ANNOTATIONS = {
     "matches.management.tasks.valve_api_calls.ValveApiCall": {"rate_limit": VALVE_RATE,
                                                               'acks_late': True},
+    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'acks_late': True},
     'matches.management.tasks.valve_api_calls.UploadMatch': {'acks_late': True},
     'matches.management.tasks.valve_api_calls.UploadMatchSummary': {'acks_late': True},
-    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'acks_late': True},
     'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {'acks_late': True},
     'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'acks_late': True},
     'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'acks_late': True},
