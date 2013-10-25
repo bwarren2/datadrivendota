@@ -22,14 +22,14 @@ BROKER_URL = getenv('CLOUDAMQP_URL')
 CELERY_IMPORTS = ("matches.management.tasks.valve_api_calls",)
 
 ## What happens if we do not use redis?.
-#CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
+CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
 
 #Stop a bazillion fake queues from being made with results.  Time in sec.
 CELERY_TASK_RESULT_EXPIRES = int(getenv('RESULT_EXPIRY_RATE'))
 
 #Only store errors.
 CELERY_IGNORE_RESULT = True
-#CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
 
 BROKER_CONNECTION_TIMEOUT = 10
 CELERYD_TASK_TIME_LIMIT = 60
