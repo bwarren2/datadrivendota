@@ -1,7 +1,9 @@
 {% extends "hero_base.html" %}
-{% block extra_css %}{% endblock extra_css %}
-{% block title %}{{title}}{% endblock title %}
-{% block page_title %}{{title}}{% endblock page_title %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block page_title %}{{ title }}{% endblock page_title %}
+
 {% block content %}
-{% include "_image_form_embed.html" %}
+  {% include "_image_form_embed.html" %}
 {% endblock content %}

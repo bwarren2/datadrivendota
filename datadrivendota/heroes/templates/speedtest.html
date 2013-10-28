@@ -1,13 +1,15 @@
 {% extends "hero_base.html" %}
-{% block extra_css %}{% endblock extra_css %}
+
 {% block title %}Hero Performance{% endblock title %}
+
 {% block page_title %}Hero Performance{% endblock page_title %}
+
 {% block content %}
+  {% if imagebase %}
     <div>
-    {% if imagebase %}
-        <img src="{{MEDIA_URL}}{{imagebase}}">
-    {% endif %}
+      <img src="{{ MEDIA_URL }}{{ imagebase }}">
     </div>
+  {% endif %}
 {% endblock content %}
 
 

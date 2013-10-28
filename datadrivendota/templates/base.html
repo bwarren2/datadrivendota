@@ -31,20 +31,21 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">DataDrivenDota</a>
+        <a class="navbar-brand" href="/">DataDrivenDota</a>
       </div>
       <div class="collapse navbar-collapse navbar-ex1-collapse">
         <ul class="nav navbar-nav">
-          <li class="{% if active|slice:":6" == "heroes" %}active{% endif %}"><a href="/heroes/">Heroes</a></li>
-          <li class="{% if active == "items" %}active{% endif %}"><a href="/items/">Items</a></li>
-          <li class="{% if active|slice:":7" == "matches" %}active{% endif %}"><a href="/matches/">Matches</a></li>
-          <li class="{% if active == "players" %}active{% endif %}"><a href="/players/">Players</a></li>
+          {# todo: fix this active logic. --kit 2013-10-27 #}
+          <li class="{% if active|slice:":6" == "heroes" %}active{% endif %}"><a href="{% url 'heroes:index' %}">Heroes</a></li>
+          <li class="{% if active == "items" %}active{% endif %}"><a href="{% url 'items:index' %}">Items</a></li>
+          <li class="{% if active|slice:":7" == "matches" %}active{% endif %}"><a href="{% url 'matches:index' %}">Matches</a></li>
+          <li class="{% if active == "players" %}active{% endif %}"><a href="{% url 'players:index' %}">Players</a></li>
           <li class="{% if active == "about" %}active{% endif %}"><a href="/about/">About</a></li>
-          <li><a href="mailto:datadrivendota@gmail">Contact</a></li>
+          <li><a href="mailto:datadrivendota@gmail.com">Contact</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           {% if user.is_active %}
-          <li><a href="/logout">Logout, {{user}}?</a></li>
+          <li><a href="{% url 'logout' %}">Logout, {{user}}?</a></li>
           {% else %}
           <li><a href="{% url 'socialauth_begin' 'steam' %}">Login</a></li>
           {% endif %}
@@ -69,9 +70,8 @@
     <!-- Placed at the end of the document so the pages load faster -->
 
     {% compressed_js 'all' %}
- <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <link rel="stylesheet" type="text/css"
-    href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/start/jquery-ui.css" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/start/jquery-ui.css" />
 
     {% block extra_js %}
     <script type="text/javascript">
@@ -79,30 +79,30 @@
     $( ".datepicker" ).datepicker(
         { dateFormat: 'yy-mm-dd' }
         );
-});
+    });
 
-$('.single-hero-tags').tagsInput({
-    autocomplete_url:'/heroes/api/getheroes',
-    defaultText:'One Hero',
-    height:'75px',
-    width:'200px',
-});
-$('.multi-hero-tags').tagsInput({
-    autocomplete_url:'/heroes/api/getheroes',
-    defaultText:'One or more Heroes'
-});
-$('.single-player-tags').tagsInput({
-    autocomplete_url:'/players/api/getplayers',
-    defaultText:'One Player',
-    height:'75px',
-    width:'200px',
-});
-$('.multi-player-tags').tagsInput({
-    autocomplete_url:'/players/api/getplayers',
-    defaultText:'One or more Players'
-});
+    $('.single-hero-tags').tagsInput({
+        autocomplete_url:'/heroes/api/getheroes',
+        defaultText:'One Hero',
+        height:'75px',
+        width:'200px',
+    });
+    $('.multi-hero-tags').tagsInput({
+        autocomplete_url:'/heroes/api/getheroes',
+        defaultText:'One or more Heroes'
+    });
+    $('.single-player-tags').tagsInput({
+        autocomplete_url:'/players/api/getplayers',
+        defaultText:'One Player',
+        height:'75px',
+        width:'200px',
+    });
+    $('.multi-player-tags').tagsInput({
+        autocomplete_url:'/players/api/getplayers',
+        defaultText:'One or more Players'
+    });
 
-</script>
+    </script>
     {% endblock extra_js %}
   </body>
 </html>

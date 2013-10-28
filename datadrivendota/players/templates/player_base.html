@@ -1,11 +1,9 @@
 {% extends "base.html" %}
 
 {% block extra_nav %}
-    <ul class='nav nav-tabs'>
-        <li class="{% if active == "players-index" %}active{% endif %}"><a href="/players/">Index</a></li>
-        <li class="{% if active == "players-winrate" %}active{% endif %}"><a href="/players/winrate">Winrate</a></li>
-        <li class="{% if active == "players-timeline" %}active{% endif %}"><a href="/players/timeline">Timeline</a></li>
-    </ul>
+  <ul class='nav nav-tabs'>
+    <li class="{% if active == 'index' %}active{% endif %}"><a href="{% url 'players:index' %}">Index</a></li>
+    <li class="{% if active == 'player_winrate' %}active{% endif %}"><a href="{% url 'players:player_winrate' %}">Winrate</a></li>
+    <li class="{% if active == 'timeline' %}active{% endif %}"><a href="{% url 'players:timeline' %}">Timeline</a></li>
+  </ul>
 {% endblock extra_nav %}
-
-

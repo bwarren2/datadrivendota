@@ -1,20 +1,19 @@
 {% extends "hero_base.html" %}
 
 {% block title %}Hero List{% endblock %}
+
 {% block page_title %}Hero Index{% endblock %}
+
 {% block content %}
 <div class "thumbnails">
-{% for hero in hero_list %}
+  {% for hero in hero_list %}
     {% if hero.thumbshot %}
-    <li class="span1">
-        <a href = "/heroes/{{hero.machine_name}}">
-        <img src="{{ hero.thumbshot.url}}">
+      <li class="span1">
+        <a href="{% url 'heroes:detail' hero_name=hero.machine_name %}">
+          <img src="{{ hero.thumbshot.url }}">
         </a>
-    </li>
+      </li>
     {% endif %}
-
-
-{% endfor %}
+  {% endfor %}
 </div>
-
 {% endblock %}

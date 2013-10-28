@@ -2,10 +2,10 @@
 
 {% block extra_nav %}
 <ul class="nav nav-tabs">
-  <li class="{% if active == 'vitals' %}active{% endif %}"><a href="{% url 'vitals' %}">Vitals</a></li>
-  <li class="{% if active == 'lineup' %}active{% endif %}"><a href="{% url 'lineup' %}">Lineups</a></li>
-  <li class="{% if active == 'hero_performance' %}active{% endif %}"><a href="{% url 'hero_performance' %}">Performance</a></li>
-  <li class="{% if active == 'hero_skill_bars' %}active{% endif %}"><a href="{% url 'hero_skill_bars' %}">Skill Time Bars</a></li>
+  <li class="{% if active == 'vitals' %}active{% endif %}"><a href="{% url 'heroes:vitals' %}">Vitals</a></li>
+  <li class="{% if active == 'lineup' %}active{% endif %}"><a href="{% url 'heroes:lineup' %}">Lineups</a></li>
+  <li class="{% if active == 'hero_performance' %}active{% endif %}"><a href="{% url 'heroes:hero_performance' %}">Performance</a></li>
+  <li class="{% if active == 'hero_skill_bars' %}active{% endif %}"><a href="{% url 'heroes:hero_skill_bars' %}">Skill Time Bars</a></li>
 </ul>
 {% endblock extra_nav %}
 

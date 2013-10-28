@@ -2,7 +2,7 @@
 
 {% block extra_nav %}
 <ul class="nav nav-tabs">
-  <li class="{% if active == "matches" %}active{% endif %}"><a href="/matches/">Matches</a></li>
-  <li class="{% if active == "matches-endgame" %}active{% endif %}"><a href="/matches/endgame">Endgame Charts</a></li>
+  <li class="{% if active == 'index' %}active{% endif %}"><a href="{% url 'matches:index' %}">Matches</a></li>
+  <li class="{% if active == 'endgame' %}active{% endif %}"><a href="{% url 'matches:endgame' %}">Endgame Charts</a></li>
 </ul>
 {% endblock extra_nav %}

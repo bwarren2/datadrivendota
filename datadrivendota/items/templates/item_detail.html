@@ -1,25 +1,27 @@
 {% extends "base.html" %}
-{% block title %}
-    {{item.external_name}}
-{% endblock title %}
+
+{% block title %}{{ item.external_name }}{% endblock title %}
+
 {% block page_title %}
-    
+
 {% endblock page_title %}
 
 {% block extra_css %}
-    <style type="text/css">
+  <style type="text/css">
     img {
-  float: right;
-  margin: 0 0 1em 1em;
-}
-.lore{
-    font-style: italic;
-}</style>
+      float: right;
+      margin: 0 0 1em 1em;
+    }
+    .lore{
+      font-style: italic;
+    }
+  </style>
+  {# todo: abstract this out. --kit 2013-10-27 #}
 {% endblock extra_css %}
 
 {% block content %}
-    <h1>{{item.external_name}}</h1>
-    <img src="{{item.image.url}}">
-    <p>{{item.description}}</p>
-    <p class='lore'>{{item.lore}}</p>
+  <h1>{{ item.external_name }}</h1>
+  <img src="{{ item.image.url }}">
+  <p>{{ item.description }}</p>
+  <p class='lore'>{{ item.lore }}</p>
 {% endblock content %}
