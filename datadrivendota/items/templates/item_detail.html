@@ -2,9 +2,7 @@
 
 {% block title %}{{ item.external_name }}{% endblock title %}
 
-{% block page_title %}
-
-{% endblock page_title %}
+{% block page_title %}{% endblock page_title %}
 
 {% block extra_css %}
   <style type="text/css">
@@ -23,5 +21,7 @@
   <h1>{{ item.external_name }}</h1>
   <img src="{{ item.image.url }}">
   <p>{{ item.description }}</p>
-  <p class='lore'>{{ item.lore }}</p>
+  <p class='lore'>
+    {{ item.lore }}
+  </p>
 {% endblock content %}
