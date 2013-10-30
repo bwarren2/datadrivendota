@@ -22,7 +22,7 @@ class MultiHeroSelect(forms.CharField):
             try:
                 hero = Hero.objects.get(name=hero_str)
             except Hero.DoesNotExist:
-                raise ValidationError("%s is not a valid hero name" % hero)
+                raise ValidationError("%s is not a valid hero name" % hero_str)
             return [hero.steam_id]
 
         else:

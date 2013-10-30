@@ -4,7 +4,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-
         c = ApiContext()
         RefreshUpdatePlayerPersonas().delay(api_context=c)
         c = ApiContext()

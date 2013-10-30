@@ -4,78 +4,185 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-from io import StringIO
 from django.contrib.auth.models import User
 from django.test.client import Client
 from django.test import TestCase
-from django.core.files import File
-from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from .models import Hero
+from .r import HeroPerformanceChart, HeroSkillLevelBwChart, generateChart, lineupChart
+from matches.tests import MatchValidityMixin
 
-class HeroViewsTest(TestCase):
+###MIXINS
+class HeroValidityMixin(object):
+    def setUp(self):
+        self.valid_hero = 8
+        self.invalid_hero = 800
+        self.invalid_stat = 'effervescence'
+        self.valid_stat = 'strength'
+        self.valid_level=6
+        self.invalid_level=-1
+        self.test_hero = Hero.objects.get(steam_id=self.valid_hero)
+        super(HeroValidityMixin,self).setUp()
 
+###TESTS
+class HeroVitalsTestCase(HeroValidityMixin, TestCase):
     def setUp(self):
         User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
-        s = slugify(u'Juggernaut')
-        self.hero = Hero.objects.create(name='Juggernaut',
-            steam_id=8,machine_name=s)
-        openfile = StringIO()
-        openfile.write(u'test')
-        self.hero.thumbshot.save('a',File(openfile))
-        self.hero.mugshot.save('a',File(openfile))
+        super(HeroVitalsTestCase,self).setUp()
 
-    def test_valid_urls(self):
-        """
-        Check that the URLs we expect to resolve do.
-        """
-        c = Client()
-        c.login(username='temporary',password='temporary')
-        resp = self.client.get('/heroes')
-        self.assertEqual(resp.status_code,200)
-        resp = self.client.get('/heroes/vitals')
-        self.assertEqual(resp.status_code,200)
-        resp = self.client.get('/heroes/lineups')
-        self.assertEqual(resp.status_code,200)
-        resp = self.client.get('/heroes/performance/')
-        self.assertEqual(resp.status_code,200)
-        resp = self.client.get('/heroes/skill_bars/')
-        self.assertEqual(resp.status_code,200)
-        url = '/heroes/'+self.hero.machine_name
-        resp = c.get(url)
-        self.assertEqual(resp.status_code,200)
+    def test_invalid_hero(self):
+        foo = generateChart(hero_list=[self.invalid_hero], stats_list=[self.valid_stat], display_options={'linked_scales': "relation='free'"})
+        self.assertEqual(foo.name,u'failface.png')
 
-class HeroRTestCase(TestCase):
+    def test_invalid_stat(self):
+        foo = generateChart(hero_list=[self.valid_hero], stats_list=[self.invalid_stat], display_options={'linked_scales': "relation='free'"})
+        self.assertEqual(foo.name,u'failface.png')
 
-    def setUp(self):
-        User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
-        s = slugify(u'Juggernaut')
-        self.hero = Hero.objects.create(name='Juggernaut',
-            steam_id=8,machine_name=s)
-        openfile = StringIO()
-        openfile.write(u'test')
-        self.hero.thumbshot.save('a',File(openfile))
-        self.hero.mugshot.save('a',File(openfile))
+    def test_valid_call(self):
+        foo = generateChart(hero_list=[self.valid_hero], stats_list=[self.valid_stat], display_options={'linked_scales': "relation='free'"})
+        self.assertNotEqual(foo.name,u'failface.png')
 
-    def test_r_generation(self):
-        """
-        Check that the URLs we expect to resolve do.
-        """
+    def test_valid_post(self):
+
         c = Client()
         c.login(username='temporary',password='temporary')
         postOpts = {
-            'heroes': 'Juggernaut',
-            'stats': 'strength',
+            'heroes': self.test_hero.name,
+            'stats': self.valid_stat,
             'unlinked_scales': True
         }
-        resp = self.client.post(reverse("vitals"), postOpts)
-        self.assertEqual(resp.context['imagebase'],'failface.png')
+        resp = self.client.post(reverse("heroes:vitals"), postOpts)
+        self.assertNotEqual(resp.context['imagebase'],u'failface.png')
 
+
+
+class HeroLineupTestCase(HeroValidityMixin, TestCase):
+    def setUp(self):
+        User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
+        super(HeroLineupTestCase,self).setUp()
+
+    def test_invalid_hero(self):
+        foo = lineupChart(heroes=[self.invalid_hero], stat=self.valid_stat, level=self.valid_level)
+        self.assertNotEqual(foo.name,'failface.png')
+        #Because lineup hero is only optional for coloration
+
+    def test_invalid_stat(self):
+        foo = lineupChart(heroes=[self.valid_hero], stat=self.invalid_stat, level=self.valid_level)
+        self.assertEqual(foo.name,'failface.png')
+
+    def test_invalid_level(self):
+        foo = lineupChart(heroes=[self.valid_hero], stat=self.valid_stat, level=self.invalid_level)
+        self.assertEqual(foo.name,'failface.png')
+
+    def test_valid_call(self):
+        foo = lineupChart(heroes=[self.valid_hero], stat=self.valid_stat, level=self.valid_level)
+        self.assertNotEqual(foo.name,'failface.png')
+
+    def test_valid_post(self):
+        c = Client()
+        c.login(username='temporary',password='temporary')
         postOpts = {
-            'heroes': 'Juggernaut',
-            'stats': 'strength',
-            'level': 1
+            'heroes': self.test_hero.name,
+            'stats': self.valid_stat,
+            'level': self.valid_level
         }
-        resp = self.client.post(reverse("lineup"), postOpts)
-        self.assertEqual(resp.context['imagebase'],'failface.png')
+        resp = self.client.post(reverse("heroes:lineup"), postOpts)
+        self.assertNotEqual(resp.context['imagebase'], 'failface.png')
 
+
+class HeroPerformanceTestCase(HeroValidityMixin, MatchValidityMixin, TestCase):
+    fixtures = ['datadrivendota/matches/test_data.json']
+    def setUp(self):
+        User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
+        super(HeroPerformanceTestCase,self).setUp()
+
+    def test_invalid_hero(self):
+
+        foo = HeroPerformanceChart(hero=self.invalid_hero,
+            game_mode_list=self.valid_game_modes,
+            x_var=self.valid_x_var,
+            y_var=self.valid_y_var,
+            group_var=self.valid_cat_var,
+            split_var=self.valid_cat_var,
+            player=None
+            )
+        self.assertEqual(foo.name,'failface.png')
+
+    def test_invalid_game_modes(self):
+        foo = HeroPerformanceChart(hero=self.valid_hero,
+            game_mode_list=self.invalid_game_modes,
+            x_var=self.valid_x_var,
+            y_var=self.valid_y_var,
+            group_var=self.valid_cat_var,
+            split_var=self.valid_cat_var,
+            player=None
+        )
+        self.assertEqual(foo.name,'failface.png')
+
+    def test_invalid_x_var(self):
+        foo = HeroPerformanceChart(hero=self.valid_hero,
+            game_mode_list=self.valid_game_modes,
+            x_var=self.invalid_x_var,
+            y_var=self.valid_y_var,
+            group_var=self.valid_cat_var,
+            split_var=self.valid_cat_var,
+            player=None
+        )
+        self.assertEqual(foo.name,'failface.png')
+
+    def test_invalid_y_var(self):
+        foo = HeroPerformanceChart(hero=self.valid_hero,
+            game_mode_list=self.valid_game_modes,
+            x_var=self.valid_x_var,
+            y_var=self.invalid_y_var,
+            group_var=self.valid_cat_var,
+            split_var=self.valid_cat_var,
+            player=None
+        )
+        self.assertEqual(foo.name,'failface.png')
+
+    def test_invalid_group_var(self):
+        foo = HeroPerformanceChart(hero=self.valid_hero,
+            game_mode_list=self.valid_game_modes,
+            x_var=self.valid_x_var,
+            y_var=self.valid_y_var,
+            group_var=self.invalid_cat_var,
+            split_var=self.valid_cat_var,
+            player=None
+        )
+        self.assertEqual(foo.name,'failface.png')
+
+    def test_invalid_split_var(self):
+        foo = HeroPerformanceChart(hero=self.valid_hero,
+            game_mode_list=self.valid_game_modes,
+            x_var=self.valid_x_var,
+            y_var=self.valid_y_var,
+            group_var=self.valid_cat_var,
+            split_var=self.invalid_cat_var,
+            player=None
+        )
+        self.assertEqual(foo.name,'failface.png')
+
+    def test_valid_call(self):
+        foo = HeroPerformanceChart(hero=self.valid_hero,
+            game_mode_list=self.valid_game_modes,
+            x_var=self.valid_x_var,
+            y_var=self.valid_y_var,
+            group_var=self.valid_cat_var,
+            split_var=self.valid_cat_var,
+            player=None
+        )
+        self.assertNotEqual(foo.name,'failface.png')
+
+class HeroSkillBwTestCase(HeroValidityMixin, MatchValidityMixin, TestCase):
+    fixtures = ['datadrivendota/matches/test_data.json']
+    def setUp(self):
+        User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
+        super(HeroSkillBwTestCase,self).setUp()
+
+    def test_valid_call(self):
+        foo = HeroSkillLevelBwChart(hero=self.valid_hero,
+            player=None,
+            game_mode_list=self.valid_game_modes,
+            levels=[5,6])
+        self.assertNotEqual(foo.name, 'failface.png')

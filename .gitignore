@@ -38,3 +38,7 @@ rabbit_reset
 
 #Folder of management things
 convenience files/
+
+#Common data failure output
+failface.png
+

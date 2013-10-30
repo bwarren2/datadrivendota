@@ -24,7 +24,29 @@ def generateChart(hero_list, stats_list, display_options):
 
     selected_heroes = HeroDossier.objects.filter(hero__steam_id__in=hero_list)
 
-    if len(selected_heroes) == 0:
+    def invalid_option(stats_list):
+        valid_stat_set = set(
+            ['level',
+            'strength',
+            'agility',
+            'intelligence',
+            'base_armor',
+            'base_hp',
+            'base_mana',
+            'base_hp_regen',
+            'base_mana_regen',
+            'base_dmg',
+            'agility_gain',
+            'modified_armor',
+            'hp',
+            'effective_hp',
+            'mana'])
+        for stat in stats_list:
+            if stat not in valid_stat_set:
+                return True
+        return False
+
+    if len(selected_heroes) == 0 or invalid_option(stats_list):
         return FailFace()
 
     grdevices = importr('grDevices')
@@ -117,10 +139,16 @@ def lineupChart(heroes, stat, level):
 
     #Database pulls and format python objects to go to R
     all_heroes = HeroDossier.objects.all().select_related()
+    if len(all_heroes)==0:
+        return FailFace()
     selected_heroes = Hero.objects.filter(steam_id__in=heroes)
     selected_names = [hero.safe_name() for hero in selected_heroes]
 
-    hero_value = dict((dossier.hero.safe_name(), fetch_value(dossier, stat, level)) for dossier in all_heroes)
+    try:
+        hero_value = dict((dossier.hero.safe_name(), fetch_value(dossier, stat, level)) for dossier in all_heroes)
+    except AttributeError:
+        return FailFace()
+
     x_vals = [key for key in sorted(hero_value, key=hero_value.get, reverse=True)]
     y_vals = [hero_value[key] for key in sorted(hero_value, key=hero_value.get, reverse=True)]
     col_vec = ['red' if name in selected_names else 'green' for name in x_vals ]
@@ -130,8 +158,6 @@ def lineupChart(heroes, stat, level):
     y = robjects.FloatVector(y_vals)
     colors = robjects.StrVector(col_vec)
     df = robjects.DataFrame({'name':x, 'val':y})
-    if len(x)==0 or len(y)==0:
-        return FailFace()
 
     #Register in the environment
 
@@ -187,14 +213,25 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     else:
         match_pool = list(chain(skill1, skill2, skill3))
 
-    x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
-    y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
-    split_vector_list, split_lab = fetch_match_attributes(match_pool, split_var)
-    group_vector_list, grouplab = fetch_match_attributes(match_pool, group_var)
+    if len(match_pool)==0:
+        return FailFace()
 
-    if len(x_vector_list)==0 or len(y_vector_list)==0 or \
-        len(split_vector_list)==0 or len(group_vector_list)==0:
-            return FailFace()
+    try:
+        x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
+    except AttributeError:
+        return FailFace()
+    try:
+        y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
+    except AttributeError:
+        return FailFace()
+    try:
+        split_vector_list, split_lab = fetch_match_attributes(match_pool, split_var)
+    except AttributeError:
+        return FailFace()
+    try:
+        group_vector_list, grouplab = fetch_match_attributes(match_pool, group_var)
+    except AttributeError:
+        return FailFace()
 
     #Register in the environment
     x_vec = FloatVector(x_vector_list)
@@ -244,6 +281,8 @@ def HeroSkillLevelBwChart(hero, player, game_mode_list, levels):
     skill3 = pms.filter(match__skill=3).select_related()[:30]
 
     pms_pool = list(chain(skill1, skill2, skill3))
+    if len(pms_pool)==0:
+        return FailFace()
 
     match_builds = SkillBuild.objects.filter(player_match_summary__hero__steam_id=hero,
         player_match_summary__in=pms_pool, level__in=levels).select_related()
@@ -258,10 +297,14 @@ def HeroSkillLevelBwChart(hero, player, game_mode_list, levels):
     else:
         chart_pool = match_builds
 
+    if len(chart_pool)==0:
+        return FailFace()
+
 
     y_vector_list = [build.time for build in chart_pool]
     x_vector_list = [build.skill_level for build in chart_pool]
     split_var_list = [build.level for build in chart_pool]
+
     #Register in the environment
     x_vec = StrVector(x_vector_list)
     y_vec = FloatVector(y_vector_list)
@@ -357,7 +400,8 @@ def fetch_value(dossier, stat, level):
                  'atk_backswing','turn_rate','legs','movespeed',
                  'projectile_speed',
                  'range','base_atk_time']
-
+    if level not in range(1,26):
+        raise AttributeError("That is not a real level")
     if hasattr(dossier, stat) and stat in easy_list:
         return getattr(dossier, stat)
     elif stat == "strength":
@@ -382,4 +426,4 @@ def fetch_value(dossier, stat, level):
         mana = dossier.mana + intelligence*13
         return mana
     else:
-        raise KeyError("What is %s" % stat)
+        raise AttributeError("What is %s" % stat)

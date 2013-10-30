@@ -7,7 +7,14 @@ Replace this with more appropriate tests for your application.
 
 from django.test import TestCase
 
+###MIXINS
+class PlayerValidityMixin(object):
+    def setUp(self):
+        self.valid_player = 1
+        self.invalid_player = -1
+        super(PlayerValidityMixin,self).setUp()
 
+###TESTS
 class SimpleTest(TestCase):
     def test_basic_addition(self):
         """
