@@ -2,6 +2,12 @@
 
 $('.info').tooltip();
 
+$(document).ready(function () {
+  $('input[type=checkbox]').change(function (evt) {
+    $(evt.target).parent().toggleClass('active');
+  });
+});
+
 
 
 /* gettext library */

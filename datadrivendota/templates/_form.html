@@ -11,11 +11,11 @@
   <label class="control-label{% if field.field.required %} required{% endif %}" for="{{ field.html_name }}">
     {{ field.label }}
       {% if field.help_text %}
-        <span class ='info glyphicon glyphicon-info-sign' data-toggle="tooltip"  title='{{ field.help_text }}' data-placement=right></span>
+        <span class='info glyphicon glyphicon-info-sign' data-toggle="tooltip"  title='{{ field.help_text }}' data-placement=right></span>
       {% endif %}
   </label>
   <div class="controls">
-  {{ field }}
+    {{ field }}
     {% if field.errors %}
       {% for error in field.errors %}
         <span class="help-inline">{{ error }}</span>
