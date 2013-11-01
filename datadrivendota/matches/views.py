@@ -44,6 +44,9 @@ def match(request, match_id):
 
 def index(request):
     match_list = Match.objects.filter(duration__gte=1500)[:10]
+    for match in match_list:
+      match.display_date = datetime.datetime.fromtimestamp(match.start_time)
+      match.display_duration = str(datetime.timedelta(seconds=match.duration))
     return render_to_response('matches_index.html', {'match_list': match_list},
                               context_instance=RequestContext(request))
 

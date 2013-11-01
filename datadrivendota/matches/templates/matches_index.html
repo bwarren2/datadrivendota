@@ -20,8 +20,8 @@
       {% for match in match_list %}
       <tr>
         <td><a href="{{ match.steam_id }}">{{ match.steam_id }}</a></td>
-        <td>{{ match.duration }}</td>
-        <td>{{ match.start_time }}</td>
+        <td>{{ match.display_duration }}</td>
+        <td>{{ match.display_date|date:"D d M Y" }}</td>
         <td>{{ match.lobby_type.description }}</td>
         <td>{{ match.game_mode.description }}</td>
       </tr>
