@@ -8,28 +8,15 @@ from django.contrib.auth.models import User
 from django.test.client import Client
 from django.test import TestCase
 from django.core.urlresolvers import reverse
-from .models import Hero
 from .r import HeroPerformanceChart, HeroSkillLevelBwChart, generateChart, lineupChart
 from matches.tests import MatchValidityMixin
-
-###MIXINS
-class HeroValidityMixin(object):
-    def setUp(self):
-        self.valid_hero = 8
-        self.invalid_hero = 800
-        self.invalid_stat = 'effervescence'
-        self.valid_stat = 'strength'
-        self.valid_level=6
-        self.invalid_level=-1
-        self.valid_level_set=[6,11]
-        self.invalid_level_set=[-1, -2]
-        self.test_hero = Hero.objects.get(steam_id=self.valid_hero)
-        super(HeroValidityMixin,self).setUp()
+from .test_mixins import HeroValidityMixin
 
 ###TESTS
 
 ##R
 class HeroVitalsTestCase(HeroValidityMixin, TestCase):
+    fixtures = ['datadrivendota/heroes/test_data.json']
     def setUp(self):
         User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
         super(HeroVitalsTestCase,self).setUp()
@@ -61,6 +48,7 @@ class HeroVitalsTestCase(HeroValidityMixin, TestCase):
 
 
 class HeroLineupTestCase(HeroValidityMixin, TestCase):
+    fixtures = ['datadrivendota/heroes/test_data.json']
     def setUp(self):
         User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
         super(HeroLineupTestCase,self).setUp()
@@ -95,7 +83,7 @@ class HeroLineupTestCase(HeroValidityMixin, TestCase):
 
 
 class HeroPerformanceTestCase(HeroValidityMixin, MatchValidityMixin, TestCase):
-    fixtures = ['datadrivendota/matches/test_data.json']
+    fixtures = ['datadrivendota/heroes/test_data.json', 'datadrivendota/matches/test_data.json']
     def setUp(self):
         User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
         super(HeroPerformanceTestCase,self).setUp()
@@ -179,7 +167,7 @@ class HeroPerformanceTestCase(HeroValidityMixin, MatchValidityMixin, TestCase):
         self.assertNotEqual(foo.name,'failface.png')
 
 class HeroSkillBwTestCase(HeroValidityMixin, MatchValidityMixin, TestCase):
-    fixtures = ['datadrivendota/matches/test_data.json']
+    fixtures = ['datadrivendota/heroes/test_data.json', 'datadrivendota/matches/test_data.json']
     def setUp(self):
         User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
         super(HeroSkillBwTestCase,self).setUp()

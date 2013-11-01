@@ -18,7 +18,10 @@ def KDADensity(player_id):
     grdevices = importr('grDevices')
     importr('lattice')
 
-    player = Player.objects.get(steam_id=player_id)
+    try:
+        player = Player.objects.get(steam_id=player_id)
+    except Player.DoesNotExist:
+        return FailFace()
 
     summaries = PlayerMatchSummary.objects.filter(player=player)
     if len(summaries)==0:
@@ -73,19 +76,26 @@ def CountWinrate(player_id, game_mode_list=None, min_date=datetime.date(2009,1,1
         max_date_utc = mktime(max_date.timetuple())
     min_dt_utc = mktime(min_date.timetuple())
 
+    if min_dt_utc > max_date_utc:
+        return FailFace()
     if game_mode_list is None:
         game_mode_list = [gm.steam_id for gm in GameMode.objects.filter(is_competitive=True)]
 
     grdevices = importr('grDevices')
     importr('lattice')
 
-    player = Player.objects.get(steam_id=player_id)
+    try:
+        player = Player.objects.get(steam_id=player_id)
+    except Player.DoesNotExist:
+        return FailFace()
     annotations = PlayerMatchSummary.objects.filter(player=player).values('hero__machine_name','is_win').annotate(Count('is_win'))
     annotations = annotations.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
     annotations = annotations.filter(match__start_time__gte=min_dt_utc)
     annotations = annotations.filter(match__start_time__lte=max_date_utc)
     annotations = annotations.filter(match__game_mode__steam_id__in=game_mode_list)
 
+    if len(annotations)==0:
+        return FailFace()
 
     heroes = list(set([row['hero__machine_name'] for row in annotations]))
     wins = {row['hero__machine_name']: row['is_win__count'] for row in annotations if row['is_win']==True}
