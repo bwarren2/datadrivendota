@@ -8,7 +8,7 @@ from rpy2.robjects.packages import importr
 
 from matches.models import PlayerMatchSummary, GameMode
 from .models import Player
-from datadrivendota.r import s3File, enforceTheme
+from datadrivendota.r import s3File, enforceTheme, FailFace
 from heroes.models import safen
 from django.conf import settings
 
@@ -21,7 +21,8 @@ def KDADensity(player_id):
     player = Player.objects.get(steam_id=player_id)
 
     summaries = PlayerMatchSummary.objects.filter(player=player)
-
+    if len(summaries)==0:
+        return FailFace()
 
     data_list = [summary.kills for summary in summaries]
     label_list = ['kills'] * len(data_list)

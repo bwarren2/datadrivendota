@@ -21,10 +21,14 @@ class HeroValidityMixin(object):
         self.valid_stat = 'strength'
         self.valid_level=6
         self.invalid_level=-1
+        self.valid_level_set=[6,11]
+        self.invalid_level_set=[-1, -2]
         self.test_hero = Hero.objects.get(steam_id=self.valid_hero)
         super(HeroValidityMixin,self).setUp()
 
 ###TESTS
+
+##R
 class HeroVitalsTestCase(HeroValidityMixin, TestCase):
     def setUp(self):
         User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
@@ -184,5 +188,28 @@ class HeroSkillBwTestCase(HeroValidityMixin, MatchValidityMixin, TestCase):
         foo = HeroSkillLevelBwChart(hero=self.valid_hero,
             player=None,
             game_mode_list=self.valid_game_modes,
-            levels=[5,6])
+            levels=self.valid_level_set)
         self.assertNotEqual(foo.name, 'failface.png')
+
+    def test_invalid_hero(self):
+        foo = HeroSkillLevelBwChart(hero=self.invalid_hero,
+            player=None,
+            game_mode_list=self.valid_game_modes,
+            levels=self.valid_level_set)
+        self.assertEqual(foo.name, 'failface.png')
+
+
+    def test_invalid_game_modes(self):
+        foo = HeroSkillLevelBwChart(hero=self.valid_hero,
+            player=None,
+            game_mode_list=self.invalid_game_modes,
+            levels=self.valid_level_set)
+        self.assertEqual(foo.name, 'failface.png')
+
+    def test_invalid_levels(self):
+        foo = HeroSkillLevelBwChart(hero=self.valid_hero,
+            player=None,
+            game_mode_list=self.valid_game_modes,
+            levels=self.invalid_level_set)
+        self.assertEqual(foo.name, 'failface.png')
+

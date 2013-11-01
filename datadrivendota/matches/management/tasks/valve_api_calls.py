@@ -203,18 +203,23 @@ class RetrievePlayerRecords(ApiFollower):
             logger.error("Could not pull data. "+str(self.api_context.account_id)+" disallowed it. ")
         elif self.result['status'] == 1:
             #Spawn a bunch of match detail queries
+
+            logger.info("Spawning")
             self.spawnDetailCalls()
             #Go around again if there are more records and the last one was before last scrape.
+            logger.info("Checking for more results")
             if self.moreResultsLeft():
                 self.rebound()
             #Successful closeout
             else:
+                logger.info("Cleaning up")
                 self.cleanup()
         else:
             logger.error("Unhandled status: "+str(self.result['status']))
             raise Exception("No Data for that call")
 
     def rebound(self):
+        logger.info("Rebounding")
         self.api_context.start_at_match_id = self.result['matches'][-1]['match_id']
         # If we want to poll more than 500 results deep, we need to reset the
         # valve api's date bounding
@@ -223,6 +228,7 @@ class RetrievePlayerRecords(ApiFollower):
         vac = ValveApiCall()
         rpr = RetrievePlayerRecords()
         chain(vac.s(mode='GetMatchHistory',api_context=self.api_context), rpr.s()).delay()
+        logger.info("Done Rebounding")
 
     def cleanup(self):
         try:
@@ -239,6 +245,7 @@ class RetrievePlayerRecords(ApiFollower):
             self.api_context.match_id=result['match_id']
             chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
             self.api_context.processed+=1
+        logger.info("Finished Spawning")
 tasks.register(RetrievePlayerRecords)
 
 

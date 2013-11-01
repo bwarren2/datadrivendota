@@ -4,7 +4,7 @@ from rpy2 import robjects
 from rpy2.robjects import FloatVector, StrVector
 from rpy2.robjects.packages import importr
 from matches.models import PlayerMatchSummary
-from datadrivendota.r import enforceTheme, s3File
+from datadrivendota.r import enforceTheme, s3File, FailFace
 from datadrivendota.utilities import safen
 
 def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
@@ -16,10 +16,15 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
         player__steam_id__in=player_list,
         match__game_mode__steam_id__in=mode_list)
     selected_summaries = selected_summaries.select_related()
-    x_vector_list, xlab = fetch_match_attributes(selected_summaries, x_var)
-    y_vector_list, ylab = fetch_match_attributes(selected_summaries, y_var)
-    split_vector_list, split_lab = fetch_match_attributes(selected_summaries, split_var)
-    group_vector_list, grouplab = fetch_match_attributes(selected_summaries, group_var)
+    if len(selected_summaries)==0:
+        return FailFace()
+    try:
+        x_vector_list, xlab = fetch_match_attributes(selected_summaries, x_var)
+        y_vector_list, ylab = fetch_match_attributes(selected_summaries, y_var)
+        split_vector_list, split_lab = fetch_match_attributes(selected_summaries, split_var)
+        group_vector_list, grouplab = fetch_match_attributes(selected_summaries, group_var)
+    except AttributeError:
+        return FailFace()
 
     x_vec = FloatVector(x_vector_list)
     y_vec = FloatVector(y_vector_list)
@@ -51,8 +56,14 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
 def MatchParameterScatterplot(match_id, x_var, y_var):
     pms = PlayerMatchSummary.objects.filter(match__steam_id=match_id)
-    x, x_lab =  fetch_match_attributes(pms, x_var)
-    y, y_lab =  fetch_match_attributes(pms, y_var)
+    if len(pms) == 0:
+        return FailFace()
+    try:
+        x, x_lab =  fetch_match_attributes(pms, x_var)
+        y, y_lab =  fetch_match_attributes(pms, y_var)
+    except AttributeError:
+        return FailFace()
+
     labels, blank =  fetch_match_attributes(pms, 'hero_name')
     x_vec = FloatVector(x)
     y_vec = FloatVector(y)

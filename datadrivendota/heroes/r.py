@@ -218,17 +218,8 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
 
     try:
         x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
-    except AttributeError:
-        return FailFace()
-    try:
         y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
-    except AttributeError:
-        return FailFace()
-    try:
         split_vector_list, split_lab = fetch_match_attributes(match_pool, split_var)
-    except AttributeError:
-        return FailFace()
-    try:
         group_vector_list, grouplab = fetch_match_attributes(match_pool, group_var)
     except AttributeError:
         return FailFace()
