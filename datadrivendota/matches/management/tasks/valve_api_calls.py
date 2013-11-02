@@ -412,10 +412,7 @@ class UpdatePlayerPersonas(ApiFollower):
         for pulled_player in response['players']:
             print "Updating " + pulled_player['personaname'] +","+str(pulled_player['steamid'])
             #The PlayerSummaries call returns 64 bit ids.  It is super annoying.
-            try:
-                id_32bit = int(pulled_player['steamid']) % ADDER_32_BIT
-            except ValueError:
-                import pdb; pdb.set_trace()
+            id_32bit = int(pulled_player['steamid']) % ADDER_32_BIT
 
             player, created = Player.objects.get_or_create(steam_id=id_32bit)
             player.persona_name = pulled_player['personaname']
