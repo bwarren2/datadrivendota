@@ -30,7 +30,7 @@ CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
 CELERY_TASK_RESULT_EXPIRES = int(getenv('RESULT_EXPIRY_RATE'))
 
 #Only store errors.
-CELERY_IGNORE_RESULT = True
+CELERY_IGNORE_RESULT = False
 CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
 
 CELERYD_TASK_TIME_LIMIT = int(getenv('CELERYD_TASK_TIME_LIMIT'))
@@ -60,11 +60,15 @@ CELERY_QUEUES = (
 
 CELERY_ROUTES = {
     'matches.management.tasks.valve_api_calls.ValveApiCall': {'exchange': 'valve_api','routing_key':'valve_api_call'},
-    'matches.management.tasks.valve_api_calls.UploadMatch': {'exchange': 'db','routing_key':'db'},
-    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'exchange': 'db','routing_key':'db'},
-    'matches.management.tasks.valve_api_calls.UploadMatchSummary': {'exchange': 'db','routing_key':'db'},
     'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'exchange': 'default'},
+    'matches.management.tasks.valve_api_calls.UploadMatch': {'exchange': 'db','routing_key':'db'},
+    'matches.management.tasks.valve_api_calls.UploadMatchSummary': {'exchange': 'db','routing_key':'db'},
     'matches.management.tasks.valve_api_calls.RefreshUpdatingPlayerRecords': {'exchange': 'default'},
+    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'exchange': 'db','routing_key':'db'},
+    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'exchange': 'default','routing_key':'default'},
+    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'exchange': 'default','routing_key':'default'},
+    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'exchange': 'default','routing_key':'default'},
+
 }
 
 CELERY_DEFAULT_EXCHANGE = 'default'

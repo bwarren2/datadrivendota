@@ -31,6 +31,7 @@ class ApiContext(object):
     start_at_match_id=None
     key=None
     match_id=None
+    hero_id=None
     #There are magic lists of teh above in the URL constructor.
 
     #Things we care about internally
@@ -144,6 +145,7 @@ class ValveApiCall(BaseTask):
         try:
             url = modeDict[mode]
         except KeyError:
+            logger.error("Keyerrors!")
             raise KeyError('That mode ('+str(mode)+") is not supported")
 
         URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
@@ -298,7 +300,6 @@ class UploadMatch(ApiFollower):
             match.save()
             ums = UploadMatchSummary()
             ums.s(players=data['players'], parent_match=match,api_context=self.api_context).delay()
-
 tasks.register(UploadMatch)
 
 
@@ -371,7 +372,6 @@ class UploadMatchSummary(BaseTask):
                         'level': skillpick['level'],
                     }
                     SkillBuild.objects.get_or_create(**kwargs)
-
 tasks.register(UploadMatchSummary)
 
 
@@ -397,7 +397,6 @@ class RefreshUpdatePlayerPersonas(BaseTask):
                 chain(vac.s(mode='GetPlayerSummaries',api_context=self.api_context), \
                       upp.s()).delay()
                 querylist = []
-
 tasks.register(RefreshUpdatePlayerPersonas)
 
 
@@ -421,7 +420,6 @@ class UpdatePlayerPersonas(ApiFollower):
             player.avatar_medium = pulled_player['avatarmedium']
             player.avatar_full = pulled_player['avatarfull']
             player.save()
-
 tasks.register(UpdatePlayerPersonas)
 
 
@@ -443,7 +441,6 @@ class RefreshPlayerMatchDetail(BaseTask):
             vac = ValveApiCall()
             rpr = RetrievePlayerRecords()
             chain(vac.s(mode='GetMatchHistory',api_context=context),rpr.s()).delay()
-
 tasks.register(RefreshPlayerMatchDetail)
 
 
@@ -468,23 +465,30 @@ class AcquirePlayerData(BaseTask):
             vac = ValveApiCall()
             rpr = RetrievePlayerRecords()
             chain(vac.s(mode='GetMatchHistory',api_context=self.api_context),rpr.s()).delay()
+tasks.register(AcquirePlayerData)
 
 class AcquireHeroSkillData(BaseTask):
 
     def run(self):
+        logger.info("Starting")
         if self.api_context.account_id is not None or self.api_context.hero_id is None:
             logger.error("Not allowed to have an account_id for this, and need a Hero.")
         else:
+
+            logger.info("Context Checking")
             if self.api_context.matches_requested is None:
                 self.api_context.matches_requested=100
             self.api_context.deepycopy=False
             if self.api_context.matches_desired is None:
                 self.api_context.matches_desired = 100
             self.api_context.skill_levels=[1,2,3]
+            logger.info("Looping")
             for skill in self.api_context.skill_levels:
                 self.api_context.skill=skill
 
                 vac = ValveApiCall()
                 rpr = RetrievePlayerRecords()
                 chain(vac.s(mode='GetMatchHistory',api_context=self.api_context),rpr.s()).delay()
+            logger.info("Done")
+tasks.register(AcquireHeroSkillData)
 
