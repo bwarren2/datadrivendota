@@ -146,7 +146,6 @@ class ValveApiCall(BaseTask):
             url = modeDict[mode]
         except KeyError:
             logger.error("Keyerrors!")
-            raise KeyError('That mode ('+str(mode)+") is not supported")
 
         URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
         logger.info("URL: "+ URL)
@@ -181,6 +180,9 @@ class ValveApiCall(BaseTask):
         except BadStatusLine:
             logger.error("Bad status line for url %s" % URL+ ".  Retrying.")
             self.retry(mode)
+        except urllib2.URLError:
+            self.retry(mode)
+
 
 
         # If everything is kosher, import the result and return it.
@@ -218,7 +220,7 @@ class RetrievePlayerRecords(ApiFollower):
                 self.cleanup()
         else:
             logger.error("Unhandled status: "+str(self.result['status']))
-            raise Exception("No Data for that call")
+
 
     def rebound(self):
         logger.info("Rebounding")
