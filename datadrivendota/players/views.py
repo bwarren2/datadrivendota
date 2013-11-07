@@ -2,14 +2,15 @@ import json
 from functools import wraps
 from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response, render
 from django.template import RequestContext
 from os.path import basename
 from .models import Player
 from .r import KDADensity, CountWinrate, PlayerTimeline
 from urllib import unquote
 from .forms import PlayerWinrateLevers, PlayerTimelineForm
-
+from matches.models import PlayerMatchSummary
+import datetime
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
         raise ImportError
@@ -30,14 +31,7 @@ def index(request):
                               context_instance = RequestContext(request))
 
 def detail(request, player_name=None, player_id=None):
-    if player_name == None and player_id == None:
-        return HttpResponseNotFound('<h1>I need either a player name or player id.</h1>')
-    elif player_id != None:
-        player = get_object_or_404(Player, steam_id=player_id)
-    else:
-        player_name = unquote(player_name).decode('utf-8')[:-1]
-        player = get_object_or_404(Player, persona_name=player_name)
-
+    player = validate_player_credentials(player_name, player_id)
     kda = KDADensity(player.steam_id)
     kdabase = basename(kda.name)
     winrate = CountWinrate(player.steam_id)
@@ -98,6 +92,16 @@ def timeline(request):
                               'title':'Player Timeline'},
                               context_instance=RequestContext(request))
 
+def player_matches(request, player_name=None, player_id=None):
+  player = validate_player_credentials(player_name, player_id)
+  pms_list = PlayerMatchSummary.objects.filter(player=player).select_related()[0:50]
+  for pms in pms_list:
+      pms.display_date = datetime.datetime.fromtimestamp(pms.match.start_time)
+      pms.display_duration = str(datetime.timedelta(seconds=pms.match.duration))
+      pms.kda2 = pms.kills - pms.deaths+ pms.assists/2.0
+      pms.color_class = 'pos' if pms.kda2 > 0 else 'neg'
+      pms.mag = abs(pms.kda2)*2
+  return render(request, 'playermatchsummary_index.html', {'pms_list':pms_list})
 
 def player_list(request):
     if request.is_ajax():
@@ -115,3 +119,13 @@ def player_list(request):
         data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
+
+def validate_player_credentials(player_name, player_id):
+    if player_name == None and player_id == None:
+        return HttpResponseNotFound('<h1>I need either a player name or player id.</h1>')
+    elif player_id != None:
+        player = get_object_or_404(Player, steam_id=player_id)
+    else:
+        player_name = unquote(player_name).decode('utf-8')
+        player = get_object_or_404(Player, persona_name=player_name)
+    return player
