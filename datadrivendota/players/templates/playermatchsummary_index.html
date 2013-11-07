@@ -1,8 +1,8 @@
-{% extends "matches_base.html" %}
+{% extends "player_base.html" %}
 
 {% block title %}Match Index{% endblock title %}
 
-{% block page_title %}Matches Index{% endblock page_title %}
+{% block page_title %}{{persona_name}}'s Matches{% endblock page_title %}
 
 {% block content %}
 <div>
@@ -17,16 +17,15 @@
         <th>A</th>
         <th colspan=2>KDA/2</th>
         <th>Start Time</th>
-        <th>Lobby Type</th>
         <th>Game Mode</th>
       </tr>
     </thead>
     <tbody>
       {% for pms in pms_list %}
       <tr>
-        <td><a href="{{ pms.match.steam_id }}">{{ pms.match.steam_id }}</a></td>
+        <td><a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}">{{pms.match.steam_id}}</a></td>
         <td>{{ pms.display_duration }}</td>
-        <td><img src="{{ pms.hero.thumbshot.url }}" width="50%" height="50%"></td>
+        <td><img src="{{ pms.hero.thumbshot.url }}" height="60%"></td>
         <td>{{ pms.hero.name }}</td>
         <td>{{ pms.kills }}</td>
         <td>{{ pms.deaths }}</td>
@@ -34,7 +33,6 @@
         <td>{{ pms.kda2 }}</td>
         <td><div style="width:{{pms.mag}}px" class="databaru {{ pms.color_class }}"></span></td>
         <td>{{ pms.display_date|date:"D d M Y" }}</td>
-        <td>{{ pms.match.lobby_type.description }}</td>
         <td>{{ pms.match.game_mode.description }}</td>
       </tr>
       {% endfor %}

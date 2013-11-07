@@ -2,8 +2,7 @@ import json
 from functools import wraps
 from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response, render
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, render
 from os.path import basename
 from .models import Player
 from .r import KDADensity, CountWinrate, PlayerTimeline
@@ -27,8 +26,7 @@ except ImportError:
 
 def index(request):
     player_list = Player.objects.filter(updated=True)
-    return render_to_response('player_index.html', {'player_list':player_list},
-                              context_instance = RequestContext(request))
+    return render('player_index.html', {'player_list':player_list})
 
 def detail(request, player_name=None, player_id=None):
     player = validate_player_credentials(player_name, player_id)
@@ -36,12 +34,11 @@ def detail(request, player_name=None, player_id=None):
     kdabase = basename(kda.name)
     winrate = CountWinrate(player.steam_id)
     winratebase = basename(winrate.name)
-    return render_to_response('player_detail.html', {'player':player,
+    return render('player_detail.html', {'player':player,
                                'kdabase':kdabase,
                                'kda':kda,
                                'winratebase':winratebase,
-                               'winrate':winrate},
-                              context_instance = RequestContext(request))
+                               'winrate':winrate})
 
 
 @devserver_profile(follow=[CountWinrate])
@@ -56,17 +53,15 @@ def winrate(request):
               max_date = winrate_form.cleaned_data['max_date'],
             )
             imagebase = basename(image.name)
-            return render_to_response('player_form.html', {'form': winrate_form,
+            return render('player_form.html', {'form': winrate_form,
                                       'imagebase': imagebase,
-                                      'title':'Hero Winrate'},
-                                      context_instance=RequestContext(request))
+                                      'title':'Hero Winrate'})
 
     else:
         winrate_form = PlayerWinrateLevers()
 
-    return render_to_response('player_form.html', {'form': winrate_form,
-                                                    'title':'Hero Winrate'},
-                              context_instance=RequestContext(request))
+    return render('player_form.html', {'form': winrate_form,
+                                       'title':'Hero Winrate'})
 
 @devserver_profile(follow=[PlayerTimeline])
 def timeline(request):
@@ -81,27 +76,28 @@ def timeline(request):
               plot_var=timeline_form.cleaned_data['plot_var']
             )
             imagebase = basename(image.name)
-            return render_to_response('player_form.html', {'form': timeline_form,
+            return render('player_form.html', {'form': timeline_form,
                                       'imagebase': imagebase,
-                                      'title':'Player Timeline',},
-                                      context_instance=RequestContext(request))
+                                      'title':'Player Timeline',})
     else:
         timeline_form = PlayerTimelineForm()
 
-    return render_to_response('player_form.html', {'form': timeline_form,
-                              'title':'Player Timeline'},
-                              context_instance=RequestContext(request))
+    return render('player_form.html', {'form': timeline_form,
+                              'title':'Player Timeline'})
 
 def player_matches(request, player_name=None, player_id=None):
   player = validate_player_credentials(player_name, player_id)
-  pms_list = PlayerMatchSummary.objects.filter(player=player).select_related()[0:50]
+  pms_list = PlayerMatchSummary.objects.select_related()
+  pms_list = pms_list.filter(player=player).order_by('-match__start_time')[0:50]
   for pms in pms_list:
+      print pms.match.steam_id, pms.hero
       pms.display_date = datetime.datetime.fromtimestamp(pms.match.start_time)
       pms.display_duration = str(datetime.timedelta(seconds=pms.match.duration))
       pms.kda2 = pms.kills - pms.deaths+ pms.assists/2.0
       pms.color_class = 'pos' if pms.kda2 > 0 else 'neg'
       pms.mag = abs(pms.kda2)*2
-  return render(request, 'playermatchsummary_index.html', {'pms_list':pms_list})
+  return render(request, 'playermatchsummary_index.html', {'pms_list':pms_list,
+    'persona_name':player.persona_name})
 
 def player_list(request):
     if request.is_ajax():

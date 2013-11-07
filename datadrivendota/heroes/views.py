@@ -6,11 +6,10 @@ from functools import wraps
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response, render
-from .models import Hero
+from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
-from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+from .models import Hero
 
 from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, \
   HeroPlayerPerformance, HeroPlayerSkillBarsForm
@@ -35,8 +34,7 @@ except ImportError:
 def index(request):
     hero_list = Hero.objects.all().order_by('name')
 
-    return render_to_response('hero_index.html', {'hero_list': hero_list},
-                              context_instance=RequestContext(request))
+    return render('hero_index.html', {'hero_list': hero_list})
 
 
 @login_required
@@ -44,8 +42,7 @@ def detail(request, hero_name):
     hero_slug = slugify(hero_name)
     current_hero = get_object_or_404(Hero, machine_name=hero_slug)
 
-    return render_to_response('heroes_detail.html', {'hero': current_hero},
-                              context_instance=RequestContext(request))
+    return render('heroes_detail.html', {'hero': current_hero})
 
 @devserver_profile(follow=[generateChart])
 def vitals(request):
@@ -67,16 +64,14 @@ def vitals(request):
               display_options=display_options
           )
           imagebase = basename(image.name)
-          return render_to_response('hero_form.html', {'form': hero_form,
+          return render('hero_form.html', {'form': hero_form,
                                     'hero_list': hero_list,
                                     'imagebase': imagebase,
-                                    'title':"Hero Vitals"},
-                                    context_instance=RequestContext(request))
+                                    'title':"Hero Vitals"})
     else:
         hero_form = HeroVitalsMultiSelect()
-    return render_to_response('hero_form.html', {'form': hero_form,
-                                                'title':"Hero Vitals"},
-                               context_instance=RequestContext(request))
+    return render('hero_form.html', {'form': hero_form,
+                                                'title':"Hero Vitals"})
 
 @devserver_profile(follow=[lineupChart])
 def lineup(request):
@@ -91,16 +86,14 @@ def lineup(request):
           )
 
           imagebase = basename(image.name)
-          return render_to_response('hero_form.html', {'form': hero_form,
+          return render('hero_form.html', {'form': hero_form,
                                     'imagebase': imagebase,
-                                    'title':'Hero Lineups'},
-                                    context_instance=RequestContext(request))
+                                    'title':'Hero Lineups'})
     else:
         hero_form = HeroLineupMultiSelect()
 
-    return render_to_response('hero_form.html', {'form': hero_form,
-                                                 'title':'Hero Lineups'},
-                              context_instance=RequestContext(request))
+    return render('hero_form.html', {'form': hero_form,
+                                                 'title':'Hero Lineups'})
 
 @devserver_profile(follow=[HeroPerformanceChart])
 def hero_performance(request):
@@ -117,16 +110,14 @@ def hero_performance(request):
               split_var = hero_form.cleaned_data['split_var'],
             )
             imagebase = basename(image.name)
-            return render_to_response('hero_form.html',{'form': hero_form,
+            return render('hero_form.html',{'form': hero_form,
                                       'imagebase': imagebase,
-                                      'title':'Hero Performance'},
-                                      context_instance=RequestContext(request))
+                                      'title':'Hero Performance'})
     else:
       hero_form = HeroPlayerPerformance()
 
-    return render_to_response('hero_form.html',{'form': hero_form,
-                                                'title':'Hero Performance'},
-                              context_instance=RequestContext(request))
+    return render('hero_form.html',{'form': hero_form,
+                                                'title':'Hero Performance'})
 
 @devserver_profile(follow=[HeroSkillLevelBwChart])
 def hero_skill_bars(request):
@@ -140,15 +131,13 @@ def hero_skill_bars(request):
               levels= hero_form.cleaned_data['levels'],
             )
             imagebase = basename(image.name)
-            return render_to_response('hero_form.html',{'form': hero_form,
+            return render('hero_form.html',{'form': hero_form,
                                       'imagebase': imagebase,
-                                      'title': 'Hero Skill Times'},
-                                      context_instance=RequestContext(request))
+                                      'title': 'Hero Skill Times'})
     else:
       hero_form = HeroPlayerSkillBarsForm
-    return render_to_response('hero_form.html',{'form': hero_form,
-                                                'title': 'Hero Skill Times'},
-                              context_instance=RequestContext(request))
+    return render('hero_form.html',{'form': hero_form,
+                                                'title': 'Hero Skill Times'})
 
 @devserver_profile(follow=[speedtest1Chart])
 def speedtest1(request):
