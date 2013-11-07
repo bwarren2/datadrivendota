@@ -32,7 +32,7 @@ def match(request, match_id):
     kdc_basename = basename(kill_dmg_chart.name)
     xp_gold_chart = MatchParameterScatterplot(match_id, 'gold_per_min', 'xp_per_min')
     xg_basename = basename(xp_gold_chart.name)
-    return render('match_detail.html', {'match':match,
+    return render(request, 'match_detail.html', {'match':match,
                               'summaries':summaries,
                               'kill_dmg_chart': kill_dmg_chart,
                               'kdc_basename': kdc_basename,
@@ -45,7 +45,7 @@ def index(request):
     for match in match_list:
       match.display_date = datetime.datetime.fromtimestamp(match.start_time)
       match.display_duration = str(datetime.timedelta(seconds=match.duration))
-    return render('matches_index.html', {'match_list': match_list})
+    return render(request, 'matches_index.html', {'match_list': match_list})
 
 @devserver_profile(follow=[EndgameChart])
 def endgame(request):
@@ -62,7 +62,7 @@ def endgame(request):
                 group_var = select_form.cleaned_data['group_var'],
             )
             imagebase = basename(image.name)
-            return render('match_form.html',
+            return render(request, 'match_form.html',
                                      {'form':select_form,
                                       'imagebase':imagebase,
                                       'title':'Endgame Charts'
@@ -70,6 +70,6 @@ def endgame(request):
 
     else:
         select_form = EndgameSelect()
-    return render('match_form.html',
+    return render(request, 'match_form.html',
       {'form':select_form,'title':'Endgame Charts'})
 

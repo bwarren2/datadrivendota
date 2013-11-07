@@ -1,7 +1,6 @@
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 
 def logout_page(request):
     """
@@ -18,10 +17,8 @@ def base(request):
         extra_dict = {}
     else:
         extra_dict = request.user.social_auth.filter(provider='steam')[0].extra_data
-    return render_to_response('base.html', extra_dict,
-                              context_instance=RequestContext(request))
+    return render(request, 'base.html', extra_dict)
 
 def about(request):
 
-    return render_to_response('about.html',{},
-                              context_instance=RequestContext(request))
+    return render(request, 'about.html',{})

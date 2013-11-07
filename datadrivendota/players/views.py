@@ -26,7 +26,7 @@ except ImportError:
 
 def index(request):
     player_list = Player.objects.filter(updated=True)
-    return render('player_index.html', {'player_list':player_list})
+    return render(request, 'player_index.html', {'player_list':player_list})
 
 def detail(request, player_name=None, player_id=None):
     player = validate_player_credentials(player_name, player_id)
@@ -34,7 +34,7 @@ def detail(request, player_name=None, player_id=None):
     kdabase = basename(kda.name)
     winrate = CountWinrate(player.steam_id)
     winratebase = basename(winrate.name)
-    return render('player_detail.html', {'player':player,
+    return render(request, 'player_detail.html', {'player':player,
                                'kdabase':kdabase,
                                'kda':kda,
                                'winratebase':winratebase,
@@ -53,14 +53,14 @@ def winrate(request):
               max_date = winrate_form.cleaned_data['max_date'],
             )
             imagebase = basename(image.name)
-            return render('player_form.html', {'form': winrate_form,
+            return render(request, 'player_form.html', {'form': winrate_form,
                                       'imagebase': imagebase,
                                       'title':'Hero Winrate'})
 
     else:
         winrate_form = PlayerWinrateLevers()
 
-    return render('player_form.html', {'form': winrate_form,
+    return render(request, 'player_form.html', {'form': winrate_form,
                                        'title':'Hero Winrate'})
 
 @devserver_profile(follow=[PlayerTimeline])
@@ -76,13 +76,13 @@ def timeline(request):
               plot_var=timeline_form.cleaned_data['plot_var']
             )
             imagebase = basename(image.name)
-            return render('player_form.html', {'form': timeline_form,
+            return render(request, 'player_form.html', {'form': timeline_form,
                                       'imagebase': imagebase,
                                       'title':'Player Timeline',})
     else:
         timeline_form = PlayerTimelineForm()
 
-    return render('player_form.html', {'form': timeline_form,
+    return render(request, 'player_form.html', {'form': timeline_form,
                               'title':'Player Timeline'})
 
 def player_matches(request, player_name=None, player_id=None):
@@ -90,7 +90,6 @@ def player_matches(request, player_name=None, player_id=None):
   pms_list = PlayerMatchSummary.objects.select_related()
   pms_list = pms_list.filter(player=player).order_by('-match__start_time')[0:50]
   for pms in pms_list:
-      print pms.match.steam_id, pms.hero
       pms.display_date = datetime.datetime.fromtimestamp(pms.match.start_time)
       pms.display_duration = str(datetime.timedelta(seconds=pms.match.duration))
       pms.kda2 = pms.kills - pms.deaths+ pms.assists/2.0

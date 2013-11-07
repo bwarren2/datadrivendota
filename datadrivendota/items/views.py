@@ -8,11 +8,11 @@ from django.utils.text import slugify
 def index(request):
     item_list = Item.objects.all().order_by('slug_name')
     print item_list
-    return render('item_index.html', {'item_list': item_list})
+    return render(request, 'item_index.html', {'item_list': item_list})
 
 
 def detail(request, item_name):
     item_slug = slugify(item_name)
     current_item = get_object_or_404(Item, slug_name=item_slug)
 
-    return render('item_detail.html', {'item': current_item})
+    return render(request, 'item_detail.html', {'item': current_item})

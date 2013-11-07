@@ -42,7 +42,7 @@ def detail(request, hero_name):
     hero_slug = slugify(hero_name)
     current_hero = get_object_or_404(Hero, machine_name=hero_slug)
 
-    return render('heroes_detail.html', {'hero': current_hero})
+    return render(request, 'heroes_detail.html', {'hero': current_hero})
 
 @devserver_profile(follow=[generateChart])
 def vitals(request):
@@ -64,13 +64,13 @@ def vitals(request):
               display_options=display_options
           )
           imagebase = basename(image.name)
-          return render('hero_form.html', {'form': hero_form,
+          return render(request, 'hero_form.html', {'form': hero_form,
                                     'hero_list': hero_list,
                                     'imagebase': imagebase,
                                     'title':"Hero Vitals"})
     else:
         hero_form = HeroVitalsMultiSelect()
-    return render('hero_form.html', {'form': hero_form,
+    return render(request, 'hero_form.html', {'form': hero_form,
                                                 'title':"Hero Vitals"})
 
 @devserver_profile(follow=[lineupChart])
@@ -86,13 +86,13 @@ def lineup(request):
           )
 
           imagebase = basename(image.name)
-          return render('hero_form.html', {'form': hero_form,
+          return render(request, 'hero_form.html', {'form': hero_form,
                                     'imagebase': imagebase,
                                     'title':'Hero Lineups'})
     else:
         hero_form = HeroLineupMultiSelect()
 
-    return render('hero_form.html', {'form': hero_form,
+    return render(request, 'hero_form.html', {'form': hero_form,
                                                  'title':'Hero Lineups'})
 
 @devserver_profile(follow=[HeroPerformanceChart])
@@ -110,13 +110,13 @@ def hero_performance(request):
               split_var = hero_form.cleaned_data['split_var'],
             )
             imagebase = basename(image.name)
-            return render('hero_form.html',{'form': hero_form,
+            return render(request, 'hero_form.html',{'form': hero_form,
                                       'imagebase': imagebase,
                                       'title':'Hero Performance'})
     else:
       hero_form = HeroPlayerPerformance()
 
-    return render('hero_form.html',{'form': hero_form,
+    return render(request, 'hero_form.html',{'form': hero_form,
                                                 'title':'Hero Performance'})
 
 @devserver_profile(follow=[HeroSkillLevelBwChart])
@@ -131,12 +131,12 @@ def hero_skill_bars(request):
               levels= hero_form.cleaned_data['levels'],
             )
             imagebase = basename(image.name)
-            return render('hero_form.html',{'form': hero_form,
+            return render(request, 'hero_form.html',{'form': hero_form,
                                       'imagebase': imagebase,
                                       'title': 'Hero Skill Times'})
     else:
       hero_form = HeroPlayerSkillBarsForm
-    return render('hero_form.html',{'form': hero_form,
+    return render(request, 'hero_form.html',{'form': hero_form,
                                                 'title': 'Hero Skill Times'})
 
 @devserver_profile(follow=[speedtest1Chart])
