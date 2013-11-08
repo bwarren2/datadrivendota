@@ -20,10 +20,9 @@ class Command(BaseCommand):
             url = 'http://media.steampowered.com/apps/dota2/images/heroes/%s_full.png' % h.internal_name[14:]
             try:
                 imgdata = urlopen(url)
-
-                filename = slugify(h.name)+'_full.png'
                 with open('%s.png' % str(uuid4()), 'w+') as f:
                     f.write(imgdata.read())
+                filename = slugify(h.name)+'_full.png'
                 h.mugshot.save(filename, File(open(f.name)))
             except HTTPError, err:
                 h.mugshot = None
@@ -32,7 +31,6 @@ class Command(BaseCommand):
             url = 'http://media.steampowered.com/apps/dota2/images/heroes/%s_sb.png' % h.internal_name[14:]
             try:
                 imgdata = urlopen(url)
-
                 with open('%s.png' % str(uuid4()), 'w+') as f:
                     f.write(imgdata.read())
                 filename = slugify(h.name)+'_thumb.png'

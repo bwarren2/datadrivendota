@@ -28,8 +28,8 @@ def index(request):
     player_list = Player.objects.filter(updated=True)
     return render(request, 'player_index.html', {'player_list':player_list})
 
-def detail(request, player_name=None, player_id=None):
-    player = validate_player_credentials(player_name, player_id)
+def detail(request, player_id=None):
+    player = validate_player_credentials(player_id)
     kda = KDADensity(player.steam_id)
     kdabase = basename(kda.name)
     winrate = CountWinrate(player.steam_id)
@@ -38,7 +38,8 @@ def detail(request, player_name=None, player_id=None):
                                'kdabase':kdabase,
                                'kda':kda,
                                'winratebase':winratebase,
-                               'winrate':winrate})
+                               'winrate':winrate,
+                               'player_id':player_id})
 
 
 @devserver_profile(follow=[CountWinrate])
@@ -86,7 +87,7 @@ def timeline(request):
                               'title':'Player Timeline'})
 
 def player_matches(request, player_name=None, player_id=None):
-  player = validate_player_credentials(player_name, player_id)
+  player = validate_player_credentials(player_id)
   pms_list = PlayerMatchSummary.objects.select_related()
   pms_list = pms_list.filter(player=player).order_by('-match__start_time')[0:50]
   for pms in pms_list:
@@ -96,7 +97,8 @@ def player_matches(request, player_name=None, player_id=None):
       pms.color_class = 'pos' if pms.kda2 > 0 else 'neg'
       pms.mag = abs(pms.kda2)*2
   return render(request, 'playermatchsummary_index.html', {'pms_list':pms_list,
-    'persona_name':player.persona_name})
+    'persona_name':player.persona_name,
+    'player_id':player_id})
 
 def player_list(request):
     if request.is_ajax():
@@ -115,12 +117,6 @@ def player_list(request):
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
 
-def validate_player_credentials(player_name, player_id):
-    if player_name == None and player_id == None:
-        return HttpResponseNotFound('<h1>I need either a player name or player id.</h1>')
-    elif player_id != None:
-        player = get_object_or_404(Player, steam_id=player_id)
-    else:
-        player_name = unquote(player_name).decode('utf-8')
-        player = get_object_or_404(Player, persona_name=player_name)
+def validate_player_credentials(player_id):
+    player = get_object_or_404(Player, steam_id=player_id)
     return player
