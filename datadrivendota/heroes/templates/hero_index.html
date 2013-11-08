@@ -5,15 +5,35 @@
 {% block page_title %}Hero Index{% endblock %}
 
 {% block content %}
-<div class "thumbnails">
+
+
+<div class="row">
   {% for hero in hero_list %}
-    {% if hero.thumbshot %}
-      <li class="span1">
-        <a href="{% url 'heroes:detail' hero_name=hero.machine_name %}">
-          <img src="{{ hero.thumbshot.url }}">
+    {% if hero.thumbshot and hero.name %}
+
+      <div class="col-md-2">
+        <a href="{% url 'heroes:detail' hero_name=hero.machine_name %}" class="thumbnail">
+            <img src="{{ hero.mugshot.url }}" alt="{{ hero.name }}">
+            <p class='overlayer'>{{ hero.name }}</p>
         </a>
-      </li>
+      </div>
     {% endif %}
   {% endfor %}
 </div>
+
 {% endblock %}
+
+
+{% block extra_css %}
+ <style type="text/css">
+    .overlayer{
+        z-index:100;
+        position:absolute;
+        color:white;
+        font-size:12px;
+        left:20px;
+        top:80px;
+        font-family: Arial
+    }
+</style>
+{% endblock extra_css %}
