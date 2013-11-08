@@ -34,7 +34,7 @@ except ImportError:
 def index(request):
     hero_list = Hero.objects.all().order_by('name')
 
-    return render('hero_index.html', {'hero_list': hero_list})
+    return render(request, 'hero_index.html', {'hero_list': hero_list})
 
 
 @login_required
