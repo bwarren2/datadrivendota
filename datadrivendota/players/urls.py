@@ -7,22 +7,12 @@ urlpatterns = patterns(
     url(r'^winrate/$', views.winrate, name='player_winrate'),
     url(r'^timeline/$', views.timeline, name='timeline'),
     url(
-        r'^(?:p:(?P<player_name>.*))/matches/$',
-        views.player_matches,
-        name="name_matches"
-    ),
-    url(
-        r'^(?:pid:(?P<player_id>[0-9]*))/matches/$',
+        r'^(?P<player_id>[0-9]*)/matches/$',
         views.player_matches,
         name="id_matches"
     ),
     url(
-        r'^(?:p:(?P<player_name>.*))/$',
-        views.detail,
-        name="name_detail"
-    ),
-    url(
-        r'^(?:pid:(?P<player_id>[0-9]*))/$',
+        r'^(?P<player_id>[0-9]*)/$',
         views.detail,
         name="id_detail"
     ),
