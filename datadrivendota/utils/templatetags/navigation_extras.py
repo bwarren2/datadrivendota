@@ -10,25 +10,27 @@ class ActiveNode(template.Node):
 
     def render(self, context):
         request = context['request']
-        if self.main_nav and request.resolver_match.namespace:
-            full_url_name = '{namespace}'.format(
-                namespace=request.resolver_match.namespace
-            )
-        elif request.resolver_match.namespace:
-            full_url_name = "{namespace}:{url_name}".format(
-                namespace=request.resolver_match.namespace,
-                url_name=request.resolver_match.url_name
-            )
-        else:
-            full_url_name = "{url_name}".format(
-                url_name=request.resolver_match.url_name
-            )
-        active = full_url_name == self.url_name
-        if active:
-            return "active"
-        else:
+        try:
+            if self.main_nav and request.resolver_match.namespace:
+                full_url_name = '{namespace}'.format(
+                    namespace=request.resolver_match.namespace
+                )
+            elif request.resolver_match.namespace:
+                full_url_name = "{namespace}:{url_name}".format(
+                    namespace=request.resolver_match.namespace,
+                    url_name=request.resolver_match.url_name
+                )
+            else:
+                full_url_name = "{url_name}".format(
+                    url_name=request.resolver_match.url_name
+                )
+            active = full_url_name == self.url_name
+            if active:
+                return "active"
+            else:
+                return ""
+        except AttributeError:
             return ""
-
 
 @register.tag
 def active(parser, token):
