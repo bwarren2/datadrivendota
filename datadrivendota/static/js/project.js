@@ -3,6 +3,7 @@
 $('.info').tooltip();
 
 $(document).ready(function () {
+  $('input[type=checkbox]:checked').parent().addClass('active');
   $('input[type=checkbox]').change(function (evt) {
     $(evt.target).parent().toggleClass('active');
   });
