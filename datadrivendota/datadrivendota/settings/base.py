@@ -229,7 +229,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
     'social_auth.context_processors.social_auth_by_type_backends',
-    'datadrivendota.custom_template_context_processors.active',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
@@ -295,6 +294,7 @@ THIRD_PARTY_APPS = (
 # Apps specific for this project go here.
 LOCAL_APPS = (
     #My custom stuff
+    'utils',
     'heroes',
     'items',
     'players',

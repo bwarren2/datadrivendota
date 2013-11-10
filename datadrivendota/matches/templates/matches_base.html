@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
+{% load navigation_extras %}
+
 {% block extra_nav %}
 <ul class="nav nav-tabs">
-  <li class="{% if active == 'index' %}active{% endif %}"><a href="{% url 'matches:index' %}">Matches</a></li>
-  <li class="{% if active == 'endgame' %}active{% endif %}"><a href="{% url 'matches:endgame' %}">Endgame Charts</a></li>
+  <li class="{% active 'matches:index' %}"><a href="{% url 'matches:index' %}">Matches</a></li>
+  <li class="{% active 'matches:endgame' %}"><a href="{% url 'matches:endgame' %}">Endgame Charts</a></li>
 </ul>
 {% endblock extra_nav %}

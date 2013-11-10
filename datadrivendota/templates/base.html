@@ -1,4 +1,4 @@
-{% load staticfiles compressed %}
+{% load staticfiles compressed navigation_extras %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -35,12 +35,11 @@
       </div>
       <div class="collapse navbar-collapse navbar-ex1-collapse">
         <ul class="nav navbar-nav">
-          {# todo: fix this active logic. --kit 2013-10-27 #}
-          <li class="{% if active|slice:":6" == "heroes" %}active{% endif %}"><a href="{% url 'heroes:index' %}">Heroes</a></li>
-          <li class="{% if active == "items" %}active{% endif %}"><a href="{% url 'items:index' %}">Items</a></li>
-          <li class="{% if active|slice:":7" == "matches" %}active{% endif %}"><a href="{% url 'matches:index' %}">Matches</a></li>
-          <li class="{% if active == "players" %}active{% endif %}"><a href="{% url 'players:index' %}">Players</a></li>
-          <li class="{% if active == "about" %}active{% endif %}"><a href="/about/">About</a></li>
+          <li class="{% active 'heroes' main_nav %}"><a href="{% url 'heroes:index' %}">Heroes</a></li>
+          <li class="{% active 'items' main_nav %}"><a href="{% url 'items:index' %}">Items</a></li>
+          <li class="{% active 'matches' main_nav %}"><a href="{% url 'matches:index' %}">Matches</a></li>
+          <li class="{% active 'players' main_nav %}"><a href="{% url 'players:index' %}">Players</a></li>
+          <li class="{% active 'about' main_nav %}"><a href="/about/">About</a></li>
           <li><a href="mailto:datadrivendota@gmail.com">Contact</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
