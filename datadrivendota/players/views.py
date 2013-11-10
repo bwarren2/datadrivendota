@@ -38,8 +38,7 @@ def detail(request, player_id=None):
                                'kdabase':kdabase,
                                'kda':kda,
                                'winratebase':winratebase,
-                               'winrate':winrate,
-                               'player_id':player_id})
+                               'winrate':winrate})
 
 
 @devserver_profile(follow=[CountWinrate])
@@ -97,8 +96,7 @@ def player_matches(request, player_name=None, player_id=None):
       pms.color_class = 'pos' if pms.kda2 > 0 else 'neg'
       pms.mag = abs(pms.kda2)*2
   return render(request, 'playermatchsummary_index.html', {'pms_list':pms_list,
-    'persona_name':player.persona_name,
-    'player_id':player_id})
+    'persona_name':player.persona_name})
 
 def player_list(request):
     if request.is_ajax():

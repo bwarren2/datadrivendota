@@ -6,3 +6,4 @@ def active(request):
         }
     except AttributeError:
         return {}
+
