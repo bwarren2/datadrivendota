@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from .models import Hero
+from matches.models import GameMode
 
 from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, \
   HeroPlayerPerformance, HeroPlayerSkillBarsForm
@@ -41,8 +42,31 @@ def index(request):
 def detail(request, hero_name):
     hero_slug = slugify(hero_name)
     current_hero = get_object_or_404(Hero, machine_name=hero_slug)
-
-    return render(request, 'heroes_detail.html', {'hero': current_hero})
+    game_modes = GameMode.objects.filter(is_competitive=True)
+    game_mode_list = [gm.steam_id for gm in game_modes]
+    image = HeroPerformanceChart(
+              hero = current_hero.steam_id,
+              player=None,
+              game_mode_list = game_mode_list,
+              x_var= 'duration',
+              y_var = 'kills',
+              group_var = 'skill',
+              split_var = 'is_win',
+            )
+    killsbase = basename(image.name)
+    image = HeroPerformanceChart(
+              hero = current_hero.steam_id,
+              player=None,
+              game_mode_list = game_mode_list,
+              x_var= 'hero_dmg',
+              y_var = 'kills',
+              group_var = 'skill',
+              split_var = 'is_win',
+            )
+    dmgbase = basename(image.name)
+    return render(request, 'heroes_detail.html', {'hero': current_hero,
+                           'killsbase': killsbase,
+                           'dmgbase': dmgbase})
 
 @devserver_profile(follow=[generateChart])
 def vitals(request):
