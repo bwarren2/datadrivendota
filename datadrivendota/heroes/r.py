@@ -201,9 +201,9 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     matches = PlayerMatchSummary.objects.filter(match__game_mode__in=game_mode_list)
     matches = matches.filter(match__duration__gte=settings.MIN_MATCH_LENGTH) #Ignore <10 min games
     matches = matches.filter(hero__steam_id=hero)
-    skill1 = matches.filter(match__skill=1).select_related()[:30]
-    skill2 = matches.filter(match__skill=2).select_related()[:30]
-    skill3 = matches.filter(match__skill=3).select_related()[:30]
+    skill1 = matches.filter(match__skill=1).select_related()[:100]
+    skill2 = matches.filter(match__skill=2).select_related()[:100]
+    skill3 = matches.filter(match__skill=3).select_related()[:100]
     for game in chain(skill1, skill2, skill3): game.skill_level=game.match.skill
 
     if player is not None:
