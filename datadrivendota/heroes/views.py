@@ -39,11 +39,13 @@ def index(request):
 
 
 @login_required
+@devserver_profile(follow=[HeroPerformanceChart])
 def detail(request, hero_name):
     hero_slug = slugify(hero_name)
     current_hero = get_object_or_404(Hero, machine_name=hero_slug)
     game_modes = GameMode.objects.filter(is_competitive=True)
     game_mode_list = [gm.steam_id for gm in game_modes]
+    charts = []
     image = HeroPerformanceChart(
               hero = current_hero.steam_id,
               player=None,
@@ -51,22 +53,41 @@ def detail(request, hero_name):
               x_var= 'duration',
               y_var = 'kills',
               group_var = 'skill',
-              split_var = 'is_win',
+              split_var = None,
+              width=350,
+              height=350
             )
-    killsbase = basename(image.name)
+    base1 = basename(image.name)
+    charts.append(base1)
     image = HeroPerformanceChart(
               hero = current_hero.steam_id,
               player=None,
               game_mode_list = game_mode_list,
-              x_var= 'hero_damage',
-              y_var = 'kills',
+              x_var= 'duration',
+              y_var = 'K-D+.5*A',
               group_var = 'skill',
-              split_var = 'is_win',
+              split_var = None,
+              width=350,
+              height=350
             )
-    dmgbase = basename(image.name)
+    base2 = basename(image.name)
+    charts.append(base2)
+    image = HeroPerformanceChart(
+          hero = current_hero.steam_id,
+          player=None,
+          game_mode_list = game_mode_list,
+          x_var= 'duration',
+          y_var = 'gold',
+          group_var = 'skill',
+          split_var = None,
+          width=350,
+          height=350
+        )
+    base3 = basename(image.name)
+    charts.append(base3)
+    print charts
     return render(request, 'heroes_detail.html', {'hero': current_hero,
-                           'killsbase': killsbase,
-                           'dmgbase': dmgbase})
+                           'charts':charts})
 
 @devserver_profile(follow=[generateChart])
 def vitals(request):

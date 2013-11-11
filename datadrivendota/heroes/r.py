@@ -18,7 +18,7 @@ from matches.models import PlayerMatchSummary, SkillBuild
 from matches.r import fetch_match_attributes
 
 
-def generateChart(hero_list, stats_list, display_options):
+def generateChart(hero_list, stats_list, display_options,width=800,height=500):
     # Currently, we are violating DRY with the available field listing from the form
     # and the R space being in different places and requiring that they are the same.
 
@@ -112,7 +112,7 @@ def generateChart(hero_list, stats_list, display_options):
 
     #Make a file
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
     enforceTheme(robjects)
     cmd="""print(
         xyplot(%s~level,groups=hero,data=df.all,type='l',
@@ -131,7 +131,7 @@ def generateChart(hero_list, stats_list, display_options):
     return hosted_file
 
 
-def lineupChart(heroes, stat, level):
+def lineupChart(heroes, stat, level, width=800, height=500):
 
     #Get the right stuff loaded in R
     grdevices = importr('grDevices')
@@ -173,7 +173,7 @@ def lineupChart(heroes, stat, level):
 
     #Make a file
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
     enforceTheme(robjects)
     robjects.r("""print(
         barchart(val~name,data=df,type='l',horizontal=F,
@@ -191,7 +191,7 @@ def lineupChart(heroes, stat, level):
     hosted_file = s3File(imagefile)
     return hosted_file
 
-def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, split_var):
+def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, split_var, width=800,height=500):
 
     #Get the right stuff loaded in R
     grdevices = importr('grDevices')
@@ -219,8 +219,16 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     try:
         x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
         y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
-        split_vector_list, split_lab = fetch_match_attributes(match_pool, split_var)
-        group_vector_list, grouplab = fetch_match_attributes(match_pool, group_var)
+        if split_var is None:
+            split_vector_list = ['No Split']
+            split_lab = 'No Split'
+        else:
+            split_vector_list, split_lab = fetch_match_attributes(match_pool, split_var)
+        if group_var is None:
+            group_vector_list = ['No Grouping'] * len(x_vector_list)
+            grouplab = 'No Grouping'
+        else:
+            group_vector_list, grouplab = fetch_match_attributes(match_pool, group_var)
     except AttributeError:
         return FailFace()
 
@@ -238,7 +246,7 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
 
     #Make a file
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
     enforceTheme(robjects)
     rcmd="""print(
         xyplot(yvec~xvec|splitvar,groups=groupvar,type=c('p','r'),
@@ -257,7 +265,7 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     return hosted_file
 
 
-def HeroSkillLevelBwChart(hero, player, game_mode_list, levels):
+def HeroSkillLevelBwChart(hero, player, game_mode_list, levels,width=800,height=500):
 
     #Get the right stuff loaded in R
     grdevices = importr('grDevices')
@@ -310,7 +318,7 @@ def HeroSkillLevelBwChart(hero, player, game_mode_list, levels):
 
     #Make a file
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
     enforceTheme(robjects)
     rcmd="""print(
         bwplot(yvec/60~xvec|as.factor(splitvec),ylab='Skill Acquisition Time (m)')
@@ -323,7 +331,7 @@ def HeroSkillLevelBwChart(hero, player, game_mode_list, levels):
     hosted_file = s3File(imagefile)
     return hosted_file
 
-def speedtest1Chart():
+def speedtest1Chart(width=800,height=500):
 
     #Get the right stuff loaded in R
     grdevices = importr('grDevices')
@@ -340,7 +348,7 @@ def speedtest1Chart():
 
     #Make a file
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
     enforceTheme(robjects)
     rcmd="""print(
         xyplot(yvec~xvec)
@@ -353,7 +361,7 @@ def speedtest1Chart():
     hosted_file = s3File(imagefile)
     return hosted_file
 
-def speedtest2Chart():
+def speedtest2Chart(width=800,height=500):
     """There is no benefit to taking the direct route with importing grDevices.
     There is to doing so with lattice.  parsing the print call fails to finish the file.
     Overall speedup: .6s
@@ -370,7 +378,7 @@ def speedtest2Chart():
 
     #Make a file
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
 
     enforceTheme(robjects)
     rcmd="""

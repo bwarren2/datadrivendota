@@ -20,9 +20,9 @@ ddd.theme = list(
  par.ylab.text = list(col = "#f4cff1"),
  axis.text = list(col = "#f4cff1"),
  axis.line = list(col = "#f4cff1"),
- superpose.line = list(col = rainbow(n=7,s=1,v=1), lwd=2),      #Long
- superpose.symbol = list(col = rainbow(n=7,s=1,v=1)),    #Long
- superpose.polygon = list(col = rainbow(n=7,s=1,v=1)),  #Long
+ superpose.line = list(col = rainbow(n=7,s=1,v=.8), lwd=2),      #Long
+ superpose.symbol = list(col = rainbow(n=7,s=1,v=.8), cex=1.4,alpha=1),    #Long
+ superpose.polygon = list(col = rainbow(n=7,s=1,v=.8)),  #Long
  regions = list(col = c("darkred")),             #Long
  axis.line = list(col = c("black")),
  axis.text = list(col = c("#f4cff1")),

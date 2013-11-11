@@ -40,7 +40,8 @@ def FailFace():
     x= seq(-10,10,.1)
     y = c(-sqrt(b**2*(1-(x/a)**2)),sqrt(b**2*(1-(x/a)**2)))
 
-    plot(y~rep(x,2),ylim=c(-10,5),xlim=c(-2,6), axis=F, xaxt='n', ann=FALSE, yaxt='n')
+    plot(y~rep(x,2),ylim=c(-10,5),xlim=c(-2,6), axis=F, xaxt='n',
+        ann=FALSE, yaxt='n', main='No Data Found!')
     points(y~rep(x+4,2),ylim=c(-1.5,1.5))
 
     xoffset=2

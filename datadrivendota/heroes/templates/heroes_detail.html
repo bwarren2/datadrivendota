@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "hero_base.html" %}
 
 {% block title %}{{ hero.name }}{% endblock %}
 
@@ -10,6 +10,7 @@
   <p class="lore">
     {{ hero.lore }}
   </p>
-  <img src="{{MEDIA_URL}}{{killsbase}}">
-  <img src="{{MEDIA_URL}}{{dmgbase}}">
+  {% for chart in charts %}
+      <img src="{{MEDIA_URL}}{{chart}}">
+  {% endfor %}
 {% endblock %}
