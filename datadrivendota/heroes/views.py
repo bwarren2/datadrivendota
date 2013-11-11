@@ -58,7 +58,7 @@ def detail(request, hero_name):
               hero = current_hero.steam_id,
               player=None,
               game_mode_list = game_mode_list,
-              x_var= 'hero_dmg',
+              x_var= 'hero_damage',
               y_var = 'kills',
               group_var = 'skill',
               split_var = 'is_win',
