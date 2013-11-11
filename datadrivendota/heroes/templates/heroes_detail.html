@@ -5,11 +5,13 @@
 {% block page_title %}{% endblock %}
 
 {% block content %}
+<div style='display: inline-block'>
   <h1>{{ hero.name }}</h1>
   <img class="hero" src='{{ hero.mugshot.url }}'>
   <p class="lore">
     {{ hero.lore }}
   </p>
+  </div>
   {% for chart in charts %}
       <img src="{{MEDIA_URL}}{{chart}}">
   {% endfor %}
