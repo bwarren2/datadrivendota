@@ -267,9 +267,9 @@ def HeroSkillLevelBwChart(hero, player, game_mode_list, levels):
     pms = PlayerMatchSummary.objects.filter(match__game_mode__in=game_mode_list)
     pms = pms.filter(match__duration__gte=settings.MIN_MATCH_LENGTH) #Ignore <10 min games
     pms = pms.filter(hero__steam_id=hero)
-    skill1 = pms.filter(match__skill=1).select_related()[:30]
-    skill2 = pms.filter(match__skill=2).select_related()[:30]
-    skill3 = pms.filter(match__skill=3).select_related()[:30]
+    skill1 = pms.filter(match__skill=1).select_related()[:100]
+    skill2 = pms.filter(match__skill=2).select_related()[:100]
+    skill3 = pms.filter(match__skill=3).select_related()[:100]
 
     pms_pool = list(chain(skill1, skill2, skill3))
     if len(pms_pool)==0:
