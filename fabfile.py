@@ -4,10 +4,13 @@ from fabric.api import local
 def hp():
     local('git push heroku master')
     local(collect_static())
+    local(heroku_migrate())
+
+def heroku_migrate():
     local(heroku_run(migrate()))
 
 def migrate():
-    return "python datadrivendota/manage.py migrate"
+    return "python datadrivendota/manage.py migrate --no-initial-data"
 
 def collect_static():
     return 'python datadrivendota/manage.py collectstatic --settings=datadrivendota.settings.production --noinput'

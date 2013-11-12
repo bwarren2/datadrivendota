@@ -1,3 +1,4 @@
+BeautifulSoup==3.2.1
 Django==1.5.4
 Fabric==1.6.0
 Jinja2==2.6
@@ -12,6 +13,7 @@ billiard==2.7.3.28
 boto==2.9.2
 bpython==0.12
 celery==3.0.19
+celery-with-redis==3.0
 coverage==3.6
 dj-database-url==0.2.1
 django-braces==0.2.1
@@ -34,10 +36,11 @@ pycrypto==2.6
 python-dateutil==2.1
 python-openid==2.2.5
 pytz==2013b
+redis==2.8.0
+requests==2.0.1
 rpy2==2.3.5
 six==1.3.0
 wsgiref==0.1.2
 flower==0.5.2
 django-select2==4.0.0
-celery-with-redis==3.0
 redis==2.8.0
