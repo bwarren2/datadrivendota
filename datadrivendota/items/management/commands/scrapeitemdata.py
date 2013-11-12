@@ -88,7 +88,7 @@ class Command(BaseCommand):
             tempfile.write(eg_image.read())
             tempfile.seek(0)
             tempfile.read()
-            filename = slugify(item.name)+'_large.png'
+            filename = slugify(item.name)+'_small.png'
             item.thumbshot.save(filename, File(tempfile))
 
 
