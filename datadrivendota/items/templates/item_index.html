@@ -5,16 +5,18 @@
 {% block page_title %}Item Index{% endblock page_title %}
 
 {% block content %}
-  {% for item in item_list %}
-    <div>
-      <p>
-        <a href="{% url 'items:detail' item_name=item.slug_name %}">
-          {% if item.image %}
-            <img src="{{ item.image.url }}">
-          {% endif %}
-          {{ item.external_name }}
-        </a>
-      </p>
-    </div>
-  {% endfor %}
+  <div class="row">
+    {% for item in item_list %}
+      {% if item.mugshot and item.name %}
+
+        <div class="col-md-2">
+          <a href="{% url 'items:detail' item_name=item.slug_name %}" class="thumbnail">
+              <img src="{{ item.mugshot.url }}" alt="{{ item.name }}">
+              <p class='overlayer'>{{ item.name }}</p>
+          </a>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
 {% endblock content %}
+

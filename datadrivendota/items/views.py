@@ -6,8 +6,7 @@ from django.utils.text import slugify
 
 
 def index(request):
-    item_list = Item.objects.all().order_by('slug_name')
-    print item_list
+    item_list = Item.objects.exclude(cost=0).order_by('slug_name')
     return render(request, 'item_index.html', {'item_list': item_list})
 
 

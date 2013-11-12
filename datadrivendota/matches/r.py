@@ -118,7 +118,7 @@ def fetch_match_attributes(summaries,attribute):
         label='Game Mode'
     elif attribute == 'skill':
         vector_list = [summary.match.skill for summary in summaries]
-        label='Skill Bracket'
+        label='Skill (3 = High)'
     elif attribute == 'hero_name':
         vector_list = [safen(summary.hero.name) for summary in summaries]
         label='Hero Name'

@@ -5,9 +5,10 @@
 {% block page_title %}{% endblock page_title %}
 
 {% block content %}
-  <h1>{{ item.external_name }}</h1>
-  <img class="item" src="{{ item.image.url }}">
+  <h1>{{ item.name }}</h1>
+  <img class="item" src="{{ item.mugshot.url }}">
   <p>{{ item.description }}</p>
+  <p>{{ item.notes }}</p>
   <p class='lore'>
     {{ item.lore }}
   </p>
