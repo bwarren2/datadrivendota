@@ -14,7 +14,7 @@ import rpy2.rinterface as rinterface
 
 from heroes.models import HeroDossier, Hero
 from datadrivendota.r import s3File, enforceTheme, FailFace
-from matches.models import PlayerMatchSummary, SkillBuild
+from matches.models import PlayerMatchSummary, SkillBuild, Match
 from matches.r import fetch_match_attributes
 
 
@@ -200,7 +200,7 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     #Database pulls and format python objects to go to R
     matches = PlayerMatchSummary.objects.filter(match__game_mode__in=game_mode_list)
     matches = matches.filter(match__duration__gte=settings.MIN_MATCH_LENGTH) #Ignore <10 min games
-    matches = matches.filter(hero__steam_id=hero)
+    matches = matches.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
     skill1 = matches.filter(match__skill=1).select_related()[:100]
     skill2 = matches.filter(match__skill=2).select_related()[:100]
     skill3 = matches.filter(match__skill=3).select_related()[:100]
@@ -274,7 +274,7 @@ def HeroSkillLevelBwChart(hero, player, game_mode_list, levels,width=800,height=
     #Database pulls and format python objects to go to R
     pms = PlayerMatchSummary.objects.filter(match__game_mode__in=game_mode_list)
     pms = pms.filter(match__duration__gte=settings.MIN_MATCH_LENGTH) #Ignore <10 min games
-    pms = pms.filter(hero__steam_id=hero)
+    pms = pms.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
     skill1 = pms.filter(match__skill=1).select_related()[:100]
     skill2 = pms.filter(match__skill=2).select_related()[:100]
     skill3 = pms.filter(match__skill=3).select_related()[:100]

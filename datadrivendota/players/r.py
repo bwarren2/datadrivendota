@@ -6,7 +6,7 @@ from django.db.models import Count
 from rpy2 import robjects
 from rpy2.robjects.packages import importr
 
-from matches.models import PlayerMatchSummary, GameMode
+from matches.models import PlayerMatchSummary, GameMode, Match
 from .models import Player
 from datadrivendota.r import s3File, enforceTheme, FailFace
 from heroes.models import safen
@@ -23,7 +23,8 @@ def KDADensity(player_id):
     except Player.DoesNotExist:
         return FailFace()
 
-    summaries = PlayerMatchSummary.objects.filter(player=player)
+    summaries = PlayerMatchSummary.objects.filter(player=player,
+        match__validity=Match.LEGIT)
     if len(summaries)==0:
         return FailFace()
 
@@ -88,7 +89,7 @@ def CountWinrate(player_id, game_mode_list=None, min_date=datetime.date(2009,1,1
         player = Player.objects.get(steam_id=player_id)
     except Player.DoesNotExist:
         return FailFace()
-    annotations = PlayerMatchSummary.objects.filter(player=player).values('hero__machine_name','is_win').annotate(Count('is_win'))
+    annotations = PlayerMatchSummary.objects.filter(player=player, match__validity=Match.LEGIT).values('hero__machine_name','is_win').annotate(Count('is_win'))
     annotations = annotations.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
     annotations = annotations.filter(match__start_time__gte=min_dt_utc)
     annotations = annotations.filter(match__start_time__lte=max_date_utc)
@@ -155,7 +156,7 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
 
 
     player = Player.objects.get(steam_id=player_id)
-    pms = PlayerMatchSummary.objects.filter(player=player).select_related()
+    pms = PlayerMatchSummary.objects.filter(player=player, match__validity=Match.LEGIT).select_related()
     pms = pms.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
     pms = pms.filter(match__start_time__gte=min_dt_utc)
     pms = pms.filter(match__start_time__lte=max_date_utc)

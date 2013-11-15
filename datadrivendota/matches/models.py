@@ -25,6 +25,18 @@ class Match(models.Model):
     game_mode = models.ForeignKey('GameMode')
     skill=models.IntegerField(default=0,
         help_text='How valve denotes skill bracket.  1 is normal, 2 is high, 3 is very high, 0 is my not-assigned')
+
+    UNPROCESSED = 0
+    LEGIT = 1
+    UNCOUNTED = 2
+
+    VALIDITY_CHOICES = (
+        (UNPROCESSED,'Unprocessed'),
+        (LEGIT,'Legitimate'),
+        (UNCOUNTED,'Abandoned'),
+        )
+    validity = models.IntegerField(choices=VALIDITY_CHOICES, default=UNPROCESSED)
+
     class Meta:
         verbose_name_plural = 'matches'
         ordering = ['-start_time']

@@ -3,7 +3,7 @@ from django.core.files import File
 from rpy2 import robjects
 from rpy2.robjects import FloatVector, StrVector
 from rpy2.robjects.packages import importr
-from matches.models import PlayerMatchSummary
+from matches.models import PlayerMatchSummary, Match
 from datadrivendota.r import enforceTheme, s3File, FailFace
 from datadrivendota.utilities import safen
 
@@ -14,7 +14,8 @@ def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
     selected_summaries = PlayerMatchSummary.objects.filter(
         player__steam_id__in=player_list,
-        match__game_mode__steam_id__in=mode_list)
+        match__game_mode__steam_id__in=mode_list,
+        match__validity=Match.LEGIT)
     selected_summaries = selected_summaries.select_related()
     if len(selected_summaries)==0:
         return FailFace()
