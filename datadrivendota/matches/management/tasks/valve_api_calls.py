@@ -435,8 +435,8 @@ class RefreshPlayerMatchDetail(BaseTask):
         for counter, user in enumerate(users, start = 1):
             context = ApiContext()
             context.account_id=user.steam_id
-            context.matches_requested=100
-            context.matches_desired=100
+            context.matches_requested=20
+            context.matches_desired=20
             context.deepcopy=True
             context.start_scrape_time=now()
             context.last_scrape_time=user.last_scrape_time
