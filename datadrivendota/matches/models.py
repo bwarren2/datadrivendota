@@ -51,6 +51,7 @@ class GameMode(models.Model):
                                    max_length=50)
     is_competitive = models.BooleanField(help_text="""Whether charts should
         show this mode by default""", default=False)
+    visible = models.BooleanField(default=False)
     class Meta:
         ordering = ['steam_id']
     def __unicode__(self):

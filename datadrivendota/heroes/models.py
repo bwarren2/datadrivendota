@@ -18,7 +18,7 @@ class Hero(models.Model):
     mugshot = models.ImageField(null=True, upload_to='heroes/img/',
                                 max_length=150)
     thumbshot = models.ImageField(null=True, upload_to='heroes/img/')
-
+    visible = models.BooleanField(default=False)
     class Meta:
         verbose_name_plural = 'heroes'
         ordering = ['name']
