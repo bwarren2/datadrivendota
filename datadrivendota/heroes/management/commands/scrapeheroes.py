@@ -21,7 +21,11 @@ class Command(BaseCommand):
             print(row)
             try:
                 hero = Hero.objects.get(steam_id=row['id'])
-
+                hero.name = row['localized_name']
+                hero.internal_name = row['name']
+                hero.machine_name = slugify(row['localized_name'])
+                hero.steam_id = row['id']
+                hero.save()
             except Hero.DoesNotExist:
                 hero = Hero(name=row['localized_name'],
                             internal_name=row['name'],
