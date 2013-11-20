@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        prefix = "http://www.dota2wiki.com"
+        prefix = "http://dota2.gamepedia.com/"
         all_heroes = Hero.objects.exclude(name='')
         for h in all_heroes:
 
@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
             #Lore section
             undername = h.name.replace(" ", "_")
-            herourl = prefix+"/wiki/"+undername
+            herourl = prefix+undername
             try:
 
                 html = urlopen(herourl).read()
