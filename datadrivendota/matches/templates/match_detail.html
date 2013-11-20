@@ -43,7 +43,12 @@
           <td>{{ summary.last_hits }}</td>
           <td>{{ summary.denies }}</td>
           <td>{{ summary.hero.name }}</td>
+
+          {% if summary.hero.thumbshot %}
           <td><img src="{{ summary.hero.thumbshot.url }}" width="50%" height="50%"></td>
+          {% else %}
+          <td></td>
+          {% endif %}
           <td>{{ summary.gold_per_min }}</td>
           <td>{{ summary.xp_per_min }}</td>
           <td>{{ summary.hero_damage }}</td>

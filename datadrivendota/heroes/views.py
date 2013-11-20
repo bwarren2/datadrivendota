@@ -39,13 +39,14 @@ def index(request):
 
 
 @login_required
-@devserver_profile(follow=[HeroPerformanceChart])
+#@devserver_profile(follow=[HeroPerformanceChart])
 def detail(request, hero_name):
     hero_slug = slugify(hero_name)
     current_hero = get_object_or_404(Hero, machine_name=hero_slug)
+    charts = []
+    """
     game_modes = GameMode.objects.filter(is_competitive=True)
     game_mode_list = [gm.steam_id for gm in game_modes]
-    charts = []
     image = HeroPerformanceChart(
               hero = current_hero.steam_id,
               player=None,
@@ -85,7 +86,7 @@ def detail(request, hero_name):
         )
     base3 = basename(image.name)
     charts.append(base3)
-    print charts
+    """
     return render(request, 'heroes_detail.html', {'hero': current_hero,
                            'charts':charts})
 
@@ -198,12 +199,15 @@ def speedtest2(request):
     return render(request, 'speedtest.html',
                               {'imagebase': imagebase})
 
+def test(request):
+    return render(request, 'test.html')
+
 
 def hero_list(request):
 
     if request.is_ajax():
         q = request.GET.get('term', '')
-        heroes = Hero.objects.filter(name__icontains = q, visible=True )[:20]
+        heroes = Hero.objects.filter(name__icontains = q, visible=True)[:20]
         results = []
         for hero in heroes:
             hero_json = {}
@@ -216,3 +220,34 @@ def hero_list(request):
         data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
+
+def hero_performance_api(request):
+    if request.is_ajax():
+        hero_name = request.GET.get('hero', None)
+        x_var = request.GET.get('x_var', None)
+        y_var = request.GET.get('y_var', None)
+        group_var = request.GET.get('group_var', None)
+        split_var = request.GET.get('split_var', None)
+        hero = Hero.objects.get(name = hero_name)
+        game_modes = GameMode.objects.filter(is_competitive=True)
+        game_mode_list = [gm.steam_id for gm in game_modes]
+        image = HeroPerformanceChart(
+                  hero = hero.steam_id,
+                  player=None,
+                  game_mode_list = game_mode_list,
+                  x_var = x_var,
+                  y_var = y_var,
+                  group_var = group_var,
+                  split_var = split_var,
+                  width=350,
+                  height=350
+                )
+        imagebase = basename(image.name)
+        response_data = {}
+        response_data['result'] = 'success'
+        response_data['url'] = settings.MEDIA_URL+imagebase
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    else:
+        data = 'fail'
+        mimetype = 'application/json'
+        return HttpResponse(data, mimetype)

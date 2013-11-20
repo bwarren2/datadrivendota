@@ -1,15 +1,18 @@
 {% extends "hero_base.html" %}
 
-{% block title %}Hero Performance{% endblock title %}
+{% block title %}Testingu!{% endblock title %}
 
-{% block page_title %}Hero Performance{% endblock page_title %}
+{% block page_title %}Testingu!{% endblock page_title %}
 
 {% block content %}
-  {% if imagebase %}
-    <div>
-      <img src="{{ MEDIA_URL }}{{ imagebase }}">
+    <div id='result'>
     </div>
-  {% endif %}
 {% endblock content %}
 
 
+<script type="text/javascript">
+    $( document ).ready(function() {
+        $( "#result" ).load( {% url "heroes:hero_stats" %} +'?'+ $.param({
+        hero: 1,}) );
+    });
+</script>
