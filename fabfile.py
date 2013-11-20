@@ -1,6 +1,12 @@
 from fabric.api import local
 
 
+def test(suite="all"):
+    if suite == 'all':
+        local('python -W ignore datadrivendota/manage.py test integration_tests')
+    else:
+        local('python -W ignore datadrivendota/manage.py test {suite}'.format(suite=suite))
+
 def hp():
     local('git push heroku master')
     local(collect_static())
