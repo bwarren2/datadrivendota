@@ -434,3 +434,7 @@ PIPELINE_COMPILERS = (
 )
 ########## END PIPELINE CONFIGURATION
 
+# Tests
+# Thorny!
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = ['--with-yanc', '--stop']
