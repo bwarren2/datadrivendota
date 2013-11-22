@@ -64,7 +64,7 @@ class Command(BaseCommand):
             except KeyError:
                 pass
 
-            """
+
             url = 'http://media.steampowered.com/apps/dota2/images/abilities/{ability}_hp2.png'.format(ability=ability)
             try:
                 imgdata = urlopen(url)
@@ -75,7 +75,7 @@ class Command(BaseCommand):
             except HTTPError, err:
                 ab.picture = None
                 print "No mugshot for %s!  Error %s" % (ability, err)
-            """
+
 
             ab.save()
 
