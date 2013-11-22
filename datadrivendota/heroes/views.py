@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
-from .models import Hero
+from .models import Hero, Ability
 from matches.models import GameMode
 
 from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, \
@@ -43,6 +43,7 @@ def index(request):
 def detail(request, hero_name):
     hero_slug = slugify(hero_name)
     current_hero = get_object_or_404(Hero, machine_name=hero_slug)
+    abilities = Ability.objects.filter(is_core=True,hero=current_hero)
     charts = []
     """
     game_modes = GameMode.objects.filter(is_competitive=True)
@@ -88,6 +89,7 @@ def detail(request, hero_name):
     charts.append(base3)
     """
     return render(request, 'heroes_detail.html', {'hero': current_hero,
+                           'abilities': abilities,
                            'charts':charts})
 
 @devserver_profile(follow=[generateChart])
@@ -251,3 +253,9 @@ def hero_performance_api(request):
         data = 'fail'
         mimetype = 'application/json'
         return HttpResponse(data, mimetype)
+
+def ability_detail(request, ability_name):
+    ability = get_object_or_404(Ability, machine_name=ability_name)
+    charts = []
+    return render(request, 'ability_detail.html', {'ability': ability,
+                           'charts':charts})
