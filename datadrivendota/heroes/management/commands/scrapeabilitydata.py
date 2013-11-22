@@ -88,7 +88,7 @@ class Command(BaseCommand):
                             asv = AbilitySpecialValues.objects.get_or_create(ability=ab,key=key)[0]
                             asv.value = value
 
-                        asv.save()
+                            asv.save()
             except KeyError:
                 pass
 
