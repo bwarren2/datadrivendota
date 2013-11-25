@@ -9,7 +9,9 @@ class ActiveNode(template.Node):
         self.main_nav = main_nav
 
     def render(self, context):
-        request = context['request']
+        request = context.get('request')
+        if request is None:
+            return ""
         try:
             if self.main_nav and request.resolver_match.namespace:
                 full_url_name = '{namespace}'.format(
@@ -31,6 +33,7 @@ class ActiveNode(template.Node):
                 return ""
         except AttributeError:
             return ""
+
 
 @register.tag
 def active(parser, token):
