@@ -18,7 +18,7 @@ from .r import generateChart, lineupChart, HeroPerformanceChart,\
  HeroSkillLevelBwChart, speedtest1Chart, speedtest2Chart
 
 try:
-    if 'devserver' not in settings.INSTALLED_APPS:
+    if 'devserver' not in settings.INSTALLED_APPS or not settings.DEBUG:
         raise ImportError
     from devserver.modules.profile import devserver_profile
 except ImportError:
