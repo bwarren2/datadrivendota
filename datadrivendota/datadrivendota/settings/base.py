@@ -288,7 +288,8 @@ THIRD_PARTY_APPS = (
     'social_auth',
     'storages',
     'djcelery',
-    'pipeline'
+    'pipeline',
+    'django_nose',
 )
 
 # Apps specific for this project go here.
