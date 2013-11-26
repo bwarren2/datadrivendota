@@ -1,8 +1,7 @@
 from optparse import make_option
-import json
-import urllib
+from json import loads
 from django.core.management.base import BaseCommand
-from heroes.models import HeroDossier, Hero
+from heroes.models import HeroDossier, Hero, Role, Assignment
 
 
 class Command(BaseCommand):
@@ -16,89 +15,80 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        with open('stats.json') as f:
+            stats = loads(f.read())['DOTAHeroes']
+        del stats['Version'] #Purge a junk field
+
+        mapping_dict = {
+          "MovementSpeed": "movespeed",
+          "AttackDamageMax": "max_dmg",
+          "AttackDamageMin": "min_dmg",
+          "StatusHealthRegen": "hp_regen",
+          "StatusManaRegen": "mana_regen",
+          "AttackRange": "range",
+          "AttributeBaseStrength": "strength",
+          "AttributeBaseAgility": "agility",
+          "AttributeBaseIntelligence": "intelligence",
+          "AttributeStrengthGain": "strength_gain",
+          "AttributeAgilityGain": "agility_gain",
+          "AttributeIntelligenceGain": "intelligence_gain",
+          "AttackRate": "base_atk_time",
+          "VisionDaytimeRange": "day_vision",
+          "VisionNighttimeRange": "night_vision",
+          "AttackAnimationPoint": "atk_point",
+          "MovementTurnRate": "turn_rate",
+        }
+
         """
-        This function pulls either a JSON of your choosing, or the all-heroes
-        data dump from jankdota and uploads those figures into the HeroDossier
-        model.  NOTE: there is a hard conversion from "Wisp" to "Io" and the
-        import only occurs for things in the data.  Completeness test would
-        probably be good eventually.  Also, currently things overwrite on
-        import; change the 'or True' below to address that.
+        atk_backswing = models.FloatField()
+        cast_point = models.FloatField()
+        cast_backswing = models.FloatField()
         """
-        if options['source_file'] is None:
-            print("You did not specify a file; using a URL pull")
-            url = "http://dotaheroes.herokuapp.com/heroes/all"
-            datafile = urllib.urlretrieve(url)[0]
-        else:
-            datafile = options['source_file']
 
-        data = json.loads(open(datafile).read())
+        alignment_dict = {"DOTA_ATTRIBUTE_INTELLECT": HeroDossier.INTELLIGENCE,
+        "DOTA_ATTRIBUTE_AGILITY": HeroDossier.AGILITY,
+        "DOTA_ATTRIBUTE_STRENGTH": HeroDossier.STRENGTH}
 
-        for key, row in data.iteritems():
-            print row
-            alignment_dict = {0: 'strength', 1: 'agility', 2: 'intelligence'}
+        #Core ability attributes
+        for machine_name, data_dict in stats.iteritems():
+            if machine_name !='npc_dota_hero_base':
+                print machine_name, data_dict['HeroID']
 
-            # Yes, I know this is awful.  I am doc'ing it at the top.  It is not
-            # my fault that the character had a name change and not everyone is
-            # with it.
-            if row['Name'] == 'Wisp':
-                row['Name'] = 'Io'
+                if machine_name == 'npc_dota_hero_undying':
+                    pass
+                hero = Hero.objects.get(steam_id=data_dict['HeroID'])
 
-            hero = Hero.objects.get(name=row['Name'])
-            defaultdict = {'movespeed': row['Movespeed'],
-                         'max_dmg': row['MaxDmg'],
-                         'min_dmg': row['MinDmg'],
-                         'hp': row['HP'],
-                         'mana': row['Mana'],
-                         'hp_regen': row['HPRegen'],
-                         'mana_regen': row['ManaRegen'],
-                         'armor': row['Armor'],
-                         'range': row['Range'],
-                         'projectile_speed': row['ProjectileSpeed'],
-                         'strength': row['BaseStr'],
-                         'agility': row['BaseAgi'],
-                         'intelligence': row['BaseInt'],
-                         'strength_gain': row['StrGain'],
-                         'agility_gain': row['AgiGain'],
-                         'intelligence_gain': row['IntGain'],
-                         'alignment': alignment_dict[row['PrimaryStat']],
-                         'base_atk_time': row['BaseAttackTime'],
-                         'day_vision': row['DayVision'],
-                         'night_vision': row['NightVision'],
-                         'atk_point': row['AttackPoint'],
-                         'atk_backswing':  row['AttackSwing'],
-                         'cast_point': row['CastPoint'],
-                         'cast_backswing': row['CastSwing'],
-                         'turn_rate': row['Turnrate'],
-                         'legs': row['Legs'],
-            }
+                default_dict = {}
+                for valve_name, my_name in mapping_dict.iteritems():
+                    trait = data_dict.get(valve_name,stats['npc_dota_hero_base'][valve_name])
+                    if trait is not None:
+                        default_dict[my_name]=trait
 
-            dossier, created = HeroDossier.objects.get_or_create(hero=hero, defaults=defaultdict)
-            if created or True:
+                default_dict['armor'] = float(default_dict['agility'])/7.0 + float(data_dict.get('ArmorPhysical',
+                                    stats['npc_dota_hero_base']['ArmorPhysical']))
+                default_dict['hp'] = float(default_dict['strength'])*19+150
+                default_dict['alignment'] = alignment_dict[data_dict['AttributePrimary']]
+                default_dict['mana'] = float(default_dict['intelligence'])*13
+                default_dict['projectile_speed'] = data_dict.get("ProjectileSpeed",0) if data_dict.get("ProjectileSpeed",0)!='' else 0
 
-                dossier.movespeed = row['Movespeed']
-                dossier.max_dmg = row['MaxDmg']
-                dossier.min_dmg = row['MinDmg']
-                dossier.hp = row['HP']
-                dossier.mana = row['Mana']
-                dossier.hp_regen = row['HPRegen']
-                dossier.mana_regen = row['ManaRegen']
-                dossier.range = row['Range']
-                dossier.projectile_speed = row['ProjectileSpeed']
-                dossier.strength = row['BaseStr']
-                dossier.agility = row['BaseAgi']
-                dossier.intelligence = row['BaseInt']
-                dossier.armor = row['Armor']
-                dossier.strength_gain = row['StrGain']
-                dossier.agility_gain = row['AgiGain']
-                dossier.intelligence_gain = row['IntGain']
-                dossier.alignment = alignment_dict[row['PrimaryStat']]
-                dossier.base_atk_time = row['BaseAttackTime']
-                dossier.day_vision = row['DayVision']
-                dossier.night_vision = row['NightVision']
-                dossier.atk_point = row['AttackPoint']
-                dossier.atk_backswing = row['AttackSwing']
-                dossier.cast_point = row['CastPoint']
-                dossier.cast_backswing = row['CastSwing']
-                dossier.turn_rate = row['Turnrate']
-                dossier.legs = row['Legs']
-            dossier.save()
+                dos, created = HeroDossier.objects.get_or_create(hero=hero, defaults=default_dict)
+
+                if not created:
+                    for field, value in default_dict.iteritems():
+                        setattr(dos,field,value)
+                dos.save()
+
+
+                key = "Role"
+                role_list = data_dict.get(key).split(",")
+                key = "Rolelevels"
+                role_level_list = data_dict.get(key).split(",")
+                if role_list !=['']:
+                    role_data = zip(role_list, role_level_list)
+                    for role, level in role_data:
+                        r = Role.objects.get_or_create(name=role)[0]
+                        assignment = Assignment.objects.get_or_create(hero=hero,
+                            role = r,
+                            magnitude = int(level))[0]
+                        assignment.save()
+

@@ -3,6 +3,39 @@ from django.utils.text import slugify
 # For the name, internal_name, and valve_id, see:
 # https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?key=<YOURKEY>&language=en_us
 
+class Role(models.Model):
+
+    LANESUPPORT = 'LaneSupport'
+    CARRY = 'Carry'
+    DISABLER = 'Disabler'
+    GANKER = 'Ganker'
+    NUKER = 'Nuker'
+    INITIATOR = 'Initiator'
+    JUNGLER = 'Jungler'
+    PUSHER = 'Pusher'
+    ROAMER = 'Roamer'
+    DURABLE = 'Durable'
+    ESCAPE = 'Escape'
+    SUPPORT = 'Support'
+    ROLES = (
+        (LANESUPPORT, 'Lane Support'),
+        (CARRY, 'Carry'),
+        (DISABLER, 'Disabler'),
+        (GANKER, 'Ganker'),
+        (NUKER, 'Nuker'),
+        (INITIATOR, 'Initiator'),
+        (JUNGLER, 'Jungler'),
+        (PUSHER, 'Pusher'),
+        (ROAMER, 'Roamer'),
+        (DURABLE, 'Durable'),
+        (ESCAPE, 'Escape'),
+        (SUPPORT, 'Support')
+    )
+    name = models.CharField(max_length=50, choices=ROLES, unique=True)
+    desc = models.TextField()
+    def __unicode__(self):
+        return self.name
+
 
 class Hero(models.Model):
     name = models.CharField(max_length=200,
@@ -14,11 +47,10 @@ class Hero(models.Model):
 
     steam_id = models.PositiveIntegerField(unique=True, help_text="Valve's int")
     lore = models.TextField(null=True)
-    role = models.ManyToManyField('Role')
     mugshot = models.ImageField(null=True, upload_to='heroes/img/')
     thumbshot = models.ImageField(null=True, upload_to='heroes/img/')
     visible = models.BooleanField(default=False)
-
+    roles = models.ManyToManyField(Role, through='Assignment')
     class Meta:
         verbose_name_plural = 'heroes'
         ordering = ['name']
@@ -33,28 +65,11 @@ class Hero(models.Model):
         self.machine_name = slugify(unicode(self.name))
         super(Hero, self).save(*args, **kwargs)
 
+class Assignment(models.Model):
+    hero = models.ForeignKey('Hero')
+    role = models.ForeignKey('Role')
+    magnitude = models.IntegerField()
 
-class Role(models.Model):
-    ROLES = (
-        ('LaneSupport', 'Lane Support'),
-        ('Carry', 'Carry'),
-        ('Disabler', 'Disabler'),
-        ('Ganker', 'Ganker'),
-        ('Nuker', 'Nuker'),
-        ('Initiator', 'Initiator'),
-        ('Jungler', 'Jungler'),
-        ('Pusher', 'Pusher'),
-        ('Roamer', 'Roamer'),
-        ('Durable', 'Durable'),
-        ('Escape', 'Escape'),
-        ('Support', 'Support')
-    )
-
-    name = models.CharField(max_length=50, choices=ROLES, unique=True)
-    desc = models.TextField()
-
-    def __unicode__(self):
-        return self.name
 
 
 class Ability(models.Model):
@@ -133,10 +148,14 @@ class AbilityUnitTargetTeam(models.Model):
 
 
 class HeroDossier(models.Model):
+    STRENGTH = 'strength'
+    AGILITY = 'agility'
+    INTELLIGENCE = 'intelligence'
+
     STAT_ALIGNMENTS = (
-        ('strength', 'strength'),
-        ('agility', 'agility'),
-        ('intelligence', 'intelligence'),
+        (STRENGTH, 'strength'),
+        (AGILITY, 'agility'),
+        (INTELLIGENCE, 'intelligence'),
     )
     hero = models.OneToOneField('Hero')
     movespeed = models.IntegerField()
@@ -162,11 +181,11 @@ class HeroDossier(models.Model):
     day_vision = models.IntegerField()
     night_vision = models.IntegerField()
     atk_point = models.FloatField()
-    atk_backswing = models.FloatField()
-    cast_point = models.FloatField()
-    cast_backswing = models.FloatField()
+    atk_backswing = models.FloatField(default=0)
+    cast_point = models.FloatField(default=0)
+    cast_backswing = models.FloatField(default=0)
     turn_rate = models.FloatField()
-    legs = models.IntegerField()
+    legs = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.hero.name
