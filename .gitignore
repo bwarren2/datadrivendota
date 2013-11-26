@@ -42,3 +42,6 @@ convenience files/
 #Common data failure output
 failface.png
 
+# SublimeText cruft
+datadrivendota.sublime-project
+datadrivendota.sublime-workspace
