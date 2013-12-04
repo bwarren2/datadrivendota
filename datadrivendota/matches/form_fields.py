@@ -1,24 +1,22 @@
 from django import forms
-from django.forms.widgets import CheckboxSelectMultiple
-from matches.models import GameMode
+from .models import GameMode
 
 __all__ = (
     'MultiGameModeSelect',
 )
 
 
-game_modes = GameMode.objects.filter(visible=True)
-game_mode_choices = [(gm.steam_id, gm.description) for gm in game_modes]
+GAME_MODES = GameMode.objects.filter(visible=True)
+GAME_MODE_CHOICES = [(gm.steam_id, gm.description) for gm in GAME_MODES]
 
-game_modes = GameMode.objects.filter(is_competitive=True, visible=True)
-game_mode_defaults = [gm.steam_id for gm in game_modes]
+GAME_MODES = GameMode.objects.filter(is_competitive=True, visible=True)
+GAME_MODE_DEFAULTS = [gm.steam_id for gm in GAME_MODES]
 
 
 class MultiGameModeSelect(forms.MultipleChoiceField):
-
-    widget = CheckboxSelectMultiple
+    widget = forms.SelectMultiple(attrs={'class': 'multi-game-mode'})
 
     def __init__(self, *args, **kwargs):
         super(MultiGameModeSelect, self).__init__(*args, **kwargs)
-        self.choices = game_mode_choices
-        self.initial = game_mode_defaults
+        self.choices = GAME_MODE_CHOICES
+        self.initial = GAME_MODE_DEFAULTS
