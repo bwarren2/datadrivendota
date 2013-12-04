@@ -209,6 +209,13 @@ SECRET_KEY = getenv('SECRET_KEY')
 ########## END SECRET CONFIGURATION
 
 
+########## INTERCOM CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
+# Note: This key only used for development and testing.
+INTERCOM_API_SECRET = getenv('INTERCOM_API_SECRET')
+########## END INTERCOM CONFIGURATION
+
+
 ########## FIXTURE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-FIXTURE_DIRS
 FIXTURE_DIRS = (

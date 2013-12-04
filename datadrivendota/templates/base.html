@@ -1,4 +1,4 @@
-{% load staticfiles compressed navigation_extras %}
+{% load staticfiles compressed navigation_extras steam_extras intercom_extras %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -138,5 +138,57 @@
     });
     </script>
     {% endblock extra_js %}
+
+    {% if request.user.is_authenticated %}
+      <script id="IntercomSettingsScriptTag">
+        window.intercomSettings = {
+          user_id: "{% steam_id request.user %}",
+          created_at: {{ request.user.date_joined|date:"U" }},
+          user_hash: "{% intercom_user_hash request.user %}",
+          widget: {
+            activator: "#IntercomDefaultWidget"
+          },
+          app_id: "e089370216a8acf00a4718fd341c87883461a240",
+          // Custom data
+          steam_id: "{% steam_id request.user %}",
+          name: "{{ request.user.username }}",
+          avatar: "{% steam_avatar request.user %}"
+        };
+      </script>
+      <script>
+        (function () {
+          var w = window;
+          var ic = w.Intercom;
+          if (typeof ic === "function") {
+            ic('reattach_activator');
+            ic('update', intercomSettings);
+          } else {
+            var d = document;
+            var i = function () {
+              i.c(arguments)
+            };
+            i.q = [];
+            i.c = function (args) {
+              i.q.push(args)
+            };
+            w.Intercom = i;
+            function l() {
+              var s = d.createElement('script');
+              s.type = 'text/javascript';
+              s.async = true;
+              s.src = 'https://static.intercomcdn.com/intercom.v1.js';
+              var x = d.getElementsByTagName('script')[0];
+              x.parentNode.insertBefore(s, x);
+            }
+            if (w.attachEvent) {
+              w.attachEvent('onload', l);
+            } else {
+              w.addEventListener('load', l, false);
+            }
+          };
+        })()
+      </script>
+    {% endif %}
+
   </body>
 </html>
