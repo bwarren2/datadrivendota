@@ -8,7 +8,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
 from .models import Hero, Ability
 from matches.models import GameMode
 
@@ -31,14 +31,14 @@ except ImportError:
             return wraps(func)(nothing)
 
 
-
+@permission_required('players.can_look')
 def index(request):
     hero_list = Hero.objects.all().order_by('name')
 
     return render(request, 'hero_index.html', {'hero_list': hero_list})
 
 
-@login_required
+@permission_required('players.can_look')
 #@devserver_profile(follow=[HeroPerformanceChart])
 def detail(request, hero_name):
     hero_slug = slugify(hero_name)
@@ -92,6 +92,7 @@ def detail(request, hero_name):
                            'abilities': abilities,
                            'charts':charts})
 
+@permission_required('players.can_look')
 @devserver_profile(follow=[generateChart])
 def vitals(request):
 
@@ -121,6 +122,7 @@ def vitals(request):
     return render(request, 'hero_form.html', {'form': hero_form,
                                                 'title':"Hero Vitals"})
 
+@permission_required('players.can_look')
 @devserver_profile(follow=[lineupChart])
 def lineup(request):
 
@@ -143,6 +145,7 @@ def lineup(request):
     return render(request, 'hero_form.html', {'form': hero_form,
                                                  'title':'Hero Lineups'})
 
+@permission_required('players.can_touch')
 @devserver_profile(follow=[HeroPerformanceChart])
 def hero_performance(request):
     if request.method=='POST':
@@ -166,7 +169,7 @@ def hero_performance(request):
 
     return render(request, 'hero_form.html',{'form': hero_form,
                                                 'title':'Hero Performance'})
-
+@permission_required('players.can_touch')
 @devserver_profile(follow=[HeroSkillLevelBwChart])
 def hero_skill_bars(request):
     if request.method=='POST':
@@ -187,6 +190,7 @@ def hero_skill_bars(request):
     return render(request, 'hero_form.html',{'form': hero_form,
                                                 'title': 'Hero Skill Times'})
 
+@permission_required('players.can_touch')
 @devserver_profile(follow=[speedtest1Chart])
 def speedtest1(request):
     image = speedtest1Chart()
@@ -194,6 +198,7 @@ def speedtest1(request):
     return render(request, 'speedtest.html',
                               {'imagebase': imagebase})
 
+@permission_required('players.can_touch')
 @devserver_profile(follow=[speedtest2Chart, render])
 def speedtest2(request):
     image = speedtest2Chart()

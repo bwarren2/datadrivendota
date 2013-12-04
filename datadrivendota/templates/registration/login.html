@@ -9,32 +9,31 @@ Login!
 {%endblock title %}
 
 {% block page_title %}
-This is a login page
+We are in closed beta
 {%endblock page_title %}
-
+<h2>If you have an upgrade code, log in to use it.</h2>
 
 {% block content %}
 
+{% if not request.user.is_anonymous %}
 
-Login with <a href="{% url 'socialauth_begin' 'steam' %}">Steam</a>
 <section>
-<form method='POST' action='.'>
-    {% csrf_token %}
-    <p>
-        <label for="id_username">Username:</label>
-        {{form.username}}
-    </p>
-    <p>
-        <label for="id_password">Password:</label>
-        {{form.password}}
-    </p>
-    {% if next %}
-        <input type='hidden' name='next' value='{{next}}'/>
-    {% else %}
-        <input type='hidden' name='next' value='/'>  
-    {% endif %}
+    <h3>Upgrade your account with an invitation code</h3>
+    <form method='POST' action='.'>
+        {% csrf_token %}
+        <p>
+            <label for="invite_code">Code:</label>
+            {{form.username}}
+        </p>
+        <input type='hidden' name='next' value='/'>
         <input type='submit' value='login'>
 
-</form>
+    </form>
 </section>
+
+<section>
+{% endif %}
+Log into a validated account with <a href="{% url 'social:begin' 'steam' %}">Steam</a>
+</section>
+
 {%endblock content %}

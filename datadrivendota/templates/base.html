@@ -46,7 +46,11 @@
           {% if user.is_active %}
           <li><a href="{% url 'logout' %}">Logout, {{user}}?</a></li>
           {% else %}
+          {% comment %}
+
           <li><a href="{% url 'socialauth_begin' 'steam' %}">Login</a></li>
+          {% endcomment %}
+          <li><a href="{% url 'login' %}">Login</a></li>
           {% endif %}
         </ul>
       </div><!-- /.navbar-collapse -->

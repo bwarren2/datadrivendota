@@ -6,7 +6,7 @@ from .forms import EndgameSelect
 from .r import EndgameChart, MatchParameterScatterplot
 from .models import Match, PlayerMatchSummary
 from django.conf import settings
-
+from django.contrib.auth.decorators import permission_required
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
         raise ImportError
@@ -20,7 +20,7 @@ except ImportError:
                 return func(*args, **kwargs)
             return wraps(func)(nothing)
 
-
+@permission_required('players.can_look')
 def match(request, match_id):
     match = get_object_or_404(Match, steam_id=match_id)
     summaries = get_list_or_404(PlayerMatchSummary, match=match)
@@ -40,6 +40,7 @@ def match(request, match_id):
                               'xg_basename': xg_basename,
                               })
 
+@permission_required('players.can_look')
 def index(request):
     match_list = Match.objects.filter(duration__gte=1500)[:10]
     for match in match_list:
@@ -47,6 +48,7 @@ def index(request):
       match.display_duration = str(datetime.timedelta(seconds=match.duration))
     return render(request, 'matches_index.html', {'match_list': match_list})
 
+@permission_required('players.can_touch')
 @devserver_profile(follow=[EndgameChart])
 def endgame(request):
     if request.method == 'POST':

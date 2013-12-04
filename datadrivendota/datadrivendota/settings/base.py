@@ -285,7 +285,7 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     # Database migration helpers:
     'south',
-    'social_auth',
+    'social.apps.django_app.default',
     'storages',
     'djcelery',
     'pipeline'
@@ -348,7 +348,7 @@ WSGI_APPLICATION = 'wsgi.application'
 LOGIN_URL = '/login/'
 
 AUTHENTICATION_BACKENDS = (
-    'social_auth.backends.steam.SteamBackend',
+    'social.backends.steam.SteamOpenId',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -365,23 +365,30 @@ MIN_MATCH_LENGTH = 600
 
 
 
+###############SOCIAL AUTH
 SOCIAL_AUTH_PIPELINE = (
-    'social_auth.backends.pipeline.social.social_auth_user',
-    #'social_auth.backends.pipeline.associate.associate_by_email',
-    'social_auth.backends.pipeline.user.get_username',
-    'social_auth.backends.pipeline.user.create_user',
-    'social_auth.backends.pipeline.social.associate_user',
-    'social_auth.backends.pipeline.social.load_extra_data',
-    'social_auth.backends.pipeline.user.update_user_details'
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'social.pipeline.user.get_username',
+    'social.pipeline.mail.mail_validation',
+    'social.pipeline.user.create_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details'
 )
 
-SOCIAL_AUTH_ENABLED_BACKENDS = ('steam',)
-SOCIAL_AUTH_COMPLETE_URL_NAME = 'socialauth_complete'
+
+SOCIAL_AUTH_STEAM_API_KEY = STEAM_API_KEY
+#SOCIAL_AUTH_ENABLED_BACKENDS = ('steam',)
+"""SOCIAL_AUTH_COMPLETE_URL_NAME = 'socialauth_complete'
 SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'associate_complete'
 SOCIAL_AUTH_DEFAULT_USERNAME = 'socialauth_default_username'
 SOCIAL_AUTH_EXTRA_DATA = False
 SOCIAL_AUTH_CHANGE_SIGNAL_ONLY = True
-SOCIAL_AUTH_ASSOCIATE_BY_EMAIL = True
+SOCIAL_AUTH_ASSOCIATE_BY_EMAIL = False"""
+VALID_KEY_DAYS = 7
 ########## END LOGIN CONFIGURATION
 
 
@@ -438,3 +445,6 @@ PIPELINE_COMPILERS = (
 # Thorny!
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--with-yanc', '--stop']
+
+
+

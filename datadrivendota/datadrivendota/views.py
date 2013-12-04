@@ -1,15 +1,8 @@
-from django.contrib.auth import logout
-from django.http import HttpResponseRedirect
+#from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.contrib.auth.decorators import permission_required
 
-def logout_page(request):
-    """
-    Log out the user.
-    """
-    logout(request)
-    return HttpResponseRedirect('/')
-
-
+@permission_required('players.can_look')
 def base(request):
 
     if request.user.is_anonymous() or \

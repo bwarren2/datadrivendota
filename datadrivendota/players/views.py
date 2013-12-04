@@ -1,12 +1,12 @@
 import json
 from functools import wraps
 from django.conf import settings
-from django.http import HttpResponseNotFound, HttpResponse
+from django.http import  HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.decorators import permission_required
 from os.path import basename
 from .models import Player
 from .r import KDADensity, CountWinrate, PlayerTimeline
-from urllib import unquote
 from .forms import PlayerWinrateLevers, PlayerTimelineForm
 from matches.models import PlayerMatchSummary
 import datetime
@@ -23,13 +23,14 @@ except ImportError:
                 return func(*args, **kwargs)
             return wraps(func)(nothing)
 
-
+@permission_required('players.can_look')
 def index(request):
     player_list = Player.objects.filter(updated=True)
     return render(request, 'player_index.html', {'player_list':player_list})
 
+@permission_required('players.can_look')
 def detail(request, player_id=None):
-    player = validate_player_credentials(player_id)
+    player = get_object_or_404(Player, steam_id=player_id)
     kda = KDADensity(player.steam_id)
     kdabase = basename(kda.name)
     winrate = CountWinrate(player.steam_id)
@@ -40,7 +41,7 @@ def detail(request, player_id=None):
                                'winratebase':winratebase,
                                'winrate':winrate})
 
-
+@permission_required('players.can_touch')
 @devserver_profile(follow=[CountWinrate])
 def winrate(request):
     if request.method == 'POST':
@@ -63,6 +64,7 @@ def winrate(request):
     return render(request, 'player_form.html', {'form': winrate_form,
                                        'title':'Hero Winrate'})
 
+@permission_required('players.can_touch')
 @devserver_profile(follow=[PlayerTimeline])
 def timeline(request):
     if request.method == 'POST':
@@ -85,8 +87,9 @@ def timeline(request):
     return render(request, 'player_form.html', {'form': timeline_form,
                               'title':'Player Timeline'})
 
+@permission_required('players.can_look')
 def player_matches(request, player_name=None, player_id=None):
-  player = validate_player_credentials(player_id)
+  player = get_object_or_404(Player, steam_id=player_id)
   pms_list = PlayerMatchSummary.objects.select_related()
   pms_list = pms_list.filter(player=player).order_by('-match__start_time')[0:50]
   for pms in pms_list:
@@ -115,6 +118,3 @@ def player_list(request):
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
 
-def validate_player_credentials(player_id):
-    player = get_object_or_404(Player, steam_id=player_id)
-    return player
