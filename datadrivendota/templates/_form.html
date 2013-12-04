@@ -1,26 +1,13 @@
+{% load bootstrap %}
+
 {% if form.non_field_errors %}
   {% for error in form.non_field_errors %}
     <div class="alert alert-error">{{ error }}</div>
   {% endfor %}
 {% endif %}
 {% for field in form.hidden_fields %}
-  {{ field }}
+  {{ field|bootstrap }}
 {% endfor %}
 {% for field in form.visible_fields %}
-<div class="control-group{% if field.errors %} error{% endif %}" id="{{field.name}}_control_group">
-  <label class="control-label{% if field.field.required %} required{% endif %}" for="{{ field.html_name }}">
-    {{ field.label }}
-      {% if field.help_text %}
-        <span class='info glyphicon glyphicon-info-sign' data-toggle="tooltip"  title='{{ field.help_text }}' data-placement=right></span>
-      {% endif %}
-  </label>
-  <div class="controls">
-    {{ field }}
-    {% if field.errors %}
-      {% for error in field.errors %}
-        <span class="help-inline">{{ error }}</span>
-      {% endfor %}
-    {% endif %}
-  </div>
-</div>
+  {{ field|bootstrap }}
 {% endfor %}
