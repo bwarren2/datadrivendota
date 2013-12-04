@@ -1,23 +1,39 @@
 /*! project specific LESS goes here. */
 
-/*
-Trick or Treat palette:
-http://www.colourlovers.com/palette/54697/Trick_or_Treat
-Dark navy: #130912;
-Rich purple: #3e1c33;
-Purple: #602749;
-Ochre: #b14623;
-Pumpkin: #f6921d;
-*/
 @import url(http://fonts.googleapis.com/css?family=Cinzel+Decorative|Roboto:400,700,400italic,700italic);
 
-@body-bg: #3e1c33;
-@text-color: #f4cff1;
-@link-color: #f6921d;
-@link-color-hover: #b14623;
+/** Palettes:
+ * http://www.colourlovers.com/palette/1287232/good
+ * http://www.colourlovers.com/palette/1415456/my_caravan_queen
+ * http://www.colourlovers.com/palette/2828110/Jane_1
+ * http://www.colourlovers.com/palette/1676040/indian_summer (particularly good?)
+ * like SecretKey here: http://www.onextrapixel.com/2013/10/25/40-stunning-website-designs-with-great-color-schemes/
+    #3f3860
+    #90c5a9
+    #7a9a95
+    #ef6d3b
+    #fa8b60
+ */
+
+@body-bg: #3f3860;
+
+@brand-danger: #ef6d3b;
+@brand-info: #f6dca2;
+@brand-primary: #7a9a95;
+@brand-success: #90c5a9;
+@brand-warning: #fa8b60;
 
 @font-family-sans-serif: 'Roboto', sans-serif;
 @headings-font-family: 'Cinzel Decorative', cursive;
 @icon-font-path: '../bootstrap/fonts/';
 
-// @btn-primary-bg: #f4cff1;
+@nav-tabs-active-link-hover-bg: @brand-info;
+
+/*
+ * @navbar-inverse-bg: #3e1c33;
+ * @navbar-inverse-border: darken(@navbar-inverse-bg, 7.5%);
+ * @navbar-inverse-color: #f4cff1;
+ * @navbar-inverse-link-active-bg: darken(@navbar-inverse-bg, 7.5%);
+ */
+
+@text-color: #f6f7f0;

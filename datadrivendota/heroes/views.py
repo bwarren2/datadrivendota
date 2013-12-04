@@ -18,7 +18,7 @@ from .r import generateChart, lineupChart, HeroPerformanceChart,\
  HeroSkillLevelBwChart, speedtest1Chart, speedtest2Chart
 
 try:
-    if 'devserver' not in settings.INSTALLED_APPS:
+    if 'devserver' not in settings.INSTALLED_APPS or not settings.DEBUG:
         raise ImportError
     from devserver.modules.profile import devserver_profile
 except ImportError:
@@ -214,7 +214,7 @@ def hero_list(request):
 
     if request.is_ajax():
         q = request.GET.get('term', '')
-        heroes = Hero.objects.filter(name__icontains = q, visible=True)[:20]
+        heroes = Hero.objects.filter(name__icontains = q, visible=False)[:20]
         results = []
         for hero in heroes:
             hero_json = {}

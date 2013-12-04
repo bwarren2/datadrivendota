@@ -4,7 +4,7 @@ from heroes.models import Hero
 
 
 class SingleHeroSelect(forms.CharField):
-    widget = forms.TextInput(attrs={'class': 'single-hero-tags'})
+    widget = forms.HiddenInput(attrs={'class': 'single-hero-tags'})
 
     def clean(self, hero):
         if ',' in hero:
@@ -18,23 +18,19 @@ class SingleHeroSelect(forms.CharField):
 
 
 class MultiHeroSelect(forms.CharField):
-    widget = forms.TextInput(attrs={'class': 'multi-hero-tags'})
+    widget = forms.HiddenInput(attrs={'class': 'multi-hero-tags'})
 
     def clean(self, hero_str):
-        if ',' not in hero_str:
+        hero_list = hero_str.split(',')
+        return_hero_list = []
+        for hero in hero_list:
             try:
-                hero = Hero.objects.get(name=hero_str)
+                hero = Hero.objects.get(name=hero)
             except Hero.DoesNotExist:
-                raise ValidationError("%s is not a valid hero name" % hero_str)
-            return [hero.steam_id]
+                raise ValidationError("%s is not a valid hero name" % hero)
+            return_hero_list.append(hero.steam_id)
+        return return_hero_list
 
-        else:
-            hero_list = hero_str.split(',')
-            return_hero_list = []
-            for hero in hero_list:
-                try:
-                    hero = Hero.objects.get(name=hero)
-                except Hero.DoesNotExist:
-                    raise ValidationError("%s is not a valid hero name" % hero)
-                return_hero_list.append(hero.steam_id)
-            return return_hero_list
+
+class MultiLeveLSelect(forms.MultipleChoiceField):
+    widget = forms.SelectMultiple(attrs={'class': 'multi-level-tags'})

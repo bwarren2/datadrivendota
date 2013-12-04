@@ -1,0 +1,56 @@
+{% load bootstrap %}
+
+<div class="form-group{% if field.errors %} has-error{% endif %}">
+  {% if field|is_checkbox %}
+    <div class="{{ classes.single_value }}">
+      <div class="checkbox">
+        <label>
+          {{ field }} <span>{{ field.label }}</span>
+        </label>
+
+        {% if field.help_text %}
+          <span class='info glyphicon glyphicon-info-sign' data-toggle="tooltip"  title='{{ field.help_text }}' data-placement=right></span>
+        {% endif %}
+
+        {% for error in field.errors %}
+          <div class="help-block text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  {% elif field|is_radio %}
+    <label class="control-label {{ classes.label }}">{{ field.label }}</label>
+
+    {% if field.help_text %}
+      <span class='info glyphicon glyphicon-info-sign' data-toggle="tooltip"  title='{{ field.help_text }}' data-placement=right></span>
+    {% endif %}
+
+    <div class="{{ classes.value }}">
+      {% for choice in field %}
+        <div class="radio">
+          <label>
+            {{ choice.tag }}
+            {{ choice.choice_label }}
+          </label>
+        </div>
+      {% endfor %}
+
+      {% for error in field.errors %}
+        <div class="help-block text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <label class="control-label {{ classes.label }}" for="{{ field.auto_id }}">{{ field.label }}</label>
+
+    {% if field.help_text %}
+      <span class='info glyphicon glyphicon-info-sign' data-toggle="tooltip"  title='{{ field.help_text }}' data-placement=right></span>
+    {% endif %}
+
+    <div class="{{ classes.value }}">
+      {{ field }}
+
+      {% for error in field.errors %}
+        <div class="help-block text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

@@ -3,7 +3,7 @@ from django.forms import ValidationError
 from django.forms.widgets import CheckboxSelectMultiple
 from matches.form_fields import MultiGameModeSelect
 from players.form_fields import SinglePlayerField
-from .form_fields import MultiHeroSelect, SingleHeroSelect
+from .form_fields import MultiHeroSelect, SingleHeroSelect, MultiLeveLSelect
 from .utils import list_to_choice_list
 
 
@@ -115,7 +115,7 @@ class HeroPlayerPerformance(forms.Form):
     )
     player = SinglePlayerField(
         required=False,
-        help_text='Pick only one hero'
+        help_text='Pick only one player'
     )
     game_modes = MultiGameModeSelect(
         help_text='Which game modes would you like to sample?'
@@ -135,7 +135,7 @@ class HeroPlayerPerformance(forms.Form):
         initial='is_win',
         required=True,
         help_text=(
-            "Which variable breaks out the panels?  "
+            "Which variable breaks out the panels? "
             "Skill is valve's estimation of skill for teams in that match. "
             "1 is normal, 2 is high, 3 is very high."
         )
@@ -164,7 +164,7 @@ class HeroPlayerSkillBarsForm(forms.Form):
     game_modes = MultiGameModeSelect(
         help_text='Which game modes would you like to sample?'
     )
-    levels = forms.MultipleChoiceField(
+    levels = MultiLeveLSelect(
         choices=[(i, i) for i in range(1, 26)],
         required=True,
         initial=[6, 11, 16],

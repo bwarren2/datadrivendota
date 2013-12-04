@@ -288,7 +288,9 @@ THIRD_PARTY_APPS = (
     'social.apps.django_app.default',
     'storages',
     'djcelery',
-    'pipeline'
+    'pipeline',
+    'django_nose',
+    'bootstrapform',
 )
 
 # Apps specific for this project go here.
@@ -400,7 +402,8 @@ PIPELINE_CSS = {
     'all': {
         'source_filenames': (
             'css/custom_bootstrap_compilation.less',
-            'js/tags/jquery.tagsinput.css',
+            'select2-3.4.5/select2.css',
+            'select2-3.4.5/select2-bootstrap.css',
             'css/project.less'
         ),
         'output_filename': 'css/all.css',
@@ -429,7 +432,7 @@ PIPELINE_JS = {
             'bootstrap/js/collapse.js',
             'bootstrap/js/carousel.js',
             'bootstrap/js/affix.js',
-            'js/tags/jquery.tagsinput.js',
+            'select2-3.4.5/select2.js',
             'js/project.js',
         ),
         'output_filename': 'js/all.js',
