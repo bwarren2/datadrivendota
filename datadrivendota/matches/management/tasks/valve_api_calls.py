@@ -301,8 +301,6 @@ class UploadMatch(ApiFollower):
 tasks.register(UploadMatch)
 
 
-
-
 class RefreshUpdatePlayerPersonas(BaseTask):
 
     def run(self):
