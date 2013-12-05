@@ -76,7 +76,6 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/start/jquery-ui.css" />
 
-    {% block extra_js %}
     <script type="text/javascript">
     $(function() {
       function format(state) {
@@ -137,6 +136,8 @@
       ajax_select2ify('.multi-hero-tags', true, "One or more Heroes", "/heroes/api/getheroes");
     });
     </script>
+
+    {% block extra_js %}
     {% endblock extra_js %}
 
     {% if request.user.is_authenticated %}

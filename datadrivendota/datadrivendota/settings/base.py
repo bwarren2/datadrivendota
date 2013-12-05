@@ -409,6 +409,7 @@ PIPELINE_CSS = {
     'all': {
         'source_filenames': (
             'css/custom_bootstrap_compilation.less',
+            'css/bootstrap-tour.less',
             'select2-3.4.5/select2.css',
             'select2-3.4.5/select2-bootstrap.css',
             'css/project.less'
@@ -439,6 +440,7 @@ PIPELINE_JS = {
             'bootstrap/js/collapse.js',
             'bootstrap/js/carousel.js',
             'bootstrap/js/affix.js',
+            'js/bootstrap-tour.js',
             'select2-3.4.5/select2.js',
             'js/project.js',
         ),
