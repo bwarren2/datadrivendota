@@ -53,12 +53,9 @@ class HeroesIntegrationTest(BaseIntegrationTest):
 
     def test_vitals_get(self):
         self.get('/heroes/vitals/')
-        self.assertEqual(self.css_count("#heroes_control_group"), 1)
-        self.assertEqual(self.css_count("#stats_control_group"), 1)
-        self.assertEqual(self.css_count(
-            "#unlinked_scales_control_group"),
-            1
-        )
+        self.assertEqual(self.css_count("#id_heroes"), 1)
+        self.assertEqual(self.css_count("input[name=stats]"), 7)
+        self.assertEqual(self.css_count("input[name=unlinked_scales]"), 1)
 
     def test_vitals_post(self):
         self.get('/heroes/vitals/')
