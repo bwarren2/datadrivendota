@@ -83,17 +83,18 @@ class PermissionCode(models.Model):
                 user = User.objects.get(id=user_id)
 
                 if self.upgrade_type==self.LOOK:
-                    g = Group.objects.get_or_create(name='look')
+                    g = Group.objects.get_or_create(name='look')[0]
                     g.user_set.add(user)
 
                 elif self.upgrade_type==self.TOUCH:
-                    g = Group.objects.get_or_create(name='touch')
+                    g = Group.objects.get_or_create(name='touch')[0]
                     g.user_set.add(user)
                 else:
                     raise Exception("What is this upgrade type? {up} ".format(up=self.upgrade_type))
 
                 self.registrant = user
                 self.save()
+                return True
             else:
                 return False
         else:

@@ -11,29 +11,18 @@ Login!
 {% block page_title %}
 We are in closed beta
 {%endblock page_title %}
-<h2>If you have an upgrade code, log in to use it.</h2>
 
 {% block content %}
 
 {% if not request.user.is_anonymous %}
 
 <section>
-    <h3>Upgrade your account with an invitation code</h3>
-    <form method='POST' action='.'>
-        {% csrf_token %}
-        <p>
-            <label for="invite_code">Code:</label>
-            {{form.username}}
-        </p>
-        <input type='hidden' name='next' value='/'>
-        <input type='submit' value='login'>
-
-    </form>
+    <a href="{% url 'upgrade' %}">Upgrade</a> your account privileges if you have an invitation code.</h3>
 </section>
 
-<section>
 {% endif %}
-Log into a validated account with <a href="{% url 'social:begin' 'steam' %}">Steam</a>
+<section>
+Log into a validated account with <a href="{% url 'social:begin' 'steam' %}">Steam</a> to apply an upgrade code.
 </section>
 
 {%endblock content %}

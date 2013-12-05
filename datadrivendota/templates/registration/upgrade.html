@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+Account Upgrading
+{%endblock title %}
+
+{% block page_title %}
+Account Upgrading
+{%endblock page_title %}
+<h2>If you have an upgrade code, log in to use it.</h2>
+
+{% block content %}
+
+{% if not request.user.is_anonymous %}
+
+<div>
+    <h3>Upgrade your account with an invitation code</h3>
+    <form class='chart-form' action="" method='POST'>
+      {% csrf_token %}
+      {% include "_form.html" %}
+      <div class="control-group">
+        <div class="controls pull-right">
+          <button type="submit" class="btn btn-small btn-primary">Submit</button>
+        </div>
+      </div>
+    </form>
+</div>
+{% else %}
+<div>
+Log into an account with <a href="{% url 'social:begin' 'steam' %}">Steam</a> to apply an upgrade code
+</div>
+{% endif %}
+<br>
+<br>
+<div>
+<h4>{{ message }}</h4>
+</div>
+{%endblock content %}

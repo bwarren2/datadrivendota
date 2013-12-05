@@ -25,4 +25,5 @@ urlpatterns = patterns(
         {'next_page': '/'},
         name='logout'
     ),
+    url(r'^upgrade/$', views.upgrade, name='upgrade'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
