@@ -3,13 +3,68 @@
 $('.info').tooltip();
 
 $(document).ready(function () {
+  function format(state) {
+      return state.label;
+  }
+
+  function singleInitSeelction(element, callback) {
+    var data = {id: element.val(), text: element.val()};
+    callback(data);
+  }
+
+  function multpleInitSelection(element, callback) {
+      var data = [];
+      $(element.val().split(",")).each(function () {
+          data.push({id: this, text: this});
+      });
+      callback(data);
+  }
+
+  function ajax_select2ify(selector, multiple, placeholder, api_endpoint) {
+    if (multiple) {
+      var initSelectionFunction = multpleInitSelection;
+    } else {
+      var initSelectionFunction = singleInitSeelction;
+    }
+
+    $(selector).select2({
+      multiple: multiple,
+      placeholder: placeholder,
+      initSelection: initSelectionFunction,
+      ajax: {
+        url: api_endpoint,
+        data: function (term) {
+          return {term: term};
+        },
+        results: function (data, page) {
+          return {
+            results: data.map(function (elt) { return {id: elt.label, text: elt.label}; })
+          };
+        },
+        formatResult: format,
+        formatSelection: format
+      }
+    });
+  }
+
   $('input[type=checkbox]:checked').parent().addClass('active');
   $('input[type=checkbox]').change(function (evt) {
     $(evt.target).parent().toggleClass('active');
   });
+
+  $(".datepicker").datepicker({
+    dateFormat: 'yy-mm-dd'
+  });
+
+  $('select').select2({
+    width: "100%"
+  });
+
+  ajax_select2ify('.single-player-tags', false, "One Player", "/players/api/getplayers");
+  ajax_select2ify('.multi-player-tags', true, "One or more Players", "/players/api/getplayers");
+  ajax_select2ify('.single-hero-tags', false, "One Hero", "/heroes/api/getheroes");
+  ajax_select2ify('.multi-hero-tags', true, "One or more Heroes", "/heroes/api/getheroes");
 });
-
-
 
 /* gettext library */
 
