@@ -73,8 +73,6 @@ class ApiContext(object):
         strng += "date max: "+str(self.date_max)+"\n"
         strng += "start_at_match_id: "+str(self.start_at_match_id)+"\n"
         strng += "key: "+str(self.key)+"\n"
-        #This is a magic list of the above.
-        strng += "url vars: "+str(self.valve_URL_vars)+"\n"
 
         #Things we care about internally
         strng += "start scrape time: "+str(self.start_scrape_time)+"\n"
@@ -294,87 +292,15 @@ class UploadMatch(ApiFollower):
                 for key, value in kwargs.iteritems():
                     setattr(match,key,value)
                 match.save()
-                ums = UploadMatchSummary()
-                ums.s(players=data['players'], parent_match=match,api_context=self.api_context).delay()
+                upload_match_summary(players=data['players'], parent_match=match,refresh_records=self.api_context.refresh_records)
 
         except Match.DoesNotExist:
             match = Match.objects.create(**kwargs)
             match.save()
-            ums = UploadMatchSummary()
-            ums.s(players=data['players'], parent_match=match,api_context=self.api_context).delay()
+            upload_match_summary(players=data['players'], parent_match=match,refresh_records=self.api_context.refresh_records)
 tasks.register(UploadMatch)
 
 
-class UploadMatchSummary(BaseTask):
-
-    def run(self, players, parent_match):
-        """
-        Populates the endgame summary data that is associated with a match
-        and invokes the build parser.  This needs to be fixed for players that
-        unanonymize by checking on hero_slot, ignoring player, and updating
-        if new data has been included (in particular, which player we are
-        talking about).
-        """
-        for player in players:
-            # Bots do not have data assigned to them.  We have a fictitious
-            # player and leaver status to hold this data.
-            try:
-                account_id = player['account_id']
-                leaver_status = player['leaver_status']
-            except KeyError:
-                account_id=0 #No acct ID means the player is a bot.
-                leaver_status=-1
-            kwargs = {
-                'match': parent_match,
-                'player': Player.objects.get_or_create(
-                    steam_id=account_id)[0],
-                'leaver': LeaverStatus.objects.get_or_create(
-                    steam_id=leaver_status)[0],
-                'player_slot': player['player_slot'],
-                'hero': Hero.objects.get_or_create(
-                    steam_id=player['hero_id'])[0],
-                'item_0': player['item_0'],
-                'item_1': player['item_1'],
-                'item_2': player['item_2'],
-                'item_3': player['item_3'],
-                'item_4': player['item_4'],
-                'item_5': player['item_5'],
-                'kills': player['kills'],
-                'deaths': player['deaths'],
-                'assists': player['assists'],
-                'gold': player['gold'],
-                'last_hits': player['last_hits'],
-                'denies': player['denies'],
-                'gold_per_min': player['gold_per_min'],
-                'xp_per_min': player['xp_per_min'],
-                'gold_spent': player['gold_spent'],
-                'hero_damage': player['hero_damage'],
-                'tower_damage': player['tower_damage'],
-                'hero_healing': player['hero_healing'],
-                'level': player['level'],
-            }
-            try:
-                pms = PlayerMatchSummary.objects.get(player_slot=player['player_slot'],match=parent_match)
-                if self.api_context.refresh_records:
-                    for key, value in kwargs.iteritems():
-                        setattr(pms,key,value)
-                    pms.save()
-                playermatchsummary = pms
-            except PlayerMatchSummary.DoesNotExist:
-                playermatchsummary = PlayerMatchSummary.objects.get_or_create(**kwargs)[0]
-
-
-            if 'ability_upgrades' in player.keys():
-                for skillpick in player['ability_upgrades']:
-                    kwargs = {
-                        'player_match_summary': playermatchsummary,
-                        'ability': Ability.objects.get_or_create(steam_id=
-                        skillpick['ability'])[0],
-                        'time': skillpick['time'],
-                        'level': skillpick['level'],
-                    }
-                    SkillBuild.objects.get_or_create(**kwargs)
-tasks.register(UploadMatchSummary)
 
 
 class RefreshUpdatePlayerPersonas(BaseTask):
@@ -494,3 +420,70 @@ class AcquireHeroSkillData(BaseTask):
             logger.info("Done")
 tasks.register(AcquireHeroSkillData)
 
+def upload_match_summary(players,parent_match,refresh_records):
+    """
+    Populates the endgame summary data that is associated with a match
+    and invokes the build parser.  This needs to be fixed for players that
+    unanonymize by checking on hero_slot, ignoring player, and updating
+    if new data has been included (in particular, which player we are
+    talking about).
+    """
+    for player in players:
+        # Bots do not have data assigned to them.  We have a fictitious
+        # player and leaver status to hold this data.
+        try:
+            account_id = player['account_id']
+            leaver_status = player['leaver_status']
+        except KeyError:
+            account_id=0 #No acct ID means the player is a bot.
+            leaver_status=-1
+        kwargs = {
+            'match': parent_match,
+            'player': Player.objects.get_or_create(
+                steam_id=account_id)[0],
+            'leaver': LeaverStatus.objects.get_or_create(
+                steam_id=leaver_status)[0],
+            'player_slot': player['player_slot'],
+            'hero': Hero.objects.get_or_create(
+                steam_id=player['hero_id'])[0],
+            'item_0': player['item_0'],
+            'item_1': player['item_1'],
+            'item_2': player['item_2'],
+            'item_3': player['item_3'],
+            'item_4': player['item_4'],
+            'item_5': player['item_5'],
+            'kills': player['kills'],
+            'deaths': player['deaths'],
+            'assists': player['assists'],
+            'gold': player['gold'],
+            'last_hits': player['last_hits'],
+            'denies': player['denies'],
+            'gold_per_min': player['gold_per_min'],
+            'xp_per_min': player['xp_per_min'],
+            'gold_spent': player['gold_spent'],
+            'hero_damage': player['hero_damage'],
+            'tower_damage': player['tower_damage'],
+            'hero_healing': player['hero_healing'],
+            'level': player['level'],
+        }
+        try:
+            pms = PlayerMatchSummary.objects.get(player_slot=player['player_slot'],match=parent_match)
+            if refresh_records:
+                for key, value in kwargs.iteritems():
+                    setattr(pms,key,value)
+                pms.save()
+            playermatchsummary = pms
+        except PlayerMatchSummary.DoesNotExist:
+            playermatchsummary = PlayerMatchSummary.objects.get_or_create(**kwargs)[0]
+
+
+        if 'ability_upgrades' in player.keys():
+            for skillpick in player['ability_upgrades']:
+                kwargs = {
+                    'player_match_summary': playermatchsummary,
+                    'ability': Ability.objects.get_or_create(steam_id=
+                    skillpick['ability'])[0],
+                    'time': skillpick['time'],
+                    'level': skillpick['level'],
+                }
+                SkillBuild.objects.get_or_create(**kwargs)
