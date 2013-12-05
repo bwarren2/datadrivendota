@@ -19,7 +19,6 @@
     <!-- Use this to quickly test CSS changes in a template,
         then move to project.css -->
     {% block extra_css %}{% endblock extra_css %}
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
   </head>
   <body>
 
@@ -40,16 +39,12 @@
           <li class="{% active 'matches' main_nav %}"><a href="{% url 'matches:index' %}">Matches</a></li>
           <li class="{% active 'players' main_nav %}"><a href="{% url 'players:index' %}">Players</a></li>
           <li class="{% active 'about' main_nav %}"><a href="/about/">About</a></li>
-          <li><a href="mailto:datadrivendota@gmail.com">Contact</a></li>
+          <li><a target="_blank" href="mailto:datadrivendota@gmail.com">Contact</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           {% if user.is_active %}
           <li><a href="{% url 'logout' %}">Logout, {{user}}?</a></li>
           {% else %}
-          {% comment %}
-
-          <li><a href="{% url 'socialauth_begin' 'steam' %}">Login</a></li>
-          {% endcomment %}
           <li><a href="{% url 'login' %}">Login</a></li>
           {% endif %}
         </ul>
@@ -73,9 +68,6 @@
     <!-- Placed at the end of the document so the pages load faster -->
 
     {% compressed_js 'all' %}
-    <!-- @todo: get local copies of these, put them in pipeline. -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/start/jquery-ui.css" />
 
     {% block extra_js %}
     {% endblock extra_js %}
@@ -130,6 +122,5 @@
         })()
       </script>
     {% endif %}
-
   </body>
 </html>

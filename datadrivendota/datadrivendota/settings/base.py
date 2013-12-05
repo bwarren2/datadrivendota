@@ -410,6 +410,7 @@ PIPELINE_CSS = {
         'source_filenames': (
             'css/custom_bootstrap_compilation.less',
             'css/bootstrap-tour.less',
+            'jquery-ui-bootstrap/jquery-ui-1.10.0.custom.css',
             'select2-3.4.5/select2.css',
             'select2-3.4.5/select2-bootstrap.css',
             'css/project.less'
@@ -425,6 +426,7 @@ PIPELINE_JS = {
     'all': {
         'source_filenames': (
             'js/jquery-1.10.2.js',
+            'js/jquery-ui.js',
             'js/jquery.metadata.js',
             'js/jquery.tablesorter.js',
             'js/jquery.tablesorter.min.js',
