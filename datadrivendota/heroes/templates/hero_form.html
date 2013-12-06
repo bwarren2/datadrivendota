@@ -10,42 +10,42 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-$(function () {
-  var tour = new Tour({
-    backdrop: true
+  $(function () {
+    var tour = new Tour({
+      backdrop: true
+    });
+
+    tour.addSteps([
+      {
+        orphan: true,
+        title: "Welcome!",
+        content: "This is Data Driven Dota. It will make you awesome."
+      },
+      {
+        element: ".chart-form",
+        title: "Asking questions",
+        content: "This is where you ask questions of the system."
+      },
+      {
+        element: "ul.nav-tabs",
+        title: "Other questions",
+        content: "Here's where you ask other questions.",
+        placement: "bottom"
+      },
+      {
+        element: "#IntercomDefaultWidget",
+        title: "Feedback",
+        content: "If you have any problems, questions, or feature requests, let us know here!",
+        placement: "left"
+      },
+      {
+        orphan: true,
+        title: "Ready to go!",
+        content: "Now you know all there is! Happy hunting!"
+      }
+    ]);
+
+    tour.restart();
   });
-
-  tour.addSteps([
-    {
-      orphan: true,
-      title: "Welcome!",
-      content: "This is Data Driven Dota. It will make you awesome."
-    },
-    {
-      element: ".chart-form",
-      title: "Asking questions",
-      content: "This is where you ask questions of the system."
-    },
-    {
-      element: "ul.nav-tabs",
-      title: "Other questions",
-      content: "Here's where you ask other questions.",
-      placement: "bottom"
-    },
-    {
-      element: "#IntercomDefaultWidget",
-      title: "Feedback",
-      content: "If you have any problems, questions, or feature requests, let us know here!",
-      placement: "left"
-    },
-    {
-      orphan: true,
-      title: "Ready to go!",
-      content: "Now you know all there is! Happy hunting!"
-    }
-  ]);
-
-  tour.restart();
-});
 </script>
 {% endblock extra_js %}

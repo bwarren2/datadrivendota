@@ -5,28 +5,28 @@
 {% block page_title %}Matches Index{% endblock page_title %}
 
 {% block content %}
-<div>
-  <table class="table  table-condensed" id='myTable'>
-    <thead>
-      <tr>
-        <th>Match ID</th>
-        <th>Duration</th>
-        <th>Start Time</th>
-        <th>Lobby Type</th>
-        <th>Game Mode</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for match in match_list %}
-      <tr>
-        <td><a href="{% url 'matches:match_detail' match_id=match.steam_id %}">{{match.steam_id}}</a></td>
-        <td>{{ match.display_duration }}</td>
-        <td>{{ match.display_date|date:"D d M Y" }}</td>
-        <td>{{ match.lobby_type.description }}</td>
-        <td>{{ match.game_mode.description }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+  <div>
+    <table class="table table-condensed" id='myTable'>
+      <thead>
+        <tr>
+          <th>Match ID</th>
+          <th>Duration</th>
+          <th>Start Time</th>
+          <th>Lobby Type</th>
+          <th>Game Mode</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for match in match_list %}
+          <tr>
+            <td><a href="{% url 'matches:match_detail' match_id=match.steam_id %}">{{match.steam_id}}</a></td>
+            <td>{{ match.display_duration }}</td>
+            <td>{{ match.display_date|date:"D d M Y" }}</td>
+            <td>{{ match.lobby_type.description }}</td>
+            <td>{{ match.game_mode.description }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% endblock content %}

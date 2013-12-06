@@ -77,3 +77,7 @@ DEVSERVER_MODULES = (
     # Modules not enabled by default
     'devserver.modules.profile.LineProfilerModule',
 )
+
+DEBUG_TOOLBAR_CONFIG = {
+    "INTERCEPT_REDIRECTS": False
+}
