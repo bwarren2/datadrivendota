@@ -13,8 +13,8 @@ class Command(BaseCommand):
         heroes = Hero.objects.all()
         for hero in heroes:
             c = ApiContext()
-            c.matches_requested = 10
-            c.matches_desired = 10
+            c.matches_requested = 1
+            c.matches_desired = 1
             c.hero_id = hero.steam_id
             ahsd = AcquireHeroSkillData()
             ahsd.delay(api_context=c)
