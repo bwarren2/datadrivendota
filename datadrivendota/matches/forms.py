@@ -36,7 +36,7 @@ class TeamEndgameSelect(forms.Form):
     X_PARAMETERS.insert(0,'duration')
     X_LIST = [(item, item) for item in X_PARAMETERS]
     Y_LIST = [(item, item) for item in SHARED_PARAMETERS]
-    SPLIT_PARAMS = ['is_win','game_mode']
+    SPLIT_PARAMS = ['is_win','game_mode','none']
     DOUBLED_PARAM_LIST = [(item,item) for item in SPLIT_PARAMS]
     COMPRESSOR_LIST = [(item,item) for item in ['sum','avg']]
 

@@ -93,7 +93,9 @@ def TeamEndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var,compr
         y_vector_list = [item for item in y_data.itervalues()]
         group_vector_list = [item for item in group_data.itervalues()]
         split_vector_list = [item for item in split_data.itervalues()]
-        xlab = ylab = grouplab = 'foo'
+        xlab = fetch_attribute_label(attribute=x_var)
+        ylab = fetch_attribute_label(attribute=y_var) + " ({a})".format(a=compressor)
+        grouplab = fetch_attribute_label(attribute=group_var)
     except AttributeError:
         return FailFace()
 
@@ -175,30 +177,22 @@ def MatchParameterScatterplot(match_id, x_var, y_var):
 def fetch_match_attributes(summaries,attribute):
     if attribute=='duration':
         vector_list = [summary.match.duration/60.0 for summary in summaries]
-        label='Game length (m)'
     elif attribute=='K-D+.5*A':
         vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in summaries]
-        label='Kills - Death + .5*Assists'
     elif attribute == 'player':
         vector_list = [summary.player.persona_name for summary in summaries]
-        label=attribute.title()
     elif attribute == 'is_win':
         vector_list = ['Won' if summary.is_win==True else 'Lost' for summary in summaries]
-        label='Won Game?'
     elif attribute == 'game_mode':
         vector_list = [summary.match.game_mode.description for summary in summaries]
-        label='Game Mode'
     elif attribute == 'skill':
         vector_list = [summary.match.skill for summary in summaries]
-        label='Skill (3 = High)'
     elif attribute == 'hero_name':
         vector_list = [safen(summary.hero.name) for summary in summaries]
-        label='Hero Name'
     else:
         vector_list = [getattr(summary, attribute) for summary in summaries]
-        label=safen(attribute)
 
-
+    label = fetch_attribute_label(attribute)
     return vector_list, label
 
 def fetch_single_attribute(summary, attribute, compressor='sum'):
@@ -216,5 +210,28 @@ def fetch_single_attribute(summary, attribute, compressor='sum'):
         return summary.match.game_mode.description
     elif attribute == 'skill':
         return summary.match.skill
+    elif attribute == 'none':
+        return ''
     else:
         return getattr(summary, attribute)/denominator
+
+def fetch_attribute_label(attribute):
+    if attribute=='duration':
+        label='Game length (m)'
+    elif attribute=='K-D+.5*A':
+        label='Kills - Death + .5*Assists'
+    elif attribute == 'player':
+        label=attribute.title()
+    elif attribute == 'is_win':
+        label='Won Game?'
+    elif attribute == 'game_mode':
+        label='Game Mode'
+    elif attribute == 'skill':
+        label='Skill (3 = High)'
+    elif attribute == 'hero_name':
+        label='Hero Name'
+    elif attribute == 'none':
+        label=''
+    else:
+        label=safen(attribute)
+    return label
