@@ -67,13 +67,16 @@ class PermissionCode(models.Model):
 
     def send_to(self, to_address):
         subject = 'Datadrivendota upgrade code'
-        message = """You are invited to the private beta at DataDrivenDota!
+        message = """
+        You are invited to the private beta at DataDrivenDota!
 
         You can redeem the key (below) at {url} after signing into your steam account.
 
         {key}
 
-        """.format(key=self.key, url=reverse('login'))
+        """.format(key=self.key, url="http://{site}{path}".format(site=self.site,
+                                                           path=reverse('upgrade')))
+
         from_address = 'datadrivendota@gmail.com'
         return send_mail(subject, message, from_address, [to_address], fail_silently=False)
 
@@ -88,6 +91,8 @@ class PermissionCode(models.Model):
 
                 elif self.upgrade_type==self.TOUCH:
                     g = Group.objects.get_or_create(name='touch')[0]
+                    g.user_set.add(user)
+                    g = Group.objects.get_or_create(name='look')[0]
                     g.user_set.add(user)
                 else:
                     raise Exception("What is this upgrade type? {up} ".format(up=self.upgrade_type))
