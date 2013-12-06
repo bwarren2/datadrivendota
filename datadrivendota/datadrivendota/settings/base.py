@@ -427,7 +427,6 @@ PIPELINE_JS = {
             'js/jquery-ui.js',
             'js/jquery.metadata.js',
             'js/jquery.tablesorter.js',
-            'js/jquery.tablesorter.min.js',
             'bootstrap/js/transition.js',
             'bootstrap/js/modal.js',
             'bootstrap/js/dropdown.js',

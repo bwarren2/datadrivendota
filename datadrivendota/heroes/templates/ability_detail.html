@@ -5,15 +5,13 @@
 {% block page_title %}{% endblock %}
 
 {% block content %}
-<div style='display: inline-block'>
-  <h1>{{ ability.name }}</h1>
-  <img class="ability" src='{{ ability.picture.url }}'>
-</div>
-  <div>
-    <p>{{ ability.description}}</p>
-    <p>{{ ability.lore}}</p>
-    <p>{{ ability.notes}}</p>
+  <div style='display: inline-block'>
+    <h1>{{ ability.name }}</h1>
+    <img class="ability" src='{{ ability.picture.url }}'>
   </div>
-
+  <div>
+    <p>{{ ability.description }}</p>
+    <p>{{ ability.lore }}</p>
+    <p>{{ ability.notes }}</p>
+  </div>
 {% endblock %}
-

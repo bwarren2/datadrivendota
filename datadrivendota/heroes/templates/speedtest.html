@@ -5,14 +5,17 @@
 {% block page_title %}Testingu!{% endblock page_title %}
 
 {% block content %}
-    <div id='result'>
-    </div>
+  <div id='result'></div>
 {% endblock content %}
 
-
-<script type="text/javascript">
-    $( document ).ready(function() {
-        $( "#result" ).load( {% url "heroes:hero_stats" %} +'?'+ $.param({
-        hero: 1,}) );
+{% block extra_js %}
+  <script type="text/javascript">
+    $(function() {
+      $("#result").load(
+        {% url "heroes:hero_stats" %} +'?'+ $.param({
+          hero: 1,
+        })
+      );
     });
-</script>
+  </script>
+{% endblock extra_js %}

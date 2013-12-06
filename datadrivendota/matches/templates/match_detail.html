@@ -1,4 +1,5 @@
 {% extends "matches_base.html" %}
+
 {% load staticfiles %}
 
 {% block extra_css %}{{ form.media }}{% endblock extra_css %}
@@ -31,36 +32,35 @@
       </thead>
       <tbody>
         {% for summary in summaries %}
-        <tr>
-          <td>{{ summary.player.steam_id }}</td>
-          <td><img src="{{ summary.player.avatar }}"></td>
-          <td>{{ summary.player.persona_name }}</td>
-          <td>{{ summary.kills }}</td>
-          <td>{{ summary.deaths }}</td>
-          <td>{{ summary.assists }}</td>
-          <td>{{ summary.kda }}</td>
-          <td>{{ summary.level }}</td>
-          <td>{{ summary.last_hits }}</td>
-          <td>{{ summary.denies }}</td>
-          <td>{{ summary.hero.name }}</td>
+          <tr>
+            <td>{{ summary.player.steam_id }}</td>
+            <td><img src="{{ summary.player.avatar }}"></td>
+            <td>{{ summary.player.persona_name }}</td>
+            <td>{{ summary.kills }}</td>
+            <td>{{ summary.deaths }}</td>
+            <td>{{ summary.assists }}</td>
+            <td>{{ summary.kda }}</td>
+            <td>{{ summary.level }}</td>
+            <td>{{ summary.last_hits }}</td>
+            <td>{{ summary.denies }}</td>
+            <td>{{ summary.hero.name }}</td>
 
-          {% if summary.hero.thumbshot %}
-          <td><img src="{{ summary.hero.thumbshot.url }}" width="50%" height="50%"></td>
-          {% else %}
-          <td></td>
-          {% endif %}
-          <td>{{ summary.gold_per_min }}</td>
-          <td>{{ summary.xp_per_min }}</td>
-          <td>{{ summary.hero_damage }}</td>
-          <td>{{ summary.tower_damage }}</td>
-          <td>{{ summary.hero_healing }}</td>
-          <td>{{ summary.which_side }}</td>
-        </tr>
+            {% if summary.hero.thumbshot %}
+              <td><img src="{{ summary.hero.thumbshot.url }}" width="50%" height="50%"></td>
+            {% else %}
+              <td></td>
+            {% endif %}
+            <td>{{ summary.gold_per_min }}</td>
+            <td>{{ summary.xp_per_min }}</td>
+            <td>{{ summary.hero_damage }}</td>
+            <td>{{ summary.tower_damage }}</td>
+            <td>{{ summary.hero_healing }}</td>
+            <td>{{ summary.which_side }}</td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-
   {% if kdc_basename %}
     <img src="{{ MEDIA_URL }}{{ kdc_basename }}">
   {% endif %}
@@ -68,12 +68,3 @@
     <img src="{{ MEDIA_URL }}{{ xg_basename }}">
   {% endif %}
 {% endblock content %}
-
-{% block extra_js %}
-<script>
-  $(document).ready(function() {
-    $("#myTable").tablesorter();
-  });
-</script>
-<script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
-{% endblock extra_js %}

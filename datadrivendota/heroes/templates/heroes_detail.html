@@ -5,74 +5,76 @@
 {% block page_title %}{% endblock %}
 
 {% block content %}
-<div style='display: inline-block'>
-  <h1>{{ hero.name }}</h1>
-  <img class="hero" src='{{ hero.mugshot.url }}'>
-  <p class="lore">
-    {{ hero.lore }}
-  </p>
+  <div style='display: inline-block'>
+    <h1>{{ hero.name }}</h1>
+    <img class="hero" src='{{ hero.mugshot.url }}'>
+    <p class="lore">
+      {{ hero.lore }}
+    </p>
   </div>
   <div>
-  {% for ability in abilities %}
-        <div class="col-md-2">
+    {% for ability in abilities %}
+      <div class="col-md-2">
         <a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name %}" class="thumbnail">
-            <img src="{{ ability.picture.url }}" alt="{{ ability.name }}">
-            <p class='overlayer'>{{ ability.name }}</p>
+          <img src="{{ ability.picture.url }}" alt="{{ ability.name }}">
+          <p class='overlayer'>{{ ability.name }}</p>
         </a>
       </div>
-  {% endfor %}
+    {% endfor %}
   </div>
-  <br>
   <div >
     <span id='chart1'></span>
     <span id='chart2'></span>
     <span id='chart3'></span>
   </div>
-{% endblock %}
+{% endblock content %}
 
 {% block extra_js %}
-    <script type="text/javascript">
-        $( document ).ready(function() {
+  <script type="text/javascript">
+    $(function() {
+      $.get(
+        '{% url "heroes:hero_performance_api" %}',
+        {
+          hero: '{{ hero.name }}',
+          x_var: 'duration',
+          y_var: 'kills',
+          group_var: 'skill',
+        },
+        function(json){
+          $( "#chart1" ).html('<img id="theImg" src='+json['url']+' />');
+        },
+        'json'
+      );
 
+      $.get(
+        '{% url "heroes:hero_performance_api" %}',
+        {
+          hero: '{{ hero.name }}',
+          x_var: 'duration',
+          y_var: 'K-D+.5*A',
+          group_var: 'skill',
+        },
+        function(json){
+          $( "#chart2" ).html('<img id="theImg" src='+json['url']+' />')
+        },
+        'json'
+      );
 
-            $.get('{% url "heroes:hero_performance_api" %}',
-                {hero: '{{ hero.name }}',
-                x_var: 'duration',
-                y_var: 'kills',
-                group_var: 'skill',
-                },
-                function(json){
-                    $( "#chart1" ).html('<img id="theImg" src='+json['url']+' />')
-                },
-                'json'
-            );
-
-            $.get('{% url "heroes:hero_performance_api" %}',
-                {hero: '{{ hero.name }}',
-                x_var: 'duration',
-                y_var: 'K-D+.5*A',
-                group_var: 'skill',
-                },
-                function(json){
-                    $( "#chart2" ).html('<img id="theImg" src='+json['url']+' />')
-                },
-                'json'
-            );
-
-            $.get('{% url "heroes:hero_performance_api" %}',
-                {hero: '{{ hero.name }}',
-                x_var: 'duration',
-                y_var: 'gold',
-                group_var: 'skill',
-                },
-                function(json){
-                    $( "#chart3" ).html('<img id="theImg" src='+json['url']+' />')
-                },
-                'json'
-            );
-
-        });
-    </script>
+      $.get(
+        '{% url "heroes:hero_performance_api" %}',
+        {
+          hero: '{{ hero.name }}',
+          x_var: 'duration',
+          y_var: 'gold',
+          group_var: 'skill',
+        },
+        function(json){
+          $( "#chart3" ).html('<img id="theImg" src='+json['url']+' />')
+        },
+        'json'
+      );
+    });
+  </script>
 {% endblock extra_js  %}
 
 
