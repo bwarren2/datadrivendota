@@ -2,8 +2,8 @@ import datetime
 from functools import wraps
 from os.path import basename
 from django.shortcuts import get_object_or_404, get_list_or_404, render
-from .forms import EndgameSelect
-from .r import EndgameChart, MatchParameterScatterplot
+from .forms import EndgameSelect, TeamEndgameSelect
+from .r import EndgameChart, MatchParameterScatterplot, TeamEndgameChart
 from .models import Match, PlayerMatchSummary
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required
@@ -72,6 +72,34 @@ def endgame(request):
 
     else:
         select_form = EndgameSelect()
+    return render(request, 'match_form.html',
+      {'form':select_form,'title':'Endgame Charts'})
+
+@permission_required('players.can_touch')
+@devserver_profile(follow=[TeamEndgameChart])
+def team_endgame(request):
+    if request.method == 'POST':
+        select_form = TeamEndgameSelect(request.POST)
+        if select_form.is_valid():
+
+            image = TeamEndgameChart(
+                player_list = select_form.cleaned_data['players'],
+                mode_list = select_form.cleaned_data['game_modes'],
+                x_var = select_form.cleaned_data['x_var'],
+                y_var = select_form.cleaned_data['y_var'],
+                split_var = select_form.cleaned_data['split_var'],
+                group_var = select_form.cleaned_data['group_var'],
+                compressor = select_form.cleaned_data['compressor'],
+            )
+            imagebase = basename(image.name)
+            return render(request, 'match_form.html',
+                                     {'form':select_form,
+                                      'imagebase':imagebase,
+                                      'title':'Endgame Charts'
+                                     })
+
+    else:
+        select_form = TeamEndgameSelect()
     return render(request, 'match_form.html',
       {'form':select_form,'title':'Endgame Charts'})
 
