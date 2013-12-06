@@ -5,14 +5,16 @@
 {% block page_title %}{% endblock %}
 
 {% block content %}
-  <div style='display: inline-block'>
+  <div class="hero-lore">
     <h1>{{ hero.name }}</h1>
-    <img class="hero" src='{{ hero.mugshot.url }}'>
+    <div class="infobox">
+      <img class="hero" src='{{ hero.mugshot.url }}'>
+    </div>
     <p class="lore">
       {{ hero.lore }}
     </p>
   </div>
-  <div>
+  <div class="hero-ability-list">
     {% for ability in abilities %}
       <div class="col-md-2">
         <a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name %}" class="thumbnail">
@@ -21,8 +23,9 @@
         </a>
       </div>
     {% endfor %}
+    <div class="clearfix"></div>
   </div>
-  <div >
+  <div class="hero-chart-list">
     <span id='chart1'></span>
     <span id='chart2'></span>
     <span id='chart3'></span>
