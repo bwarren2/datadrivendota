@@ -2,7 +2,10 @@
 
 {% block title %}{{ title }}{% endblock title %}
 
-{% block page_title %}{{ title }}{% endblock page_title %}
+{% block page_title %}{{ title }}
+<span class='glyphicon glyphicon-road tourglyph'></span>
+{% endblock page_title %}
+
 
 {% block content %}
   {% include "_image_form_embed.html" %}
@@ -45,7 +48,15 @@
       }
     ]);
 
-    tour.restart();
+    $(".tourglyph").on("click",function(){
+      tour.start('.page-tour');
+    })
+
   });
+
+
+  {% comment %}
+  {% endcomment %}
 </script>
+
 {% endblock extra_js %}
