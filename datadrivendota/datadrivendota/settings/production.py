@@ -51,7 +51,7 @@ SERVER_EMAIL = EMAIL_HOST_USER
 ########## END EMAIL CONFIGURATION
 
 ###Setting allowed hosts for security.  Only needed when debug = false
-ALLOWED_HOSTS = ['datadrivendota.herokuapp.com','datadrivendota.com']
+ALLOWED_HOSTS = ['datadrivendota.herokuapp.com','datadrivendota.com','www.datadrivendota.com']
 
 ########## DATABASE CONFIGURATION
 """DATABASES = {}"""
