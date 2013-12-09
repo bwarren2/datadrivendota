@@ -2,7 +2,9 @@ from optparse import make_option
 from json import loads
 from django.core.management.base import BaseCommand
 from heroes.models import HeroDossier, Hero, Role, Assignment
-
+from BeautifulSoup import BeautifulSoup
+from urllib2 import urlopen, HTTPError
+import re
 
 class Command(BaseCommand):
 
@@ -76,6 +78,7 @@ class Command(BaseCommand):
                 if not created:
                     for field, value in default_dict.iteritems():
                         setattr(dos,field,value)
+
                 dos.save()
 
 
@@ -91,4 +94,40 @@ class Command(BaseCommand):
                             role = r,
                             magnitude = int(level))[0]
                         assignment.save()
+        #Backswings
+        cast_url = "http://dota2.gamepedia.com/Cast_animation"
+        try:
+            html = urlopen(cast_url).read()
+            bs = BeautifulSoup(html)
+            table = bs.findAll(attrs={'class':re.compile(r".*\bwikitable\b.*")})[0]
+            children = table.findChildren()
+            for row in children:
+              cells = row.findAll('td')
+              if len(cells)!=4:
+                continue
+              hero_name = cells[1].getText()
+              dos = HeroDossier.objects.get(hero__name=hero_name)
+              dos.cast_point = cells[2].getText()
+              dos.cast_backswing = cells[3].getText()
+              print hero_name, dos.cast_point, dos.cast_backswing
+              dos.save()
+        except HTTPError, err:
+            print "No Cast animations pulled!  Error %s" % (err)
 
+        attack_url = "http://dota2.gamepedia.com/Attack_animation"
+        try:
+            html = urlopen(attack_url).read()
+            bs = BeautifulSoup(html)
+            table = bs.findAll(attrs={'class':re.compile(r".*\bwikitable\b.*")})[0]
+            children = table.findChildren()
+            for row in children:
+              cells = row.findAll('td')
+              if len(cells)!=6:
+                continue
+              hero_name = cells[1].getText()
+              dos = HeroDossier.objects.get(hero__name=hero_name)
+              dos.atk_backswing = float(cells[4].getText())
+              print hero_name,dos.atk_backswing
+              dos.save()
+        except HTTPError, err:
+            print "No Cast animations pulled!  Error %s" % (err)
