@@ -18,6 +18,7 @@ urlpatterns = patterns(
     url(r'^players/', include('players.urls', namespace='players')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^djs2/', include('django_select2.urls')),
+    url(r'^privacy/$', views.privacy, name='privacy'),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
     url(
         r'^logout/$',

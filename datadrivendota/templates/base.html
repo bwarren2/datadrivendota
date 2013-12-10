@@ -45,7 +45,7 @@
           {% if user.is_active %}
           <li><a href="{% url 'logout' %}">Logout, {{user}}?</a></li>
           {% else %}
-          <li><a href="{% url 'social:begin' 'steam' %}">Login</a></li>
+          <li><a href="{% url 'social:begin' 'steam' %}"><img src="{{STATIC_URL}}images/sits_small.png"></a></li>
           {% endif %}
         </ul>
       </div><!-- /.navbar-collapse -->
@@ -123,4 +123,6 @@
       </script>
     {% endif %}
   </body>
+<div class='footer'>
+  Copyright 2013 Deep Dive Data LLC. Dota 2 is a registered trademark of Valve Corporation.  <a href="http://steampowered.com">Powered By Steam</a>, Privacy stuff <a href="{% url 'privacy' %}">here</a>.</div>
 </html>

@@ -16,6 +16,9 @@ def base(request):
 def about(request):
     return render(request, 'about.html',{})
 
+def privacy(request):
+    return render(request, 'privacy.html',{})
+
 def upgrade(request):
     if request.method == 'POST':
         form = KeyForm(request.POST)
