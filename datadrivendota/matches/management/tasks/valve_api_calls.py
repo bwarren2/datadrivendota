@@ -242,11 +242,12 @@ class RetrievePlayerRecords(ApiFollower):
             pass
     def spawnDetailCalls(self):
         for result in self.result['matches']:
-            vac = ValveApiCall()
-            um = UploadMatch()
-            self.api_context.match_id=result['match_id']
-            chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
-            self.api_context.processed+=1
+            if self.moreResultsLeft():
+                vac = ValveApiCall()
+                um = UploadMatch()
+                self.api_context.match_id=result['match_id']
+                chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
+                self.api_context.processed+=1
         logger.info("Finished Spawning")
 tasks.register(RetrievePlayerRecords)
 
