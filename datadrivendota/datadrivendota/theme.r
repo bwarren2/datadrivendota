@@ -1,5 +1,5 @@
 ddd.theme = list(
- background = list(col = "#734b66"),
+ background = list(col = "#615694"),
  panel.background = list(col = "#ffffff"),
  add.line = list(col = "black"),
  add.text = list(col = "black"),
@@ -13,8 +13,8 @@ ddd.theme = list(
  plot.line = list(col = "black"),
  plot.symbol = list(col = "black"),
  reference.line = list(col = "black"),
- strip.background = list(col = "#ba82a6"),    #Long
- strip.shingle = list(col = "#ba82a6"),       #Long
+ strip.background = list(col = "#7367B0"),    #Long
+ strip.shingle = list(col = "#7367B0"),       #Long
  strip.border = list(col = 'black'),        #Long
  par.xlab.text = list(col = "#f4cff1"),
  par.ylab.text = list(col = "#f4cff1"),
