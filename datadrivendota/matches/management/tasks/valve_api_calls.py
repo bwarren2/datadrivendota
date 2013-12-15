@@ -203,6 +203,9 @@ class RetrievePlayerRecords(ApiFollower):
         #Validate
         if self.result['status'] == 15:
             logger.error("Could not pull data. "+str(self.api_context.account_id)+" disallowed it. ")
+            p = Player.objects.get(steam_id=self.api_context.account_id)
+            p.updated=False
+            p.save()
         elif self.result['status'] == 1:
             #Spawn a bunch of match detail queries
 
@@ -242,12 +245,11 @@ class RetrievePlayerRecords(ApiFollower):
             pass
     def spawnDetailCalls(self):
         for result in self.result['matches']:
-            if self.moreResultsLeft():
-                vac = ValveApiCall()
-                um = UploadMatch()
-                self.api_context.match_id=result['match_id']
-                chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
-                self.api_context.processed+=1
+            vac = ValveApiCall()
+            um = UploadMatch()
+            self.api_context.match_id=result['match_id']
+            chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
+            self.api_context.processed+=1
         logger.info("Finished Spawning")
 tasks.register(RetrievePlayerRecords)
 
