@@ -23,8 +23,6 @@ class Command(BaseCommand):
 
         mapping_dict = {
           "MovementSpeed": "movespeed",
-          "AttackDamageMax": "max_dmg",
-          "AttackDamageMin": "min_dmg",
           "StatusHealthRegen": "hp_regen",
           "StatusManaRegen": "mana_regen",
           "AttackRange": "range",
@@ -41,25 +39,21 @@ class Command(BaseCommand):
           "MovementTurnRate": "turn_rate",
         }
 
-        """
-        atk_backswing = models.FloatField()
-        cast_point = models.FloatField()
-        cast_backswing = models.FloatField()
-        """
 
         alignment_dict = {"DOTA_ATTRIBUTE_INTELLECT": HeroDossier.INTELLIGENCE,
         "DOTA_ATTRIBUTE_AGILITY": HeroDossier.AGILITY,
         "DOTA_ATTRIBUTE_STRENGTH": HeroDossier.STRENGTH}
 
+        attr_dict = {"DOTA_ATTRIBUTE_STRENGTH": "AttributeBaseStrength",
+        "DOTA_ATTRIBUTE_AGILITY": "AttributeBaseAgility",
+        "DOTA_ATTRIBUTE_INTELLECT": "AttributeBaseIntelligence"}
+
+
         #Core ability attributes
         for machine_name, data_dict in stats.iteritems():
             if machine_name !='npc_dota_hero_base':
                 print machine_name, data_dict['HeroID']
-
-                if machine_name == 'npc_dota_hero_undying':
-                    pass
                 hero = Hero.objects.get(steam_id=data_dict['HeroID'])
-
                 default_dict = {}
                 for valve_name, my_name in mapping_dict.iteritems():
                     trait = data_dict.get(valve_name,stats['npc_dota_hero_base'][valve_name])
@@ -68,10 +62,16 @@ class Command(BaseCommand):
 
                 default_dict['armor'] = float(default_dict['agility'])/7.0 + float(data_dict.get('ArmorPhysical',
                                     stats['npc_dota_hero_base']['ArmorPhysical']))
-                default_dict['hp'] = float(default_dict['strength'])*19+150
+                default_dict['hp'] = 150+19*int(default_dict['strength'])
                 default_dict['alignment'] = alignment_dict[data_dict['AttributePrimary']]
                 default_dict['mana'] = float(default_dict['intelligence'])*13
                 default_dict['projectile_speed'] = data_dict.get("ProjectileSpeed",0) if data_dict.get("ProjectileSpeed",0)!='' else 0
+
+                #Valve does not count the dmg gain from primary stat in their base assessment
+                default_dict['min_dmg'] = data_dict.get("AttackDamageMin",stats['npc_dota_hero_base'][valve_name])
+                default_dict['min_dmg'] = int(default_dict['min_dmg']) + float(data_dict[attr_dict[data_dict['AttributePrimary']]])
+                default_dict['max_dmg'] = data_dict.get("AttackDamageMax",stats['npc_dota_hero_base'][valve_name])
+                default_dict['max_dmg'] = int(default_dict['max_dmg']) + float(data_dict[attr_dict[data_dict['AttributePrimary']]])
 
                 dos, created = HeroDossier.objects.get_or_create(hero=hero, defaults=default_dict)
 

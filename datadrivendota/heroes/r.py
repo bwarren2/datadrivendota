@@ -76,13 +76,15 @@ def generateChart(hero_list, stats_list, display_options,width=800,height=500):
             strength=(seq(0,24,1)*%f)+%f,
             agility=(seq(0,24,1)*%f)+%f,
             intelligence=(seq(0,24,1)*%f)+%f,
+            strength_gain=seq(0,24,1)*%f,
+            agility_gain=seq(0,24,1)*%f,
+            intelligence_gain=seq(0,24,1)*%f,
             base_armor=rep(%f,25),
             base_hp=rep(%f,25),
             base_mana=rep(%f,25),
             base_hp_regen=rep(%f,25),
             base_mana_regen=rep(%f,25),
             base_dmg=rep(%f,25),
-            agility_gain=seq(0,24,1)*%f,
             hero='%s'
             )
         )
@@ -101,9 +103,9 @@ def generateChart(hero_list, stats_list, display_options,width=800,height=500):
         robjects.r(cmd)
     cmd = """
         df.thing = data.frame(modified_armor = df.all$base_armor+df.all$agility_gain/7,
-            hp=df.all$base_hp+df.all$strength*19,
-            effective_hp = (1+0.06*(df.all$base_armor+df.all$agility_gain/7))*(df.all$base_hp+df.all$strength*19),
-            mana=df.all$base_mana+df.all$intelligence*13
+            hp=df.all$base_hp+df.all$strength_gain*19,
+            effective_hp = (1+0.06*(df.all$base_armor+df.all$agility_gain/7))*(df.all$base_hp+df.all$strength_gain*19),
+            mana=df.all$base_mana+df.all$intelligence_gain*13
         )
         """
     #print cmd
@@ -204,6 +206,9 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     skill1 = matches.filter(match__skill=1).select_related()[:100]
     skill2 = matches.filter(match__skill=2).select_related()[:100]
     skill3 = matches.filter(match__skill=3).select_related()[:100]
+    pmstest = PlayerMatchSummary.objects.get(id=112043)
+    if pmstest in skill3:
+        print "Had it"
     for game in chain(skill1, skill2, skill3): game.skill_level=game.match.skill
 
     if player is not None:
@@ -217,6 +222,8 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
         return FailFace()
 
     try:
+        if pmstest in match_pool:
+            print "Still had it"
         x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
         y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
         if split_var is None:
@@ -410,19 +417,24 @@ def fetch_value(dossier, stat, level):
     elif stat == "agility":
         return dossier.agility+(level-1)*dossier.agility_gain
     elif stat == "modified_armor":
-        return dossier.armor + (dossier.agility+(level-1)*dossier.agility_gain)/7.0
+        return dossier.armor + ((level-1)*dossier.agility_gain)/7.0
     elif stat == "effective_hp":
-        armor = dossier.armor + (dossier.agility+(level-1)*dossier.agility_gain)/7.0
-        strength = dossier.strength+(level-1)*dossier.strength_gain
-        hp = dossier.hp + strength*19
+        armor = dossier.armor + ((level-1)*dossier.agility_gain)/7.0
+        strength_add = (level-1)*dossier.strength_gain
+        hp = dossier.hp + strength_add*19
         return (1+0.06*armor) * hp
     elif stat == 'hp':
-        strength = dossier.strength+(level-1)*dossier.strength_gain
-        hp = dossier.hp + strength*19
+        strength_add = (level-1)*dossier.strength_gain
+        hp = dossier.hp + strength_add*19
         return hp
     elif stat == 'mana':
-        intelligence = dossier.intelligence+(level-1)*dossier.intelligence_gain
-        mana = dossier.mana + intelligence*13
+        intelligence_add = (level-1)*dossier.intelligence_gain
+        mana = dossier.mana + intelligence_add*13
         return mana
+    elif stat == "hp_regen":
+        return dossier.hp_regen + ((level-1)*dossier.strength_gain)*0.03
+    elif stat == "mana_regen":
+        return dossier.mana_regen + ((level-1)*dossier.intelligence_gain)*0.04
+
     else:
         raise AttributeError("What is %s" % stat)
