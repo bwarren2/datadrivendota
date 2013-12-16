@@ -83,22 +83,21 @@ a.thumbnail:hover, a.thumbnail:focus {
 }
 
 /*Enfootening*/
-html, body{
-height:100%;    /* to keep .footer on bottom */
-margin:0;   /* to get rid of scroll bar, because (100% + default margin = scroll) */
-
+html,
+body {
+  height: 100%;    /* to keep .footer on bottom */
+  margin: 0;       /* to get rid of scroll bar, because (100% + default margin = scroll) */
 }
-.wrapper {
-min-height: 100%;   /* to keep .footer on bottom */
-position: relative; /* must be relative or .footer will cover content */
-}
-.page {
-padding-bottom:2.2em;   /* MUST have padding on the bottom => .footer, or .footer will cover content 8*/
 
+#main-wrap {
+  min-height: 100%;   /* to keep .footer on bottom */
+  height: auto;
+  margin: 0 auto -60px;
+  padding: 0 0 60px;
 }
-.footer {
-position: absolute; /* to keep .footer on bottom */
-bottom: 0px;    /* to keep .footer on bottom */
-height:2em; /* height must be smaller then .page's bottom padding */
 
+#footer {
+  height: 60px;
+  font-size: smaller;
+  font-style: italic;
 }

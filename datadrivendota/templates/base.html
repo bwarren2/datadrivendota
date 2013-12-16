@@ -22,46 +22,57 @@
   </head>
   <body>
 
-    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/">DataDrivenDota</a>
+  <div id="main-wrap">
+      <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">DataDrivenDota</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav">
+            <li class="{% active 'heroes' main_nav %}"><a href="{% url 'heroes:index' %}">Heroes</a></li>
+            <li class="{% active 'items' main_nav %}"><a href="{% url 'items:index' %}">Items</a></li>
+            <li class="{% active 'matches' main_nav %}"><a href="{% url 'matches:index' %}">Matches</a></li>
+            <li class="{% active 'players' main_nav %}"><a href="{% url 'players:index' %}">Players</a></li>
+            <li class="{% active 'about' main_nav %}"><a href="/about/">About</a></li>
+            <li><a target="_blank" href="mailto:datadrivendota@gmail.com">Contact</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            {% if user.is_active %}
+            <li><a href="{% url 'logout' %}">Logout, {{user}}?</a></li>
+            {% else %}
+            <li><a href="{% url 'social:begin' 'steam' %}"><img src="{{STATIC_URL}}images/sits_small.png"></a></li>
+            {% endif %}
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </nav>
+      <div id="body" class="container">
+        <div class="row">
+          {% block extra_nav %}{% endblock extra_nav %}
+
+          <h2>{% block page_title %}Hello!{% endblock page_title %}</h2>
+
+          {% block content %}
+            <p>We are still under construction.  Please come back later.</p>
+          {% endblock content %}
+
+        </div>
+      </div> <!-- /container -->
+    </div>
+
+    <div id='footer'>
+      <div class="container">
+        Copyright 2013 Deep Dive Data LLC. Dota 2 is a registered trademark of
+        Valve Corporation.  <a href="http://steampowered.com">Powered By
+        Steam</a>, Privacy stuff <a href="{% url 'privacy' %}">here</a>.
       </div>
-      <div class="collapse navbar-collapse navbar-ex1-collapse">
-        <ul class="nav navbar-nav">
-          <li class="{% active 'heroes' main_nav %}"><a href="{% url 'heroes:index' %}">Heroes</a></li>
-          <li class="{% active 'items' main_nav %}"><a href="{% url 'items:index' %}">Items</a></li>
-          <li class="{% active 'matches' main_nav %}"><a href="{% url 'matches:index' %}">Matches</a></li>
-          <li class="{% active 'players' main_nav %}"><a href="{% url 'players:index' %}">Players</a></li>
-          <li class="{% active 'about' main_nav %}"><a href="/about/">About</a></li>
-          <li><a target="_blank" href="mailto:datadrivendota@gmail.com">Contact</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          {% if user.is_active %}
-          <li><a href="{% url 'logout' %}">Logout, {{user}}?</a></li>
-          {% else %}
-          <li><a href="{% url 'social:begin' 'steam' %}"><img src="{{STATIC_URL}}images/sits_small.png"></a></li>
-          {% endif %}
-        </ul>
-      </div><!-- /.navbar-collapse -->
-    </nav>
-    <div id="body" class="container">
-      <div class="row">
-        {% block extra_nav %}{% endblock extra_nav %}
+    </div>
 
-        <h2>{% block page_title %}Hello!{% endblock page_title %}</h2>
-
-        {% block content %}
-          <p>We are still under construction.  Please come back later.</p>
-        {% endblock content %}
-
-      </div>
-    </div> <!-- /container -->
 
     <!-- Le javascript
     ================================================== -->
@@ -123,6 +134,4 @@
       </script>
     {% endif %}
   </body>
-<div class='footer'>
-  Copyright 2013 Deep Dive Data LLC. Dota 2 is a registered trademark of Valve Corporation.  <a href="http://steampowered.com">Powered By Steam</a>, Privacy stuff <a href="{% url 'privacy' %}">here</a>.</div>
 </html>
