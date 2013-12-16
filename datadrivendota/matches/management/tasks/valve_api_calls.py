@@ -97,6 +97,9 @@ class BaseTask(Task):
         #logger.info("Ending run")
         pass
 
+    def on_failure(self, retval, task_id, args, kwargs):
+        logger.error("Task failure! {args}, {kwargs}, {task_id}".format(args=args,kwargs=kwargs,task_id=task_id))
+
 
 class ApiFollower(BaseTask):
 
@@ -251,6 +254,8 @@ class RetrievePlayerRecords(ApiFollower):
             chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
             self.api_context.processed+=1
         logger.info("Finished Spawning")
+    def on_failure(self):
+        logger.error("Task failure! {stuff}".format(stuff=self.request))
 tasks.register(RetrievePlayerRecords)
 
 
@@ -301,6 +306,8 @@ class UploadMatch(ApiFollower):
             match = Match.objects.create(**kwargs)
             match.save()
             upload_match_summary(players=data['players'], parent_match=match,refresh_records=self.api_context.refresh_records)
+    def on_failure(self):
+        logger.error("Task failure! {stuff}".format(stuff=self.request))
 tasks.register(UploadMatch)
 
 
