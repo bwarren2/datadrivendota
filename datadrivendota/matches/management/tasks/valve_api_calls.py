@@ -109,10 +109,6 @@ class ApiFollower(BaseTask):
         self.api_context = args[0].get('api_context',{})
         return self.run(*args, **kwargs)
 
-    def after_return(self, status, retval, task_id, args, kwargs, einfo):
-        #exit point of the task whatever is the state
-        pass
-
     def moreResultsLeft(self):
         if self.result['results_remaining'] == 0:
             return False
@@ -156,33 +152,33 @@ class ValveApiCall(BaseTask):
         except urllib2.HTTPError, err:
             if err.code == 104:
                 logger.error("Got error 104 (connection reset by peer) for mode " + str(mode) + self.api_context.toUrlDict() + ".  Retrying.")
-                self.retry(mode)
+                self.retry(mode=mode)
             elif err.code == 111:
                 logger.error("Connection Refused! "+URL+ ".  Retrying.")
-                self.retry(mode)
+                self.retry(mode=mode)
             elif err.code == 404:
                 logger.error("Page not found! "+URL+ ".  Retrying.")
-                self.retry(mode)
+                self.retry(mode=mode)
             elif err.code == 403:
                 logger.error("Your access was denied. "+URL+ ".  Retrying.")
-                self.retry(mode)
+                self.retry(mode=mode)
             elif err.code == 401:
                 logger.error("Unauth'd! "+URL+ ".  Retrying.")
-                self.retry(mode)
+                self.retry(mode=mode)
             elif err.code == 500:
                 logger.error("Server Error! "+URL+ ".  Retrying.")
-                self.retry(mode)
+                self.retry(mode=mode)
             elif err.code == 503:
                 logger.error("Server busy or limit exceeded "+URL+ ".  Retrying.")
-                self.retry(mode)
+                self.retry(mode=mode)
             else:
                 logger.error("Got error "+str(err)+" with URL "+URL+ ".  Retrying.")
-                self.retry(mode)
+                self.retry(mode=mode)
         except BadStatusLine:
             logger.error("Bad status line for url %s" % URL+ ".  Retrying.")
-            self.retry(mode)
+            self.retry(mode=mode)
         except urllib2.URLError:
-            self.retry(mode)
+            self.retry(mode=mode)
 
 
 
