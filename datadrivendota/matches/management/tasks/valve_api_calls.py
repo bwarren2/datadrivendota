@@ -236,7 +236,7 @@ class RetrievePlayerRecords(ApiFollower):
         vac = ValveApiCall()
         rpr = RetrievePlayerRecords()
         chain(vac.s(mode='GetMatchHistory',api_context=self.api_context), rpr.s()).delay()
-        logger.info("Done Rebounding")
+
 
     def cleanup(self):
         try:
@@ -246,14 +246,14 @@ class RetrievePlayerRecords(ApiFollower):
             player.save()
         except Player.DoesNotExist:
             pass
+
     def spawnDetailCalls(self):
         for result in self.result['matches']:
             vac = ValveApiCall()
             um = UploadMatch()
             self.api_context.match_id=result['match_id']
-            chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
             self.api_context.processed+=1
-        logger.info("Finished Spawning")
+            chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
 tasks.register(RetrievePlayerRecords)
 
 
