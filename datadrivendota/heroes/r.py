@@ -100,7 +100,6 @@ def generateChart(hero_list, stats_list, display_options,width=800,height=500):
                hero.hp_regen,
                hero.mana_regen,
                (hero.max_dmg+hero.min_dmg)/2.0,
-               hero.agility_gain,
                hero.hero.safe_name())
     #    print cmd
         robjects.r(cmd)
