@@ -295,7 +295,6 @@ THIRD_PARTY_APPS = (
     'storages',
     'djcelery',
     'pipeline',
-    'django_nose',
     'bootstrapform',
 )
 

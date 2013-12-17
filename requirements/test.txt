@@ -1,4 +1,7 @@
 # Test dependencies go here.
 -r base.txt
+behave==1.2.3
 coverage==3.6
 django-discover-runner==0.2.2
+parse==1.6.3
+splinter==0.5.4
