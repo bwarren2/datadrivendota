@@ -77,14 +77,15 @@ CELERY_DEFAULT_QUEUE = 'default'
 
 CELERY_ANNOTATIONS = {
     "matches.management.tasks.valve_api_calls.ValveApiCall": {"rate_limit": VALVE_RATE,
-                                                              'acks_late': True},
-    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'acks_late': True},
-    'matches.management.tasks.valve_api_calls.UploadMatch': {'acks_late': True},
-    'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {'acks_late': True},
-    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'acks_late': True},
-    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'acks_late': True},
-    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'acks_late': True},
-    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'acks_late': True},
+                                                              'acks_late': True,
+                                                              'max_retries':5},
+    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'acks_late': True,'max_retries':5},
+    'matches.management.tasks.valve_api_calls.UploadMatch': {'acks_late': True,'max_retries':5},
+    'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {'acks_late': True,'max_retries':5},
+    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'acks_late': True,'max_retries':5},
+    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'acks_late': True,'max_retries':5},
+    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'acks_late': True,'max_retries':5},
+    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'acks_late': True,'max_retries':5},
 
 }
 
