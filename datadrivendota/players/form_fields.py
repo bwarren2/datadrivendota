@@ -1,7 +1,7 @@
 from django import forms
 from .models import Player
 from django.forms import ValidationError
-
+from django.core.exceptions import MultipleObjectsReturned
 
 class SinglePlayerField(forms.CharField):
     widget = forms.HiddenInput(attrs={'class': 'single-player-tags'})
@@ -19,6 +19,8 @@ class SinglePlayerField(forms.CharField):
             player = Player.objects.get(persona_name=player_name)
         except Player.DoesNotExist:
             raise forms.ValidationError("I do not have a player by that name")
+        except MultipleObjectsReturned:
+            raise forms.ValidationError("I could not uniquely identify that person")
         return player.steam_id
 
 
