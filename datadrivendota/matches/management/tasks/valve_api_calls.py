@@ -94,7 +94,7 @@ class BaseTask(Task):
         return self.run(*args, **kwargs)
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
-        #logger.info("Ending run")
+        logger.info("Ending {task_id}".format(task_id=task_id))
         pass
 
     def on_failure(self, retval, task_id, args, kwargs):
