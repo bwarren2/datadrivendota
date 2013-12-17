@@ -37,5 +37,8 @@ class MultiPlayerField(forms.CharField):
                 raise ValidationError(
                     "{player} is not a valid player name".format(player=player)
                 )
+            except MultipleObjectsReturned:
+                raise forms.ValidationError("I could not uniquely identify {player}".format(player=player))
+
             return_player_list.append(player.steam_id)
         return return_player_list
