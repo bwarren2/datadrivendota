@@ -146,7 +146,7 @@ class ValveApiCall(BaseTask):
         try:
             url = modeDict[mode]
         except KeyError:
-            logger.error("Keyerrors!")
+            logger.info("Keyerrors!")
 
         URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
         logger.info("URL: "+ URL)
@@ -254,8 +254,6 @@ class RetrievePlayerRecords(ApiFollower):
             chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
             self.api_context.processed+=1
         logger.info("Finished Spawning")
-    def on_failure(self):
-        logger.error("Task failure! {stuff}".format(stuff=self.request))
 tasks.register(RetrievePlayerRecords)
 
 
@@ -306,8 +304,6 @@ class UploadMatch(ApiFollower):
             match = Match.objects.create(**kwargs)
             match.save()
             upload_match_summary(players=data['players'], parent_match=match,refresh_records=self.api_context.refresh_records)
-    def on_failure(self):
-        logger.error("Task failure! {stuff}".format(stuff=self.request))
 tasks.register(UploadMatch)
 
 
