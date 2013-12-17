@@ -206,9 +206,6 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     skill1 = matches.filter(match__skill=1).select_related()[:100]
     skill2 = matches.filter(match__skill=2).select_related()[:100]
     skill3 = matches.filter(match__skill=3).select_related()[:100]
-    pmstest = PlayerMatchSummary.objects.get(id=112043)
-    if pmstest in skill3:
-        print "Had it"
     for game in chain(skill1, skill2, skill3): game.skill_level=game.match.skill
 
     if player is not None:
@@ -222,8 +219,6 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
         return FailFace()
 
     try:
-        if pmstest in match_pool:
-            print "Still had it"
         x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
         y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
         if split_var is None:
