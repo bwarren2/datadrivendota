@@ -120,8 +120,10 @@ class ApiFollower(BaseTask):
         elif self.api_context.processed >= self.api_context.matches_desired:
             return False
         else:
-            return self.api_context.last_scrape_time < self.result['matches'][-1]['start_time']
-
+            if self.api_context.deepcopy is False:
+                return self.api_context.last_scrape_time < self.result['matches'][-1]['start_time']
+            else:
+                return True
 
 #Descendants
 class ValveApiCall(BaseTask):
