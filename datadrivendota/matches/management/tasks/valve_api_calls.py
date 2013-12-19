@@ -100,6 +100,11 @@ class BaseTask(Task):
     def on_failure(self, retval, task_id, args, kwargs):
         logger.error("Task failure! {args}, {kwargs}, {task_id}".format(args=args,kwargs=kwargs,task_id=task_id))
 
+    def on_retry(self, retval, task_id, args, kwargs):
+        logger.error("Task retry! {args}, {kwargs}, {task_id}".format(args=args,kwargs=kwargs,task_id=task_id))
+
+    def on_success(self, retval, task_id, args, kwargs):
+        logger.error("Task success! {args}, {kwargs}, {task_id}".format(args=args,kwargs=kwargs,task_id=task_id))
 
 class ApiFollower(BaseTask):
 
@@ -361,10 +366,17 @@ class RefreshPlayerMatchDetail(BaseTask):
         for counter, user in enumerate(users, start = 1):
             context = ApiContext()
             context.account_id=user.steam_id
+
             if self.api_context.matches_requested is None:
                 context.matches_requested = 20
+            else:
+                context.matches_requested = self.api_context.matches_requested
+
             if self.api_context.matches_desired is None:
                 context.matches_desired = 20
+            else:
+                context.matches_desired = self.api_context.matches_desired
+
             context.deepcopy=True
             context.start_scrape_time=now()
             context.last_scrape_time=user.last_scrape_time
