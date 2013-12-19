@@ -155,11 +155,15 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
     min_dt_utc = mktime(min_date.timetuple())
 
 
+
     player = Player.objects.get(steam_id=player_id)
     pms = PlayerMatchSummary.objects.filter(player=player, match__validity=Match.LEGIT).select_related()
     pms = pms.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
     pms = pms.filter(match__start_time__gte=min_dt_utc)
     pms = pms.filter(match__start_time__lte=max_date_utc)
+
+    if len(pms)==0:
+        return FailFace()
 
     wins = [1 if m.is_win else 0 for m in pms]
     start_times = [m.match.start_time for m in pms]
