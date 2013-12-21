@@ -1,5 +1,6 @@
 # Test dependencies go here.
 -r base.txt
+-e git+https://github.com/rwillmer/django-behave.git@80b8fa7f2851e3e316f9efbe9fc0e36338d47bdb#egg=django_behave-dev
 behave==1.2.3
 coverage==3.6
 django-discover-runner==0.2.2
