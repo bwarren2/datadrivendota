@@ -1,0 +1,39 @@
+{% extends "player_base.html" %}
+
+{% block page_title %}Player Management!{% endblock page_title %}
+
+{% block content %}
+
+<div>
+  <table class="table  table-condensed" id='myTable'>
+    <thead>
+      <tr>
+        <th>People you are following</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for player in follow_list %}
+      <tr>
+        <td><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.steam_id}}</a></td>
+        <td><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.persona_name}}</a></td>
+        <td><img src="{{player.avatar}}"></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div>
+<div class='form-container'>
+  <form class='chart-form' action="" method='POST'>
+    {% csrf_token %}
+    {% include "_form.html" %}
+    <div class="control-group">
+      <div class="controls pull-right">
+        <button type="submit" class="btn btn-small btn-primary">Submit</button>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+  </form>
+</div>
+</div>
+{% endblock content %}

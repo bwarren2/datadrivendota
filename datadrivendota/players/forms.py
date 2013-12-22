@@ -36,3 +36,6 @@ class PlayerTimelineForm(forms.Form):
     max_date = forms.DateField(required=False, initial=datetime.date.today,
         help_text='Start times for included dates must be on or before this')
     max_date.widget=forms.TextInput(attrs={'class':'datepicker'})
+
+class PlayerAddFollowForm(forms.Form):
+    player = SinglePlayerField(help_text='Pick exactly one player.  Use the autocomplete.')

@@ -7,6 +7,8 @@ from .r import EndgameChart, MatchParameterScatterplot, TeamEndgameChart
 from .models import Match, PlayerMatchSummary
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required
+from players.models import Player
+from players.models import request_to_player
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
         raise ImportError
@@ -42,7 +44,9 @@ def match(request, match_id):
 
 @permission_required('players.can_look')
 def index(request):
-    match_list = Match.objects.filter(duration__gte=1500)[:10]
+    player = request_to_player(request)
+    follow_list = [follow for follow in player.following.all()]
+    match_list = Match.objects.filter(duration__gte=1500, playermatchsummary__player__in=follow_list)[:10]
     for match in match_list:
       match.display_date = datetime.datetime.fromtimestamp(match.start_time)
       match.display_duration = str(datetime.timedelta(seconds=match.duration))

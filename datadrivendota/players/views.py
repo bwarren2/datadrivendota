@@ -7,8 +7,9 @@ from django.contrib.auth.decorators import permission_required
 from os.path import basename
 from .models import Player
 from .r import KDADensity, CountWinrate, PlayerTimeline
-from .forms import PlayerWinrateLevers, PlayerTimelineForm
+from .forms import PlayerWinrateLevers, PlayerTimelineForm, PlayerAddFollowForm
 from matches.models import PlayerMatchSummary
+from players.models import request_to_player
 import datetime
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -88,7 +89,7 @@ def timeline(request):
                               'title':'Player Timeline'})
 
 @permission_required('players.can_look')
-def player_matches(request, player_name=None, player_id=None):
+def player_matches(request,player_id=None):
   player = get_object_or_404(Player, steam_id=player_id)
   pms_list = PlayerMatchSummary.objects.select_related()
   pms_list = pms_list.filter(player=player).order_by('-match__start_time')[0:50]
@@ -100,6 +101,28 @@ def player_matches(request, player_name=None, player_id=None):
       pms.mag = abs(pms.kda2)*2
   return render(request, 'playermatchsummary_index.html', {'pms_list':pms_list,
     'persona_name':player.persona_name})
+
+@permission_required('players.can_look')
+def player_management(request):
+
+  player = request_to_player(request)
+
+  if request.method == 'POST':
+    form = PlayerAddFollowForm(request.POST)
+    if form.is_valid():
+      follow_player_id = form.cleaned_data['player']
+      follow_player= Player.objects.get(steam_id=follow_player_id)
+      print follow_player
+      player.following.add(follow_player)
+    follow_list = [follow for follow in player.following.all()]
+    return render(request, 'player_management.html',
+      {'follow_list': follow_list,
+      'form': form})
+  else:
+    form = PlayerAddFollowForm()
+    follow_list = [follow for follow in player.following.all()]
+    return render(request, 'player_management.html', {'follow_list': follow_list,
+      'form': form})
 
 def player_list(request):
     if request.is_ajax():

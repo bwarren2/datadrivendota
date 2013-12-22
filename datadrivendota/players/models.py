@@ -39,6 +39,9 @@ class Player(models.Model):
     def get_64_bit_id(self):
         return self.steam_id + ADDER_32_BIT
 
+    def get_32_bit_id(self):
+        return self.steam_id + ADDER_32_BIT
+
     def __unicode__(self):
         return unicode(self.steam_id)
 
@@ -113,3 +116,9 @@ class PermissionCode(models.Model):
             return False
         return True
 
+
+def request_to_player(request):
+    user_id = request.user.social_auth.filter(provider='steam')[0].extra_data['steamid']
+    user_id_32 = int(user_id) % settings.ADDER_32_BIT
+    player = Player.objects.get(steam_id=user_id_32)
+    return player

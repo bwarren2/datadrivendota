@@ -7,10 +7,16 @@ urlpatterns = patterns(
     url(r'^winrate/$', views.winrate, name='player_winrate'),
     url(r'^timeline/$', views.timeline, name='timeline'),
     url(
+        r'^management/$',
+        views.player_management,
+        name="id_management"
+    ),
+    url(
         r'^(?P<player_id>[0-9]*)/matches/$',
         views.player_matches,
         name="id_matches"
     ),
+
     url(
         r'^(?P<player_id>[0-9]*)/$',
         views.detail,
