@@ -190,7 +190,7 @@ def fetch_match_attributes(summaries,attribute):
     elif attribute == 'hero_name':
         vector_list = [safen(summary.hero.name) for summary in summaries]
     elif attribute == 'first_blood_time':
-        vector_list = [safen(summary.match.first_blood_time) for summary in summaries]
+        vector_list = [summary.match.first_blood_time/60 for summary in summaries]
     else:
         vector_list = [getattr(summary, attribute) for summary in summaries]
 
