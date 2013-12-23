@@ -44,14 +44,17 @@ def match(request, match_id):
 
 @permission_required('players.can_look')
 def index(request):
-    player = request_to_player(request)
-    follow_list = [follow for follow in player.following.all()]
-    match_list = Match.objects.filter(duration__gte=1500, playermatchsummary__player__in=follow_list)[:10]
-    for match in match_list:
-      match.display_date = datetime.datetime.fromtimestamp(match.start_time)
-      match.display_duration = str(datetime.timedelta(seconds=match.duration))
-    return render(request, 'matches_index.html', {'match_list': match_list})
 
+    player = request_to_player(request)
+    if player is not None:
+      follow_list = [follow for follow in player.following.all()]
+      match_list = Match.objects.filter(duration__gte=1500, playermatchsummary__player__in=follow_list)[:10]
+      for match in match_list:
+        match.display_date = datetime.datetime.fromtimestamp(match.start_time)
+        match.display_duration = str(datetime.timedelta(seconds=match.duration))
+      return render(request, 'matches_index.html', {'match_list': match_list})
+    else:
+      return render(request, 'matches_index.html')
 @permission_required('players.can_touch')
 @devserver_profile(follow=[EndgameChart])
 def endgame(request):
