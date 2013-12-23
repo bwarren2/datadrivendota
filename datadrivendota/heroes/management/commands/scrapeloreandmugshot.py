@@ -51,6 +51,8 @@ class Command(BaseCommand):
                 h.lore = lore
             except HTTPError, err:
                 print "No lore for %s!  Error %s" % (h.name, err)
+            except AttributeError:
+                print "{hero} has no lore {err}".format(hero=h.name, err=AttributeError)
 
             h.save()
             print h.name
