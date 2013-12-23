@@ -95,6 +95,8 @@ class Command(BaseCommand):
                             magnitude = int(level))[0]
                         assignment.save()
         #Backswings
+        #Sometimes the wiki does not purge old heroes (skeleton king)
+        banned_list = ['Skeleton King']
         cast_url = "http://dota2.gamepedia.com/Cast_animation"
         try:
             html = urlopen(cast_url).read()
@@ -106,11 +108,12 @@ class Command(BaseCommand):
               if len(cells)!=4:
                 continue
               hero_name = cells[1].getText()
-              dos = HeroDossier.objects.get(hero__name=hero_name)
-              dos.cast_point = cells[2].getText()
-              dos.cast_backswing = cells[3].getText()
-              print hero_name, dos.cast_point, dos.cast_backswing
-              dos.save()
+              if hero_name not in banned_list:
+                dos = HeroDossier.objects.get(hero__name=hero_name)
+                dos.cast_point = cells[2].getText()
+                dos.cast_backswing = cells[3].getText()
+                print hero_name, dos.cast_point, dos.cast_backswing
+                dos.save()
         except HTTPError, err:
             print "No Cast animations pulled!  Error %s" % (err)
 
@@ -125,9 +128,10 @@ class Command(BaseCommand):
               if len(cells)!=6:
                 continue
               hero_name = cells[1].getText()
-              dos = HeroDossier.objects.get(hero__name=hero_name)
-              dos.atk_backswing = float(cells[4].getText())
-              print hero_name,dos.atk_backswing
-              dos.save()
+              if hero_name not in banned_list:
+                dos = HeroDossier.objects.get(hero__name=hero_name)
+                dos.atk_backswing = float(cells[4].getText())
+                print hero_name,dos.atk_backswing
+                dos.save()
         except HTTPError, err:
             print "No Cast animations pulled!  Error %s" % (err)
