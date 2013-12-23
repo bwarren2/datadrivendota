@@ -1,1 +1,318 @@
-[{"pk": 1, "model": "matches.lobbytype", "fields": {"steam_id": 0, "description": "Public matchmaking"}}, {"pk": 2, "model": "matches.lobbytype", "fields": {"steam_id": 5, "description": "Team match"}}, {"pk": 3, "model": "matches.lobbytype", "fields": {"steam_id": 4, "description": "Co-op with bots"}}, {"pk": 4, "model": "matches.lobbytype", "fields": {"steam_id": 2, "description": "Tournament"}}, {"pk": 5, "model": "matches.lobbytype", "fields": {"steam_id": 1, "description": "Practice"}}, {"pk": 6, "model": "matches.lobbytype", "fields": {"steam_id": 3, "description": "Tutorial"}}, {"pk": 7, "model": "matches.lobbytype", "fields": {"steam_id": -1, "description": "Invalid"}}, {"pk": 1, "model": "matches.leaverstatus", "fields": {"steam_id": 0, "description": "Player stayed for the entire match"}}, {"pk": 2, "model": "matches.leaverstatus", "fields": {"steam_id": 1, "description": "Player left after safe to leave"}}, {"pk": 3, "model": "matches.leaverstatus", "fields": {"steam_id": 2, "description": "Player abandoned game"}}, {"pk": 4, "model": "matches.leaverstatus", "fields": {"steam_id": 3, "description": "Player chose to abandon"}}, {"pk": 5, "model": "matches.leaverstatus", "fields": {"steam_id": 4, "description": "Player abandoned after 5 minutes"}}, {"pk": 6, "model": "matches.leaverstatus", "fields": {"steam_id": -1, "description": "Player is a bot."}}, {"pk": 7, "model": "matches.leaverstatus", "fields": {"steam_id": 5, "description": "Never Connected"}}, {"pk": 8, "model": "matches.leaverstatus", "fields": {"steam_id": 6, "description": "Never connected too long"}}, {"pk": 1, "model": "matches.gamemode", "fields": {"steam_id": 3, "is_competitive": true, "description": "Random Draft"}}, {"pk": 2, "model": "matches.gamemode", "fields": {"steam_id": 1, "is_competitive": true, "description": "All Pick"}}, {"pk": 3, "model": "matches.gamemode", "fields": {"steam_id": 16, "is_competitive": false, "description": "AD"}}, {"pk": 4, "model": "matches.gamemode", "fields": {"steam_id": 2, "is_competitive": true, "description": "Captains Mode"}}, {"pk": 5, "model": "matches.gamemode", "fields": {"steam_id": 4, "is_competitive": true, "description": "Single Draft"}}, {"pk": 6, "model": "matches.gamemode", "fields": {"steam_id": 5, "is_competitive": true, "description": "All Random"}}, {"pk": 7, "model": "matches.gamemode", "fields": {"steam_id": 14, "is_competitive": false, "description": "Custom"}}, {"pk": 8, "model": "matches.gamemode", "fields": {"steam_id": 12, "is_competitive": false, "description": "Least Played"}}, {"pk": 9, "model": "matches.gamemode", "fields": {"steam_id": 9, "is_competitive": false, "description": "Greeviling"}}, {"pk": 10, "model": "matches.gamemode", "fields": {"steam_id": 7, "is_competitive": false, "description": "The Diretide"}}, {"pk": 11, "model": "matches.gamemode", "fields": {"steam_id": 13, "is_competitive": false, "description": "New Player Pool"}}, {"pk": 12, "model": "matches.gamemode", "fields": {"steam_id": 0, "is_competitive": false, "description": ""}}, {"pk": 13, "model": "matches.gamemode", "fields": {"steam_id": 11, "is_competitive": false, "description": "Mid Only"}}, {"pk": 14, "model": "matches.gamemode", "fields": {"steam_id": 10, "is_competitive": false, "description": "Tutorial"}}, {"pk": 15, "model": "matches.gamemode", "fields": {"steam_id": 6, "is_competitive": false, "description": "?? INTRO/DEATH ??"}}, {"pk": 16, "model": "matches.gamemode", "fields": {"steam_id": 8, "is_competitive": false, "description": "Reverse Captains Mode"}}, {"pk": 17, "model": "matches.gamemode", "fields": {"steam_id": 15, "is_competitive": false, "description": "Captains Draft"}}]
+[
+  {
+    "pk": 1,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 2,
+      "is_competitive": true,
+      "description": "Captains Mode"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 3,
+      "is_competitive": true,
+      "description": "Random Draft"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 1,
+      "is_competitive": true,
+      "description": "All Pick"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 4,
+      "is_competitive": true,
+      "description": "Single Draft"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 5,
+      "is_competitive": true,
+      "description": "All Random"
+    }
+  },
+  {
+    "pk": 6,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 12,
+      "is_competitive": false,
+      "description": "Least Played"
+    }
+  },
+  {
+    "pk": 7,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": false,
+      "steam_id": 9,
+      "is_competitive": false,
+      "description": "Greeviling"
+    }
+  },
+  {
+    "pk": 8,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 0,
+      "is_competitive": false,
+      "description": "Unknown (very old games)"
+    }
+  },
+  {
+    "pk": 9,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": false,
+      "steam_id": 7,
+      "is_competitive": false,
+      "description": "The Diretide"
+    }
+  },
+  {
+    "pk": 10,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 16,
+      "is_competitive": false,
+      "description": "Captains Draft"
+    }
+  },
+  {
+    "pk": 11,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 13,
+      "is_competitive": false,
+      "description": "New Player Pool"
+    }
+  },
+  {
+    "pk": 12,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 14,
+      "is_competitive": false,
+      "description": "Limited Heroes"
+    }
+  },
+  {
+    "pk": 13,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 8,
+      "is_competitive": false,
+      "description": "Reverse Captains Mode"
+    }
+  },
+  {
+    "pk": 14,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": false,
+      "steam_id": 6,
+      "is_competitive": false,
+      "description": "?? INTRO/DEATH ??"
+    }
+  },
+  {
+    "pk": 15,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 11,
+      "is_competitive": false,
+      "description": "Mid Only"
+    }
+  },
+  {
+    "pk": 16,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": false,
+      "steam_id": 10,
+      "is_competitive": false,
+      "description": "Tutorial"
+    }
+  },
+  {
+    "pk": 17,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 15,
+      "is_competitive": false,
+      "description": "Custom"
+    }
+  },
+  {
+    "pk": 18,
+    "model": "matches.gamemode",
+    "fields": {
+      "visible": true,
+      "steam_id": 17,
+      "is_competitive": false,
+      "description": "Auto Draft"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "matches.lobbytype",
+    "fields": {
+      "steam_id": 0,
+      "description": "Public matchmaking"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "matches.lobbytype",
+    "fields": {
+      "steam_id": 5,
+      "description": "Team match"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "matches.lobbytype",
+    "fields": {
+      "steam_id": 4,
+      "description": "Co-op with bots"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "matches.lobbytype",
+    "fields": {
+      "steam_id": 2,
+      "description": "Tournament"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "matches.lobbytype",
+    "fields": {
+      "steam_id": 3,
+      "description": "Tutorial"
+    }
+  },
+  {
+    "pk": 6,
+    "model": "matches.lobbytype",
+    "fields": {
+      "steam_id": 1,
+      "description": "Practice"
+    }
+  },
+  {
+    "pk": 7,
+    "model": "matches.lobbytype",
+    "fields": {
+      "steam_id": -1,
+      "description": "Invalid"
+    }
+  },
+  {
+    "pk": 8,
+    "model": "matches.lobbytype",
+    "fields": {
+      "steam_id": 7,
+      "description": "Competitive Match"
+    }
+  },
+  {
+    "pk": 9,
+    "model": "matches.lobbytype",
+    "fields": {
+      "steam_id": 6,
+      "description": "Solo Queue Match"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "matches.leaverstatus",
+    "fields": {
+      "steam_id": 4,
+      "description": "Player abandoned after 5 minutes"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "matches.leaverstatus",
+    "fields": {
+      "steam_id": 0,
+      "description": "Player stayed for the entire match"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "matches.leaverstatus",
+    "fields": {
+      "steam_id": 1,
+      "description": "Player left after safe to leave"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "matches.leaverstatus",
+    "fields": {
+      "steam_id": 3,
+      "description": "Player chose to abandon"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "matches.leaverstatus",
+    "fields": {
+      "steam_id": 2,
+      "description": "Player abandoned game"
+    }
+  },
+  {
+    "pk": 6,
+    "model": "matches.leaverstatus",
+    "fields": {
+      "steam_id": -1,
+      "description": "Player is a bot."
+    }
+  },
+  {
+    "pk": 7,
+    "model": "matches.leaverstatus",
+    "fields": {
+      "steam_id": 6,
+      "description": "Never connected too long"
+    }
+  },
+  {
+    "pk": 8,
+    "model": "matches.leaverstatus",
+    "fields": {
+      "steam_id": 5,
+      "description": "Never Connected"
+    }
+  }
+]
