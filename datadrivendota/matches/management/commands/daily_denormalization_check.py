@@ -74,17 +74,17 @@ class Command(BaseCommand):
 
 
         #Hero Integrity checks
-        h = Hero.objects.filter(thumbshot='')
+        h = Hero.objects.filter(thumbshot='').exclude(visible=False)
         if len(h)!=0:
             error_email('Database alert!',
                 'We have a hero without a thumbshot url')
 
-        h = Hero.objects.filter(name='')
+        h = Hero.objects.filter(name='').exclude(visible=False)
         if len(h)!=0:
             error_email('Database alert!',
                 'We have a hero without a name')
 
-        heroes = Hero.objects.all()
+        heroes = Hero.objects.all().exclude(visible=False)
         error_msg = ''
         for hero in heroes:
             try:
