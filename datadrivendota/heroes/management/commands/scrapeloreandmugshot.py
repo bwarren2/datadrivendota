@@ -42,6 +42,7 @@ class Command(BaseCommand):
 
             #Lore section
             undername = h.name.replace(" ", "_")
+            undername = undername.replace("'", "")
             herourl = prefix+undername
             try:
 
@@ -51,8 +52,8 @@ class Command(BaseCommand):
                 h.lore = lore
             except HTTPError, err:
                 print "No lore for %s!  Error %s" % (h.name, err)
-            except AttributeError:
-                print "{hero} has no lore {err}".format(hero=h.name, err=AttributeError)
+            except AttributeError, err:
+                print "{hero} has no lore {err} {url}".format(hero=h.name, err=err,url=herourl)
 
             h.save()
             print h.name
