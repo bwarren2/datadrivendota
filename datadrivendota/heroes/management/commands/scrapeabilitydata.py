@@ -58,7 +58,7 @@ class Command(BaseCommand):
                 ab.lore = BeautifulSoup(ability_text_dict['lore']).getText(separator=u' ')
                 #Stupid hack to deal with abilitydata js feed formatting error.
                 if ability_text_dict['hurl'] == 'LegionCommander':
-                    ability_text_dict['hurl'] = "Legion_Commander"
+                    ability_text_dict['hurl'] = u"Legion_Commander"
                 hero_slug = slugify(ability_text_dict['hurl'].replace("_"," "))
                 hero = Hero.objects.get(machine_name=hero_slug)
                 ab.hero = hero
