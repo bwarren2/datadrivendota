@@ -53,7 +53,6 @@ class HeroLineupMultiSelect(forms.Form):
         'atk_point',
         'atk_backswing',
         'turn_rate',
-        'legs',
         'movespeed',
         'projectile_speed',
         'range',
