@@ -30,6 +30,7 @@ class Command(BaseCommand):
             'AbilityCooldown': 'cooldown',
             'ID': 'steam_id',
         }
+
         #Core ability attributes
         keep_going = False
         for ability, data_dict in abilities.iteritems():
@@ -48,21 +49,23 @@ class Command(BaseCommand):
                     if data_dict.get('AbilityType','') == 'DOTA_ABILITY_TYPE_ULTIMATE':
                         ab.is_ultimate = True
                 except AttributeError:
-                    pass
+                    print "Failed on {key} {value} for ability {ab}".format(ab=ab,key=key,value=value)
             try:
-
-
                 ability_text_dict = ability_text[ability]
                 ab.name = BeautifulSoup(ability_text_dict['dname']).getText(separator=u' ')
                 ab.description = BeautifulSoup(ability_text_dict['desc']).getText(separator=u' ')
                 ab.notes = BeautifulSoup(ability_text_dict['notes']).getText(separator=u' ')
                 ab.lore = BeautifulSoup(ability_text_dict['lore']).getText(separator=u' ')
+                #Stupid hack to deal with abilitydata js feed formatting error.
+                if ability_text_dict['hurl'] == 'LegionCommander':
+                    ability_text_dict['hurl'] = "Legion_Commander"
                 hero_slug = slugify(ability_text_dict['hurl'].replace("_"," "))
                 hero = Hero.objects.get(machine_name=hero_slug)
                 ab.hero = hero
                 ab.is_core=True
             except KeyError:
-                pass
+                print "Keyerror on {key} {value} for ability {ab}".format(ab=ab,key=key,value=value)
+
 
 
             url = 'http://media.steampowered.com/apps/dota2/images/abilities/{ability}_hp2.png'.format(ability=ability)
