@@ -9,7 +9,7 @@ urlpatterns = patterns(
     url(
         r'^management/$',
         views.player_management,
-        name="id_management"
+        name="management"
     ),
     url(
         r'^(?P<player_id>[0-9]*)/matches/$',

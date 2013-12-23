@@ -106,23 +106,25 @@ def player_matches(request,player_id=None):
 def player_management(request):
 
   player = request_to_player(request)
-
-  if request.method == 'POST':
-    form = PlayerAddFollowForm(request.POST)
-    if form.is_valid():
-      follow_player_id = form.cleaned_data['player']
-      follow_player= Player.objects.get(steam_id=follow_player_id)
-      print follow_player
-      player.following.add(follow_player)
-    follow_list = [follow for follow in player.following.all()]
-    return render(request, 'player_management.html',
-      {'follow_list': follow_list,
-      'form': form})
+  if player is not None:
+    if request.method == 'POST':
+      form = PlayerAddFollowForm(request.POST)
+      if form.is_valid():
+        follow_player_id = form.cleaned_data['player']
+        follow_player= Player.objects.get(steam_id=follow_player_id)
+        print follow_player
+        player.following.add(follow_player)
+      follow_list = [follow for follow in player.following.all()]
+      return render(request, 'player_management.html',
+        {'follow_list': follow_list,
+        'form': form})
+    else:
+      form = PlayerAddFollowForm()
+      follow_list = [follow for follow in player.following.all()]
+      return render(request, 'player_management.html', {'follow_list': follow_list,
+        'form': form})
   else:
-    form = PlayerAddFollowForm()
-    follow_list = [follow for follow in player.following.all()]
-    return render(request, 'player_management.html', {'follow_list': follow_list,
-      'form': form})
+    return render(request, 'player_management.html', {})
 
 def player_list(request):
     if request.is_ajax():

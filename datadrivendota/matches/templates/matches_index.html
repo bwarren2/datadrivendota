@@ -31,6 +31,7 @@
     </table>
   </div>
 {% else %}
-<h5>You do not seem to have any feeds active.  Add players to follow in the management panel to track new games here!</h5>
+
+<h5>You do not seem to have any feeds active.  Add players to follow in the <a href="{% url "players:management"%} ">management panel</a> to track new games here!</h5>
 {% endif %}
 {% endblock content %}
