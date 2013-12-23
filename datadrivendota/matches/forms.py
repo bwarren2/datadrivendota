@@ -8,7 +8,7 @@ class EndgameSelect(forms.Form):
 
     SHARED_PARAMETERS = ['kills','deaths','assists','gold',
                   'last_hits','denies','hero_damage','tower_damage','hero_healing',
-                  'level','K-D+.5*A']
+                  'level','K-D+.5*A','first_blood_time']
     X_PARAMETERS = list(SHARED_PARAMETERS)
     X_PARAMETERS.insert(0,'duration')
     X_LIST = [(item, item) for item in X_PARAMETERS]

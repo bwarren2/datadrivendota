@@ -189,6 +189,8 @@ def fetch_match_attributes(summaries,attribute):
         vector_list = [summary.match.skill for summary in summaries]
     elif attribute == 'hero_name':
         vector_list = [safen(summary.hero.name) for summary in summaries]
+    elif attribute == 'first_blood_time':
+        vector_list = [safen(summary.match.first_blood_time) for summary in summaries]
     else:
         vector_list = [getattr(summary, attribute) for summary in summaries]
 
@@ -230,6 +232,8 @@ def fetch_attribute_label(attribute):
         label='Skill (3 = High)'
     elif attribute == 'hero_name':
         label='Hero Name'
+    elif attribute == 'first_blood_time':
+        label='First Blood Time (m)'
     elif attribute == 'none':
         label=''
     else:
