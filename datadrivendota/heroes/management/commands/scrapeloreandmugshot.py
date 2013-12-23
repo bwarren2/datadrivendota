@@ -4,6 +4,7 @@ from re import compile, MULTILINE
 from django.utils.text import slugify
 from django.core.management.base import BaseCommand
 from django.core.files import File
+from BeautifulSoup import BeautifulSoup
 
 from heroes.models import Hero
 
@@ -12,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        prefix = "http://dota2.gamepedia.com/"
+        prefix = "http://www.dota2.com/hero/"
         all_heroes = Hero.objects.exclude(name='')
         for h in all_heroes:
 
@@ -45,15 +46,9 @@ class Command(BaseCommand):
             try:
 
                 html = urlopen(herourl).read()
-                regex = compile(r"<td> <i>(?P<Lore>[^$]*?)</i", MULTILINE)
-                r = regex.search(html)
-                if r is not None:
-                    lore = r.groupdict()['Lore']
-                    lore = lore.replace("<p>", "\n")
-                    lore = lore.replace("<br />", " ")
-                    h.lore = lore
-                else:
-                    print h.name+" has no lore!"
+                bs = BeautifulSoup(html)
+                lore = bs.find("div",{'id':'bioInner'}).getText(separator=u' ')
+                h.lore = lore
             except HTTPError, err:
                 print "No lore for %s!  Error %s" % (h.name, err)
 
