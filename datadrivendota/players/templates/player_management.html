@@ -6,10 +6,14 @@
 <div class="row">
 
   <div class="span4">
+    <h7>People you are following</h7>
     <table class="table table-condensed" id='myTable'>
       <thead>
         <tr>
-          <th>People you are following</th>
+          <th>Steam ID</th>
+          <th>Name</th>
+          <th>Avatar</th>
+          <th>Purge Button</th>
         </tr>
       </thead>
       <tbody>
@@ -18,8 +22,10 @@
           <td><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.steam_id}}</a></td>
           <td><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.persona_name}}</a></td>
           <td><img src="{{player.avatar}}"></td>
+        {% comment %}
+        {% endcomment %}
           <td>
-            <input type="button" id="purgeButton" name="{{player.steam_id}}" value="Purge" />
+            <input type="button" class="purgeButton" name="{{player.steam_id}}" value="Purge" />
           </td>
         </tr>
         {% endfor %}
@@ -46,7 +52,7 @@
 {% endblock content %}
 {% block extra_js %}
 <script>
-$('#purgeButton').click(function(){
+$('.purgeButton').click(function(){
     $.ajax({
              type: "POST",
              url: "{% url 'players:drop_follow' %}",

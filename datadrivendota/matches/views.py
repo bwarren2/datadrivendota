@@ -48,13 +48,28 @@ def index(request):
     player = request_to_player(request)
     if player is not None:
       follow_list = [follow for follow in player.following.all()]
-      match_list = Match.objects.filter(duration__gte=1500, playermatchsummary__player__in=follow_list)[:10]
+      match_list = Match.objects.filter(validity=Match.LEGIT, playermatchsummary__player__in=follow_list)
+      match_list = match_list.select_related().distinct()[:10]
+
+      for match in match_list:
+        match.follow_annotations=[]
+        match.display_date = datetime.datetime.fromtimestamp(match.start_time)
+        match.display_duration = str(datetime.timedelta(seconds=match.duration))
+        for pms in match.playermatchsummary_set.all():
+          if pms.player in follow_list:
+            follow_data = {'player_image':pms.player.avatar,
+                           'hero_image':pms.hero.thumbshot.url,
+                           'KDA':pms.kills-pms.deaths+pms.assists/2.0}
+            match.follow_annotations.append(follow_data)
+      return render(request, 'matches_index.html', {'match_list': match_list})
+
+    else:
+      match_list = Match.objects.filter(validity=Match.LEGIT)[:10]
       for match in match_list:
         match.display_date = datetime.datetime.fromtimestamp(match.start_time)
         match.display_duration = str(datetime.timedelta(seconds=match.duration))
       return render(request, 'matches_index.html', {'match_list': match_list})
-    else:
-      return render(request, 'matches_index.html')
+
 @permission_required('players.can_touch')
 @devserver_profile(follow=[EndgameChart])
 def endgame(request):
