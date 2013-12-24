@@ -24,5 +24,6 @@ urlpatterns = patterns(
     ),
 
     url(r'^api/getplayers/$', views.player_list, name='player_list'),
+    url(r'^api/dropfollow/$', views.drop_follow, name='drop_follow'),
 
 )

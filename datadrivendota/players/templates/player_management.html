@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="row">
+
   <div class="span4">
     <table class="table table-condensed" id='myTable'>
       <thead>
@@ -18,18 +19,14 @@
           <td><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.persona_name}}</a></td>
           <td><img src="{{player.avatar}}"></td>
           <td>
-            <form class='chart-form' action="" method='POST'>
-              {% csrf_token %}
-              <input type='hidden' name='purge' value='{{player.steam_id}}'>
-              <button type="submit" class="btn btn-small btn-primary">Purge</button>
-              <div class="clearfix"></div>
-            </form>
+            <input type="button" id="purgeButton" name="{{player.steam_id}}" value="Purge" />
           </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
   <div class='span2'>
     <div class='form-container'>
       <form class='chart-form' action="" method='POST'>
@@ -44,5 +41,24 @@
       </form>
     </div>
   </div>
+
 </div>
 {% endblock content %}
+{% block extra_js %}
+<script>
+$('#purgeButton').click(function(){
+    $.ajax({
+             type: "POST",
+             url: "{% url 'players:drop_follow' %}",
+             data: {'slug': $(this).attr('name'), 'csrfmiddlewaretoken': '{{csrf_token}}'},
+             dataType: "text",
+             success: function(response) {
+                    alert('Dropped')
+              },
+              error: function(rs, e) {
+                     alert(rs.responseText);
+              }
+        });
+  })
+</script>
+{% endblock extra_js %}

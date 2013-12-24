@@ -112,7 +112,6 @@ def player_management(request):
       if form.is_valid():
         follow_player_id = form.cleaned_data['player']
         follow_player= Player.objects.get(steam_id=follow_player_id)
-        print follow_player
         player.following.add(follow_player)
       follow_list = [follow for follow in player.following.all()]
       return render(request, 'player_management.html',
@@ -138,6 +137,18 @@ def player_list(request):
             player_json['value'] = player.persona_name
             results.append(player_json)
         data = json.dumps(results)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
+
+
+def drop_follow(request):
+    if request.is_ajax():
+        player = request_to_player(request)
+        drop = Player.objects.get(steam_id=request.POST['slug'])
+        player.following.remove(drop)
+        data='success'
     else:
         data = 'fail'
     mimetype = 'application/json'
