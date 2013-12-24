@@ -10,6 +10,7 @@ class Command(BaseCommand):
         c = ApiContext()
         RefreshUpdatePlayerPersonas().delay(api_context=c)
 
+        """
         heroes = Hero.objects.all()
         for hero in heroes:
             c = ApiContext()
@@ -18,6 +19,6 @@ class Command(BaseCommand):
             c.hero_id = hero.steam_id
             ahsd = AcquireHeroSkillData()
             ahsd.delay(api_context=c)
-
+        """
         c = ApiContext()
         RefreshPlayerMatchDetail().delay(api_context=c)
