@@ -22,8 +22,6 @@
           <td><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.steam_id}}</a></td>
           <td><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.persona_name}}</a></td>
           <td><img src="{{player.avatar}}"></td>
-        {% comment %}
-        {% endcomment %}
           <td>
             <input type="button" class="purgeButton" name="{{player.steam_id}}" value="Purge" />
           </td>
