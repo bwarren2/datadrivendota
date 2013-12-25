@@ -79,6 +79,19 @@ def index(request):
 
     else:
       match_list = Match.objects.filter(validity=Match.LEGIT)[:10]
+
+      paginator = Paginator(match_list, 10) # Show 25 contacts per page
+      page = request.GET.get('page')
+      try:
+          match_list = paginator.page(page)
+      except PageNotAnInteger:
+          # If page is not an integer, deliver first page.
+          match_list = paginator.page(1)
+      except EmptyPage:
+          # If page is out of range (e.g. 9999), deliver last page of results.
+          match_list = paginator.page(paginator.num_pages)
+
+
       for match in match_list:
         match.display_date = datetime.datetime.fromtimestamp(match.start_time)
         match.display_duration = str(datetime.timedelta(seconds=match.duration))
