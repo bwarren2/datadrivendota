@@ -1,12 +1,13 @@
 import datetime
 from functools import wraps
 from os.path import basename
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import get_object_or_404, get_list_or_404, render
+from django.conf import settings
+from django.contrib.auth.decorators import permission_required
 from .forms import EndgameSelect, TeamEndgameSelect
 from .r import EndgameChart, MatchParameterScatterplot, TeamEndgameChart
 from .models import Match, PlayerMatchSummary
-from django.conf import settings
-from django.contrib.auth.decorators import permission_required
 from players.models import Player
 from players.models import request_to_player
 try:
@@ -49,7 +50,19 @@ def index(request):
     if player is not None:
       follow_list = [follow for follow in player.following.all()]
       match_list = Match.objects.filter(validity=Match.LEGIT, playermatchsummary__player__in=follow_list)
-      match_list = match_list.select_related().distinct()[:10]
+      match_list = match_list.select_related().distinct()[:100]
+
+
+      paginator = Paginator(match_list, 10) # Show 25 contacts per page
+      page = request.GET.get('page')
+      try:
+          match_list = paginator.page(page)
+      except PageNotAnInteger:
+          # If page is not an integer, deliver first page.
+          match_list = paginator.page(1)
+      except EmptyPage:
+          # If page is out of range (e.g. 9999), deliver last page of results.
+          match_list = paginator.page(paginator.num_pages)
 
       for match in match_list:
         match.follow_annotations=[]
@@ -61,6 +74,7 @@ def index(request):
                            'hero_image':pms.hero.thumbshot.url,
                            'KDA':pms.kills-pms.deaths+pms.assists/2.0}
             match.follow_annotations.append(follow_data)
+
       return render(request, 'matches_index.html', {'match_list': match_list})
 
     else:

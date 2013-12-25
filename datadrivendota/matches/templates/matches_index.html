@@ -44,6 +44,23 @@
       </tbody>
     </table>
   </div>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if match_list.has_previous %}
+            <a href="?page={{ match_list.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ match_list.number }} of {{ match_list.paginator.num_pages }}.
+        </span>
+
+        {% if match_list.has_next %}
+            <a href="?page={{ match_list.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+
 {% else %}
 
 <h5>You do not seem to have any feeds active.  Add players to follow in the <a href="{% url "players:management"%} ">management panel</a> to track new games here!</h5>
