@@ -4,7 +4,9 @@
 
 {% block content %}
 <div class="row">
-
+  {% if error %}
+    <h5>{{errror}}</h5>
+  {% endif %}
   <div class="span4">
     <h7>People you are following</h7>
     <table class="table table-condensed" id='myTable'>

@@ -123,7 +123,7 @@ def player_management(request):
       return render(request, 'player_management.html', {'follow_list': follow_list,
         'form': form})
   else:
-    return render(request, 'player_management.html', {})
+    return render(request, 'player_management.html', {'error':'You need to be logged in to edit stuff here.'})
 
 def player_list(request):
     if request.is_ajax():
