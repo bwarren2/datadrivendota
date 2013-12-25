@@ -78,7 +78,7 @@ def index(request):
       return render(request, 'matches_index.html', {'match_list': match_list})
 
     else:
-      match_list = Match.objects.filter(validity=Match.LEGIT)[:10]
+      match_list = Match.objects.filter(validity=Match.LEGIT)[:100]
 
       paginator = Paginator(match_list, 10) # Show 25 contacts per page
       page = request.GET.get('page')
