@@ -1,5 +1,6 @@
 from django.core.mail import send_mail
-from uuid import uuid4
+from django.conf import settings
+from players.models import Player
 def safen(str):
     return str.replace('-',' ').replace('_',' ').title()
 
@@ -9,7 +10,7 @@ def error_email(subject, content):
 
 
 ###Auth Pipeline Stuff
-def pipeline_test(backend, details, response, social_user, uid, user, *args, **kwargs):
-    print backend, details, response, social_user, uid, user, args, kwargs
-    return None
-
+def create_player(strategy, response, *args, **kwargs):
+    steam_64_id = kwargs['uid']
+    p = Player.objects.get_or_create(steam_id=steam_64_id)
+    return {'player_created':p[1]}

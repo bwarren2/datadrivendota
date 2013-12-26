@@ -40,7 +40,7 @@ class Player(models.Model):
         return self.steam_id + ADDER_32_BIT
 
     def get_32_bit_id(self):
-        return self.steam_id + ADDER_32_BIT
+        return self.steam_id % ADDER_32_BIT
 
     def __unicode__(self):
         return unicode(self.steam_id)
