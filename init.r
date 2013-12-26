@@ -12,4 +12,3 @@ install.packages('yaml',repos='http://cran.rstudio.com/')
 
 require(devtools)
 #install_github('rCharts', 'ramnathv')
-
