@@ -47,7 +47,7 @@
             <li><a href="{% url 'players:management' %}">Preferences</a></li>
             <li><a href="{% url 'logout' %}">Logout, {{user}}?</a></li>
             {% else %}
-            <li><a href="{% url 'social:begin' 'steam' %}"><img src="{{STATIC_URL}}images/sits_small.png"></a></li>
+            <li><a href="{% url 'social:begin' 'steam' %}"><img src="{{S3_URL}}images/sits_small.png"></a></li>
             {% endif %}
           </ul>
         </div><!-- /.navbar-collapse -->
