@@ -386,8 +386,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.user.create_user',
     'social.pipeline.social_auth.associate_user',
     'social.pipeline.social_auth.load_extra_data',
+#    'players.pipeline.create_player',
     'social.pipeline.user.user_details',
-    'players.pipeline.create_player',
 )
 
 

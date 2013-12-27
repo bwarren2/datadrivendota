@@ -1,7 +1,7 @@
 from players.models import Player
 from django.conf import settings
 
-def create_player(strategy, response, *args, **kwargs):
+def create_player(strategy, details, response, *args, **kwargs):
 
     steam_64_id = kwargs['uid']
     steam_32_id = steam_64_id % settings.ADDER_32_BIT
