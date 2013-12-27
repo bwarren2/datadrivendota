@@ -52,8 +52,7 @@
         <div class='form-container'>
           <form class='chart-form' action="" method='POST'>
            {% csrf_token %}
-            {{ form.as_p }}
-
+            {% include "_form.html" %}
             <div class="control-group">
               <div class="controls pull-right">
                 <button type="submit" class="btn btn-small btn-primary">Submit</button>
