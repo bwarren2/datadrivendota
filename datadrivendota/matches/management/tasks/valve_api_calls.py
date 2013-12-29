@@ -101,10 +101,10 @@ class BaseTask(Task):
         logger.error("Task failure! {args}, {kwargs}, {task_id}".format(args=args,kwargs=kwargs,task_id=task_id))
 
     def on_retry(self, retval, task_id, args, kwargs):
-        logger.error("Task retry! {args}, {kwargs}, {task_id}".format(args=args,kwargs=kwargs,task_id=task_id))
+        logger.info("Task retry! {args}, {kwargs}, {task_id}".format(args=args,kwargs=kwargs,task_id=task_id))
 
     def on_success(self, retval, task_id, args, kwargs):
-        logger.error("Task success! {task_id}".format(task_id=task_id))
+        logger.info("Task success! {task_id}".format(task_id=task_id))
 
 class ApiFollower(BaseTask):
 

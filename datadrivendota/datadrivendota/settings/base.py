@@ -56,20 +56,20 @@ SERVER_EMAIL = "celery@datadrivendota.com"
 
 
 CELERY_QUEUES = (
-    Queue('default', Exchange('default'), routing_key='default'),
+    Queue('management', Exchange('management'), routing_key='management'),
     Queue('api_call',  Exchange('valve_api'),   routing_key='valve_api_call'),
     Queue('db_upload',  Exchange('db'),   routing_key='db'),
 )
 
 CELERY_ROUTES = {
     'matches.management.tasks.valve_api_calls.ValveApiCall': {'exchange': 'valve_api','routing_key':'valve_api_call'},
-    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'exchange': 'default'},
+    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'exchange': 'management'},
     'matches.management.tasks.valve_api_calls.UploadMatch': {'exchange': 'db','routing_key':'db'},
-    'matches.management.tasks.valve_api_calls.RefreshUpdatingPlayerRecords': {'exchange': 'default'},
+    'matches.management.tasks.valve_api_calls.RefreshUpdatingPlayerRecords': {'exchange': 'management', 'routing_key':'management'},
     'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'exchange': 'db','routing_key':'db'},
-    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'exchange': 'default','routing_key':'default'},
-    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'exchange': 'default','routing_key':'default'},
-    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'exchange': 'default','routing_key':'default'},
+    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'exchange': 'management','routing_key':'management'},
+    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'exchange': 'management','routing_key':'management'},
+    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'exchange': 'management','routing_key':'management'},
 
 }
 
