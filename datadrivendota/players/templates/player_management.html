@@ -5,40 +5,53 @@
 {% block content %}
 <div class='container'>
   <div class="row">
+
     {% if error %}
       <h5>{{errror}}</h5>
     {% endif %}
-    <div class="col-md-4">
-      <div>
-      <h6>People you are following</h6>
-      <table class="table table-condensed" id='myTable'>
-        <thead>
-          <tr>
-            <th>Steam ID</th>
-            <th>Name</th>
-            <th>Avatar</th>
-            <th>Purge Button</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for player in follow_list %}
-          <tr>
-            <td><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.steam_id}}</a></td>
-            <td><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.persona_name}}</a></td>
-            <td><img src="{{player.avatar}}"></td>
-            <td>
-              <input type="button" class="purgeButton" name="{{player.steam_id}}" value="Purge" />
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
 
-     <div>
+    <div class="col-md-4">
+
+      <div>
+        <h6>People you are following</h6>
+        <table class="table table-condensed" id='myTable'>
+          <thead>
+            <tr>
+              <th>Steam ID</th>
+              <th>Name</th>
+              <th>Avatar</th>
+              <th>Purge Button</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for player in follow_list %}
+              <tr>
+                <td>
+                  <a href="{% url 'players:id_detail' player_id=player.steam_id %}">
+                    {{player.steam_id}}
+                  </a>
+                </td>
+                <td>
+                  <a href="{% url 'players:id_detail' player_id=player.steam_id %}">
+                    {{player.persona_name}}
+                  </a>
+                </td>
+                <td>
+                  <img src="{{player.avatar}}">
+                </td>
+                <td>
+                  <input type="button" class="purgeButton" name="{{player.steam_id}}" value="Purge" />
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
         <div class='form-container'>
           <form class='chart-form' action="" method='POST'>
-           {% csrf_token %}
+            {% csrf_token %}
             {% include "_form.html" %}
             <div class="control-group">
               <div class="controls pull-right">
@@ -54,21 +67,25 @@
   </div>
 </div>
 {% endblock content %}
+
 {% block extra_js %}
 <script>
 $('.purgeButton').click(function(){
-    $.ajax({
-             type: "POST",
-             url: "{% url 'players:drop_follow' %}",
-             data: {'slug': $(this).attr('name'), 'csrfmiddlewaretoken': '{{csrf_token}}'},
-             dataType: "text",
-             success: function(response) {
-                    alert('Dropped')
-              },
-              error: function(rs, e) {
-                     alert(rs.responseText);
-              }
-        });
-  })
+  $.ajax({
+    type: "POST",
+    url: "{% url 'players:drop_follow' %}",
+    data: {
+      'slug': $(this).attr('name'),
+      'csrfmiddlewaretoken': '{{csrf_token}}'
+    },
+    dataType: "text",
+    success: function(response) {
+      alert('Dropped')
+    },
+    error: function(rs, e) {
+      alert(rs.responseText);
+    }
+  });
+});
 </script>
 {% endblock extra_js %}
