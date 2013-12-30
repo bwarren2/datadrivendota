@@ -40,5 +40,4 @@ class PlayerTimelineForm(forms.Form):
 class PlayerAddFollowForm(forms.Form):
     player = SinglePlayerField(required=True,
         help_text='Pick exactly one player.  Use the autocomplete.')
-    fake = forms.CharField(help_text='Thingy.')
 
