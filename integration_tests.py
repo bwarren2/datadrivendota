@@ -34,9 +34,9 @@ class BaseIntegrationTest(LiveServerTestCase):
 
 
 class IntegrationTest(BaseIntegrationTest):
-    def test_title(self):
+    def test_redirect_to_login(self):
         self.get('/')
-        self.assertIn('datadrivendota', self.browser.title)
+        self.assertIn('Login!', self.browser.title)
 
 
 class HeroesIntegrationTest(BaseIntegrationTest):
