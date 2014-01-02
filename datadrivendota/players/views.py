@@ -106,6 +106,7 @@ def player_matches(request,player_id=None):
 def player_management(request):
 
   player = request_to_player(request)
+  print player
   if player is not None:
     if request.method == 'POST':
       form = PlayerAddFollowForm(request.POST)

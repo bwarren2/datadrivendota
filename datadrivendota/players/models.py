@@ -119,9 +119,15 @@ class PermissionCode(models.Model):
 
 def request_to_player(request):
     try:
+        print request
+        print request.user
+        print request.user.social_auth
+        print request.user.social_auth.filter(provider='steam')[0]
+        print request.user.social_auth.filter(provider='steam')[0].extra_data['steamid']
         user_id = request.user.social_auth.filter(provider='steam')[0].extra_data['steamid']
         user_id_32 = int(user_id) % settings.ADDER_32_BIT
         player = Player.objects.get(steam_id=user_id_32)
         return player
-    except KeyError:
+    except KeyError, err:
+        print err
         return None
