@@ -190,6 +190,83 @@ class HeroDossier(models.Model):
     def __unicode__(self):
         return self.hero.name
 
+    def level_stat(self,stat,level):
+        if stat == 'level':
+            return level
+        elif stat == 'strength':
+            return self.strength + (level-1)*self.strength_gain
+        elif stat == 'agility':
+            return self.agility + (level-1)*self.agility_gain
+        elif stat == 'intelligence':
+            return self.intelligence + (level-1)*self.intelligence_gain
+        elif stat == 'armor':
+            return self.armor + (level-1)*self.agility_gain/7
+        elif stat == 'hp':
+            return self.hp+(level-1)*self.strength_gain*19
+        elif stat == 'effective_hp':
+            return (1+0.06*(self.level_stat('armor',level)))*self.level_stat('hp',level)
+        elif stat == 'mana':
+            return self.mana+(level-1)*self.intelligence_gain*13
+        else:
+            raise Exception("{0},{1},{2}, buh?".format(self,stat,level))
+
+    def fetch_value(self, stat, level):
+
+        easy_list = ['day_vision','night_vision','atk_point',
+                     'atk_backswing','turn_rate','legs','movespeed',
+                     'projectile_speed',
+                     'range','base_atk_time']
+        if level not in range(1,26):
+            raise AttributeError("That is not a real level")
+        if hasattr(self, stat) and stat in easy_list:
+            return getattr(self, stat)
+        elif stat == "strength":
+            return self.strength+(level-1)*self.strength_gain
+        elif stat == "intelligence":
+            return self.intelligence+(level-1)*self.intelligence_gain
+        elif stat == "agility":
+            return self.agility+(level-1)*self.agility_gain
+        elif stat == "modified_armor":
+            return self.armor + ((level-1)*self.agility_gain)/7.0
+        elif stat == "effective_hp":
+            armor = self.armor + ((level-1)*self.agility_gain)/7.0
+            strength_add = (level-1)*self.strength_gain
+            hp = self.hp + strength_add*19
+            return (1+0.06*armor) * hp
+        elif stat == 'hp':
+            strength_add = (level-1)*self.strength_gain
+            hp = self.hp + strength_add*19
+            return hp
+        elif stat == 'mana':
+            intelligence_add = (level-1)*self.intelligence_gain
+            mana = self.mana + intelligence_add*13
+            return mana
+        elif stat == "hp_regen":
+            return self.hp_regen + ((level-1)*self.strength_gain)*0.03
+        elif stat == "mana_regen":
+            return self.mana_regen + ((level-1)*self.intelligence_gain)*0.04
+
+        else:
+            raise AttributeError("What is %s" % stat)
+
+
+def invalid_option(stats_list):
+    valid_stat_set = set(
+        ['level',
+        'strength',
+        'agility',
+        'intelligence',
+        'armor',
+        'hp',
+        'effective_hp',
+        'mana'])
+    for stat in stats_list:
+        if stat not in valid_stat_set:
+            return True
+    return False
+
+
+
 def safen(str):
     return str.replace('-',' ').replace('_',' ').title()
 
