@@ -14,9 +14,8 @@ from matches.models import GameMode
 from .json_data import hero_vitals_json, hero_lineup_json, hero_performance_json
 from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, \
   HeroPlayerPerformance, HeroPlayerSkillBarsForm
-from .r import generateChart, lineupChart, HeroPerformanceChart,\
- HeroSkillLevelBwChart, speedtest1Chart, speedtest2Chart
-
+from .r import  HeroPerformanceChart,\
+ HeroSkillLevelBwChart
 try:
     if 'devserver' not in settings.INSTALLED_APPS or not settings.DEBUG:
         raise ImportError

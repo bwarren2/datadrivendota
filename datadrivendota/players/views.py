@@ -8,6 +8,7 @@ from os.path import basename
 from .models import Player
 from .r import KDADensity, CountWinrate, PlayerTimeline
 from .forms import PlayerWinrateLevers, PlayerTimelineForm, PlayerAddFollowForm
+from .json_data import player_winrate_breakout
 from matches.models import PlayerMatchSummary
 from players.models import request_to_player
 import datetime
@@ -45,18 +46,34 @@ def detail(request, player_id=None):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[CountWinrate])
 def winrate(request):
+    chart_spec = """
+        {title: "",
+    dom: "chart",
+    width: 800,
+    height: 600,
+    layers: [{
+            data: chartdata,
+            type: "point",
+            x: "x_var",
+            y: "y_var",
+            size:{const:4},
+        }],
+
+    }
+    """
+
     if request.method == 'POST':
         winrate_form = PlayerWinrateLevers(request.POST)
         if winrate_form.is_valid():
-            image = CountWinrate(
+            return_json = player_winrate_breakout(
               player_id = winrate_form.cleaned_data['player'],
               game_mode_list = winrate_form.cleaned_data['game_modes'],
               min_date = winrate_form.cleaned_data['min_date'],
               max_date = winrate_form.cleaned_data['max_date'],
             )
-            imagebase = basename(image.name)
             return render(request, 'player_form.html', {'form': winrate_form,
-                                      'imagebase': imagebase,
+                                    'json_data': return_json,
+                                    'chart_spec': chart_spec,
                                       'title':'Hero Winrate'})
 
     else:

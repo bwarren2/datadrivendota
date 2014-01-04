@@ -1,4 +1,5 @@
 from django.db import models
+from datadrivendota.utilities import safen
 
 
 # Create your models here.
@@ -171,3 +172,72 @@ class SkillBuild(models.Model):
     def __unicode__(self):
         return str(self.player_match_summary.id)+', '+str(self.level)
         pass
+
+
+def fetch_match_attributes(summaries,attribute):
+    if attribute=='duration':
+        vector_list = [summary.match.duration/60.0 for summary in summaries]
+    elif attribute=='K-D+.5*A':
+        vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in summaries]
+    elif attribute == 'player':
+        vector_list = [summary.player.persona_name for summary in summaries]
+    elif attribute == 'is_win':
+        vector_list = ['Won' if summary.is_win==True else 'Lost' for summary in summaries]
+    elif attribute == 'game_mode':
+        vector_list = [summary.match.game_mode.description for summary in summaries]
+    elif attribute == 'skill':
+        vector_list = [summary.match.skill for summary in summaries]
+    elif attribute == 'hero_name':
+        vector_list = [safen(summary.hero.name) for summary in summaries]
+    elif attribute == 'first_blood_time':
+        vector_list = [summary.match.first_blood_time/60.0 for summary in summaries]
+    elif attribute == 'match_id':
+        vector_list = [summary.match.steam_id for summary in summaries]
+    else:
+        vector_list = [getattr(summary, attribute) for summary in summaries]
+
+    label = fetch_attribute_label(attribute)
+    return vector_list, label
+
+def fetch_single_attribute(summary, attribute, compressor='sum'):
+    if compressor =='sum':
+        denominator = 1
+    else:
+        denominator = 5
+    if attribute=='duration':
+        return summary.match.duration/60.0/5
+    elif attribute=='K-D+.5*A':
+        return (summary.kills - summary.deaths + summary.assists*.5)/denominator
+    elif attribute == 'is_win':
+        return 'Won' if summary.is_win==True else 'Lost'
+    elif attribute == 'game_mode':
+        return summary.match.game_mode.description
+    elif attribute == 'skill':
+        return summary.match.skill
+    elif attribute == 'none':
+        return ''
+    else:
+        return getattr(summary, attribute)/denominator
+
+def fetch_attribute_label(attribute):
+    if attribute=='duration':
+        label='GameLength(m)'
+    elif attribute=='K-D+.5*A':
+        label='Kills-Death+.5*Assists'
+    elif attribute == 'player':
+        label=attribute.title()
+    elif attribute == 'is_win':
+        label='WonGame?'
+    elif attribute == 'game_mode':
+        label='GameMode'
+    elif attribute == 'skill':
+        label='Skill(3=High)'
+    elif attribute == 'hero_name':
+        label='HeroName'
+    elif attribute == 'first_blood_time':
+        label='FirstBloodTime(m)'
+    elif attribute == 'none':
+        label=''
+    else:
+        label=safen(attribute)
+    return label

@@ -149,7 +149,7 @@ def lineupChart(heroes, stat, level, width=800, height=500):
     selected_names = [hero.safe_name() for hero in selected_heroes]
 
     try:
-        hero_value = dict((dossier.hero.safe_name(), fetch_value(dossier, stat, level)) for dossier in all_heroes)
+        hero_value = dict((dossier.hero.safe_name(), dossier.fetch_value(stat, level)) for dossier in all_heroes)
     except AttributeError:
         return FailFace()
 
@@ -335,103 +335,3 @@ def HeroSkillLevelBwChart(hero, player, game_mode_list, levels,width=800,height=
     hosted_file = s3File(imagefile)
     return hosted_file
 
-def speedtest1Chart(width=800,height=500):
-
-    #Get the right stuff loaded in R
-    grdevices = importr('grDevices')
-    importr('lattice')
-
-    x_vec = IntVector([i for i in range(1,10)])
-    y_vec = IntVector([i for i in range(1,10)])
-
-    robjects.globalenv["xvec"] = x_vec
-    robjects.globalenv["yvec"] = y_vec
-
-    #robjects.globalenv["y"] = y
-    #Some in-R formatting
-
-    #Make a file
-    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
-    enforceTheme(robjects)
-    rcmd="""print(
-        xyplot(yvec~xvec)
-    )"""
-    robjects.r(rcmd )
-    #relation='free' in scales for independent axes
-    grdevices.dev_off()
-    imagefile.close()
-
-    hosted_file = s3File(imagefile)
-    return hosted_file
-
-def speedtest2Chart(width=800,height=500):
-    """There is no benefit to taking the direct route with importing grDevices.
-    There is to doing so with lattice.  parsing the print call fails to finish the file.
-    Overall speedup: .6s
-    """
-
-    grdevices = importr('grDevices')
-
-    x_vec = rinterface.IntSexpVector([i for i in range(1,10)])
-    y_vec = rinterface.IntSexpVector([i for i in range(1,10)])
-
-    rinterface.globalenv["xvec"] = x_vec
-    rinterface.globalenv["yvec"] = y_vec
-
-
-    #Make a file
-    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
-
-    enforceTheme(robjects)
-    rcmd="""
-    print(xyplot(yvec~xvec))
-    """
-    print(rcmd)
-    robjects.r(rcmd)
-    #rinterface.parse(rcmd)
-    grdevices.dev_off()
-    imagefile.close()
-    hosted_file = s3File(imagefile)
-    return hosted_file
-
-
-def fetch_value(dossier, stat, level):
-
-    easy_list = ['day_vision','night_vision','atk_point',
-                 'atk_backswing','turn_rate','legs','movespeed',
-                 'projectile_speed',
-                 'range','base_atk_time']
-    if level not in range(1,26):
-        raise AttributeError("That is not a real level")
-    if hasattr(dossier, stat) and stat in easy_list:
-        return getattr(dossier, stat)
-    elif stat == "strength":
-        return dossier.strength+(level-1)*dossier.strength_gain
-    elif stat == "intelligence":
-        return dossier.intelligence+(level-1)*dossier.intelligence_gain
-    elif stat == "agility":
-        return dossier.agility+(level-1)*dossier.agility_gain
-    elif stat == "modified_armor":
-        return dossier.armor + ((level-1)*dossier.agility_gain)/7.0
-    elif stat == "effective_hp":
-        armor = dossier.armor + ((level-1)*dossier.agility_gain)/7.0
-        strength_add = (level-1)*dossier.strength_gain
-        hp = dossier.hp + strength_add*19
-        return (1+0.06*armor) * hp
-    elif stat == 'hp':
-        strength_add = (level-1)*dossier.strength_gain
-        hp = dossier.hp + strength_add*19
-        return hp
-    elif stat == 'mana':
-        intelligence_add = (level-1)*dossier.intelligence_gain
-        mana = dossier.mana + intelligence_add*13
-        return mana
-    elif stat == "hp_regen":
-        return dossier.hp_regen + ((level-1)*dossier.strength_gain)*0.03
-    elif stat == "mana_regen":
-        return dossier.mana_regen + ((level-1)*dossier.intelligence_gain)*0.04
-
-    else:
-        raise AttributeError("What is %s" % stat)

@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import permission_required
 from .forms import EndgameSelect, TeamEndgameSelect
 from .r import EndgameChart, MatchParameterScatterplot, TeamEndgameChart
 from .models import Match, PlayerMatchSummary
-from players.models import Player
+from .json_data import player_endgame_json, team_endgame_json
 from players.models import request_to_player
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -53,7 +53,7 @@ def index(request):
       match_list = match_list.select_related().distinct()[:100]
 
 
-      paginator = Paginator(match_list, 10) # Show 25 contacts per page
+      paginator = Paginator(match_list, 10)
       page = request.GET.get('page')
       try:
           match_list = paginator.page(page)
@@ -80,7 +80,7 @@ def index(request):
     else:
       match_list = Match.objects.filter(validity=Match.LEGIT)[:100]
 
-      paginator = Paginator(match_list, 10) # Show 25 contacts per page
+      paginator = Paginator(match_list, 10)
       page = request.GET.get('page')
       try:
           match_list = paginator.page(page)
@@ -100,23 +100,59 @@ def index(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[EndgameChart])
 def endgame(request):
+
+    chart_spec = """
+    {title: "",
+dom: "chart",
+width: 800,
+height: 600,
+layers: [{
+        data: chartdata,
+        type: "point",
+        x: "x_var",
+        y: "y_var",
+        color: "group_var",
+        size:{const:3},
+        opacity:{const:3},
+    }],
+
+    facet:{
+      type:'wrap',
+      var:'split_var',
+      formatter: function(facetObject) {
+            var title = facetObject.split_var;
+            return title;
+        }
+    }
+}
+    """
+    extra_chart_js= """tester = function(type, obj, event, chart){
+  data = obj.evtData;
+  if (type ==="click"){
+    top.location="/matches/"+String(data.match_id["in"]);
+  }
+}
+chart.addHandler(tester)"""
+
+
     if request.method == 'POST':
         select_form = EndgameSelect(request.POST)
         if select_form.is_valid():
 
-            image = EndgameChart(
+            return_json = player_endgame_json(
                 player_list = select_form.cleaned_data['players'],
                 mode_list = select_form.cleaned_data['game_modes'],
                 x_var = select_form.cleaned_data['x_var'],
                 y_var = select_form.cleaned_data['y_var'],
                 split_var = select_form.cleaned_data['split_var'],
                 group_var = select_form.cleaned_data['group_var'],
-            )
-            imagebase = basename(image.name)
+            )[0]
             return render(request, 'match_form.html',
                                      {'form':select_form,
-                                      'imagebase':imagebase,
-                                      'title':'Endgame Charts'
+                                    'json_data': return_json,
+                                    'chart_spec': chart_spec,
+                                    'extra_chart_js': extra_chart_js,
+                                    'title':'Endgame Charts'
                                      })
 
     else:
@@ -125,13 +161,47 @@ def endgame(request):
       {'form':select_form,'title':'Endgame Charts'})
 
 @permission_required('players.can_touch')
-@devserver_profile(follow=[TeamEndgameChart])
+@devserver_profile(follow=[team_endgame_json])
 def team_endgame(request):
+
+    chart_spec = """
+    {title: "",
+dom: "chart",
+width: 800,
+height: 600,
+layers: [{
+        data: chartdata,
+        type: "point",
+        x: "x_var",
+        y: "y_var",
+        color: "group_var",
+        size:{const:3},
+        opacity:{const:3},
+    }],
+
+    facet:{
+      type:'wrap',
+      var:'split_var',
+      formatter: function(facetObject) {
+            var title = facetObject.split_var;
+            return title;
+        }
+    }
+}
+    """
+    extra_chart_js= """tester = function(type, obj, event, chart){
+  data = obj.evtData;
+  if (type ==="click"){
+    window.open("/matches/"+String(data.match_id["in"]));
+  }
+}
+chart.addHandler(tester)"""
+
     if request.method == 'POST':
         select_form = TeamEndgameSelect(request.POST)
         if select_form.is_valid():
 
-            image = TeamEndgameChart(
+            return_json, xlab, ylab, grouplab = team_endgame_json(
                 player_list = select_form.cleaned_data['players'],
                 mode_list = select_form.cleaned_data['game_modes'],
                 x_var = select_form.cleaned_data['x_var'],
@@ -140,10 +210,12 @@ def team_endgame(request):
                 group_var = select_form.cleaned_data['group_var'],
                 compressor = select_form.cleaned_data['compressor'],
             )
-            imagebase = basename(image.name)
+
             return render(request, 'match_form.html',
                                      {'form':select_form,
-                                      'imagebase':imagebase,
+                                    'json_data': return_json,
+                                    'chart_spec': chart_spec,
+                                    'extra_chart_js': extra_chart_js,
                                       'title':'Endgame Charts'
                                      })
 
