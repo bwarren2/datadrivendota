@@ -389,13 +389,12 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.user.create_user',
     'social.pipeline.social_auth.associate_user',
     'social.pipeline.social_auth.load_extra_data',
-#    'players.pipeline.create_player',
     'social.pipeline.user.user_details',
+    'players.pipeline.create_player',
 )
 
 
 SOCIAL_AUTH_STEAM_API_KEY = STEAM_API_KEY
-API_KEY = STEAM_API_KEY
 #SOCIAL_AUTH_ENABLED_BACKENDS = ('steam',)
 """SOCIAL_AUTH_COMPLETE_URL_NAME = 'socialauth_complete'
 SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'associate_complete'
@@ -435,6 +434,7 @@ PIPELINE_JS = {
             'js/jquery-ui.js',
             'js/jquery.metadata.js',
             'js/jquery.tablesorter.js',
+            'js/polychart2.standalone.js',
             'bootstrap/js/transition.js',
             'bootstrap/js/modal.js',
             'bootstrap/js/dropdown.js',
