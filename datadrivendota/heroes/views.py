@@ -227,26 +227,6 @@ def hero_skill_bars(request):
     return render(request, 'hero_form.html',{'form': hero_form,
                                                 'title': 'Hero Skill Times'})
 
-@permission_required('players.can_touch')
-@devserver_profile(follow=[speedtest1Chart])
-def speedtest1(request):
-    image = speedtest1Chart()
-    imagebase = basename(image.name)
-    return render(request, 'speedtest.html',
-                              {'imagebase': imagebase})
-
-@permission_required('players.can_touch')
-@devserver_profile(follow=[speedtest2Chart, render])
-def speedtest2(request):
-    image = speedtest2Chart()
-    imagebase = basename(image.name)
-    return render(request, 'speedtest.html',
-                              {'imagebase': imagebase})
-
-@permission_required('players.can_touch')
-def test(request):
-    return render(request, 'test.html')
-
 
 def hero_list(request):
 
