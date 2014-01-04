@@ -12,7 +12,7 @@ class HeroVitalsMultiSelect(forms.Form):
         'strength',
         'intelligence',
         'agility',
-        'modified_armor',
+        'armor',
         'effective_hp',
         'hp',
         'mana',
