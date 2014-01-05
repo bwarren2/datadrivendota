@@ -48,7 +48,7 @@ def index(request):
 
     player = request_to_player(request)
     if player is not None:
-      follow_list = [follow for follow in player.following.all()]
+      follow_list = [follow for follow in player.userprofile.following.all()]
       match_list = Match.objects.filter(validity=Match.LEGIT, playermatchsummary__player__in=follow_list)
       match_list = match_list.select_related().distinct()[:100]
 

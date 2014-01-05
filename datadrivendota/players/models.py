@@ -23,7 +23,7 @@ class Player(models.Model):
     updated = models.BooleanField(help_text='Do we update this person \
               and scrape them?', default=False)
     last_scrape_time = models.IntegerField(help_text='Unix time of last match scrape start', default=0)
-    following = models.ManyToManyField('self',symmetrical=False)
+
 
     def save(self, *args, **kwargs):
         # That magic number is the valve 32bit -64bit adder.
@@ -47,7 +47,7 @@ class Player(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
     player = models.OneToOneField('Player')
-
+    following = models.ManyToManyField('Player', related_name='quarry')
     def __unicode__(self):
         return "User:{0}, Player{1}".format(unicode(self.user),
                                         unicode(self.player))

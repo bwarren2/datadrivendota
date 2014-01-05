@@ -25,7 +25,7 @@
           </thead>
           <tbody>
             {% for player in follow_list %}
-              <tr>
+              <tr id={{player.steam_id}}>
                 <td>
                   <a href="{% url 'players:id_detail' player_id=player.steam_id %}">
                     {{player.steam_id}}
@@ -83,7 +83,7 @@ $('.purgeButton').click(function(){
     },
     dataType: "text",
     success: function(response) {
-      alert('Dropped')
+      $("tr#"+response).remove();
     },
     error: function(rs, e) {
       alert(rs.responseText);

@@ -123,21 +123,20 @@ def player_matches(request,player_id=None):
 def player_management(request):
 
   player = request_to_player(request)
-  print player
   if player is not None:
     if request.method == 'POST':
       form = PlayerAddFollowForm(request.POST)
       if form.is_valid():
         follow_player_id = form.cleaned_data['player']
         follow_player= Player.objects.get(steam_id=follow_player_id)
-        player.following.add(follow_player)
-      follow_list = [follow for follow in player.following.all()]
+        player.userprofile.following.add(follow_player)
+      follow_list = [follow for follow in player.userprofile.following.all()]
       return render(request, 'player_management.html',
         {'follow_list': follow_list,
         'form': form})
     else:
       form = PlayerAddFollowForm()
-      follow_list = [follow for follow in player.following.all()]
+      follow_list = [follow for follow in player.userprofile.following.all()]
       return render(request, 'player_management.html', {'follow_list': follow_list,
         'form': form})
   else:
@@ -163,10 +162,9 @@ def player_list(request):
 
 def drop_follow(request):
     if request.is_ajax():
-        player = request_to_player(request)
         drop = Player.objects.get(steam_id=request.POST['slug'])
-        player.following.remove(drop)
-        data='success'
+        request.user.userprofile.following.remove(drop)
+        data=request.POST['slug']
     else:
         data = 'fail'
     mimetype = 'application/json'
