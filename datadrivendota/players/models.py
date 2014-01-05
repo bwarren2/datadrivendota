@@ -11,7 +11,6 @@ from uuid import uuid4
 def get_code():
     return str(uuid4())
 
-
 # Create your models here.
 class Player(models.Model):
     steam_id = models.BigIntegerField(help_text="Valve's internal map",
@@ -44,6 +43,15 @@ class Player(models.Model):
 
     def __unicode__(self):
         return unicode(self.steam_id)
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
+    player = models.OneToOneField('Player')
+
+    def __unicode__(self):
+        return "User:{0}, Player{1}".format(unicode(self.user),
+                                        unicode(self.player))
+
 
 class PermissionCode(models.Model):
 
@@ -118,16 +126,4 @@ class PermissionCode(models.Model):
 
 
 def request_to_player(request):
-    try:
-        print request
-        print request.user
-        print request.user.social_auth
-        print request.user.social_auth.filter(provider='steam')[0]
-        print request.user.social_auth.filter(provider='steam')[0].extra_data['steamid']
-        user_id = request.user.social_auth.filter(provider='steam')[0].extra_data['steamid']
-        user_id_32 = int(user_id) % settings.ADDER_32_BIT
-        player = Player.objects.get(steam_id=user_id_32)
-        return player
-    except KeyError, err:
-        print err
-        return None
+    return request.user.userprofile.player
