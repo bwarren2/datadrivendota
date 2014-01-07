@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.contrib.auth.models import User, Group
 from .validators import validate_32bit
@@ -48,6 +49,17 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
     player = models.OneToOneField('Player')
     following = models.ManyToManyField('Player', related_name='quarry')
+    tracking = models.ManyToManyField('Player', related_name='feed')
+    track_limit = models.IntegerField(default=7)
+
+    def add_tracking(self, player):
+        if len(self.tracking>=self.track_limit):
+            return None
+        else:
+            self.tracking.add(player)
+            self.track_limit+=1
+            self.save()
+
     def __unicode__(self):
         return "User:{0}, Player{1}".format(unicode(self.user),
                                         unicode(self.player))
@@ -127,3 +139,14 @@ class PermissionCode(models.Model):
 
 def request_to_player(request):
     return request.user.userprofile.player
+
+def get_tracks(users):
+    tracked = []
+    for user in users:
+        try:
+            track_list = user.userprofile.tracking.all()
+            for track in track_list:
+                tracked.append(track)
+        except ObjectDoesNotExist:
+            pass
+    return tracked

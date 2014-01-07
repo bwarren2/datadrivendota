@@ -30,7 +30,8 @@ CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
 CELERY_TASK_RESULT_EXPIRES = int(getenv('RESULT_EXPIRY_RATE'))
 
 #Only store errors.
-CELERY_IGNORE_RESULT = getenv('CELERY_IGNORE_RESULT')
+#NOTE: this means that you cannot get the results of the tasks.
+CELERY_IGNORE_RESULT = getenv('CELERY_IGNORE_RESULT') == 'True'
 CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
 
 CELERYD_TASK_TIME_LIMIT = int(getenv('CELERYD_TASK_TIME_LIMIT'))
@@ -82,13 +83,13 @@ CELERY_ANNOTATIONS = {
     "matches.management.tasks.valve_api_calls.ValveApiCall": {"rate_limit": VALVE_RATE,
                                                               'acks_late': True,
                                                               'max_retries':5},
-    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'acks_late': True,'max_retries':5},
-    'matches.management.tasks.valve_api_calls.UploadMatch': {'acks_late': True,'max_retries':5},
-    'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {'acks_late': True,'max_retries':5},
-    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'acks_late': True,'max_retries':5},
-    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'acks_late': True,'max_retries':5},
-    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'acks_late': True,'max_retries':5},
-    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'acks_late': True,'max_retries':5},
+    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'acks_late': True,'max_retries':5, 'ignore_result': True},
+    'matches.management.tasks.valve_api_calls.UploadMatch': {'acks_late': True,'max_retries':5, 'ignore_result': True},
+    'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {'acks_late': True,'max_retries':5, 'ignore_result': True},
+    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'acks_late': True,'max_retries':5, 'ignore_result': True},
+    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'acks_late': True,'max_retries':5, 'ignore_result': True},
+    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'acks_late': True,'max_retries':5, 'ignore_result': True},
+    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'acks_late': True,'max_retries':5, 'ignore_result': True},
 
 }
 

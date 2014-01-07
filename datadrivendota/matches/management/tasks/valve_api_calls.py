@@ -1,7 +1,8 @@
+from itertools import chain as meld
 from matches.models import Match, LobbyType, GameMode,\
  LeaverStatus, PlayerMatchSummary, SkillBuild
 from datadrivendota.settings.base import STEAM_API_KEY
-from players.models import Player
+from players.models import Player, get_tracks
 from heroes.models import Ability, Hero
 from settings.base import ADDER_32_BIT
 
@@ -95,13 +96,14 @@ class BaseTask(Task):
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         logger.info("Ending {task_id}".format(task_id=task_id))
-        pass
 
-    def on_failure(self, retval, task_id, args, kwargs):
-        logger.error("Task failure! {args}, {kwargs}, {task_id}".format(args=args,kwargs=kwargs,task_id=task_id))
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        logger.error("Task failure! {args}, {kwargs}, {task_id} {einfo}".format(
+            args=args,kwargs=kwargs,task_id=task_id,einfo=einfo))
 
     def on_retry(self, retval, task_id, args, kwargs):
-        logger.info("Task retry! {args}, {kwargs}, {task_id}".format(args=args,kwargs=kwargs,task_id=task_id))
+        logger.info("Task retry! {args}, {kwargs}, {task_id}".format(
+            args=args,kwargs=kwargs,task_id=task_id))
 
     def on_success(self, retval, task_id, args, kwargs):
         logger.info("Task success! {task_id}".format(task_id=task_id))
@@ -317,14 +319,17 @@ class RefreshUpdatePlayerPersonas(BaseTask):
         of 50.  The profile update API actually supports up to 100"""
         list_send_length = 50
         users = Player.objects.filter(updated=True)
+        tracked = get_tracks(users)
+        check_list = meld(users,tracked)
+        check_list = [user for user in check_list]
         querylist = []
 
-        for counter, user in enumerate(users, start = 1):
+        for counter, user in enumerate(check_list, start = 1):
             id_64_bit =  str(user.get_64_bit_id())
             querylist.append(id_64_bit)
 
             # if our list is list_send_length long or we have reached the end
-            if counter % list_send_length == 0 or counter == len(users):
+            if counter % list_send_length == 0 or counter == len(check_list):
                 steamids = ",".join(querylist)
                 vac = ValveApiCall()
                 upp = UpdatePlayerPersonas()
@@ -363,9 +368,11 @@ class RefreshPlayerMatchDetail(BaseTask):
     def run(self):
         """ Go through the users for whom update is True and pull match histories
         since their last scrape time"""
-        users = Player.objects.filter(updated=True)
-
-        for counter, user in enumerate(users, start = 1):
+        users = Player.objects.filter(updated=True).select_related()
+        tracked = get_tracks(users)
+        check_list = meld(users, tracked)
+        check_list = [user for user in check_list]
+        for counter, user in enumerate(check_list, start = 1):
             context = ApiContext()
             context.account_id=user.steam_id
 
@@ -384,7 +391,7 @@ class RefreshPlayerMatchDetail(BaseTask):
             context.last_scrape_time=user.last_scrape_time
             vac = ValveApiCall()
             rpr = RetrievePlayerRecords()
-            foo = chain(vac.s(mode='GetMatchHistory',api_context=context),rpr.s()).delay()
+            chain(vac.s(mode='GetMatchHistory',api_context=context),rpr.s()).delay()
 tasks.register(RefreshPlayerMatchDetail)
 
 

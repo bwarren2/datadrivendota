@@ -9,12 +9,11 @@
     {% if error %}
       <h5>{{error}}</h5>
     {% endif %}
-
     <div class="col-md-4">
 
       <div>
         <h6>People you are following</h6>
-        <table class="table table-condensed" id='myTable'>
+        <table class="table table-condensed" id='followTable'>
           <thead>
             <tr>
               <th>Steam ID</th>
@@ -52,10 +51,7 @@
         <div class='form-container'>
           <form class='chart-form' action="" method='POST'>
            {% csrf_token %}
-           {% comment %}
             {% include "_form.html" %}
-           {% endcomment %}
-           {{form.as_p}}
             <div class="control-group">
               <div class="controls pull-right">
                 <button type="submit" class="btn btn-small btn-primary">Submit</button>
@@ -67,6 +63,64 @@
       </div>
 
     </div>
+    <div class="col-md-4">
+
+      <div>
+        <h6>Players you are importing ({{track_list|length}}/{{track_limit}})</h6>
+        <table class="table table-condensed" id='importTable'>
+          <thead>
+            <tr>
+              <th>Steam ID</th>
+              <th>Name</th>
+              <th>Avatar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for player in track_list %}
+              <tr id={{player.steam_id}}>
+                <td>
+                  <a href="{% url 'players:id_detail' player_id=player.steam_id %}">
+                    {{player.steam_id}}
+                  </a>
+                </td>
+                <td>
+                  <a href="{% url 'players:id_detail' player_id=player.steam_id %}">
+                    {{player.persona_name}}
+                  </a>
+                </td>
+                <td>
+                  <img src="{{player.avatar}}">
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <table id='checkTable'>
+          <thead>
+            <tr>
+              <th>Player Exists</th>
+              <th>Steam ID</th>
+              <th>Name</th>
+              <th>Image</th>
+              <th>Public Info</th>
+              <th>Currently Tracked</th>
+              <th>Add Button</th>
+
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div>
+        <input type='text' id='steam_id_input'>
+        <input type="button" id="steam_id_validator" name="Check availability" value="Check" />
+      </div>
+
+    </div>
+
   </div>
 </div>
 {% endblock content %}
@@ -90,5 +144,43 @@ $('.purgeButton').click(function(){
     }
   });
 });
+
+$('#steam_id_validator').click(function(){
+  $.ajax({
+    type:"POST",
+    url: "{%url 'players:check_id' %}",
+    data:{
+      'steam_id':$('#steam_id_input').val(),
+      'csrfmiddlewaretoken': '{{csrf_token}}'
+    },
+    dataType: "text",
+    success: function(response) {
+      $('#checkTable > tbody:last').append(response);
+      $("#add_track").click(function(){
+        $.ajax({
+          type:'POST',
+          url:'{% url "players:add_track" %}',
+          data:{
+            "steam_id":$("#add_track").attr('name'),
+            'csrfmiddlewaretoken': '{{csrf_token}}',
+          },
+          dataType: "text",
+          success: function(response) {
+            alert('success')
+          },
+          error: function(rs, e) {
+            alert('fail')
+          }
+
+        })
+      })
+
+    },
+    error: function(rs, e) {
+    }
+
+  })
+})
+
 </script>
 {% endblock extra_js %}

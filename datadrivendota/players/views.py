@@ -1,16 +1,17 @@
 import json
 from functools import wraps
 from django.conf import settings
-from django.http import  HttpResponse
+from django.http import  HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import permission_required
 from os.path import basename
-from .models import Player
+from .models import Player, UserProfile
 from .r import KDADensity, CountWinrate, PlayerTimeline
 from .forms import PlayerWinrateLevers, PlayerTimelineForm, PlayerAddFollowForm
 from .json_data import player_winrate_breakout
 from matches.models import PlayerMatchSummary
-from players.models import request_to_player
+from matches.management.tasks.valve_api_calls import ApiContext, ValveApiCall
+from .models import request_to_player
 import datetime
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -130,15 +131,13 @@ def player_management(request):
         follow_player_id = form.cleaned_data['player']
         follow_player= Player.objects.get(steam_id=follow_player_id)
         player.userprofile.following.add(follow_player)
-      follow_list = [follow for follow in player.userprofile.following.all()]
-      return render(request, 'player_management.html',
-        {'follow_list': follow_list,
-        'form': form})
-    else:
-      form = PlayerAddFollowForm()
-      follow_list = [follow for follow in player.userprofile.following.all()]
-      return render(request, 'player_management.html', {'follow_list': follow_list,
-        'form': form})
+    form = PlayerAddFollowForm()
+    follow_list = [follow for follow in player.userprofile.following.all()]
+    track_list = [track for track in player.userprofile.tracking.all()]
+    return render(request, 'player_management.html', {'follow_list': follow_list,
+      'track_list': track_list,
+      'track_limit': player.userprofile.track_limit,
+      'form': form})
   else:
     return render(request, 'player_management.html', {'error':'You need to be logged in to edit stuff here.'})
 
@@ -170,3 +169,106 @@ def drop_follow(request):
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
 
+def check_id(request):
+    if request.is_ajax() and request.POST['steam_id']!='':
+      steam_id = request.POST['steam_id']
+      c = ApiContext()
+      c.steamids="{base},{check}".format(base=steam_id,check=int(steam_id)+settings.ADDER_32_BIT)
+      vac = ValveApiCall()
+      t = vac.delay(api_context=c,mode='GetPlayerSummaries')
+      steam_response=t.get()
+
+      if steam_response['response']['players'] == []:
+        params = {
+          'player_exists': False,
+          'steam_id': None,
+          'name': None,
+          'avatar_url': None,
+          'public': False,
+          'tracked': False
+        }
+        data = json.dumps(params)
+      else:
+        c = ApiContext()
+        c.account_id=steam_id
+        c.matches_requested=1
+        c.matches_desired=1
+        vac = ValveApiCall()
+        t = vac.delay(api_context=c,mode='GetMatchHistory')
+        dota_response = t.get()
+
+        tracking = len(UserProfile.objects.filter(tracking__steam_id=steam_id)) != 0 or \
+        len(Player.objects.filter(steam_id=steam_id,updated=True))!=0
+        if dota_response['result']['status'] != 1:
+          params = {
+            'player_exists': True,
+            'steam_id': steam_response['response']['players'][0]['steamid'],
+            'name': steam_response['response']['players'][0]['personaname'],
+            'avatar_url': steam_response['response']['players'][0]['avatarmedium'],
+            'public': False,
+            'tracked': tracking
+          }
+          data = json.dumps(params)
+        else:
+          params = {
+            'player_exists': True,
+            'steam_id': steam_response['response']['players'][0]['steamid'],
+            'name': steam_response['response']['players'][0]['personaname'],
+            'avatar_url': steam_response['response']['players'][0]['avatarmedium'],
+            'public': True,
+            'tracked': tracking
+          }
+          data = json.dumps(params)
+      if params['player_exists'] and params['public'] and not params['tracked']:
+        data = """<tr>
+          <td>{exists}</td>
+          <td>{id}</td>
+          <td>{name}</td>
+          <td><img src='{image}'></td>
+          <td>{public}</td>
+          <td>{tracked}</td>
+          <td><input type="button" id="add_track" name="{id}" value="Import!" /></td>
+          </tr>""".format(exists=params['player_exists'],
+            id=params['steam_id'],
+            name=params['name'],
+            public=params['public'],
+            image=params['avatar_url'],
+            tracked=params['tracked'],
+            )
+      else:
+        data = """<tr>
+          <td>{exists}</td>
+          <td>{id}</td>
+          <td>{name}</td>
+          <td><img src='{image}'></td>
+          <td>{public}</td>
+          <td>{tracked}</td>
+          <td>Not available</td>
+          </tr>""".format(exists=params['player_exists'],
+            id=params['steam_id'],
+            name=params['name'],
+            public=params['public'],
+            image=params['avatar_url'],
+            tracked=params['tracked'],
+            )
+
+    else:
+        data = 'fail'
+        mimetype = 'application/json'
+        return HttpResponseNotFound(data, mimetype)
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
+
+def add_track(request):
+    if request.is_ajax():
+        steam_id = int(request.POST['steam_id']) % settings.ADDER_32_BIT
+        try:
+          track = Player.objects.get(steam_id=steam_id)
+        except Player.DoesNotExist:
+          track = Player.objects.create(steam_id=steam_id)
+        request.user.userprofile.tracking.add(track)
+        data=request.POST['steam_id']
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
