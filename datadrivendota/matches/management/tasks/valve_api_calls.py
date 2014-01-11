@@ -1,11 +1,11 @@
 from itertools import chain as meld
+from copy import deepcopy
 from matches.models import Match, LobbyType, GameMode,\
  LeaverStatus, PlayerMatchSummary, SkillBuild
 from datadrivendota.settings.base import STEAM_API_KEY
 from players.models import Player, get_tracks
 from heroes.models import Ability, Hero
 from settings.base import ADDER_32_BIT
-
 from time import time as now
 ### Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os
@@ -240,7 +240,8 @@ class RetrievePlayerRecords(ApiFollower):
             self.api_context.date_max = self.result['matches'][-1]['start_time']
         vac = ValveApiCall()
         rpr = RetrievePlayerRecords()
-        chain(vac.s(mode='GetMatchHistory',api_context=self.api_context), rpr.s()).delay()
+        pass_context = deepcopy(self.api_context)
+        chain(vac.s(mode='GetMatchHistory',api_context=pass_context), rpr.s()).delay()
 
 
     def cleanup(self):
@@ -258,7 +259,8 @@ class RetrievePlayerRecords(ApiFollower):
             um = UploadMatch()
             self.api_context.match_id=result['match_id']
             self.api_context.processed+=1
-            chain(vac.s(mode='GetMatchDetails',api_context=self.api_context), um.s()).delay()
+            pass_context = deepcopy(self.api_context)
+            chain(vac.s(mode='GetMatchDetails',api_context=pass_context), um.s()).delay()
 tasks.register(RetrievePlayerRecords)
 
 
@@ -334,7 +336,8 @@ class RefreshUpdatePlayerPersonas(BaseTask):
                 vac = ValveApiCall()
                 upp = UpdatePlayerPersonas()
                 self.api_context.steamids=steamids
-                chain(vac.s(mode='GetPlayerSummaries',api_context=self.api_context), \
+                pass_context = deepcopy(self.api_context)
+                chain(vac.s(mode='GetPlayerSummaries',api_context=pass_context), \
                       upp.s()).delay()
                 querylist = []
 tasks.register(RefreshUpdatePlayerPersonas)
@@ -415,7 +418,8 @@ class AcquirePlayerData(BaseTask):
 
             vac = ValveApiCall()
             rpr = RetrievePlayerRecords()
-            chain(vac.s(mode='GetMatchHistory',api_context=self.api_context),rpr.s()).delay()
+            pass_context = deepcopy(self.api_context)
+            chain(vac.s(mode='GetMatchHistory',api_context=pass_context),rpr.s()).delay()
 tasks.register(AcquirePlayerData)
 
 class AcquireHeroSkillData(BaseTask):
@@ -439,7 +443,8 @@ class AcquireHeroSkillData(BaseTask):
 
                 vac = ValveApiCall()
                 rpr = RetrievePlayerRecords()
-                chain(vac.s(mode='GetMatchHistory',api_context=self.api_context),rpr.s()).delay()
+                pass_context = deepcopy(self.api_context)
+                chain(vac.s(mode='GetMatchHistory',api_context=pass_context),rpr.s()).delay()
             logger.info("Done")
 tasks.register(AcquireHeroSkillData)
 
