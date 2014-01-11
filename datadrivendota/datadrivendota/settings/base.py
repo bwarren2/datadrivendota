@@ -60,11 +60,12 @@ CELERY_QUEUES = (
     Queue('management', Exchange('management'), routing_key='management'),
     Queue('api_call',  Exchange('valve_api'),   routing_key='valve_api_call'),
     Queue('db_upload',  Exchange('db'),   routing_key='db'),
+    Queue('rpr',  Exchange('rpr'),   routing_key='rpr'),
 )
 
 CELERY_ROUTES = {
     'matches.management.tasks.valve_api_calls.ValveApiCall': {'exchange': 'valve_api','routing_key':'valve_api_call'},
-    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'exchange': 'management','routing_key':'management'},
+    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'exchange': 'rpr','routing_key':'rpr'},
     'matches.management.tasks.valve_api_calls.UploadMatch': {'exchange': 'db','routing_key':'db'},
     'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {'exchange': 'management', 'routing_key':'management'},
     'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'exchange': 'db','routing_key':'db'},
