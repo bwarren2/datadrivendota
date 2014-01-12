@@ -157,7 +157,7 @@ class ValveApiCall(BaseTask):
         logger.info("URL: "+ URL)
         # Exception handling for the URL opening.
         try:
-            pageaccess = urllib2.urlopen(URL)
+            pageaccess = urllib2.urlopen(URL, timeout=2)
         except urllib2.HTTPError, err:
             if err.code == 104:
                 logger.error("Got error 104 (connection reset by peer) for mode " + str(mode) + self.api_context.toUrlDict() + ".  Retrying.")
