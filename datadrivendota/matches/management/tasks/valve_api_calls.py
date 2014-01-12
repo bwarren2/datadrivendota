@@ -208,27 +208,30 @@ class RetrievePlayerRecords(ApiFollower):
         Recursively pings the valve API to get match data and spawns new tasks
         to deal with the downloaded match IDs.
         """
+        try:
         #Validate
-        if self.result['status'] == 15:
-            logger.error("Could not pull data. "+str(self.api_context.account_id)+" disallowed it. ")
-            p = Player.objects.get(steam_id=self.api_context.account_id)
-            p.updated=False
-            p.save()
-        elif self.result['status'] == 1:
-            #Spawn a bunch of match detail queries
+            if self.result['status'] == 15:
+                logger.error("Could not pull data. "+str(self.api_context.account_id)+" disallowed it. ")
+                p = Player.objects.get(steam_id=self.api_context.account_id)
+                p.updated=False
+                p.save()
+            elif self.result['status'] == 1:
+                #Spawn a bunch of match detail queries
 
-            logger.info("Spawning")
-            self.spawnDetailCalls()
-            #Go around again if there are more records and the last one was before last scrape.
-            logger.info("Checking for more results")
-            if self.moreResultsLeft():
-                self.rebound()
-            #Successful closeout
+                logger.info("Spawning")
+                self.spawnDetailCalls()
+                #Go around again if there are more records and the last one was before last scrape.
+                logger.info("Checking for more results")
+                if self.moreResultsLeft():
+                    self.rebound()
+                #Successful closeout
+                else:
+                    logger.info("Cleaning up")
+                    self.cleanup()
             else:
-                logger.info("Cleaning up")
-                self.cleanup()
-        else:
-            logger.error("Unhandled status: "+str(self.result['status']))
+                logger.error("Unhandled status: "+str(self.result['status']))
+        except Exception, err:
+            logger.error("ERROR!:{0}".format(err))
 
 
     def rebound(self):
@@ -251,7 +254,7 @@ class RetrievePlayerRecords(ApiFollower):
             player.last_scrape_time = new_last_scrape
             player.save()
         except Player.DoesNotExist:
-            pass
+            logger.error("ERROR! Player does not exist {0}".format(self.api_context.account_id))
 
     def spawnDetailCalls(self):
         for result in self.result['matches']:
