@@ -215,6 +215,7 @@ class RetrievePlayerRecords(ApiFollower):
                 p = Player.objects.get(steam_id=self.api_context.account_id)
                 p.updated=False
                 p.save()
+                return True
             elif self.result['status'] == 1:
                 #Spawn a bunch of match detail queries
 
@@ -228,11 +229,13 @@ class RetrievePlayerRecords(ApiFollower):
                 else:
                     logger.info("Cleaning up")
                     self.cleanup()
+                return True
             else:
                 logger.error("Unhandled status: "+str(self.result['status']))
+                return True
         except Exception, err:
             logger.error("ERROR!:{0}".format(err))
-
+            return False
 
     def rebound(self):
         logger.info("Rebounding")
