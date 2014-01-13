@@ -1,23 +1,24 @@
+import urllib2
+import json
 from itertools import chain as meld
 from copy import deepcopy
+from time import time as now
+from urllib import urlencode
+
 from matches.models import Match, LobbyType, GameMode,\
  LeaverStatus, PlayerMatchSummary, SkillBuild
 from datadrivendota.settings.base import STEAM_API_KEY
 from players.models import Player, get_tracks
 from heroes.models import Ability, Hero
 from settings.base import ADDER_32_BIT
-from time import time as now
-### Patch for <urlopen error [Errno -2] Name or service not known in urllib2
-import os
-os.environ['http_proxy']=''
-### End Patch
-import urllib2
-import json
-from urllib import urlencode
 from celery import Task, chain
 from celery.registry import tasks
 import logging
 
+### Patch for <urlopen error [Errno -2] Name or service not known in urllib2
+import os
+os.environ['http_proxy']=''
+### End Patch
 
 from httplib import BadStatusLine
 
@@ -92,7 +93,7 @@ class BaseTask(Task):
         #logger.info("Starting to run")
         self.api_context = kwargs['api_context']
         del kwargs['api_context']
-        return self.run(*args, **kwargs)
+        return super(BaseTask, self).__call__(*args, **kwargs)
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         logger.info("Ending {task_id}".format(task_id=task_id))
@@ -114,18 +115,8 @@ class ApiFollower(BaseTask):
     def __call__(self, *args, **kwargs):
         self.result = args[0].get('result',{})
         self.api_context = args[0].get('api_context',{})
-        return self.run(*args, **kwargs)
+        return super(ApiFollower, self).__call__(*args, **kwargs)
 
-    def moreResultsLeft(self):
-        if self.result['results_remaining'] == 0:
-            return False
-        elif self.api_context.processed >= self.api_context.matches_desired:
-            return False
-        else:
-            if self.api_context.deepcopy is False:
-                return self.api_context.last_scrape_time < self.result['matches'][-1]['start_time']
-            else:
-                return True
 
 #Descendants
 class ValveApiCall(BaseTask):
@@ -267,6 +258,18 @@ class RetrievePlayerRecords(ApiFollower):
             self.api_context.processed+=1
             pass_context = deepcopy(self.api_context)
             chain(vac.s(mode='GetMatchDetails',api_context=pass_context), um.s()).delay()
+
+    def moreResultsLeft(self):
+        if self.result['results_remaining'] == 0:
+            return False
+        elif self.api_context.processed >= self.api_context.matches_desired:
+            return False
+        else:
+            if self.api_context.deepcopy is False:
+                return self.api_context.last_scrape_time < self.result['matches'][-1]['start_time']
+            else:
+                return True
+
 tasks.register(RetrievePlayerRecords)
 
 
