@@ -109,13 +109,27 @@ class BaseTask(Task):
     def on_success(self, retval, task_id, args, kwargs):
         logger.info("Task success! {task_id}".format(task_id=task_id))
 
-class ApiFollower(BaseTask):
+class ApiFollower(Task):
 
     abstract=True
     def __call__(self, *args, **kwargs):
         self.result = args[0].get('result',{})
         self.api_context = args[0].get('api_context',{})
         return super(ApiFollower, self).__call__(*args, **kwargs)
+
+    def after_return(self, status, retval, task_id, args, kwargs, einfo):
+        logger.info("Ending {task_id}".format(task_id=task_id))
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        logger.error("Task failure! {args}, {kwargs}, {task_id} {einfo}".format(
+            args=args,kwargs=kwargs,task_id=task_id,einfo=einfo))
+
+    def on_retry(self, retval, task_id, args, kwargs):
+        logger.info("Task retry! {args}, {kwargs}, {task_id}".format(
+            args=args,kwargs=kwargs,task_id=task_id))
+
+    def on_success(self, retval, task_id, args, kwargs):
+        logger.info("Task success! {task_id}".format(task_id=task_id))
 
 
 #Descendants
@@ -148,7 +162,7 @@ class ValveApiCall(BaseTask):
         logger.info("URL: "+ URL)
         # Exception handling for the URL opening.
         try:
-            pageaccess = urllib2.urlopen(URL, timeout=2)
+            pageaccess = urllib2.urlopen(URL, timeout=5)
         except urllib2.HTTPError, err:
             if err.code == 104:
                 logger.error("Got error 104 (connection reset by peer) for mode " + str(mode) + self.api_context.toUrlDict() + ".  Retrying.")
