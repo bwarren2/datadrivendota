@@ -1,10 +1,11 @@
 import urllib2
 import json
+import socket
+import ssl
 from itertools import chain as meld
 from copy import deepcopy
 from time import time as now
 from urllib import urlencode
-
 from matches.models import Match, LobbyType, GameMode,\
  LeaverStatus, PlayerMatchSummary, SkillBuild
 from datadrivendota.settings.base import STEAM_API_KEY
@@ -102,9 +103,9 @@ class BaseTask(Task):
         logger.error("Task failure! {args}, {kwargs}, {task_id} {einfo}".format(
             args=args,kwargs=kwargs,task_id=task_id,einfo=einfo))
 
-    def on_retry(self, retval, task_id, args, kwargs):
+    def on_retry(self, exc, id, args, kwargs, einfo):
         logger.info("Task retry! {args}, {kwargs}, {task_id}".format(
-            args=args,kwargs=kwargs,task_id=task_id))
+            args=args,kwargs=kwargs,task_id=id))
 
     def on_success(self, retval, task_id, args, kwargs):
         logger.info("Task success! {task_id}".format(task_id=task_id))
@@ -124,9 +125,9 @@ class ApiFollower(Task):
         logger.error("Task failure! {args}, {kwargs}, {task_id} {einfo}".format(
             args=args,kwargs=kwargs,task_id=task_id,einfo=einfo))
 
-    def on_retry(self, retval, task_id, args, kwargs):
+    def on_retry(self, exc, id, args, kwargs, einfo):
         logger.info("Task retry! {args}, {kwargs}, {task_id}".format(
-            args=args,kwargs=kwargs,task_id=task_id))
+            args=args,kwargs=kwargs,task_id=id))
 
     def on_success(self, retval, task_id, args, kwargs):
         logger.info("Task success! {task_id}".format(task_id=task_id))
@@ -191,7 +192,10 @@ class ValveApiCall(BaseTask):
         except BadStatusLine:
             logger.error("Bad status line for url %s" % URL+ ".  Retrying.")
             self.retry(mode=mode)
-        except urllib2.URLError:
+        except urllib2.URLError as err:
+            self.retry(mode=mode)
+        except (ssl.SSLError, socket.timeout) as err:
+            logger.error("Connection timeout for {url}. Error: {e}  Retrying.".format(url=URL,e=err))
             self.retry(mode=mode)
 
 
