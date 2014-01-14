@@ -18,7 +18,7 @@ def generate_intercom_user_hash(user_steam_id):
 @register.simple_tag
 def intercom_user_hash(user):
     try:
-        steam_id = user.social_auth.all()[0].extra_data['steamid']
+        steam_id = user.userprofile.player.steam_id
         return generate_intercom_user_hash(steam_id)
     except Exception:
         return ""
