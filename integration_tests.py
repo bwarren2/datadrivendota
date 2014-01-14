@@ -78,31 +78,10 @@ class HeroesIntegrationTest(IntegrationTest):
         r = self.client.get('/heroes/')
         self.assertEqual(r.status_code, 200)
 
-    # def test_vitals_get(self):
-    #     self.get('/heroes/vitals/')
-    #     self.assertEqual(self.css_count("#id_heroes"), 1)
-    #     self.assertEqual(self.css_count("input[name=stats]"), 7)
-    #     self.assertEqual(self.css_count("input[name=unlinked_scales]"), 1)
-
-    # def test_vitals_post(self):
-    #     self.get('/heroes/vitals/')
-    #     # The following form entry fails because the database is not
-    #     # initialized correctly.
-    #     self.css_single('#id_heroes').send_keys("Faceless Void")
-    #     self.css_single('#id_stats_3').click()
-    #     self.css_single('#id_stats_5').click()
-    #     self.css_single('button[type=submit]').click()
-    #     self.assertEqual(self.css_count('.error'), 0)
-
-    # def test_vitals_post_bad(self):
-    #     self.get('/heroes/vitals/')
-    #     # The following form entry fails because the database is not
-    #     # initialized correctly.
-    #     self.css_single('#id_heroes').send_keys("This hero doesn't exist")
-    #     self.css_single('#id_stats_3').click()
-    #     self.css_single('#id_stats_5').click()
-    #     self.css_single('button[type=submit]').click()
-    #     self.assertEqual(self.css_count('.error'), 1)
+    @logged_in(UserFactory)
+    def test_vitals_get(self, user):
+        r = self.client.get('/heroes/vitals/')
+        self.assertEqual(r.status_code, 200)
 
 # Heroes
 #  (Possibly slow-ajax-images on some pages, check)
@@ -123,13 +102,34 @@ class HeroesIntegrationTest(IntegrationTest):
 #   Submit form (check for image)
 #   Submit bad form (check for errors)
 
+
+class ItemsIntegrationTest(IntegrationTest):
+    @logged_in(UserFactory)
+    def test_index(self, user):
+        r = self.client.get('/items/')
+        self.assertEqual(r.status_code, 200)
+
 # Items
 #  Index
 #  Instance
 
+
+class MatchesIntegrationTest(IntegrationTest):
+    @logged_in(UserFactory)
+    def test_index(self, user):
+        r = self.client.get('/matches/')
+        self.assertEqual(r.status_code, 200)
+
 # Matches
 #  Index
 #  Instance (test for ajax-grabbed slow image)
+
+
+class PlayersIntegrationTest(IntegrationTest):
+    @logged_in(UserFactory)
+    def test_index(self, user):
+        r = self.client.get('/players/')
+        self.assertEqual(r.status_code, 200)
 
 # Players
 #  Detail
