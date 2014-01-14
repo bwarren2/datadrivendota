@@ -267,8 +267,18 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'pipeline.middleware.MinifyHTMLMiddleware',
     'datadrivendota.middleware.AccessControlAllowOriginMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 )
 ########## END MIDDLEWARE CONFIGURATION
+
+
+########## BEGIN CORS CONFIGURATION
+CORS_ORIGIN_WHITELIST = (
+    'api.intercom.io',
+    'datadrivendota.s3.amazonaws.com',
+    'fonts.googleapis.com',
+)
+########## END CORS CONFIGURATION
 
 
 ########## URL CONFIGURATION
@@ -304,6 +314,7 @@ THIRD_PARTY_APPS = (
     'djcelery',
     'pipeline',
     'bootstrapform',
+    'corsheaders',
 )
 
 # Apps specific for this project go here.
@@ -466,6 +477,3 @@ PIPELINE_COMPILERS = (
 # Thorny!
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--with-yanc', '--stop']
-
-
-

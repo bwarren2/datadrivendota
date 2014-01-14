@@ -12,6 +12,7 @@ dj-database-url==0.2.1
 django-bootstrap-form==3.0
 django-braces==0.2.1
 django-celery==3.0.17
+django-cors-headers==0.12
 django-debug-toolbar==0.9.4
 django-discover-runner==0.2.2
 django-model-utils==1.1.0
