@@ -1,55 +1,82 @@
-from splinter import Browser
-from django.test import LiveServerTestCase
+from functools import wraps
 
-from heroes.models import Hero
+import factory
 
+from django.contrib.auth.models import User, Permission
+from django.test import TestCase
 
-class BaseIntegrationTest(LiveServerTestCase):
-    implicit_wait = 3
-
-    @classmethod
-    def setUpClass(cls):
-        cls.browser = Browser(driver_name='phantomjs')
-        super(BaseIntegrationTest, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.browser.quit()
-        super(BaseIntegrationTest, cls).tearDownClass()
-
-    def get(self, path, query=None):
-        return self.browser.visit("{scheme_host_port}{path}".format(
-            scheme_host_port=self.live_server_url,
-            path=path
-        ))
-
-    def css(self, selector):
-        return self.browser.find_elements_by_css_selector(selector)
-
-    def css_count(self, selector):
-        return len(self.css(selector))
-
-    def css_single(self, selector):
-        return self.css(selector)[0]
+from players.models import Player
 
 
-class IntegrationTest(BaseIntegrationTest):
-    def test_redirect_to_login(self):
-        self.get('/')
-        self.assertIn('Login!', self.browser.title)
+## Test Factories
+class UserFactory(factory.django.DjangoModelFactory):
+    FACTORY_FOR = User
+
+    username = factory.Sequence(lambda n: 'person{0}'.format(n))
+    email = factory.Sequence(lambda n: 'person{0}@example.com'.format(n))
+    first_name = "Test"
+    last_name = "User"
+
+    @factory.post_generation
+    def password(self, create, extracted, **kwargs):
+        self.set_password(self.username)
 
 
-class HeroesIntegrationTest(BaseIntegrationTest):
+class PlayerFactory(factory.django.DjangoModelFactory):
+    FACTORY_FOR = Player
+
+    steam_id = factory.Sequence(lambda n: n + 1)
+    persona_name = factory.Sequence(lambda n: 'Steam{0}'.format(n))
+    updated = True
+
+
+### Test Utils
+
+class LoginError(Exception):
     pass
-    # def test_index(self):
-    #     self.get('/heroes/')
-    #     for hero in Hero.objects.all():
-    #         self.assertEqual(
-    #             self.css_count("a[href={link}]".format(
-    #                 link=hero.get_absolute_url()
-    #             )),
-    #             1
-    #         )
+
+
+def logged_in(user_factory):
+    def logged_in(f):
+        @wraps(f)
+        def wrapper(self, *args, **kwargs):
+            user = user_factory.create()
+            username = user.username
+            password = user.username
+            permissions = Permission.objects.filter(
+                codename__in=['can_look', 'can_touch']
+            )
+            user.user_permissions = permissions
+            user.save()
+            if not self.client.login(username=username, password=password):
+                raise LoginError
+            return f(self, user, *args, **kwargs)
+        return wrapper
+    return logged_in
+
+
+# Tests
+
+class IntegrationTest(TestCase):
+    pass
+
+
+class CoreIntegrationTest(IntegrationTest):
+    def test_redirect_to_login(self):
+        r = self.client.get('/')
+        self.assertEqual(r.status_code, 302)
+        # Is this the best way to check headers?
+        self.assertIn(
+            "http://testserver/login/?next=/",
+            r._headers['location']
+        )
+
+
+class HeroesIntegrationTest(IntegrationTest):
+    @logged_in(UserFactory)
+    def test_index(self, user):
+        r = self.client.get('/heroes/')
+        self.assertEqual(r.status_code, 200)
 
     # def test_vitals_get(self):
     #     self.get('/heroes/vitals/')
