@@ -35,12 +35,41 @@
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
           <ul class="nav navbar-nav">
-            <li class="{% active 'heroes' main_nav %}"><a href="{% url 'heroes:index' %}">Heroes</a></li>
+
+            <li class="dropdown {% active 'heroes' main_nav %}">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Heroes <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="{% url 'heroes:index' %}">Index</a></li>
+                <li><a href="{% url 'heroes:vitals' %}">Vitals</a></li>
+                <li><a href="{% url 'heroes:lineup' %}">Lineups</a></li>
+                <li><a href="{% url 'heroes:hero_performance' %}">Performance</a></li>
+                <li><a href="{% url 'heroes:hero_skill_bars' %}">Skill Time Bars</a></li>
+              </ul>
+            </li>
+
             <li class="{% active 'items' main_nav %}"><a href="{% url 'items:index' %}">Items</a></li>
-            <li class="{% active 'matches' main_nav %}"><a href="{% url 'matches:index' %}">Matches</a></li>
-            <li class="{% active 'players' main_nav %}"><a href="{% url 'players:index' %}">Players</a></li>
+
+            <li class="dropdown {% active 'matches' main_nav %}">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Matches <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="{% url 'matches:index' %}">Index</a></li>
+                <li><a href="{% url 'matches:endgame' %}">Endgame Charts</a></li>
+                <li><a href="{% url 'matches:team_endgame' %}">Team Endgame Charts</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown {% active 'players' main_nav %}">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Players <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="{% url 'players:index' %}">Index</a></li>
+                <li><a href="{% url 'players:player_winrate' %}">Winrate</a></li>
+                <li><a href="{% url 'players:timeline' %}">Timeline</a></li>
+              </ul>
+            </li>
+
             <li class="{% active 'about' main_nav %}"><a href="/about/">About</a></li>
             <li><a target="_blank" href="mailto:datadrivendota@gmail.com">Contact</a></li>
+
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_active %}
