@@ -118,7 +118,7 @@ def player_matches(request,player_id=None):
       pms.color_class = 'pos' if pms.kda2 > 0 else 'neg'
       pms.mag = abs(pms.kda2)*2
   return render(request, 'playermatchsummary_index.html', {'pms_list':pms_list,
-    'persona_name':player.persona_name})
+    'player':player})
 
 @permission_required('players.can_look')
 def player_management(request):

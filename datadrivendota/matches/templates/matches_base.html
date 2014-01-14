@@ -7,5 +7,8 @@
   <li class="{% active 'matches:index' %}"><a href="{% url 'matches:index' %}">Matches</a></li>
   <li class="{% active 'matches:endgame' %}"><a href="{% url 'matches:endgame' %}">Endgame Charts</a></li>
   <li class="{% active 'matches:team_endgame' %}"><a href="{% url 'matches:team_endgame' %}">Team Endgame Charts</a></li>
+  {% if match %}
+    <li class="{% active 'matches:match_detail' %}"><a href="{% url 'matches:match_detail' match_id=match.steam_id %}">Match #{{ match.steam_id }}</a></li>
+  {% endif %}
 </ul>
 {% endblock extra_nav %}

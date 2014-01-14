@@ -2,7 +2,7 @@
 
 {% block title %}Match Index{% endblock title %}
 
-{% block page_title %}{{persona_name}}'s Matches{% endblock page_title %}
+{% block page_title %}{{ player.persona_name }}'s Matches{% endblock page_title %}
 
 {% block content %}
   <div>
@@ -23,7 +23,7 @@
       <tbody>
         {% for pms in pms_list %}
           <tr>
-            <td><a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}">{{pms.match.steam_id}}</a></td>
+            <td><a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}">{{ pms.match.steam_id }}</a></td>
             <td>{{ pms.display_duration }}</td>
             <td><img src="{{ pms.hero.thumbshot.url }}" height="60%"></td>
             <td>{{ pms.hero.name }}</td>
@@ -31,7 +31,7 @@
             <td>{{ pms.deaths }}</td>
             <td>{{ pms.assists }}</td>
             <td>{{ pms.kda2 }}</td>
-            <td><div style="width:{{pms.mag}}px" class="databaru {{ pms.color_class }}"></div></td>
+            <td><div style="width:{{ pms.mag }}px" class="databaru {{ pms.color_class }}"></div></td>
             <td>{{ pms.display_date|date:"D d M Y" }}</td>
             <td>{{ pms.match.game_mode.description }}</td>
           </tr>
