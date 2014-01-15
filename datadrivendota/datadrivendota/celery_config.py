@@ -1,4 +1,4 @@
-from kombu import Exchange, Queue
+"""from kombu import Exchange, Queue
 from os import getenv
 
 ########## CELERY CONFIG
@@ -80,3 +80,4 @@ CELERY_ANNOTATIONS = {
     'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'acks_late': True,'max_retries':5, },
 
 }
+"""
