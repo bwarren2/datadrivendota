@@ -9,9 +9,6 @@ from kombu import Exchange, Queue
 import dj_database_url
 
 #Celery
-
-
-
 ########## CELERY CONFIG
 BROKER_POOL_LIMIT = int(getenv('BROKER_POOL_LIMIT', 1))
 BROKER_URL = getenv('CLOUDAMQP_URL')
