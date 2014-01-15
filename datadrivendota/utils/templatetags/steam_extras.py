@@ -6,7 +6,7 @@ register = template.Library()
 @register.simple_tag
 def steam_id(user):
     try:
-        return user.social_auth.all()[0].extra_data['steamid']
+        return user.userprofile.player.steam_id
     except Exception:
         return ""
 
@@ -14,6 +14,6 @@ def steam_id(user):
 @register.simple_tag
 def steam_avatar(user):
     try:
-        return user.social_auth.all()[0].extra_data['avatar']
+        return user.userprofile.player.avatar
     except Exception:
         return ""

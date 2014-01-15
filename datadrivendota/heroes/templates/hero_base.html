@@ -10,7 +10,10 @@
     <li class="{% active 'heroes:hero_performance' %}"><a href="{% url 'heroes:hero_performance' %}">Performance</a></li>
     <li class="{% active 'heroes:hero_skill_bars' %}"><a href="{% url 'heroes:hero_skill_bars' %}">Skill Time Bars</a></li>
     {% if hero %}
-      <li class="{% active 'heroes:detail' hero_name=hero.name %}"><a href="{% url 'heroes:hero_skill_bars' %}">{{ hero.name }}</a></li>
+      <li class="{% active 'heroes:detail' %}"><a href="{% url 'heroes:detail' hero_name=hero.machine_name %}">{{ hero.name }}</a></li>
+    {% endif %}
+    {% if ability %}
+      <li class="{% active 'heroes:ability_detail' %}"><a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name %}">{{ ability.name }}</a></li>
     {% endif %}
   </ul>
 {% endblock extra_nav %}
