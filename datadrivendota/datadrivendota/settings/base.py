@@ -9,8 +9,6 @@ from kombu import Exchange, Queue
 import dj_database_url
 
 #Celery
-import djcelery
-djcelery.setup_loader()
 
 
 
@@ -311,7 +309,6 @@ THIRD_PARTY_APPS = (
     'south',
     'social.apps.django_app.default',
     'storages',
-    'djcelery',
     'pipeline',
     'bootstrapform',
     'corsheaders',

@@ -1,0 +1,10 @@
+from __future__ import absolute_import
+from celery import Celery
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'datadrivendota.settings.local')
+app = Celery('datadrivendota')
+app.config_from_object('celery_config')
+
+if __name__ == '__main__':
+    app.start()
+
