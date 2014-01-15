@@ -6,22 +6,22 @@
 
 {% block content %}
   {% if request.user.is_authenticated %}
-    <div>
-      <h3>Upgrade your account with an invitation code</h3>
-      <form class='chart-form' action="" method='POST'>
-        {% csrf_token %}
-        {% include "_form.html" %}
-        <div class="control-group">
-        <div class="controls pull-right">
-          <button type="submit" class="btn btn-small btn-primary">Submit</button>
-        </div>
-        </div>
-      </form>
-    </div>
+    <p>Upgrade your account with an invitation code</p>
+    <form class='chart-form' action="" method='POST'>
+      {% csrf_token %}
+      {% include "_form.html" %}
+      <div class="control-group">
+      <div class="controls pull-right">
+        <button type="submit" class="btn btn-small btn-primary">Submit</button>
+      </div>
+      </div>
+    </form>
   {% else %}
-    <div>
-      Log into an account with <a href="{% url 'social:begin' 'steam' %}">Steam</a> to apply an upgrade code
-    </div>
+    <p>
+      Log into an account with
+      <a href="{% url 'social:begin' 'steam' %}">Steam</a> to apply an
+      upgrade code.
+    </p>
   {% endif %}
   <h4>{{ message }}</h4>
 {% endblock content %}
