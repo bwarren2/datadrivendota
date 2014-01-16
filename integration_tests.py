@@ -83,6 +83,21 @@ class HeroesIntegrationTest(IntegrationTest):
         r = self.client.get('/heroes/vitals/')
         self.assertEqual(r.status_code, 200)
 
+    @logged_in(UserFactory)
+    def test_lineups_get(self, user):
+        r = self.client.get('/heroes/lineups/')
+        self.assertEqual(r.status_code, 200)
+
+    @logged_in(UserFactory)
+    def test_performance_get(self, user):
+        r = self.client.get('/heroes/performance/')
+        self.assertEqual(r.status_code, 200)
+
+    @logged_in(UserFactory)
+    def test_skill_bars_get(self, user):
+        r = self.client.get('/heroes/skill_bars/')
+        self.assertEqual(r.status_code, 200)
+
 # Heroes
 #  (Possibly slow-ajax-images on some pages, check)
 #  Vitals
@@ -131,6 +146,20 @@ class PlayersIntegrationTest(IntegrationTest):
         r = self.client.get('/players/')
         self.assertEqual(r.status_code, 200)
 
+    @logged_in(UserFactory)
+    def test_winrate(self, user):
+        r = self.client.get('/players/winrate/')
+        self.assertEqual(r.status_code, 200)
+
+    @logged_in(UserFactory)
+    def test_timeline(self, user):
+        r = self.client.get('/players/timeline/')
+        self.assertEqual(r.status_code, 200)
+
+    @logged_in(UserFactory)
+    def test_management(self, user):
+        r = self.client.get('/players/management/')
+        self.assertEqual(r.status_code, 200)
 # Players
 #  Detail
 #   Get form
