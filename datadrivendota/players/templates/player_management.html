@@ -133,11 +133,11 @@ $('.purgeButton').click(function(){
     url: "{% url 'players:drop_follow' %}",
     data: {
       'slug': $(this).attr('name'),
-      'csrfmiddlewaretoken': '{{csrf_token}}'
+      'csrfmiddlewaretoken': '{{ csrf_token }}'
     },
     dataType: "text",
     success: function(response) {
-      $("tr#"+response).remove();
+      $("tr#" + response).remove();
     },
     error: function(rs, e) {
       alert(rs.responseText);
@@ -147,11 +147,11 @@ $('.purgeButton').click(function(){
 
 $('#steam_id_validator').click(function(){
   $.ajax({
-    type:"POST",
-    url: "{%url 'players:check_id' %}",
-    data:{
-      'steam_id':$('#steam_id_input').val(),
-      'csrfmiddlewaretoken': '{{csrf_token}}'
+    type: "POST",
+    url: "{% url 'players:check_id' %}",
+    data: {
+      'steam_id': $('#steam_id_input').val(),
+      'csrfmiddlewaretoken': '{{ csrf_token }}'
     },
     dataType: "text",
     success: function(response) {
@@ -161,8 +161,8 @@ $('#steam_id_validator').click(function(){
           type:'POST',
           url:'{% url "players:add_track" %}',
           data:{
-            "steam_id":$("#add_track").attr('name'),
-            'csrfmiddlewaretoken': '{{csrf_token}}',
+            "steam_id": $("#add_track").attr('name'),
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
           },
           dataType: "text",
           success: function(response) {
@@ -171,16 +171,11 @@ $('#steam_id_validator').click(function(){
           error: function(rs, e) {
             alert('fail')
           }
-
-        })
-      })
-
+        });
+      });
     },
-    error: function(rs, e) {
-    }
-
+    error: function(rs, e) {}
   })
 })
-
 </script>
 {% endblock extra_js %}
