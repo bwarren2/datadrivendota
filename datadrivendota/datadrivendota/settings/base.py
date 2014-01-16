@@ -44,7 +44,7 @@ CELERY_SEND_TASK_ERROR_EMAILS = True
 
 # Name and email addresses of recipients
 ADMINS = (
-    ("Ben Warren", "datadrivendota@gmail.com"),
+    ("Ben Warren", "ben@datadrivendota.com"),
 )
 
 # Email address used as sender (From field).
@@ -116,9 +116,6 @@ TEMPLATE_DEBUG = DEBUG
 
 ########## MANAGER CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = (
-    ('ben', 'datadrivendota@gmail.com'),
-)
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS

@@ -97,7 +97,7 @@ class PermissionCode(models.Model):
 
         {key}
 
-        """.format(key=self.key, url="http://{site}{path}".format(site=self.site,
+        """.format(key=self.key, url="http://{site}.com{path}".format(site=settings.SITE_NAME,
                                                            path=reverse('upgrade')))
 
         from_address = 'datadrivendota@gmail.com'
