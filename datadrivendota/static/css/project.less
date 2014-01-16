@@ -4,6 +4,10 @@ body {
   background-position: top;
 }
 
+#body.container {
+  margin-bottom: 70px;
+}
+
 .navbar-brand {
   font-family: 'Cinzel Decorative', cursive;
   font-variant: small-caps;
@@ -36,10 +40,10 @@ img.item {
 .infobox {
   float: right;
   width: 300px;
-}
 
-.infobox img.hero {
-  margin: 0 auto;
+  img.hero {
+    margin: 0 auto;
+  }
 }
 
 .help-block {
@@ -105,4 +109,21 @@ body {
 img.hero-portrait {
   height: 90px;
   width: 160px;
+}
+
+.player-infobox {
+  float: right;
+  width: 330px;
+  border: 1px solid #DDD;
+  border-radius: 4px;
+  padding: 20px 10px;
+
+  img {
+    display: block;
+    margin: 0 auto;
+  }
+
+  h2 {
+    text-align: center;
+  }
 }

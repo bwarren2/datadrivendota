@@ -6,22 +6,17 @@
 {% block page_title %}Steam ID: {{ player.steam_id }}{% endblock page_title %}
 
 {% block content %}
-  <div>
-    <div style='float:left'>
-      <img src="{{ player.avatar_full }}">
-      {{ player.persona_name }}
-    </div>
-    <br>
-    {# Oh, really? Let's style that right. --kit 2013-10-27 #}
-
-    <div style='float:right'>
-      {% if winratebase %}
-        <img src="{{ MEDIA_URL }}{{ winratebase }}">
-      {% endif %}
-      {% if kdabase %}
-        <img src="{{ MEDIA_URL }}{{ kdabase }}">
-      {% endif %}
-    </div>
+  <div class="player-infobox">
+    <img src="{{ player.avatar_full }}">
+    <h2>{{ player.persona_name }}</h2>
+  </div>
+  <div class="player-charts">
+    {% if winratebase %}
+      <img src="{{ MEDIA_URL }}{{ winratebase }}">
+    {% endif %}
+    {% if kdabase %}
+      <img src="{{ MEDIA_URL }}{{ kdabase }}">
+    {% endif %}
   </div>
   <div id='chart'></div>
 {% endblock content %}
