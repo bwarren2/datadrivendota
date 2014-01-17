@@ -1,0 +1,23 @@
+<div class="pagination-wrap">
+  <ul class="pagination">
+    {% if pages_list.has_previous %}
+      <li><a href="?page={{ pages_list.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+
+    {% for page_number in page_links_to_display %}
+      {% if page_number != pages_list.number %}
+        <li><a href="?page={{ page_number }}">{{ page_number }}</a></li>
+      {% else %}
+        <li class="active"><span>{{ page_number }}<span class="sr-only"> (current)</span></span></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if pages_list.has_next %}
+      <li><a href="?page={{ pages_list.next_page_number }}">&raquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+</div>

@@ -15,6 +15,7 @@
           <th>Start Time</th>
           <th>Lobby Type</th>
           <th>Game Mode</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -45,19 +46,8 @@
     </table>
   </div>
 
-  <div class="pagination">
-    <span class="step-links">
-      {% if match_list.has_previous %}
-        <a href="?page={{ match_list.previous_page_number }}">previous</a>
-      {% endif %}
-      <span class="current">
-        Page {{ match_list.number }} of {{ match_list.paginator.num_pages }}.
-      </span>
-      {% if match_list.has_next %}
-        <a href="?page={{ match_list.next_page_number }}">next</a>
-      {% endif %}
-    </span>
-  </div>
+  {% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range %}
+
 {% else %}
   <p>
     You do not seem to have any feeds active.  Add players to follow in the
