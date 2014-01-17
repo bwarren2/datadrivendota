@@ -4,11 +4,15 @@
 
 {% block extra_css %}{{ form.media }}{% endblock extra_css %}
 
-{% block title %}Match Detail{% endblock title %}
+{% block title %}Match #{{ match.steam_id }}{% endblock title %}
 
-{% block page_title %}Match #{{ match.steam_id }}: {{ match.game_mode.description }} {{ match.lobby_type.description }}, {{ match.hms_duration }} @ {{ match.hms_start_time }}{% endblock page_title %}
+{% block page_title %}Match #{{ match.steam_id }}{% endblock page_title %}
 
 {% block content %}
+  <div class="match-data">
+    {{ match.game_mode.description }} {{ match.lobby_type.description }},
+    {{ match.hms_duration }} @ {{ match.hms_start_time }}
+  </div>
   <div>
     <table class="table  table-condensed" id='myTable'>
       <thead>
