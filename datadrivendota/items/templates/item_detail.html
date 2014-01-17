@@ -2,14 +2,17 @@
 
 {% block title %}{{ item.external_name }}{% endblock title %}
 
-{% block page_title %}{% endblock page_title %}
+{% block page_title %}{{ item.name }}{% endblock page_title %}
 
 {% block content %}
-  <h1>{{ item.name }}</h1>
-  <img class="item" src="{{ item.mugshot.url }}">
-  <p>{{ item.description }}</p>
-  <p>{{ item.notes }}</p>
-  <p class='lore'>
-    {{ item.lore }}
-  </p>
+  <img class="item" src="{{ item.mugshot.url }}" alt="{{ item.name }}">
+  {% if item.description %}
+    <p>{{ item.description }}</p>
+  {% endif %}
+  {% if item.notes %}
+    <p>{{ item.notes }}</p>
+  {% endif %}
+  {% if item.lore %}
+    <p class="lore">{{ item.lore }}</p>
+  {% endif %}
 {% endblock content %}
