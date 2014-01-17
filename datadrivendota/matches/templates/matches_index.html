@@ -7,7 +7,7 @@
 {% block content %}
 {% if match_list %}
   <div>
-    <table class="table table-condensed" id='myTable'>
+    <table class="table table-condensed">
       <thead>
         <tr>
           <th>Match ID</th>
@@ -20,24 +20,24 @@
       <tbody>
         {% for match in match_list %}
           <tr>
-            <td><a href="{% url 'matches:match_detail' match_id=match.steam_id %}">{{match.steam_id}}</a></td>
+            <td>
+              <a href="{% url 'matches:match_detail' match_id=match.steam_id %}">{{match.steam_id}}</a>
+            </td>
             <td>{{ match.display_duration }}</td>
             <td>{{ match.display_date|date:"D d M Y" }}</td>
             <td>{{ match.lobby_type.description }}</td>
             <td>{{ match.game_mode.description }}</td>
             {% if match.follow_annotations %}
-
-
-            <td>
-            {% for detail in match.follow_annotations %}
-              <span>
-                <img src="{{detail.player_image}}">
-                <img src="{{detail.hero_image}}">{{detail.KDA}}
-              </span>
-            {% endfor %}
-            </td>
+              <td>
+              {% for detail in match.follow_annotations %}
+                <span>
+                  <img src="{{detail.player_image}}">
+                  <img src="{{detail.hero_image}}">{{detail.KDA}}
+                </span>
+              {% endfor %}
+              </td>
             {% else %}
-            <td></td>
+              <td></td>
             {% endif %}
           </tr>
         {% endfor %}
