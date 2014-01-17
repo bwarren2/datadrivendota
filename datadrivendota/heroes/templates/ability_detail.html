@@ -2,16 +2,17 @@
 
 {% block title %}{{ ability.name }}{% endblock %}
 
-{% block page_title %}{% endblock %}
+{% block page_title %}{{ ability.name }}{% endblock %}
 
 {% block content %}
-  <div style='display: inline-block'>
-    <h1>{{ ability.name }}</h1>
-    <img class="ability" src='{{ ability.picture.url }}'>
-  </div>
-  <div>
+  <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
+  {% if ability.description %}
     <p>{{ ability.description }}</p>
+  {% endif %}
+  {% if ability.lore %}
     <p>{{ ability.lore }}</p>
+  {% endif %}
+  {% if ability.notes %}
     <p>{{ ability.notes }}</p>
-  </div>
+  {% endif %}
 {% endblock %}

@@ -18,7 +18,7 @@
     {% for ability in abilities %}
       <div class="col-md-2">
         <a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name %}" class="thumbnail">
-          <img src="{{ ability.picture.url }}" alt="{{ ability.name }}">
+          <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
           <p class='overlayer'>{{ ability.name }}</p>
         </a>
       </div>
