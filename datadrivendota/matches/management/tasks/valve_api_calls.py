@@ -7,13 +7,14 @@ from copy import deepcopy
 from time import time as now
 from urllib import urlencode
 from matches.models import Match, LobbyType, GameMode,\
- LeaverStatus, PlayerMatchSummary, SkillBuild
+ LeaverStatus, PlayerMatchSummary, SkillBuild, AdditionalUnit, PickBan
 from datadrivendota.settings.base import STEAM_API_KEY
 from players.models import Player, get_tracks
 from heroes.models import Ability, Hero
+from item.models import Item
+from guilds.models import Guilds
 from settings.base import ADDER_32_BIT
 from celery import Task, chain
-from celery.registry import tasks
 import logging
 
 ### Patch for <urlopen error [Errno -2] Name or service not known in urllib2
@@ -207,7 +208,6 @@ class ValveApiCall(BaseTask):
         # unless you do this.
         data['api_context'] = self.api_context
         return data
-tasks.register(ValveApiCall)
 
 
 class RetrievePlayerRecords(ApiFollower):
@@ -288,7 +288,6 @@ class RetrievePlayerRecords(ApiFollower):
             else:
                 return True
 
-tasks.register(RetrievePlayerRecords)
 
 
 class UploadMatch(ApiFollower):
@@ -338,8 +337,35 @@ class UploadMatch(ApiFollower):
             match = Match.objects.create(**kwargs)
             match.save()
             upload_match_summary(players=data['players'], parent_match=match,refresh_records=self.api_context.refresh_records)
-tasks.register(UploadMatch)
 
+        if 'picks_bans' in data.keys():
+            for pickban in data['picks_bans']:
+                datadict = {
+                    'match': match,
+                    'is_pick': data['is_pick'],
+                    'hero': Hero.objects.get_or_create(steam_id=data['hero_id']),
+                    'team': data['team'],
+                    'order': data['order'],
+
+                }
+            pb = PickBan.objects.get_or_create(match=match,order=data['order'], defaults=datadict)
+            pb.save()
+
+        if 'dire_guild_id' in data.keys():
+            datadict = {
+                'steam_id': data["dire_guild_id"],
+                'name': data["dire_guild_name"],
+                'logo': data["dire_guild_logo"],
+            }
+            Guilds.objects.get_or_create(steam_id=data["dire_guild_id"],defaults=datadict)
+
+        if 'radiant_guild_id' in data.keys():
+            datadict = {
+                'steam_id': data["radiant_guild_id"],
+                'name': data["radiant_guild_name"],
+                'logo': data["radiant_guild_logo"],
+            }
+            Guilds.objects.get_or_create(steam_id=data["radiant_guild_id"],defaults=datadict)
 
 class RefreshUpdatePlayerPersonas(BaseTask):
 
@@ -367,7 +393,6 @@ class RefreshUpdatePlayerPersonas(BaseTask):
                 chain(vac.s(mode='GetPlayerSummaries',api_context=pass_context), \
                       upp.s()).delay()
                 querylist = []
-tasks.register(RefreshUpdatePlayerPersonas)
 
 
 class UpdatePlayerPersonas(ApiFollower):
@@ -390,7 +415,6 @@ class UpdatePlayerPersonas(ApiFollower):
             player.avatar_medium = pulled_player['avatarmedium']
             player.avatar_full = pulled_player['avatarfull']
             player.save()
-tasks.register(UpdatePlayerPersonas)
 
 
 class RefreshPlayerMatchDetail(BaseTask):
@@ -422,7 +446,6 @@ class RefreshPlayerMatchDetail(BaseTask):
             vac = ValveApiCall()
             rpr = RetrievePlayerRecords()
             chain(vac.s(mode='GetMatchHistory',api_context=context),rpr.s()).delay()
-tasks.register(RefreshPlayerMatchDetail)
 
 
 class AcquirePlayerData(BaseTask):
@@ -447,7 +470,6 @@ class AcquirePlayerData(BaseTask):
             rpr = RetrievePlayerRecords()
             pass_context = deepcopy(self.api_context)
             chain(vac.s(mode='GetMatchHistory',api_context=pass_context),rpr.s()).delay()
-tasks.register(AcquirePlayerData)
 
 class AcquireHeroSkillData(BaseTask):
 
@@ -473,7 +495,6 @@ class AcquireHeroSkillData(BaseTask):
                 pass_context = deepcopy(self.api_context)
                 chain(vac.s(mode='GetMatchHistory',api_context=pass_context),rpr.s()).delay()
             logger.info("Done")
-tasks.register(AcquireHeroSkillData)
 
 def upload_match_summary(players,parent_match,refresh_records):
     """
@@ -542,3 +563,17 @@ def upload_match_summary(players,parent_match,refresh_records):
                     'level': skillpick['level'],
                 }
                 SkillBuild.objects.get_or_create(**kwargs)
+
+        if 'additional_units' in player.keys():
+            for unit in player['additional_units']:
+                kwargs = {
+                    'player_match_summary': playermatchsummary,
+                    'unit_name': unit['unitname'],
+                    'item_0': Item.objects.get_or_create(steam_id=unit['item_0']),
+                    'item_1': Item.objects.get_or_create(steam_id=unit['item_1']),
+                    'item_2': Item.objects.get_or_create(steam_id=unit['item_2']),
+                    'item_3': Item.objects.get_or_create(steam_id=unit['item_3']),
+                    'item_4': Item.objects.get_or_create(steam_id=unit['item_4']),
+                    'item_5': Item.objects.get_or_create(steam_id=unit['item_5']),
+                }
+                AdditionalUnit.objects.get_or_create(**kwargs)

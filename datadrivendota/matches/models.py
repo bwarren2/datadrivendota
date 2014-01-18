@@ -26,6 +26,8 @@ class Match(models.Model):
     game_mode = models.ForeignKey('GameMode')
     skill=models.IntegerField(default=0,
         help_text='How valve denotes skill bracket.  1 is normal, 2 is high, 3 is very high, 0 is my not-assigned')
+    dire_guild = models.ForeignKey('guilds.Guild', null=True)
+    radiant_guild = models.ForeignKey('guilds.Guild', blank=True)
 
     UNPROCESSED = 0
     LEGIT = 1
@@ -80,12 +82,12 @@ class PlayerMatchSummary(models.Model):
     hero = models.ForeignKey('heroes.Hero')
     player_slot = models.IntegerField()
     leaver = models.ForeignKey('LeaverStatus')
-    item_0 = models.IntegerField()
-    item_1 = models.IntegerField()
-    item_2 = models.IntegerField()
-    item_3 = models.IntegerField()
-    item_4 = models.IntegerField()
-    item_5 = models.IntegerField()
+    item_0 = models.ForeignKey('items.Item', related_name='item0')
+    item_1 = models.ForeignKey('items.Item', related_name='item1')
+    item_2 = models.ForeignKey('items.Item', related_name='item2')
+    item_3 = models.ForeignKey('items.Item', related_name='item3')
+    item_4 = models.ForeignKey('items.Item', related_name='item4')
+    item_5 = models.ForeignKey('items.Item', related_name='item5')
     kills = models.IntegerField()
     deaths = models.IntegerField()
     assists = models.IntegerField()
@@ -150,6 +152,22 @@ class PlayerMatchSummary(models.Model):
         label = fetch_attribute_label(attribute)
         return vector_list, label
 
+class AdditonalUnit(models.Model):
+    player_match_summary = models.OneToOneField('PlayerMatchSummary')
+    unit_name = models.CharField(max_length=50)
+    item_0 = models.ForeignKey('items.Item', related_name='additem0')
+    item_1 = models.ForeignKey('items.Item', related_name='additem1')
+    item_2 = models.ForeignKey('items.Item', related_name='additem2')
+    item_3 = models.ForeignKey('items.Item', related_name='additem3')
+    item_4 = models.ForeignKey('items.Item', related_name='additem4')
+    item_5 = models.ForeignKey('items.Item', related_name='additem5')
+
+class PickBan(models.Model):
+    match = models.OneToOneField('Match')
+    is_pick = models.BooleanField()
+    hero = models.ForeignKey('heroes.Hero')
+    team = models.IntegerField()
+    order = models.IntegerField()
 
 class LeaverStatus(models.Model):
     steam_id = models.IntegerField(unique=True)
