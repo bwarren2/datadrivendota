@@ -26,8 +26,8 @@ class Match(models.Model):
     game_mode = models.ForeignKey('GameMode')
     skill=models.IntegerField(default=0,
         help_text='How valve denotes skill bracket.  1 is normal, 2 is high, 3 is very high, 0 is my not-assigned')
-    dire_guild = models.ForeignKey('guilds.Guild', null=True)
-    radiant_guild = models.ForeignKey('guilds.Guild', blank=True)
+    dire_guild = models.ForeignKey('guilds.Guild', null=True, related_name='dire_guild')
+    radiant_guild = models.ForeignKey('guilds.Guild', null=True, related_name='radiant_guild')
 
     UNPROCESSED = 0
     LEGIT = 1

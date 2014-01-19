@@ -316,6 +316,7 @@ LOCAL_APPS = (
     'items',
     'players',
     'matches',
+    'guilds',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
