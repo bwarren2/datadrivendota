@@ -152,7 +152,7 @@ class PlayerMatchSummary(models.Model):
         label = fetch_attribute_label(attribute)
         return vector_list, label
 
-class AdditonalUnit(models.Model):
+class AdditionalUnit(models.Model):
     player_match_summary = models.OneToOneField('PlayerMatchSummary')
     unit_name = models.CharField(max_length=50)
     item_0 = models.ForeignKey('items.Item', related_name='additem0')
