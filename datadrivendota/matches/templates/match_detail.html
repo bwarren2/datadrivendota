@@ -59,7 +59,10 @@
             <td>{{ summary.hero_damage }}</td>
             <td>{{ summary.tower_damage }}</td>
             <td>{{ summary.hero_healing }}</td>
-            <td>{{ summary.which_side }}</td>
+            <td>
+              {{ summary.which_side }}
+              {% if summary.is_win %} (win){% endif %}
+            </td>
           </tr>
         {% endfor %}
       </tbody>
