@@ -169,6 +169,10 @@ class PickBan(models.Model):
     team = models.IntegerField()
     order = models.IntegerField()
 
+    class Meta:
+        ordering = ['order']
+
+
 class LeaverStatus(models.Model):
     steam_id = models.IntegerField(unique=True)
     description = models.CharField(max_length=50)

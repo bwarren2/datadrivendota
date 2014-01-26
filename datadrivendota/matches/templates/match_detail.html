@@ -14,6 +14,29 @@
     {{ match.hms_duration }} @ {{ match.hms_start_time }}
   </div>
   <div>
+  <table class='table table-condensed'>
+    <thead>
+      <tr>
+        <td>Hero</td>
+        <td>Pick/Ban</td>
+        <td>Team</td>
+      </tr>
+    </thead>
+    <tbody>
+
+    {% for pb  in match.pickban_set.all %}
+      <tr>
+        <td>{{pb.hero.name}}</td>
+        <td>{{pb.is_pick}}</td>
+        <td>{{pb.team}}</td>
+        <td>{{pb.order}}</td>
+      </tr>
+    {% endfor %}
+
+    </tbody>
+  </table>
+  </div>
+  <div>
     <table class="table  table-condensed" id='myTable'>
       <thead>
         <tr>
