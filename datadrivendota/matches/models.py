@@ -163,7 +163,7 @@ class AdditionalUnit(models.Model):
     item_5 = models.ForeignKey('items.Item', related_name='additem5')
 
 class PickBan(models.Model):
-    match = models.OneToOneField('Match')
+    match = models.ForeignKey('Match')
     is_pick = models.BooleanField()
     hero = models.ForeignKey('heroes.Hero')
     team = models.IntegerField()
