@@ -11,8 +11,8 @@ from matches.models import Match, LobbyType, GameMode,\
 from datadrivendota.settings.base import STEAM_API_KEY
 from players.models import Player, get_tracks
 from heroes.models import Ability, Hero
-from item.models import Item
-from guilds.models import Guilds
+from items.models import Item
+from guilds.models import Guild
 from settings.base import ADDER_32_BIT
 from celery import Task, chain
 import logging
@@ -357,7 +357,7 @@ class UploadMatch(ApiFollower):
                 'name': data["dire_guild_name"],
                 'logo': data["dire_guild_logo"],
             }
-            Guilds.objects.get_or_create(steam_id=data["dire_guild_id"],defaults=datadict)
+            Guild.objects.get_or_create(steam_id=data["dire_guild_id"],defaults=datadict)
 
         if 'radiant_guild_id' in data.keys():
             datadict = {
@@ -365,7 +365,7 @@ class UploadMatch(ApiFollower):
                 'name': data["radiant_guild_name"],
                 'logo': data["radiant_guild_logo"],
             }
-            Guilds.objects.get_or_create(steam_id=data["radiant_guild_id"],defaults=datadict)
+            Guild.objects.get_or_create(steam_id=data["radiant_guild_id"],defaults=datadict)
 
 class RefreshUpdatePlayerPersonas(BaseTask):
 
