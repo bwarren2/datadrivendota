@@ -342,14 +342,14 @@ class UploadMatch(ApiFollower):
             for pickban in data['picks_bans']:
                 datadict = {
                     'match': match,
-                    'is_pick': data['is_pick'],
-                    'hero': Hero.objects.get_or_create(steam_id=data['hero_id']),
-                    'team': data['team'],
-                    'order': data['order'],
+                    'is_pick': pickban['is_pick'],
+                    'hero': Hero.objects.get_or_create(steam_id=pickban['hero_id'])[0],
+                    'team': pickban['team'],
+                    'order': pickban['order'],
 
                 }
-            pb = PickBan.objects.get_or_create(match=match,order=data['order'], defaults=datadict)
-            pb.save()
+                pb = PickBan.objects.get_or_create(match=match,order=pickban['order'], defaults=datadict)[0]
+                pb.save()
 
         if 'dire_guild_id' in data.keys():
             datadict = {
@@ -522,12 +522,12 @@ def upload_match_summary(players,parent_match,refresh_records):
             'player_slot': player['player_slot'],
             'hero': Hero.objects.get_or_create(
                 steam_id=player['hero_id'])[0],
-            'item_0': player['item_0'],
-            'item_1': player['item_1'],
-            'item_2': player['item_2'],
-            'item_3': player['item_3'],
-            'item_4': player['item_4'],
-            'item_5': player['item_5'],
+            'item_0': Item.objects.get_or_create(steam_id=player['item_0'])[0],
+            'item_1': Item.objects.get_or_create(steam_id=player['item_1'])[0],
+            'item_2': Item.objects.get_or_create(steam_id=player['item_2'])[0],
+            'item_3': Item.objects.get_or_create(steam_id=player['item_3'])[0],
+            'item_4': Item.objects.get_or_create(steam_id=player['item_4'])[0],
+            'item_5': Item.objects.get_or_create(steam_id=player['item_5'])[0],
             'kills': player['kills'],
             'deaths': player['deaths'],
             'assists': player['assists'],
@@ -569,11 +569,11 @@ def upload_match_summary(players,parent_match,refresh_records):
                 kwargs = {
                     'player_match_summary': playermatchsummary,
                     'unit_name': unit['unitname'],
-                    'item_0': Item.objects.get_or_create(steam_id=unit['item_0']),
-                    'item_1': Item.objects.get_or_create(steam_id=unit['item_1']),
-                    'item_2': Item.objects.get_or_create(steam_id=unit['item_2']),
-                    'item_3': Item.objects.get_or_create(steam_id=unit['item_3']),
-                    'item_4': Item.objects.get_or_create(steam_id=unit['item_4']),
-                    'item_5': Item.objects.get_or_create(steam_id=unit['item_5']),
+                    'item_0': Item.objects.get_or_create(steam_id=unit['item_0'])[0],
+                    'item_1': Item.objects.get_or_create(steam_id=unit['item_1'])[0],
+                    'item_2': Item.objects.get_or_create(steam_id=unit['item_2'])[0],
+                    'item_3': Item.objects.get_or_create(steam_id=unit['item_3'])[0],
+                    'item_4': Item.objects.get_or_create(steam_id=unit['item_4'])[0],
+                    'item_5': Item.objects.get_or_create(steam_id=unit['item_5'])[0],
                 }
                 AdditionalUnit.objects.get_or_create(**kwargs)
