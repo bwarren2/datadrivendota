@@ -20,7 +20,6 @@ class Command(BaseCommand):
         email = options['email']
         privilege_level = options['privilege_level']
 
-        print email, privilege_level, privilege_level.lower, privilege_level.lower()=='look'
 
         if email is None:
             raise Exception("I need to have an email to send to. (Use --email)")
