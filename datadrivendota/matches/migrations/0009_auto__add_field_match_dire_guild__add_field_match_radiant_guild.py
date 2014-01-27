@@ -7,6 +7,11 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("guilds", "0001_initial"),
+    )
+
+
     def forwards(self, orm):
         # Adding field 'Match.dire_guild'
         db.add_column(u'matches_match', 'dire_guild',
