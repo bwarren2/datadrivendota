@@ -10,10 +10,9 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-var chartdata = polyjs.data({{json_data|safe}});
-var chart = polyjs.chart({{chart_spec|safe}});
-{{extra_chart_js|safe}}
+  var chartdata = polyjs.data({{json_data|safe}});
+  var chart = polyjs.chart({{chart_spec|safe}});
+  {{extra_chart_js|safe}}
 </script>
-
 {% endblock extra_js %}
 
