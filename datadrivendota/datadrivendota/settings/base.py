@@ -423,6 +423,8 @@ PIPELINE_CSS = {
             'jquery-ui-bootstrap/jquery-ui-1.10.0.custom.css',
             'select2-3.4.5/select2.css',
             'select2-3.4.5/select2-bootstrap.css',
+            'messenger/messenger.css',
+            'messenger/messenger-theme-future.css',
             'css/project.less'
         ),
         'output_filename': 'css/all.css',
@@ -440,6 +442,8 @@ PIPELINE_JS = {
             'js/jquery.metadata.js',
             'js/jquery.tablesorter.js',
             'js/polychart2.standalone.js',
+            'messenger/messenger.js',
+            'messenger/messenger-theme-future.js',
             'bootstrap/js/transition.js',
             'bootstrap/js/modal.js',
             'bootstrap/js/dropdown.js',

@@ -1,6 +1,11 @@
 /* Project specific Javascript goes here. */
 
 $(function () {
+  Messenger.options = {
+      extraClasses: 'messenger-fixed messenger-on-top',
+      theme: 'future'
+  }
+
   function format(state) {
       return state.label;
   }
