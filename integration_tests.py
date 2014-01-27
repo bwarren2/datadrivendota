@@ -2,10 +2,16 @@ from functools import wraps
 
 import factory
 
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import (
+    User,
+    Permission,
+)
 from django.test import TestCase
 
-from players.models import Player
+from players.models import (
+    Player,
+    UserProfile,
+)
 
 
 ## Test Factories
@@ -30,6 +36,10 @@ class PlayerFactory(factory.django.DjangoModelFactory):
     updated = True
 
 
+class UserProfileFactory(factory.django.DjangoModelFactory):
+    FACTORY_FOR = UserProfile
+
+
 ### Test Utils
 
 class LoginError(Exception):
@@ -48,6 +58,8 @@ def logged_in(user_factory):
             )
             user.user_permissions = permissions
             user.save()
+            player = PlayerFactory.create()
+            UserProfileFactory.create(user=user, player=player)
             if not self.client.login(username=username, password=password):
                 raise LoginError
             return f(self, user, *args, **kwargs)
