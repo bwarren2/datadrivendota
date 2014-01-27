@@ -48,3 +48,7 @@ def get_hero_seed_heroku():
     local(heroku_run(scrape_valve_heroes()))
     local(heroku_run(scrape_hero_faces()))
     local(heroku_run(scrape_dossiers()))
+
+
+def generate_heroku_static_pages():
+    local("python datadrivendota/manage.py generate_static_error_pages --settings=datadrivendota.settings.production")

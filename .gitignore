@@ -45,3 +45,6 @@ failface.png
 # SublimeText cruft
 datadrivendota.sublime-project
 datadrivendota.sublime-workspace
+
+# Build artifacts
+heroku_static_pages/
