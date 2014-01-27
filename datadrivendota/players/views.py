@@ -4,12 +4,13 @@ from django.conf import settings
 from django.http import  HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import permission_required
+from django.db.models import Count
 from os.path import basename
 from .models import Player, UserProfile
 from .r import KDADensity, CountWinrate, PlayerTimeline
 from .forms import PlayerWinrateLevers, PlayerTimelineForm, PlayerAddFollowForm
 from .json_data import player_winrate_breakout
-from matches.models import PlayerMatchSummary
+from matches.models import PlayerMatchSummary, Match
 from matches.management.tasks.valve_api_calls import ApiContext, ValveApiCall
 from .models import request_to_player
 import datetime
@@ -34,6 +35,20 @@ def index(request):
 @permission_required('players.can_look')
 def detail(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
+    stats = {}
+    try:
+      wins = PlayerMatchSummary.objects.filter(player=player, match__validity=Match.LEGIT,is_win=True).values('is_win').annotate(Count('is_win'))[0]['is_win__count']
+    except IndexError:
+      wins = 0
+    try:
+      losses = PlayerMatchSummary.objects.filter(player=player, match__validity=Match.LEGIT,is_win=False).values('is_win').annotate(Count('is_win'))[0]['is_win__count']
+    except IndexError:
+      losses = 0
+
+    stats['wins'] = wins
+    stats['losses'] = losses
+    stats['winrate'] = wins/(wins+losses) if wins+losses>0 else 0
+
     kda = KDADensity(player.steam_id)
     kdabase = basename(kda.name)
     winrate = CountWinrate(player.steam_id)
@@ -42,7 +57,8 @@ def detail(request, player_id=None):
                                'kdabase':kdabase,
                                'kda':kda,
                                'winratebase':winratebase,
-                               'winrate':winrate})
+                               'winrate':winrate,
+                               'stats':stats})
 
 @permission_required('players.can_touch')
 @devserver_profile(follow=[CountWinrate])

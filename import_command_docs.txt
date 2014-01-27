@@ -18,3 +18,6 @@ heroku run python datadrivendota/manage.py  importHeroStats
 # and match to the heroes that have them.
 # Relies on the above running (because it pulls )
 heroku run python datadrivendota/manage.py  scrapeabilitydata
+
+#Pull in items.  Does not do components.  Is incomplete.
+heroku run python datadrivendota/manage.py  scrapeitemdata
