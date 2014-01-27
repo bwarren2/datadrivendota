@@ -1522,7 +1522,6 @@
       "AbilityCastRange": "150",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
-    "Version": "1",
     "item_gem": {
       "UIDropSound": "Item.DropGemShop",
       "ItemStockTime": "600.0",

@@ -45,6 +45,7 @@
           <th>D</th>
           <th>A</th>
           <th>K-D+A/2</th>
+          <th>Items</th>
           <th>Level</th>
           <th>Last Hits</th>
           <th>Denies</th>
@@ -67,6 +68,28 @@
             <td>{{ summary.deaths }}</td>
             <td>{{ summary.assists }}</td>
             <td>{{ summary.kda }}</td>
+            <td>
+              {% if summary.item_0.thumbshot %}
+                <img src="{{ summary.item_0.thumbshot.url }}">
+              {% endif %}
+              {% if summary.item_1.thumbshot %}
+                <img src="{{ summary.item_1.thumbshot.url }}">
+              {% endif %}
+              {% if summary.item_2.thumbshot %}
+                <img src="{{ summary.item_2.thumbshot.url }}">
+              {% endif %}
+              {% if summary.item_3.thumbshot %}
+                <img src="{{ summary.item_3.thumbshot.url }}">
+              {% endif %}
+              {% if summary.item_4.thumbshot %}
+                <img src="{{ summary.item_4.thumbshot.url }}">
+              {% endif %}
+              {% if summary.item_5.thumbshot %}
+                <img src="{{ summary.item_5.thumbshot.url }}">
+              {% endif %}
+
+            </td>
+
             <td>{{ summary.level }}</td>
             <td>{{ summary.last_hits }}</td>
             <td>{{ summary.denies }}</td>
