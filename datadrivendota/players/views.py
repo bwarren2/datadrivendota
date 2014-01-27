@@ -48,7 +48,7 @@ def detail(request, player_id=None):
     stats['wins'] = wins
     stats['losses'] = losses
     stats['winrate'] = wins/(wins+losses) if wins+losses>0 else 0
-
+    pms_list = get_playermatchsummaries_for_player(player, 10)
     kda = KDADensity(player.steam_id)
     kdabase = basename(kda.name)
     winrate = CountWinrate(player.steam_id)
@@ -58,7 +58,8 @@ def detail(request, player_id=None):
                                'kda':kda,
                                'winratebase':winratebase,
                                'winrate':winrate,
-                               'stats':stats})
+                               'stats':stats,
+                               'pms_list': pms_list})
 
 @permission_required('players.can_touch')
 @devserver_profile(follow=[CountWinrate])
@@ -125,14 +126,7 @@ def timeline(request):
 @permission_required('players.can_look')
 def player_matches(request,player_id=None):
   player = get_object_or_404(Player, steam_id=player_id)
-  pms_list = PlayerMatchSummary.objects.select_related()
-  pms_list = pms_list.filter(player=player).order_by('-match__start_time')[0:50]
-  for pms in pms_list:
-      pms.display_date = datetime.datetime.fromtimestamp(pms.match.start_time)
-      pms.display_duration = str(datetime.timedelta(seconds=pms.match.duration))
-      pms.kda2 = pms.kills - pms.deaths+ pms.assists/2.0
-      pms.color_class = 'pos' if pms.kda2 > 0 else 'neg'
-      pms.mag = abs(pms.kda2)*2
+  pms_list = get_playermatchsummaries_for_player(player, 50)
   return render(request, 'playermatchsummary_index.html', {'pms_list':pms_list,
     'player':player})
 
@@ -288,3 +282,14 @@ def add_track(request):
         data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
+
+def get_playermatchsummaries_for_player(player, count):
+  pms_list = PlayerMatchSummary.objects.select_related()
+  pms_list = pms_list.filter(player=player).order_by('-match__start_time')[0:count]
+  for pms in pms_list:
+      pms.display_date = datetime.datetime.fromtimestamp(pms.match.start_time)
+      pms.display_duration = str(datetime.timedelta(seconds=pms.match.duration))
+      pms.kda2 = pms.kills - pms.deaths+ pms.assists/2.0
+      pms.color_class = 'pos' if pms.kda2 > 0 else 'neg'
+      pms.mag = abs(pms.kda2)*2
+  return pms_list

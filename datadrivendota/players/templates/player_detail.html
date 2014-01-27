@@ -20,6 +20,42 @@
     {% endif %}
   </div>
   <div id='chart'></div>
+
+  <div>
+    <table class="table  table-condensed" id='myTable'>
+      <thead>
+        <tr>
+          <th>Match ID</th>
+          <th>Duration</th>
+          <th colspan=2>Hero</th>
+          <th>K</th>
+          <th>D</th>
+          <th>A</th>
+          <th colspan=2>KDA/2</th>
+          <th>Start Time</th>
+          <th>Game Mode</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pms in pms_list %}
+          <tr>
+            <td><a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}">{{ pms.match.steam_id }}</a></td>
+            <td>{{ pms.display_duration }}</td>
+            <td><img src="{{ pms.hero.thumbshot.url }}" height="60%"></td>
+            <td>{{ pms.hero.name }}</td>
+            <td>{{ pms.kills }}</td>
+            <td>{{ pms.deaths }}</td>
+            <td>{{ pms.assists }}</td>
+            <td>{{ pms.kda2 }}</td>
+            <td><div style="width:{{ pms.mag }}px" class="databaru {{ pms.color_class }}"></div></td>
+            <td>{{ pms.display_date|date:"D d M Y" }}</td>
+            <td>{{ pms.match.game_mode.description }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% url 'players:id_matches' player_id=player.steam_id %}">More</a>
+  </div>
 {% endblock content %}
 
 {% block extra_js %}

@@ -100,7 +100,7 @@ class PermissionCode(models.Model):
         """.format(key=self.key, url="http://{site}.com{path}".format(site=settings.SITE_NAME,
                                                            path=reverse('upgrade')))
 
-        from_address = 'datadrivendota@gmail.com'
+        from_address = 'ben@datadrivendota.com'
         return send_mail(subject, message, from_address, [to_address], fail_silently=False)
 
     def associate(self, user_id):
