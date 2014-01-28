@@ -13,29 +13,50 @@
     {{ match.game_mode.description }} {{ match.lobby_type.description }},
     {{ match.hms_duration }} @ {{ match.hms_start_time }}
   </div>
-  <div>
-  <table class='table table-condensed'>
-    <thead>
-      <tr>
-        <td>Hero</td>
-        <td>Is Pick?</td>
-        <td>Team</td>
-      </tr>
-    </thead>
-    <tbody>
 
+  <h3>Dire</h3>
+
+  <h4>Pick</h4>
+  <ul class="pickban-list" id="dire-pick">
     {% for pb  in match.pickban_set.all %}
-      <tr>
-        <td>{{pb.hero.name}}</td>
-        <td>{{pb.is_pick}}</td>
-        <td>{{pb.team}}</td>
-        <td>{{pb.order}}</td>
-      </tr>
+      {% if pb.team == 0 and pb.is_pick %}
+        <li data-pborder="{{ pb.order }}">{{ pb.hero.name }}</li>
+      {% endif %}
     {% endfor %}
+  </ul>
 
-    </tbody>
-  </table>
-  </div>
+  <h4>Ban</h4>
+  <ul class="pickban-list" id="dire-ban">
+    {% for pb  in match.pickban_set.all %}
+      {% if pb.team == 0 and not pb.is_pick %}
+        <li data-pborder="{{ pb.order }}">{{ pb.hero.name }}</li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
+  <h3>Radiant</h3>
+
+  <h4>Pick</h4>
+  <ul class="pickban-list" id="dire-pick">
+    {% for pb  in match.pickban_set.all %}
+      {% if pb.team == 1 and pb.is_pick %}
+        <li data-pborder="{{ pb.order }}">{{ pb.hero.name }}</li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
+  <h4>Ban</h4>
+  <ul class="pickban-list" id="dire-ban">
+    {% for pb  in match.pickban_set.all %}
+      {% if pb.team == 1 and not pb.is_pick %}
+        <li data-pborder="{{ pb.order }}">{{ pb.hero.name }}</li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
+  <button id="pickban-reveal">Reveal pick/ban</button>
+
+
   <div>
     <table class="table  table-condensed" id='myTable'>
       <thead>
@@ -121,3 +142,20 @@
     <img src="{{ MEDIA_URL }}{{ xg_basename }}">
   {% endif %}
 {% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('.pickban-list li').hide();
+    $('#pickban-reveal').click(function () {
+      var PICKBAN_LIMIT = 20;
+      var PICKBAN_REVEAL_SECONDS = 2;
+      for (var i = 0; i < PICKBAN_LIMIT; i++) {
+        setTimeout(function (count) {
+          $('[data-pborder=' + count + ']').show();
+        }, i * PICKBAN_REVEAL_SECONDS * 1000, i);
+      }
+    });
+  });
+</script>
+{% endblock extra_js %}
