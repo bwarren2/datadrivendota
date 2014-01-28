@@ -18,7 +18,7 @@
 
   <h4>Pick</h4>
   <ul class="pickban-list" id="dire-pick">
-    {% for pb  in match.pickban_set.all %}
+    {% for pb in dire_picks %}
       {% if pb.team == 0 and pb.is_pick %}
         <li data-pborder="{{ pb.order }}">{{ pb.hero.name }}</li>
       {% endif %}
@@ -27,7 +27,7 @@
 
   <h4>Ban</h4>
   <ul class="pickban-list" id="dire-ban">
-    {% for pb  in match.pickban_set.all %}
+    {% for pb in dire_bans %}
       {% if pb.team == 0 and not pb.is_pick %}
         <li data-pborder="{{ pb.order }}">{{ pb.hero.name }}</li>
       {% endif %}
@@ -38,7 +38,7 @@
 
   <h4>Pick</h4>
   <ul class="pickban-list" id="dire-pick">
-    {% for pb  in match.pickban_set.all %}
+    {% for pb in radiant_picks %}
       {% if pb.team == 1 and pb.is_pick %}
         <li data-pborder="{{ pb.order }}">{{ pb.hero.name }}</li>
       {% endif %}
@@ -47,7 +47,7 @@
 
   <h4>Ban</h4>
   <ul class="pickban-list" id="dire-ban">
-    {% for pb  in match.pickban_set.all %}
+    {% for pb in radiant_bans %}
       {% if pb.team == 1 and not pb.is_pick %}
         <li data-pborder="{{ pb.order }}">{{ pb.hero.name }}</li>
       {% endif %}
