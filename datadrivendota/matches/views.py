@@ -52,10 +52,10 @@ def match(request, match_id):
       else:
         dire_flag = 1-pick.team
 
-      dire_picks = PickBan.objects.filter(team=dire_flag, is_pick=True).select_related()
-      dire_bans = PickBan.objects.filter(team=dire_flag, is_pick=False).select_related()
-      radiant_picks = PickBan.objects.filter(team=dire_flag, is_pick=True).select_related()
-      radiant_bans = PickBan.objects.filter(team=dire_flag, is_pick=False).select_related()
+      dire_picks = PickBan.objects.filter(match=match, team=dire_flag, is_pick=True).select_related()
+      dire_bans = PickBan.objects.filter(match=match, team=dire_flag, is_pick=False).select_related()
+      radiant_picks = PickBan.objects.filter(match=match, team=dire_flag, is_pick=True).select_related()
+      radiant_bans = PickBan.objects.filter(match=match, team=dire_flag, is_pick=False).select_related()
 
 
       return render(request, 'match_detail.html', {'match':match,
