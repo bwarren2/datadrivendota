@@ -1,4 +1,5 @@
 import json
+from celery import chain
 from functools import wraps
 from django.conf import settings
 from django.http import  HttpResponse, HttpResponseNotFound
@@ -11,7 +12,7 @@ from .r import KDADensity, CountWinrate, PlayerTimeline
 from .forms import PlayerWinrateLevers, PlayerTimelineForm, PlayerAddFollowForm
 from .json_data import player_winrate_breakout
 from matches.models import PlayerMatchSummary, Match
-from matches.management.tasks.valve_api_calls import ApiContext, ValveApiCall
+from matches.management.tasks.valve_api_calls import ApiContext, ValveApiCall, UpdatePlayerPersonas
 from .models import request_to_player
 from utils.exceptions import NoDataFound
 import datetime
@@ -283,6 +284,13 @@ def add_track(request):
           track = Player.objects.create(steam_id=steam_id)
         request.user.userprofile.tracking.add(track)
         data=request.POST['steam_id']
+        c = ApiContext()
+        vac = ValveApiCall()
+        upp = UpdatePlayerPersonas()
+        c.steamids=steam_id+settings.ADDER_32_BIT
+        chain(vac.s(mode='GetPlayerSummaries',api_context=c), upp.s()).delay()
+
+
     else:
         data = 'fail'
     mimetype = 'application/json'
