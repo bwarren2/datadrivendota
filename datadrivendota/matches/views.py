@@ -1,13 +1,14 @@
 import datetime
 from functools import wraps
 from os.path import basename
+from django.http import Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import get_object_or_404, get_list_or_404, render
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required
 from .forms import EndgameSelect, TeamEndgameSelect
 from .r import EndgameChart, MatchParameterScatterplot, TeamEndgameChart
-from .models import Match, PlayerMatchSummary
+from .models import Match, PlayerMatchSummary, PickBan
 from .json_data import player_endgame_json, team_endgame_json
 from players.models import request_to_player
 from utils.exceptions import NoDataFound
@@ -25,25 +26,57 @@ except ImportError:
             return wraps(func)(nothing)
 
 @permission_required('players.can_look')
+@devserver_profile()
 def match(request, match_id):
-    match = get_object_or_404(Match, steam_id=match_id)
-    summaries = get_list_or_404(PlayerMatchSummary, match=match)
-    for summary in summaries:
-        summary.kda = summary.kills - summary.deaths + .5*summary.assists
+    try:
+      match = Match.objects.select_related().get(steam_id=match_id)
+    except Match.DoesNotExist:
+      raise Http404
+    summaries = PlayerMatchSummary.objects.filter(match=match).select_related()
+#    summaries = get_list_or_404(PlayerMatchSummary, match=match).prefetch_related()
+    # for summary in summaries:
+    #     summary.kda = summary.kills - summary.deaths + .5*summary.assists
     match.hms_duration = datetime.timedelta(seconds=match.duration)
     match.hms_start_time = datetime.datetime.fromtimestamp(match.start_time).strftime('%H:%M:%S %Y-%m-%d')
     kill_dmg_chart = MatchParameterScatterplot(match_id, 'kills', 'hero_damage')
     kdc_basename = basename(kill_dmg_chart.name)
     xp_gold_chart = MatchParameterScatterplot(match_id, 'gold_per_min', 'xp_per_min')
     xg_basename = basename(xp_gold_chart.name)
-    return render(request, 'match_detail.html', {'match':match,
-                              'summaries':summaries,
-                              'kill_dmg_chart': kill_dmg_chart,
-                              'kdc_basename': kdc_basename,
-                              'xp_gold_chart': xp_gold_chart,
-                              'xg_basename': xg_basename,
-                              })
 
+    #Identify any pickbans for templating.
+    dire_hero_ids = [pms.hero.steam_id for pms in summaries if pms.which_side() == 'Dire']
+    try:
+      pick = [pickban for pickban in match.pickban_set.all() if pickban.is_pick==True][0]
+      if pick.hero.steam_id in dire_hero_ids:
+        dire_flag = pick.team
+      else:
+        dire_flag = 1-pick.team
+
+      dire_picks = PickBan.objects.filter(team=dire_flag, is_pick=True).select_related()
+      dire_bans = PickBan.objects.filter(team=dire_flag, is_pick=False).select_related()
+      radiant_picks = PickBan.objects.filter(team=dire_flag, is_pick=True).select_related()
+      radiant_bans = PickBan.objects.filter(team=dire_flag, is_pick=False).select_related()
+
+
+      return render(request, 'match_detail.html', {'match':match,
+                                'summaries':summaries,
+                                'kill_dmg_chart': kill_dmg_chart,
+                                'kdc_basename': kdc_basename,
+                                'xp_gold_chart': xp_gold_chart,
+                                'xg_basename': xg_basename,
+                                'dire_picks': dire_picks,
+                                'radiant_picks': radiant_picks,
+                                'dire_bans': dire_bans,
+                                'radiant_bans': radiant_bans,
+                                })
+    except IndexError:
+      return render(request, 'match_detail.html', {'match':match,
+                                'summaries':summaries,
+                                'kill_dmg_chart': kill_dmg_chart,
+                                'kdc_basename': kdc_basename,
+                                'xp_gold_chart': xp_gold_chart,
+                                'xg_basename': xg_basename,
+                                })
 @permission_required('players.can_look')
 def index(request):
 
