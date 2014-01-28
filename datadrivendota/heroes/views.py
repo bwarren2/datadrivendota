@@ -9,9 +9,11 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
 from django.contrib.auth.decorators import permission_required
+from datadrivendota.utilities import NoDataFound
 from .models import Hero, Ability
 from matches.models import GameMode
 from .json_data import hero_vitals_json, hero_lineup_json, hero_performance_json
+
 from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, \
   HeroPlayerPerformance, HeroPlayerSkillBarsForm
 from .r import  HeroPerformanceChart,\
@@ -64,6 +66,7 @@ layers: [{
         y: "value",
         color: "hero",
         size:{const:5},
+        sample:1000,
     },
     {
         data: chartdata,
@@ -89,14 +92,21 @@ layers: [{
     if request.method == 'POST':
         hero_form = HeroVitalsMultiSelect(request.POST)
         if hero_form.is_valid():
-          return_json = hero_vitals_json(
-              hero_list = hero_form.cleaned_data['heroes'],
-              stats_list = hero_form.cleaned_data['stats'],
-          )
-          return render(request, 'hero_form.html', {'form': hero_form,
-                                    'json_data': return_json,
-                                    'chart_spec': chart_spec,
-                                    'title':"Hero Vitals"})
+          try:
+            return_json = hero_vitals_json(
+                hero_list = hero_form.cleaned_data['heroes'],
+                stats_list = hero_form.cleaned_data['stats'],
+            )
+            return render(request, 'hero_form.html', {'form': hero_form,
+                                      'json_data': return_json,
+                                      'chart_spec': chart_spec,
+                                      'title':"Hero Vitals"})
+          except NoDataFound:
+            return render(request, 'hero_form.html', {'form': hero_form,
+                          'json_data': return_json,
+                          'chart_spec': chart_spec,
+                          'title':"Hero Vitals"})
+
     else:
         hero_form = HeroVitalsMultiSelect()
     return render(request, 'hero_form.html', {'form': hero_form,
@@ -118,6 +128,7 @@ layers: [
         x: {'var':'HeroName', sort:'Value', asc: false},
         y: "Value",
         color: "Color",
+        sample:1000,
     }],
 
 }
@@ -171,6 +182,7 @@ def hero_performance(request):
                     y: "y_var",
                     color: "group_var",
                     size:{const:4},
+                    sample:1000,
                 }],
 
                 facet:{

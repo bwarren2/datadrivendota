@@ -114,6 +114,7 @@ layers: [{
         color: "group_var",
         size:{const:3},
         opacity:{const:3},
+        sample:1000,
     }],
 
     facet:{
@@ -177,6 +178,7 @@ layers: [{
         color: "group_var",
         size:{const:3},
         opacity:{const:3},
+        sample:1000,
     }],
 
     facet:{

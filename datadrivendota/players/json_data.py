@@ -19,7 +19,7 @@ def player_winrate_breakout(player_id, game_mode_list=None, min_date=datetime.da
     min_dt_utc = mktime(min_date.timetuple())
 
     if min_dt_utc > max_date_utc:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
     if game_mode_list is None:
         game_mode_list = [gm.steam_id for gm in GameMode.objects.filter(is_competitive=True)]
 
@@ -27,7 +27,7 @@ def player_winrate_breakout(player_id, game_mode_list=None, min_date=datetime.da
     try:
         player = Player.objects.get(steam_id=player_id)
     except Player.DoesNotExist:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
     annotations = PlayerMatchSummary.objects.filter(player=player, match__validity=Match.LEGIT).values('hero__machine_name','is_win').annotate(Count('is_win'))
     annotations = annotations.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
     annotations = annotations.filter(match__start_time__gte=min_dt_utc)
@@ -35,7 +35,7 @@ def player_winrate_breakout(player_id, game_mode_list=None, min_date=datetime.da
     annotations = annotations.filter(match__game_mode__steam_id__in=game_mode_list)
 
     if len(annotations)==0:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
 
     heroes = list(set([row['hero__machine_name'] for row in annotations]))
     wins = {row['hero__machine_name']: row['is_win__count'] for row in annotations if row['is_win']==True}

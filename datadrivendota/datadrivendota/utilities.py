@@ -7,3 +7,5 @@ def error_email(subject, content):
     send_mail(subject,content,'ben@datadrivendota.com',
         ['ben@datadrivendota.com'],fail_silently=False)
 
+class NoDataFound(BaseException):
+    pass

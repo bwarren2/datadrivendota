@@ -4,7 +4,7 @@ from itertools import chain
 from django.conf import settings
 from heroes.models import HeroDossier, Hero, invalid_option
 from matches.models import PlayerMatchSummary,  Match, fetch_match_attributes
-
+from datadrivendota.utilities import NoDataFound
 
 
 def hero_vitals_json(hero_list, stats_list):
@@ -14,7 +14,7 @@ def hero_vitals_json(hero_list, stats_list):
     selected_hero_dossiers = HeroDossier.objects.filter(hero__steam_id__in=hero_list)
 
     if len(selected_hero_dossiers) == 0 or invalid_option(stats_list):
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
     # Convention: Raw numbers that need to be modified to be right (like base
     # hero hp, which is always 150 at last check but gets gains from str, are
     # dubbed "base_".  A number inclusive of gains from stat growth is prefixless.
@@ -37,12 +37,12 @@ def hero_lineup_json(heroes, stat, level):
     hero_dossiers = HeroDossier.objects.all().select_related()
     selected_names = [h.name for h in Hero.objects.filter(steam_id__in=heroes)]
     if len(hero_dossiers)==0:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
 
     try:
         hero_value = dict((dossier.hero.safe_name(), dossier.fetch_value(stat, level)) for dossier in hero_dossiers)
     except AttributeError:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
 
     x_vals = [key for key in sorted(hero_value, key=hero_value.get, reverse=True)]
     y_vals = [hero_value[key] for key in sorted(hero_value, key=hero_value.get, reverse=True)]
@@ -70,7 +70,7 @@ def hero_performance_json(hero, player, game_mode_list, x_var, y_var, group_var,
         match_pool = list(chain(skill1, skill2, skill3))
 
     if len(match_pool)==0:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
 
     try:
         x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
@@ -87,7 +87,7 @@ def hero_performance_json(hero, player, game_mode_list, x_var, y_var, group_var,
         else:
             group_vector_list, grouplab = fetch_match_attributes(match_pool, group_var)
     except AttributeError:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
 
     return_json = json.dumps({
         'x_var': x_vector_list,

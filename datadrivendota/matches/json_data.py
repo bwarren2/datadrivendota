@@ -1,7 +1,7 @@
 from itertools import chain
 from matches.models import PlayerMatchSummary, Match, fetch_match_attributes,\
  fetch_single_attribute, fetch_attribute_label
-from datadrivendota.utilities import safen
+from datadrivendota.utilities import NoDataFound
 import json
 
 def player_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var):
@@ -13,7 +13,7 @@ def player_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var):
         match__validity=Match.LEGIT)
     selected_summaries = selected_summaries.select_related()
     if len(selected_summaries)==0:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
     try:
         x_vector_list, xlab = fetch_match_attributes(selected_summaries, x_var)
         y_vector_list, ylab = fetch_match_attributes(selected_summaries, y_var)
@@ -21,7 +21,7 @@ def player_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var):
         group_vector_list, grouplab = fetch_match_attributes(selected_summaries, group_var)
         match_list = fetch_match_attributes(selected_summaries, 'match_id')[0]
     except AttributeError:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
 
     return_json = json.dumps({
         'x_var': x_vector_list,
@@ -42,7 +42,7 @@ def team_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var,comp
         dire_matches = dire_matches.filter(playermatchsummary__player__steam_id=player, playermatchsummary__player_slot__gte=5)
 
     if len(radiant_matches) + len(dire_matches)==0:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
     radiant = PlayerMatchSummary.objects.filter(match__in=radiant_matches,player_slot__lte=5).select_related()
     dire = PlayerMatchSummary.objects.filter(match__in=dire_matches,player_slot__gte=5).select_related()
 
@@ -72,7 +72,7 @@ def team_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var,comp
         ylab = fetch_attribute_label(attribute=y_var) + " ({a})".format(a=compressor)
         grouplab = fetch_attribute_label(attribute=group_var)
     except AttributeError:
-        raise Exception("Sad Pandas!")
+        raise NoDataFound
 
     return_json = json.dumps({
         'x_var': x_vector_list,
