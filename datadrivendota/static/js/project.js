@@ -51,7 +51,7 @@ $(function () {
   }
 
   $('.info').tooltip();
-  $("#myTable").tablesorter();
+  // $("#myTable").tablesorter();
 
   $('input[type=checkbox]:checked').parent().addClass('active');
   $('input[type=checkbox]').change(function (evt) {
