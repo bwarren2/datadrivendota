@@ -4,7 +4,7 @@ from django.forms.widgets import CheckboxSelectMultiple
 from matches.form_fields import MultiGameModeSelect
 from players.form_fields import SinglePlayerField
 from .form_fields import MultiHeroSelect, SingleHeroSelect, MultiLeveLSelect
-from .utils import list_to_choice_list
+from utils import list_to_choice_list
 
 
 class HeroVitalsMultiSelect(forms.Form):

@@ -4,7 +4,7 @@ from itertools import chain
 from django.conf import settings
 from heroes.models import HeroDossier, Hero, invalid_option
 from matches.models import PlayerMatchSummary,  Match, fetch_match_attributes
-from datadrivendota.utilities import NoDataFound
+from utils.exceptions import NoDataFound
 
 
 def hero_vitals_json(hero_list, stats_list):

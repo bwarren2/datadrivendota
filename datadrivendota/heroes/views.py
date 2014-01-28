@@ -9,10 +9,10 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
 from django.contrib.auth.decorators import permission_required
-from datadrivendota.utilities import NoDataFound
-from .models import Hero, Ability
 from matches.models import GameMode
+from utils.exceptions import NoDataFound
 from .json_data import hero_vitals_json, hero_lineup_json, hero_performance_json
+from .models import Hero, Ability
 
 from .forms import HeroVitalsMultiSelect, HeroLineupMultiSelect, \
   HeroPlayerPerformance, HeroPlayerSkillBarsForm
@@ -103,8 +103,7 @@ layers: [{
                                       'title':"Hero Vitals"})
           except NoDataFound:
             return render(request, 'hero_form.html', {'form': hero_form,
-                          'json_data': return_json,
-                          'chart_spec': chart_spec,
+                          'error': 'error',
                           'title':"Hero Vitals"})
 
     else:
@@ -137,16 +136,22 @@ layers: [
     if request.method == 'POST':
         hero_form = HeroLineupMultiSelect(request.POST)
         if hero_form.is_valid():
-          return_json = hero_lineup_json(
-            heroes = hero_form.cleaned_data['heroes'],
-            stat = hero_form.cleaned_data['stats'],
-            level =  hero_form.cleaned_data['level']
-          )
+          try:
+            return_json = hero_lineup_json(
+              heroes = hero_form.cleaned_data['heroes'],
+              stat = hero_form.cleaned_data['stats'],
+              level =  hero_form.cleaned_data['level']
+            )
 
-          return render(request, 'hero_form.html', {'form': hero_form,
-                                    'json_data': return_json,
-                                    'chart_spec': chart_spec,
-                                    'title':'Hero Lineups'})
+            return render(request, 'hero_form.html', {'form': hero_form,
+                                      'json_data': return_json,
+                                      'chart_spec': chart_spec,
+                                      'title':'Hero Lineups'})
+          except NoDataFound:
+            return render(request, 'hero_form.html', {'form': hero_form,
+                                      'error':'error',
+                                      'title':'Hero Lineups'})
+
     else:
         hero_form = HeroLineupMultiSelect()
 
@@ -160,6 +165,7 @@ def hero_performance(request):
     if request.method=='POST':
         hero_form = HeroPlayerPerformance(request.POST)
         if hero_form.is_valid():
+          try:
             return_json, x, y, group, split = hero_performance_json(
               hero = hero_form.cleaned_data['hero'],
               player = hero_form.cleaned_data['player'],
@@ -211,6 +217,11 @@ chart.addHandler(tester)"""
                                     'chart_spec': chart_spec,
                                     'extra_chart_js': extra_chart_js,
                                     'title':'Hero Performance'})
+          except NoDataFound:
+            return render(request, 'hero_form.html',{'form': hero_form,
+                                    'error': 'error',
+                                  'title':'Hero Performance'})
+
     else:
       hero_form = HeroPlayerPerformance()
 

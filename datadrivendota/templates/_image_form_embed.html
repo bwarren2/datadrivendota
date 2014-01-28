@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <div>
   <div class='form-container'>
     <form class='chart-form' action="" method='POST'>
@@ -11,8 +12,10 @@
       <div class="clearfix"></div>
     </form>
   </div>
-  {% if imagebase %}
-    <img src="{{MEDIA_URL}}{{imagebase}}">
+  {% if error %}
+    <img src="{% static 'images/sad_panda_caption.png' %}">
+  {% elif image_name %}
+    <img src="{% static image_name %}">
   {% endif %}
   <div id='chart'></div>
 </div>

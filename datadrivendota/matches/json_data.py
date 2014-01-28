@@ -1,7 +1,7 @@
 from itertools import chain
 from matches.models import PlayerMatchSummary, Match, fetch_match_attributes,\
  fetch_single_attribute, fetch_attribute_label
-from datadrivendota.utilities import NoDataFound
+from utils.exceptions import NoDataFound
 import json
 
 def player_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var):

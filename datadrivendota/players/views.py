@@ -13,6 +13,7 @@ from .json_data import player_winrate_breakout
 from matches.models import PlayerMatchSummary, Match
 from matches.management.tasks.valve_api_calls import ApiContext, ValveApiCall
 from .models import request_to_player
+from utils.exceptions import NoDataFound
 import datetime
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -83,6 +84,7 @@ def winrate(request):
     if request.method == 'POST':
         winrate_form = PlayerWinrateLevers(request.POST)
         if winrate_form.is_valid():
+          try:
             return_json = player_winrate_breakout(
               player_id = winrate_form.cleaned_data['player'],
               game_mode_list = winrate_form.cleaned_data['game_modes'],
@@ -93,7 +95,10 @@ def winrate(request):
                                     'json_data': return_json,
                                     'chart_spec': chart_spec,
                                       'title':'Hero Winrate'})
-
+          except NoDataFound:
+            return render(request, 'player_form.html', {'form': winrate_form,
+                                      'error': 'error',
+                                      'title':'Hero Winrate'})
     else:
         winrate_form = PlayerWinrateLevers()
 

@@ -10,6 +10,7 @@ from .r import EndgameChart, MatchParameterScatterplot, TeamEndgameChart
 from .models import Match, PlayerMatchSummary
 from .json_data import player_endgame_json, team_endgame_json
 from players.models import request_to_player
+from utils.exceptions import NoDataFound
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
         raise ImportError
@@ -139,7 +140,7 @@ chart.addHandler(tester)"""
     if request.method == 'POST':
         select_form = EndgameSelect(request.POST)
         if select_form.is_valid():
-
+          try:
             return_json = player_endgame_json(
                 player_list = select_form.cleaned_data['players'],
                 mode_list = select_form.cleaned_data['game_modes'],
@@ -153,6 +154,12 @@ chart.addHandler(tester)"""
                                     'json_data': return_json,
                                     'chart_spec': chart_spec,
                                     'extra_chart_js': extra_chart_js,
+                                    'title':'Endgame Charts'
+                                     })
+          except NoDataFound:
+            return render(request, 'match_form.html',
+                                     {'form':select_form,
+                                     'error': 'error',
                                     'title':'Endgame Charts'
                                      })
 
@@ -202,7 +209,7 @@ chart.addHandler(tester)"""
     if request.method == 'POST':
         select_form = TeamEndgameSelect(request.POST)
         if select_form.is_valid():
-
+          try:
             return_json, xlab, ylab, grouplab = team_endgame_json(
                 player_list = select_form.cleaned_data['players'],
                 mode_list = select_form.cleaned_data['game_modes'],
@@ -221,6 +228,12 @@ chart.addHandler(tester)"""
                                       'title':'Endgame Charts'
                                      })
 
+          except NoDataFound:
+            return render(request, 'match_form.html',
+                                     {'form':select_form,
+                                     'error': 'error',
+                                      'title':'Endgame Charts'
+                                     })
     else:
         select_form = TeamEndgameSelect()
     return render(request, 'match_form.html',

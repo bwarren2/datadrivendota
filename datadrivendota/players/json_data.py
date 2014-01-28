@@ -9,6 +9,7 @@ from .models import Player
 from datadrivendota.r import s3File, enforceTheme, FailFace
 from heroes.models import safen
 from django.conf import settings
+from utils.exceptions import NoDataFound
 
 
 def player_winrate_breakout(player_id, game_mode_list=None, min_date=datetime.date(2009,1,1), max_date=None):
