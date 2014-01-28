@@ -10,8 +10,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
 
-        #Fix Matches
-        matches = Match.objects.filter(duration__lte=settings.MIN_MATCH_LENGTH)
+        #Fix non-competitive matches
+        matches = Match.objects.filter(duration__lte=settings.MIN_MATCH_LENGTH).exclude(lobby_type__steam_id=7)
         matches.update(validity=Match.UNCOUNTED)
 
         #Games that do not have ten match summaries are uncounted, but we need to re-check things in the scrape.

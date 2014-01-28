@@ -76,6 +76,7 @@ def match(request, match_id):
                                 'xp_gold_chart': xp_gold_chart,
                                 'xg_basename': xg_basename,
                                 })
+
 @permission_required('players.can_look')
 def index(request):
 
