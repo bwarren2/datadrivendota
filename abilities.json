@@ -1441,7 +1441,6 @@
       "ID": "5441",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
-    "Version": "1",
     "lone_druid_synergy": {
       "AbilitySpecial": {
         "02": {

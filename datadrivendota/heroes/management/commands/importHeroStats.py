@@ -19,8 +19,11 @@ class Command(BaseCommand):
 
         with open('stats.json') as f:
             stats = loads(f.read())['DOTAHeroes']
-        del stats['Version'] #Purge a junk field
-
+        try:
+          del stats['Version'] #Purge a junk field
+        except KeyError:
+          #Probably manually deleted.
+          pass
         mapping_dict = {
           "MovementSpeed": "movespeed",
           "StatusHealthRegen": "hp_regen",

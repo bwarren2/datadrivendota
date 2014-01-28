@@ -15,7 +15,8 @@
   {% if error %}
     <img src="{% static 'images/sad_panda_caption.png' %}">
   {% elif image_name %}
-    <img src="{% static image_name %}">
+    <img src="{{MEDIA_URL}}{{image_name}}">
+    {# <img src="{% static image_name %}"> #}
   {% endif %}
   <div id='chart'></div>
 </div>

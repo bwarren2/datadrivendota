@@ -34,7 +34,7 @@ except ImportError:
 
 @permission_required('players.can_look')
 def index(request):
-    hero_list = Hero.objects.all().order_by('name')
+    hero_list = Hero.objects.filter(visible=True).order_by('name')
 
     return render(request, 'hero_index.html', {'hero_list': hero_list})
 
@@ -84,6 +84,9 @@ layers: [{
             var title = facetObject.stat;
             return title;
         }
+    },
+    guides: {
+      x:{color: '#000'}
     }
 }
 """

@@ -86,15 +86,16 @@ def winrate(request):
         winrate_form = PlayerWinrateLevers(request.POST)
         if winrate_form.is_valid():
           try:
-            return_json = player_winrate_breakout(
+
+            image = CountWinrate(
               player_id = winrate_form.cleaned_data['player'],
               game_mode_list = winrate_form.cleaned_data['game_modes'],
               min_date = winrate_form.cleaned_data['min_date'],
               max_date = winrate_form.cleaned_data['max_date'],
             )
+            imagebase = basename(image.name)
             return render(request, 'player_form.html', {'form': winrate_form,
-                                    'json_data': return_json,
-                                    'chart_spec': chart_spec,
+                                      'image_name':imagebase,
                                       'title':'Hero Winrate'})
           except NoDataFound:
             return render(request, 'player_form.html', {'form': winrate_form,

@@ -1067,6 +1067,14 @@
       "Enabled": "1",
       "NameAliases": "sk;snk;wk",
       "ParticleFile": "particles/units/heroes/hero_skeletonking.pcf",
+      "animation_transitions": {
+        "ACT_DOTA_IDLE": {
+          "regular": "0.25"
+        },
+        "ACT_DOTA_RUN": {
+          "regular": "0.5"
+        }
+      },
       "Team": "Bad",
       "PickSound": "skeleton_king_wraith_spawn_01",
       "Model": "models/heroes/wraith_king/wraith_king.mdl",
@@ -5400,7 +5408,6 @@
       "AttributeAgilityGain": "3.0",
       "AttributeBaseIntelligence": "18"
     },
-    "Version": "1",
     "npc_dota_hero_undying": {
       "AttackAnimationPoint": "0.3",
       "AttackDamageMax": "43",
@@ -11913,9 +11920,9 @@
           "MaxPolygonsLOD0": "1400",
           "SlotName": "armor",
           "SlotText": "#LoadoutSlot_Armor",
-          "TextureHeight": "256",
+          "TextureHeight": "512",
           "MaxPolygonsLOD1": "1200",
-          "TextureWidth": "256"
+          "TextureWidth": "512"
         },
         "0": {
           "SlotIndex": "0",
@@ -15434,8 +15441,12 @@
         },
         "6": {
           "SlotIndex": "5",
+          "MaxPolygonsLOD0": "3000",
           "SlotName": "hero_fxsummons",
-          "SlotText": "#LoadoutSlot_fxsummons"
+          "SlotText": "#LoadoutSlot_fxsummons",
+          "TextureHeight": "512",
+          "MaxPolygonsLOD1": "3000",
+          "TextureWidth": "512"
         }
       },
       "HeroID": "107",
