@@ -57,7 +57,6 @@ def match(request, match_id):
       radiant_picks = PickBan.objects.filter(match=match, is_pick=True).exclude(team=dire_flag).select_related()
       radiant_bans = PickBan.objects.filter(match=match, is_pick=False).exclude(team=dire_flag).select_related()
 
-
       return render(request, 'match_detail.html', {'match':match,
                                 'summaries':summaries,
                                 'kill_dmg_chart': kill_dmg_chart,
