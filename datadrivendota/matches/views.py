@@ -54,8 +54,8 @@ def match(request, match_id):
 
       dire_picks = PickBan.objects.filter(match=match, team=dire_flag, is_pick=True).select_related()
       dire_bans = PickBan.objects.filter(match=match, team=dire_flag, is_pick=False).select_related()
-      radiant_picks = PickBan.objects.filter(match=match, team__dne=dire_flag, is_pick=True).select_related()
-      radiant_bans = PickBan.objects.filter(match=match, team__dne=dire_flag, is_pick=False).select_related()
+      radiant_picks = PickBan.objects.filter(match=match, is_pick=True).exclude(team=dire_flag).select_related()
+      radiant_bans = PickBan.objects.filter(match=match, is_pick=False).exclude(team=dire_flag).select_related()
 
 
       return render(request, 'match_detail.html', {'match':match,
