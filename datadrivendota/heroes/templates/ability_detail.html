@@ -5,7 +5,9 @@
 {% block page_title %}{{ ability.name }}{% endblock %}
 
 {% block content %}
-  <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
+  <a class="ability thumbnail">
+    <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
+  </a>
   {% if ability.description %}
     <p>{{ ability.description }}</p>
   {% endif %}

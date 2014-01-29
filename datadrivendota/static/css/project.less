@@ -1,3 +1,15 @@
+/* Mixins */
+
+.rounded-corners (@radius: 5px) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  -ms-border-radius: @radius;
+  -o-border-radius: @radius;
+  border-radius: @radius;
+}
+
+/* Rules */
+
 body {
   background-image: url('../images/background.png');
   background-repeat: repeat-x;
@@ -31,13 +43,6 @@ img.ability {
   width: 105px;
 }
 
-img.item {
-  float: right;
-  height: 64px;
-  margin: 0 0 1em 1em;
-  width: 85px;
-}
-
 .lore {
   font-style: italic;
   width: 700px;
@@ -47,6 +52,10 @@ img.item {
 .infobox {
   float: right;
   width: 300px;
+
+  a.thumbnail {
+    display: inline-block;
+  }
 
   img.hero {
     margin: 0 auto;
@@ -82,15 +91,33 @@ div#IntercomDefaultWidget {
 }
 
 .overlayer {
-  z-index: 100;
-  position: absolute;
+  .rounded-corners;
+  background-color: #000000;
+  bottom: 17px;
   color: #f6f7f0; /* @text-color */
-  left: 20px;
-  top: 80px;
+  left: 22px;
+  opacity: 0.7;
+  padding-left: 4px;
+  padding-right: 4px;
+  position: absolute;
+  z-index: 100;
 }
 
-a.thumbnail:hover, a.thumbnail:focus {
+a.thumbnail:hover,
+a.thumbnail:focus {
   border-color: #ef6d3b; /* @brand-danger, but it looks good. */
+}
+
+a.item.thumbnail {
+  display: inline-block;
+  margin: 0 auto;
+  position: relative;
+
+  p.overlayer {
+    bottom: -5px;
+    left: 5px;
+    max-width: 83px;
+  }
 }
 
 a.ability {
@@ -98,10 +125,11 @@ a.ability {
   position: relative;
 
   p.overlayer {
-    display: inline-block;
-    top: auto;
     bottom: -5px;
+    display: inline-block;
     left: 5px;
+    max-width: 102px;
+    top: auto;
   }
 }
 
@@ -179,8 +207,11 @@ img.hero-portrait {
   height: 410px;
   text-align: center;
 }
-svg{background:#534A80;}
 
-text{
-  fill:#000000;
+svg {
+  background: #534a80;
+}
+
+text {
+  fill: #000000;
 }

@@ -5,7 +5,9 @@
 {% block page_title %}{{ item.name }}{% endblock page_title %}
 
 {% block content %}
-  <img class="item" src="{{ item.mugshot.url }}" alt="{{ item.name }}">
+  <a class="item thumbnail">
+    <img class="item" src="{{ item.mugshot.url }}" alt="{{ item.name }}">
+  </a>
   {% if item.description %}
     <p>{{ item.description }}</p>
   {% endif %}

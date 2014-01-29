@@ -9,7 +9,9 @@
     <h1>{{ hero.name }}</h1>
     <div class="infobox">
       {% if hero.mugshot %}
-      <img class="hero" src='{{ hero.mugshot.url }}'>
+      <a class="thumbnail">
+        <img class="hero" src='{{ hero.mugshot.url }}'>
+      </a>
       {% endif %}
     </div>
     <p class="lore">

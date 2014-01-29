@@ -8,8 +8,8 @@
   <div class="row">
     {% for item in item_list %}
       {% if item.mugshot and item.name %}
-        <div class="col-md-2">
-          <a href="{% url 'items:detail' item_name=item.slug_name %}" class="thumbnail">
+        <div class="col-md-2 text-center">
+          <a href="{% url 'items:detail' item_name=item.slug_name %}" class="item thumbnail">
             <img src="{{ item.mugshot.url }}" alt="{{ item.name }}">
             <p class='overlayer'>{{ item.name }}</p>
           </a>
