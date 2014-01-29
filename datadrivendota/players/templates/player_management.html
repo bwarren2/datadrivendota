@@ -40,7 +40,7 @@
                   <img src="{{ player.avatar }}">
                 </td>
                 <td>
-                  <input type="button" class="purgeButton" name="{{ player.steam_id }}" value="Purge" />
+                  <input type="button" class="btn btn-danger purgeButton" name="{{ player.steam_id }}" value="Purge" />
                 </td>
               </tr>
             {% endfor %}
@@ -99,7 +99,7 @@
       </div>
 
       <div>
-        <table id='checkTable'>
+        <table class="table table-condensed" id='checkTable'>
           <thead>
             <tr>
               <th>Player Exists</th>
@@ -117,8 +117,13 @@
       </div>
       <div>
         <form id="steam_id_form">
-          <input type='text' id='steam_id_input'>
-          <input type="button" id="steam_id_validator" name="Check availability" value="Check" />
+          <div class="form-group">
+            <label class="control-label" for="steam_id_input">Steam ID</label>
+            <input type='text' id='steam_id_input' class="form-control">
+          </div>
+          <div class="form-group">
+            <input type="button" class="pull-right btn btn-primary" id="steam_id_validator" name="Check availability" value="Check" />
+          </div>
         </form>
       </div>
 
