@@ -49,7 +49,7 @@ def detail(request, player_id=None):
 
     stats['wins'] = wins
     stats['losses'] = losses
-    stats['winrate'] = wins/(wins+losses) if wins+losses>0 else 0
+    stats['winrate'] = round(float(wins)/(wins+losses) if wins+losses>0 else 0,2)
     pms_list = get_playermatchsummaries_for_player(player, 10)
     kda = KDADensity(player.steam_id)
     kdabase = basename(kda.name)

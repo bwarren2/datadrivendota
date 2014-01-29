@@ -10,6 +10,9 @@
   <div class="player-infobox">
     <img src="{{ player.avatar_full }}">
     <h2>{{ player.persona_name }}</h2>
+    <h6>Wins: {{stats.wins}}</h6>
+    <h6>Losses: {{stats.losses}}</h6>
+    <h6>Winrate: {{stats.winrate}}%</h6>
   </div>
   <div class="player-charts">
     {% if winratebase %}
