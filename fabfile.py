@@ -16,22 +16,22 @@ def heroku_migrate():
     local(heroku_run(migrate()))
 
 def migrate():
-    return "python datadrivendota/manage.py migrate --no-initial-data"
+    return local("python datadrivendota/manage.py migrate --no-initial-data")
 
 def collect_static():
-    return 'python datadrivendota/manage.py collectstatic --settings=datadrivendota.settings.production --noinput'
+    return local('python datadrivendota/manage.py collectstatic --settings=datadrivendota.settings.production --noinput')
 
 
 def scrape_valve_heroes():
-    return 'python datadrivendota/manage.py scrapeheroes'
+    return local('python datadrivendota/manage.py scrapeheroes')
 
 
 def scrape_hero_faces():
-    return 'python datadrivendota/manage.py scrapeloreandmugshot'
+    return local('python datadrivendota/manage.py scrapeloreandmugshot')
 
 
 def scrape_dossiers():
-    return 'python datadrivendota/manage.py importHeroStats --file hero_stats.txt'
+    return local('python datadrivendota/manage.py importHeroStats --file hero_stats.txt')
 
 
 def get_hero_seed_local():
@@ -40,8 +40,8 @@ def get_hero_seed_local():
     local(scrape_dossiers())
 
 
-def heroku_run(str):
-    return "heroku run "+str
+def heroku_run(cmd):
+    return "heroku run " + cmd
 
 
 def get_hero_seed_heroku():
