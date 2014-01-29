@@ -1,6 +1,6 @@
 {% extends "player_base.html" %}
 
-{% block page_title %}Player Management!{% endblock page_title %}
+{% block page_title %}Player Management! <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>{% endblock page_title %}
 
 {% block content %}
 <div class='container'>
@@ -266,24 +266,29 @@ $('form#steam_id_form').submit(function () {
       {
         orphan: true,
         title: "Ahoy!",
-        content: "Welcome to data management."
+        content: "Welcome to data management!"
+      },
+      {
+        orphan: true,
+        title: "Ahoy!",
+        content: "Here, you can manage what data we import and what you follow."
       },
       {
         element: ".chart-form",
         title: "Follow players",
-        content: "Here's where you ask other questions.",
+        content: "Pick players from our dataset to follow here.",
         placement: "right"
       },
       {
-        element: ".chart-form",
+        element: "#followTable",
         title: "Manage follows",
-        content: "This is where you can alter whose games you follow.",
+        content: "Remove people you are already following here.",
         placement: "right"
       },
       {
-        element: ".steam_id_input",
+        element: "#steam_id_form",
         title: "Importing other players",
-        content: "If you have a steam ID for a friend or pro to follow, check it here",
+        content: "If you have a steam ID (from a steamcommunity URL) for a new friend or pro to follow, check it here",
         placement: "left"
       },
       {
