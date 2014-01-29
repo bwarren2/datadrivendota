@@ -15,74 +15,73 @@
   </div>
 
   {% if dire_bans %}
-
-  <div class="row">
-    <div class="dire-pickban col-md-6">
-      <h3>Dire</h3>
-      <div class="row">
-        <div class="col-md-3">
-          <h4>Ban</h4>
-          <ul class="pickban-list" id="dire-ban">
-            {% for pb in dire_bans %}
-              <li data-pborder="{{ pb.order }}">
-                <a href="#" class="thumbnail">
-                  <img src="{{ pb.hero.thumbshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
+    <div class="row">
+      <div class="dire-pickban col-md-6">
+        <h3>Dire</h3>
+        <div class="row">
+          <div class="col-md-3">
+            <h4>Ban</h4>
+            <ul class="pickban-list" id="dire-ban">
+              {% for pb in dire_bans %}
+                <li data-pborder="{{ pb.order }}">
+                  <a href="#" class="thumbnail">
+                    <img src="{{ pb.hero.thumbshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="col-md-9">
+            <h4>Pick</h4>
+            <ul class="pickban-list" id="dire-pick">
+              {% for pb in dire_picks %}
+                <li data-pborder="{{ pb.order }}">
+                  <a href="#" class="thumbnail">
+                    <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
-        <div class="col-md-9">
-          <h4>Pick</h4>
-          <ul class="pickban-list" id="dire-pick">
-            {% for pb in dire_picks %}
-              <li data-pborder="{{ pb.order }}">
-                <a href="#" class="thumbnail">
-                  <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
+      </div>
+
+      <div class="radiant-pickban col-md-6">
+        <h3>Radiant</h3>
+        <div class="row">
+          <div class="col-md-3">
+            <h4>Ban</h4>
+            <ul class="pickban-list" id="dire-ban">
+              {% for pb in radiant_bans %}
+                <li data-pborder="{{ pb.order }}">
+                  <a href="#" class="thumbnail">
+                    <img src="{{ pb.hero.thumbshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="col-md-9">
+            <h4>Pick</h4>
+            <ul class="pickban-list" id="dire-pick">
+              {% for pb in radiant_picks %}
+                <li data-pborder="{{ pb.order }}">
+                  <a href="#" class="thumbnail">
+                    <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="radiant-pickban col-md-6">
-      <h3>Radiant</h3>
-      <div class="row">
-        <div class="col-md-3">
-          <h4>Ban</h4>
-          <ul class="pickban-list" id="dire-ban">
-            {% for pb in radiant_bans %}
-              <li data-pborder="{{ pb.order }}">
-                <a href="#" class="thumbnail">
-                  <img src="{{ pb.hero.thumbshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-        <div class="col-md-9">
-          <h4>Pick</h4>
-          <ul class="pickban-list" id="dire-pick">
-            {% for pb in radiant_picks %}
-              <li data-pborder="{{ pb.order }}">
-                <a href="#" class="thumbnail">
-                  <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
+    <div class="row controls-button">
+      <div class="col-sm-12 text-center">
+        <button class="btn btn-default" id="pickban-reveal">Reveal pick/ban</button>
       </div>
     </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-12">
-      <button id="pickban-reveal">Reveal pick/ban</button>
-    </div>
-  </div>
   {% endif %}
 
   <div>
@@ -175,6 +174,7 @@
 <script type="text/javascript">
   $(document).ready(function () {
     $('#pickban-reveal').click(function () {
+      $('#pickban-reveal').attr('disabled', 'disabled');
       $('.pickban-list li').fadeOut();
       var PICKBAN_LIMIT = 20;
       var PICKBAN_REVEAL_SECONDS = 2;
@@ -183,6 +183,9 @@
           $('[data-pborder=' + count + ']').fadeIn();
         }, i * PICKBAN_REVEAL_SECONDS * 1000, i);
       }
+      setTimeout(function () {
+        $('#pickban-reveal').removeAttr("disabled");
+      }, i * PICKBAN_REVEAL_SECONDS * 1000);
     });
   });
 </script>
