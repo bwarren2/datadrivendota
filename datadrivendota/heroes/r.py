@@ -200,10 +200,10 @@ def HeroPerformanceChart(hero, player, game_mode_list, x_var, y_var, group_var, 
     #Get the right stuff loaded in R
     grdevices = importr('grDevices')
     importr('lattice')
-
+    print hero, player, game_mode_list, x_var, y_var, group_var, split_var
     #Database pulls and format python objects to go to R
     matches = PlayerMatchSummary.objects.filter(match__game_mode__in=game_mode_list)
-    matches = matches.filter(match__duration__gte=settings.MIN_MATCH_LENGTH) #Ignore <10 min games
+    matches = matches.filter(match__validity=Match.LEGIT) #Ignore <10 min games
     matches = matches.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
     skill1 = matches.filter(match__skill=1).select_related()[:100]
     skill2 = matches.filter(match__skill=2).select_related()[:100]

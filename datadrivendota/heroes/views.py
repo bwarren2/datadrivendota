@@ -168,62 +168,75 @@ def hero_performance(request):
     if request.method=='POST':
         hero_form = HeroPlayerPerformance(request.POST)
         if hero_form.is_valid():
-          try:
-            return_json, x, y, group, split = hero_performance_json(
-              hero = hero_form.cleaned_data['hero'],
-              player = hero_form.cleaned_data['player'],
-              game_mode_list = hero_form.cleaned_data['game_modes'],
-              x_var= hero_form.cleaned_data['x_var'],
-              y_var = hero_form.cleaned_data['y_var'],
-              group_var = hero_form.cleaned_data['group_var'],
-              split_var = hero_form.cleaned_data['split_var'],
-            )
-
-            chart_spec = """
-                {title: "",
-            dom: "chart",
-            width: 800,
-            height: 600,
-            layers: [{
-                    data: chartdata,
-                    type: "point",
-                    x: "x_var",
-                    y: "y_var",
-                    color: "group_var",
-                    size:{const:4},
-                    sample:1000,
-                }],
-
-                facet:{
-                  type:'wrap',
-                  var:'split_var',
-                  formatter: function(facetObject) {
-                        var title = facetObject.split_var;
-                        return title;
-                    }
-                },
-                guides:{
-                  x:{'title':'"""+x+"""'},
-                  y:{'title':'"""+y+"""'}
-                }
-            }
-            """
-            extra_chart_js= """tester = function(type, obj, event, chart){
-  data = obj.evtData;
-  if (type ==="click"){
-    top.location="/matches/"+String(data.match_id["in"]);
-  }
-}
-chart.addHandler(tester)"""
-            return render(request, 'hero_form.html',{'form': hero_form,
-                                    'json_data': return_json,
-                                    'chart_spec': chart_spec,
-                                    'extra_chart_js': extra_chart_js,
+          image = HeroPerformanceChart(
+            hero = hero_form.cleaned_data['hero'],
+            player = hero_form.cleaned_data['player'],
+            game_mode_list = hero_form.cleaned_data['game_modes'],
+            x_var= hero_form.cleaned_data['x_var'],
+            y_var = hero_form.cleaned_data['y_var'],
+            group_var = hero_form.cleaned_data['group_var'],
+            split_var = hero_form.cleaned_data['split_var'],
+          )
+          imagebase = basename(image.name)
+          return render(request, 'hero_form.html',{'form': hero_form,
+                                    'image_name': imagebase,
                                     'title':'Hero Performance'})
-          except NoDataFound:
-            return render(request, 'hero_form.html',{'form': hero_form,
-                                    'error': 'error',
-                                  'title':'Hero Performance'})
+#           try:
+#             return_json, x, y, group, split = hero_performance_json(
+#               hero = hero_form.cleaned_data['hero'],
+#               player = hero_form.cleaned_data['player'],
+#               game_mode_list = hero_form.cleaned_data['game_modes'],
+#               x_var= hero_form.cleaned_data['x_var'],
+#               y_var = hero_form.cleaned_data['y_var'],
+#               group_var = hero_form.cleaned_data['group_var'],
+#               split_var = hero_form.cleaned_data['split_var'],
+#             )
+
+#             chart_spec = """
+#                 {title: "",
+#             dom: "chart",
+#             width: 800,
+#             height: 600,
+#             layers: [{
+#                     data: chartdata,
+#                     type: "point",
+#                     x: "x_var",
+#                     y: "y_var",
+#                     color: "group_var",
+#                     size:{const:4},
+#                     sample:1000,
+#                 }],
+
+#                 facet:{
+#                   type:'wrap',
+#                   var:'split_var',
+#                   formatter: function(facetObject) {
+#                         var title = facetObject.split_var;
+#                         return title;
+#                     }
+#                 },
+#                 guides:{
+#                   x:{'title':'"""+x+"""'},
+#                   y:{'title':'"""+y+"""'}
+#                 }
+#             }
+#             """
+#             extra_chart_js= """tester = function(type, obj, event, chart){
+#   data = obj.evtData;
+#   if (type ==="click"){
+#     top.location="/matches/"+String(data.match_id["in"]);
+#   }
+# }
+# chart.addHandler(tester)"""
+#             return render(request, 'hero_form.html',{'form': hero_form,
+#                                     'json_data': return_json,
+#                                     'chart_spec': chart_spec,
+#                                     'extra_chart_js': extra_chart_js,
+#                                     'title':'Hero Performance'})
+#           except NoDataFound:
+#             return render(request, 'hero_form.html',{'form': hero_form,
+#                                     'error': 'error',
+#                                   'title':'Hero Performance'})
 
     else:
       hero_form = HeroPlayerPerformance()

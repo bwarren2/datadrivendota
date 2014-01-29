@@ -11,8 +11,9 @@ class Command(BaseCommand):
 
 
         #Fix non-competitive matches
-        matches = Match.objects.filter(duration__lte=settings.MIN_MATCH_LENGTH).exclude(lobby_type__steam_id=7)
+        matches = Match.objects.filter(duration__lte=settings.MIN_MATCH_LENGTH)
         matches.update(validity=Match.UNCOUNTED)
+        # .exclude(lobby_type__steam_id=7)
 
         #Games that do not have ten match summaries are uncounted, but we need to re-check things in the scrape.
         unprocessed = Match.objects.filter(validity=Match.UNPROCESSED)
