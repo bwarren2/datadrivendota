@@ -50,6 +50,15 @@ $(function () {
     });
   }
 
+  $('#contact-link').click(function () {
+    if ($('#IntercomDefaultWidget').length) {
+      $('#IntercomDefaultWidget').click();
+      return false;
+    } else {
+      return true;
+    }
+  });
+
   $('.info').tooltip();
   // $("#myTable").tablesorter();
 
