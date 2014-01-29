@@ -32,10 +32,9 @@ def match(request, match_id):
       match = Match.objects.select_related().get(steam_id=match_id)
     except Match.DoesNotExist:
       raise Http404
-    summaries = PlayerMatchSummary.objects.filter(match=match).select_related()
-#    summaries = get_list_or_404(PlayerMatchSummary, match=match).prefetch_related()
-    # for summary in summaries:
-    #     summary.kda = summary.kills - summary.deaths + .5*summary.assists
+    summaries = PlayerMatchSummary.objects.filter(match=match).select_related().order_by('player_slot')
+    for summary in summaries:
+        summary.kda = summary.kills - summary.deaths + .5*summary.assists
     match.hms_duration = datetime.timedelta(seconds=match.duration)
     match.hms_start_time = datetime.datetime.fromtimestamp(match.start_time).strftime('%H:%M:%S %Y-%m-%d')
     kill_dmg_chart = MatchParameterScatterplot(match_id, 'kills', 'hero_damage')
