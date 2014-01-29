@@ -32,9 +32,6 @@ except ImportError:
 @permission_required('players.can_look')
 def index(request):
     player_list = Player.objects.filter(updated=True)
-    for player in player_list:
-      player.wins = PlayerMatchSummary.objects.filter(player=player,is_win=True,match__validity=Match.LEGIT).count()
-      player.games = PlayerMatchSummary.objects.filter(player=player).count()
     return render(request, 'player_index.html', {'player_list':player_list})
 
 @permission_required('players.can_look')
