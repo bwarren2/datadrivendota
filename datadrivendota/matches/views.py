@@ -1,11 +1,13 @@
 import datetime
+from django.contrib.auth.decorators import user_passes_test
 from functools import wraps
 from os.path import basename
 from django.http import Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import get_object_or_404, get_list_or_404, render
+from django.shortcuts import render
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required
+from heroes.models import Hero
 from .forms import EndgameSelect, TeamEndgameSelect
 from .r import EndgameChart, MatchParameterScatterplot, TeamEndgameChart
 from .models import Match, PlayerMatchSummary, PickBan
@@ -24,6 +26,24 @@ except ImportError:
             def nothing(*args, **kwargs):
                 return func(*args, **kwargs)
             return wraps(func)(nothing)
+
+@user_passes_test(lambda u: u.is_superuser)
+@devserver_profile()
+def overview(request):
+  skill_levels = range(0,4)
+  match_info = {}
+  validity_set = [Match.LEGIT, Match.UNCOUNTED, Match.UNPROCESSED]
+  heroes = Hero.objects.filter(visible=True)
+  for hero in heroes:
+    match_info[hero] = {}
+    for skill in skill_levels:
+      match_info[hero][skill] = {}
+      for validity in validity_set:
+        match_info[hero][skill][validity] = PlayerMatchSummary.objects.filter(hero=hero,\
+          match__validity=validity, match__skill=skill).count()
+
+  return render(request, 'matches_index.html', {'match_info':match_info,
+      'skill_levels':skill_levels})
 
 @permission_required('players.can_look')
 @devserver_profile()
@@ -77,7 +97,7 @@ def match(request, match_id):
                                 })
 
 @permission_required('players.can_look')
-def index(request):
+def follow_match_feed(request):
 
     player = request_to_player(request)
     if player is not None:
@@ -108,7 +128,7 @@ def index(request):
                            'KDA':pms.kills-pms.deaths+pms.assists/2.0}
             match.follow_annotations.append(follow_data)
 
-      return render(request, 'matches_index.html', {'match_list': match_list})
+      return render(request, 'follow_matches.html', {'match_list': match_list})
 
     else:
       match_list = Match.objects.filter(validity=Match.LEGIT)[:100]
