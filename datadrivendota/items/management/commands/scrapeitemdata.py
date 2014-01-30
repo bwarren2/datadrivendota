@@ -11,26 +11,34 @@ from collections import defaultdict
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-
         id_dict = defaultdict(dict)
         edited_json={}
+
         #Get the item IDs from the local file.
         with open('items.json') as f:
             internal_json = loads(f.read())
-            for name, internal_dict in internal_json['DOTAAbilities'].iteritems():
-                name = name[5:]
-                edited_json[name] = internal_dict
+
+        try:
+          del internal_json['DOTAAbilities']['Version'] #Purge a junk field
+        except KeyError:
+          #Probably manually deleted.
+          pass
+
+
+        for name, internal_dict in internal_json['DOTAAbilities'].iteritems():
+            name = name[5:]
+            edited_json[name] = internal_dict
 
         internal_json = edited_json
-
         for name, information_dict in internal_json.iteritems():
+            print name
             id = information_dict['ID']
-
+            if name == 'courier':
+                import pdb; pdb.set_trace()
             id_dict[name]['internal_data'] = information_dict
             id_dict[name]['id'] = id
             i = Item.objects.get_or_create(steam_id=id)[0]
             i.save()
-
         #Get the JSON item data feed.
         #url = 'http://www.dota2.com/jsfeed/itemdata'
         with open('item_detail.json') as f:

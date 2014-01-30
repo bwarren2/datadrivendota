@@ -1,6 +1,7 @@
 {
   "DOTAAbilities": {
     "item_broadsword": {
+      "ItemAliases": "broadsword",
       "ItemShopTags": "damage",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -15,6 +16,7 @@
     },
     "item_satanic": {
       "AbilityCooldown": "35.0",
+      "ItemAliases": "satanic",
       "ItemShopTags": "damage;str;armor;unique;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "artifact",
@@ -69,8 +71,9 @@
       "ID": "205"
     },
     "item_maelstrom": {
+      "ItemAliases": "maelstrom",
       "ItemShopTags": "damage;attack_speed;unique",
-      "ID": "166",
+      "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "artifact",
       "AbilitySpecial": {
         "02": {
@@ -103,13 +106,13 @@
         }
       },
       "ItemCost": "2700",
-      "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
+      "ID": "166",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_veil_of_discord": {
       "AbilityManaCost": "75",
       "AbilityCooldown": "30",
-      "ItemAliases": "vod",
+      "ItemAliases": "vod;veil of discord",
       "ItemShopTags": "int;armor;regen_health;hard_to_tag",
       "AbilityCastPoint": "0.0",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
@@ -132,7 +135,7 @@
           "var_type": "FIELD_FLOAT"
         },
         "07": {
-          "bonus_strength": "3",
+          "bonus_strength": "6",
           "var_type": "FIELD_INTEGER"
         },
         "04": {
@@ -144,12 +147,12 @@
           "var_type": "FIELD_INTEGER"
         },
         "08": {
-          "bonus_agility": "3",
+          "bonus_agility": "6",
           "var_type": "FIELD_INTEGER"
         },
         "09": {
           "var_type": "FIELD_INTEGER",
-          "bonus_damage": "3"
+          "bonus_damage": "6"
         }
       },
       "ItemCost": "2675",
@@ -160,7 +163,7 @@
     "item_invis_sword": {
       "AbilityManaCost": "75",
       "AbilityCooldown": "28.0",
-      "ItemAliases": "sb;invis",
+      "ItemAliases": "sb;invis;shadow blade",
       "ItemShopTags": "damage;attack_speed;movespeed;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -198,6 +201,7 @@
       "ItemKillable": "0",
       "ItemSellable": "0",
       "ItemShareability": "ITEM_NOT_SHAREABLE",
+      "ItemAliases": "divine rapier",
       "ItemShopTags": "damage",
       "ID": "133",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS | DECLARE_PURCHASES_IN_SPEECH",
@@ -213,8 +217,9 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_eagle": {
+      "SecretShop": "1",
+      "ItemAliases": "eaglesong",
       "ItemShopTags": "agi",
-      "ID": "52",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
         "01": {
@@ -222,8 +227,8 @@
           "var_type": "FIELD_INTEGER"
         }
       },
-      "SecretShop": "1",
       "ItemCost": "3300",
+      "ID": "52",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_recipe_ultimate_scepter": {
@@ -237,8 +242,9 @@
       "ID": "107"
     },
     "item_ancient_janggo": {
-      "ItemInitialCharges": "4",
+      "ItemInitialCharges": "5",
       "AbilityCooldown": "30.0",
+      "ItemAliases": "drum of endurance",
       "ItemShopTags": "str;agi;int;damage;move_speed;attack_speed;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemDisplayCharges": "1",
@@ -278,7 +284,7 @@
           "var_type": "FIELD_INTEGER"
         }
       },
-      "ItemCost": "1775",
+      "ItemCost": "1875",
       "ID": "185",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
@@ -295,6 +301,7 @@
     },
     "item_medallion_of_courage": {
       "AbilityCooldown": "7.0",
+      "ItemAliases": "medallion of courage",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_MECHANICAL",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
@@ -389,6 +396,7 @@
       "ItemCost": "900"
     },
     "item_staff_of_wizardry": {
+      "ItemAliases": "staff of wizardry",
       "ItemShopTags": "int",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -413,6 +421,7 @@
     },
     "item_magic_wand": {
       "AbilityCooldown": "13.0",
+      "ItemAliases": "magic wand",
       "ItemShopTags": "regen_health;regen_mana;boost_health;boost_mana;int;agi;str",
       "AbilitySharedCooldown": "magicwand",
       "ItemDisplayCharges": "1",
@@ -442,8 +451,9 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
     "item_vitality_booster": {
+      "SecretShop": "1",
+      "ItemAliases": "vitality booster",
       "ItemShopTags": "health_pool",
-      "ID": "61",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
         "01": {
@@ -451,13 +461,14 @@
           "var_type": "FIELD_INTEGER"
         }
       },
-      "SecretShop": "1",
       "ItemCost": "1100",
+      "ID": "61",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_orb_of_venom": {
+      "SecretShop": "1",
+      "ItemAliases": "orb of venom",
       "ItemShopTags": "hard_to_tag",
-      "ID": "181",
       "SideShop": "1",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
@@ -478,8 +489,8 @@
           "var_type": "FIELD_FLOAT"
         }
       },
-      "SecretShop": "1",
       "ItemCost": "275",
+      "ID": "181",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_recipe_pers": {
@@ -494,8 +505,9 @@
       "ItemCost": "0"
     },
     "item_hood_of_defiance": {
+      "ItemAliases": "hood of defiance",
       "ItemShopTags": "regen_health;magic_resist",
-      "ID": "131",
+      "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
       "AbilitySpecial": {
         "02": {
@@ -512,7 +524,7 @@
         }
       },
       "ItemCost": "2125",
-      "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
+      "ID": "131",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_greevil_whistle": {
@@ -547,8 +559,9 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED"
     },
     "item_energy_booster": {
+      "SecretShop": "1",
+      "ItemAliases": "energy booster",
       "ItemShopTags": "mana_pool",
-      "ID": "59",
       "SideShop": "1",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
@@ -557,13 +570,14 @@
           "bonus_mana": "250"
         }
       },
-      "SecretShop": "1",
       "ItemCost": "1000",
+      "ID": "59",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_vanguard": {
+      "ItemAliases": "vanguard",
       "ItemShopTags": "regen_health;block;health_pool",
-      "ID": "125",
+      "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
       "AbilitySpecial": {
         "02": {
@@ -588,7 +602,7 @@
         }
       },
       "ItemCost": "2225",
-      "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
+      "ID": "125",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_ward_sentry": {
@@ -596,11 +610,13 @@
       "ItemSupport": "1",
       "ItemStackable": "1",
       "ItemInitialCharges": "2",
-      "AbilityCooldown": "1.0",
       "ItemShareability": "ITEM_FULLY_SHAREABLE_STACKING",
-      "ItemShopTags": "consumable",
+      "AbilityCooldown": "1.0",
+      "ItemAliases": "sentry ward",
+      "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_FRIENDLY",
+      "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO",
       "AbilityCastPoint": "0.0",
-      "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES",
+      "ItemShopTags": "consumable",
       "ItemQuality": "consumable",
       "ItemPermanent": "0",
       "AbilitySpecial": {
@@ -622,16 +638,18 @@
         }
       },
       "Model": "models/props_gameplay/sentry_ward_bundle.mdl",
+      "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES",
       "ID": "43",
       "AbilityCastRange": "500",
-      "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT"
+      "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
     },
     "item_abyssal_blade": {
       "AbilityManaCost": "150",
       "AbilityCooldown": "60",
-      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
+      "ItemAliases": "abyssal blade",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
+      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "AbilityCastPoint": "0.0",
       "ItemShopTags": "damage;str;hard_to_tag",
       "AbilityUnitTargetFlags": "DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES",
@@ -673,6 +691,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
     },
     "item_yasha": {
+      "ItemAliases": "yasha",
       "ItemShopTags": "agi;attack_speed;move_speed",
       "ItemQuality": "artifact",
       "AbilitySpecial": {
@@ -696,8 +715,9 @@
     "item_manta": {
       "AbilityManaCost": "165",
       "AbilityCooldown": "50.0",
-      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
+      "ItemAliases": "manta style",
       "ItemShopTags": "agi;str;int;attack_speed;move_speed;hard_to_tag",
+      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "AbilityCastPoint": "0.0",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -772,8 +792,9 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
     },
     "item_radiance": {
+      "ItemAliases": "radiance",
       "ItemShopTags": "damage",
-      "ID": "137",
+      "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
       "AbilitySpecial": {
         "02": {
@@ -786,14 +807,15 @@
         },
         "01": {
           "var_type": "FIELD_INTEGER",
-          "bonus_damage": "60"
+          "bonus_damage": "65"
         }
       },
       "ItemCost": "5150",
-      "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
+      "ID": "137",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE"
     },
     "item_mantle": {
+      "ItemAliases": "mantle of intelligence",
       "ItemShopTags": "int",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -863,8 +885,9 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_desolator": {
+      "ItemAliases": "desolator",
       "ItemShopTags": "damage;unique",
-      "ID": "168",
+      "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "artifact",
       "AbilitySpecial": {
         "02": {
@@ -881,13 +904,14 @@
         }
       },
       "ItemCost": "4100",
-      "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
+      "ID": "168",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_necronomicon": {
       "AbilityManaCost": "50",
       "UpgradeRecipe": "item_recipe_necronomicon",
-      "AbilityCooldown": "80.0",
+      "AbilityCooldown": "95.0",
+      "ItemAliases": "necronomicon 1",
       "ItemShopTags": "int;str;hard_to_tag;see_invis",
       "AbilitySharedCooldown": "necronomicon",
       "UpgradesItems": "item_necronomicon;item_necronomicon_2",
@@ -937,6 +961,7 @@
     "item_void_stone": {
       "SecretShop": "1",
       "ItemShareability": "ITEM_PARTIALLY_SHAREABLE",
+      "ItemAliases": "void stone",
       "ItemShopTags": "regen_mana",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
@@ -991,6 +1016,7 @@
       "ItemCost": "900"
     },
     "item_quarterstaff": {
+      "ItemAliases": "quarterstaff",
       "ItemShopTags": "damage;attack_speed",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -1011,7 +1037,7 @@
     "item_bloodstone": {
       "ItemInitialCharges": "8",
       "AbilityCooldown": "300.0",
-      "ItemAliases": "bs",
+      "ItemAliases": "bs;bloodstone",
       "ItemShopTags": "regen_health;regen_mana;mana_pool;health_pool",
       "AbilityCastPoint": "0.0",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
@@ -1100,7 +1126,7 @@
     },
     "item_ethereal_blade": {
       "AbilityManaCost": "150",
-      "ItemAliases": "eb",
+      "ItemAliases": "eb;ethereal blade",
       "AbilityCooldown": "30.0",
       "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY | DOTA_UNIT_TARGET_TEAM_FRIENDLY",
@@ -1164,7 +1190,7 @@
       "ID": "179"
     },
     "item_skadi": {
-      "ItemAliases": "eos",
+      "ItemAliases": "eos;eye of skadi",
       "ItemShopTags": "agi;str;int;hard_to_tag;mana_pool;health_pool;unique",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "artifact",
@@ -1214,12 +1240,16 @@
       "ItemCost": "1300"
     },
     "item_bottle": {
+      "ItemCost": "650",
       "ItemStackable": "0",
       "ItemInitialCharges": "3",
-      "AbilityCooldown": "0.5",
       "ItemShareability": "ITEM_FULLY_SHAREABLE",
+      "AbilityCooldown": "0.5",
+      "ItemAliases": "bottle",
+      "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_FRIENDLY",
+      "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO",
+      "AbilityCastPoint": "0.0",
       "ItemShopTags": "consumable",
-      "ID": "41",
       "ItemDisplayCharges": "1",
       "ItemQuality": "consumable",
       "ItemPermanent": "1",
@@ -1242,10 +1272,12 @@
         }
       },
       "Model": "models/props_gameplay/bottle_blue.mdl",
-      "ItemCost": "650",
-      "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+      "ID": "41",
+      "AbilityCastRange": "350",
+      "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_OPTIONAL_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
     },
     "item_soul_booster": {
+      "ItemAliases": "soul booster",
       "ItemShopTags": "regen_health;regen_mana;health_pool;mana_pool",
       "ItemQuality": "epic",
       "AbilitySpecial": {
@@ -1293,6 +1325,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
     "item_claymore": {
+      "ItemAliases": "claymore",
       "ItemShopTags": "damage",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -1306,6 +1339,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_lesser_crit": {
+      "ItemAliases": "crystalys",
       "ItemShopTags": "damage;crit",
       "ItemQuality": "epic",
       "AbilitySpecial": {
@@ -1327,6 +1361,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_blade_of_alacrity": {
+      "ItemAliases": "blade of alacrity",
       "ItemShopTags": "agi",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -1341,6 +1376,7 @@
     },
     "item_phase_boots": {
       "AbilityCooldown": "8.0",
+      "ItemAliases": "phase boots",
       "ItemShopTags": "damage;move_speed;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "common",
@@ -1415,8 +1451,9 @@
       "ID": "87"
     },
     "item_reaver": {
+      "SecretShop": "1",
+      "ItemAliases": "reaver",
       "ItemShopTags": "str",
-      "ID": "53",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
         "01": {
@@ -1424,8 +1461,8 @@
           "var_type": "FIELD_INTEGER"
         }
       },
-      "SecretShop": "1",
       "ItemCost": "3200",
+      "ID": "53",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_recipe_dagon": {
@@ -1440,6 +1477,7 @@
       "ItemCost": "1250"
     },
     "item_null_talisman": {
+      "ItemAliases": "null talisman",
       "ItemShopTags": "damage;int;agi;str",
       "ItemQuality": "common",
       "AbilitySpecial": {
@@ -1465,6 +1503,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_helm_of_iron_will": {
+      "ItemAliases": "helm of iron will",
       "ItemShopTags": "armor;regen_health",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -1522,32 +1561,35 @@
       "AbilityCastRange": "150",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
+    "Version": "1",
     "item_gem": {
       "UIDropSound": "Item.DropGemShop",
       "ItemStockTime": "600.0",
       "ItemStockMax": "1",
       "ItemSellable": "0",
       "UIPickupSound": "Item.PickUpGemShop",
-      "ItemShareability": "ITEM_PARTIALLY_SHAREABLE",
+      "ItemAliases": "gem of true sight",
       "Effect": "dropped_gem",
       "ItemShopTags": "see_invis",
       "ID": "30",
-      "AbilitySpecial": {
-        "01": {
-          "radius": "1100",
-          "var_type": "FIELD_INTEGER"
-        }
-      },
+      "ItemShareability": "ITEM_PARTIALLY_SHAREABLE",
       "ItemKillable": "0",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS",
       "WorldDropSound": "Item.DropGemWorld",
       "ItemQuality": "component",
       "ItemSupport": "1",
       "Model": "models/props_gameplay/gem01.mdl",
+      "AbilitySpecial": {
+        "01": {
+          "radius": "1100",
+          "var_type": "FIELD_INTEGER"
+        }
+      },
       "ItemCost": "900",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_mithril_hammer": {
+      "ItemAliases": "mithril hammer",
       "ItemShopTags": "damage",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -1563,9 +1605,9 @@
     "item_ring_of_health": {
       "SecretShop": "1",
       "UIDropSound": "Item.DropRingShop",
-      "ItemAliases": "roh",
-      "UIPickupSound": "Item.PickUpRingShop",
       "ItemShareability": "ITEM_PARTIALLY_SHAREABLE",
+      "UIPickupSound": "Item.PickUpRingShop",
+      "ItemAliases": "roh;ring of health",
       "ItemShopTags": "regen_health",
       "SideShop": "1",
       "WorldDropSound": "Item.DropRingWorld",
@@ -1603,6 +1645,7 @@
       "ItemCost": "1550"
     },
     "item_talisman_of_evasion": {
+      "ItemAliases": "talisman of evasion",
       "ItemShopTags": "evasion",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -1630,6 +1673,7 @@
     "item_urn_of_shadows": {
       "ItemStackable": "0",
       "AbilityCooldown": "7.0",
+      "ItemAliases": "urn of shadows",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_BOTH",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO",
       "AbilityCastPoint": "0.0",
@@ -1698,11 +1742,15 @@
       "ItemCost": "150"
     },
     "item_ward_observer": {
-      "ItemStockTime": "360.0",
-      "ItemCost": "150",
-      "ItemStockMax": "2",
+      "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_FRIENDLY",
+      "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO",
+      "ItemPermanent": "0",
+      "Model": "models/props_gameplay/observer_ward_bundle.mdl",
+      "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
+      "ItemSupport": "1",
       "ItemStackable": "1",
-      "ItemInitialCharges": "2",
+      "ItemAliases": "observer ward",
+      "AbilityCastPoint": "0.0",
       "AbilitySpecial": {
         "02": {
           "vision_range": "1600",
@@ -1717,19 +1765,18 @@
           "var_type": "FIELD_INTEGER"
         }
       },
-      "AbilityCooldown": "1.0",
-      "ItemShareability": "ITEM_FULLY_SHAREABLE_STACKING",
-      "ItemShopTags": "consumable",
-      "AbilityCastPoint": "0.0",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES",
+      "ItemStockMax": "2",
+      "ItemShopTags": "consumable",
       "ItemQuality": "consumable",
-      "ItemPermanent": "0",
-      "ItemSupport": "1",
-      "Model": "models/props_gameplay/observer_ward_bundle.mdl",
+      "ItemCost": "150",
       "ItemStockInitial": "1",
       "ID": "42",
-      "AbilityCastRange": "500",
-      "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT"
+      "ItemStockTime": "360.0",
+      "ItemInitialCharges": "2",
+      "AbilityCooldown": "1.0",
+      "ItemShareability": "ITEM_FULLY_SHAREABLE_STACKING",
+      "AbilityCastRange": "500"
     },
     "item_winter_greevil_garbage": {
       "ItemKillable": "0",
@@ -1807,6 +1854,7 @@
       "ItemPermanent": "1",
       "ItemBaseLevel": "1",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
+      "ItemAliases": "diffusal blade 1",
       "AbilityCastPoint": "0.0",
       "AbilitySpecial": {
         "02": {
@@ -1818,7 +1866,7 @@
           "var_type": "FIELD_INTEGER"
         },
         "01": {
-          "bonus_agility": "22 26",
+          "bonus_agility": "25 30",
           "var_type": "FIELD_INTEGER"
         },
         "06": {
@@ -1890,6 +1938,7 @@
       "ItemCost": "0"
     },
     "item_gloves": {
+      "ItemAliases": "gloves of haste",
       "ItemShopTags": "attack_speed",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -1906,6 +1955,7 @@
     "item_hand_of_midas": {
       "AbilityManaCost": "0",
       "AbilityCooldown": "100.0",
+      "ItemAliases": "hand of midas",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_CREEP",
       "AbilityCastPoint": "0.0",
@@ -1935,6 +1985,7 @@
     "item_pipe": {
       "AbilityManaCost": "100",
       "AbilityCooldown": "60.0",
+      "ItemAliases": "pipe of insight",
       "ItemShopTags": "regen_health;boost_magic_resist",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "rare",
@@ -1968,13 +2019,14 @@
           "var_type": "FIELD_FLOAT"
         }
       },
-      "ItemCost": "3628",
+      "ItemCost": "3625",
       "ID": "90",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
     "item_blink": {
-      "AbilityManaCost": "75",
+      "AbilityManaCost": "0",
       "AbilityCooldown": "12.0",
+      "ItemAliases": "blink dagger",
       "ItemShopTags": "teleport",
       "AbilityCastPoint": "0.0",
       "SideShop": "1",
@@ -2023,6 +2075,7 @@
       "UIDropSound": "Item.DropRingShop",
       "AbilityManaCost": "0",
       "AbilityCooldown": "30.0",
+      "ItemAliases": "soul ring",
       "ItemShopTags": "regen_health;boost_mana",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
       "WorldDropSound": "Item.DropRingWorld",
@@ -2066,7 +2119,7 @@
       "ItemCost": "0"
     },
     "item_monkey_king_bar": {
-      "ItemAliases": "mkb",
+      "ItemAliases": "mkb;monkey king bar",
       "ItemShopTags": "damage;attack_speed;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -2137,7 +2190,7 @@
       "ID": "144"
     },
     "item_ultimate_scepter": {
-      "ItemAliases": "ultimate",
+      "ItemAliases": "ultimate;aghanim's scepter",
       "ItemShopTags": "int;str;agi;mana_pool;health_pool;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "rare",
@@ -2172,6 +2225,7 @@
     },
     "item_sobi_mask": {
       "ItemShareability": "ITEM_PARTIALLY_SHAREABLE",
+      "ItemAliases": "sage's mask",
       "ItemShopTags": "regen_mana",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -2187,7 +2241,7 @@
     },
     "item_sphere": {
       "AbilityCooldown": "17.0",
-      "ItemAliases": "ls",
+      "ItemAliases": "ls;linken's sphere",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_FRIENDLY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
@@ -2221,10 +2275,11 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
     },
     "item_quelling_blade": {
+      "SideShop": "1",
       "AbilityManaCost": "0",
       "ItemCost": "225",
       "AbilityCooldown": "5.0",
-      "SideShop": "1",
+      "ItemAliases": "quelling blade",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_CUSTOM",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_TREE | DOTA_UNIT_TARGET_CUSTOM",
       "AbilityCastPoint": "0.0",
@@ -2246,6 +2301,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
     },
     "item_lifesteal": {
+      "ItemAliases": "morbid mask",
       "ItemShopTags": "unique",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -2271,9 +2327,9 @@
     },
     "item_ring_of_regen": {
       "UIDropSound": "Item.DropRingShop",
-      "ItemAliases": "ror",
-      "UIPickupSound": "Item.PickUpRingShop",
       "ItemShareability": "ITEM_PARTIALLY_SHAREABLE",
+      "UIPickupSound": "Item.PickUpRingShop",
+      "ItemAliases": "ror",
       "ItemShopTags": "regen_health",
       "SideShop": "1",
       "WorldDropSound": "Item.DropRingWorld",
@@ -2323,6 +2379,7 @@
     "item_blade_mail": {
       "AbilityManaCost": "25",
       "AbilityCooldown": "17.0",
+      "ItemAliases": "blade mail",
       "ItemShopTags": "damage;armor;int;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -2351,6 +2408,7 @@
     "item_orchid": {
       "AbilityManaCost": "100",
       "AbilityCooldown": "18.0",
+      "ItemAliases": "orchid malevolence",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
       "AbilityCastPoint": "0.0",
@@ -2420,8 +2478,8 @@
     },
     "item_cyclone": {
       "AbilityManaCost": "75",
-      "AbilityCooldown": "25.0",
-      "ItemAliases": "cyclone euls",
+      "AbilityCooldown": "23.0",
+      "ItemAliases": "cyclone euls;eul's scepter of divinity",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_CUSTOM",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_CUSTOM",
       "AbilityCastPoint": "0.0",
@@ -2452,12 +2510,12 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
     },
     "item_arcane_boots": {
-      "AbilityManaCost": "25",
+      "AbilityManaCost": "35",
       "ItemAlertable": "1",
-      "ItemAliases": "mana;mb",
       "AbilityCooldown": "55.0",
-      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
+      "ItemAliases": "mana;mb;arcane boots",
       "ItemShopTags": "move_speed;boost_mana;mana_pool",
+      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "rare",
       "AbilitySpecial": {
@@ -2483,6 +2541,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
     "item_robe": {
+      "ItemAliases": "robe of the magi",
       "ItemShopTags": "int",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -2518,8 +2577,9 @@
     },
     "item_pers": {
       "ItemShareability": "ITEM_PARTIALLY_SHAREABLE",
+      "ItemAliases": "perseverance",
       "ItemShopTags": "damage;regen_health;regen_mana",
-      "ID": "69",
+      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "ItemQuality": "common",
       "AbilitySpecial": {
         "02": {
@@ -2536,11 +2596,11 @@
         }
       },
       "ItemCost": "1750",
-      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
+      "ID": "69",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_sange_and_yasha": {
-      "ItemAliases": "sny;s&y;sy",
+      "ItemAliases": "sny;s&y;sy;sange and yasha",
       "ItemShopTags": "damage;str;agi;attack_speed;unique",
       "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
@@ -2563,7 +2623,7 @@
           "var_type": "FIELD_INTEGER"
         },
         "07": {
-          "maim_slow_movement": "-30",
+          "maim_slow_movement": "-32",
           "var_type": "FIELD_INTEGER"
         },
         "04": {
@@ -2575,11 +2635,11 @@
           "var_type": "FIELD_INTEGER"
         },
         "08": {
-          "maim_slow_attack": "-30",
+          "maim_slow_attack": "-32",
           "var_type": "FIELD_INTEGER"
         },
         "09": {
-          "maim_duration": "4.0",
+          "maim_duration": "5.0",
           "var_type": "FIELD_FLOAT"
         }
       },
@@ -2729,8 +2789,9 @@
       "ItemCost": "200"
     },
     "item_relic": {
+      "SecretShop": "1",
+      "ItemAliases": "sacred relic",
       "ItemShopTags": "damage",
-      "ID": "54",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
         "01": {
@@ -2738,11 +2799,12 @@
           "bonus_damage": "60"
         }
       },
-      "SecretShop": "1",
       "ItemCost": "3800",
+      "ID": "54",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_circlet": {
+      "ItemAliases": "circlet",
       "ItemShopTags": "agi;int;str",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -2808,6 +2870,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
     },
     "item_belt_of_strength": {
+      "ItemAliases": "belt of strength",
       "ItemShopTags": "str",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -2822,6 +2885,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_blades_of_attack": {
+      "ItemAliases": "blades of attack",
       "ItemShopTags": "damage;tutorial",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -2836,7 +2900,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_assault": {
-      "ItemAliases": "ac",
+      "ItemAliases": "ac;assault cuirass",
       "ItemShopTags": "attack_speed;armor;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -2873,8 +2937,8 @@
     "item_flying_courier": {
       "ItemStockTime": "270.0",
       "ItemStockMax": "1",
-      "ItemAliases": "crow",
       "ItemShareability": "ITEM_FULLY_SHAREABLE",
+      "ItemAliases": "crow;flying courier",
       "ItemShopTags": "consumable",
       "ID": "84",
       "ItemQuality": "consumable",
@@ -2888,7 +2952,7 @@
       "AbilityManaCost": "75",
       "ItemCost": "2450",
       "AbilityCooldown": "60.0",
-      "ItemAliases": "bot",
+      "ItemAliases": "bot;boots of travel",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_FRIENDLY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_CREEP | DOTA_UNIT_TARGET_MECHANICAL | DOTA_UNIT_TARGET_BUILDING",
       "AbilitySharedCooldown": "teleport",
@@ -2933,6 +2997,7 @@
       "ItemCost": "3300",
       "ItemInitialCharges": "8",
       "AbilityCooldown": "8.0",
+      "ItemAliases": "diffusal blade 2",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_BOTH",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
       "AbilitySharedCooldown": "diffusal",
@@ -2952,7 +3017,7 @@
           "var_type": "FIELD_INTEGER"
         },
         "01": {
-          "bonus_agility": "22 26",
+          "bonus_agility": "25 30",
           "var_type": "FIELD_INTEGER"
         },
         "06": {
@@ -2986,6 +3051,7 @@
     "item_tranquil_boots": {
       "AbilityManaCost": "0",
       "AbilityCooldown": "13.0",
+      "ItemAliases": "tranquil boots",
       "ItemShopTags": "move_speed;regen_health;armor",
       "ItemHideCharges": "1",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
@@ -2996,12 +3062,12 @@
           "var_type": "FIELD_INTEGER"
         },
         "03": {
-          "bonus_health_regen": "10",
+          "bonus_health_regen": "12",
           "var_type": "FIELD_INTEGER"
         },
         "01": {
           "var_type": "FIELD_INTEGER",
-          "bonus_movement_speed": "85"
+          "bonus_movement_speed": "90"
         },
         "06": {
           "var_type": "FIELD_FLOAT",
@@ -3050,9 +3116,10 @@
     "item_mjollnir": {
       "AbilityManaCost": "50",
       "AbilityCooldown": "35.0",
-      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
+      "ItemAliases": "mjollnir",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_FRIENDLY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
+      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "AbilityCastPoint": "0.0",
       "ItemShopTags": "damage;attack_speed;unique",
       "ItemQuality": "artifact",
@@ -3094,7 +3161,7 @@
           "var_type": "FIELD_INTEGER"
         },
         "09": {
-          "static_radius": "450",
+          "static_radius": "900",
           "var_type": "FIELD_INTEGER"
         },
         "12": {
@@ -3172,6 +3239,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
     },
     "item_wraith_band": {
+      "ItemAliases": "wraith band",
       "ItemShopTags": "damage;int;agi;str",
       "ItemQuality": "common",
       "AbilitySpecial": {
@@ -3198,6 +3266,7 @@
     },
     "item_armlet": {
       "AbilityCooldown": "0.0",
+      "ItemAliases": "armlet of mordiggian",
       "ItemShopTags": "damage;attack_speed;armor;regen_health;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -3266,7 +3335,7 @@
     },
     "item_ghost": {
       "AbilityCooldown": "30.0",
-      "ItemAliases": "ghost",
+      "ItemAliases": "ghost scepter",
       "ItemShopTags": "int;agi;str;hard_to_tag",
       "AbilitySharedCooldown": "ethereal",
       "ItemQuality": "component",
@@ -3289,6 +3358,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
     },
     "item_sange": {
+      "ItemAliases": "sange",
       "ItemShopTags": "damage;str;unique",
       "ItemQuality": "artifact",
       "AbilitySpecial": {
@@ -3325,7 +3395,7 @@
       "AbilityManaCost": "150",
       "ItemAlertable": "1",
       "AbilityCooldown": "45.0",
-      "ItemAliases": "mechanism",
+      "ItemAliases": "mechanism;mekansm",
       "ItemShopTags": "agi;int;str;armor;boost_health",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "rare",
@@ -3368,7 +3438,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
     "item_poor_mans_shield": {
-      "ItemAliases": "pms",
+      "ItemAliases": "pms;poor man's shield",
       "ItemShopTags": "agi;block",
       "ItemQuality": "common",
       "AbilitySpecial": {
@@ -3399,11 +3469,11 @@
     },
     "item_helm_of_the_dominator": {
       "AbilityManaCost": "75",
-      "ItemAliases": "hotd",
       "AbilityCooldown": "60.0",
-      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
+      "ItemAliases": "hotd;helm of the dominator",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_CREEP",
+      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "AbilityCastPoint": "0.0",
       "ItemShopTags": "damage;armor;unique;hard_to_tag",
       "AbilityUnitTargetFlags": "DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS",
@@ -3443,6 +3513,7 @@
     },
     "item_basher": {
       "AbilityCooldown": "2.0",
+      "ItemAliases": "skull basher",
       "ItemShopTags": "damage;str;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -3488,6 +3559,7 @@
       "ItemCost": "125"
     },
     "item_boots": {
+      "ItemAliases": "boots of speed",
       "ItemShopTags": "move_speed",
       "ID": "29",
       "SideShop": "1",
@@ -3514,6 +3586,7 @@
       "ItemCost": "600"
     },
     "item_stout_shield": {
+      "ItemAliases": "stout shield",
       "ItemShopTags": "block",
       "ID": "182",
       "SideShop": "1",
@@ -3539,9 +3612,9 @@
     "item_ring_of_basilius": {
       "UIDropSound": "Item.DropRingShop",
       "UIPickupSound": "Item.PickUpRingShop",
-      "ItemAliases": "rob",
+      "ItemAliases": "rob;ring of basilius",
       "ItemShopTags": "damage;regen_mana;armor",
-      "ID": "88",
+      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES",
       "WorldDropSound": "Item.DropRingWorld",
       "ItemQuality": "rare",
@@ -3568,7 +3641,7 @@
         }
       },
       "ItemCost": "500",
-      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
+      "ID": "88",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE"
     },
     "item_recipe_dagon_2": {
@@ -3619,6 +3692,7 @@
       "ItemCost": "50",
       "ItemStackable": "1",
       "ItemInitialCharges": "1",
+      "ItemAliases": "clarity",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_FRIENDLY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO",
       "AbilityCastPoint": "0.0",
@@ -3711,8 +3785,9 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
     },
     "item_hyperstone": {
+      "SecretShop": "1",
+      "ItemAliases": "hyperstone",
       "ItemShopTags": "attack_speed",
-      "ID": "55",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
         "01": {
@@ -3720,8 +3795,8 @@
           "var_type": "FIELD_INTEGER"
         }
       },
-      "SecretShop": "1",
       "ItemCost": "2000",
+      "ID": "55",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_recipe_phase_boots": {
@@ -3758,6 +3833,7 @@
       "ItemCost": "1250"
     },
     "item_cloak": {
+      "ItemAliases": "cloak",
       "ItemShopTags": "magic_resist",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -3776,6 +3852,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_boots_of_elves": {
+      "ItemAliases": "band of elvenskin",
       "ItemShopTags": "agi",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -3803,6 +3880,7 @@
     "item_refresher": {
       "AbilityManaCost": "375",
       "AbilityCooldown": "160.0",
+      "ItemAliases": "refresher orb",
       "ItemShopTags": "regen_health;regen_mana;damage;hard_to_tag",
       "AbilityCastPoint": "0.0",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
@@ -3829,7 +3907,7 @@
           "var_type": "FIELD_INTEGER"
         }
       },
-      "ItemCost": "5300",
+      "ItemCost": "5225",
       "ID": "110",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
@@ -3838,6 +3916,7 @@
       "ItemCost": "2800",
       "UpgradeRecipe": "item_recipe_dagon",
       "AbilityCooldown": "35.0 30.0 25.0 20.0 15.0",
+      "ItemAliases": "dagon 1",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
       "AbilitySharedCooldown": "dagon",
@@ -3890,11 +3969,12 @@
         "01": "item_oblivion_staff;item_pers"
       },
       "Model": "models/props_gameplay/recipe.mdl",
-      "ItemCost": "1875"
+      "ItemCost": "1800"
     },
     "item_point_booster": {
+      "SecretShop": "1",
+      "ItemAliases": "point booster",
       "ItemShopTags": "mana_pool;health_pool",
-      "ID": "60",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
         "02": {
@@ -3906,14 +3986,14 @@
           "bonus_mana": "150"
         }
       },
-      "SecretShop": "1",
       "ItemCost": "1200",
+      "ID": "60",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_mask_of_madness": {
       "AbilityManaCost": "25",
       "AbilityCooldown": "25.0",
-      "ItemAliases": "mom",
+      "ItemAliases": "mom;mask of madness",
       "ItemShopTags": "unique;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "artifact",
@@ -3927,7 +4007,7 @@
           "var_type": "FIELD_INTEGER"
         },
         "01": {
-          "lifesteal_percent": "17",
+          "lifesteal_percent": "20",
           "var_type": "FIELD_INTEGER"
         },
         "04": {
@@ -3957,7 +4037,7 @@
     "item_force_staff": {
       "AbilityManaCost": "25",
       "AbilityCooldown": "20.0",
-      "ItemAliases": "fs",
+      "ItemAliases": "fs;force staff",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_BOTH",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_MECHANICAL",
       "AbilityCastPoint": "0.0",
@@ -3999,6 +4079,19 @@
       "ItemStockMax": "3",
       "ItemStackable": "1",
       "ItemInitialCharges": "1",
+      "ItemShareability": "ITEM_FULLY_SHAREABLE",
+      "AbilityCooldown": "90.0",
+      "ItemAliases": "smoke of deceit",
+      "Effect": "dropped_smoke",
+      "ItemShopTags": "consumable",
+      "ID": "188",
+      "ItemAlertable": "1",
+      "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS",
+      "ItemDisplayCharges": "1",
+      "ItemQuality": "consumable",
+      "ItemPermanent": "0",
+      "ItemSupport": "1",
+      "Model": "models/props_gameplay/smoke.mdl",
       "AbilitySpecial": {
         "02": {
           "visibility_radius": "1025",
@@ -4013,28 +4106,17 @@
           "var_type": "FIELD_INTEGER"
         },
         "04": {
-          "duration": "40.0",
+          "duration": "35.0",
           "var_type": "FIELD_FLOAT"
         }
       },
-      "AbilityCooldown": "90.0",
-      "ItemShareability": "ITEM_FULLY_SHAREABLE",
-      "Effect": "dropped_smoke",
-      "ItemShopTags": "consumable",
-      "ID": "188",
-      "ItemAlertable": "1",
-      "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS",
-      "ItemDisplayCharges": "1",
-      "ItemQuality": "consumable",
-      "ItemPermanent": "0",
-      "ItemSupport": "1",
-      "Model": "models/props_gameplay/smoke.mdl",
       "ItemCost": "100",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
     },
     "item_mystic_staff": {
+      "SecretShop": "1",
+      "ItemAliases": "mystic staff",
       "ItemShopTags": "int",
-      "ID": "58",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
         "01": {
@@ -4042,8 +4124,8 @@
           "var_type": "FIELD_INTEGER"
         }
       },
-      "SecretShop": "1",
       "ItemCost": "2700",
+      "ID": "58",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_recipe_mask_of_madness": {
@@ -4058,7 +4140,7 @@
       "ItemCost": "1000"
     },
     "item_butterfly": {
-      "ItemAliases": "bfly",
+      "ItemAliases": "bfly;butterfly",
       "ItemShopTags": "agi;damage;evasion;attack_speed",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -4085,6 +4167,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_chainmail": {
+      "ItemAliases": "chainmail",
       "ItemShopTags": "armor",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -4101,8 +4184,9 @@
     "item_shivas_guard": {
       "AbilityManaCost": "100",
       "AbilityCooldown": "30",
-      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
+      "ItemAliases": "shiva's guard",
       "ItemShopTags": "int;armor;hard_to_tag",
+      "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
       "AbilitySpecial": {
@@ -4119,7 +4203,7 @@
           "var_type": "FIELD_INTEGER"
         },
         "06": {
-          "blast_speed": "300",
+          "blast_speed": "350",
           "var_type": "FIELD_INTEGER"
         },
         "07": {
@@ -4131,7 +4215,7 @@
           "var_type": "FIELD_INTEGER"
         },
         "05": {
-          "blast_radius": "719",
+          "blast_radius": "900",
           "var_type": "FIELD_INTEGER"
         },
         "08": {
@@ -4149,6 +4233,7 @@
     },
     "item_magic_stick": {
       "AbilityCooldown": "13.0",
+      "ItemAliases": "magic stick",
       "ItemShopTags": "regen_health;regen_mana;boost_health;boost_mana",
       "AbilitySharedCooldown": "magicwand",
       "SideShop": "1",
@@ -4177,8 +4262,8 @@
     "item_courier": {
       "ItemStockTime": "7.0",
       "ItemStockMax": "1",
-      "ItemAliases": "donkey;chicken",
       "ItemShareability": "ITEM_FULLY_SHAREABLE",
+      "ItemAliases": "donkey;chicken;animal courier",
       "ItemShopTags": "consumable",
       "ID": "45",
       "ItemQuality": "consumable",
@@ -4190,6 +4275,7 @@
     "item_heavens_halberd": {
       "AbilityManaCost": "100",
       "AbilityCooldown": "30",
+      "ItemAliases": "heaven's halberd",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
       "AbilityCastPoint": "0.0",
@@ -4240,8 +4326,9 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
     },
     "item_vladmir": {
+      "ItemAliases": "vladmir's offering;vlads",
       "ItemShopTags": "lifesteal;damage;armor;regen_mana",
-      "ID": "81",
+      "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "rare",
       "AbilitySpecial": {
         "02": {
@@ -4270,7 +4357,7 @@
         }
       },
       "ItemCost": "2050",
-      "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
+      "ID": "81",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_dust": {
@@ -4279,8 +4366,9 @@
       "ItemSupport": "1",
       "ItemStackable": "1",
       "ItemInitialCharges": "2",
-      "AbilityCooldown": "60.0",
       "ItemShareability": "ITEM_FULLY_SHAREABLE",
+      "AbilityCooldown": "60.0",
+      "ItemAliases": "dust of appearance",
       "Effect": "dropped_dust",
       "ItemShopTags": "consumable",
       "ItemDeclarations": "DECLARE_PURCHASES_TO_TEAMMATES",
@@ -4364,6 +4452,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
     },
     "item_headdress": {
+      "ItemAliases": "headdress",
       "ItemShopTags": "str;int;agi;regen_health",
       "ItemQuality": "rare",
       "AbilitySpecial": {
@@ -4389,6 +4478,7 @@
       "ItemCost": "2850",
       "UpgradeRecipe": "item_recipe_dagon",
       "AbilityCooldown": "35.0 30.0 25.0 20.0 15.0",
+      "ItemAliases": "dagon 4",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
       "AbilitySharedCooldown": "dagon",
@@ -4425,6 +4515,7 @@
       "AbilityManaCost": "180 160 140 120 100",
       "ItemCost": "2850",
       "AbilityCooldown": "35.0 30.0 25.0 20.0 15.0",
+      "ItemAliases": "dagon 5",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
       "AbilitySharedCooldown": "dagon",
@@ -4461,6 +4552,7 @@
       "ItemCost": "2850",
       "UpgradeRecipe": "item_recipe_dagon",
       "AbilityCooldown": "35.0 30.0 25.0 20.0 15.0",
+      "ItemAliases": "dagon 2",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
       "AbilitySharedCooldown": "dagon",
@@ -4494,6 +4586,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
     },
     "item_ogre_axe": {
+      "ItemAliases": "ogre club",
       "ItemShopTags": "str",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -4509,6 +4602,7 @@
     "item_rod_of_atos": {
       "AbilityManaCost": "50",
       "AbilityCooldown": "12",
+      "ItemAliases": "rod of atos",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
       "AbilityCastPoint": "0.0",
@@ -4516,7 +4610,7 @@
       "ItemQuality": "rare",
       "AbilitySpecial": {
         "02": {
-          "bonus_health": "325",
+          "bonus_health": "350",
           "var_type": "FIELD_INTEGER"
         },
         "03": {
@@ -4539,7 +4633,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
     },
     "item_branches": {
-      "ItemAliases": "gg branch",
+      "ItemAliases": "gg branch;iron branch",
       "ItemShopTags": "agi;int;str",
       "ID": "16",
       "ItemQuality": "component",
@@ -4550,7 +4644,7 @@
         }
       },
       "Model": "models/props_gameplay/branch.mdl",
-      "ItemCost": "53",
+      "ItemCost": "50",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_recipe_ancient_janggo": {
@@ -4563,12 +4657,12 @@
         "01": "item_bracer;item_robe"
       },
       "Model": "models/props_gameplay/recipe.mdl",
-      "ItemCost": "800"
+      "ItemCost": "875"
     },
     "item_black_king_bar": {
       "ItemSellable": "0",
       "AbilityCooldown": "80 75 70 65 60 55 50",
-      "ItemAliases": "bkb",
+      "ItemAliases": "bkb;black king bar",
       "ItemShopTags": "str;damage;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -4603,6 +4697,7 @@
       "ItemCost": "2850",
       "UpgradeRecipe": "item_recipe_dagon",
       "AbilityCooldown": "35.0 30.0 25.0 20.0 15.0",
+      "ItemAliases": "dagon 3",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
       "AbilitySharedCooldown": "dagon",
@@ -4659,6 +4754,7 @@
     "item_buckler": {
       "AbilityManaCost": "10",
       "AbilityCooldown": "25.0",
+      "ItemAliases": "buckler",
       "ItemShopTags": "armor;boost_armor",
       "ItemQuality": "rare",
       "AbilitySpecial": {
@@ -4692,6 +4788,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
     "item_slippers": {
+      "ItemAliases": "slippers of agility",
       "ItemShopTags": "agi",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -4708,7 +4805,8 @@
     "item_necronomicon_2": {
       "AbilityManaCost": "50",
       "UpgradeRecipe": "item_recipe_necronomicon",
-      "AbilityCooldown": "80.0",
+      "AbilityCooldown": "95.0",
+      "ItemAliases": "necronomicon 2",
       "ItemShopTags": "int;str;hard_to_tag;see_invis",
       "AbilitySharedCooldown": "necronomicon",
       "UpgradesItems": "item_necronomicon_2",
@@ -4757,7 +4855,8 @@
     },
     "item_necronomicon_3": {
       "AbilityManaCost": "50",
-      "AbilityCooldown": "80.0",
+      "AbilityCooldown": "95.0",
+      "ItemAliases": "necronomicon 3",
       "ItemShopTags": "int;str;hard_to_tag;see_invis",
       "AbilitySharedCooldown": "necronomicon",
       "AbilityCastPoint": "0.0",
@@ -4804,8 +4903,9 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
     "item_greater_crit": {
+      "ItemAliases": "daedalus",
       "ItemShopTags": "damage;crit",
-      "ID": "141",
+      "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
       "AbilitySpecial": {
         "02": {
@@ -4822,7 +4922,7 @@
         }
       },
       "ItemCost": "5550",
-      "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
+      "ID": "141",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_greevil_whistle_toggle": {
@@ -4858,8 +4958,9 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED"
     },
     "item_demon_edge": {
+      "SecretShop": "1",
+      "ItemAliases": "demon edge",
       "ItemShopTags": "damage",
-      "ID": "51",
       "ItemQuality": "secret_shop",
       "AbilitySpecial": {
         "01": {
@@ -4867,13 +4968,16 @@
           "bonus_damage": "46"
         }
       },
-      "SecretShop": "1",
       "ItemCost": "2400",
+      "ID": "51",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_shadow_amulet": {
       "AbilityManaCost": "0",
-      "AbilityCooldown": "0.0",
+      "AbilityCooldown": "10.0",
+      "ItemAliases": "shadow amulet",
+      "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_FRIENDLY",
+      "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO",
       "ItemShopTags": "",
       "AbilitySpecial": {
         "02": {
@@ -4882,14 +4986,16 @@
         },
         "01": {
           "var_type": "FIELD_FLOAT",
-          "fade_time": "1.8"
+          "fade_time": "1.5"
         }
       },
       "ItemCost": "1600",
       "ID": "215",
-      "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_MOVEMENT"
+      "AbilityCastRange": "600",
+      "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_MOVEMENT"
     },
     "item_gauntlets": {
+      "ItemAliases": "gauntlets of strength",
       "ItemShopTags": "str",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -4905,7 +5011,7 @@
     "item_sheepstick": {
       "AbilityManaCost": "100",
       "AbilityCooldown": "35.0",
-      "ItemAliases": "hex;sheepstick",
+      "ItemAliases": "hex;sheepstick;scythe of vyse",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_ENEMY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC",
       "AbilityCastPoint": "0.0",
@@ -4944,6 +5050,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
     },
     "item_bracer": {
+      "ItemAliases": "bracer",
       "ItemShopTags": "damage;int;agi;str",
       "ItemQuality": "common",
       "AbilitySpecial": {
@@ -4970,7 +5077,7 @@
     },
     "item_heart": {
       "AbilityCooldown": "6.0",
-      "ItemAliases": "hot",
+      "ItemAliases": "hot;heart of tarrasque",
       "ItemShopTags": "str;regen_health;health_pool",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -4997,6 +5104,7 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_ultimate_orb": {
+      "ItemAliases": "ultimate orb",
       "ItemShopTags": "agi;int;str",
       "SideShop": "1",
       "ItemQuality": "component",
@@ -5025,8 +5133,9 @@
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     },
     "item_power_treads": {
+      "ItemAliases": "power treads",
       "ItemShopTags": "attack_speed;move_speed;int;agi;str",
-      "ID": "63",
+      "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "common",
       "AbilitySpecial": {
         "02": {
@@ -5043,10 +5152,11 @@
         }
       },
       "ItemCost": "1400",
-      "ItemDeclarations": "DECLARE_PURCHASES_TO_SPECTATORS",
+      "ID": "63",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     },
     "item_javelin": {
+      "ItemAliases": "javelin",
       "ItemShopTags": "damage",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -5113,6 +5223,7 @@
       "ItemCost": "125",
       "ItemStackable": "1",
       "ItemInitialCharges": "4",
+      "ItemAliases": "tango",
       "Effect": "dropped_tango",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_TREE | DOTA_UNIT_TARGET_CUSTOM",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_CUSTOM",
@@ -5144,12 +5255,12 @@
       "AbilityChannelTime": "3.0",
       "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_NOASSIST | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK",
       "ItemStackable": "1",
-      "ItemAliases": "tp",
+      "ItemAliases": "tp;town portal scroll",
       "AbilityCastPoint": "0.0",
       "AbilityUnitTargetFlags": "DOTA_UNIT_TARGET_FLAG_INVULNERABLE",
       "AbilitySpecial": {
         "02": {
-          "maximum_distance": "525",
+          "maximum_distance": "575",
           "var_type": "FIELD_INTEGER"
         },
         "03": {
@@ -5174,9 +5285,9 @@
     },
     "item_ring_of_aquila": {
       "UIDropSound": "Item.DropRingShop",
-      "ItemAliases": "roa",
-      "UIPickupSound": "Item.PickUpRingShop",
       "ItemShareability": "",
+      "UIPickupSound": "Item.PickUpRingShop",
+      "ItemAliases": "roa;ring of aquila",
       "ItemShopTags": "",
       "ItemDisassembleRule": "DOTA_ITEM_DISASSEMBLE_ALWAYS",
       "WorldDropSound": "Item.DropRingWorld",
@@ -5187,7 +5298,7 @@
           "var_type": "FIELD_INTEGER"
         },
         "03": {
-          "bonus_agility": "3",
+          "bonus_agility": "6",
           "var_type": "FIELD_INTEGER"
         },
         "01": {
@@ -5238,6 +5349,7 @@
       "ID": "192"
     },
     "item_oblivion_staff": {
+      "ItemAliases": "oblivion staff",
       "ItemShopTags": "damage;int;attack_speed;regen_mana",
       "ItemQuality": "common",
       "AbilitySpecial": {
@@ -5266,6 +5378,7 @@
       "ItemCost": "115",
       "ItemStackable": "1",
       "ItemInitialCharges": "1",
+      "ItemAliases": "healing salve",
       "AbilityUnitTargetTeam": "DOTA_UNIT_TARGET_TEAM_FRIENDLY",
       "AbilityUnitTargetType": "DOTA_UNIT_TARGET_HERO",
       "AbilityCastPoint": "0.0",
@@ -5320,6 +5433,7 @@
       "ItemCost": "200"
     },
     "item_platemail": {
+      "ItemAliases": "platemail",
       "ItemShopTags": "armor",
       "ItemQuality": "component",
       "AbilitySpecial": {
@@ -5343,7 +5457,7 @@
       "ID": "138"
     },
     "item_bfury": {
-      "ItemAliases": "bf",
+      "ItemAliases": "bf;battle fury",
       "ItemShopTags": "damage;health_regen;mana_regen;hard_to_tag",
       "ItemDeclarations": "DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS",
       "ItemQuality": "epic",
@@ -5365,7 +5479,7 @@
           "cleave_damage_percent": "35"
         },
         "05": {
-          "cleave_radius": "225",
+          "cleave_radius": "250",
           "var_type": "FIELD_INTEGER"
         }
       },
@@ -5398,7 +5512,7 @@
     "item_ring_of_protection": {
       "UIDropSound": "Item.DropRingShop",
       "UIPickupSound": "Item.PickUpRingShop",
-      "ItemAliases": "rop",
+      "ItemAliases": "rop;ring of protection",
       "ItemShopTags": "armor",
       "WorldDropSound": "Item.DropRingWorld",
       "ItemQuality": "component",

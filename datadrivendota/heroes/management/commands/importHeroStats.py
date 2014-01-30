@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        with open('stats.json') as f:
+        with open('npc_heroes.json') as f:
             stats = loads(f.read())['DOTAHeroes']
         try:
           del stats['Version'] #Purge a junk field

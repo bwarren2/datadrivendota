@@ -16,7 +16,7 @@ class Command(BaseCommand):
         url = 'http://www.dota2.com/jsfeed/abilitydata'
         ability_text = loads(urlopen(url).read())['abilitydata']
 
-        with open('abilities.json') as f:
+        with open('npc_abilities.json') as f:
             abilities = loads(f.read())['DOTAAbilities']
         del abilities['Version'] #Purge a junk field
 
