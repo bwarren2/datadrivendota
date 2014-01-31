@@ -8,12 +8,14 @@ from django.shortcuts import render
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required
 from heroes.models import Hero
-from .forms import EndgameSelect, TeamEndgameSelect
-from .r import EndgameChart, MatchParameterScatterplot, TeamEndgameChart
+from .forms import EndgameSelect, TeamEndgameSelect, MatchAbilitySelect
+from .r import EndgameChart, MatchParameterScatterplot, MatchAbilityTimeline
 from .models import Match, PlayerMatchSummary, PickBan
-from .json_data import player_endgame_json, team_endgame_json
+from .json_data import player_endgame_json, team_endgame_json, match_ability_json
 from players.models import request_to_player
 from utils.exceptions import NoDataFound
+
+
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
         raise ImportError
@@ -291,3 +293,31 @@ chart.addHandler(tester)"""
     return render(request, 'match_form.html',
       {'form':select_form,'title':'Endgame Charts'})
 
+
+@permission_required('players.can_touch')
+#@devserver_profile
+def ability_build(request):
+  title = 'Match Ability Breakdown'
+  if request.method == 'POST':
+    select_form = MatchAbilitySelect(request.POST)
+    if select_form.is_valid():
+      try:
+        json_data = match_ability_json(
+            match_id = select_form.cleaned_data['match'],
+            split_var = select_form.cleaned_data['split_var']
+          )
+        rplot = MatchAbilityTimeline(json_data)
+        rplot = basename(rplot.name)
+
+        return render(request, 'match_form.html', {'image_name': rplot,
+                                                   'title': title,
+                                                   'form': select_form})
+      except NoDataFound:
+        return render(request, 'match_form.html', {'error': 'error',
+                                                   'title': title,
+                                                   'form': select_form})
+  else:
+    select_form = MatchAbilitySelect()
+  return render(request, 'match_form.html', {'form': select_form,
+                                             'title': title,
+                                            })

@@ -1,13 +1,14 @@
 from uuid import uuid4
 from django.core.files import File
+from django.conf import settings
 from itertools import chain
 from rpy2 import robjects
-from rpy2.robjects import FloatVector, StrVector
+from rpy2.robjects import FloatVector, StrVector, FactorVector
 from rpy2.robjects.packages import importr
-from matches.models import PlayerMatchSummary, Match
+from matches.models import PlayerMatchSummary, Match, fetch_match_attributes, fetch_attribute_label, fetch_single_attribute
 from datadrivendota.r import enforceTheme, s3File, FailFace
 from datadrivendota.utilities import safen
-
+from json import loads as jsonloads
 
 def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
 
@@ -129,23 +130,32 @@ def TeamEndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var,compr
 
 
 def MatchParameterScatterplot(match_id, x_var, y_var):
-    pms = PlayerMatchSummary.objects.filter(match__steam_id=match_id)
+    pms = PlayerMatchSummary.objects.filter(match__steam_id=match_id).select_related()
     if len(pms) == 0:
         return FailFace()
     try:
         x, x_lab =  fetch_match_attributes(pms, x_var)
         y, y_lab =  fetch_match_attributes(pms, y_var)
+        groups, group_lab =  fetch_match_attributes(pms, 'which_side')
+        if groups[0]=='Radiant':
+            color=[settings.RADIANT_GREEN,settings.DIRE_RED]
+        else:
+            color=[settings.DIRE_RED,settings.RADIANT_GREEN]
     except AttributeError:
         return FailFace()
 
     labels, blank =  fetch_match_attributes(pms, 'hero_name')
     x_vec = FloatVector(x)
     y_vec = FloatVector(y)
+    group_vec = StrVector(groups)
+    color_vec = StrVector(color)
     labels = robjects.StrVector(fetch_match_attributes(pms, 'hero_name')[0])
 
     robjects.globalenv["xvec"] = x_vec
     robjects.globalenv["yvec"] = y_vec
     robjects.globalenv["labels"] = labels
+    robjects.globalenv["groupvec"] = group_vec
+    robjects.globalenv["colorvec"] = color_vec
 
     grdevices = importr('grDevices')
     importr('lattice')
@@ -156,14 +166,15 @@ def MatchParameterScatterplot(match_id, x_var, y_var):
 
     rcmd="""
     print(
-        xyplot(yvec~xvec,type=c('p','r'),
+        xyplot(yvec~xvec,groups=groupvec,
+                par.settings=simpleTheme(pch=20,lwd=4,col=colorvec),
                 ylab='%s',xlab='%s',
-                auto.key=list(lines=T,points=T,corner=c(0,.9),background='white'),
+                auto.key=list(points=T,corner=c(0,.9),background='white',pch=20),
                 panel=function(x, y, ...) {
                     panel.xyplot(x, y, ...);
                     ltext(x=x, y=y, labels=labels, pos=1, offset=0, cex=0.8)
                 }
-                )
+        )
     )"""% (y_lab, x_lab)
     robjects.r(rcmd)
     grdevices.dev_off()
@@ -173,71 +184,69 @@ def MatchParameterScatterplot(match_id, x_var, y_var):
     hosted_file = s3File(imagefile)
     return hosted_file
 
+def MatchAbilityTimeline(json_data, width=800, height=400):
+    input_data= jsonloads(json_data)
+    x = input_data['x_var']
+    y = input_data['y_var']
+    group = input_data['group_var']
+    split = input_data['split_var']
 
-def fetch_match_attributes(summaries,attribute):
-    if attribute=='duration':
-        vector_list = [summary.match.duration/60.0 for summary in summaries]
-    elif attribute=='K-D+.5*A':
-        vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in summaries]
-    elif attribute == 'player':
-        vector_list = [summary.player.persona_name for summary in summaries]
-    elif attribute == 'is_win':
-        vector_list = ['Won' if summary.is_win==True else 'Lost' for summary in summaries]
-    elif attribute == 'game_mode':
-        vector_list = [summary.match.game_mode.description for summary in summaries]
-    elif attribute == 'skill':
-        vector_list = [summary.match.skill for summary in summaries]
-    elif attribute == 'hero_name':
-        vector_list = [safen(summary.hero.name) for summary in summaries]
-    elif attribute == 'first_blood_time':
-        vector_list = [summary.match.first_blood_time/60.0 for summary in summaries]
-    elif attribute == 'match_id':
-        vector_list = [summary.match.steam_id for summary in summaries]
-    else:
-        vector_list = [getattr(summary, attribute) for summary in summaries]
 
-    label = fetch_attribute_label(attribute)
-    return vector_list, label
+    x_vec = FloatVector(x)
+    y_vec = FloatVector(y)
+    group_vec = FactorVector(group)
+    split_vec = StrVector(split)
 
-def fetch_single_attribute(summary, attribute, compressor='sum'):
-    if compressor =='sum':
-        denominator = 1
-    else:
-        denominator = 5
-    if attribute=='duration':
-        return summary.match.duration/60.0/5
-    elif attribute=='K-D+.5*A':
-        return (summary.kills - summary.deaths + summary.assists*.5)/denominator
-    elif attribute == 'is_win':
-        return 'Won' if summary.is_win==True else 'Lost'
-    elif attribute == 'game_mode':
-        return summary.match.game_mode.description
-    elif attribute == 'skill':
-        return summary.match.skill
-    elif attribute == 'none':
-        return ''
-    else:
-        return getattr(summary, attribute)/denominator
+    robjects.globalenv["xvec"] = x_vec
+    robjects.globalenv["yvec"] = y_vec
+    robjects.globalenv["groupvec"] = group_vec
+    robjects.globalenv["splitvec"] = split_vec
 
-def fetch_attribute_label(attribute):
-    if attribute=='duration':
-        label='GameLength(m)'
-    elif attribute=='K-D+.5*A':
-        label='Kills-Death+.5*Assists'
-    elif attribute == 'player':
-        label=attribute.title()
-    elif attribute == 'is_win':
-        label='WonGame?'
-    elif attribute == 'game_mode':
-        label='GameMode'
-    elif attribute == 'skill':
-        label='Skill(3=High)'
-    elif attribute == 'hero_name':
-        label='HeroName'
-    elif attribute == 'first_blood_time':
-        label='FirstBloodTime(m)'
-    elif attribute == 'none':
-        label=''
-    else:
-        label=safen(attribute)
-    return label
+    grdevices = importr('grDevices')
+    importr('lattice')
+    importr('grid')
+
+    imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
+    grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
+    enforceTheme(robjects)
+
+    rcmd="""
+    print(
+        xyplot(yvec~xvec|splitvec,type=c('p','l'),groups=groupvec,
+                ylab='%s',xlab='%s',
+                auto.key=list(lines=T,points=T,corner=c(0,.9),background='white'),
+                panel=function(x,y,groups,subscripts,...){
+                    require(grid);
+                    panel.xyplot(x,y,groups=groups,subscripts=subscripts,...);
+                    pug <- levels(groups)[levels(groups)%%in%%groups[subscripts]];
+                    draw.key(key=list(text = list(as.character(pug)),
+                    lines = list(lty =
+                        rep(trellis.par.get('superpose.line')$lty,10)[as.numeric(pug)]),
+                    points = list(pch =
+                        rep(trellis.par.get('superpose.symbol')$pch,10)[as.numeric(pug)])),
+                    draw=TRUE)
+                }
+        )
+    )"""% (input_data['y_lab'], input_data['x_lab'])
+
+    # rcmd="""
+    # print(
+    #     xyplot(yvec~xvec|splitvec,type=c('p','l'),groups=groupvec,
+    #             ylab='{y_lab}',xlab='{x_lab}',
+    #             auto.key=list(lines=T,points=T,corner=c(0,.9),background='transparent'),
+    #             panel=function(x, y, ...) {
+    #                 panel.xyplot(x, y, ...);
+    #             }
+
+    #     )
+    # )""".format(x_lab=input_data['x_lab'],y_lab=input_data['y_lab'])
+
+    robjects.r(rcmd)
+    grdevices.dev_off()
+
+    imagefile.close()
+
+    hosted_file = s3File(imagefile)
+    return hosted_file
+
+

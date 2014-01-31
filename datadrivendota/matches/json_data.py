@@ -1,6 +1,6 @@
 from itertools import chain
 from matches.models import PlayerMatchSummary, Match, fetch_match_attributes,\
- fetch_single_attribute, fetch_attribute_label
+ fetch_single_attribute, fetch_attribute_label, SkillBuild
 from utils.exceptions import NoDataFound
 import json
 
@@ -82,3 +82,37 @@ def team_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var,comp
         'match_id': match_list,
         })
     return return_json, xlab, ylab, grouplab
+
+def match_ability_json(match_id, split_var):
+    skill_builds = SkillBuild.objects.filter(player_match_summary__match__steam_id=match_id).select_related()
+
+    x_list = []
+    y_list = []
+    group_list = []
+    split_list = []
+    for build in skill_builds:
+        x_list.append(build.time/60.0)
+        y_list.append(build.level)
+        hero_name = build.player_match_summary.hero.name
+        side = build.player_match_summary.which_side()
+        group_list.append(hero_name)
+        if split_var=='No Split':
+            split_list.append('No Split')
+        elif split_var=='hero':
+            split_list.append(hero_name)
+        elif split_var=='side':
+            split_list.append(side)
+        else:
+            raise NoDataFound
+
+    return_json = json.dumps({
+        'x_var':x_list,
+        'y_var':y_list,
+        'group_var':group_list,
+        'split_var': split_list,
+        'x_lab': 'Time (m)',
+        'y_lab': 'Level',
+        'group_lab': 'Hero',
+        'split_lab': 'Thingy'}
+    )
+    return return_json

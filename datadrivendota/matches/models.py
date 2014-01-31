@@ -1,6 +1,6 @@
 from django.db import models
 from datadrivendota.utilities import safen
-
+from django.conf import settings
 
 # Create your models here.
 class Match(models.Model):
@@ -191,6 +191,9 @@ class SkillBuild(models.Model):
     time = models.IntegerField()
     level = models.IntegerField()
 
+    class Meta:
+        ordering = ['player_match_summary','level']
+
     def __unicode__(self):
         return str(self.player_match_summary.id)+', '+str(self.level)
         pass
@@ -215,6 +218,13 @@ def fetch_match_attributes(summaries,attribute):
         vector_list = [summary.match.first_blood_time/60.0 for summary in summaries]
     elif attribute == 'match_id':
         vector_list = [summary.match.steam_id for summary in summaries]
+    elif attribute == 'which_side':
+        vector_list = [summary.which_side() for summary in summaries]
+    elif attribute == 'side_color':
+        dire_red = settings.DIRE_RED
+        radiant_green = settings.RADIANT_GREEN
+        vector_list = [radiant_green if summary.which_side()=='Radiant' else dire_red for summary in summaries]
+        print summaries[6].which_side()
     else:
         vector_list = [getattr(summary, attribute) for summary in summaries]
 

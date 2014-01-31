@@ -53,3 +53,9 @@ class TeamEndgameSelect(forms.Form):
     compressor = forms.ChoiceField(choices=COMPRESSOR_LIST, required=True,
         help_text="It's just a factor of 5",
         initial='sum')
+
+class MatchAbilitySelect(forms.Form):
+    SPLIT_PARAMS = ['side','hero','No Split']
+    DOUBLED_PARAM_LIST = [(item,item) for item in SPLIT_PARAMS]
+    match = forms.IntegerField()
+    split_var = forms.ChoiceField(DOUBLED_PARAM_LIST)
