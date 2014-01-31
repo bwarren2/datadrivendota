@@ -220,11 +220,6 @@ def fetch_match_attributes(summaries,attribute):
         vector_list = [summary.match.steam_id for summary in summaries]
     elif attribute == 'which_side':
         vector_list = [summary.which_side() for summary in summaries]
-    elif attribute == 'side_color':
-        dire_red = settings.DIRE_RED
-        radiant_green = settings.RADIANT_GREEN
-        vector_list = [radiant_green if summary.which_side()=='Radiant' else dire_red for summary in summaries]
-        print summaries[6].which_side()
     else:
         vector_list = [getattr(summary, attribute) for summary in summaries]
 
