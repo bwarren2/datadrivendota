@@ -473,3 +473,6 @@ PIPELINE_COMPILERS = (
 # Thorny!
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--with-yanc', '--stop']
+
+DIRE_RED = '#804839'
+RADIANT_GREEN = '#7FEB1B'
