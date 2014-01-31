@@ -27,6 +27,8 @@
             <td>{{ pms.display_duration }}</td>
             {% if pms.hero.thumbshot %}
               <td><img src="{{ pms.hero.thumbshot.url }}" height="60%"></td>
+            {% else %}
+              <td></td>
             {% endif %}
             <td>{{ pms.hero.name }}</td>
             <td>{{ pms.kills }}</td>
