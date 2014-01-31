@@ -3,11 +3,12 @@ from django.core.files import File
 from django.conf import settings
 from itertools import chain
 from rpy2 import robjects
-from rpy2.robjects import FloatVector, StrVector, FactorVector
+from rpy2.robjects import FloatVector, StrVector
 from rpy2.robjects.packages import importr
 from matches.models import PlayerMatchSummary, Match, fetch_match_attributes, fetch_attribute_label, fetch_single_attribute
 from datadrivendota.r import enforceTheme, s3File, FailFace
 from datadrivendota.utilities import safen
+from utils.exceptions import NoDataFound
 from json import loads as jsonloads
 
 def EndgameChart(player_list,mode_list,x_var,y_var,split_var,group_var):
@@ -191,10 +192,11 @@ def MatchAbilityTimeline(json_data, width=800, height=400):
     group = input_data['group_var']
     split = input_data['split_var']
 
-
+    if len(x) == 0 or len(y)==0 or len(group) == 0 or len(split)==0:
+        raise NoDataFound
     x_vec = FloatVector(x)
     y_vec = FloatVector(y)
-    group_vec = FactorVector(group)
+    group_vec = StrVector(group)
     split_vec = StrVector(split)
 
     robjects.globalenv["xvec"] = x_vec
@@ -214,18 +216,7 @@ def MatchAbilityTimeline(json_data, width=800, height=400):
     print(
         xyplot(yvec~xvec|splitvec,type=c('p','l'),groups=groupvec,
                 ylab='%s',xlab='%s',
-                auto.key=list(lines=T,points=T,corner=c(0,.9),background='white'),
-                panel=function(x,y,groups,subscripts,...){
-                    require(grid);
-                    panel.xyplot(x,y,groups=groups,subscripts=subscripts,...);
-                    pug <- levels(groups)[levels(groups)%%in%%groups[subscripts]];
-                    draw.key(key=list(text = list(as.character(pug)),
-                    lines = list(lty =
-                        rep(trellis.par.get('superpose.line')$lty,10)[as.numeric(pug)]),
-                    points = list(pch =
-                        rep(trellis.par.get('superpose.symbol')$pch,10)[as.numeric(pug)])),
-                    draw=TRUE)
-                }
+                auto.key=list(lines=T,points=T,corner=c(0,.9),background='white')
         )
     )"""% (input_data['y_lab'], input_data['x_lab'])
 
