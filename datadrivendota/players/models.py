@@ -34,7 +34,7 @@ class Player(models.Model):
 
     def is_masked(self):
         #That's the magic number for anonymous data
-        return self.steamid == ANONYMOUS_ID
+        return self.steam_id == ANONYMOUS_ID
 
     def get_64_bit_id(self):
         return self.steam_id + ADDER_32_BIT

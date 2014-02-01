@@ -111,7 +111,13 @@
           <tr>
             <td>{{ summary.player.steam_id }}</td>
             <td><img src="{{ summary.player.avatar }}"></td>
-            <td>{{ summary.player.persona_name }}</td>
+            {% if summary.player.persona_name %}
+              <td>{{ summary.player.persona_name }}</td>
+            {% elif summary.player.is_masked%}
+              <td>Anonymous</td>
+            {% else %}
+              <td>(Blank)</td>
+            {% endif %}
             <td>{{ summary.kills }}</td>
             <td>{{ summary.deaths }}</td>
             <td>{{ summary.assists }}</td>
