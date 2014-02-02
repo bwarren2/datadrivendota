@@ -7,9 +7,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
 
-        c = ApiContext()
-        RefreshUpdatePlayerPersonas().delay(api_context=c)
-
         """
         heroes = Hero.objects.all()
         for hero in heroes:
