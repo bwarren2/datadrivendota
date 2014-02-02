@@ -92,7 +92,7 @@ class HeroPlayerPerformance(forms.Form):
         'kills',
         'deaths',
         'assists',
-        'gold',
+        'gold_total',
         'last_hits',
         'denies',
         'hero_damage',

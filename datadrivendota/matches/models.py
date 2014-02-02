@@ -220,6 +220,8 @@ def fetch_match_attributes(summaries,attribute):
         vector_list = [summary.match.steam_id for summary in summaries]
     elif attribute == 'which_side':
         vector_list = [summary.which_side() for summary in summaries]
+    elif attribute == 'gold_total':
+        vector_list = [summary.gold_per_min*summary.match.duration/60 for summary in summaries]
     else:
         vector_list = [getattr(summary, attribute) for summary in summaries]
 
