@@ -12,7 +12,7 @@ from .r import KDADensity, CountWinrate, PlayerTimeline
 from .forms import PlayerWinrateLevers, PlayerTimelineForm, PlayerAddFollowForm
 from .json_data import player_winrate_breakout
 from matches.models import PlayerMatchSummary, Match
-from matches.management.tasks.valve_api_calls import ApiContext, ValveApiCall, UpdatePlayerPersonas
+from matches.management.tasks.valve_api_calls import ApiContext, ValveApiCall, UpdatePlayerPersonas, AcquirePlayerData
 from .models import request_to_player
 from utils.exceptions import NoDataFound
 import datetime
@@ -189,6 +189,13 @@ def drop_follow(request):
 def check_id(request):
     if request.is_ajax() and request.POST['steam_id']!='':
       steam_id = request.POST['steam_id']
+      try:
+        int(steam_id)
+      except ValueError:
+        data = 'We need an integer id'
+        mimetype = 'application/json'
+        return HttpResponseNotFound(data, mimetype)
+
       c = ApiContext()
       c.steamids="{base},{check}".format(base=steam_id,check=int(steam_id)+settings.ADDER_32_BIT)
       vac = ValveApiCall()
@@ -283,13 +290,27 @@ def add_track(request):
           track = Player.objects.get(steam_id=steam_id)
         except Player.DoesNotExist:
           track = Player.objects.create(steam_id=steam_id)
-        request.user.userprofile.tracking.add(track)
-        data=request.POST['steam_id']
-        c = ApiContext()
-        vac = ValveApiCall()
-        upp = UpdatePlayerPersonas()
-        c.steamids=steam_id+settings.ADDER_32_BIT
-        chain(vac.s(mode='GetPlayerSummaries',api_context=c), upp.s()).delay()
+
+        if request.user.userprofile.tracking.add(track) or True:
+          data=request.POST['steam_id']
+
+          #Refresh all the names
+          c = ApiContext()
+          vac = ValveApiCall()
+          upp = UpdatePlayerPersonas()
+          c.steamids=steam_id+settings.ADDER_32_BIT
+          chain(vac.s(mode='GetPlayerSummaries',api_context=c), upp.s()).delay()
+
+          #Pull in the new guy.
+          apd = AcquirePlayerData()
+          c = ApiContext()
+          c.account_id = steam_id
+          apd.delay(api_context=c)
+
+        else:
+            data = 'fail'
+        mimetype = 'application/json'
+        return HttpResponse(data, mimetype)
 
 
     else:

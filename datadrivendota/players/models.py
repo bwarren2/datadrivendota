@@ -53,13 +53,14 @@ class UserProfile(models.Model):
     track_limit = models.IntegerField(default=7)
 
     def add_tracking(self, player):
-        if len(self.tracking>=self.track_limit):
-            return None
+        print self
+        if len(self.tracking>=int(self.track_limit)):
+            return False
         else:
             self.tracking.add(player)
             self.track_limit+=1
             self.save()
-
+            return True
     def __unicode__(self):
         return "User:{0}, Player{1}".format(unicode(self.user),
                                         unicode(self.player))
