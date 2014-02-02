@@ -227,7 +227,7 @@ def check_id(request):
           params = {
             'player_exists': True,
             'steam_id': steam_response['response']['players'][0]['steamid'],
-            'name': steam_response['response']['players'][0]['personaname'],
+            'name': steam_response['response']['players'][0]['personaname'].encode('utf-8'),
             'avatar_url': steam_response['response']['players'][0]['avatarmedium'],
             'public': False,
             'tracked': tracking
