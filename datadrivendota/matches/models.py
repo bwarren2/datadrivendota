@@ -222,6 +222,8 @@ def fetch_match_attributes(summaries,attribute):
         vector_list = [summary.which_side() for summary in summaries]
     elif attribute == 'gold_total':
         vector_list = [summary.gold_per_min*summary.match.duration/60 for summary in summaries]
+    elif attribute == 'xp_total':
+        vector_list = [summary.xp_per_min*summary.match.duration/60 for summary in summaries]
     else:
         vector_list = [getattr(summary, attribute) for summary in summaries]
 

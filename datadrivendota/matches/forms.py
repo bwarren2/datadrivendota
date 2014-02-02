@@ -6,7 +6,7 @@ from .form_fields import MultiGameModeSelect
 
 class EndgameSelect(forms.Form):
 
-    SHARED_PARAMETERS = ['kills','deaths','assists','gold_total',
+    SHARED_PARAMETERS = ['kills','deaths','assists','gold_total','xp_total',
                   'last_hits','denies','hero_damage','tower_damage','hero_healing',
                   'level','K-D+.5*A','first_blood_time']
     X_PARAMETERS = list(SHARED_PARAMETERS)
@@ -29,7 +29,7 @@ class EndgameSelect(forms.Form):
 
 class TeamEndgameSelect(forms.Form):
 
-    SHARED_PARAMETERS = ['kills','deaths','assists','gold_total',
+    SHARED_PARAMETERS = ['kills','deaths','assists','gold_total','xp_total',
                   'last_hits','denies','hero_damage','tower_damage','hero_healing',
                   'level','K-D+.5*A']
     X_PARAMETERS = list(SHARED_PARAMETERS)
