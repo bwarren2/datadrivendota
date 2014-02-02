@@ -237,7 +237,7 @@ def check_id(request):
           params = {
             'player_exists': True,
             'steam_id': steam_response['response']['players'][0]['steamid'],
-            'name': steam_response['response']['players'][0]['personaname'],
+            'name': steam_response['response']['players'][0]['personaname'].encode('utf-8'),
             'avatar_url': steam_response['response']['players'][0]['avatarmedium'],
             'public': True,
             'tracked': tracking
@@ -291,7 +291,7 @@ def add_track(request):
         except Player.DoesNotExist:
           track = Player.objects.create(steam_id=steam_id)
 
-        if request.user.userprofile.tracking.add(track) or True:
+        if request.user.userprofile.tracking.add(track):
           data=request.POST['steam_id']
 
           #Refresh all the names
