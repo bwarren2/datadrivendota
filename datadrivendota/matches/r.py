@@ -3,7 +3,7 @@ from django.core.files import File
 from django.conf import settings
 from itertools import chain
 from rpy2 import robjects
-from rpy2.robjects import FloatVector, StrVector
+from rpy2.robjects import FloatVector, StrVector, FactorVector
 from rpy2.robjects.packages import importr
 from matches.models import PlayerMatchSummary, Match, fetch_match_attributes, fetch_attribute_label, fetch_single_attribute
 from datadrivendota.r import enforceTheme, s3File, FailFace
@@ -206,7 +206,7 @@ def MatchAbilityTimeline(json_data, width=800, height=400):
 
     grdevices = importr('grDevices')
     importr('lattice')
-    importr('grid')
+
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
     grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
@@ -215,6 +215,7 @@ def MatchAbilityTimeline(json_data, width=800, height=400):
     #if there are lots of panels, and keys would get in the way/be redundant
     if len(set(split)) > 5:
         rcmd="""
+        splitvec = factor(splitvec,levels=unique(splitvec),ordered=T)
         print(
             xyplot(yvec~xvec|splitvec,type=c('p','l'),groups=groupvec,
                     ylab='%s',xlab='%s',

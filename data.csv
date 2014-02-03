@@ -1,0 +1,209 @@
+val,lvl,hero,side
+12.433333333333334,1,Lifestealer,Lifestealer
+15.3,2,Lifestealer,Lifestealer
+16.566666666666666,3,Lifestealer,Lifestealer
+19.216666666666665,4,Lifestealer,Lifestealer
+22.2,5,Lifestealer,Lifestealer
+24.75,6,Lifestealer,Lifestealer
+26.75,7,Lifestealer,Lifestealer
+29.4,8,Lifestealer,Lifestealer
+33.2,9,Lifestealer,Lifestealer
+35.21666666666667,10,Lifestealer,Lifestealer
+36.63333333333333,11,Lifestealer,Lifestealer
+41.05,12,Lifestealer,Lifestealer
+42.25,13,Lifestealer,Lifestealer
+44.55,14,Lifestealer,Lifestealer
+46.916666666666664,15,Lifestealer,Lifestealer
+47.43333333333333,16,Lifestealer,Lifestealer
+47.5,17,Lifestealer,Lifestealer
+49.13333333333333,18,Lifestealer,Lifestealer
+51.56666666666667,19,Lifestealer,Lifestealer
+52.05,20,Lifestealer,Lifestealer
+55.03333333333333,21,Lifestealer,Lifestealer
+56.05,22,Lifestealer,Lifestealer
+60.36666666666667,23,Lifestealer,Lifestealer
+61.46666666666667,24,Lifestealer,Lifestealer
+65.85,25,Lifestealer,Lifestealer
+13.866666666666667,1,Lich,Lich
+16.25,2,Lich,Lich
+17.533333333333335,3,Lich,Lich
+20.166666666666668,4,Lich,Lich
+22.633333333333333,5,Lich,Lich
+27.65,6,Lich,Lich
+30.933333333333334,7,Lich,Lich
+32.833333333333336,8,Lich,Lich
+36.833333333333336,9,Lich,Lich
+39.8,10,Lich,Lich
+41.03333333333333,11,Lich,Lich
+44.516666666666666,12,Lich,Lich
+47.666666666666664,13,Lich,Lich
+49.28333333333333,14,Lich,Lich
+51.5,15,Lich,Lich
+51.583333333333336,16,Lich,Lich
+57.78333333333333,17,Lich,Lich
+60.36666666666667,18,Lich,Lich
+61.6,19,Lich,Lich
+13.716666666666667,1,Vengeful Spirit,Vengeful Spirit
+15.983333333333333,2,Vengeful Spirit,Vengeful Spirit
+19.1,3,Vengeful Spirit,Vengeful Spirit
+22.416666666666668,4,Vengeful Spirit,Vengeful Spirit
+26.816666666666666,5,Vengeful Spirit,Vengeful Spirit
+30.066666666666666,6,Vengeful Spirit,Vengeful Spirit
+33.78333333333333,7,Vengeful Spirit,Vengeful Spirit
+37.1,8,Vengeful Spirit,Vengeful Spirit
+39.016666666666666,9,Vengeful Spirit,Vengeful Spirit
+43.46666666666667,10,Vengeful Spirit,Vengeful Spirit
+47.75,11,Vengeful Spirit,Vengeful Spirit
+51.8,12,Vengeful Spirit,Vengeful Spirit
+51.81666666666667,13,Vengeful Spirit,Vengeful Spirit
+53.666666666666664,14,Vengeful Spirit,Vengeful Spirit
+55.483333333333334,15,Vengeful Spirit,Vengeful Spirit
+60.55,16,Vengeful Spirit,Vengeful Spirit
+64.46666666666667,17,Vengeful Spirit,Vengeful Spirit
+14.516666666666667,1,Clockwerk,Clockwerk
+14.783333333333333,2,Clockwerk,Clockwerk
+15.45,3,Clockwerk,Clockwerk
+16.4,4,Clockwerk,Clockwerk
+17.6,5,Clockwerk,Clockwerk
+18.933333333333334,6,Clockwerk,Clockwerk
+20.066666666666666,7,Clockwerk,Clockwerk
+21.516666666666666,8,Clockwerk,Clockwerk
+25.15,9,Clockwerk,Clockwerk
+30.983333333333334,10,Clockwerk,Clockwerk
+31.0,11,Clockwerk,Clockwerk
+36.68333333333333,12,Clockwerk,Clockwerk
+38.35,13,Clockwerk,Clockwerk
+45.166666666666664,14,Clockwerk,Clockwerk
+49.9,15,Clockwerk,Clockwerk
+53.9,16,Clockwerk,Clockwerk
+58.63333333333333,17,Clockwerk,Clockwerk
+60.583333333333336,18,Clockwerk,Clockwerk
+12.283333333333333,1,Slark,Slark
+14.55,2,Slark,Slark
+15.266666666666667,3,Slark,Slark
+16.133333333333333,4,Slark,Slark
+18.316666666666666,5,Slark,Slark
+19.4,6,Slark,Slark
+21.283333333333335,7,Slark,Slark
+24.416666666666668,8,Slark,Slark
+29.533333333333335,9,Slark,Slark
+31.816666666666666,10,Slark,Slark
+32.666666666666664,11,Slark,Slark
+35.36666666666667,12,Slark,Slark
+35.46666666666667,13,Slark,Slark
+36.31666666666667,14,Slark,Slark
+38.4,15,Slark,Slark
+42.25,16,Slark,Slark
+43.85,17,Slark,Slark
+44.583333333333336,18,Slark,Slark
+45.86666666666667,19,Slark,Slark
+47.333333333333336,20,Slark,Slark
+47.43333333333333,21,Slark,Slark
+49.13333333333333,22,Slark,Slark
+51.36666666666667,23,Slark,Slark
+52.03333333333333,24,Slark,Slark
+54.9,25,Slark,Slark
+14.15,1,Puck,Puck
+14.95,2,Puck,Puck
+15.583333333333334,3,Puck,Puck
+16.566666666666666,4,Puck,Puck
+18.366666666666667,5,Puck,Puck
+20.233333333333334,6,Puck,Puck
+22.816666666666666,7,Puck,Puck
+24.533333333333335,8,Puck,Puck
+28.566666666666666,9,Puck,Puck
+31.366666666666667,10,Puck,Puck
+31.416666666666668,11,Puck,Puck
+33.61666666666667,12,Puck,Puck
+34.61666666666667,13,Puck,Puck
+36.93333333333333,14,Puck,Puck
+37.06666666666667,15,Puck,Puck
+38.46666666666667,16,Puck,Puck
+40.85,17,Puck,Puck
+44.96666666666667,18,Puck,Puck
+49.583333333333336,19,Puck,Puck
+53.21666666666667,20,Puck,Puck
+55.05,21,Puck,Puck
+63.833333333333336,22,Puck,Puck
+64.55,23,Puck,Puck
+14.333333333333334,1,Timbersaw,Timbersaw
+15.066666666666666,2,Timbersaw,Timbersaw
+15.833333333333334,3,Timbersaw,Timbersaw
+16.5,4,Timbersaw,Timbersaw
+17.883333333333333,5,Timbersaw,Timbersaw
+18.933333333333334,6,Timbersaw,Timbersaw
+20.683333333333334,7,Timbersaw,Timbersaw
+21.966666666666665,8,Timbersaw,Timbersaw
+25.966666666666665,9,Timbersaw,Timbersaw
+28.7,10,Timbersaw,Timbersaw
+28.766666666666666,11,Timbersaw,Timbersaw
+32.06666666666667,12,Timbersaw,Timbersaw
+33.833333333333336,13,Timbersaw,Timbersaw
+33.833333333333336,14,Timbersaw,Timbersaw
+37.333333333333336,15,Timbersaw,Timbersaw
+37.36666666666667,16,Timbersaw,Timbersaw
+37.36666666666667,17,Timbersaw,Timbersaw
+40.0,18,Timbersaw,Timbersaw
+42.78333333333333,19,Timbersaw,Timbersaw
+45.55,20,Timbersaw,Timbersaw
+49.416666666666664,21,Timbersaw,Timbersaw
+53.31666666666667,22,Timbersaw,Timbersaw
+59.43333333333333,23,Timbersaw,Timbersaw
+63.5,24,Timbersaw,Timbersaw
+13.366666666666667,1,Ursa,Ursa
+14.966666666666667,2,Ursa,Ursa
+16.533333333333335,3,Ursa,Ursa
+19.016666666666666,4,Ursa,Ursa
+21.483333333333334,5,Ursa,Ursa
+23.166666666666668,6,Ursa,Ursa
+23.25,7,Ursa,Ursa
+25.666666666666668,8,Ursa,Ursa
+26.95,9,Ursa,Ursa
+29.333333333333332,10,Ursa,Ursa
+31.866666666666667,11,Ursa,Ursa
+36.85,12,Ursa,Ursa
+36.85,13,Ursa,Ursa
+38.75,14,Ursa,Ursa
+42.65,15,Ursa,Ursa
+42.666666666666664,16,Ursa,Ursa
+44.9,17,Ursa,Ursa
+46.333333333333336,18,Ursa,Ursa
+49.4,19,Ursa,Ursa
+51.766666666666666,20,Ursa,Ursa
+54.65,21,Ursa,Ursa
+60.516666666666666,22,Ursa,Ursa
+64.48333333333333,23,Ursa,Ursa
+12.333333333333334,1,Crystal Maiden,Crystal Maiden
+16.116666666666667,2,Crystal Maiden,Crystal Maiden
+18.45,3,Crystal Maiden,Crystal Maiden
+20.966666666666665,4,Crystal Maiden,Crystal Maiden
+22.8,5,Crystal Maiden,Crystal Maiden
+26.616666666666667,6,Crystal Maiden,Crystal Maiden
+31.916666666666668,7,Crystal Maiden,Crystal Maiden
+33.416666666666664,8,Crystal Maiden,Crystal Maiden
+35.21666666666667,9,Crystal Maiden,Crystal Maiden
+35.86666666666667,10,Crystal Maiden,Crystal Maiden
+37.63333333333333,11,Crystal Maiden,Crystal Maiden
+49.11666666666667,12,Crystal Maiden,Crystal Maiden
+49.333333333333336,13,Crystal Maiden,Crystal Maiden
+51.21666666666667,14,Crystal Maiden,Crystal Maiden
+57.93333333333333,15,Crystal Maiden,Crystal Maiden
+63.38333333333333,16,Crystal Maiden,Crystal Maiden
+64.33333333333333,17,Crystal Maiden,Crystal Maiden
+12.383333333333333,1,Earthshaker,Earthshaker
+15.583333333333334,2,Earthshaker,Earthshaker
+17.883333333333333,3,Earthshaker,Earthshaker
+20.966666666666665,4,Earthshaker,Earthshaker
+22.633333333333333,5,Earthshaker,Earthshaker
+23.2,6,Earthshaker,Earthshaker
+25.583333333333332,7,Earthshaker,Earthshaker
+26.05,8,Earthshaker,Earthshaker
+30.883333333333333,9,Earthshaker,Earthshaker
+41.083333333333336,10,Earthshaker,Earthshaker
+42.1,11,Earthshaker,Earthshaker
+43.083333333333336,12,Earthshaker,Earthshaker
+51.31666666666667,13,Earthshaker,Earthshaker
+54.45,14,Earthshaker,Earthshaker
+58.28333333333333,15,Earthshaker,Earthshaker
+62.333333333333336,16,Earthshaker,Earthshaker
+64.5,17,Earthshaker,Earthshaker

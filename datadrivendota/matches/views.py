@@ -14,7 +14,7 @@ from .models import Match, PlayerMatchSummary, PickBan
 from .json_data import player_endgame_json, team_endgame_json, match_ability_json
 from players.models import request_to_player
 from utils.exceptions import NoDataFound
-
+from django.core.urlresolvers import reverse
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -295,7 +295,7 @@ chart.addHandler(tester)"""
 
 
 @permission_required('players.can_touch')
-#@devserver_profile
+@devserver_profile(follow=[match_ability_json,MatchAbilityTimeline,render])
 def ability_build(request):
   title = 'Match Ability Breakdown'
   if request.method == 'POST':
@@ -308,10 +308,13 @@ def ability_build(request):
           )
         rplot = MatchAbilityTimeline(json_data)
         rplot = basename(rplot.name)
-
+        match_url = reverse('matches:match_detail',kwargs={'match_id':select_form.cleaned_data['match']})
+        extra_notes = "<a href='{0}'>See this match</a>".format(match_url)
         return render(request, 'match_form.html', {'image_name': rplot,
                                                    'title': title,
-                                                   'form': select_form})
+                                                   'form': select_form,
+                                                   'extra_notes': extra_notes,
+                                                   })
       except NoDataFound:
         return render(request, 'match_form.html', {'error': 'error',
                                                    'title': title,

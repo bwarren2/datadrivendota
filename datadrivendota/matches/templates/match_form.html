@@ -6,6 +6,8 @@
 
 {% block content %}
   {% include "_image_form_embed.html" %}
+
+  <div>{{extra_notes|safe}}</div>
 {% endblock content %}
 
 {% block extra_js %}

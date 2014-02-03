@@ -84,7 +84,7 @@ def team_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var,comp
     return return_json, xlab, ylab, grouplab
 
 def match_ability_json(match_id, split_var):
-    skill_builds = SkillBuild.objects.filter(player_match_summary__match__steam_id=match_id).select_related()
+    skill_builds = SkillBuild.objects.filter(player_match_summary__match__steam_id=match_id).select_related().order_by('player_match_summary','level')
 
     x_list = []
     y_list = []
@@ -99,7 +99,7 @@ def match_ability_json(match_id, split_var):
         if split_var=='No Split':
             split_list.append('No Split')
         elif split_var=='hero':
-            split_list.append(hero_name)
+            split_list.append("{hero} ({side})".format(hero=hero_name,side=side))
         elif split_var=='side':
             split_list.append(side)
         else:
