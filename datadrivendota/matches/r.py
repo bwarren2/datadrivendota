@@ -212,13 +212,22 @@ def MatchAbilityTimeline(json_data, width=800, height=400):
     grdevices.png(file=imagefile.name, type='cairo',width=width,height=height)
     enforceTheme(robjects)
 
-    rcmd="""
-    print(
-        xyplot(yvec~xvec|splitvec,type=c('p','l'),groups=groupvec,
-                ylab='%s',xlab='%s',
-                auto.key=list(lines=T,points=T,corner=c(0,.9),background='white')
-        )
-    )"""% (input_data['y_lab'], input_data['x_lab'])
+    #if there are lots of panels, and keys would get in the way/be redundant
+    if len(set(split)) > 5:
+        rcmd="""
+        print(
+            xyplot(yvec~xvec|splitvec,type=c('p','l'),groups=groupvec,
+                    ylab='%s',xlab='%s',
+            )
+        )"""% (input_data['y_lab'], input_data['x_lab'])
+    else:
+        rcmd="""
+        print(
+            xyplot(yvec~xvec|splitvec,type=c('p','l'),groups=groupvec,
+                    ylab='%s',xlab='%s',
+                    auto.key=list(lines=T,points=T,corner=c(0,.9),background='transparent')
+            )
+        )"""% (input_data['y_lab'], input_data['x_lab'])
 
     # rcmd="""
     # print(
