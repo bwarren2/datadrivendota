@@ -97,9 +97,7 @@
           <h2>{% block page_title %}Hello!{% endblock page_title %}</h2>
 
           {% block content %}
-            <div class='container'>
             <div class='glyphicon glyphicon-question-sign tourglyph'  title='Click me!'></div>
-            </div>
             <p>Welcome to DataDrivenDota.  Use the menu items in the top nav bar to access charting data; heroes and matches are the best built out right now.</p>
           {% endblock content %}
 
@@ -130,6 +128,47 @@
     {% endblock extra_js %}
 
     {% if request.user.is_authenticated %}
+
+    {% block tour %}
+      <script type="text/javascript">
+  $(function () {
+    var tour = new Tour({
+      backdrop: true
+    });
+
+    tour.addSteps([
+      {
+        orphan: true,
+        title: "Welcome!",
+        content: "We are a bit different, so let's overview a couple big things."
+      },
+      {
+        element: "#IntercomDefaultWidget",
+        title: "Feedback",
+        content: "If you have any problems, questions, or feature requests, let us know here!",
+        placement: "left"
+      },
+      {
+        element: ".primary_nav",
+        title: "Navigation",
+        content: "Find tools to use here.  Basically everything that is not an index is a chart.",
+        placement: "bottom"
+      },
+      {
+        orphan: true,
+        title: "Ready to go!",
+        content: "Now you know all there is! Happy hunting!"
+      }
+    ]);
+
+    $(".tourglyph").on("click",function(){
+      tour.start('.page-tour');
+    })
+
+  });
+      </script>
+    {% endblock tour %}
+
       <script id="IntercomSettingsScriptTag">
         window.intercomSettings = {
           user_id: "{% steam_id request.user %}",
@@ -178,36 +217,6 @@
           };
         })()
       </script>
-      <script type="text/javascript">
-  $(function () {
-    var tour = new Tour({
-      backdrop: true
-    });
-
-    tour.addSteps([
-      {
-        orphan: true,
-        title: "Welcome!",
-        content: "We are a bit different, so let's overview a couple big things."
-      },
-      {
-        element: "#IntercomDefaultWidget",
-        title: "Feedback",
-        content: "If you have any problems, questions, or feature requests, let us know here!",
-        placement: "left"
-      },
-      {
-        orphan: true,
-        title: "Ready to go!",
-        content: "Now you know all there is! Happy hunting!"
-      }
-    ]);
-
-    $(".tourglyph").on("click",function(){
-      tour.start('.page-tour');
-    })
-
-  });
     {% endif %}
   </body>
 </html>
