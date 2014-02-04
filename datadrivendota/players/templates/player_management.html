@@ -261,6 +261,12 @@ $('form#steam_id_form').submit(function () {
 });
 </script>
 
+
+
+{% endblock extra_js %}
+
+{% block tour %}
+
 <script type="text/javascript">
   $(function () {
     var tour = new Tour({
@@ -310,12 +316,10 @@ $('form#steam_id_form').submit(function () {
     ]);
 
     $(".tourglyph").on("click",function(){
-      tour.start('.page-tour');
+      tour.restart('.page-tour');
     })
 
   });
 
 </script>
-
-
-{% endblock extra_js %}
+{% endblock tour %}
