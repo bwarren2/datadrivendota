@@ -1,3 +1,4 @@
+import datetime
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
@@ -15,10 +16,9 @@ class Command(BaseCommand):
         matches.update(validity=Match.UNCOUNTED)
         # .exclude(lobby_type__steam_id=7)
 
-        #Games that do not have ten match summaries are uncounted, but we need to re-check things in the scrape.
-        unprocessed = Match.objects.filter(validity=Match.UNPROCESSED)
 
         def process_matches(unprocessed):
+            #Games that do not have ten match summaries are uncounted.
             ms = unprocessed.annotate(Count('playermatchsummary'))
             ms = ms.filter(playermatchsummary__count__lt=10)
             keys = ms.values_list('pk', flat=True)
@@ -43,6 +43,10 @@ class Command(BaseCommand):
             ms = unprocessed.exclude(pk__in=keys)
             ms.update(validity=Match.LEGIT)
 
+        unprocessed = Match.objects.filter(validity=Match.UNPROCESSED)
+        process_matches(unprocessed)
+        a = datetime.datetime.utcnow()-datetime.timedelta(days=3)
+        unprocessed = Match.objects.filter(start_time__gte = a.strftime('%s'))
         process_matches(unprocessed)
 
 
