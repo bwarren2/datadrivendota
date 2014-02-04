@@ -2,7 +2,7 @@
 # sudo aptitude install libxml2-dev
 
 #Key functions
-install.packages("grid", repos = "http://cran.rstudio.com/")
+#install.packages("grid", repos = "http://cran.rstudio.com/")
 
 
 #gridSVG
