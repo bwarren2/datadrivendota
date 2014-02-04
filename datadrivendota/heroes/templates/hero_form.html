@@ -22,34 +22,28 @@
       {
         orphan: true,
         title: "Welcome!",
-        content: "This is Data Driven Dota. It will make you awesome."
+        content: "These hero pages let you chart data you are interested in."
       },
       {
         element: ".chart-form",
         title: "Asking questions",
-        content: "This is where you ask questions of the system."
+        content: "Specify what data you want to see here."
       },
       {
         element: "ul.nav-tabs",
         title: "Other questions",
-        content: "Here's where you ask other questions.",
+        content: "For other charts, try these subtabs.",
         placement: "bottom"
-      },
-      {
-        element: "#IntercomDefaultWidget",
-        title: "Feedback",
-        content: "If you have any problems, questions, or feature requests, let us know here!",
-        placement: "left"
       },
       {
         orphan: true,
         title: "Ready to go!",
-        content: "Now you know all there is! Happy hunting!"
+        content: "Challenge: how does your favorite hero compare to your least favorite?"
       }
     ]);
 
     $(".tourglyph").on("click",function(){
-      tour.start('.page-tour');
+      tour.restart('.page-tour');
     })
 
   });

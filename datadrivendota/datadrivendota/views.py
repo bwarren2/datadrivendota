@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from datadrivendota.forms import KeyForm
 from players.models import PermissionCode
-@permission_required('players.can_look')
+#@permission_required('players.can_look')
 def base(request):
 
     if request.user.is_anonymous() or \

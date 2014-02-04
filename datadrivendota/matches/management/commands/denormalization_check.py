@@ -45,6 +45,7 @@ class Command(BaseCommand):
 
         unprocessed = Match.objects.filter(validity=Match.UNPROCESSED)
         process_matches(unprocessed)
+
         a = datetime.datetime.utcnow()-datetime.timedelta(days=3)
         unprocessed = Match.objects.filter(start_time__gte = a.strftime('%s'))
         process_matches(unprocessed)

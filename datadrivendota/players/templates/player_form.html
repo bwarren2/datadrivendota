@@ -2,7 +2,8 @@
 
 {% block title %}{{ title }}{% endblock title %}
 
-{% block page_title %}{{ title }}{% endblock page_title %}
+{% block page_title %}{{ title }}
+<span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>{% endblock page_title %}
 
 {% block content %}
   {% include "_image_form_embed.html" %}
@@ -14,5 +15,48 @@
   var chart = polyjs.chart({{chart_spec|safe}});
   {{extra_chart_js|safe}}
 </script>
+{% block tour %}
+
+<script type="text/javascript">
+  $(function () {
+    var tour = new Tour({
+      backdrop: true
+    });
+
+    tour.addSteps([
+      {
+        orphan: true,
+        title: "Welcome!",
+        content: "Player pages let you examine one player in particular."
+      },
+      {
+        element: ".chart-form",
+        title: "Asking questions",
+        content: "Pick what you would like to know about them here."
+      },
+      {
+        element: "ul.nav-tabs",
+        title: "Other questions",
+        content: "Other types of charts about players are here.",
+        placement: "bottom"
+      },
+      {
+        orphan: true,
+        element: "#main-nav",
+        title: "Other resources",
+        content: "Data across players and for heroes are in other locations.",
+        placement: "bottom"
+      }
+    ]);
+
+    $(".tourglyph").on("click",function(){
+      tour.restart('.page-tour');
+    })
+
+  });
+
+</script>
+{% endblock tour %}
+
 {% endblock extra_js %}
 

@@ -2,7 +2,9 @@
 
 {% block title %}{{ title }}{% endblock title %}
 
-{% block page_title %}{{ title }}{% endblock page_title %}
+{% block page_title %}{{ title }}
+            <div class='glyphicon glyphicon-question-sign tourglyph'  title='Click me!'></div>
+{% endblock page_title %}
 
 {% block content %}
   {% include "_image_form_embed.html" %}
@@ -16,6 +18,48 @@ var chartdata = polyjs.data({{json_data|safe}});
 var chart = polyjs.chart({{chart_spec|safe}});
 {{extra_chart_js|safe}}
 </script>
+
+{% block tour %}
+
+<script type="text/javascript">
+  $(function () {
+    var tour = new Tour({
+      backdrop: true
+    });
+
+    tour.addSteps([
+      {
+        orphan: true,
+        title: "Welcome!",
+        content: "Match pages let you compare end-of-game data across players."
+      },
+      {
+        element: ".chart-form",
+        title: "Asking questions",
+        content: "Specify who and what to see here."
+      },
+      {
+        element: "ul.nav-tabs",
+        title: "Other questions",
+        content: "For charts about heroes or players themselves, try these subtabs.",
+        placement: "bottom"
+      },
+      {
+        orphan: true,
+        title: "Ready to go!",
+        content: "Challenge: How do your endgame kills compare to [A]kke's when you both win?"
+      }
+    ]);
+
+    $(".tourglyph").on("click",function(){
+      tour.restart('.page-tour');
+    })
+
+  });
+
+</script>
+{% endblock tour %}
+
 
 {% endblock extra_js %}
 
