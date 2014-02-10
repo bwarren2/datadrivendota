@@ -9,3 +9,7 @@
 	path = datadrivendota/static/js/tags
 	url = https://github.com/xoxco/jQuery-Tags-Input
     ignore = all
+[submodule "datadrivendota/static/js/d3"]
+	path = datadrivendota/static/js/d3
+	url = https://github.com/mbostock/d3
+    ignore = all
