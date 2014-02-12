@@ -13,7 +13,7 @@ import rpy2.rinterface as rinterface
 
 
 from heroes.models import HeroDossier, Hero
-from datadrivendota.r import s3File, enforceTheme, FailFace
+from utils.r import s3File, enforceTheme, FailFace
 from matches.models import PlayerMatchSummary, SkillBuild, Match
 from matches.r import fetch_match_attributes
 

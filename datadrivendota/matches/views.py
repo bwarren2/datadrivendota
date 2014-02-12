@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import permission_required
 from heroes.models import Hero
 from .forms import EndgameSelect, TeamEndgameSelect, MatchAbilitySelect
-from .r import EndgameChart, MatchParameterScatterplot, MatchAbilityTimeline
+from .r import EndgameChart, MatchParameterScatterplot
 from .models import Match, PlayerMatchSummary, PickBan
 from .json_data import player_endgame_json, team_endgame_json, match_ability_json
 from players.models import request_to_player
@@ -156,58 +156,25 @@ def follow_match_feed(request):
 @devserver_profile(follow=[EndgameChart])
 def endgame(request):
 
-    chart_spec = """
-    {title: "",
-dom: "chart",
-width: 800,
-height: 600,
-layers: [{
-        data: chartdata,
-        type: "point",
-        x: "x_var",
-        y: "y_var",
-        color: "group_var",
-        size:{const:3},
-        opacity:{const:3},
-        sample:1000,
-    }],
-
-    facet:{
-      type:'wrap',
-      var:'split_var',
-      formatter: function(facetObject) {
-            var title = facetObject.split_var;
-            return title;
-        }
-    }
-}
-    """
-    extra_chart_js= """tester = function(type, obj, event, chart){
-  data = obj.evtData;
-  if (type ==="click"){
-    top.location="/matches/"+String(data.match_id["in"]);
-  }
-}
-chart.addHandler(tester)"""
-
-
     if request.method == 'POST':
         select_form = EndgameSelect(request.POST)
         if select_form.is_valid():
           try:
-            return_json = player_endgame_json(
+            json_data, params = player_endgame_json(
                 player_list = select_form.cleaned_data['players'],
                 mode_list = select_form.cleaned_data['game_modes'],
                 x_var = select_form.cleaned_data['x_var'],
                 y_var = select_form.cleaned_data['y_var'],
                 split_var = select_form.cleaned_data['split_var'],
-                group_var = select_form.cleaned_data['group_var'],
-            )[0]
+                group_var = select_form.cleaned_data['group_var']
+            )
+            json_data = basename(json_data.name)
+            params = basename(params.name)
+
             return render(request, 'match_form.html',
                                      {'form':select_form,
-                                    'json_data': return_json,
-                                    'chart_spec': chart_spec,
-                                    'extra_chart_js': extra_chart_js,
+                                      'json_data': json_data,
+                                      'params': params,
                                     'title':'Endgame Charts'
                                      })
           except NoDataFound:
@@ -226,59 +193,26 @@ chart.addHandler(tester)"""
 @devserver_profile(follow=[team_endgame_json])
 def team_endgame(request):
 
-    chart_spec = """
-    {title: "",
-dom: "chart",
-width: 800,
-height: 600,
-layers: [{
-        data: chartdata,
-        type: "point",
-        x: "x_var",
-        y: "y_var",
-        color: "group_var",
-        size:{const:3},
-        opacity:{const:3},
-        sample:1000,
-    }],
-
-    facet:{
-      type:'wrap',
-      var:'split_var',
-      formatter: function(facetObject) {
-            var title = facetObject.split_var;
-            return title;
-        }
-    }
-}
-    """
-    extra_chart_js= """tester = function(type, obj, event, chart){
-  data = obj.evtData;
-  if (type ==="click"){
-    window.open("/matches/"+String(data.match_id["in"]));
-  }
-}
-chart.addHandler(tester)"""
-
     if request.method == 'POST':
         select_form = TeamEndgameSelect(request.POST)
         if select_form.is_valid():
           try:
-            return_json, xlab, ylab, grouplab = team_endgame_json(
+            json_data, params = team_endgame_json(
                 player_list = select_form.cleaned_data['players'],
                 mode_list = select_form.cleaned_data['game_modes'],
                 x_var = select_form.cleaned_data['x_var'],
                 y_var = select_form.cleaned_data['y_var'],
                 split_var = select_form.cleaned_data['split_var'],
                 group_var = select_form.cleaned_data['group_var'],
-                compressor = select_form.cleaned_data['compressor'],
+                compressor = select_form.cleaned_data['compressor']
             )
+            json_data = basename(json_data.name)
+            params = basename(params.name)
 
             return render(request, 'match_form.html',
                                      {'form':select_form,
-                                    'json_data': return_json,
-                                    'chart_spec': chart_spec,
-                                    'extra_chart_js': extra_chart_js,
+                                     'json_data': json_data,
+                                     'params': params,
                                       'title':'Endgame Charts'
                                      })
 
@@ -295,22 +229,23 @@ chart.addHandler(tester)"""
 
 
 @permission_required('players.can_touch')
-@devserver_profile(follow=[match_ability_json,MatchAbilityTimeline,render])
+@devserver_profile(follow=[match_ability_json])
 def ability_build(request):
   title = 'Match Ability Breakdown'
   if request.method == 'POST':
     select_form = MatchAbilitySelect(request.POST)
     if select_form.is_valid():
       try:
-        json_data = match_ability_json(
+        json_data, params = match_ability_json(
             match_id = select_form.cleaned_data['match'],
             split_var = select_form.cleaned_data['split_var']
           )
-        rplot = MatchAbilityTimeline(json_data)
-        rplot = basename(rplot.name)
+        json_data = basename(json_data.name)
+        params = basename(params.name)
         match_url = reverse('matches:match_detail',kwargs={'match_id':select_form.cleaned_data['match']})
         extra_notes = "<a href='{0}'>See this match</a>".format(match_url)
-        return render(request, 'match_form.html', {'image_name': rplot,
+        return render(request, 'match_form.html', {'json_data': json_data,
+                                                   'params': params,
                                                    'title': title,
                                                    'form': select_form,
                                                    'extra_notes': extra_notes,

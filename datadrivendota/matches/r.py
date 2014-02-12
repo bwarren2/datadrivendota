@@ -6,7 +6,7 @@ from rpy2 import robjects
 from rpy2.robjects import FloatVector, StrVector, FactorVector
 from rpy2.robjects.packages import importr
 from matches.models import PlayerMatchSummary, Match, fetch_match_attributes, fetch_attribute_label, fetch_single_attribute
-from datadrivendota.r import enforceTheme, s3File, FailFace
+from utils.r import enforceTheme, s3File, FailFace
 from datadrivendota.utilities import safen
 from utils.exceptions import NoDataFound
 from json import loads as jsonloads

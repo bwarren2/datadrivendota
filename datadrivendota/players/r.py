@@ -8,7 +8,7 @@ from rpy2.robjects.packages import importr
 
 from matches.models import PlayerMatchSummary, GameMode, Match
 from .models import Player
-from datadrivendota.r import s3File, enforceTheme, FailFace
+from utils.r import s3File, enforceTheme, FailFace
 from heroes.models import safen
 from django.conf import settings
 

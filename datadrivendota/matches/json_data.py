@@ -1,7 +1,10 @@
+from uuid import uuid4
 from itertools import chain
 from matches.models import PlayerMatchSummary, Match, fetch_match_attributes,\
  fetch_single_attribute, fetch_attribute_label, SkillBuild
 from utils.exceptions import NoDataFound
+from utils.r import s3File
+
 import json
 
 def player_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var):
@@ -23,14 +26,36 @@ def player_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var):
     except AttributeError:
         raise NoDataFound
 
-    return_json = json.dumps({
-        'x_var': x_vector_list,
-        'y_var': y_vector_list,
-        'group_var': group_vector_list,
-        'split_var': split_vector_list,
-        'match_id': match_list,
-        })
-    return return_json, xlab, ylab, grouplab, split_lab
+    datalist = []
+    for key in range(0,len(x_vector_list)):
+        minidict = {
+            'x_var':x_vector_list[key],
+            'y_var':y_vector_list[key],
+            'label':group_vector_list[key],
+            'tooltip':match_list[key],
+            'split_var':split_vector_list[key],
+            'group_var':group_vector_list[key],
+        }
+        datalist.append(minidict)
+    params = {}
+    params['x_min'] = min(x_vector_list)
+    params['x_max'] = max(x_vector_list)
+    params['y_min'] = min(y_vector_list)
+    params['y_max'] = max(y_vector_list)
+    params['x_label'] = xlab
+    params['y_label'] = ylab
+
+    datafilename = '1d_%s.json' % str(uuid4())
+    datafile = open(datafilename,'wb')
+    datafile.write(json.dumps(datalist))
+    datafile.close()
+
+    paramfilename = '1d_%s.json' % str(uuid4())
+    paramfile = open(paramfilename,'wb')
+    paramfile.write(json.dumps(params))
+    paramfile.close()
+
+    return s3File(datafile), s3File(paramfile)
 
 
 def team_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var,compressor):
@@ -39,7 +64,7 @@ def team_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var,comp
     dire_matches = Match.objects.filter(game_mode__steam_id__in=mode_list, validity=Match.LEGIT)
     for player in player_list:
         radiant_matches = radiant_matches.filter(playermatchsummary__player__steam_id=player, playermatchsummary__player_slot__lte=5)
-        dire_matches = dire_matches.filter(playermatchsummary__player__steam_id=player, playermatchsummary__player_slot__gte=5)
+        dire_matches = dire_matches.filter(playermatchsummary__player__steam_id=player, playermatchsummary__player_slot__gt=5)
 
     if len(radiant_matches) + len(dire_matches)==0:
         raise NoDataFound
@@ -63,56 +88,131 @@ def team_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var,comp
                                     attribute=split_var, compressor=compressor)
 
     try:
-        x_vector_list = [item for item in x_data.itervalues()]
-        y_vector_list = [item for item in y_data.itervalues()]
-        group_vector_list = [item for item in group_data.itervalues()]
-        split_vector_list = [item for item in split_data.itervalues()]
-        match_list = [key for key in split_data.iterkeys()]
-        xlab = fetch_attribute_label(attribute=x_var)
-        ylab = fetch_attribute_label(attribute=y_var) + " ({a})".format(a=compressor)
-        grouplab = fetch_attribute_label(attribute=group_var)
+        dataset = []
+        for p in pmses:
+            match_id = p.match.steam_id
+            minidict = {
+            'x_var': x_data[match_id],
+            'y_var': y_data[match_id],
+            'group_var': group_data[match_id],
+            'split_var': split_data[match_id],
+            'label':match_id,
+            'tooltip':match_id,
+            }
+            dataset.append(minidict)
+            xlab = fetch_attribute_label(attribute=x_var)
+            ylab = fetch_attribute_label(attribute=y_var) + " ({a})".format(a=compressor)
+            grouplab = fetch_attribute_label(attribute=group_var)
     except AttributeError:
         raise NoDataFound
 
-    return_json = json.dumps({
-        'x_var': x_vector_list,
-        'y_var': y_vector_list,
-        'group_var': group_vector_list,
-        'split_var': split_vector_list,
-        'match_id': match_list,
-        })
-    return return_json, xlab, ylab, grouplab
+    params = {}
+    params['x_min'] = min(x_data.itervalues())
+    params['x_max'] = max(x_data.itervalues())
+    params['y_min'] = min(y_data.itervalues())
+    params['y_max'] = max(y_data.itervalues())
+    params['x_label'] = xlab
+    params['y_label'] = ylab
 
-def match_ability_json(match_id, split_var):
+    datafilename = '1d_%s.json' % str(uuid4())
+    datafile = open(datafilename,'wb')
+    datafile.write(json.dumps(dataset))
+    datafile.close()
+
+    paramfilename = '1d_%s.json' % str(uuid4())
+    paramfile = open(paramfilename,'wb')
+    paramfile.write(json.dumps(params))
+    paramfile.close()
+
+    return s3File(datafile), s3File(paramfile)
+
+
+
+def match_ability_json(match_id, split_var='No Split'):
+
     skill_builds = SkillBuild.objects.filter(player_match_summary__match__steam_id=match_id).select_related().order_by('player_match_summary','level')
-
-    x_list = []
-    y_list = []
-    group_list = []
-    split_list = []
+    dataset = []
     for build in skill_builds:
-        x_list.append(build.time/60.0)
-        y_list.append(build.level)
-        hero_name = build.player_match_summary.hero.name
-        side = build.player_match_summary.which_side()
-        group_list.append(hero_name)
-        if split_var=='No Split':
-            split_list.append('No Split')
-        elif split_var=='hero':
-            split_list.append("{hero} ({side})".format(hero=hero_name,side=side))
-        elif split_var=='side':
-            split_list.append(side)
-        else:
-            raise NoDataFound
 
-    return_json = json.dumps({
-        'x_var':x_list,
-        'y_var':y_list,
-        'group_var':group_list,
-        'split_var': split_list,
-        'x_lab': 'Time (m)',
-        'y_lab': 'Level',
-        'group_lab': 'Hero',
-        'split_lab': 'Thingy'}
-    )
-    return return_json
+        side = build.player_match_summary.which_side()
+        hero = build.player_match_summary.hero.name
+        if split_var=='No Split':
+            split_param = 'No Split'
+        elif split_var=='hero':
+            split_param = hero+'_foo'
+        elif split_var=='side':
+            split_param = side
+
+        dataset.append({
+            'x_var':build.time/60,
+            'y_var':build.level,
+            'label':hero,
+            'tooltip':build.ability.name,
+            'split_var':split_param,
+            'group_var':hero,
+            }
+        )
+    xs = [build.time/60 for build in skill_builds]
+    ys = [build.level for build in skill_builds]
+    params = {}
+    params['x_min'] = min(xs)
+    params['x_max'] = max(xs)
+    params['y_min'] = min(ys)
+    params['y_max'] = max(ys)
+    params['x_label'] = 'Time (m)'
+    params['y_label'] = 'Level'
+    params['draw_path'] = True
+
+    datafilename = '1d_%s.json' % str(uuid4())
+    datafile = open(datafilename,'wb')
+    datafile.write(json.dumps(dataset))
+    datafile.close()
+
+    paramfilename = '1d_%s.json' % str(uuid4())
+    paramfile = open(paramfilename,'wb')
+    paramfile.write(json.dumps(params))
+    paramfile.close()
+
+    return (s3File(datafile),s3File(paramfile))
+
+
+# def match_ability_json(match_id, split_var='No Split'):
+
+#     skill_builds = SkillBuild.objects.filter(player_match_summary__match__steam_id=match_id).select_related().order_by('player_match_summary','level')
+#     dataset = {}
+#     for build in skill_builds:
+
+#         side = build.player_match_summary.which_side()
+#         hero = build.player_match_summary.hero.name
+#         if split_var=='No Split':
+#             split_param = 'No Split'
+#         elif split_var=='hero':
+#             split_param = hero
+#         elif split_var=='side':
+#             split_param = side
+#         if split_param not in dataset:
+#             dataset[split_param] = {}
+#         if hero not in dataset[split_param]:
+#             dataset[split_param][hero] = []
+#         minidict = {'x':build.time/60, 'y':build.level,'hero':hero,'ability':build.ability.name}
+#         dataset[split_param][hero].append(minidict)
+
+#     xs = [build.time/60 for build in skill_builds]
+#     ys = [build.level for build in skill_builds]
+#     params = {}
+#     params['x_min'] = min(xs)
+#     params['x_max'] = max(xs)
+#     params['y_min'] = min(ys)
+#     params['y_max'] = max(ys)
+
+#     datafilename = '1d_%s.json' % str(uuid4())
+#     datafile = open(datafilename,'wb')
+#     datafile.write(json.dumps(dataset))
+#     datafile.close()
+
+#     paramfilename = '1d_%s.json' % str(uuid4())
+#     paramfile = open(paramfilename,'wb')
+#     paramfile.write(json.dumps(params))
+#     paramfile.close()
+
+#     return (s3File(datafile),s3File(paramfile))
