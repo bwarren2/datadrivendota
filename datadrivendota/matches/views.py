@@ -160,7 +160,7 @@ def endgame(request):
         select_form = EndgameSelect(request.POST)
         if select_form.is_valid():
           try:
-            json_data, params = player_endgame_json(
+            json_data = player_endgame_json(
                 player_list = select_form.cleaned_data['players'],
                 mode_list = select_form.cleaned_data['game_modes'],
                 x_var = select_form.cleaned_data['x_var'],
@@ -168,13 +168,10 @@ def endgame(request):
                 split_var = select_form.cleaned_data['split_var'],
                 group_var = select_form.cleaned_data['group_var']
             )
-            json_data = basename(json_data.name)
-            params = basename(params.name)
 
             return render(request, 'match_form.html',
                                      {'form':select_form,
-                                      'json_data': json_data,
-                                      'params': params,
+                                      'json_data': basename(json_data.name),
                                     'title':'Endgame Charts'
                                      })
           except NoDataFound:
@@ -197,7 +194,7 @@ def team_endgame(request):
         select_form = TeamEndgameSelect(request.POST)
         if select_form.is_valid():
           try:
-            json_data, params = team_endgame_json(
+            json_data = team_endgame_json(
                 player_list = select_form.cleaned_data['players'],
                 mode_list = select_form.cleaned_data['game_modes'],
                 x_var = select_form.cleaned_data['x_var'],
@@ -206,13 +203,9 @@ def team_endgame(request):
                 group_var = select_form.cleaned_data['group_var'],
                 compressor = select_form.cleaned_data['compressor']
             )
-            json_data = basename(json_data.name)
-            params = basename(params.name)
-
             return render(request, 'match_form.html',
                                      {'form':select_form,
-                                     'json_data': json_data,
-                                     'params': params,
+                                     'json_data': basename(json_data.name),
                                       'title':'Endgame Charts'
                                      })
 
@@ -236,16 +229,13 @@ def ability_build(request):
     select_form = MatchAbilitySelect(request.POST)
     if select_form.is_valid():
       try:
-        json_data, params = match_ability_json(
+        json_data = match_ability_json(
             match_id = select_form.cleaned_data['match'],
             split_var = select_form.cleaned_data['split_var']
           )
-        json_data = basename(json_data.name)
-        params = basename(params.name)
         match_url = reverse('matches:match_detail',kwargs={'match_id':select_form.cleaned_data['match']})
         extra_notes = "<a href='{0}'>See this match</a>".format(match_url)
-        return render(request, 'match_form.html', {'json_data': json_data,
-                                                   'params': params,
+        return render(request, 'match_form.html', {'json_data': basename(json_data.name),
                                                    'title': title,
                                                    'form': select_form,
                                                    'extra_notes': extra_notes,

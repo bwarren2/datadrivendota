@@ -1,25 +1,7 @@
-from uuid import uuid4
-from django.core.files.storage import default_storage
 from django.core.files import File
 from rpy2.robjects.packages import importr
 from rpy2 import robjects
-
-
-def s3File(imagefile, chosen_name=None):
-    imagefile2 = open(imagefile.name, 'r')
-
-    if chosen_name is not None:
-        filename = chosen_name+'.png'
-    else:
-        filename = '1d_%s.png' % str(uuid4())
-    #Try making a new file and sending that to s3
-    s3file = default_storage.open(filename, 'w')
-    s3file.write(imagefile2.read())
-    s3file.close()
-    imagefile2.close()
-
-    return s3file
-
+from utils.file_management import s3File
 
 def enforceTheme(robjects):
     cmd = """

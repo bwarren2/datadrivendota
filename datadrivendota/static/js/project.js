@@ -202,3 +202,21 @@ $(function () {
     }
   }
 });
+
+
+function convertToSlug(Text)
+{
+    return Text
+        .toLowerCase()
+        .replace(/ /g,'-')
+        .replace(/[^\w-]+/g,'')
+        ;
+}
+
+var getVals = function(obj){
+   var vals = [];
+   for(var key in obj){
+      vals.push(obj[key]);
+   }
+   return vals;
+}

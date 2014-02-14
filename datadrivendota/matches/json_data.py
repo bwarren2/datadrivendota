@@ -1,11 +1,10 @@
-from uuid import uuid4
+from django.core.urlresolvers import reverse
 from itertools import chain
 from matches.models import PlayerMatchSummary, Match, fetch_match_attributes,\
  fetch_single_attribute, fetch_attribute_label, SkillBuild
 from utils.exceptions import NoDataFound
-from utils.r import s3File
-
-import json
+from utils.file_management import  outsourceJson
+from utils.charts import params_dict, datapoint_dict
 
 def player_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var):
 
@@ -28,35 +27,26 @@ def player_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var):
 
     datalist = []
     for key in range(0,len(x_vector_list)):
-        minidict = {
+        datadict = datapoint_dict()
+        datadict.update({
             'x_var':x_vector_list[key],
             'y_var':y_vector_list[key],
             'label':group_vector_list[key],
             'tooltip':match_list[key],
             'split_var':split_vector_list[key],
             'group_var':group_vector_list[key],
-        }
-        datalist.append(minidict)
-    params = {}
+        })
+        datalist.append(datadict)
+    params = params_dict()
     params['x_min'] = min(x_vector_list)
     params['x_max'] = max(x_vector_list)
     params['y_min'] = min(y_vector_list)
     params['y_max'] = max(y_vector_list)
     params['x_label'] = xlab
     params['y_label'] = ylab
+    params['chart'] = 'xyplot'
 
-    datafilename = '1d_%s.json' % str(uuid4())
-    datafile = open(datafilename,'wb')
-    datafile.write(json.dumps(datalist))
-    datafile.close()
-
-    paramfilename = '1d_%s.json' % str(uuid4())
-    paramfile = open(paramfilename,'wb')
-    paramfile.write(json.dumps(params))
-    paramfile.close()
-
-    return s3File(datafile), s3File(paramfile)
-
+    return outsourceJson(datalist,params)
 
 def team_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var,compressor):
 
@@ -88,50 +78,42 @@ def team_endgame_json(player_list,mode_list,x_var,y_var,split_var,group_var,comp
                                     attribute=split_var, compressor=compressor)
 
     try:
-        dataset = []
+        datalist = []
         for p in pmses:
             match_id = p.match.steam_id
-            minidict = {
+            datadict = datapoint_dict()
+
+            datadict.update({
             'x_var': x_data[match_id],
             'y_var': y_data[match_id],
             'group_var': group_data[match_id],
             'split_var': split_data[match_id],
-            'label':match_id,
+            'label':group_data[match_id],
             'tooltip':match_id,
-            }
-            dataset.append(minidict)
+            'url':reverse('matches:match_detail',kwargs={'match_id':match_id}),
+            })
+
+            datalist.append(datadict)
             xlab = fetch_attribute_label(attribute=x_var)
             ylab = fetch_attribute_label(attribute=y_var) + " ({a})".format(a=compressor)
-            grouplab = fetch_attribute_label(attribute=group_var)
     except AttributeError:
         raise NoDataFound
 
-    params = {}
+    params = params_dict()
     params['x_min'] = min(x_data.itervalues())
     params['x_max'] = max(x_data.itervalues())
     params['y_min'] = min(y_data.itervalues())
     params['y_max'] = max(y_data.itervalues())
     params['x_label'] = xlab
     params['y_label'] = ylab
+    params['chart'] = 'xyplot'
 
-    datafilename = '1d_%s.json' % str(uuid4())
-    datafile = open(datafilename,'wb')
-    datafile.write(json.dumps(dataset))
-    datafile.close()
-
-    paramfilename = '1d_%s.json' % str(uuid4())
-    paramfile = open(paramfilename,'wb')
-    paramfile.write(json.dumps(params))
-    paramfile.close()
-
-    return s3File(datafile), s3File(paramfile)
-
-
+    return outsourceJson(datalist,params)
 
 def match_ability_json(match_id, split_var='No Split'):
 
     skill_builds = SkillBuild.objects.filter(player_match_summary__match__steam_id=match_id).select_related().order_by('player_match_summary','level')
-    dataset = []
+    datalist = []
     for build in skill_builds:
 
         side = build.player_match_summary.which_side()
@@ -143,7 +125,8 @@ def match_ability_json(match_id, split_var='No Split'):
         elif split_var=='side':
             split_param = side
 
-        dataset.append({
+        datadict = datapoint_dict()
+        minidict = {
             'x_var':build.time/60,
             'y_var':build.level,
             'label':hero,
@@ -151,10 +134,12 @@ def match_ability_json(match_id, split_var='No Split'):
             'split_var':split_param,
             'group_var':hero,
             }
-        )
+        datadict.update(minidict)
+        print minidict, datadict
+        datalist.append(datadict)
     xs = [build.time/60 for build in skill_builds]
     ys = [build.level for build in skill_builds]
-    params = {}
+    params = params_dict()
     params['x_min'] = min(xs)
     params['x_max'] = max(xs)
     params['y_min'] = min(ys)
@@ -162,57 +147,8 @@ def match_ability_json(match_id, split_var='No Split'):
     params['x_label'] = 'Time (m)'
     params['y_label'] = 'Level'
     params['draw_path'] = True
-
-    datafilename = '1d_%s.json' % str(uuid4())
-    datafile = open(datafilename,'wb')
-    datafile.write(json.dumps(dataset))
-    datafile.close()
-
-    paramfilename = '1d_%s.json' % str(uuid4())
-    paramfile = open(paramfilename,'wb')
-    paramfile.write(json.dumps(params))
-    paramfile.close()
-
-    return (s3File(datafile),s3File(paramfile))
+    params['chart'] = 'xyplot'
 
 
-# def match_ability_json(match_id, split_var='No Split'):
+    return outsourceJson(datalist,params)
 
-#     skill_builds = SkillBuild.objects.filter(player_match_summary__match__steam_id=match_id).select_related().order_by('player_match_summary','level')
-#     dataset = {}
-#     for build in skill_builds:
-
-#         side = build.player_match_summary.which_side()
-#         hero = build.player_match_summary.hero.name
-#         if split_var=='No Split':
-#             split_param = 'No Split'
-#         elif split_var=='hero':
-#             split_param = hero
-#         elif split_var=='side':
-#             split_param = side
-#         if split_param not in dataset:
-#             dataset[split_param] = {}
-#         if hero not in dataset[split_param]:
-#             dataset[split_param][hero] = []
-#         minidict = {'x':build.time/60, 'y':build.level,'hero':hero,'ability':build.ability.name}
-#         dataset[split_param][hero].append(minidict)
-
-#     xs = [build.time/60 for build in skill_builds]
-#     ys = [build.level for build in skill_builds]
-#     params = {}
-#     params['x_min'] = min(xs)
-#     params['x_max'] = max(xs)
-#     params['y_min'] = min(ys)
-#     params['y_max'] = max(ys)
-
-#     datafilename = '1d_%s.json' % str(uuid4())
-#     datafile = open(datafilename,'wb')
-#     datafile.write(json.dumps(dataset))
-#     datafile.close()
-
-#     paramfilename = '1d_%s.json' % str(uuid4())
-#     paramfile = open(paramfilename,'wb')
-#     paramfile.write(json.dumps(params))
-#     paramfile.close()
-
-#     return (s3File(datafile),s3File(paramfile))

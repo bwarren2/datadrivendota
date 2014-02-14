@@ -54,55 +54,16 @@ def detail(request, hero_name):
 #@devserver_profile(follow=[generateChart])
 def vitals(request):
 
-    chart_spec = """
-    {title: "",
-dom: "chart",
-width: 800,
-height: 600,
-layers: [{
-        data: chartdata,
-        type: "point",
-        x: "level",
-        y: "value",
-        color: "hero",
-        size:{const:5},
-        sample:1000,
-    },
-    {
-        data: chartdata,
-        type: "line",
-        x: "level",
-        y: "value",
-        color: "hero",
-        size:{const:3},
-    }],
-
-    facet:{
-      type:'wrap',
-      var:'stat',
-      formatter: function(facetObject) {
-            var title = facetObject.stat;
-            return title;
-        }
-    },
-    guides: {
-      x:{color: '#000'}
-    }
-}
-"""
-
-
     if request.method == 'POST':
         hero_form = HeroVitalsMultiSelect(request.POST)
         if hero_form.is_valid():
           try:
-            return_json = hero_vitals_json(
+            json_data = hero_vitals_json(
                 hero_list = hero_form.cleaned_data['heroes'],
-                stats_list = hero_form.cleaned_data['stats'],
+                stats_list = hero_form.cleaned_data['stats']
             )
             return render(request, 'hero_form.html', {'form': hero_form,
-                                      'json_data': return_json,
-                                      'chart_spec': chart_spec,
+                                      'json_data': basename(json_data.name),
                                       'title':"Hero Vitals"})
           except NoDataFound:
             return render(request, 'hero_form.html', {'form': hero_form,
@@ -118,37 +79,18 @@ layers: [{
 #@devserver_profile(follow=[lineupChart])
 def lineup(request):
 
-    chart_spec = """
-    {title: "",
-dom: "chart",
-width: 800,
-height: 600,
-layers: [
-    {
-        data: chartdata,
-        type: "bar",
-        x: {'var':'HeroName', sort:'Value', asc: false},
-        y: "Value",
-        color: "Color",
-        sample:1000,
-    }],
-
-}
-"""
-
     if request.method == 'POST':
         hero_form = HeroLineupMultiSelect(request.POST)
         if hero_form.is_valid():
           try:
-            return_json = hero_lineup_json(
+            json_data =  hero_lineup_json(
               heroes = hero_form.cleaned_data['heroes'],
               stat = hero_form.cleaned_data['stats'],
               level =  hero_form.cleaned_data['level']
             )
 
             return render(request, 'hero_form.html', {'form': hero_form,
-                                      'json_data': return_json,
-                                      'chart_spec': chart_spec,
+                                      'json_data': basename(json_data.name),
                                       'title':'Hero Lineups'})
           except NoDataFound:
             return render(request, 'hero_form.html', {'form': hero_form,

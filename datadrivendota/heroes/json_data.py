@@ -1,12 +1,13 @@
 import json
+import operator
 
 from itertools import chain
 from django.conf import settings
 from heroes.models import HeroDossier, Hero, invalid_option
 from matches.models import PlayerMatchSummary,  Match, fetch_match_attributes
 from utils.exceptions import NoDataFound
-
-
+from utils.file_management import outsourceJson
+from utils.charts import datapoint_dict, params_dict
 def hero_vitals_json(hero_list, stats_list):
     # Currently, we are violating DRY with the available field listing from the form
     # and the R space being in different places and requiring that they are the same.
@@ -15,26 +16,44 @@ def hero_vitals_json(hero_list, stats_list):
 
     if len(selected_hero_dossiers) == 0 or invalid_option(stats_list):
         raise NoDataFound
-    # Convention: Raw numbers that need to be modified to be right (like base
-    # hero hp, which is always 150 at last check but gets gains from str, are
-    # dubbed "base_".  A number inclusive of gains from stat growth is prefixless.
-    # Modifiers (from stat points or items, w/e) will go into a "modified_"
-    # variable, and final values (for plotting) are "final_")
-    # NOTE: this convention is wrong with the numbers being imported as level 1
-    # right now.
-    return_pool={'level':[],'value':[],'hero':[],'stat':[]}
+    datalist = []
+    xs = []
+    ys = []
     for hero_dossier in selected_hero_dossiers:
         for stat in stats_list:
             for level in range(1,26):
-                return_pool['level'].append(level)
-                return_pool['value'].append(hero_dossier.level_stat(stat,level))
-                return_pool['hero'].append(hero_dossier.hero.name)
-                return_pool['stat'].append(stat)
-    return json.dumps(return_pool)
+
+                datadict = datapoint_dict()
+                datadict.update({
+                    'x_var': level,
+                    'y_var': hero_dossier.level_stat(stat,level),
+                    'group_var': hero_dossier.hero.name,
+                    'label': hero_dossier.hero.name,
+                    'split_var': stat,
+                })
+                datalist.append(datadict)
+                xs.append(level)
+                ys.append(hero_dossier.level_stat(stat,level))
+
+    params = params_dict()
+    params['x_min'] = min(xs)
+    params['x_max'] = max(xs)
+    params['y_min'] = min(ys)
+    params['y_max'] = max(ys)
+    params['x_label'] = 'Level'
+    params['y_label'] = 'Quantity'
+    params['draw_path'] = True
+    params['chart'] = 'xyplot'
+    params['outerWidth'] = 300
+    params['outerHeight'] = 300
+
+
+    return outsourceJson(datalist,params)
+
 
 def hero_lineup_json(heroes, stat, level):
     #Database pulls and format python objects to go to R
-    hero_dossiers = HeroDossier.objects.all().select_related()
+    hero_dossiers = HeroDossier.objects.filter(hero__visible=True).select_related()
     selected_names = [h.name for h in Hero.objects.filter(steam_id__in=heroes)]
     if len(hero_dossiers)==0:
         raise NoDataFound
@@ -43,12 +62,35 @@ def hero_lineup_json(heroes, stat, level):
         hero_value = dict((dossier.hero.safe_name(), dossier.fetch_value(stat, level)) for dossier in hero_dossiers)
     except AttributeError:
         raise NoDataFound
+    datalist = []
+    ys = []
+    xs = []
 
-    x_vals = [key for key in sorted(hero_value, key=hero_value.get, reverse=True)]
-    y_vals = [hero_value[key] for key in sorted(hero_value, key=hero_value.get, reverse=True)]
-    col_vec = [1 if name in selected_names else 0 for name in x_vals ]
-    glom = {'HeroName':x_vals, 'Value':y_vals, 'Color':col_vec }
-    return json.dumps(glom)
+    hero_value = sorted(hero_value.iteritems(), key=operator.itemgetter(1),reverse=True)
+
+    for key, val in hero_value:
+        datadict = datapoint_dict()
+        datadict['x_var'] = key
+        datadict['y_var'] = val
+        datadict['label'] = key
+        datadict['tooltip'] = key
+        datadict['group_var'] = key if key in selected_names else 'Else'
+        datadict['split_var'] = 'Hero {stat}'.format(stat=stat)
+        datalist.append(datadict)
+        ys.append(val)
+        xs.append(key)
+    params = params_dict()
+    params['y_min'] = 0
+    params['y_max'] = max(ys)
+    params['x_label'] = 'Hero'
+    params['y_label'] = stat
+    params['chart'] = 'barplot'
+    params['outerWidth'] = 800
+    params['outerHeight'] = 500
+    params['x_set'] = xs
+    params['padding']['bottom']=120
+    params['tickValues']=[x for ind, x in enumerate(xs) if ind%2==0]
+    return outsourceJson(datalist,params)
 
 def hero_performance_json(hero, player, game_mode_list, x_var, y_var, group_var, split_var):
 

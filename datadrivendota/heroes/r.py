@@ -7,16 +7,15 @@ from django.conf import settings
 from rpy2 import robjects
 from rpy2.robjects import FloatVector, StrVector, IntVector
 from rpy2.robjects.packages import importr
-import rpy2.rinterface as rinterface
 
 #rinterface.set_initoptions(('rpy2', '--verbose', '--no-save'))
 
 
 from heroes.models import HeroDossier, Hero
-from utils.r import s3File, enforceTheme, FailFace
+from utils.r import  enforceTheme, FailFace
 from matches.models import PlayerMatchSummary, SkillBuild, Match
 from matches.r import fetch_match_attributes
-
+from utils.file_management import s3File
 
 def generateChart(hero_list, stats_list, display_options,width=800,height=500):
     # Currently, we are violating DRY with the available field listing from the form
