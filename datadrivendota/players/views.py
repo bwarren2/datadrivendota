@@ -2,7 +2,8 @@ import json
 from celery import chain
 from functools import wraps
 from django.conf import settings
-from django.http import  HttpResponse, HttpResponseNotFound
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import permission_required
 from django.db.models import Count
@@ -134,6 +135,19 @@ def timeline(request):
 def player_matches(request,player_id=None):
   player = get_object_or_404(Player, steam_id=player_id)
   pms_list = get_playermatchsummaries_for_player(player, 50)
+
+  paginator = Paginator(pms_list, 10)
+  page = request.GET.get('page')
+  try:
+    pms_list = paginator.page(page)
+  except PageNotAnInteger:
+    # If page is not an integer, deliver first page.
+    pms_list = paginator.page(1)
+  except EmptyPage:
+    # If page is out of range (e.g. 9999), deliver last page of results.
+    pms_list = paginator.page(paginator.num_pages)
+
+
   return render(request, 'playermatchsummary_index.html', {'pms_list':pms_list,
     'player':player})
 

@@ -42,5 +42,6 @@
         {% endfor %}
       </tbody>
     </table>
+    {% include "_pagination.html" with pages_list=pms_list page_links_to_display=pms_list.paginator.page_range %}
   </div>
 {% endblock content %}
