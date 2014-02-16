@@ -11,21 +11,17 @@
 {% endblock content %}
 
 {% block extra_js %}
-  <script type="text/javascript">
-
-var input_data;
-d3.json('{{MEDIA_URL}}{{json_data}}',function(source){
-  var x;
-  input_data = source;
-  plot(source)
-});
-
+<script type="text/javascript">
+  var input_data;
+  d3.json('{{MEDIA_URL}}{{json_data}}',function(source){
+    var x;
+    input_data = source;
+    plot(source)
+  });
 </script>
-
 {% endblock extra_js %}
 
 {% block tour %}
-
 <script type="text/javascript">
   $(function () {
     var tour = new Tour({
@@ -57,11 +53,10 @@ d3.json('{{MEDIA_URL}}{{json_data}}',function(source){
     ]);
 
     $(".tourglyph").on("click",function(){
-      tour.restart('.page-tour');
+      tour.restart();
     })
 
   });
-
 </script>
 {% endblock tour %}
 
