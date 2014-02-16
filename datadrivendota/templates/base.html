@@ -74,8 +74,8 @@
             <li class="{% active 'about' main_nav %}">
               <a href="/about/">About</a>
             </li>
-            <li>
-              <a id="contact-link" target="_blank" href="mailto:contact@datadrivendota.com">Contact</a>
+            <li id="contact-link">
+              <a target="_blank" href="mailto:contact@datadrivendota.com">Contact</a>
             </li>
 
           </ul>
@@ -119,62 +119,59 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
 
-
-</script>
     {% compressed_js 'all' %}
 
     {% block extra_js %}
 
     {% endblock extra_js %}
 
-    {% if request.user.is_authenticated %}
-
     {% block tour %}
       <script type="text/javascript">
-  $(function () {
-    var tour = new Tour({
-      backdrop: true
-    });
+        $(function () {
+          var tour = new Tour({
+            backdrop: true
+          });
 
-    tour.addSteps([
-      {
-        orphan: true,
-        title: "Welcome!",
-        content: "We are a bit different, so let's overview a couple big things."
-      },
-      {
-        element: "#IntercomDefaultWidget",
-        title: "Feedback",
-        content: "If you have any problems, questions, or feature requests, message the devs here!",
-        placement: "left"
-      },
-      {
-        element: "#main-nav",
-        title: "Navigation",
-        content: "Find tools to use here.  Basically everything that is not an index is a chart.",
-        placement: "bottom"
-      },
-      {
-        element: ".tourglyph",
-        title: "Guidance",
-        content: "Smaller cousins of this guy are available for tours of other pages.",
-        placement: "bottom"
-      },
-      {
-        orphan: true,
-        title: "Ready to go!",
-        content: "That's it for now. Happy hunting!"
-      }
-    ]);
+          tour.addSteps([
+            {
+              orphan: true,
+              title: "Welcome!",
+              content: "We are a bit different, so let's overview a couple big things."
+            },
+            {
+              element: "#IntercomDefaultWidget",
+              title: "Feedback",
+              content: "If you have any problems, questions, or feature requests, message the devs here!",
+              placement: "left"
+            },
+            {
+              element: "#main-nav",
+              title: "Navigation",
+              content: "Find tools to use here.  Basically everything that is not an index is a chart.",
+              placement: "bottom"
+            },
+            {
+              element: ".tourglyph",
+              title: "Guidance",
+              content: "Smaller cousins of this guy are available for tours of other pages.",
+              placement: "bottom"
+            },
+            {
+              orphan: true,
+              title: "Ready to go!",
+              content: "That's it for now. Happy hunting!"
+            }
+          ]);
 
-    $(".tourglyph").on("click",function(){
-      tour.restart('.page-tour');
-    })
+          $(".tourglyph").on("click",function(){
+            tour.restart('.page-tour');
+          })
 
-  });
+        });
       </script>
     {% endblock tour %}
 
+    {% if user.is_authenticated %}
       <script id="IntercomSettingsScriptTag">
         window.intercomSettings = {
           user_id: "{% steam_id request.user %}",
