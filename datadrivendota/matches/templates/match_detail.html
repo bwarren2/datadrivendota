@@ -1,6 +1,6 @@
 {% extends "matches_base.html" %}
 
-{% load staticfiles %}
+{% load staticfiles player_extras %}
 
 {% block extra_css %}{{ form.media }}{% endblock extra_css %}
 
@@ -88,12 +88,12 @@
     <table class="table  table-condensed" id='myTable'>
       <thead>
         <tr>
-          <th colspan=3>Player</th>
+          <th colspan="2">Player</th>
           <th>K</th>
           <th>D</th>
           <th>A</th>
           <th>K-D+A/2</th>
-          <th colspan=2>Hero</th>
+          <th colspan="2">Hero</th>
           <th>Items</th>
           <th>Level</th>
           <th>Last Hits</th>
@@ -108,16 +108,9 @@
       </thead>
       <tbody>
         {% for summary in summaries %}
-          <tr>
-            <td>{{ summary.player.steam_id }}</td>
+          <tr{% if summary.is_win %} class="winner"{% endif %}>
             <td><img src="{{ summary.player.avatar }}"></td>
-            {% if summary.player.persona_name %}
-              <td>{{ summary.player.persona_name }}</td>
-            {% elif summary.player.is_masked%}
-              <td>Anonymous</td>
-            {% else %}
-              <td>(Blank)</td>
-            {% endif %}
+            <td>{% player_link summary.player %}</td>
             <td>{{ summary.kills }}</td>
             <td>{{ summary.deaths }}</td>
             <td>{{ summary.assists }}</td>
@@ -125,11 +118,11 @@
             <td>{{ summary.hero.name }}</td>
 
             {% if summary.hero.thumbshot %}
-              <td><img src="{{ summary.hero.thumbshot.url }}" width="50%" height="50%"></td>
+              <td><img src="{{ summary.hero.thumbshot.url }}" class="summary-hero-thumbshot"></td>
             {% else %}
               <td></td>
             {% endif %}
-            <td>
+            <td class="match-summary-images">
               {% if summary.item_0.thumbshot %}
                 <img src="{{ summary.item_0.thumbshot.url }}">
               {% endif %}
