@@ -41,7 +41,7 @@ def index(request):
     player_list = Player.objects.filter(updated=True)
     return render(
         request,
-        'player_index.html',
+        'players/index.html',
         {
             'player_list': player_list
         }
@@ -82,7 +82,7 @@ def detail(request, player_id=None):
     winratebase = basename(winrate.name)
     return render(
         request,
-        'player_detail.html',
+        'players/detail.html',
         {
             'player': player,
             'kdabase': kdabase,
@@ -127,7 +127,7 @@ def winrate(request):
                 imagebase = basename(image.name)
                 return render(
                     request,
-                    'player_form.html',
+                    'players/form.html',
                     {
                         'form': winrate_form,
                         'image_name': imagebase,
@@ -137,7 +137,7 @@ def winrate(request):
             except NoDataFound:
                 return render(
                     request,
-                    'player_form.html',
+                    'players/form.html',
                     {
                         'form': winrate_form,
                         'error': 'error',
@@ -149,7 +149,7 @@ def winrate(request):
 
     return render(
         request,
-        'player_form.html',
+        'players/form.html',
         {
             'form': winrate_form,
             'title': 'Hero Winrate',
@@ -173,7 +173,7 @@ def timeline(request):
             imagebase = basename(image.name)
             return render(
                 request,
-                'player_form.html',
+                'players/form.html',
                 {
                     'form': timeline_form,
                     'imagebase': imagebase,
@@ -185,7 +185,7 @@ def timeline(request):
 
     return render(
         request,
-        'player_form.html',
+        'players/form.html',
         {
             'form': timeline_form,
             'title': 'Player Timeline'
@@ -211,7 +211,7 @@ def player_matches(request, player_id=None):
 
     return render(
         request,
-        'playermatchsummary_index.html',
+        'players/match_summary.html',
         {
             'pms_list': pms_list,
             'player': player
@@ -234,7 +234,7 @@ def player_management(request):
         track_list = [track for track in player.userprofile.tracking.all()]
         return render(
             request,
-            'player_management.html',
+            'players/management.html',
             {
                 'follow_list': follow_list,
                 'track_list': track_list,
@@ -245,7 +245,7 @@ def player_management(request):
     else:
         return render(
             request,
-            'player_management.html',
+            'players/management.html',
             {
                 'error': 'You need to be logged in to edit stuff here.'
             }

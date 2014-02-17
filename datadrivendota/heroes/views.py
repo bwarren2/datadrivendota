@@ -46,7 +46,7 @@ except ImportError:
 def index(request):
     hero_list = Hero.objects.filter(visible=True).order_by('name')
 
-    return render(request, 'hero_index.html', {'hero_list': hero_list})
+    return render(request, 'heroes/index.html', {'hero_list': hero_list})
 
 
 @permission_required('players.can_look')
@@ -58,7 +58,7 @@ def detail(request, hero_name):
     charts = []
     return render(
         request,
-        'heroes_detail.html',
+        'heroes/detail.html',
         {
             'hero': current_hero,
             'abilities': abilities,
@@ -80,7 +80,7 @@ def vitals(request):
                 )
                 return render(
                     request,
-                    'hero_form.html',
+                    'heroes/form.html',
                     {
                         'form': hero_form,
                         'json_data': basename(json_data.name),
@@ -90,7 +90,7 @@ def vitals(request):
             except NoDataFound:
                 return render(
                     request,
-                    'hero_form.html',
+                    'heroes/form.html',
                     {
                         'form': hero_form,
                         'error': 'error',
@@ -102,7 +102,7 @@ def vitals(request):
         hero_form = HeroVitalsMultiSelect()
     return render(
         request,
-        'hero_form.html',
+        'heroes/form.html',
         {
             'form': hero_form,
             'title': "Hero Vitals",
@@ -125,7 +125,7 @@ def lineup(request):
 
                 return render(
                     request,
-                    'hero_form.html',
+                    'heroes/form.html',
                     {
                         'form': hero_form,
                         'json_data': basename(json_data.name),
@@ -135,7 +135,7 @@ def lineup(request):
             except NoDataFound:
                 return render(
                     request,
-                    'hero_form.html',
+                    'heroes/form.html',
                     {
                         'form': hero_form,
                         'error': 'error',
@@ -148,7 +148,7 @@ def lineup(request):
 
     return render(
         request,
-        'hero_form.html',
+        'heroes/form.html',
         {
             'form': hero_form,
             'title': 'Hero Lineups',
@@ -174,7 +174,7 @@ def hero_performance(request):
             imagebase = basename(image.name)
             return render(
                 request,
-                'hero_form.html',
+                'heroes/form.html',
                 {
                     'form': hero_form,
                     'image_name': imagebase,
@@ -185,7 +185,7 @@ def hero_performance(request):
         hero_form = HeroPlayerPerformance()
     return render(
         request,
-        'hero_form.html',
+        'heroes/form.html',
         {
             'form': hero_form,
             'title': 'Hero Performance',
@@ -208,7 +208,7 @@ def hero_skill_bars(request):
             imagebase = basename(image.name)
             return render(
                 request,
-                'hero_form.html',
+                'heroes/form.html',
                 {
                     'form': hero_form,
                     'imagebase': imagebase,
@@ -219,7 +219,7 @@ def hero_skill_bars(request):
         hero_form = HeroPlayerSkillBarsForm
     return render(
         request,
-        'hero_form.html',
+        'heroes/form.html',
         {
             'form': hero_form,
             'title': 'Hero Skill Times',
@@ -285,7 +285,7 @@ def ability_detail(request, ability_name):
     charts = []
     return render(
         request,
-        'ability_detail.html',
+        'heroes/ability.html',
         {
             'ability': ability,
             'charts': charts,

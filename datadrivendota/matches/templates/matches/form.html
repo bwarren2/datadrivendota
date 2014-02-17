@@ -1,28 +1,32 @@
-{% extends "player_base.html" %}
+{% extends "matches/base.html" %}
+{% load staticfiles compressed navigation_extras steam_extras intercom_extras %}
 
 {% block title %}{{ title }}{% endblock title %}
 
-{% block page_title %}
-  {{ title }}
-  <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>
+{% block page_title %}{{ title }}
+  <div class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></div>
 {% endblock page_title %}
 
 {% block content %}
   {% include "_image_form_embed.html" %}
+
+  <div>{{extra_notes|safe}}</div>
 {% endblock content %}
 
 {% block extra_js %}
 <script type="text/javascript">
-  var chartdata = polyjs.data({{ json_data|safe }});
-  var chart = polyjs.chart({{ chart_spec|safe }});
-  {{ extra_chart_js|safe }}
+  var data;
+  d3.json('{{MEDIA_URL}}{{json_data}}', function(source){
+    data = source;
+    plot(source)
+  });
 </script>
 {% endblock extra_js %}
 
 {% block tour %}
 <script type="text/javascript">
   $(function () {
-    var tour = new Tour({
+    tour = new Tour({
       backdrop: true
     });
 
@@ -30,25 +34,23 @@
       {
         orphan: true,
         title: "Welcome!",
-        content: "Player pages let you examine one player in particular."
+        content: "Match pages let you compare end-of-game data across players."
       },
       {
         element: ".chart-form",
         title: "Asking questions",
-        content: "Pick what you would like to know about them here."
+        content: "Specify who and what to see here."
       },
       {
         element: "ul.nav-tabs",
         title: "Other questions",
-        content: "Other types of charts about players are here.",
+        content: "For charts about heroes or players themselves, try these subtabs.",
         placement: "bottom"
       },
       {
         orphan: true,
-        element: "#main-nav",
-        title: "Other resources",
-        content: "Data across players and for heroes are in other locations.",
-        placement: "bottom"
+        title: "Ready to go!",
+        content: "Challenge: How do your endgame kills compare to [A]kke's when you both win?"
       }
     ]);
 
@@ -59,5 +61,3 @@
   });
 </script>
 {% endblock tour %}
-
-

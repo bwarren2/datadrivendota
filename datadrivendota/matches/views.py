@@ -56,7 +56,7 @@ def overview(request):
 
     return render(
         request,
-        'matches_index.html',
+        'matches/index.html',
         {
             'match_info': match_info,
             'skill_levels': skill_levels
@@ -127,7 +127,7 @@ def match(request, match_id):
 
         return render(
             request,
-            'match_detail.html',
+            'matches/detail.html',
             {
                 'match': match,
                 'summaries': summaries,
@@ -144,7 +144,7 @@ def match(request, match_id):
     except IndexError:
         return render(
             request,
-            'match_detail.html',
+            'matches/detail.html',
             {
                 'match': match,
                 'summaries': summaries,
@@ -199,7 +199,7 @@ def follow_match_feed(request):
 
         return render(
             request,
-            'follow_matches.html',
+            'matches/follow.html',
             {
                 'match_list': match_list
             }
@@ -229,7 +229,7 @@ def follow_match_feed(request):
             ))
         return render(
             request,
-            'matches_index.html',
+            'matches/index.html',
             {
                 'match_list': match_list
             }
@@ -255,7 +255,7 @@ def endgame(request):
 
                 return render(
                     request,
-                    'match_form.html',
+                    'matches/form.html',
                     {
                         'form': select_form,
                         'json_data': basename(json_data.name),
@@ -265,7 +265,7 @@ def endgame(request):
             except NoDataFound:
                 return render(
                     request,
-                    'match_form.html',
+                    'matches/form.html',
                     {
                         'form': select_form,
                         'error': 'error',
@@ -277,7 +277,7 @@ def endgame(request):
         select_form = EndgameSelect()
     return render(
         request,
-        'match_form.html',
+        'matches/form.html',
         {
             'form': select_form,
             'title': 'Endgame Charts'
@@ -304,7 +304,7 @@ def team_endgame(request):
                 )
                 return render(
                     request,
-                    'match_form.html',
+                    'matches/form.html',
                     {
                         'form': select_form,
                         'json_data': basename(json_data.name),
@@ -315,7 +315,7 @@ def team_endgame(request):
             except NoDataFound:
                 return render(
                     request,
-                    'match_form.html',
+                    'matches/form.html',
                     {
                         'form': select_form,
                         'error': 'error',
@@ -326,7 +326,7 @@ def team_endgame(request):
         select_form = TeamEndgameSelect()
     return render(
         request,
-        'match_form.html',
+        'matches/form.html',
         {
             'form': select_form,
             'title': 'Endgame Charts'
@@ -355,7 +355,7 @@ def ability_build(request):
                 )
                 return render(
                     request,
-                    'match_form.html',
+                    'matches/form.html',
                     {
                         'json_data': basename(json_data.name),
                         'title': title,
@@ -366,7 +366,7 @@ def ability_build(request):
             except NoDataFound:
                 return render(
                     request,
-                    'match_form.html',
+                    'matches/form.html',
                     {
                         'error': 'error',
                         'title': title,
@@ -377,7 +377,7 @@ def ability_build(request):
         select_form = MatchAbilitySelect()
     return render(
         request,
-        'match_form.html',
+        'matches/form.html',
         {
             'form': select_form,
             'title': title,

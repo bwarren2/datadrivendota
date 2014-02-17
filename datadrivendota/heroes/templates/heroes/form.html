@@ -1,23 +1,21 @@
-{% extends "matches_base.html" %}
-{% load staticfiles compressed navigation_extras steam_extras intercom_extras %}
+{% extends "heroes/base.html" %}
 
 {% block title %}{{ title }}{% endblock title %}
 
 {% block page_title %}{{ title }}
-  <div class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></div>
+<span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>
 {% endblock page_title %}
 
 {% block content %}
   {% include "_image_form_embed.html" %}
-
-  <div>{{extra_notes|safe}}</div>
 {% endblock content %}
 
 {% block extra_js %}
 <script type="text/javascript">
-  var data;
-  d3.json('{{MEDIA_URL}}{{json_data}}', function(source){
-    data = source;
+  var input_data;
+  d3.json('{{MEDIA_URL}}{{json_data}}',function(source){
+    var x;
+    input_data = source;
     plot(source)
   });
 </script>
@@ -26,7 +24,7 @@
 {% block tour %}
 <script type="text/javascript">
   $(function () {
-    tour = new Tour({
+    var tour = new Tour({
       backdrop: true
     });
 
@@ -34,23 +32,23 @@
       {
         orphan: true,
         title: "Welcome!",
-        content: "Match pages let you compare end-of-game data across players."
+        content: "These hero pages let you chart stats, like endgame kills or effective hp by level, for heroes you are interested in."
       },
       {
         element: ".chart-form",
         title: "Asking questions",
-        content: "Specify who and what to see here."
+        content: "Specify what attributes you want to render here."
       },
       {
         element: "ul.nav-tabs",
         title: "Other questions",
-        content: "For charts about heroes or players themselves, try these subtabs.",
+        content: "For other charts, try these subtabs.",
         placement: "bottom"
       },
       {
         orphan: true,
         title: "Ready to go!",
-        content: "Challenge: How do your endgame kills compare to [A]kke's when you both win?"
+        content: "Challenge: how does your favorite hero compare to your least favorite?"
       }
     ]);
 
@@ -61,3 +59,4 @@
   });
 </script>
 {% endblock tour %}
+
