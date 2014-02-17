@@ -9,6 +9,7 @@ from pipeline.storage import PipelineMixin
 import urllib
 import urlparse
 
+
 # CachedFilesMixin doesn't play well with Boto and S3. It over-quotes things,
 # causing erratic failures. So we subclass.
 # (See http://stackoverflow.com/questions/11820566/inconsistent-
@@ -25,5 +26,4 @@ class PatchedCachedFilesMixin(CachedFilesMixin):
 
 
 class S3PipelineStorage(PipelineMixin, PatchedCachedFilesMixin, S3BotoStorage):
-     pass
-
+    pass

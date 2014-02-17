@@ -23,7 +23,6 @@ def get_env_setting(setting):
 
 INSTALLED_APPS += ('gunicorn',)
 
-
 ########## EMAIL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -51,12 +50,11 @@ SERVER_EMAIL = EMAIL_HOST_USER
 ########## END EMAIL CONFIGURATION
 
 ###Setting allowed hosts for security.  Only needed when debug = false
-ALLOWED_HOSTS = ['datadrivendota.herokuapp.com','datadrivendota.com','www.datadrivendota.com']
-
-########## DATABASE CONFIGURATION
-"""DATABASES = {}"""
-########## END DATABASE CONFIGURATION
-
+ALLOWED_HOSTS = (
+    'datadrivendota.herokuapp.com',
+    'datadrivendota.com',
+    'www.datadrivendota.com',
+)
 
 ########## CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
@@ -65,7 +63,4 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
-
 ########## END CACHE CONFIGURATION
-
-

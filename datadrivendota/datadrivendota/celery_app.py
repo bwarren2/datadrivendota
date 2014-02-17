@@ -8,9 +8,7 @@ from celery import Celery
 app = Celery('datadrivendota')
 
 
-#app.config_from_object('celery_config')
-
-class Config:
+class Config(object):
     BROKER_POOL_LIMIT = int(getenv('BROKER_POOL_LIMIT', 1))
     BROKER_URL = getenv('CLOUDAMQP_URL')
     BROKER_CONNECTION_TIMEOUT = int(getenv('BROKER_CONNECTION_TIMEOUT'))
@@ -45,23 +43,68 @@ class Config:
 
     SERVER_EMAIL = "celery@datadrivendota.com"
 
-
     CELERY_QUEUES = (
-        Queue('management', Exchange('management'), routing_key='management'),
-        Queue('api_call',  Exchange('valve_api'),   routing_key='valve_api_call'),
-        Queue('db_upload',  Exchange('db'),   routing_key='db'),
-        Queue('rpr',  Exchange('rpr'),   routing_key='rpr'),
+        Queue(
+            'management',
+            Exchange('management'),
+            routing_key='management'
+        ),
+        Queue(
+            'api_call',
+            Exchange('valve_api'),
+            routing_key='valve_api_call'
+        ),
+        Queue(
+            'db_upload',
+            Exchange('db'),
+            routing_key='db'
+        ),
+        Queue(
+            'rpr',
+            Exchange('rpr'),
+            routing_key='rpr'
+        ),
     )
 
+    # @todo: This looks not-DRY; I think this same data exists in settings? If
+    # so:
+    #     from django.conf import settings
+    #     CELERY_ROUTS = settings.CELERY_ROUTES
+    # etc.
+    # --kit 2014-02-16
     CELERY_ROUTES = {
-        'matches.management.tasks.valve_api_calls.ValveApiCall': {'exchange': 'valve_api','routing_key':'valve_api_call'},
-        'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'exchange': 'rpr','routing_key':'rpr'},
-        'matches.management.tasks.valve_api_calls.UploadMatch': {'exchange': 'db','routing_key':'db'},
-        'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {'exchange': 'management', 'routing_key':'management'},
-        'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'exchange': 'db','routing_key':'db'},
-        'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'exchange': 'management','routing_key':'management'},
-        'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'exchange': 'management','routing_key':'management'},
-        'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'exchange': 'management','routing_key':'management'},
+        'matches.management.tasks.valve_api_calls.ValveApiCall': {
+            'exchange': 'valve_api',
+            'routing_key': 'valve_api_call'
+        },
+        'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {
+            'exchange': 'rpr',
+            'routing_key': 'rpr'
+        },
+        'matches.management.tasks.valve_api_calls.UploadMatch': {
+            'exchange': 'db',
+            'routing_key': 'db'
+        },
+        'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
+        'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {
+            'exchange': 'db',
+            'routing_key': 'db'
+        },
+        'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
+        'matches.management.tasks.valve_api_calls.AcquirePlayerData': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
+        'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
 
     }
 
@@ -71,23 +114,44 @@ class Config:
     CELERY_DEFAULT_QUEUE = 'default'
 
     CELERY_ANNOTATIONS = {
-        "matches.management.tasks.valve_api_calls.ValveApiCall": {"rate_limit": VALVE_RATE,
-                                                                  'acks_late': True,
-                                                                  'max_retries':5},
-        'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'acks_late': True,'max_retries':5, },
-        'matches.management.tasks.valve_api_calls.UploadMatch': {'acks_late': True,'max_retries':5, },
-        'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {'acks_late': True,'max_retries':5,},
-        'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'acks_late': True,'max_retries':5, },
-        'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'acks_late': True,'max_retries':5,},
-        'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'acks_late': True,'max_retries':5, },
-        'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'acks_late': True,'max_retries':5, },
+        "matches.management.tasks.valve_api_calls.ValveApiCall": {
+            "rate_limit": VALVE_RATE,
+            'acks_late': True,
+            'max_retries': 5,
+        },
+        'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {
+            'acks_late': True,
+            'max_retries': 5,
+        },
+        'matches.management.tasks.valve_api_calls.UploadMatch': {
+            'acks_late': True,
+            'max_retries': 5,
+        },
+        'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {
+            'acks_late': True,
+            'max_retries': 5,
+        },
+        'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {
+            'acks_late': True,
+            'max_retries': 5,
+        },
+        'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {
+            'acks_late': True,
+            'max_retries': 5,
+        },
+        'matches.management.tasks.valve_api_calls.AcquirePlayerData': {
+            'acks_late': True,
+            'max_retries': 5,
+        },
+        'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {
+            'acks_late': True,
+            'max_retries': 5,
+        },
 
     }
-
 
 
 app.config_from_object(Config)
 
 if __name__ == '__main__':
     app.start()
-

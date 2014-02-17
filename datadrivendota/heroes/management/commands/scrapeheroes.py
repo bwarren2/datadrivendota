@@ -11,9 +11,15 @@ from heroes.models import Hero
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-
+        # @todo: I suspect using the requests lib would be better here, for
+        # the future, even though it does add an additional dependency outside
+        # of the stdlib.
+        # --kit 2014-02-16
         diction = {'key': STEAM_API_KEY, 'language': 'en_us'}
-        response = urllib2.urlopen("https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?"+urlencode(diction))
+        response = urllib2.urlopen(
+            "https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?"
+            + urlencode(diction)
+        )
         html = response.read()
         data = json.loads(html)
 

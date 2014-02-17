@@ -10,7 +10,10 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     url(r'^$', views.base, name='base'),
-    url('', include('social.apps.django_app.urls', namespace='social')), # Wat? --kit 2013-10-27
+    url(
+        '',
+        include('social.apps.django_app.urls', namespace='social')
+    ),  # Wat? Why are we including this at root? Seems risky. --kit 2014-02-16
     url(r'^about/$', views.about, name='about'),
     url(r'^heroes/', include('heroes.urls', namespace='heroes')),
     url(r'^items/', include('items.urls', namespace='items')),

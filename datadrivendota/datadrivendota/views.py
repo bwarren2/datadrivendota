@@ -1,23 +1,30 @@
-#from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.contrib.auth.decorators import permission_required
+# from django.contrib.auth.decorators import permission_required
 from datadrivendota.forms import KeyForm
 from players.models import PermissionCode
-#@permission_required('players.can_look')
-def base(request):
 
-    if request.user.is_anonymous() or \
-    request.user.social_auth.filter(provider='steam').count() == 0:
+
+# @permission_required('players.can_look')
+def base(request):
+    if (
+            request.user.is_anonymous()
+            or request.user.social_auth.filter(provider='steam').count() == 0
+            ):
         extra_dict = {}
     else:
-        extra_dict = request.user.social_auth.filter(provider='steam')[0].extra_data
+        extra_dict = request.user.social_auth.filter(
+            provider='steam'
+        )[0].extra_data
     return render(request, 'base.html', extra_dict)
 
+
 def about(request):
-    return render(request, 'about.html',{})
+    return render(request, 'about.html')
+
 
 def privacy(request):
-    return render(request, 'privacy.html',{})
+    return render(request, 'privacy.html')
+
 
 def upgrade(request):
     if request.method == 'POST':
@@ -29,7 +36,6 @@ def upgrade(request):
                 code = form.cleaned_data['code']
                 try:
                     pcode = PermissionCode.objects.get(key=code)
-                    #print request.user.social_auth.filter(provider='steam')[0].extra_data
                     application = pcode.associate(request.user.id)
                     if application:
                         msg = "Code applied successfully!  Privileges upgraded"
@@ -41,8 +47,16 @@ def upgrade(request):
 
                 except PermissionCode.DoesNotExist:
                     msg = "We do not recognize that code."
-            else: msg = ""
-            return render(request, 'registration/upgrade.html',{'form':form,'message':msg})
+            else:
+                msg = ""
+            return render(
+                request,
+                'registration/upgrade.html',
+                {
+                    'form': form,
+                    'message': msg,
+                }
+            )
     else:
         form = KeyForm()
-        return render(request, 'registration/upgrade.html', {'form':form})
+        return render(request, 'registration/upgrade.html', {'form': form})

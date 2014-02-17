@@ -5,25 +5,26 @@ from tempfile import TemporaryFile
 from json import loads
 from BeautifulSoup import BeautifulSoup
 from urllib2 import urlopen
-from items.models import Item, ItemAttributes, ItemComponents
+from items.models import Item, ItemAttributes
 from collections import defaultdict
+
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
         id_dict = defaultdict(dict)
-        edited_json={}
+        edited_json = {}
 
-        #Get the item IDs from the local file.
+        # Get the item IDs from the local file.
         with open('items.json') as f:
             internal_json = loads(f.read())
 
         try:
-          del internal_json['DOTAAbilities']['Version'] #Purge a junk field
+            # Purge a junk field
+            del internal_json['DOTAAbilities']['Version']
         except KeyError:
-          #Probably manually deleted.
-          pass
-
+            # Probably manually deleted.
+            pass
 
         for name, internal_dict in internal_json['DOTAAbilities'].iteritems():
             name = name[5:]
@@ -34,6 +35,8 @@ class Command(BaseCommand):
             print name
             id = information_dict['ID']
             if name == 'courier':
+                # @todo: pdb should NEVER EVER EVER be in production code.
+                # --kit 2014-02-16
                 import pdb; pdb.set_trace()
             id_dict[name]['internal_data'] = information_dict
             id_dict[name]['id'] = id
@@ -47,11 +50,16 @@ class Command(BaseCommand):
         #Do some cleanup
         for item in site_json['itemdata']:
             for attr in site_json['itemdata'][item]:
-                if attr in ['attrib','desc']:
+                if attr in ['attrib', 'desc']:
                     linelist = []
-                    for line in site_json['itemdata'][item][attr].split('<br />\n'):
-                        l = ' '.join(BeautifulSoup(line).getText(separator=u' ').split())
-                        linelist.append(l.replace("<br />",""))
+                    split_items = site_json[
+                        'itemdata'
+                    ][item][attr].split('<br />\n')
+                    for line in split_items:
+                        l = ' '.join(
+                            BeautifulSoup(line).getText(separator=u' ').split()
+                        )
+                        linelist.append(l.replace("<br />", ""))
                     if attr == 'desc':
                         site_json['itemdata'][item][attr] = '\n'.join(linelist)
                     elif attr == 'attrib':
@@ -59,12 +67,17 @@ class Command(BaseCommand):
                     else:
                         exit("WTF!?")
                 if attr in ['notes']:
-                    site_json['itemdata'][item][attr] = site_json['itemdata'][item][attr].replace("<br />","")
+                    insert_value = site_json[
+                        'itemdata'
+                    ][item][attr].replace("<br />", "")
+                    site_json['itemdata'][item][attr] = insert_value
 
         for item in id_dict:
             if item != 'diffusal_blade_2' and item != 'tango_single':
                 try:
-                    id_dict[item]['external_data'] = site_json['itemdata'][item]
+                    id_dict[item]['external_data'] = site_json[
+                        'itemdata'
+                    ][item]
                 except KeyError:
                     print "Could not find external data for {0}".format(item)
 
@@ -87,17 +100,24 @@ class Command(BaseCommand):
                 item.cost = id_dict[clean_item]['external_data']['cost']
                 if id_dict[clean_item]['external_data']['mc'] == 'false':
                     mc = 0
-                else: mc = id_dict[clean_item]['external_data']['mc']
+                else:
+                    mc = id_dict[clean_item]['external_data']['mc']
                 if id_dict[clean_item]['external_data']['cd'] == 'false':
                     cd = 0
-                else: cd = id_dict[clean_item]['external_data']['cd']
+                else:
+                    cd = id_dict[clean_item]['external_data']['cd']
                 item.mana_cost = mc
                 item.cooldown = cd
                 item.lore = id_dict[clean_item]['external_data']['lore']
                 item.created = id_dict[clean_item]['external_data']['created']
-                item.slug_name = slugify(id_dict[clean_item]['external_data']['dname'])
+                item.slug_name = slugify(
+                    id_dict[clean_item]['external_data']['dname']
+                )
 
-                url = 'http://media.steampowered.com/apps/dota2/images/items/%s_lg.png' % item
+                url = (
+                    'http://media.steampowered.com'
+                    '/apps/dota2/images/items/%s_lg.png' % item
+                )
                 lg_image = urlopen(url)
                 tempfile = TemporaryFile()
                 tempfile.write(lg_image.read())
@@ -105,7 +125,10 @@ class Command(BaseCommand):
                 tempfile.read()
                 filename = slugify(item.name)+'_large.png'
                 item.mugshot.save(filename, File(tempfile))
-                url = 'http://media.steampowered.com/apps/dota2/images/items/%s_eg.png' % item
+                url = (
+                    'http://media.steampowered.com'
+                    '/apps/dota2/images/items/%s_eg.png' % item
+                )
                 eg_image = urlopen(url)
                 tempfile = TemporaryFile()
                 tempfile.write(eg_image.read())
@@ -116,12 +139,15 @@ class Command(BaseCommand):
 
             except KeyError:
                 item = Item.objects.get(steam_id=id_dict[clean_item]['id'])
-                item.name = slugify(clean_item.replace("_"," ")).title()
+                item.name = slugify(clean_item.replace("_", " ")).title()
                 item.internal_name = clean_item
                 item.slug_name = slugify(item.name)
 
                 if 'recipe' in clean_item:
-                    url = 'http://media.steampowered.com/apps/dota2/images/items/recipe_lg.png'
+                    url = (
+                        'http://media.steampowered.com'
+                        '/apps/dota2/images/items/recipe_lg.png'
+                    )
                     lg_image = urlopen(url)
                     tempfile = TemporaryFile()
                     tempfile.write(lg_image.read())
@@ -129,7 +155,10 @@ class Command(BaseCommand):
                     tempfile.read()
                     filename = slugify(item.name)+'_large.png'
                     item.mugshot.save(filename, File(tempfile))
-                    url = 'http://media.steampowered.com/apps/dota2/images/items/recipe_lg.png'
+                    url = (
+                        'http://media.steampowered.com'
+                        '/apps/dota2/images/items/recipe_lg.png'
+                    )
                     eg_image = urlopen(url)
                     tempfile = TemporaryFile()
                     tempfile.write(eg_image.read())
@@ -138,23 +167,16 @@ class Command(BaseCommand):
                     filename = slugify(item.name)+'_small.png'
                     item.thumbshot.save(filename, File(tempfile))
 
-
         for clean_item in sorted(id_dict):
-
-            print "SKIPPING Comp "+ clean_item
-            """
-            try:
-                if id_dict[clean_item]['external_data']['components'] !='null':
-                    for comp in id_dict[clean_item]['external_data']['components']:
-                        print comp
-                        ItemComponents.objects.get_or_create(product=Item.objects.get(internal_name=clean_item),ingredient=Item.objects.get(internal_name=comp))
-            except KeyError:
-                pass
-            """
-
+            # @todo: print debugging?
+            # --kit 2014-02-16
+            print "SKIPPING Comp " + clean_item
             try:
                 for attrib in id_dict[clean_item]['external_data']['attrib']:
-                    ItemAttributes.objects.get_or_create(item=Item.objects.get(internal_name=clean_item),attribute=attrib)
+                    ItemAttributes.objects.get_or_create(
+                        item=Item.objects.get(internal_name=clean_item),
+                        attribute=attrib
+                    )
             except KeyError:
                 pass
             except Item.DoesNotExist:

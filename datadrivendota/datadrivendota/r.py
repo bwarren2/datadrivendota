@@ -3,6 +3,7 @@ from rpy2.robjects.packages import importr
 from rpy2 import robjects
 from utils.file_management import s3File
 
+
 def enforceTheme(robjects):
     cmd = """
     source('datadrivendota/datadrivendota/theme.r')
@@ -10,11 +11,12 @@ def enforceTheme(robjects):
     robjects.r(cmd)
     return True
 
+
 def FailFace():
 
     grdevices = importr('grDevices')
     imagefile = File(open('failface.png', 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=850,height=500)
+    grdevices.png(file=imagefile.name, type='cairo', width=850, height=500)
     cmd = """
     x = 2
     a = 1

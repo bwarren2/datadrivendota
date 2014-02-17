@@ -59,14 +59,38 @@ CELERY_QUEUES = (
 )
 
 CELERY_ROUTES = {
-    'matches.management.tasks.valve_api_calls.ValveApiCall': {'exchange': 'valve_api','routing_key':'valve_api_call'},
-    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'exchange': 'rpr','routing_key':'rpr'},
-    'matches.management.tasks.valve_api_calls.UploadMatch': {'exchange': 'db','routing_key':'db'},
-    'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {'exchange': 'management', 'routing_key':'management'},
-    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'exchange': 'db','routing_key':'db'},
-    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'exchange': 'management','routing_key':'management'},
-    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'exchange': 'management','routing_key':'management'},
-    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'exchange': 'management','routing_key':'management'},
+    'matches.management.tasks.valve_api_calls.ValveApiCall': {
+        'exchange': 'valve_api',
+        'routing_key': 'valve_api_call',
+    },
+    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {
+        'exchange': 'rpr',
+        'routing_key': 'rpr',
+    },
+    'matches.management.tasks.valve_api_calls.UploadMatch': {
+        'exchange': 'db',
+        'routing_key': 'db',
+    },
+    'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {
+        'exchange': 'management',
+        'routing_key': 'management',
+    },
+    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {
+        'exchange': 'db',
+        'routing_key': 'db',
+    },
+    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {
+        'exchange': 'management',
+        'routing_key': 'management',
+    },
+    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {
+        'exchange': 'management',
+        'routing_key': 'management',
+    },
+    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {
+        'exchange': 'management',
+        'routing_key': 'management',
+    },
 
 }
 
@@ -76,16 +100,39 @@ CELERY_DEFAULT_ROUTING_KEY = 'default'
 CELERY_DEFAULT_QUEUE = 'default'
 
 CELERY_ANNOTATIONS = {
-    "matches.management.tasks.valve_api_calls.ValveApiCall": {"rate_limit": VALVE_RATE,
-                                                              'acks_late': True,
-                                                              'max_retries':5},
-    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {'acks_late': True,'max_retries':5, },
-    'matches.management.tasks.valve_api_calls.UploadMatch': {'acks_late': True,'max_retries':5, },
-    'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {'acks_late': True,'max_retries':5,},
-    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {'acks_late': True,'max_retries':5, },
-    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {'acks_late': True,'max_retries':5,},
-    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {'acks_late': True,'max_retries':5, },
-    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {'acks_late': True,'max_retries':5, },
+    "matches.management.tasks.valve_api_calls.ValveApiCall": {
+        "rate_limit": VALVE_RATE,
+        'acks_late': True,
+        'max_retries': 5,
+    },
+    'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {
+        'acks_late': True,
+        'max_retries': 5,
+    },
+    'matches.management.tasks.valve_api_calls.UploadMatch': {
+        'acks_late': True,
+        'max_retries': 5,
+    },
+    'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {
+        'acks_late': True,
+        'max_retries': 5,
+    },
+    'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {
+        'acks_late': True,
+        'max_retries': 5,
+    },
+    'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {
+        'acks_late': True,
+        'max_retries': 5,
+    },
+    'matches.management.tasks.valve_api_calls.AcquirePlayerData': {
+        'acks_late': True,
+        'max_retries': 5,
+    },
+    'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {
+        'acks_late': True,
+        'max_retries': 5,
+    },
 
 }
 
@@ -163,8 +210,6 @@ STATIC_DIRECTORY = '/assets/'
 MEDIA_DIRECTORY = '/media/'
 
 
-
-
 ########## MEDIA CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
 MEDIA_ROOT = normpath(join(SITE_ROOT, 'media'))
@@ -181,13 +226,16 @@ STATIC_ROOT = normpath(join(SITE_ROOT, 'assets'))
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = S3_URL + STATIC_DIRECTORY
 
-# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-# Note: There is a presumption that the first entry here is 'static' so that trash dirs work.
+# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/
+#      #std:setting-STATICFILES_DIRS
+# Note: There is a presumption that the first entry here is 'static' so that
+# trash dirs work.
 STATICFILES_DIRS = (
     normpath(join(SITE_ROOT, 'static')),
 )
 
-# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
+# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/
+#      #staticfiles-finders
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -213,7 +261,8 @@ INTERCOM_API_SECRET = getenv('INTERCOM_API_SECRET')
 
 
 ########## FIXTURE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-FIXTURE_DIRS
+# See: https://docs.djangoproject.com/en/dev/ref/settings/
+#      #std:setting-FIXTURE_DIRS
 FIXTURE_DIRS = (
     normpath(join(SITE_ROOT, 'fixtures')),
 )
@@ -221,7 +270,8 @@ FIXTURE_DIRS = (
 
 
 ########## TEMPLATE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
+# See: https://docs.djangoproject.com/en/dev/ref/settings/
+#      #template-context-processors
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
@@ -231,7 +281,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
-#    'social_auth.context_processors.social_auth_by_type_backends',
+    # 'social_auth.context_processors.social_auth_by_type_backends',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
@@ -258,7 +308,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'pipeline.middleware.MinifyHTMLMiddleware',
-    'datadrivendota.middleware.AccessControlAllowOriginMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 )
 ########## END MIDDLEWARE CONFIGURATION
@@ -382,7 +431,6 @@ ANONYMOUS_ID = 4294967295
 MIN_MATCH_LENGTH = 600
 
 
-
 ###############SOCIAL AUTH
 SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.social_details',
@@ -400,13 +448,6 @@ SOCIAL_AUTH_PIPELINE = (
 
 
 SOCIAL_AUTH_STEAM_API_KEY = STEAM_API_KEY
-#SOCIAL_AUTH_ENABLED_BACKENDS = ('steam',)
-"""SOCIAL_AUTH_COMPLETE_URL_NAME = 'socialauth_complete'
-SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'associate_complete'
-SOCIAL_AUTH_DEFAULT_USERNAME = 'socialauth_default_username'
-SOCIAL_AUTH_EXTRA_DATA = False
-SOCIAL_AUTH_CHANGE_SIGNAL_ONLY = True
-SOCIAL_AUTH_ASSOCIATE_BY_EMAIL = False"""
 VALID_KEY_DAYS = 7
 ########## END LOGIN CONFIGURATION
 

@@ -10,6 +10,4 @@ urlpatterns = patterns(
     url(r'^(?P<match_id>[0-9\-]*)/$', views.match, name="match_detail"),
     url(r'^ability-build/$', views.ability_build, name="ability_build"),
     url(r'^overview/$', views.overview, name="overview")
-
 )
-

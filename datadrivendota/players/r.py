@@ -24,9 +24,11 @@ def KDADensity(player_id):
     except Player.DoesNotExist:
         return FailFace()
 
-    summaries = PlayerMatchSummary.objects.filter(player=player,
-        match__validity=Match.LEGIT)
-    if len(summaries)==0:
+    summaries = PlayerMatchSummary.objects.filter(
+        player=player,
+        match__validity=Match.LEGIT
+    )
+    if len(summaries) == 0:
         return FailFace()
 
     data_list = [summary.kills for summary in summaries]
@@ -38,7 +40,10 @@ def KDADensity(player_id):
     data_list.extend([summary.assists for summary in summaries])
     label_list.extend(['assists'] * (len(data_list)-len(label_list)))
 
-    KDA2 = [summary.kills-summary.deaths+summary.assists/2 for summary in summaries]
+    KDA2 = [
+        summary.kills - summary.deaths + summary.assists / 2
+        for summary in summaries
+    ]
     data_list.extend(KDA2)
     label_list.extend(['K-D+A/2'] * (len(data_list)-len(label_list)))
 
@@ -49,7 +54,7 @@ def KDADensity(player_id):
     robjects.globalenv['KDA2_median'] = sorted(KDA2)[int(len(KDA2)/2.0)]
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=600,height=500)
+    grdevices.png(file=imagefile.name, type='cairo', width=600, height=500)
     enforceTheme(robjects)
 
     robjects.r("""
@@ -64,15 +69,21 @@ def KDADensity(player_id):
                     corner=c(0,.99),background='white')
         )
     )""")
-    #relation='free' in scales for independent axes
+    # relation='free' in scales for independent axes
     grdevices.dev_off()
     imagefile.close()
 
     hosted_file = s3File(imagefile)
     return hosted_file
 
-def CountWinrate(player_id, game_mode_list=None, min_date=datetime.date(2009,1,1), max_date=None):
-    if max_date==None:
+
+def CountWinrate(
+        player_id,
+        game_mode_list=None,
+        min_date=datetime.date(2009, 1, 1),
+        max_date=None
+        ):
+    if max_date is None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
         max_date_utc = mktime(max_date.timetuple())
@@ -81,7 +92,10 @@ def CountWinrate(player_id, game_mode_list=None, min_date=datetime.date(2009,1,1
     if min_dt_utc > max_date_utc:
         return FailFace()
     if game_mode_list is None:
-        game_mode_list = [gm.steam_id for gm in GameMode.objects.filter(is_competitive=True)]
+        game_mode_list = [
+            gm.steam_id
+            for gm in GameMode.objects.filter(is_competitive=True)
+        ]
 
     grdevices = importr('grDevices')
     importr('lattice')
@@ -90,30 +104,48 @@ def CountWinrate(player_id, game_mode_list=None, min_date=datetime.date(2009,1,1
         player = Player.objects.get(steam_id=player_id)
     except Player.DoesNotExist:
         return FailFace()
-    annotations = PlayerMatchSummary.objects.filter(player=player, match__validity=Match.LEGIT).values('hero__machine_name','is_win').annotate(Count('is_win'))
-    annotations = annotations.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
+    annotations = PlayerMatchSummary.objects.filter(
+        player=player,
+        match__validity=Match.LEGIT
+    ).values('hero__machine_name', 'is_win').annotate(Count('is_win'))
+    annotations = annotations.filter(
+        match__duration__gte=settings.MIN_MATCH_LENGTH
+    )
     annotations = annotations.filter(match__start_time__gte=min_dt_utc)
     annotations = annotations.filter(match__start_time__lte=max_date_utc)
-    annotations = annotations.filter(match__game_mode__steam_id__in=game_mode_list)
+    annotations = annotations.filter(
+        match__game_mode__steam_id__in=game_mode_list
+    )
 
-    if len(annotations)==0:
+    if len(annotations) == 0:
         return FailFace()
 
     heroes = list(set([row['hero__machine_name'] for row in annotations]))
-    wins = {row['hero__machine_name']: row['is_win__count'] for row in annotations if row['is_win']==True}
-    losses = {row['hero__machine_name']: row['is_win__count'] for row in annotations if row['is_win']==False}
+    wins = {
+        row['hero__machine_name']: row['is_win__count']
+        for row in annotations if row['is_win']
+    }
+    losses = {
+        row['hero__machine_name']: row['is_win__count']
+        for row in annotations if not row['is_win']
+    }
 
-    win_rates = robjects.FloatVector([float(wins.get(hero,0))/(wins.get(hero,0)+losses.get(hero,0))*100 for hero in heroes])
-    games = robjects.IntVector([wins.get(hero,0)+losses.get(hero,0) for hero in heroes])
+    win_rates = robjects.FloatVector([
+        float(wins.get(hero, 0))
+        / (wins.get(hero, 0) + losses.get(hero, 0)) * 100
+        for hero in heroes
+    ])
+    games = robjects.IntVector([
+        wins.get(hero, 0) + losses.get(hero, 0) for hero in heroes
+    ])
     labels = robjects.StrVector([safen(hero) for hero in heroes])
 
     robjects.globalenv['labels'] = labels
     robjects.globalenv['win_rates'] = win_rates
     robjects.globalenv['games'] = games
 
-
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo',width=500,height=500)
+    grdevices.png(file=imagefile.name, type='cairo', width=500, height=500)
 
     enforceTheme(robjects)
     cmd = """
@@ -144,26 +176,28 @@ def CountWinrate(player_id, game_mode_list=None, min_date=datetime.date(2009,1,1
     hosted_file = s3File(imagefile)
     return hosted_file
 
+
 def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
 
     grdevices = importr('grDevices')
     importr('lattice')
 
-    if max_date==None:
+    if max_date is None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
         max_date_utc = mktime(max_date.timetuple())
     min_dt_utc = mktime(min_date.timetuple())
 
-
-
     player = Player.objects.get(steam_id=player_id)
-    pms = PlayerMatchSummary.objects.filter(player=player, match__validity=Match.LEGIT).select_related()
+    pms = PlayerMatchSummary.objects.filter(
+        player=player,
+        match__validity=Match.LEGIT
+    ).select_related()
     pms = pms.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
     pms = pms.filter(match__start_time__gte=min_dt_utc)
     pms = pms.filter(match__start_time__lte=max_date_utc)
 
-    if len(pms)==0:
+    if len(pms) == 0:
         return FailFace()
 
     wins = [1 if m.is_win else 0 for m in pms]
@@ -172,25 +206,31 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
     wins_vec = robjects.IntVector(wins)
     start_times_vec = robjects.IntVector(start_times)
 
-    robjects.globalenv['wins_vec']=wins_vec
-    robjects.globalenv['start_times_vec']=start_times_vec
+    robjects.globalenv['wins_vec'] = wins_vec
+    robjects.globalenv['start_times_vec'] = start_times_vec
 
     if plot_var == 'winrate':
         plot_func = 'winrate'
     else:
         plot_func = 'length'
-    optionsDict = { 'date':
-                        {'collapse_dt_format':r'%Y-%m-%d',
-                         'present_dt_format':r'%Y-%m-%d'},
-                    'hour_of_day':
-                        {'collapse_dt_format':r'%H',
-                         'present_dt_format':r'%Y-%m-%d'},
-                    'month':
-                        {'collapse_dt_format':r'%Y-%m',
-                         'present_dt_format':r'%Y-%m-%d'},
-                    'week':
-                        {'collapse_dt_format':r'%Y-%W',
-                         'present_dt_format':r'%Y-%m-%d'},}
+    optionsDict = {
+        'date': {
+            'collapse_dt_format': r'%Y-%m-%d',
+            'present_dt_format': r'%Y-%m-%d'
+        },
+        'hour_of_day': {
+            'collapse_dt_format': r'%H',
+            'present_dt_format': r'%Y-%m-%d'
+        },
+        'month': {
+            'collapse_dt_format': r'%Y-%m',
+            'present_dt_format': r'%Y-%m-%d'
+        },
+        'week': {
+            'collapse_dt_format': r'%Y-%W',
+            'present_dt_format': r'%Y-%m-%d'
+        },
+    }
 
     if bucket_var == 'hour_of_day':
         cmd = """
@@ -267,15 +307,17 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
                 # return axes definition list
                 return(ans)
             }
-            """ % (optionsDict[bucket_var]['collapse_dt_format'],
-                optionsDict[bucket_var]['present_dt_format'],
-                min_date,
-                max_date,
-                plot_func)
+        """ % (
+            optionsDict[bucket_var]['collapse_dt_format'],
+            optionsDict[bucket_var]['present_dt_format'],
+            min_date,
+            max_date,
+            plot_func
+        )
     robjects.r(cmd)
 
     imagefile = File(open('1d_%s.png' % str(uuid4()), 'w'))
-    grdevices.png(file=imagefile.name, type='cairo', width=800,height=500)
+    grdevices.png(file=imagefile.name, type='cairo', width=800, height=500)
 
     enforceTheme(robjects)
     if plot_var == 'winrate':
@@ -292,9 +334,12 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
 
                 )
             )
-        """ % (bucket_var.replace("_"," ").title(),plot_var.replace("_"," ").title())
+        """ % (
+            bucket_var.replace("_", " ").title(),
+            plot_var.replace("_", " ").title()
+        )
     else:
-            cmd = """
+        cmd = """
         print(
              barchart(var~render_x,data=df.plot2,type='h',horizontal=F,
                 scales=list(x=list(rot=90)),col='purple',
@@ -302,14 +347,15 @@ def PlayerTimeline(player_id, min_date, max_date, bucket_var, plot_var):
                 xscale.components=xscale.components.A
             )
         )
-    """ % (bucket_var.replace("_"," ").title(),plot_var.replace("_"," ").title())
+        """ % (
+            bucket_var.replace("_", " ").title(),
+            plot_var.replace("_", " ").title()
+        )
 
     #
     robjects.r(cmd)
     grdevices.dev_off()
     imagefile.close()
-
-
 
     hosted_file = s3File(imagefile)
     return hosted_file

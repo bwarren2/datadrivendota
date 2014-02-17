@@ -17,17 +17,15 @@ def params_dict():
     }
     return dictionary
 
+
 def datapoint_dict():
     dictionary = {
         'x_var': None,
-        'y_var':None,
-        'split_var':None,
-        'group_var':None,
-        'label':None,
-        'tooltip':None,
-        'url':None,
+        'y_var': None,
+        'split_var': None,
+        'group_var': None,
+        'label': None,
+        'tooltip': None,
+        'url': None,
     }
     return dictionary
-
-
-

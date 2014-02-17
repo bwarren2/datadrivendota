@@ -11,9 +11,13 @@ from os.path import basename
 from .models import Player, UserProfile
 from .r import KDADensity, CountWinrate, PlayerTimeline
 from .forms import PlayerWinrateLevers, PlayerTimelineForm, PlayerAddFollowForm
-from .json_data import player_winrate_breakout
 from matches.models import PlayerMatchSummary, Match
-from matches.management.tasks.valve_api_calls import ApiContext, ValveApiCall, UpdatePlayerPersonas, AcquirePlayerData
+from matches.management.tasks.valve_api_calls import (
+    ApiContext,
+    ValveApiCall,
+    UpdatePlayerPersonas,
+    AcquirePlayerData
+)
 from .models import request_to_player
 from utils.exceptions import NoDataFound
 import datetime
@@ -25,44 +29,71 @@ except ImportError:
     class devserver_profile(object):
         def __init__(self, *args, **kwargs):
             pass
+
         def __call__(self, func):
             def nothing(*args, **kwargs):
                 return func(*args, **kwargs)
             return wraps(func)(nothing)
 
+
 @permission_required('players.can_look')
 def index(request):
     player_list = Player.objects.filter(updated=True)
-    return render(request, 'player_index.html', {'player_list':player_list})
+    return render(
+        request,
+        'player_index.html',
+        {
+            'player_list': player_list
+        }
+    )
+
 
 @permission_required('players.can_look')
 def detail(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
     stats = {}
     try:
-      wins = PlayerMatchSummary.objects.filter(player=player, match__validity=Match.LEGIT,is_win=True).values('is_win').annotate(Count('is_win'))[0]['is_win__count']
+        wins = PlayerMatchSummary.objects.filter(
+            player=player,
+            match__validity=Match.LEGIT,
+            is_win=True
+        ).values('is_win').annotate(Count('is_win'))[0]['is_win__count']
     except IndexError:
-      wins = 0
+        wins = 0
     try:
-      losses = PlayerMatchSummary.objects.filter(player=player, match__validity=Match.LEGIT,is_win=False).values('is_win').annotate(Count('is_win'))[0]['is_win__count']
+        losses = PlayerMatchSummary.objects.filter(
+            player=player,
+            match__validity=Match.LEGIT,
+            is_win=False
+        ).values('is_win').annotate(Count('is_win'))[0]['is_win__count']
     except IndexError:
-      losses = 0
+        losses = 0
 
     stats['wins'] = wins
     stats['losses'] = losses
-    stats['winrate'] = round(float(wins)/(wins+losses) if wins+losses>0 else 0,2)
+    stats['winrate'] = round(
+        float(wins) / (wins + losses) if wins + losses > 0 else 0,
+        2
+    )
     pms_list = get_playermatchsummaries_for_player(player, 10)
     kda = KDADensity(player.steam_id)
     kdabase = basename(kda.name)
     winrate = CountWinrate(player.steam_id)
     winratebase = basename(winrate.name)
-    return render(request, 'player_detail.html', {'player':player,
-                               'kdabase':kdabase,
-                               'kda':kda,
-                               'winratebase':winratebase,
-                               'winrate':winrate,
-                               'stats':stats,
-                               'pms_list': pms_list})
+    return render(
+        request,
+        'player_detail.html',
+        {
+            'player': player,
+            'kdabase': kdabase,
+            'kda': kda,
+            'winratebase': winratebase,
+            'winrate': winrate,
+            'stats': stats,
+            'pms_list': pms_list
+        }
+    )
+
 
 @permission_required('players.can_touch')
 @devserver_profile(follow=[CountWinrate])
@@ -86,27 +117,45 @@ def winrate(request):
     if request.method == 'POST':
         winrate_form = PlayerWinrateLevers(request.POST)
         if winrate_form.is_valid():
-          try:
-
-            image = CountWinrate(
-              player_id = winrate_form.cleaned_data['player'],
-              game_mode_list = winrate_form.cleaned_data['game_modes'],
-              min_date = winrate_form.cleaned_data['min_date'],
-              max_date = winrate_form.cleaned_data['max_date'],
-            )
-            imagebase = basename(image.name)
-            return render(request, 'player_form.html', {'form': winrate_form,
-                                      'image_name':imagebase,
-                                      'title':'Hero Winrate'})
-          except NoDataFound:
-            return render(request, 'player_form.html', {'form': winrate_form,
-                                      'error': 'error',
-                                      'title':'Hero Winrate'})
+            try:
+                image = CountWinrate(
+                    player_id=winrate_form.cleaned_data['player'],
+                    game_mode_list=winrate_form.cleaned_data['game_modes'],
+                    min_date=winrate_form.cleaned_data['min_date'],
+                    max_date=winrate_form.cleaned_data['max_date'],
+                )
+                imagebase = basename(image.name)
+                return render(
+                    request,
+                    'player_form.html',
+                    {
+                        'form': winrate_form,
+                        'image_name': imagebase,
+                        'title': 'Hero Winrate',
+                    }
+                )
+            except NoDataFound:
+                return render(
+                    request,
+                    'player_form.html',
+                    {
+                        'form': winrate_form,
+                        'error': 'error',
+                        'title': 'Hero Winrate',
+                    }
+                )
     else:
         winrate_form = PlayerWinrateLevers()
 
-    return render(request, 'player_form.html', {'form': winrate_form,
-                                       'title':'Hero Winrate'})
+    return render(
+        request,
+        'player_form.html',
+        {
+            'form': winrate_form,
+            'title': 'Hero Winrate',
+        }
+    )
+
 
 @permission_required('players.can_touch')
 @devserver_profile(follow=[PlayerTimeline])
@@ -115,67 +164,100 @@ def timeline(request):
         timeline_form = PlayerTimelineForm(request.POST)
         if timeline_form.is_valid():
             image = PlayerTimeline(
-              player_id=timeline_form.cleaned_data['player'],
-              min_date=timeline_form.cleaned_data['min_date'],
-              max_date=timeline_form.cleaned_data['max_date'],
-              bucket_var=timeline_form.cleaned_data['bucket_var'],
-              plot_var=timeline_form.cleaned_data['plot_var']
+                player_id=timeline_form.cleaned_data['player'],
+                min_date=timeline_form.cleaned_data['min_date'],
+                max_date=timeline_form.cleaned_data['max_date'],
+                bucket_var=timeline_form.cleaned_data['bucket_var'],
+                plot_var=timeline_form.cleaned_data['plot_var']
             )
             imagebase = basename(image.name)
-            return render(request, 'player_form.html', {'form': timeline_form,
-                                      'imagebase': imagebase,
-                                      'title':'Player Timeline',})
+            return render(
+                request,
+                'player_form.html',
+                {
+                    'form': timeline_form,
+                    'imagebase': imagebase,
+                    'title': 'Player Timeline',
+                }
+            )
     else:
         timeline_form = PlayerTimelineForm()
 
-    return render(request, 'player_form.html', {'form': timeline_form,
-                              'title':'Player Timeline'})
+    return render(
+        request,
+        'player_form.html',
+        {
+            'form': timeline_form,
+            'title': 'Player Timeline'
+        }
+    )
+
 
 @permission_required('players.can_look')
-def player_matches(request,player_id=None):
-  player = get_object_or_404(Player, steam_id=player_id)
-  pms_list = get_playermatchsummaries_for_player(player, 50)
+def player_matches(request, player_id=None):
+    player = get_object_or_404(Player, steam_id=player_id)
+    pms_list = get_playermatchsummaries_for_player(player, 50)
 
-  paginator = Paginator(pms_list, 10)
-  page = request.GET.get('page')
-  try:
-    pms_list = paginator.page(page)
-  except PageNotAnInteger:
-    # If page is not an integer, deliver first page.
-    pms_list = paginator.page(1)
-  except EmptyPage:
-    # If page is out of range (e.g. 9999), deliver last page of results.
-    pms_list = paginator.page(paginator.num_pages)
+    paginator = Paginator(pms_list, 10)
+    page = request.GET.get('page')
+    try:
+        pms_list = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        pms_list = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        pms_list = paginator.page(paginator.num_pages)
 
+    return render(
+        request,
+        'playermatchsummary_index.html',
+        {
+            'pms_list': pms_list,
+            'player': player
+        }
+    )
 
-  return render(request, 'playermatchsummary_index.html', {'pms_list':pms_list,
-    'player':player})
 
 @permission_required('players.can_look')
 def player_management(request):
+    player = request_to_player(request)
+    if player is not None:
+        if request.method == 'POST':
+            form = PlayerAddFollowForm(request.POST)
+            if form.is_valid():
+                follow_player_id = form.cleaned_data['player']
+                follow_player = Player.objects.get(steam_id=follow_player_id)
+                player.userprofile.following.add(follow_player)
+        form = PlayerAddFollowForm()
+        follow_list = [follow for follow in player.userprofile.following.all()]
+        track_list = [track for track in player.userprofile.tracking.all()]
+        return render(
+            request,
+            'player_management.html',
+            {
+                'follow_list': follow_list,
+                'track_list': track_list,
+                'track_limit': player.userprofile.track_limit,
+                'form': form
+            }
+        )
+    else:
+        return render(
+            request,
+            'player_management.html',
+            {
+                'error': 'You need to be logged in to edit stuff here.'
+            }
+        )
 
-  player = request_to_player(request)
-  if player is not None:
-    if request.method == 'POST':
-      form = PlayerAddFollowForm(request.POST)
-      if form.is_valid():
-        follow_player_id = form.cleaned_data['player']
-        follow_player= Player.objects.get(steam_id=follow_player_id)
-        player.userprofile.following.add(follow_player)
-    form = PlayerAddFollowForm()
-    follow_list = [follow for follow in player.userprofile.following.all()]
-    track_list = [track for track in player.userprofile.tracking.all()]
-    return render(request, 'player_management.html', {'follow_list': follow_list,
-      'track_list': track_list,
-      'track_limit': player.userprofile.track_limit,
-      'form': form})
-  else:
-    return render(request, 'player_management.html', {'error':'You need to be logged in to edit stuff here.'})
 
 def player_list(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
-        players = Player.objects.filter(persona_name__icontains = q )[:20]
+        players = Player.objects.filter(
+            persona_name__icontains=q
+        )[:20]
         results = []
         for player in players:
             player_json = {}
@@ -194,101 +276,138 @@ def drop_follow(request):
     if request.is_ajax():
         drop = Player.objects.get(steam_id=request.POST['slug'])
         request.user.userprofile.following.remove(drop)
-        data=request.POST['slug']
+        data = request.POST['slug']
     else:
         data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
+
 
 def check_id(request):
-    if request.is_ajax() and request.POST['steam_id']!='':
-      steam_id = request.POST['steam_id']
-      try:
-        int(steam_id)
-      except ValueError:
-        data = 'We need an integer id'
-        mimetype = 'application/json'
-        return HttpResponseNotFound(data, mimetype)
+    # @todo: The Pythonic thing, again, is to treat '' as False, and any non-
+    # empty string as True.
+    # --kit 2014-02-16
+    if request.is_ajax() and request.POST['steam_id'] != '':
+        steam_id = request.POST['steam_id']
+        try:
+            int(steam_id)
+        except ValueError:
+            data = 'We need an integer id'
+            mimetype = 'application/json'
+            return HttpResponseNotFound(data, mimetype)
 
-      c = ApiContext()
-      c.steamids="{base},{check}".format(base=steam_id,check=int(steam_id)+settings.ADDER_32_BIT)
-      vac = ValveApiCall()
-      t = vac.delay(api_context=c,mode='GetPlayerSummaries')
-      steam_response=t.get()
-
-      if steam_response['response']['players'] == []:
-        params = {
-          'player_exists': False,
-          'steam_id': None,
-          'name': None,
-          'avatar_url': None,
-          'public': False,
-          'tracked': False
-        }
-        data = json.dumps(params)
-      else:
         c = ApiContext()
-        c.account_id=steam_id
-        c.matches_requested=1
-        c.matches_desired=1
+        c.steamids = "{base},{check}".format(
+            base=steam_id,
+            check=int(steam_id) + settings.ADDER_32_BIT
+        )
         vac = ValveApiCall()
-        t = vac.delay(api_context=c,mode='GetMatchHistory')
-        dota_response = t.get()
+        t = vac.delay(
+            api_context=c,
+            mode='GetPlayerSummaries'
+        )
+        steam_response = t.get()
 
-        tracking = len(UserProfile.objects.filter(tracking__steam_id=steam_id)) != 0 or \
-        len(Player.objects.filter(steam_id=steam_id,updated=True))!=0
-        if dota_response['result']['status'] != 1:
-          params = {
-            'player_exists': True,
-            'steam_id': steam_response['response']['players'][0]['steamid'],
-            'name': steam_response['response']['players'][0]['personaname'].encode('utf-8'),
-            'avatar_url': steam_response['response']['players'][0]['avatarmedium'],
-            'public': False,
-            'tracked': tracking
-          }
-          data = json.dumps(params)
+        if steam_response['response']['players'] == []:
+            params = {
+                'player_exists': False,
+                'steam_id': None,
+                'name': None,
+                'avatar_url': None,
+                'public': False,
+                'tracked': False
+            }
+            data = json.dumps(params)
         else:
-          params = {
-            'player_exists': True,
-            'steam_id': steam_response['response']['players'][0]['steamid'],
-            'name': steam_response['response']['players'][0]['personaname'].encode('utf-8'),
-            'avatar_url': steam_response['response']['players'][0]['avatarmedium'],
-            'public': True,
-            'tracked': tracking
-          }
-          data = json.dumps(params)
-      if params['player_exists'] and params['public'] and not params['tracked']:
-        data = """<tr>
-          <td>{exists}</td>
-          <td>{id}</td>
-          <td>{name}</td>
-          <td><img src='{image}'></td>
-          <td>{public}</td>
-          <td>{tracked}</td>
-          <td><input type="button" id="add_track" name="{id}" value="Import!" /></td>
-          </tr>""".format(exists=params['player_exists'],
-            id=params['steam_id'],
-            name=params['name'],
-            public=params['public'],
-            image=params['avatar_url'],
-            tracked=params['tracked'],
+            c = ApiContext()
+            c.account_id = steam_id
+            c.matches_requested = 1
+            c.matches_desired = 1
+            vac = ValveApiCall()
+            t = vac.delay(api_context=c, mode='GetMatchHistory')
+            dota_response = t.get()
+
+            tracking = (
+                len(
+                    UserProfile.objects.filter(tracking__steam_id=steam_id)
+                ) != 0
+                or len(
+                    Player.objects.filter(steam_id=steam_id, updated=True)
+                ) != 0
             )
-      else:
-        data = """<tr>
-          <td>{exists}</td>
-          <td>{id}</td>
-          <td>{name}</td>
-          <td><img src='{image}'></td>
-          <td>{public}</td>
-          <td>{tracked}</td>
-          <td>Not available</td>
-          </tr>""".format(exists=params['player_exists'],
-            id=params['steam_id'],
-            name=params['name'],
-            public=params['public'],
-            image=params['avatar_url'],
-            tracked=params['tracked'],
-            )
+            if dota_response['result']['status'] != 1:
+                params = {
+                    'player_exists': True,
+                    'steam_id': steam_response[
+                        'response'
+                    ]['players'][0]['steamid'],
+                    'name': steam_response[
+                        'response'
+                    ]['players'][0]['personaname'].encode('utf-8'),
+                    'avatar_url': steam_response[
+                        'response'
+                    ]['players'][0]['avatarmedium'],
+                    'public': False,
+                    'tracked': tracking
+                }
+                data = json.dumps(params)
+            else:
+                params = {
+                    'player_exists': True,
+                    'steam_id': steam_response[
+                        'response'
+                    ]['players'][0]['steamid'],
+                    'name': steam_response[
+                        'response'
+                    ]['players'][0]['personaname'].encode('utf-8'),
+                    'avatar_url': steam_response[
+                        'response'
+                    ]['players'][0]['avatarmedium'],
+                    'public': True,
+                    'tracked': tracking
+                }
+                data = json.dumps(params)
+        if (
+                params['player_exists']
+                and params['public']
+                and not params['tracked']
+                ):
+        # @todo: This crap should be in templates. If you are writing HTML in
+        # a string in a Python file, check yourself.
+        # --kit 2014-02-16
+            data = """<tr>
+              <td>{exists}</td>
+              <td>{id}</td>
+              <td>{name}</td>
+              <td><img src='{image}'></td>
+              <td>{public}</td>
+              <td>{tracked}</td>
+              <td><input type="button" id="add_track" name="{id}" value="Import!" /></td>
+              </tr>""".format(
+                exists=params['player_exists'],
+                id=params['steam_id'],
+                name=params['name'],
+                public=params['public'],
+                image=params['avatar_url'],
+                tracked=params['tracked'],
+                )
+        else:
+            data = """<tr>
+              <td>{exists}</td>
+              <td>{id}</td>
+              <td>{name}</td>
+              <td><img src='{image}'></td>
+              <td>{public}</td>
+              <td>{tracked}</td>
+              <td>Not available</td>
+              </tr>""".format(
+                exists=params['player_exists'],
+                id=params['steam_id'],
+                name=params['name'],
+                public=params['public'],
+                image=params['avatar_url'],
+                tracked=params['tracked'],
+                )
 
     else:
         data = 'fail'
@@ -296,49 +415,61 @@ def check_id(request):
         return HttpResponseNotFound(data, mimetype)
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
+
 
 def add_track(request):
     if request.is_ajax():
         steam_id = int(request.POST['steam_id']) % settings.ADDER_32_BIT
         try:
-          track = Player.objects.get(steam_id=steam_id)
+            track = Player.objects.get(steam_id=steam_id)
         except Player.DoesNotExist:
-          track = Player.objects.create(steam_id=steam_id)
+            track = Player.objects.create(steam_id=steam_id)
 
         if request.user.userprofile.tracking.add(track):
-          data=request.POST['steam_id']
+            data = request.POST['steam_id']
 
-          #Refresh all the names
-          c = ApiContext()
-          vac = ValveApiCall()
-          upp = UpdatePlayerPersonas()
-          c.steamids=steam_id+settings.ADDER_32_BIT
-          chain(vac.s(mode='GetPlayerSummaries',api_context=c), upp.s()).delay()
+            # Refresh all the names
+            c = ApiContext()
+            vac = ValveApiCall()
+            upp = UpdatePlayerPersonas()
+            c.steamids = steam_id + settings.ADDER_32_BIT
+            chain(vac.s(
+                mode='GetPlayerSummaries',
+                api_context=c
+            ), upp.s()).delay()
 
-          #Pull in the new guy.
-          apd = AcquirePlayerData()
-          c = ApiContext()
-          c.account_id = steam_id
-          apd.delay(api_context=c)
+            # Pull in the new guy.
+            apd = AcquirePlayerData()
+            c = ApiContext()
+            c.account_id = steam_id
+            apd.delay(api_context=c)
 
         else:
             data = 'fail'
         mimetype = 'application/json'
         return HttpResponse(data, mimetype)
 
-
     else:
         data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
 
+
 def get_playermatchsummaries_for_player(player, count):
-  pms_list = PlayerMatchSummary.objects.select_related()
-  pms_list = pms_list.filter(player=player).order_by('-match__start_time')[0:count]
-  for pms in pms_list:
-      pms.display_date = datetime.datetime.fromtimestamp(pms.match.start_time)
-      pms.display_duration = str(datetime.timedelta(seconds=pms.match.duration))
-      pms.kda2 = pms.kills - pms.deaths+ pms.assists/2.0
-      pms.color_class = 'pos' if pms.kda2 > 0 else 'neg'
-      pms.mag = abs(pms.kda2)*2
-  return pms_list
+    pms_list = PlayerMatchSummary.objects.select_related()
+    pms_list = pms_list.filter(
+        player=player
+    ).order_by('-match__start_time')[0:count]
+    for pms in pms_list:
+        pms.display_date = datetime.datetime.fromtimestamp(
+            pms.match.start_time
+        )
+        pms.display_duration = str(datetime.timedelta(
+            seconds=pms.match.duration
+        ))
+        pms.kda2 = pms.kills - pms.deaths + pms.assists / 2.0
+        # @todo: Again, postposed conditionals.
+        # --kit 2014-02-16
+        pms.color_class = 'pos' if pms.kda2 > 0 else 'neg'
+        pms.mag = abs(pms.kda2)*2
+    return pms_list

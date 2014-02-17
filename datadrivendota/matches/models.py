@@ -1,8 +1,7 @@
 from django.db import models
 from datadrivendota.utilities import safen
-from django.conf import settings
 
-# Create your models here.
+
 class Match(models.Model):
 
     steam_id = models.IntegerField(help_text="Valve's id field", unique=True)
@@ -22,23 +21,42 @@ class Match(models.Model):
     league_id = models.IntegerField()
     positive_votes = models.IntegerField()
     negative_votes = models.IntegerField()
-    lobby_type = models.ForeignKey('LobbyType', help_text='How the game was queued')
+    lobby_type = models.ForeignKey(
+        'LobbyType',
+        help_text='How the game was queued'
+    )
     game_mode = models.ForeignKey('GameMode')
-    skill=models.IntegerField(default=0,
-        help_text='How valve denotes skill bracket.  1 is normal, 2 is high, 3 is very high, 0 is my not-assigned')
-    dire_guild = models.ForeignKey('guilds.Guild', null=True, related_name='dire_guild')
-    radiant_guild = models.ForeignKey('guilds.Guild', null=True, related_name='radiant_guild')
+    skill = models.IntegerField(
+        default=0,
+        help_text=(
+            'How valve denotes skill bracket.  '
+            '1 is normal, 2 is high, 3 is very high, 0 is my not-assigned'
+        )
+    )
+    dire_guild = models.ForeignKey(
+        'guilds.Guild',
+        null=True,
+        related_name='dire_guild'
+    )
+    radiant_guild = models.ForeignKey(
+        'guilds.Guild',
+        null=True,
+        related_name='radiant_guild'
+    )
 
     UNPROCESSED = 0
     LEGIT = 1
     UNCOUNTED = 2
 
     VALIDITY_CHOICES = (
-        (UNPROCESSED,'Unprocessed'),
-        (LEGIT,'Legitimate'),
-        (UNCOUNTED,'Abandoned'),
-        )
-    validity = models.IntegerField(choices=VALIDITY_CHOICES, default=UNPROCESSED)
+        (UNPROCESSED, 'Unprocessed'),
+        (LEGIT, 'Legitimate'),
+        (UNCOUNTED, 'Abandoned'),
+    )
+    validity = models.IntegerField(
+        choices=VALIDITY_CHOICES,
+        default=UNPROCESSED
+    )
 
     class Meta:
         verbose_name_plural = 'matches'
@@ -49,28 +67,35 @@ class Match(models.Model):
 
 
 class GameMode(models.Model):
-    steam_id = models.IntegerField(help_text="Valve's id field", unique=True, db_index=True)
+    steam_id = models.IntegerField(
+        help_text="Valve's id field",
+        unique=True,
+        db_index=True
+    )
     description = models.CharField(help_text='Game mode, ie. captains',
                                    max_length=50)
     is_competitive = models.BooleanField(help_text="""Whether charts should
         show this mode by default""", default=False)
     visible = models.BooleanField(default=False)
+
     class Meta:
         ordering = ['steam_id']
+
     def __unicode__(self):
         return self.description+', ('+str(self.steam_id)+')'
 
 
 class LobbyType(models.Model):
-
-    steam_id = models.IntegerField(help_text='How the queue occurred', unique=True)
+    steam_id = models.IntegerField(
+        help_text='How the queue occurred',
+        unique=True
+    )
     description = models.CharField(help_text='Queue type', max_length=50)
-
 
     class Meta:
         verbose_name = 'LobbyType'
         verbose_name_plural = 'LobbyTypes'
-        ordering=['steam_id']
+        ordering = ['steam_id']
 
     def __unicode__(self):
         return self.description+', ('+str(self.steam_id)+')'
@@ -120,7 +145,15 @@ class PlayerMatchSummary(models.Model):
         return False
 
     def __unicode__(self):
-        return "Match "+str(self.match.steam_id)+", User "+str(self.player.steam_id)
+        # @todo: This doesn't currently return a unicode object, but a string
+        # object. Bad news bears!
+        # --kit 2014-02-16
+        return (
+            "Match "
+            + str(self.match.steam_id)
+            + ", User "
+            + str(self.player.steam_id)
+        )
 
     def which_side(self):
         """ Returns radiant or dire based on player slot."""
@@ -129,28 +162,50 @@ class PlayerMatchSummary(models.Model):
         else:
             return 'Dire'
 
-    def derive_attribute(summaries,attribute):
-        if attribute=='duration':
-            vector_list = [summary.match.duration/60.0 for summary in summaries]
-        elif attribute=='K-D+.5*A':
-            vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in summaries]
+    def derive_attribute(summaries, attribute):
+        if attribute == 'duration':
+            vector_list = [
+                summary.match.duration / 60.0
+                for summary in summaries
+            ]
+        elif attribute == 'K-D+.5*A':
+            vector_list = [
+                summary.kills - summary.deaths + summary.assists*.5
+                for summary in summaries
+            ]
         elif attribute == 'player':
-            vector_list = [summary.player.persona_name for summary in summaries]
+            vector_list = [
+                summary.player.persona_name
+                for summary in summaries
+            ]
         elif attribute == 'is_win':
-            vector_list = ['Won' if summary.is_win==True else 'Lost' for summary in summaries]
+            vector_list = [
+                'Won' if summary.is_win else 'Lost'
+                for summary in summaries
+            ]
         elif attribute == 'game_mode':
-            vector_list = [summary.match.game_mode.description for summary in summaries]
+            vector_list = [
+                summary.match.game_mode.description
+                for summary in summaries
+            ]
         elif attribute == 'skill':
             vector_list = [summary.match.skill for summary in summaries]
         elif attribute == 'hero_name':
             vector_list = [safen(summary.hero.name) for summary in summaries]
         elif attribute == 'first_blood_time':
-            vector_list = [summary.match.first_blood_time/60.0 for summary in summaries]
+            vector_list = [
+                summary.match.first_blood_time / 60.0
+                for summary in summaries
+            ]
         else:
-            vector_list = [getattr(summary, attribute) for summary in summaries]
+            vector_list = [
+                getattr(summary, attribute)
+                for summary in summaries
+            ]
 
         label = fetch_attribute_label(attribute)
         return vector_list, label
+
 
 class AdditionalUnit(models.Model):
     player_match_summary = models.OneToOneField('PlayerMatchSummary')
@@ -161,6 +216,7 @@ class AdditionalUnit(models.Model):
     item_3 = models.ForeignKey('items.Item', related_name='additem3')
     item_4 = models.ForeignKey('items.Item', related_name='additem4')
     item_5 = models.ForeignKey('items.Item', related_name='additem5')
+
 
 class PickBan(models.Model):
     match = models.ForeignKey('Match')
@@ -180,7 +236,8 @@ class LeaverStatus(models.Model):
     class Meta:
         verbose_name = 'LeaverStatus'
         verbose_name_plural = 'LeaverStatuses'
-        ordering=['steam_id']
+        ordering = ['steam_id']
+
     def __unicode__(self):
         return self.description+', ('+str(self.steam_id)+')'
 
@@ -192,55 +249,77 @@ class SkillBuild(models.Model):
     level = models.IntegerField()
 
     class Meta:
-        ordering = ['player_match_summary','level']
+        ordering = ['player_match_summary', 'level']
 
     def __unicode__(self):
         return str(self.player_match_summary.id)+', '+str(self.level)
         pass
 
 
-def fetch_match_attributes(summaries,attribute):
-    if attribute=='duration':
+def fetch_match_attributes(summaries, attribute):
+    if attribute == 'duration':
         vector_list = [summary.match.duration/60.0 for summary in summaries]
-    elif attribute=='K-D+.5*A':
-        vector_list = [summary.kills - summary.deaths + summary.assists*.5 for summary in summaries]
+    elif attribute == 'K-D+.5*A':
+        vector_list = [
+            summary.kills - summary.deaths + summary.assists * .5
+            for summary in summaries
+        ]
     elif attribute == 'player':
         vector_list = [summary.player.persona_name for summary in summaries]
     elif attribute == 'is_win':
-        vector_list = ['Won' if summary.is_win==True else 'Lost' for summary in summaries]
+        vector_list = [
+            'Won' if summary.is_win else 'Lost'
+            for summary in summaries
+        ]
     elif attribute == 'game_mode':
-        vector_list = [summary.match.game_mode.description for summary in summaries]
+        vector_list = [
+            summary.match.game_mode.description
+            for summary in summaries
+        ]
     elif attribute == 'skill':
         vector_list = [summary.match.skill for summary in summaries]
     elif attribute == 'hero_name':
         vector_list = [safen(summary.hero.name) for summary in summaries]
     elif attribute == 'first_blood_time':
-        vector_list = [summary.match.first_blood_time/60.0 for summary in summaries]
+        vector_list = [
+            summary.match.first_blood_time/60.0
+            for summary in summaries
+        ]
     elif attribute == 'match_id':
         vector_list = [summary.match.steam_id for summary in summaries]
     elif attribute == 'which_side':
         vector_list = [summary.which_side() for summary in summaries]
     elif attribute == 'gold_total':
-        vector_list = [summary.gold_per_min*summary.match.duration/60 for summary in summaries]
+        vector_list = [
+            summary.gold_per_min*summary.match.duration/60
+            for summary in summaries
+        ]
     elif attribute == 'xp_total':
-        vector_list = [summary.xp_per_min*summary.match.duration/60 for summary in summaries]
+        vector_list = [
+            summary.xp_per_min*summary.match.duration/60
+            for summary in summaries
+        ]
     else:
         vector_list = [getattr(summary, attribute) for summary in summaries]
 
     label = fetch_attribute_label(attribute)
     return vector_list, label
 
+
 def fetch_single_attribute(summary, attribute, compressor='sum'):
-    if compressor =='sum':
+    if compressor == 'sum':
         denominator = 1
     else:
         denominator = 5
-    if attribute=='duration':
+    if attribute == 'duration':
         return summary.match.duration/60.0/5
-    elif attribute=='K-D+.5*A':
-        return (summary.kills - summary.deaths + summary.assists*.5)/denominator
+    elif attribute == 'K-D+.5*A':
+        return (
+            (summary.kills - summary.deaths + summary.assists * .5)
+            / denominator
+        )
     elif attribute == 'is_win':
-        return 'Won' if summary.is_win==True else 'Lost'
+        return 'Won' if summary.is_win else 'Lost'
     elif attribute == 'game_mode':
         return summary.match.game_mode.description
     elif attribute == 'skill':
@@ -250,25 +329,26 @@ def fetch_single_attribute(summary, attribute, compressor='sum'):
     else:
         return getattr(summary, attribute)/denominator
 
+
 def fetch_attribute_label(attribute):
-    if attribute=='duration':
-        label='GameLength(m)'
-    elif attribute=='K-D+.5*A':
-        label='Kills-Death+.5*Assists'
+    if attribute == 'duration':
+        label = 'GameLength(m)'
+    elif attribute == 'K-D+.5*A':
+        label = 'Kills-Death+.5*Assists'
     elif attribute == 'player':
-        label=attribute.title()
+        label = attribute.title()
     elif attribute == 'is_win':
-        label='WonGame?'
+        label = 'WonGame?'
     elif attribute == 'game_mode':
-        label='GameMode'
+        label = 'GameMode'
     elif attribute == 'skill':
-        label='Skill(3=High)'
+        label = 'Skill(3=High)'
     elif attribute == 'hero_name':
-        label='HeroName'
+        label = 'HeroName'
     elif attribute == 'first_blood_time':
-        label='FirstBloodTime(m)'
+        label = 'FirstBloodTime(m)'
     elif attribute == 'none':
-        label=''
+        label = ''
     else:
-        label=safen(attribute)
+        label = safen(attribute)
     return label

@@ -18,7 +18,10 @@ class Command(BaseCommand):
         for h in all_heroes:
 
         # the first bit per API FAQ specs
-            url = 'http://media.steampowered.com/apps/dota2/images/heroes/%s_full.png' % h.internal_name[14:]
+            url = (
+                'http://media.steampowered.com'
+                '/apps/dota2/images/heroes/%s_full.png' % h.internal_name[14:]
+            )
             try:
                 imgdata = urlopen(url)
                 with open('%s.png' % str(uuid4()), 'w+') as f:
@@ -29,7 +32,10 @@ class Command(BaseCommand):
                 h.mugshot = None
                 print "No mugshot for %s!  Error %s" % (h.name, err)
 
-            url = 'http://media.steampowered.com/apps/dota2/images/heroes/%s_sb.png' % h.internal_name[14:]
+            url = (
+                'http://media.steampowered.com'
+                '/apps/dota2/images/heroes/%s_sb.png' % h.internal_name[14:]
+            )
             try:
                 imgdata = urlopen(url)
                 with open('%s.png' % str(uuid4()), 'w+') as f:
@@ -48,12 +54,19 @@ class Command(BaseCommand):
 
                 html = urlopen(herourl).read()
                 bs = BeautifulSoup(html)
-                lore = bs.find("div",{'id':'bioInner'}).getText(separator=u' ')
+                lore = bs.find(
+                    "div",
+                    {'id': 'bioInner'}
+                ).getText(separator=u' ')
                 h.lore = lore
             except HTTPError, err:
                 print "No lore for %s!  Error %s" % (h.name, err)
             except AttributeError, err:
-                print "{hero} has no lore {err} {url}".format(hero=h.name, err=err,url=herourl)
+                print "{hero} has no lore {err} {url}".format(
+                    hero=h.name,
+                    err=err,
+                    url=herourl
+                )
 
             h.save()
             print h.name

@@ -5,19 +5,22 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-#from django.contrib.auth.models import User
-#from django.test.client import Client
 from django.test import TestCase
 from .r import EndgameChart, MatchParameterScatterplot
 from players.test_mixins import PlayerValidityMixin
 from matches.test_mixins import MatchValidityMixin
-#MIXINS
 
-#TESTS
+
+# MIXINS
+# TESTS
 class EndgameChartTestCase(PlayerValidityMixin, MatchValidityMixin, TestCase):
-    fixtures = ['datadrivendota/heroes/test_data.json', 'datadrivendota/matches/test_data.json']
+    fixtures = [
+        'datadrivendota/heroes/test_data.json',
+        'datadrivendota/matches/test_data.json'
+    ]
+
     def setUp(self):
-        super(EndgameChartTestCase,self).setUp()
+        super(EndgameChartTestCase, self).setUp()
 
     def test_valid_call(self):
         foo = EndgameChart(
@@ -89,10 +92,19 @@ class EndgameChartTestCase(PlayerValidityMixin, MatchValidityMixin, TestCase):
             group_var=self.invalid_cat_var)
         self.assertEqual(foo.name, 'failface.png')
 
-class MatchParameterScatterplotTestCase(PlayerValidityMixin, MatchValidityMixin, TestCase):
-    fixtures = ['datadrivendota/heroes/test_data.json', 'datadrivendota/matches/test_data.json']
+
+class MatchParameterScatterplotTestCase(
+        PlayerValidityMixin,
+        MatchValidityMixin,
+        TestCase
+        ):
+    fixtures = [
+        'datadrivendota/heroes/test_data.json',
+        'datadrivendota/matches/test_data.json'
+    ]
+
     def setUp(self):
-        super(MatchParameterScatterplotTestCase,self).setUp()
+        super(MatchParameterScatterplotTestCase, self).setUp()
 
     def test_valid_call(self):
         foo = MatchParameterScatterplot(
@@ -121,5 +133,3 @@ class MatchParameterScatterplotTestCase(PlayerValidityMixin, MatchValidityMixin,
             x_var=self.valid_x_var,
             y_var=self.invalid_y_var)
         self.assertEqual(foo.name, 'failface.png')
-
-

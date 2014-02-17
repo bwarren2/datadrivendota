@@ -3,23 +3,36 @@ from fabric.api import local
 
 def test(suite="all"):
     if suite == 'all':
-        local('python -W ignore datadrivendota/manage.py test integration_tests')
+        local(
+            'python -W ignore datadrivendota/manage.py test integration_tests'
+        )
     else:
-        local('python -W ignore datadrivendota/manage.py test {suite}'.format(suite=suite))
+        local(
+            'python -W ignore datadrivendota/manage.py test {suite}'.format(
+                suite=suite
+            )
+        )
+
 
 def hp():
     local('git push heroku master')
     local(collect_static())
     local(heroku_migrate())
 
+
 def heroku_migrate():
     local(heroku_run(migrate()))
+
 
 def migrate():
     return local("python datadrivendota/manage.py migrate --no-initial-data")
 
+
 def collect_static():
-    return local('python datadrivendota/manage.py collectstatic --settings=datadrivendota.settings.production --noinput')
+    return local(
+        'python datadrivendota/manage.py '
+        'collectstatic --settings=datadrivendota.settings.production --noinput'
+    )
 
 
 def scrape_valve_heroes():
@@ -31,7 +44,10 @@ def scrape_hero_faces():
 
 
 def scrape_dossiers():
-    return local('python datadrivendota/manage.py importHeroStats --file hero_stats.txt')
+    return local(
+        'python datadrivendota/manage.py '
+        'importHeroStats --file hero_stats.txt'
+    )
 
 
 def get_hero_seed_local():
@@ -51,4 +67,8 @@ def get_hero_seed_heroku():
 
 
 def generate_heroku_static_pages():
-    local("python datadrivendota/manage.py generate_static_error_pages --settings=datadrivendota.settings.production")
+    local(
+        "python datadrivendota/manage.py "
+        "generate_static_error_pages "
+        "--settings=datadrivendota.settings.production"
+    )

@@ -6,8 +6,16 @@ from BeautifulSoup import BeautifulSoup
 
 from json import loads
 from urllib2 import urlopen, HTTPError
-from heroes.models import (Ability, AbilitySpecialValues, AbilityBehavior,
-AbilityUnitTargetFlags, AbilityUnitTargetType, AbilityUnitTargetTeam, Hero)
+from heroes.models import (
+    Ability,
+    AbilitySpecialValues,
+    AbilityBehavior,
+    AbilityUnitTargetFlags,
+    AbilityUnitTargetType,
+    AbilityUnitTargetTeam,
+    Hero
+)
+
 
 class Command(BaseCommand):
 
@@ -18,9 +26,10 @@ class Command(BaseCommand):
 
         with open('npc_abilities.json') as f:
             abilities = loads(f.read())['DOTAAbilities']
-        del abilities['Version'] #Purge a junk field
+        del abilities['Version']  # Purge a junk field
 
-        mapping_dict = {'AbilityDuration': 'duration',
+        mapping_dict = {
+            'AbilityDuration': 'duration',
             'AbilityChannelTime': 'channel_time',
             'AbilityDamage': 'damage',
             'AbilityUnitDamageType': 'damage_type',
@@ -36,7 +45,7 @@ class Command(BaseCommand):
         for ability, data_dict in abilities.iteritems():
             print ability
             if ability == 'greevil_miniboss_orange_light_strike_array':
-                keep_going=False
+                keep_going = False
             if keep_going:
                 continue
             ab = Ability.objects.get_or_create(steam_id=data_dict['ID'])[0]
@@ -44,31 +53,54 @@ class Command(BaseCommand):
                 try:
                     trait = data_dict.get(key)
                     if trait is not None:
-                        setattr(ab,value,trait)
+                        setattr(ab, value, trait)
                         ab.internal_name = ability
-                    if data_dict.get('AbilityType','') == 'DOTA_ABILITY_TYPE_ULTIMATE':
+                    if (
+                            data_dict.get('AbilityType', '')
+                            == 'DOTA_ABILITY_TYPE_ULTIMATE'
+                            ):
                         ab.is_ultimate = True
                 except AttributeError:
-                    print "Failed on {key} {value} for ability {ab}".format(ab=ab,key=key,value=value)
+                    print "Failed on {key} {value} for ability {ab}".format(
+                        ab=ab,
+                        key=key,
+                        value=value
+                    )
             try:
                 ability_text_dict = ability_text[ability]
-                ab.name = BeautifulSoup(ability_text_dict['dname']).getText(separator=u' ')
-                ab.description = BeautifulSoup(ability_text_dict['desc']).getText(separator=u' ')
-                ab.notes = BeautifulSoup(ability_text_dict['notes']).getText(separator=u' ')
-                ab.lore = BeautifulSoup(ability_text_dict['lore']).getText(separator=u' ')
-                #Stupid hack to deal with abilitydata js feed formatting error.
+                ab.name = BeautifulSoup(
+                    ability_text_dict['dname']
+                ).getText(separator=u' ')
+                ab.description = BeautifulSoup(
+                    ability_text_dict['desc']
+                ).getText(separator=u' ')
+                ab.notes = BeautifulSoup(
+                    ability_text_dict['notes']
+                ).getText(separator=u' ')
+                ab.lore = BeautifulSoup(
+                    ability_text_dict['lore']
+                ).getText(separator=u' ')
+                # Stupid hack to deal with abilitydata js feed formatting
+                # error.
                 if ability_text_dict['hurl'] == 'LegionCommander':
                     ability_text_dict['hurl'] = u"Legion_Commander"
-                hero_slug = slugify(ability_text_dict['hurl'].replace("_"," "))
+                hero_slug = slugify(
+                    ability_text_dict['hurl'].replace("_", " ")
+                )
                 hero = Hero.objects.get(machine_name=hero_slug)
                 ab.hero = hero
-                ab.is_core=True
+                ab.is_core = True
             except KeyError:
-                print "Keyerror on {key} {value} for ability {ab}".format(ab=ab,key=key,value=value)
+                print "Keyerror on {key} {value} for ability {ab}".format(
+                    ab=ab,
+                    key=key,
+                    value=value
+                )
 
-
-
-            url = 'http://media.steampowered.com/apps/dota2/images/abilities/{ability}_hp2.png'.format(ability=ability)
+            url = (
+                'http://media.steampowered.com'
+                '/apps/dota2/images/abilities/{ability}_hp2.png'
+            ).format(ability=ability)
             try:
                 imgdata = urlopen(url)
                 with open('%s.png' % str(uuid4()), 'w+') as f:
@@ -79,7 +111,6 @@ class Command(BaseCommand):
                 ab.picture = None
                 print "No mugshot for %s!  Error %s" % (ability, err)
 
-
             ab.save()
 
             #If there are special values, map them in.
@@ -87,8 +118,11 @@ class Command(BaseCommand):
                 special_dict = data_dict['AbilitySpecial']
                 for idx, pairs_dict in special_dict.iteritems():
                     for key, value in pairs_dict.iteritems():
-                        if key !='var_type':
-                            asv = AbilitySpecialValues.objects.get_or_create(ability=ab,key=key)[0]
+                        if key != 'var_type':
+                            asv = AbilitySpecialValues.objects.get_or_create(
+                                ability=ab,
+                                key=key
+                            )[0]
                             asv.value = value
 
                             asv.save()
@@ -98,7 +132,9 @@ class Command(BaseCommand):
             try:
                 param_str = data_dict['AbilityUnitTargetFlags']
                 for param in param_str.split("|"):
-                    autf = AbilityUnitTargetFlags.objects.get_or_create(internal_name=param)[0]
+                    autf = AbilityUnitTargetFlags.objects.get_or_create(
+                        internal_name=param
+                    )[0]
                     autf.save()
                     ab.target_flags.add(autf)
             except KeyError:
@@ -108,7 +144,9 @@ class Command(BaseCommand):
             try:
                 param_str = data_dict['AbilityUnitTargetFlag']
                 for param in param_str.split("|"):
-                    autf = AbilityUnitTargetFlags.objects.get_or_create(internal_name=param)[0]
+                    autf = AbilityUnitTargetFlags.objects.get_or_create(
+                        internal_name=param
+                    )[0]
                     autf.save()
                     ab.target_flags.add(autf)
             except KeyError:
@@ -117,7 +155,9 @@ class Command(BaseCommand):
             try:
                 param_str = data_dict['AbilityBehavior']
                 for param in param_str.split("|"):
-                    abehav = AbilityBehavior.objects.get_or_create(internal_name=param)[0]
+                    abehav = AbilityBehavior.objects.get_or_create(
+                        internal_name=param
+                    )[0]
                     abehav.save()
                     ab.behavior.add(abehav)
             except KeyError:
@@ -126,7 +166,9 @@ class Command(BaseCommand):
             try:
                 param_str = data_dict['AbilityUnitTargetType']
                 for param in param_str.split("|"):
-                    auttype = AbilityUnitTargetType.objects.get_or_create(internal_name=param)[0]
+                    auttype = AbilityUnitTargetType.objects.get_or_create(
+                        internal_name=param
+                    )[0]
                     auttype.save()
                     ab.target_type.add(auttype)
             except KeyError:
@@ -135,9 +177,10 @@ class Command(BaseCommand):
             try:
                 param_str = data_dict['AbilityUnitTargetTeam']
                 for param in param_str.split("|"):
-                    autteam = AbilityUnitTargetTeam.objects.get_or_create(internal_name=param)[0]
+                    autteam = AbilityUnitTargetTeam.objects.get_or_create(
+                        internal_name=param
+                    )[0]
                     autteam.save()
                     ab.target_team.add(autteam)
             except KeyError:
                 pass
-

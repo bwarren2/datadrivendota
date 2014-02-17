@@ -1,11 +1,20 @@
 from django.core.mail import send_mail
 
+
 def safen(str):
-    return str.replace('-',' ').replace('_',' ').title()
+    return str.replace('-', ' ').replace('_', ' ').title()
+
 
 def error_email(subject, content):
-    send_mail(subject,content,'ben@datadrivendota.com',
-        ['ben@datadrivendota.com'],fail_silently=False)
+    send_mail(
+        subject,
+        content,
+        # These next two lines should be pulled from settings. --kit 2014-02-16
+        'ben@datadrivendota.com',
+        ['ben@datadrivendota.com'],
+        fail_silently=False
+    )
+
 
 class NoDataFound(BaseException):
     pass
