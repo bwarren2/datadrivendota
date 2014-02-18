@@ -301,3 +301,5 @@ function plot(source){
         draw_barplot(source);
     }
 }
+window.d3ening = {}
+window.d3ening.plot = plot

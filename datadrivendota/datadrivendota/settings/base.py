@@ -174,7 +174,8 @@ MANAGERS = ADMINS
 # Database settings for Heroku
 DATABASES = {}
 DATABASES['default'] = dj_database_url.config(
-    default='postgres://localhost/datadrivendota'
+    # default='postgres://ben:m0QGJ6VNxfljYy4UDmQPlocalhost/datadrivendota'
+    default=getenv('DATABASE_URL')
 )
 ########## END DATABASE CONFIGURATION
 
