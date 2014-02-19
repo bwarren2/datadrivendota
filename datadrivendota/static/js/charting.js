@@ -1,4 +1,4 @@
-function draw_scatterplot(source){
+function draw_scatterplot(source, placement_div){
     var raw_data = source['data'];
     var params = source['parameters'];
 
@@ -19,7 +19,7 @@ function draw_scatterplot(source){
         .style("opacity", 0);
 
 
-    var svg = d3.select("#chart").selectAll("svg")
+    var svg = d3.select(placement_div).selectAll("svg")
         .data(data)
         .enter().append("svg:svg")
         .attr("width", outerWidth)
@@ -87,7 +87,7 @@ function draw_scatterplot(source){
     .attr('cx',function(d){return(x(d.x_var)); })
     .attr('cy',function(d){return(y(d.y_var)); })
     .attr('r', 5)
-    .style("fill", function(d) { return color(String(d.label));})
+    .style("fill", function(d) { return color(String(d.group_var));})
     .on("mouseover", function(d) {
             div.transition()
                 .duration(200)
@@ -104,7 +104,7 @@ function draw_scatterplot(source){
 
     if(params['draw_path']){
       series.append("svg:path").attr("d", function(d){return(line(d.values));})
-      .style("stroke", function(d) { return color(d.values[0].label);})
+      .style("stroke", function(d) { return color(String(d.values[0].group_var));})
       .style("stroke-width", 3)
       .style("fill", 'none');
     }
@@ -114,7 +114,7 @@ function draw_scatterplot(source){
           .attr("class", "legend")
           .attr("height", 100)
           .attr("width", 100)
-        .attr("transform", "translate(10,20)");
+        .attr("transform", "translate("+width/5+","+height/10+")");
 
         var rows = legend.selectAll('rect')
               .data(function(d){return d.values;})
@@ -125,7 +125,7 @@ function draw_scatterplot(source){
               .attr("width", 10)
               .attr("height", 10)
               .style("fill", function(d) {
-                 var return_color = color(d.values[0].label);
+                 var return_color = color(d.values[0].group_var);
                  return return_color;
               })
               .on("mouseover",
@@ -144,7 +144,7 @@ function draw_scatterplot(source){
               .text(function(d){return d.key;});
     }
 }
-function draw_barplot(source){
+function draw_barplot(source, placement_div){
     var raw_data = source['data'];
     var params = source['parameters'];
 
@@ -165,7 +165,7 @@ function draw_barplot(source){
         .style("opacity", 0);
 
 
-    var svg = d3.select("#chart").selectAll("svg")
+    var svg = d3.select(placement_div).selectAll("svg")
         .data(data)
         .enter().append("svg:svg")
         .attr("width", outerWidth)
@@ -293,12 +293,12 @@ function draw_barplot(source){
     }
 }
 
-function plot(source){
+function plot(source, div){
     if(source.parameters['chart']=='xyplot'){
-        draw_scatterplot(source);
+        draw_scatterplot(source, div);
     }
     else if(source.parameters['chart']=='barplot'){
-        draw_barplot(source);
+        draw_barplot(source, div);
     }
 }
 window.d3ening = {}

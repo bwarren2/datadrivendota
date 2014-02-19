@@ -257,53 +257,42 @@ class SkillBuild(models.Model):
 
 
 def fetch_match_attributes(summaries, attribute):
-    if attribute == 'duration':
-        vector_list = [summary.match.duration/60.0 for summary in summaries]
-    elif attribute == 'K-D+.5*A':
-        vector_list = [
-            summary.kills - summary.deaths + summary.assists * .5
-            for summary in summaries
-        ]
-    elif attribute == 'player':
-        vector_list = [summary.player.persona_name for summary in summaries]
-    elif attribute == 'is_win':
-        vector_list = [
-            'Won' if summary.is_win else 'Lost'
-            for summary in summaries
-        ]
-    elif attribute == 'game_mode':
-        vector_list = [
-            summary.match.game_mode.description
-            for summary in summaries
-        ]
-    elif attribute == 'skill':
-        vector_list = [summary.match.skill for summary in summaries]
-    elif attribute == 'hero_name':
-        vector_list = [safen(summary.hero.name) for summary in summaries]
-    elif attribute == 'first_blood_time':
-        vector_list = [
-            summary.match.first_blood_time/60.0
-            for summary in summaries
-        ]
-    elif attribute == 'match_id':
-        vector_list = [summary.match.steam_id for summary in summaries]
-    elif attribute == 'which_side':
-        vector_list = [summary.which_side() for summary in summaries]
-    elif attribute == 'gold_total':
-        vector_list = [
-            summary.gold_per_min*summary.match.duration/60
-            for summary in summaries
-        ]
-    elif attribute == 'xp_total':
-        vector_list = [
-            summary.xp_per_min*summary.match.duration/60
-            for summary in summaries
-        ]
-    else:
-        vector_list = [getattr(summary, attribute) for summary in summaries]
+    vector_list = [
+        fetch_pms_attribute(summary, attribute)
+        for summary in summaries
+    ]
 
     label = fetch_attribute_label(attribute)
     return vector_list, label
+
+
+def fetch_pms_attribute(summary, attribute):
+    if attribute == 'duration':
+        return summary.match.duration/60.0
+    elif attribute == 'K-D+.5*A':
+        return summary.kills - summary.deaths + summary.assists * .5
+    elif attribute == 'player':
+        return summary.player.persona_name
+    elif attribute == 'is_win':
+        return 'Won' if summary.is_win else 'Lost'
+    elif attribute == 'game_mode':
+        return summary.match.game_mode.description
+    elif attribute == 'skill':
+        return summary.match.skill
+    elif attribute == 'hero_name':
+        return safen(summary.hero.name)
+    elif attribute == 'first_blood_time':
+        return summary.match.first_blood_time/60.0
+    elif attribute == 'match_id':
+        return summary.match.steam_id
+    elif attribute == 'which_side':
+        return summary.which_side()
+    elif attribute == 'gold_total':
+        return summary.gold_per_min*summary.match.duration/60
+    elif attribute == 'xp_total':
+        return summary.xp_per_min*summary.match.duration/60
+    else:
+        return getattr(summary, attribute)
 
 
 def fetch_single_attribute(summary, attribute, compressor='sum'):

@@ -161,11 +161,12 @@
       </tbody>
     </table>
   </div>
-  {% if kdc_basename %}
-    <img src="{{ MEDIA_URL }}{{ kdc_basename }}">
+  <div id='charts'></div>
+  {% if kill_dmg_json %}
+    <span id='kill_dmg'></span>
   {% endif %}
-  {% if xg_basename %}
-    <img src="{{ MEDIA_URL }}{{ xg_basename }}">
+  {% if xp_gold_json %}
+    <span id='xp_gold'></span>
   {% endif %}
 {% endblock content %}
 
@@ -188,4 +189,22 @@
     });
   });
 </script>
+<script type="text/javascript">
+    {% if kill_dmg_json %}
+      var kill_raw_data;
+      d3.json('{{MEDIA_URL}}{{kill_dmg_json}}', function(source){
+        raw_data=source
+        window.d3ening.plot(source,'#kill_dmg')
+      })
+    {% endif %}
+      {% if xp_gold_json %}
+      var xp_raw_data;
+      d3.json('{{MEDIA_URL}}{{xp_gold_json}}', function(source){
+        xp_raw_data=source
+        window.d3ening.plot(source,'#xp_gold')
+      })
+    {% endif %}
+
+</script>
+
 {% endblock extra_js %}

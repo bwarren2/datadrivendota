@@ -14,7 +14,8 @@ from .models import Match, PlayerMatchSummary, PickBan
 from .json_data import (
     player_endgame_json,
     team_endgame_json,
-    match_ability_json
+    match_ability_json,
+    match_parameter_json
 )
 from players.models import request_to_player
 from utils.exceptions import NoDataFound
@@ -80,18 +81,16 @@ def match(request, match_id):
     match.hms_start_time = datetime.datetime.fromtimestamp(
         match.start_time
     ).strftime('%H:%M:%S %Y-%m-%d')
-    kill_dmg_chart = MatchParameterScatterplot(
+    kill_dmg_json = match_parameter_json(
         match_id,
         'kills',
         'hero_damage'
     )
-    kdc_basename = basename(kill_dmg_chart.name)
-    xp_gold_chart = MatchParameterScatterplot(
+    xp_gold_json = match_parameter_json(
         match_id,
         'gold_per_min',
         'xp_per_min'
     )
-    xg_basename = basename(xp_gold_chart.name)
 
     #Identify any pickbans for templating.
     dire_hero_ids = [
@@ -131,10 +130,8 @@ def match(request, match_id):
             {
                 'match': match,
                 'summaries': summaries,
-                'kill_dmg_chart': kill_dmg_chart,
-                'kdc_basename': kdc_basename,
-                'xp_gold_chart': xp_gold_chart,
-                'xg_basename': xg_basename,
+                'kill_dmg_json': basename(kill_dmg_json.name),
+                'xp_gold_json': basename(xp_gold_json.name),
                 'dire_picks': dire_picks,
                 'radiant_picks': radiant_picks,
                 'dire_bans': dire_bans,
@@ -148,10 +145,8 @@ def match(request, match_id):
             {
                 'match': match,
                 'summaries': summaries,
-                'kill_dmg_chart': kill_dmg_chart,
-                'kdc_basename': kdc_basename,
-                'xp_gold_chart': xp_gold_chart,
-                'xg_basename': xg_basename,
+                'kill_dmg_json': basename(kill_dmg_json.name),
+                'xp_gold_json': basename(xp_gold_json.name),
             }
         )
 

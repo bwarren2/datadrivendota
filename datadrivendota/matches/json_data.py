@@ -6,6 +6,7 @@ from matches.models import (
     fetch_match_attributes,
     fetch_single_attribute,
     fetch_attribute_label,
+    fetch_pms_attribute,
     SkillBuild
 )
 from utils.exceptions import NoDataFound
@@ -207,6 +208,7 @@ def match_ability_json(match_id, split_var='No Split'):
         datalist.append(datadict)
     xs = [build.time/60 for build in skill_builds]
     ys = [build.level for build in skill_builds]
+    
     params = params_dict()
     params['x_min'] = min(xs)
     params['x_max'] = max(xs)
@@ -218,3 +220,35 @@ def match_ability_json(match_id, split_var='No Split'):
     params['chart'] = 'xyplot'
 
     return outsourceJson(datalist, params)
+
+
+def match_parameter_json(match_id, x_var, y_var):
+    pmses = PlayerMatchSummary.objects.filter(match__steam_id=match_id)
+    data_list = []
+    for pms in pmses:
+        datadict = datapoint_dict()
+
+        datadict.update({
+            'x_var': fetch_pms_attribute(pms, x_var),
+            'y_var': fetch_pms_attribute(pms, y_var),
+            'group_var': fetch_pms_attribute(pms, 'which_side'),
+            'split_var': '',
+            'label': fetch_pms_attribute(pms, 'hero_name'),
+            'tooltip': fetch_pms_attribute(pms, 'hero_name'),
+        })
+        data_list.append(datadict)
+
+    params = params_dict()
+    params['x_min'] = min([d['x_var'] for d in data_list])
+    params['x_max'] = max([d['x_var'] for d in data_list])
+    params['y_min'] = min([d['y_var'] for d in data_list])
+    params['y_max'] = max([d['y_var'] for d in data_list])
+    params['x_label'] = fetch_attribute_label(x_var)
+    params['y_label'] = fetch_attribute_label(y_var)
+    params['draw_path'] = False
+    params['chart'] = 'xyplot'
+    params['margin']['left'] = 60
+    params['outerWidth'] = 250
+    params['outerHeight'] = 250
+
+    return outsourceJson(data_list, params)

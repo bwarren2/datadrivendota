@@ -18,7 +18,7 @@
   var data;
   d3.json('{{MEDIA_URL}}{{json_data}}', function(source){
     data = source;
-    window.d3ening.plot(source)
+    window.d3ening.plot(source, '#chart')
   });
 </script>
 {% endblock extra_js %}
