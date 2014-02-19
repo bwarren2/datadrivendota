@@ -13,9 +13,12 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-  var chartdata = polyjs.data({{ json_data|safe }});
-  var chart = polyjs.chart({{ chart_spec|safe }});
-  {{ extra_chart_js|safe }}
+  var input_data;
+  d3.json('{{MEDIA_URL}}{{json_data}}',function(source){
+    var x;
+    input_data = source;
+    window.d3ening.plot(source, '#chart')
+  });
 </script>
 {% endblock extra_js %}
 

@@ -232,7 +232,7 @@ def match_parameter_json(match_id, x_var, y_var):
             'x_var': fetch_pms_attribute(pms, x_var),
             'y_var': fetch_pms_attribute(pms, y_var),
             'group_var': fetch_pms_attribute(pms, 'which_side'),
-            'split_var': '',
+            'split_var': '{x} vs {y}'.format(x=x_var, y=y_var),
             'label': fetch_pms_attribute(pms, 'hero_name'),
             'tooltip': fetch_pms_attribute(pms, 'hero_name'),
         })
@@ -247,7 +247,7 @@ def match_parameter_json(match_id, x_var, y_var):
     params['y_label'] = fetch_attribute_label(y_var)
     params['draw_path'] = False
     params['chart'] = 'xyplot'
-    params['margin']['left'] = 60
+    params['margin']['left'] = 12*len(str(params['y_max']))
     params['outerWidth'] = 250
     params['outerHeight'] = 250
 

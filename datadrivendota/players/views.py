@@ -20,6 +20,7 @@ from matches.management.tasks.valve_api_calls import (
 )
 from .models import request_to_player
 from utils.exceptions import NoDataFound
+from .json_data import player_winrate_json
 import datetime
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -98,39 +99,24 @@ def detail(request, player_id=None):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[CountWinrate])
 def winrate(request):
-    chart_spec = """
-        {title: "",
-    dom: "chart",
-    width: 800,
-    height: 600,
-    layers: [{
-            data: chartdata,
-            type: "point",
-            x: "x_var",
-            y: "y_var",
-            size:{const:4},
-        }],
-
-    }
-    """
 
     if request.method == 'POST':
         winrate_form = PlayerWinrateLevers(request.POST)
         if winrate_form.is_valid():
             try:
-                image = CountWinrate(
+                json_data = player_winrate_json(
                     player_id=winrate_form.cleaned_data['player'],
                     game_mode_list=winrate_form.cleaned_data['game_modes'],
                     min_date=winrate_form.cleaned_data['min_date'],
                     max_date=winrate_form.cleaned_data['max_date'],
                 )
-                imagebase = basename(image.name)
+
                 return render(
                     request,
                     'players/form.html',
                     {
                         'form': winrate_form,
-                        'image_name': imagebase,
+                        'json_data': basename(json_data.name),
                         'title': 'Hero Winrate',
                     }
                 )

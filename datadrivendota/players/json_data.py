@@ -1,15 +1,14 @@
 import datetime
 from time import mktime
 from django.db.models import Count
-import json
 from matches.models import PlayerMatchSummary, GameMode, Match
 from .models import Player
-from heroes.models import safen
-from django.conf import settings
 from utils.exceptions import NoDataFound
+from utils.file_management import outsourceJson
+from utils.charts import params_dict, datapoint_dict
 
 
-def player_winrate_breakout(
+def player_winrate_json(
         player_id,
         game_mode_list=None,
         min_date=datetime.date(2009, 1, 1),
@@ -38,10 +37,7 @@ def player_winrate_breakout(
     annotations = PlayerMatchSummary.objects.filter(
         player=player,
         match__validity=Match.LEGIT
-    ).values('hero__machine_name', 'is_win').annotate(Count('is_win'))
-    annotations = annotations.filter(
-        match__duration__gte=settings.MIN_MATCH_LENGTH
-    )
+    ).values('hero__name', 'is_win').annotate(Count('is_win'))
     annotations = annotations.filter(match__start_time__gte=min_dt_utc)
     annotations = annotations.filter(match__start_time__lte=max_date_utc)
     annotations = annotations.filter(
@@ -51,27 +47,49 @@ def player_winrate_breakout(
     if len(annotations) == 0:
         raise NoDataFound
 
-    heroes = list(set([row['hero__machine_name'] for row in annotations]))
+    heroes = list(set([row['hero__name'] for row in annotations]))
     wins = {
-        row['hero__machine_name']: row['is_win__count']
+        row['hero__name']: row['is_win__count']
         for row in annotations if row['is_win']
     }
     losses = {
-        row['hero__machine_name']: row['is_win__count']
+        row['hero__name']: row['is_win__count']
         for row in annotations if not row['is_win']
     }
 
-    win_rates = [
+    win_rates = {hero:
         float(wins.get(hero, 0))
         / (wins.get(hero, 0) + losses.get(hero, 0)) * 100
         for hero in heroes
-    ]
-    games = [wins.get(hero, 0) + losses.get(hero, 0) for hero in heroes]
-    labels = [safen(hero) for hero in heroes]
+    }
+    games = {hero: wins.get(hero, 0) + losses.get(hero, 0) for hero in heroes}
 
-    return_json = json.dumps({
-        'x_var': games,
-        'y_var': win_rates,
-        'labels': labels,
+    data_list = []
+    for hero in heroes:
+        datadict = datapoint_dict()
+
+        datadict.update({
+            'x_var': games[hero],
+            'y_var': win_rates[hero],
+            'group_var': hero,
+            'split_var': '',
+            'label': hero,
+            'tooltip': hero,
         })
-    return return_json
+        data_list.append(datadict)
+
+    params = params_dict()
+    params['x_min'] = min([d['x_var'] for d in data_list])
+    params['x_max'] = max([d['x_var'] for d in data_list])
+    params['y_min'] = min([d['y_var'] for d in data_list])
+    params['y_max'] = max([d['y_var'] for d in data_list])
+    params['x_label'] = 'Games'
+    params['y_label'] = 'Winrate'
+    params['draw_path'] = False
+    params['draw_legend'] = False
+    params['chart'] = 'xyplot'
+    params['margin']['left'] = 12*len(str(params['y_max']))
+    params['outerWidth'] = 500
+    params['outerHeight'] = 500
+
+    return outsourceJson(data_list, params)
