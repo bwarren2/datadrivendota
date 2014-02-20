@@ -110,11 +110,11 @@ function draw_scatterplot(source, placement_div){
     }
 
     if(params['draw_legend']){
-        var legend = g.append("g")
+        var legend = svg.append("g")
           .attr("class", "legend")
           .attr("height", 100)
           .attr("width", 100)
-          .attr("transform", "translate("+width/10+","+height/10+")");
+          .attr("transform", "translate("+outerWidth/10+","+outerHeight/10+")");
 
         var rows = legend.selectAll('rect')
               .data(function(d){return d.values;})
