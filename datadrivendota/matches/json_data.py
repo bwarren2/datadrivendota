@@ -250,5 +250,6 @@ def match_parameter_json(match_id, x_var, y_var):
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['outerWidth'] = 250
     params['outerHeight'] = 250
-
+    params['margin']['top'] = 20
+    
     return outsourceJson(data_list, params)

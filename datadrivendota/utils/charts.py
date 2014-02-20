@@ -9,7 +9,7 @@ def params_dict():
         'y_label': 'Y Label',
         'draw_path': False,
         'draw_legend': True,
-        'margin': {'top': 10, 'right': 20, 'bottom': 20, 'left': 30},
+        'margin': {'top': 25, 'right': 20, 'bottom': 20, 'left': 30},
         'padding': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
         'outerWidth': 400,
         'outerHeight': 400,

@@ -66,13 +66,13 @@ function draw_scatterplot(source, placement_div){
           .style("text-anchor", "end")
           .text(params['y_label']);
 
-    g.append("g")
+    svg.append("g")
     .attr('class','title')
     .attr("transform", "translate(0,0)")
     .append("text")
-      .attr("x", width/2*1.2)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
+      .attr("x", outerWidth/2)
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
       .text(function(d){return d.key;});
 
     var series = g.selectAll('.series').data(function(d){
@@ -110,11 +110,11 @@ function draw_scatterplot(source, placement_div){
     }
 
     if(params['draw_legend']){
-        var legend = svg.append("g")
+        var legend = g.append("g")
           .attr("class", "legend")
           .attr("height", 100)
           .attr("width", 100)
-        .attr("transform", "translate("+width/5+","+height/10+")");
+          .attr("transform", "translate("+width/10+","+height/10+")");
 
         var rows = legend.selectAll('rect')
               .data(function(d){return d.values;})

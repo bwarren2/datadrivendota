@@ -12,7 +12,9 @@ def player_winrate_json(
         player_id,
         game_mode_list=None,
         min_date=datetime.date(2009, 1, 1),
-        max_date=None
+        max_date=None,
+        width=500,
+        height=500
         ):
     # @todo: This had been "== None". Should always be "is None"
     # --kit 2014-02-16
@@ -89,7 +91,7 @@ def player_winrate_json(
     params['draw_legend'] = False
     params['chart'] = 'xyplot'
     params['margin']['left'] = 12*len(str(params['y_max']))
-    params['outerWidth'] = 500
-    params['outerHeight'] = 500
+    params['outerWidth'] = width
+    params['outerHeight'] = height
 
     return outsourceJson(data_list, params)

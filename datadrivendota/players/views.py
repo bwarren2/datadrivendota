@@ -77,16 +77,15 @@ def detail(request, player_id=None):
         2
     )
     pms_list = get_playermatchsummaries_for_player(player, 10)
-    kda = KDADensity(player.steam_id)
-    kdabase = basename(kda.name)
-    winrate_json = player_winrate_json(player.steam_id)
+    winrate_json = player_winrate_json(player.steam_id,
+        width=400,
+        height=400
+    )
     return render(
         request,
         'players/detail.html',
         {
             'player': player,
-            'kdabase': kdabase,
-            'kda': kda,
             'winrate_json': basename(winrate_json.name),
             'stats': stats,
             'pms_list': pms_list
