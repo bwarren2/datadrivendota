@@ -15,8 +15,8 @@
     <h6>Winrate: {{stats.winrate}}%</h6>
   </div>
   <div class="player-charts">
-    {% if winratebase %}
-      <img src="{{ MEDIA_URL }}{{ winratebase }}">
+    {% if winrate_json %}
+      <span id='winrate_chart'></span>
     {% endif %}
     {% if kdabase %}
       <img src="{{ MEDIA_URL }}{{ kdabase }}">
@@ -64,7 +64,14 @@
 {% endblock content %}
 
 {% block extra_js %}
+<script type="text/javascript">
+  var input_data;
+  d3.json('{{MEDIA_URL}}{{winrate_json}}',function(source){
+    var x;
+    input_data = source;
+    window.d3ening.plot(source, '#winrate_chart')
+  });
+</script>
 
 {% endblock extra_js %}
-
 
