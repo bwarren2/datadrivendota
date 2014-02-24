@@ -70,8 +70,8 @@ def detail(request, hero_name):
 @permission_required('players.can_look')
 # @devserver_profile(follow=[generateChart])
 def vitals(request):
-    if request.method == 'POST':
-        hero_form = HeroVitalsMultiSelect(request.POST)
+    if request.GET:
+        hero_form = HeroVitalsMultiSelect(request.GET)
         if hero_form.is_valid():
             try:
                 json_data = hero_vitals_json(
@@ -113,8 +113,8 @@ def vitals(request):
 @permission_required('players.can_look')
 # @devserver_profile(follow=[lineupChart])
 def lineup(request):
-    if request.method == 'POST':
-        hero_form = HeroLineupMultiSelect(request.POST)
+    if request.GET:
+        hero_form = HeroLineupMultiSelect(request.GET)
         if hero_form.is_valid():
             try:
                 json_data = hero_lineup_json(
@@ -159,8 +159,8 @@ def lineup(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[hero_performance_json])
 def hero_performance(request):
-    if request.method == 'POST':
-        hero_form = HeroPlayerPerformance(request.POST)
+    if request.GET:
+        hero_form = HeroPlayerPerformance(request.GET)
         if hero_form.is_valid():
             image = HeroPerformanceChart(
                 hero=hero_form.cleaned_data['hero'],
@@ -196,8 +196,8 @@ def hero_performance(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[HeroSkillLevelBwChart])
 def hero_skill_bars(request):
-    if request.method == 'POST':
-        hero_form = HeroPlayerSkillBarsForm(request.POST)
+    if request.GET:
+        hero_form = HeroPlayerSkillBarsForm(request.GET)
         if hero_form.is_valid():
             image = HeroSkillLevelBwChart(
                 hero=hero_form.cleaned_data['hero'],

@@ -242,9 +242,8 @@ def follow_match_feed(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[EndgameChart])
 def endgame(request):
-
-    if request.method == 'POST':
-        select_form = EndgameSelect(request.POST)
+    if request.GET:
+        select_form = EndgameSelect(request.GET)
         if select_form.is_valid():
             try:
                 json_data = player_endgame_json(
@@ -291,9 +290,8 @@ def endgame(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[team_endgame_json])
 def team_endgame(request):
-
-    if request.method == 'POST':
-        select_form = TeamEndgameSelect(request.POST)
+    if request.GET:
+        select_form = TeamEndgameSelect(request.GET)
         if select_form.is_valid():
             try:
                 json_data = team_endgame_json(
@@ -341,8 +339,8 @@ def team_endgame(request):
 @devserver_profile(follow=[match_ability_json])
 def ability_build(request):
     title = 'Match Ability Breakdown'
-    if request.method == 'POST':
-        select_form = MatchAbilitySelect(request.POST)
+    if request.GET:
+        select_form = MatchAbilitySelect(request.GET)
         if select_form.is_valid():
             try:
                 json_data = match_ability_json(

@@ -96,9 +96,8 @@ def detail(request, player_id=None):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[CountWinrate])
 def winrate(request):
-
-    if request.method == 'POST':
-        winrate_form = PlayerWinrateLevers(request.POST)
+    if request.GET:
+        winrate_form = PlayerWinrateLevers(request.GET)
         if winrate_form.is_valid():
             try:
                 json_data = player_winrate_json(
@@ -143,8 +142,8 @@ def winrate(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[PlayerTimeline])
 def timeline(request):
-    if request.method == 'POST':
-        timeline_form = PlayerTimelineForm(request.POST)
+    if request.GET:
+        timeline_form = PlayerTimelineForm(request.GET)
         if timeline_form.is_valid():
             image = PlayerTimeline(
                 player_id=timeline_form.cleaned_data['player'],

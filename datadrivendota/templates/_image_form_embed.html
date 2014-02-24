@@ -1,8 +1,7 @@
 {% load staticfiles %}
 <div>
   <div class='form-container'>
-    <form class='chart-form' action="" method='POST'>
-      {% csrf_token %}
+    <form class='chart-form' action="" method='GET'>
       {% include "_form.html" %}
       <div class="control-group">
         <div class="controls pull-right">
