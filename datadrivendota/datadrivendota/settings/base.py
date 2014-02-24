@@ -503,7 +503,7 @@ PIPELINE_JS = {
             'js/bootstrap-tour.js',
             'select2-3.4.5/select2.js',
             'js/d3/d3.min.js',
-            'js/eldarion-ajax.full.js'
+            'js/eldarion-ajax.full.js',
             'js/charting.js',
             'js/project.js',
         ),
