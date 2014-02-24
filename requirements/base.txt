@@ -48,3 +48,5 @@ sqlparse==0.1.9
 django-stripe-payments==2.0b34
 stripe==1.12.0
 django-jsonfield==0.9.12
+django-bootstrap-form==3.0
+django-forms-bootstrap==3.0.0
