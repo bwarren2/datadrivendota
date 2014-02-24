@@ -111,6 +111,8 @@ def team_endgame_json(
     ).select_related()
 
     pmses = list(chain(radiant, dire))
+    if len(pmses) == 0:
+        raise NoDataFound
     x_data = dict([(p.match.steam_id, 0) for p in pmses])
     y_data = dict([(p.match.steam_id, 0) for p in pmses])
     group_data = dict([(p.match.steam_id, False) for p in pmses])
@@ -182,6 +184,8 @@ def match_ability_json(match_id, split_var='No Split'):
     skill_builds = SkillBuild.objects.filter(
         player_match_summary__match__steam_id=match_id
     ).select_related().order_by('player_match_summary', 'level')
+    if len(skill_builds) == 0:
+        raise NoDataFound
     datalist = []
     for build in skill_builds:
 
@@ -224,6 +228,10 @@ def match_ability_json(match_id, split_var='No Split'):
 
 def match_parameter_json(match_id, x_var, y_var):
     pmses = PlayerMatchSummary.objects.filter(match__steam_id=match_id)
+    if len(pmses) == 0:
+        raise NoDataFound
+
+
     data_list = []
     for pms in pmses:
         datadict = datapoint_dict()
@@ -250,6 +258,5 @@ def match_parameter_json(match_id, x_var, y_var):
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['outerWidth'] = 250
     params['outerHeight'] = 250
-    params['margin']['top'] = 20
     
     return outsourceJson(data_list, params)

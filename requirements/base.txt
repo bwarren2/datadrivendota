@@ -45,3 +45,6 @@ South==0.7.6
 wsgiref==0.1.2
 ecdsa==0.10
 sqlparse==0.1.9
+django-stripe-payments==2.0b34
+stripe==1.12.0
+django-jsonfield==0.9.12

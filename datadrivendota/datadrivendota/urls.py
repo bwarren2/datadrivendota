@@ -30,4 +30,5 @@ urlpatterns = patterns(
         name='logout'
     ),
     url(r'^upgrade/$', views.upgrade, name='upgrade'),
+    url(r'^payments/', include("payments.urls", namespace='payments')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

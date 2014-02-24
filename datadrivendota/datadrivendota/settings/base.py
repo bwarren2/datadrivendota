@@ -309,6 +309,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'pipeline.middleware.MinifyHTMLMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'payments.middleware.ActiveSubscriptionMiddleware',
 )
 ########## END MIDDLEWARE CONFIGURATION
 
@@ -355,6 +356,8 @@ THIRD_PARTY_APPS = (
     'pipeline',
     'bootstrapform',
     'corsheaders',
+    'payments',
+    'django_forms_bootstrap',
 )
 
 # Apps specific for this project go here.
@@ -500,6 +503,7 @@ PIPELINE_JS = {
             'js/bootstrap-tour.js',
             'select2-3.4.5/select2.js',
             'js/d3/d3.min.js',
+            'js/eldarion-ajax.min.js'
             'js/charting.js',
             'js/project.js',
         ),
@@ -519,3 +523,30 @@ NOSE_ARGS = ['--with-yanc', '--stop']
 
 DIRE_RED = '#804839'
 RADIANT_GREEN = '#7FEB1B'
+
+
+#Stripe
+STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
+STRIPE_PUBLIC_KEY = getenv('STRIPE_PUBLIC_KEY')
+
+PAYMENTS_PLANS = {
+    "monthly": {
+        "stripe_plan_id": "pro-monthly",
+        "name": "DDD Pro ($3/month)",
+        "description": "The monthly subscription plan to DataDrivenDota",
+        "price": 3,
+        "interval": "month",
+        "currency": "usd"
+    },
+    "annually": {
+        "stripe_plan_id": "pro-yearly",
+        "name": "Web App Pro ($30/year)",
+        "description": "The annual subscription plan to DataDrivenDota",
+        "price": 30,
+        "interval": "year",
+        "currency": "usd"
+    }
+}
+
+SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = ['heroes:index', 'payments:payments_subscribe']
+SUBSCRIPTION_REQUIRED_REDIRECT = 'payments:payments_subscribe'
