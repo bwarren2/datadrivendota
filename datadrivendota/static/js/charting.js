@@ -1,3 +1,21 @@
+function convertToSlug(Text)
+{
+    return Text
+        .toLowerCase()
+        .replace(/ /g,'-')
+        .replace(/[^\w-]+/g,'')
+        ;
+}
+
+var getVals = function(obj){
+   var vals = [];
+   for(var key in obj){
+      vals.push(obj[key]);
+   }
+   return vals;
+}
+
+
 function draw_scatterplot(source, placement_div){
     var raw_data = source['data'];
     var params = source['parameters'];

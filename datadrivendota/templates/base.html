@@ -118,9 +118,11 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-
-    {% compressed_js 'all' %}
+    {% comment %}
+      
    <script type="text/javascript" src='/assets/js/eldarion-ajax.min.js'></script>
+    {% endcomment %}
+    {% compressed_js 'all' %}
     {% block extra_js %}
 
     {% endblock extra_js %}

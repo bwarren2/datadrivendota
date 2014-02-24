@@ -91,6 +91,12 @@ def match(request, match_id):
         'gold_per_min',
         'xp_per_min'
     )
+    abilities = match_ability_json(
+        match_id=match_id,
+        width=250,
+        height=250,
+        split_var='side'
+        )
 
     #Identify any pickbans for templating.
     dire_hero_ids = [
@@ -132,6 +138,7 @@ def match(request, match_id):
                 'summaries': summaries,
                 'kill_dmg_json': basename(kill_dmg_json.name),
                 'xp_gold_json': basename(xp_gold_json.name),
+                'abilities_json': basename(abilities.name),
                 'dire_picks': dire_picks,
                 'radiant_picks': radiant_picks,
                 'dire_bans': dire_bans,
@@ -147,6 +154,7 @@ def match(request, match_id):
                 'summaries': summaries,
                 'kill_dmg_json': basename(kill_dmg_json.name),
                 'xp_gold_json': basename(xp_gold_json.name),
+                'abilities_json': basename(abilities.name),
             }
         )
 

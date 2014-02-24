@@ -179,7 +179,7 @@ def team_endgame_json(
     return outsourceJson(datalist, params)
 
 
-def match_ability_json(match_id, split_var='No Split'):
+def match_ability_json(match_id, width=400, height=400, split_var='No Split'):
 
     skill_builds = SkillBuild.objects.filter(
         player_match_summary__match__steam_id=match_id
@@ -208,11 +208,10 @@ def match_ability_json(match_id, split_var='No Split'):
             'group_var': hero,
         }
         datadict.update(minidict)
-        print minidict, datadict
         datalist.append(datadict)
     xs = [build.time/60 for build in skill_builds]
     ys = [build.level for build in skill_builds]
-    
+
     params = params_dict()
     params['x_min'] = min(xs)
     params['x_max'] = max(xs)
@@ -222,6 +221,8 @@ def match_ability_json(match_id, split_var='No Split'):
     params['y_label'] = 'Level'
     params['draw_path'] = True
     params['chart'] = 'xyplot'
+    params['outerWidth'] = width
+    params['outerHeight'] = height
 
     return outsourceJson(datalist, params)
 
@@ -230,7 +231,6 @@ def match_parameter_json(match_id, x_var, y_var):
     pmses = PlayerMatchSummary.objects.filter(match__steam_id=match_id)
     if len(pmses) == 0:
         raise NoDataFound
-
 
     data_list = []
     for pms in pmses:
@@ -258,5 +258,5 @@ def match_parameter_json(match_id, x_var, y_var):
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['outerWidth'] = 250
     params['outerHeight'] = 250
-    
+
     return outsourceJson(data_list, params)

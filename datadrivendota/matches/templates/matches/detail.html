@@ -168,6 +168,9 @@
   {% if xp_gold_json %}
     <span id='xp_gold'></span>
   {% endif %}
+  {% if abilities_json %}
+    <span id='abilities'></span>
+  {% endif %}
 {% endblock content %}
 
 {% block extra_js %}
@@ -197,14 +200,20 @@
         window.d3ening.plot(source,'#kill_dmg')
       })
     {% endif %}
-      {% if xp_gold_json %}
+    {% if xp_gold_json %}
       var xp_raw_data;
       d3.json('{{MEDIA_URL}}{{xp_gold_json}}', function(source){
         xp_raw_data=source
         window.d3ening.plot(source,'#xp_gold')
       })
     {% endif %}
-
+    {% if abilities_json %}
+      var xp_raw_data;
+      d3.json('{{MEDIA_URL}}{{abilities_json}}', function(source){
+        xp_raw_data=source
+        window.d3ening.plot(source,'#abilities')
+      })
+    {% endif %}
 </script>
 
 {% endblock extra_js %}

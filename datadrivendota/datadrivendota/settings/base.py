@@ -309,7 +309,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'pipeline.middleware.MinifyHTMLMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'payments.middleware.ActiveSubscriptionMiddleware',
+    #'payments.middleware.ActiveSubscriptionMiddleware',
 )
 ########## END MIDDLEWARE CONFIGURATION
 
@@ -503,7 +503,7 @@ PIPELINE_JS = {
             'js/bootstrap-tour.js',
             'select2-3.4.5/select2.js',
             'js/d3/d3.min.js',
-            'js/eldarion-ajax.min.js'
+            'js/eldarion-ajax.full.js'
             'js/charting.js',
             'js/project.js',
         ),
@@ -548,5 +548,9 @@ PAYMENTS_PLANS = {
     }
 }
 
-SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = ['heroes:index', 'payments:payments_subscribe']
+SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = [
+    'heroes:index',
+    'payments:payments_subscribe',
+    ]
+
 SUBSCRIPTION_REQUIRED_REDIRECT = 'payments:payments_subscribe'
