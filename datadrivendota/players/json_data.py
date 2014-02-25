@@ -5,7 +5,7 @@ from matches.models import PlayerMatchSummary, GameMode, Match
 from .models import Player
 from utils.exceptions import NoDataFound
 from utils.file_management import outsourceJson
-
+from itertools import chain
 from utils.charts import params_dict, datapoint_dict
 from heroes.models import Hero
 from players.models import Player
@@ -103,24 +103,33 @@ def player_winrate_json(
 
 def player_hero_abilities_json(player_1, hero_1, player_2, hero_2, game_modes):
 
-    meg = Player.objects.get(steam_id=103611462)
-    mig = Player.objects.get(steam_id=85045426)
-    me = Player.objects.get(steam_id=66289584)
-    aa = Hero.objects.get(name='Ancient Apparition')
-    pudge = Hero.objects.get(name='Pudge')
+    p1 = Player.objects.get(steam_id=player_1)
+    p2 = Player.objects.get(steam_id=player_2)
+    h1 = Hero.objects.get(steam_id=hero_1)
+    h2 = Hero.objects.get(steam_id=hero_2)
 
-    sbs = SkillBuild.objects.filter(player_match_summary__hero=pudge,
-    player_match_summary__player__in=[mig,me],
+    sb1 = SkillBuild.objects.filter(
+        player_match_summary__hero=h1,
+        player_match_summary__player=p1,
     ).select_related().order_by('player_match_summary', 'level')
+    sb2 = SkillBuild.objects.filter(
+        player_match_summary__hero=h2,
+        player_match_summary__player=p2,
+    ).select_related().order_by('player_match_summary', 'level')
+    sbs = chain(sb1, sb2)
 
     datalist = []
+    xs = []
+    ys = []
     for build in sbs:
-        if build.level==1:
+        if build.level == 1:
             subtractor = build.time/60.0
         print build.level, build.time/60.0, subtractor
         datapoint = datapoint_dict()
         datapoint['x_var'] = round(build.time/60.0-subtractor, 3)
+        xs.append(round(build.time/60.0-subtractor, 3))
         datapoint['y_var'] = build.level
+        ys.append(build.level)
         datapoint['group_var'] = build.player_match_summary.player.persona_name
         datapoint['series_var'] = build.player_match_summary.match.steam_id
         datapoint['label'] = build.player_match_summary.player.persona_name
@@ -129,8 +138,8 @@ def player_hero_abilities_json(player_1, hero_1, player_2, hero_2, game_modes):
     params = params_dict()
     params['chart'] = 'scatterseries'
     params['x_min'] = 0
-    params['x_max'] = max([round(sb.time/60.0, 3) for sb in sbs])
-    params['y_min'] = min([sb.level for sb in sbs])
-    params['y_max'] = max([sb.level for sb in sbs])
-    foo = outsourceJson(datalist,params)
+    params['x_max'] = max(xs)
+    params['y_min'] = min(ys)
+    params['y_max'] = max(ys)
+    foo = outsourceJson(datalist, params)
     return foo
