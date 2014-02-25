@@ -10,7 +10,12 @@ from django.db.models import Count
 from os.path import basename
 from .models import Player, UserProfile
 from .r import KDADensity, CountWinrate, PlayerTimeline
-from .forms import PlayerWinrateLevers, PlayerTimelineForm, PlayerAddFollowForm
+from .forms import (
+    PlayerWinrateLevers,
+    PlayerTimelineForm,
+    PlayerAddFollowForm,
+    HeroAbilitiesForm,
+)
 from matches.models import PlayerMatchSummary, Match
 from matches.management.tasks.valve_api_calls import (
     ApiContext,
@@ -20,7 +25,7 @@ from matches.management.tasks.valve_api_calls import (
 )
 from .models import request_to_player
 from utils.exceptions import NoDataFound
-from .json_data import player_winrate_json
+from .json_data import player_winrate_json, player_hero_abilities_json
 import datetime
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -171,6 +176,41 @@ def timeline(request):
         {
             'form': timeline_form,
             'title': 'Player Timeline'
+        }
+    )
+
+
+@permission_required('players.can_touch')
+@devserver_profile(follow=[player_hero_abilities_json])
+def hero_abilities(request):
+    if request.GET:
+        form = HeroAbilitiesForm(request.GET)
+        if form.is_valid():
+            json_data = player_hero_abilities_json(
+                player_1=form.cleaned_data['player_1'],
+                hero_1=form.cleaned_data['hero_1'],
+                player_2=form.cleaned_data['player_2'],
+                hero_2=form.cleaned_data['hero_2'],
+                game_modes=form.cleaned_data['game_modes'],
+            )
+            return render(
+                request,
+                'players/form.html',
+                {
+                    'form': form,
+                    'json_data': basename(json_data.name),
+                    'title': 'Hero Skilling Comparison',
+                }
+            )
+    else:
+        form = HeroAbilitiesForm()
+
+    return render(
+        request,
+        'players/form.html',
+        {
+            'form': form,
+            'title': 'Hero Skilling Comparison'
         }
     )
 

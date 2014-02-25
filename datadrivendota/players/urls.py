@@ -7,6 +7,11 @@ urlpatterns = patterns(
     url(r'^winrate/$', views.winrate, name='player_winrate'),
     url(r'^timeline/$', views.timeline, name='timeline'),
     url(
+        r'^hero_ability_comparison/$',
+        views.hero_abilities,
+        name='hero_abilities'
+    ),
+    url(
         r'^management/$',
         views.player_management,
         name="management"

@@ -200,7 +200,7 @@ def match_ability_json(match_id, width=400, height=400, split_var='No Split'):
 
         datadict = datapoint_dict()
         minidict = {
-            'x_var': build.time / 60,
+            'x_var': round(build.time / 60.0, 3),
             'y_var': build.level,
             'label': hero,
             'tooltip': build.ability.name,

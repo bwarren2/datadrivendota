@@ -2,6 +2,7 @@ from django import forms
 import datetime
 from matches.form_fields import MultiGameModeSelect
 from .form_fields import SinglePlayerField
+from heroes.form_fields import SingleHeroSelect
 
 thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
 
@@ -76,4 +77,27 @@ class PlayerAddFollowForm(forms.Form):
     player = SinglePlayerField(
         required=True,
         help_text='Pick exactly one player.  Use the autocomplete.'
+    )
+
+
+class HeroAbilitiesForm(forms.Form):
+    player_1 = SinglePlayerField(
+        required=True,
+        help_text='Pick exactly one player.  Use the autocomplete.'
+    )
+    hero_1 = SingleHeroSelect(
+        required=True,
+        help_text='Pick exactly one hero.  Use the autocomplete.'
+    )
+    player_2 = SinglePlayerField(
+        required=False,
+        help_text='Pick up to one player.  Use the autocomplete.'
+    )
+    hero_2 = SingleHeroSelect(
+        required=False,
+        help_text='Pick up to one hero.  Use the autocomplete.'
+    )
+    game_modes = MultiGameModeSelect(
+        required=True,
+        help_text='Which modes would you like to include?'
     )

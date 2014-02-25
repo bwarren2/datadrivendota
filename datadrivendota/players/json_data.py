@@ -5,7 +5,11 @@ from matches.models import PlayerMatchSummary, GameMode, Match
 from .models import Player
 from utils.exceptions import NoDataFound
 from utils.file_management import outsourceJson
+
 from utils.charts import params_dict, datapoint_dict
+from heroes.models import Hero
+from players.models import Player
+from matches.models import SkillBuild
 
 
 def player_winrate_json(
@@ -95,3 +99,38 @@ def player_winrate_json(
     params['outerHeight'] = height
 
     return outsourceJson(data_list, params)
+
+
+def player_hero_abilities_json(player_1, hero_1, player_2, hero_2, game_modes):
+
+    meg = Player.objects.get(steam_id=103611462)
+    mig = Player.objects.get(steam_id=85045426)
+    me = Player.objects.get(steam_id=66289584)
+    aa = Hero.objects.get(name='Ancient Apparition')
+    pudge = Hero.objects.get(name='Pudge')
+
+    sbs = SkillBuild.objects.filter(player_match_summary__hero=pudge,
+    player_match_summary__player__in=[mig,me],
+    ).select_related().order_by('player_match_summary', 'level')
+
+    datalist = []
+    for build in sbs:
+        if build.level==1:
+            subtractor = build.time/60.0
+        print build.level, build.time/60.0, subtractor
+        datapoint = datapoint_dict()
+        datapoint['x_var'] = round(build.time/60.0-subtractor, 3)
+        datapoint['y_var'] = build.level
+        datapoint['group_var'] = build.player_match_summary.player.persona_name
+        datapoint['series_var'] = build.player_match_summary.match.steam_id
+        datapoint['label'] = build.player_match_summary.player.persona_name
+        datalist.append(datapoint)
+
+    params = params_dict()
+    params['chart'] = 'scatterseries'
+    params['x_min'] = 0
+    params['x_max'] = max([round(sb.time/60.0, 3) for sb in sbs])
+    params['y_min'] = min([sb.level for sb in sbs])
+    params['y_max'] = max([sb.level for sb in sbs])
+    foo = outsourceJson(datalist,params)
+    return foo
