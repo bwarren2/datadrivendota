@@ -158,7 +158,7 @@ def timeline(request):
                 'players/form.html',
                 {
                     'form': timeline_form,
-                    'imagebase': imagebase,
+                    'image_name': imagebase,
                     'title': 'Player Timeline',
                 }
             )
