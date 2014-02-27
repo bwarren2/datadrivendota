@@ -530,22 +530,22 @@ STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
 STRIPE_PUBLIC_KEY = getenv('STRIPE_PUBLIC_KEY')
 
 PAYMENTS_PLANS = {
-    # "monthly": {
-    #     "stripe_plan_id": "pro-monthly",
-    #     "name": "DDD Pro ($3/month)",
-    #     "description": "The monthly subscription plan to DataDrivenDota",
-    #     "price": 3,
-    #     "interval": "month",
-    #     "currency": "usd"
-    # },
-    # "annually": {
-    #     "stripe_plan_id": "pro-yearly",
-    #     "name": "Web App Pro ($30/year)",
-    #     "description": "The annual subscription plan to DataDrivenDota",
-    #     "price": 30,
-    #     "interval": "year",
-    #     "currency": "usd"
-    # }
+    "monthly": {
+        "stripe_plan_id": "pro-monthly",
+        "name": "DDD Pro ($3/month)",
+        "description": "The monthly subscription plan to DataDrivenDota",
+        "price": 300,
+        "interval": "month",
+        "currency": "usd"
+    },
+    "annually": {
+        "stripe_plan_id": "pro-yearly",
+        "name": "Web App Pro ($30/year)",
+        "description": "The annual subscription plan to DataDrivenDota",
+        "price": 3000,
+        "interval": "year",
+        "currency": "usd"
+    }
 }
 
 SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = [
