@@ -534,7 +534,7 @@ PAYMENTS_PLANS = {
         "stripe_plan_id": "ddd-monthly",
         "name": "DDD Pro ($3/month)",
         "description": "The monthly subscription plan to DataDrivenDota",
-        "price": 300,
+        "price": 3,
         "interval": "month",
         "currency": "usd"
     },
@@ -542,7 +542,7 @@ PAYMENTS_PLANS = {
         "stripe_plan_id": "ddd-yearly",
         "name": "Web App Pro ($30/year)",
         "description": "The annual subscription plan to DataDrivenDota",
-        "price": 3000,
+        "price": 30,
         "interval": "year",
         "currency": "usd"
     }
