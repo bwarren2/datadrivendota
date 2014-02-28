@@ -531,7 +531,7 @@ STRIPE_PUBLIC_KEY = getenv('STRIPE_PUBLIC_KEY')
 
 PAYMENTS_PLANS = {
     "monthly": {
-        "stripe_plan_id": "ddd-monthly",
+        "stripe_plan_id": "ddd-month",
         "name": "DDD Pro ($3/month)",
         "description": "The monthly subscription plan to DataDrivenDota",
         "price": 3,
@@ -539,8 +539,8 @@ PAYMENTS_PLANS = {
         "currency": "usd"
     },
     "annually": {
-        "stripe_plan_id": "ddd-yearly",
-        "name": "Web App Pro ($30/year)",
+        "stripe_plan_id": "ddd-year",
+        "name": "DDD Pro ($30/year)",
         "description": "The annual subscription plan to DataDrivenDota",
         "price": 30,
         "interval": "year",
