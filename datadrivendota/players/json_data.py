@@ -101,38 +101,61 @@ def player_winrate_json(
     return outsourceJson(data_list, params)
 
 
-def player_hero_abilities_json(player_1, hero_1, player_2, hero_2, game_modes):
+def player_hero_abilities_json(
+        player_1,
+        hero_1,
+        player_2,
+        hero_2,
+        game_modes,
+        division=None
+        ):
 
     p1 = Player.objects.get(steam_id=player_1)
-    p2 = Player.objects.get(steam_id=player_2)
     h1 = Hero.objects.get(steam_id=hero_1)
-    h2 = Hero.objects.get(steam_id=hero_2)
-
     sb1 = SkillBuild.objects.filter(
         player_match_summary__hero=h1,
         player_match_summary__player=p1,
     ).select_related().order_by('player_match_summary', 'level')
-    sb2 = SkillBuild.objects.filter(
-        player_match_summary__hero=h2,
-        player_match_summary__player=p2,
-    ).select_related().order_by('player_match_summary', 'level')
-    sbs = chain(sb1, sb2)
+    if player_2 is not None and hero_2 is not None:
+        p2 = Player.objects.get(steam_id=player_2)
+        h2 = Hero.objects.get(steam_id=hero_2)
 
+        sb2 = SkillBuild.objects.filter(
+            player_match_summary__hero=h2,
+            player_match_summary__player=p2,
+        ).select_related().order_by('player_match_summary', 'level')
+        sbs = chain(sb1, sb2)
+    elif player_2 is None and hero_2 is None:
+        sbs = sb1
+    else:
+        raise NoDataFound
     datalist = []
     xs = []
     ys = []
     for build in sbs:
         if build.level == 1:
             subtractor = build.time/60.0
-        print build.level, build.time/60.0, subtractor
         datapoint = datapoint_dict()
         datapoint['x_var'] = round(build.time/60.0-subtractor, 3)
         xs.append(round(build.time/60.0-subtractor, 3))
         datapoint['y_var'] = build.level
         ys.append(build.level)
-        datapoint['group_var'] = build.player_match_summary.player.persona_name
+        winningness = 'Win' if \
+            build.player_match_summary.is_win \
+            else 'Loss'
+        if division == 'Player win/loss':
+            datapoint['group_var'] = "{p}, ({win})".format(
+                p=build.player_match_summary.player.persona_name,
+                win=winningness)
+        elif division == 'Players':
+            datapoint['group_var'] = "{p}".format(
+                p=build.player_match_summary.player.persona_name)
+        elif division == 'Win/loss':
+            datapoint['group_var'] = "{win}".format(
+                win=winningness)
         datapoint['series_var'] = build.player_match_summary.match.steam_id
         datapoint['label'] = build.player_match_summary.player.persona_name
+        datapoint['split_var'] = 'Skill Progression' 
         datalist.append(datapoint)
 
     params = params_dict()
@@ -141,5 +164,8 @@ def player_hero_abilities_json(player_1, hero_1, player_2, hero_2, game_modes):
     params['x_max'] = max(xs)
     params['y_min'] = min(ys)
     params['y_max'] = max(ys)
+    params['x_label'] = 'Time (m)'
+    params['y_label'] = 'Level'
+
     foo = outsourceJson(datalist, params)
     return foo

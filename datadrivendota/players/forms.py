@@ -101,3 +101,12 @@ class HeroAbilitiesForm(forms.Form):
         required=True,
         help_text='Which modes would you like to include?'
     )
+    division = forms.ChoiceField(
+        choices=[
+            ('Players', 'Players'),
+            ('Win/loss', 'Win/loss'),
+            ('Player win/loss', 'Player win/loss')
+            ],
+        required=True,
+        help_text='What goes on the x axis?'
+    )

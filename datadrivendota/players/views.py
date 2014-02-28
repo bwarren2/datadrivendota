@@ -1,3 +1,4 @@
+import datetime
 import json
 from celery import chain
 from functools import wraps
@@ -26,7 +27,7 @@ from matches.management.tasks.valve_api_calls import (
 from .models import request_to_player
 from utils.exceptions import NoDataFound
 from .json_data import player_winrate_json, player_hero_abilities_json
-import datetime
+
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
         raise ImportError
@@ -192,16 +193,28 @@ def hero_abilities(request):
                 player_2=form.cleaned_data['player_2'],
                 hero_2=form.cleaned_data['hero_2'],
                 game_modes=form.cleaned_data['game_modes'],
+                division=form.cleaned_data['division'],
             )
-            return render(
-                request,
-                'players/form.html',
-                {
-                    'form': form,
-                    'json_data': basename(json_data.name),
-                    'title': 'Hero Skilling Comparison',
-                }
-            )
+            try:
+                return render(
+                    request,
+                    'players/form.html',
+                    {
+                        'form': form,
+                        'json_data': basename(json_data.name),
+                        'title': 'Hero Skilling Comparison',
+                    }
+                )
+            except NoDataFound:
+                return render(
+                    request,
+                    'players/form.html',
+                    {
+                        'form': form,
+                        'error': 'error',
+                        'title': 'Hero Skilling Comparison',
+                    }
+                )
     else:
         form = HeroAbilitiesForm()
 
