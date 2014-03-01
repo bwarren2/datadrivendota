@@ -7,6 +7,7 @@
     <li class="{% active 'players:index' %}"><a href="{% url 'players:index' %}">Index</a></li>
     <li class="{% active 'players:player_winrate' %}"><a href="{% url 'players:player_winrate' %}">Winrate</a></li>
     <li class="{% active 'players:timeline' %}"><a href="{% url 'players:timeline' %}">Timeline</a></li>
+    <li class="{% active 'players:hero_ability_comparison' %}"><a href="{% url 'players:hero_ability_comparison' %}">Hero Skilling Comparison</a></li>
     <li class="{% active 'players:management' %}"><a href="{% url 'players:management' %}">Management</a></li>
     {% if player %}
       <li class="{% active 'players:id_detail' %}"><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{ player.persona_name }}</a></li>
