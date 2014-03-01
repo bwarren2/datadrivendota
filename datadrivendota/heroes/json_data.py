@@ -4,7 +4,12 @@ import operator
 from itertools import chain
 from django.conf import settings
 from heroes.models import HeroDossier, Hero, invalid_option
-from matches.models import PlayerMatchSummary,  Match, fetch_match_attributes
+from matches.models import (
+    PlayerMatchSummary,
+    Match,
+    fetch_match_attributes,
+    SkillBuild
+)
 from utils.exceptions import NoDataFound
 from utils.file_management import outsourceJson
 from utils.charts import datapoint_dict, params_dict
@@ -125,7 +130,6 @@ def hero_performance_json(
         match__game_mode__in=game_mode_list
     )
     # Ignore <10 min games
-    matches = matches.filter(match__duration__gte=settings.MIN_MATCH_LENGTH)
     matches = matches.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
     skill1 = matches.filter(match__skill=1).select_related()[:100]
     skill2 = matches.filter(match__skill=2).select_related()[:100]
@@ -175,3 +179,80 @@ def hero_performance_json(
         'match_id': match_list,
         })
     return return_json, xlab, ylab, grouplab, split_lab
+
+
+def hero_progression_json(hero, player, game_mode_list, division):
+    pmses = PlayerMatchSummary.objects.filter(
+        match__game_mode__in=game_mode_list
+    )
+
+    pmses = pmses.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
+    skill1 = pmses.filter(match__skill=1).select_related()[:100]
+    skill2 = pmses.filter(match__skill=2).select_related()[:100]
+    skill3 = pmses.filter(match__skill=3).select_related()[:100]
+    for game in chain(skill1, skill2, skill3):
+        game.skill_level = game.match.skill
+
+    if player is not None:
+        player_games = pmses.filter(player__steam_id=player).select_related()
+        pmses_pool = list(chain(skill1, skill2, skill3, player_games))
+    else:
+        pmses_pool = list(chain(skill1, skill2, skill3))
+
+    if len(pmses_pool) == 0:
+        raise NoDataFound
+
+    sbs = SkillBuild.objects.filter(
+        player_match_summary__in=pmses_pool,
+        player_match_summary__hero__steam_id=hero
+    ).select_related().order_by('player_match_summary', 'level')
+
+    datalist = []
+    xs = []
+    ys = []
+
+    for build in sbs:
+        if build.level == 1:
+            subtractor = build.time/60.0
+
+        datapoint = datapoint_dict()
+        datapoint['x_var'] = round(build.time/60.0-subtractor, 3)
+        xs.append(round(build.time/60.0-subtractor, 3))
+        datapoint['y_var'] = build.level
+        ys.append(build.level)
+
+        winningness = 'Win' if \
+            build.player_match_summary.is_win \
+            else 'Loss'
+
+        skill_value = build.player_match_summary.match.skill if \
+            build.player_match_summary not in player_games \
+            else 'Player'
+
+        if division == 'Skill win/loss':
+            datapoint['group_var'] = "{s}, ({win})".format(
+                s=skill_value,
+                win=winningness)
+        elif division == 'Skill':
+            datapoint['group_var'] = "{s}".format(
+                s=skill_value)
+        elif division == 'Win/loss':
+            datapoint['group_var'] = "{win}".format(
+                win=winningness)
+
+        datapoint['series_var'] = build.player_match_summary.match.steam_id
+        datapoint['label'] = build.player_match_summary.player.persona_name
+        datapoint['split_var'] = 'Skill Progression'
+        datalist.append(datapoint)
+
+    params = params_dict()
+    params['chart'] = 'scatterseries'
+    params['x_min'] = 0
+    params['x_max'] = max(xs)
+    params['y_min'] = min(ys)
+    params['y_max'] = max(ys)
+    params['x_label'] = 'Time (m)'
+    params['y_label'] = 'Level'
+
+    foo = outsourceJson(datalist, params)
+    return foo

@@ -108,5 +108,5 @@ class HeroAbilitiesForm(forms.Form):
             ('Player win/loss', 'Player win/loss')
             ],
         required=True,
-        help_text='What goes on the x axis?'
+        help_text='How should the datasets be partitioned?'
     )

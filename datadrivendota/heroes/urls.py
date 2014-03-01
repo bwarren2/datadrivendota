@@ -9,6 +9,11 @@ urlpatterns = patterns(
     url(r'^performance/$', views.hero_performance, name='hero_performance'),
     url(r'^skill_bars/$', views.hero_skill_bars, name='hero_skill_bars'),
     url(
+        r'^skill_progression/$',
+        views.hero_skill_progression,
+        name='hero_skill_progression'
+    ),
+    url(
         r'^ability/(?P<ability_name>[a-zA-Z0-9\-]*)/$',
         views.ability_detail,
         name='ability_detail'

@@ -654,7 +654,7 @@ class AcquireHeroSkillData(BaseTask):
             logger.info("Context Checking")
             if self.api_context.matches_requested is None:
                 self.api_context.matches_requested = 100
-            self.api_context.deepycopy = False
+            self.api_context.deepcopy = False
             if self.api_context.matches_desired is None:
                 self.api_context.matches_desired = 100
             self.api_context.skill_levels = [1, 2, 3]

@@ -183,3 +183,25 @@ class HeroPlayerSkillBarsForm(forms.Form):
                     "{lvl} could not be turned into an int".format(lvl=lvl)
                 )
         return return_lvl_list
+
+
+class HeroProgressionForm(forms.Form):
+    hero = SingleHeroSelect(
+        help_text='Pick exactly one hero'
+    )
+    player = SinglePlayerField(
+        required=False,
+        help_text='Optionally, pick one player'
+    )
+    game_modes = MultiGameModeSelect(
+        help_text='Which game modes would you like to sample?'
+    )
+    division = forms.ChoiceField(
+        choices=[
+            ('Skill', 'Skill'),
+            ('Win/loss', 'Win/loss'),
+            ('Skill win/loss', 'Skill win/loss')
+            ],
+        required=True,
+        help_text='How should the datasets be partitioned?'
+    )

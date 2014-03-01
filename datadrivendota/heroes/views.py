@@ -13,7 +13,8 @@ from utils.exceptions import NoDataFound
 from .json_data import (
     hero_vitals_json,
     hero_lineup_json,
-    hero_performance_json
+    hero_performance_json,
+    hero_progression_json
 )
 from .models import Hero, Ability
 
@@ -21,7 +22,8 @@ from .forms import (
     HeroVitalsMultiSelect,
     HeroLineupMultiSelect,
     HeroPlayerPerformance,
-    HeroPlayerSkillBarsForm
+    HeroPlayerSkillBarsForm,
+    HeroProgressionForm
 )
 from .r import (
     HeroPerformanceChart,
@@ -183,6 +185,39 @@ def hero_performance(request):
             )
     else:
         hero_form = HeroPlayerPerformance()
+    return render(
+        request,
+        'heroes/form.html',
+        {
+            'form': hero_form,
+            'title': 'Hero Performance',
+        }
+    )
+
+
+@permission_required('players.can_touch')
+@devserver_profile(follow=[hero_progression_json])
+def hero_skill_progression(request):
+    if request.GET:
+        hero_form = HeroProgressionForm(request.GET)
+        if hero_form.is_valid():
+            json_data = hero_progression_json(
+                hero=hero_form.cleaned_data['hero'],
+                player=hero_form.cleaned_data['player'],
+                game_mode_list=hero_form.cleaned_data['game_modes'],
+                division=hero_form.cleaned_data['division'],
+            )
+            return render(
+                request,
+                'heroes/form.html',
+                {
+                    'form': hero_form,
+                    'json_data': basename(json_data.name),
+                    'title': 'Hero Skilling',
+                }
+            )
+    else:
+        hero_form = HeroProgressionForm()
     return render(
         request,
         'heroes/form.html',

@@ -155,7 +155,7 @@ def player_hero_abilities_json(
                 win=winningness)
         datapoint['series_var'] = build.player_match_summary.match.steam_id
         datapoint['label'] = build.player_match_summary.player.persona_name
-        datapoint['split_var'] = 'Skill Progression' 
+        datapoint['split_var'] = 'Skill Progression'
         datalist.append(datapoint)
 
     params = params_dict()
