@@ -190,8 +190,6 @@ def hero_progression_json(hero, player, game_mode_list, division):
     skill1 = pmses.filter(match__skill=1).select_related()[:100]
     skill2 = pmses.filter(match__skill=2).select_related()[:100]
     skill3 = pmses.filter(match__skill=3).select_related()[:100]
-    for game in chain(skill1, skill2, skill3):
-        game.skill_level = game.match.skill
 
     if player is not None:
         player_games = pmses.filter(player__steam_id=player).select_related()
@@ -204,7 +202,6 @@ def hero_progression_json(hero, player, game_mode_list, division):
 
     sbs = SkillBuild.objects.filter(
         player_match_summary__in=pmses_pool,
-        player_match_summary__hero__steam_id=hero
     ).select_related().order_by('player_match_summary', 'level')
 
     datalist = []

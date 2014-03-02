@@ -14,6 +14,18 @@
     {{ match.hms_duration }} @ {{ match.hms_start_time }}
   </div>
 
+  <div id='charts'>
+  {% if abilities_json %}
+    <span id='abilities'></span>
+  {% endif %}
+  {% if kill_dmg_json %}
+    <span id='kill_dmg'></span>
+  {% endif %}
+  {% if xp_gold_json %}
+    <span id='xp_gold'></span>
+  {% endif %}
+  </div>
+  
   {% if dire_bans %}
     <div class="row">
       <div class="dire-pickban col-md-6">
@@ -161,16 +173,6 @@
       </tbody>
     </table>
   </div>
-  <div id='charts'></div>
-  {% if kill_dmg_json %}
-    <span id='kill_dmg'></span>
-  {% endif %}
-  {% if xp_gold_json %}
-    <span id='xp_gold'></span>
-  {% endif %}
-  {% if abilities_json %}
-    <span id='abilities'></span>
-  {% endif %}
 {% endblock content %}
 
 {% block extra_js %}
