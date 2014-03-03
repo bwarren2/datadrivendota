@@ -56,7 +56,9 @@ def index(request):
 def detail(request, hero_name):
     hero_slug = slugify(hero_name)
     current_hero = get_object_or_404(Hero, machine_name=hero_slug)
-    abilities = Ability.objects.filter(is_core=True, hero=current_hero)
+    abilities = Ability.objects.filter(
+        is_core=True,
+        hero=current_hero).order_by('steam_id')
     dossier = HeroDossier.objects.get(hero=current_hero)
     charts = []
     return render(
