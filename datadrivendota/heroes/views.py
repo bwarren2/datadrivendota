@@ -16,7 +16,7 @@ from .json_data import (
     hero_performance_json,
     hero_progression_json
 )
-from .models import Hero, Ability
+from .models import Hero, Ability, HeroDossier
 
 from .forms import (
     HeroVitalsMultiSelect,
@@ -57,6 +57,7 @@ def detail(request, hero_name):
     hero_slug = slugify(hero_name)
     current_hero = get_object_or_404(Hero, machine_name=hero_slug)
     abilities = Ability.objects.filter(is_core=True, hero=current_hero)
+    dossier = HeroDossier.objects.get(hero=current_hero)
     charts = []
     return render(
         request,
@@ -64,6 +65,7 @@ def detail(request, hero_name):
         {
             'hero': current_hero,
             'abilities': abilities,
+            'dossier': dossier,
             'charts': charts,
         }
     )

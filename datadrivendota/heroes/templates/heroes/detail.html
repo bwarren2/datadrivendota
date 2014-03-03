@@ -13,6 +13,62 @@
         <img class="hero" src='{{ hero.mugshot.url }}'>
       </a>
       {% endif %}
+      <table>
+      <thead>
+        <tr>
+          <td>Stat</td>
+          <td>Level 1</td>
+          <td>Level 16</td>
+          <td>Level 25</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr> 
+          <td>
+            Strength: {{dossier.strength}} + {{dossier.strength_gain}}
+          </td>          
+          <td><a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stats=strength&level=1">
+          <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
+          </a></td>
+          <td><a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stats=strength&level=16">
+          <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
+          </a></td>
+          <td><a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stats=strength&level=25">
+          <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
+          </a></td>
+        </tr>
+        <tr> 
+          <td>
+            Agility: {{dossier.agility}} + {{dossier.agility_gain}}
+            <td><a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stats=agility&level=1">
+              <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
+            </a></td>
+            <td><a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stats=agility&level=16">
+            <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
+            </a></td>
+            <td><a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stats=agility&level=25">
+            <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
+            </a></td>
+          </td>          
+        </tr>
+        <tr> 
+          <td>
+            Intelligence: {{dossier.intelligence}} + {{dossier.intelligence_gain}}
+            <td><a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stats=intelligence&level=1">
+            <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
+            </a></td>
+            <td><a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stats=intelligence&level=16">
+            <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
+            </a></td>
+            <td><a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stats=intelligence&level=25">
+            <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
+            </a></td>
+          </td>          
+        </tr>
+      </tbody>
+      </table>
+      <div>Day/Night vision: {{dossier.day_vision}} / {{dossier.night_vision}}</div>
+      <div>HP/Mana regen: {{dossier.hp_regen}} / {{dossier.mana_regen}}</div>
     </div>
     <p class="lore">
       {{ hero.lore }}

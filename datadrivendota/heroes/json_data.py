@@ -76,7 +76,7 @@ def hero_lineup_json(heroes, stat, level):
 
     try:
         hero_value = dict(
-            (dossier.hero.safe_name(), dossier.fetch_value(stat, level))
+            (dossier, dossier.fetch_value(stat, level))
             for dossier in hero_dossiers
         )
     except AttributeError:
@@ -93,15 +93,17 @@ def hero_lineup_json(heroes, stat, level):
 
     for key, val in hero_value:
         datadict = datapoint_dict()
-        datadict['x_var'] = key
+        datadict['x_var'] = key.hero.safe_name()
         datadict['y_var'] = val
-        datadict['label'] = key
-        datadict['tooltip'] = key
-        datadict['group_var'] = key if key in selected_names else 'Else'
+        datadict['label'] = key.hero.safe_name()
+        datadict['tooltip'] = key.hero.safe_name()
+        datadict['group_var'] = key.hero.safe_name() \
+            if key.hero.safe_name() in selected_names \
+            else key.alignment
         datadict['split_var'] = 'Hero {stat}'.format(stat=stat)
         datalist.append(datadict)
         ys.append(val)
-        xs.append(key)
+        xs.append(key.hero.safe_name())
     params = params_dict()
     params['y_min'] = 0
     params['y_max'] = max(ys)
