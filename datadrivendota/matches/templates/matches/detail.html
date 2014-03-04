@@ -121,7 +121,7 @@
       <tbody>
         {% for summary in summaries %}
           <tr{% if summary.is_win %} class="winner"{% endif %}>
-            <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
+            <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
             <td>{% player_link summary.player %}</td>
             <td><img src="{{ summary.player.avatar }}"></td>
             <td>{{ summary.kills }}</td>
