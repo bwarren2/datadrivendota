@@ -13,6 +13,11 @@
         <img class="hero" src='{{ hero.mugshot.url }}'>
       </a>
       {% endif %}
+      <div class='roles'>
+      {% for assignment in hero.assignment_set.all %}
+        <text class='role-magnitude-{{assignment.magnitude}}'>{{assignment.role.name}}</text>
+      {% endfor %}
+      </div>
       <table>
       <thead>
         <tr>

@@ -46,7 +46,7 @@ except ImportError:
 
 @permission_required('players.can_look')
 def index(request):
-    hero_list = Hero.objects.filter(visible=True).order_by('name')
+    hero_list = Hero.objects.filter(visible=True).order_by('name').select_related()
 
     return render(request, 'heroes/index.html', {'hero_list': hero_list})
 
