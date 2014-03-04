@@ -128,6 +128,9 @@ class PlayerMatchSummary(models.Model):
     level = models.IntegerField()
     is_win = models.BooleanField()
 
+    class Meta:
+        ordering = ['match', 'player_slot']
+
     def save(self, *args, **kwargs):
         self.is_win = self.determine_win()
         super(PlayerMatchSummary, self).save(*args, **kwargs)
