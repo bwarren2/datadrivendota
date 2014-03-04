@@ -96,7 +96,10 @@ def hero_lineup_json(heroes, stat, level):
         datadict['x_var'] = key.hero.safe_name()
         datadict['y_var'] = val
         datadict['label'] = key.hero.safe_name()
-        datadict['tooltip'] = key.hero.safe_name()
+        datadict['tooltip'] = "{name} ({val})".format(
+            name=key.hero.safe_name(),
+            val=val,
+        )
         datadict['group_var'] = key.hero.safe_name() \
             if key.hero.safe_name() in selected_names \
             else key.alignment
@@ -195,8 +198,10 @@ def hero_progression_json(hero, player, game_mode_list, division):
 
     if player is not None:
         player_games = pmses.filter(player__steam_id=player).select_related()
+        player_game_ids = [pg.id for pg in player_games]
         pmses_pool = list(chain(skill1, skill2, skill3, player_games))
     else:
+        player_game_ids = []
         pmses_pool = list(chain(skill1, skill2, skill3))
 
     if len(pmses_pool) == 0:
@@ -205,27 +210,36 @@ def hero_progression_json(hero, player, game_mode_list, division):
     sbs = SkillBuild.objects.filter(
         player_match_summary__in=pmses_pool,
     ).select_related().order_by('player_match_summary', 'level')
-
+    sbs = sbs.values(
+        'level',
+        'time',
+        'player_match_summary__is_win',
+        'player_match_summary__id',
+        'player_match_summary__match__skill',
+        'player_match_summary__match__steam_id',
+        'player_match_summary__player__persona_name',
+    )
+    print sbs
     datalist = []
     xs = []
     ys = []
 
     for build in sbs:
-        if build.level == 1:
-            subtractor = build.time/60.0
+        if build['level'] == 1:
+            subtractor = build['time']/60.0
 
         datapoint = datapoint_dict()
-        datapoint['x_var'] = round(build.time/60.0-subtractor, 3)
-        xs.append(round(build.time/60.0-subtractor, 3))
-        datapoint['y_var'] = build.level
-        ys.append(build.level)
+        datapoint['x_var'] = round(build['time']/60.0-subtractor, 3)
+        xs.append(round(build['time']/60.0-subtractor, 3))
+        datapoint['y_var'] = build['level']
+        ys.append(build['level'])
 
         winningness = 'Win' if \
-            build.player_match_summary.is_win \
+            build['player_match_summary__is_win'] \
             else 'Loss'
 
-        skill_value = build.player_match_summary.match.skill if \
-            build.player_match_summary not in player_games \
+        skill_value = build['player_match_summary__match__skill'] if \
+            build['player_match_summary__id'] not in player_game_ids \
             else 'Player'
 
         if division == 'Skill win/loss':
@@ -239,8 +253,12 @@ def hero_progression_json(hero, player, game_mode_list, division):
             datapoint['group_var'] = "{win}".format(
                 win=winningness)
 
-        datapoint['series_var'] = build.player_match_summary.match.steam_id
-        datapoint['label'] = build.player_match_summary.player.persona_name
+        datapoint['series_var'] = build[
+            'player_match_summary__match__steam_id'
+        ]
+        datapoint['label'] = build[
+            'player_match_summary__player__persona_name'
+        ]
         datapoint['split_var'] = 'Skill Progression'
         datalist.append(datapoint)
 
