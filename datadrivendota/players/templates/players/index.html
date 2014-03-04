@@ -3,22 +3,18 @@
 {% block page_title %}Player Index!{% endblock page_title %}
 
 {% block content %}
-<div>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Steam ID</th>
-        <th>Persona Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for player in player_list %}
-        <tr>
-          <td><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.steam_id}}</a></td>
-          <td><img src="{{player.avatar}}"> <a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{player.persona_name}}</a></td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+
+  <div class="row">
+    {% for player in player_list %}
+      {% if player.avatar %}
+        <div class="col-md-2">
+          <a href="{% url 'players:id_detail' player_id=player.steam_id %}" class="thumbnail">
+            <img src="{{player.avatar_full}}" alt="{{player.persona_name}}" class="player-portrait">
+            <p class='overlayer'>{{player.persona_name}}</p>
+          </a>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
 {% endblock content %}
