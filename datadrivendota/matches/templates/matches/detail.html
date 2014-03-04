@@ -102,20 +102,20 @@
         <tr>
           <th>Hero</th>
           <th colspan="2">Player</th>
-          <th>K</th>
-          <th>D</th>
-          <th>A</th>
-          <th>K-D+A/2</th>
-          <th>Items</th>
-          <th>Level</th>
-          <th>Last Hits</th>
-          <th>Denies</th>
-          <th>Gold/min</th>
-          <th>XP/min</th>
-          <th>Hero Dmg</th>
-          <th>Tower Dmg</th>
-          <th>Hero Heal</th>
-          <th>Side</th>
+          <th title='Kills'>K</th>
+          <th title='Deaths'>D</th>
+          <th title='Assists'>A</th>
+          <th title='Kills - Deaths + Assists/2'>K-D+A/2</th>
+          <th title='Items'>Items</th>
+          <th title='Level'>Lvl</th>
+          <th title='Last Hits'>LH</th>
+          <th title='Denies'>DN</th>
+          <th title='Gold per minute'>GPM</th>
+          <th title='Experience per minute'>XPM</th>
+          <th title='Damage to heroes'>Hero Dmg</th>
+          <th title='Damage to Towers'>Tower Dmg</th>
+          <th title='Heal to heroes'>Hero Heal</th>
+          <th title='Which side did they play for?'>Side</th>
         </tr>
       </thead>
       <tbody>
@@ -123,14 +123,14 @@
           <tr{% if summary.is_win %} class="winner"{% endif %}>
             <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
             <td>{% player_link summary.player %}</td>
-            <td><img src="{{ summary.player.avatar }}"></td>
+            <td><img src="{{ summary.player.avatar }}" class="summary-hero-thumbshot"></td>
             <td>{{ summary.kills }}</td>
             <td>{{ summary.deaths }}</td>
             <td>{{ summary.assists }}</td>
             <td>{{ summary.kda }}</td>
 
             <td class="match-summary-images">
-              {% if summary.item_0.thumbshot %}
+              {% if summary.item_0.mugshot %}
                 <img src="{{ summary.item_0.thumbshot.url }}">
               {% endif %}
               {% if summary.item_1.thumbshot %}
