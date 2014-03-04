@@ -17,4 +17,51 @@
   {% if ability.notes %}
     <p>{{ ability.notes }}</p>
   {% endif %}
+  {% if ability.channel_time %}
+    <p>Channel time: {{ ability.channel_time }}</p>
+  {% endif %}
+  {% if ability.damage_type %}
+    <p>Damage Type: {{ ability.damage_type }}</p>
+  {% endif %}
+  {% if ability.damage %}
+    <p>Damage: {{ ability.damage }}</p>
+  {% endif %}
+  {% if ability.cast_range %}
+    <p>Cast Range: {{ ability.cast_range }}</p>
+  {% endif %}
+  {% if ability.mana_cost %}
+    <p>Mana Cost: {{ ability.mana_cost }}</p>
+  {% endif %}
+  {% if ability.cooldown %}
+    <p>Cooldown: {{ ability.cooldown }}</p>
+  {% endif %}  
+  <p> Behavior:
+  {% for b in ability.behavior.all %}
+    {{forloop.counter}}: {{ b.internal_name }}
+  {% endfor %}
+  </p>
+
+  <p> Target flags:
+  {% for b in ability.target_flags.all %}
+    {{forloop.counter}}: {{ b.internal_name }}
+  {% endfor %}
+  </p>
+
+  <p> Target type:
+  {% for b in ability.target_type.all %}
+    {{forloop.counter}}: {{ b.internal_name }}
+  {% endfor %}
+  </p>
+
+  <p> Target team:
+  {% for b in ability.target_team.all %}
+    {{forloop.counter}}: {{ b.internal_name }}
+  {% endfor %}
+  </p>
+  <p> Special Values:
+  {% for b in ability.abilityspecialvalues_set.all %}
+    {{b.key}}: {{ b.value }}
+  {% endfor %}
+  </p>
+
 {% endblock %}

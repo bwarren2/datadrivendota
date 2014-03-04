@@ -100,12 +100,12 @@
     <table class="table  table-condensed" id='myTable'>
       <thead>
         <tr>
+          <th>Hero</th>
           <th colspan="2">Player</th>
           <th>K</th>
           <th>D</th>
           <th>A</th>
           <th>K-D+A/2</th>
-          <th colspan="2">Hero</th>
           <th>Items</th>
           <th>Level</th>
           <th>Last Hits</th>
@@ -121,19 +121,14 @@
       <tbody>
         {% for summary in summaries %}
           <tr{% if summary.is_win %} class="winner"{% endif %}>
-            <td><img src="{{ summary.player.avatar }}"></td>
+            <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
             <td>{% player_link summary.player %}</td>
+            <td><img src="{{ summary.player.avatar }}"></td>
             <td>{{ summary.kills }}</td>
             <td>{{ summary.deaths }}</td>
             <td>{{ summary.assists }}</td>
             <td>{{ summary.kda }}</td>
-            <td>{{ summary.hero.name }}</td>
 
-            {% if summary.hero.thumbshot %}
-              <td><img src="{{ summary.hero.thumbshot.url }}" class="summary-hero-thumbshot"></td>
-            {% else %}
-              <td></td>
-            {% endif %}
             <td class="match-summary-images">
               {% if summary.item_0.thumbshot %}
                 <img src="{{ summary.item_0.thumbshot.url }}">
