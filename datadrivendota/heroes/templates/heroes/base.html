@@ -13,7 +13,7 @@
       <li class="{% active 'heroes:detail' %}"><a href="{% url 'heroes:detail' hero_name=hero.machine_name %}">{{ hero.name }}</a></li>
     {% endif %}
     {% if ability %}
-      <li class="{% active 'heroes:ability_detail' %}"><a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name %}">{{ ability.name }}</a></li>
+      <li class="{% active 'heroes:ability_detail' %}"><a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name hero_name=ability.hero.machine_name %}">{{ ability.name }}</a></li>
     {% endif %}
   </ul>
 {% endblock extra_nav %}

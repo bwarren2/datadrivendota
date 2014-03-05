@@ -319,8 +319,12 @@ def hero_performance_api(request):
         return HttpResponse(data, mimetype)
 
 
-def ability_detail(request, ability_name):
-    ability = get_object_or_404(Ability, machine_name=ability_name)
+def ability_detail(request, hero_name, ability_name):
+    ability = get_object_or_404(
+        Ability,
+        machine_name=ability_name,
+        hero__machine_name=hero_name,
+    )
     charts = []
     return render(
         request,
