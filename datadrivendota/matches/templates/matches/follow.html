@@ -10,12 +10,12 @@
           <a href="{% url 'matches:match_detail' match_id=key %}" class="thumbnail">
               <div>
                 {% for key, detail in match.pms_data.Radiant.iteritems %}
-                  <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="follow-hero-thumbshot">
+                  <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
                 {% endfor %}
               </div>
               <div>
               {% for key, detail in match.pms_data.Dire.iteritems %}
-                <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="follow-hero-thumbshot">
+                <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
               {% endfor %}
               </div>
               <p class='overlayer'>{{ match.match_data.game_mode }}</p>
