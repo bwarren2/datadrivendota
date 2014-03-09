@@ -225,7 +225,8 @@ def follow_match_feed(request):
             request,
             'matches/follow.html',
             {
-                'match_list': match_data
+                'match_list': match_list,
+                'match_data': match_data
             }
         )
 
