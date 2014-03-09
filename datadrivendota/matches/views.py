@@ -170,9 +170,9 @@ def follow_match_feed(request):
             validity=Match.LEGIT,
             playermatchsummary__player__in=follow_list
         )
-        match_list = match_list.select_related().distinct()[:100]
+        match_list = match_list.select_related().distinct()[:500]
 
-        paginator = Paginator(match_list, 10)
+        paginator = Paginator(match_list, 20)
         page = request.GET.get('page')
         try:
             match_list = paginator.page(page)
