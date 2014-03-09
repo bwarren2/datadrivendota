@@ -160,6 +160,7 @@ def match(request, match_id):
 
 
 @permission_required('players.can_look')
+@devserver_profile(follow=[])
 def follow_match_feed(request):
 
     player = request_to_player(request)
@@ -183,28 +184,48 @@ def follow_match_feed(request):
             # results.
             match_list = paginator.page(paginator.num_pages)
 
-        for match in match_list:
-            match.follow_annotations = []
-            match.display_date = datetime.datetime.fromtimestamp(
-                match.start_time
-            )
-            match.display_duration = str(datetime.timedelta(
-                seconds=match.duration
-            ))
-            for pms in match.playermatchsummary_set.all():
-                if pms.player in follow_list:
-                    follow_data = {
-                        'player_image': pms.player.avatar,
-                        'hero_image': pms.hero.thumbshot.url,
-                        'KDA': pms.kills - pms.deaths + pms.assists / 2.0
-                    }
-                    match.follow_annotations.append(follow_data)
+        pms_list = PlayerMatchSummary.\
+            objects.filter(match__in=match_list).select_related()
+        match_data = {}
+
+        for pms in pms_list:
+            id = pms.match.steam_id
+            side = pms.which_side()
+            if pms.match.steam_id not in match_data.keys():
+                match_data[id] = {}
+                match_data[id]['pms_data'] = {}
+                match_data[id]['pms_data']['Radiant'] = {}
+                match_data[id]['pms_data']['Dire'] = {}
+                match_data[id]['match_data'] = {}
+
+            match_data[id]['match_data']['display_date'] = \
+                datetime.datetime.fromtimestamp(pms.match.start_time)
+
+            match_data[id]['match_data']['display_duration'] = \
+                str(datetime.timedelta(seconds=pms.match.duration))
+
+            match_data[id]['match_data']['game_mode'] = \
+                pms.match.game_mode.description
+
+            pms_data = {}
+            pms_data['hero_image'] = pms.hero.thumbshot.url
+            pms_data['hero_name'] = pms.hero.name
+            pms_data['player_slot'] = pms.player_slot
+            pms_data['side'] = side
+            pms_data['KDA2'] = \
+                pms.kills - pms.deaths + pms.assists / 2.0
+            if pms.player in follow_list:
+                pms_data['player_image'] = pms.player.avatar
+                pms_data['player_name'] = pms.player.persona_name
+                pms_data['followed'] = True
+
+            match_data[id]['pms_data'][side][pms.player_slot] = pms_data
 
         return render(
             request,
             'matches/follow.html',
             {
-                'match_list': match_list
+                'match_list': match_data
             }
         )
 
