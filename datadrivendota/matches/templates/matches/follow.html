@@ -8,6 +8,7 @@
     {% for key, match in match_data.iteritems %}
         <div class="col-md-3">
           <a href="{% url 'matches:match_detail' match_id=key %}" class="thumbnail">
+            <div><br> </div>
               <div>
                 {% for key, detail in match.pms_data.Radiant.iteritems %}
                   <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
@@ -18,7 +19,12 @@
                 <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
               {% endfor %}
               </div>
-              <p class='overlayer'>{{ match.match_data.game_mode }}</p>
+              <div><br> </div>
+              <p class='overlayer'>
+                {{ match.match_data.game_mode }} 
+                {{match.match_data.Radiant.Kills}}/{{match.match_data.Radiant.Deaths}}/{{match.match_data.Radiant.Assists}}/{{match.match_data.Radiant.KDA2}} : {{match.match_data.Dire.Kills}}/{{match.match_data.Dire.Deaths}}/{{match.match_data.Dire.Assists}}/{{match.match_data.Dire.KDA2}}
+              </p>
+              <p class='overlayer-top-right'>{{match.match_data.display_date}}, {{match.match_data.display_duration}}</p>
           </a>
         </div>
       

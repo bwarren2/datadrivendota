@@ -170,7 +170,7 @@ def follow_match_feed(request):
             validity=Match.LEGIT,
             playermatchsummary__player__in=follow_list
         )
-        match_list = match_list.select_related().distinct()[:500]
+        match_list = match_list.select_related().distinct().order_by('-start_time')[:500]
 
         paginator = Paginator(match_list, 20)
         page = request.GET.get('page')
@@ -197,6 +197,16 @@ def follow_match_feed(request):
                 match_data[id]['pms_data']['Radiant'] = {}
                 match_data[id]['pms_data']['Dire'] = {}
                 match_data[id]['match_data'] = {}
+                match_data[id]['match_data']['Radiant'] = {}
+                match_data[id]['match_data']['Radiant']['Kills'] = 0
+                match_data[id]['match_data']['Radiant']['Deaths'] = 0
+                match_data[id]['match_data']['Radiant']['Assists'] = 0
+                match_data[id]['match_data']['Radiant']['KDA2'] = 0
+                match_data[id]['match_data']['Dire'] = {}
+                match_data[id]['match_data']['Dire']['Kills'] = 0
+                match_data[id]['match_data']['Dire']['Deaths'] = 0
+                match_data[id]['match_data']['Dire']['Assists'] = 0
+                match_data[id]['match_data']['Dire']['KDA2'] = 0
 
             match_data[id]['match_data']['display_date'] = \
                 datetime.datetime.fromtimestamp(pms.match.start_time)
@@ -206,6 +216,12 @@ def follow_match_feed(request):
 
             match_data[id]['match_data']['game_mode'] = \
                 pms.match.game_mode.description
+
+            match_data[id]['match_data'][side]['Kills'] += pms.kills
+            match_data[id]['match_data'][side]['Deaths'] += pms.deaths
+            match_data[id]['match_data'][side]['Assists'] += pms.assists
+            match_data[id]['match_data'][side]['KDA2'] += pms.kills\
+                - pms.deaths + pms.assists/2
 
             pms_data = {}
             pms_data['hero_image'] = pms.hero.thumbshot.url
