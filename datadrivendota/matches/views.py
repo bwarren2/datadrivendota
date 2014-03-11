@@ -163,6 +163,8 @@ def match(request, match_id):
 @devserver_profile(follow=[])
 def follow_match_feed(request):
 
+    mode = request.GET.get('format', 'lineup_thumbs')
+
     player = request_to_player(request)
     if player is not None:
         follow_list = [follow for follow in player.userprofile.following.all()]
@@ -170,7 +172,8 @@ def follow_match_feed(request):
             validity=Match.LEGIT,
             playermatchsummary__player__in=follow_list
         )
-        match_list = match_list.select_related().distinct().order_by('-start_time')[:500]
+        match_list = match_list.select_related()\
+            .distinct().order_by('-start_time')[:500]
 
         paginator = Paginator(match_list, 20)
         page = request.GET.get('page')
@@ -230,9 +233,10 @@ def follow_match_feed(request):
             pms_data['side'] = side
             pms_data['KDA2'] = \
                 pms.kills - pms.deaths + pms.assists / 2.0
-            if pms.player in follow_list:
+            if pms.player.avatar is not None:
                 pms_data['player_image'] = pms.player.avatar
                 pms_data['player_name'] = pms.player.persona_name
+            if pms.player in follow_list:
                 pms_data['followed'] = True
 
             match_data[id]['pms_data'][side][pms.player_slot] = pms_data
@@ -242,7 +246,8 @@ def follow_match_feed(request):
             'matches/follow.html',
             {
                 'match_list': match_list,
-                'match_data': match_data
+                'match_data': match_data,
+                mode: 'true'
             }
         )
 

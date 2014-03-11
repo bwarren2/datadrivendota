@@ -54,6 +54,7 @@ class Command(BaseCommand):
         unprocessed = Match.objects.filter(start_time__gte=a.strftime('%s'))
         process_matches(unprocessed)
 
+
         # Match Integrity Checks
         radiant_badness = PlayerMatchSummary.objects.filter(
             match__radiant_win=True,

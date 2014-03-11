@@ -64,7 +64,7 @@ def detail(request, player_id=None):
             player=player,
             match__validity=Match.LEGIT,
             is_win=True
-        ).values('is_win').annotate(Count('is_win'))[0]['is_win__count']
+        ).count()
     except IndexError:
         wins = 0
     try:
@@ -72,7 +72,7 @@ def detail(request, player_id=None):
             player=player,
             match__validity=Match.LEGIT,
             is_win=False
-        ).values('is_win').annotate(Count('is_win'))[0]['is_win__count']
+        ).count()
     except IndexError:
         losses = 0
 

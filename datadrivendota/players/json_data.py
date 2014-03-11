@@ -8,8 +8,8 @@ from utils.file_management import outsourceJson
 from itertools import chain
 from utils.charts import params_dict, datapoint_dict
 from heroes.models import Hero
-from players.models import Player
 from matches.models import SkillBuild
+from collections import defaultdict
 
 
 def player_winrate_json(
@@ -42,26 +42,22 @@ def player_winrate_json(
         raise NoDataFound
     annotations = PlayerMatchSummary.objects.filter(
         player=player,
-        match__validity=Match.LEGIT
+        match__validity=Match.LEGIT,
+        match__game_mode__steam_id__in=game_mode_list,
     ).values('hero__name', 'is_win').annotate(Count('is_win'))
-    annotations = annotations.filter(match__start_time__gte=min_dt_utc)
-    annotations = annotations.filter(match__start_time__lte=max_date_utc)
-    annotations = annotations.filter(
-        match__game_mode__steam_id__in=game_mode_list
-    )
 
     if len(annotations) == 0:
         raise NoDataFound
 
     heroes = list(set([row['hero__name'] for row in annotations]))
-    wins = {
-        row['hero__name']: row['is_win__count']
-        for row in annotations if row['is_win']
-    }
-    losses = {
-        row['hero__name']: row['is_win__count']
-        for row in annotations if not row['is_win']
-    }
+    wins = defaultdict(int)
+    losses = defaultdict(int)
+
+    for row in annotations:
+        if row['is_win']:
+            wins[row['hero__name']] += 1
+        else:
+            losses[row['hero__name']] += 1
 
     win_rates = {hero:
         float(wins.get(hero, 0))
@@ -76,7 +72,7 @@ def player_winrate_json(
 
         datadict.update({
             'x_var': games[hero],
-            'y_var': win_rates[hero],
+            'y_var': round(win_rates[hero], 2),
             'group_var': hero,
             'split_var': '',
             'label': hero,

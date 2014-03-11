@@ -26,6 +26,10 @@ class Player(models.Model):
     avatar = models.TextField(help_text='Tiny avatar image url')
     avatar_medium = models.TextField(help_text='Medium avatar image url')
     avatar_full = models.TextField(help_text="Big avatar image url")
+    pro_name = models.TextField(
+        help_text='If this is a pro, what are they known as?',
+        null=True
+    )
     updated = models.BooleanField(
         help_text='Do we update this person and scrape them?',
         default=False)
@@ -33,6 +37,13 @@ class Player(models.Model):
         help_text='Unix time of last match scrape start',
         default=0
     )
+
+    def display_name(self):
+
+        if self.pro_name is not None:
+            return self.pro_name
+        else:
+            return self.persona_name
 
     def save(self, *args, **kwargs):
         # That magic number is the valve 32bit -64bit adder.

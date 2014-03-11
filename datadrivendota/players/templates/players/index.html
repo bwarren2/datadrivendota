@@ -9,8 +9,8 @@
       {% if player.avatar %}
         <div class="col-md-2">
           <a href="{% url 'players:id_detail' player_id=player.steam_id %}" class="thumbnail">
-            <img src="{{player.avatar_full}}" alt="{{player.persona_name}}" class="player-portrait">
-            <p class='overlayer'>{{player.persona_name}}</p>
+            <img src="{{player.avatar_full}}" alt="{{player.display_name}}" class="player-portrait">
+            <p class='overlayer'>{{player.display_name}}</p>
           </a>
         </div>
       {% endif %}
