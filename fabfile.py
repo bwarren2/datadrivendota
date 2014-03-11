@@ -21,7 +21,7 @@ def hp():
 
 
 def heroku_migrate():
-    local(heroku_run(migrate()))
+    return local("heroku run python datadrivendota/manage.py migrate --no-initial-data")
 
 
 def migrate():
