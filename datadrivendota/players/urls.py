@@ -3,7 +3,9 @@ from players import views
 
 urlpatterns = patterns(
     '',
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.pro_index, name='pro_index'),
+    url(r'^followed/$', views.followed_index, name='followed_index'),
+    url(r'^all-players/$', views.index, name='index'),
     url(r'^winrate/$', views.winrate, name='player_winrate'),
     url(r'^timeline/$', views.timeline, name='timeline'),
     url(

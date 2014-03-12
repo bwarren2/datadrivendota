@@ -56,6 +56,31 @@ def index(request):
 
 
 @permission_required('players.can_look')
+def followed_index(request):
+    player_list = Player.objects.filter(updated=True)
+    player_list = request.user.userprofile.following.all()
+    return render(
+        request,
+        'players/index.html',
+        {
+            'player_list': player_list
+        }
+    )
+
+
+@permission_required('players.can_look')
+def pro_index(request):
+    player_list = Player.objects.exclude(pro_name=None)
+    return render(
+        request,
+        'players/index.html',
+        {
+            'player_list': player_list
+        }
+    )
+
+
+@permission_required('players.can_look')
 def detail(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
     stats = {}
