@@ -334,7 +334,7 @@ def hero_abilities(request):
         'players/form.html',
         {
             'form': form,
-            'title': 'Hero Skilling Comparison'
+            'title': 'Hero Skilling Comparison',
             'tour': tour,
         }
     )
