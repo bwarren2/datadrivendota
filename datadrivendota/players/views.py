@@ -127,6 +127,30 @@ def detail(request, player_id=None):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[CountWinrate])
 def winrate(request):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts hero winrate for a particular player."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Modes and players you want to see here.  (Hint: don't use ability draft.)"
+        },
+        {
+            'element': "ul.nav-tabs",
+            'title': "Other questions",
+            'content': "For other charts, like endgame data for individuals, try other tabs.",
+            'placement': "bottom"
+        },
+        {
+            'orphan': True,
+            'title': "Ready to go!",
+            'content': "Challenge: Who is Dendi's highest winrate hero of those with 15 games?"
+        }
+    ]
+    tour = json.dumps(tour)
     if request.GET:
         winrate_form = PlayerWinrateLevers(request.GET)
         if winrate_form.is_valid():
@@ -145,6 +169,7 @@ def winrate(request):
                         'form': winrate_form,
                         'json_data': basename(json_data.name),
                         'title': 'Hero Winrate',
+                        'tour': tour,
                     }
                 )
             except NoDataFound:
@@ -155,6 +180,7 @@ def winrate(request):
                         'form': winrate_form,
                         'error': 'error',
                         'title': 'Hero Winrate',
+                        'tour': tour,
                     }
                 )
     else:
@@ -166,6 +192,7 @@ def winrate(request):
         {
             'form': winrate_form,
             'title': 'Hero Winrate',
+            'tour': tour,
         }
     )
 
@@ -173,6 +200,31 @@ def winrate(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[PlayerTimeline])
 def timeline(request):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts player activity over time."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Pick a player and time bracketing to see trends in play."
+        },
+        {
+            'element': "#main-nav",
+            'title': "Other questions",
+            'content': "For other charts, like data about heroes stats, try other tabs.",
+            'placement': "bottom"
+        },
+        {
+            'orphan': True,
+            'title': "Ready to go!",
+            'content': "Challenge: About how many games has Funn1k played per week in the last month?"
+        }
+    ]
+    tour = json.dumps(tour)
+
     if request.GET:
         timeline_form = PlayerTimelineForm(request.GET)
         if timeline_form.is_valid():
@@ -209,6 +261,36 @@ def timeline(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[player_hero_abilities_json])
 def hero_abilities(request):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts in-game level progression for two players."
+        },
+        {
+            'orphan': True,
+            'title': "Example",
+            'content': "For example, you can compare Dendi's Pudge to XBOCT's Lifestealer."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Pick two players and two heroes to compare their leveling rates."
+        },
+        {
+            'element': "#main-nav",
+            'title': "Other questions",
+            'content': "For other charts, like data about heroes stats, try other tabs.",
+            'placement': "bottom"
+        },
+        {
+            'orphan': True,
+            'title': "Ready to go!",
+            'content': "Challenge: At what level does Dendi's Pudge start falling behind Funnik's Lifestealer?"
+        }
+    ]
+    tour = json.dumps(tour)
+
     if request.GET:
         form = HeroAbilitiesForm(request.GET)
         if form.is_valid():

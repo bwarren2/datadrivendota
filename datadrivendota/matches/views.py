@@ -1,4 +1,5 @@
 import datetime
+import json
 from django.contrib.auth.decorators import user_passes_test
 from functools import wraps
 from os.path import basename
@@ -285,6 +286,35 @@ def follow_match_feed(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[EndgameChart])
 def endgame(request):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts end-of-game data for players of your choosing."
+        },
+        {
+            'orphan': True,
+            'title': "Example",
+            'content': "For example, you can compare kills-deaths+assists/2 (KDA2, kind of a net score) between imported players."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Specify which attributes and players you want to render here."
+        },
+        {
+            'element': "ul.nav-tabs",
+            'title': "Other questions",
+            'content': "For other charts, like endgame data for teams, try other tabs.",
+            'placement': "bottom"
+        },
+        {
+            'orphan': True,
+            'title': "Ready to go!",
+            'content': "Challenge: how do [A]kke's and Funn1k's KDA2s change based on win/loss?  Hint: tweak the group and split vars for different renderings."
+        }
+    ]
+    tour = json.dumps(tour)
     if request.GET:
         select_form = EndgameSelect(request.GET)
         if select_form.is_valid():
@@ -304,7 +334,8 @@ def endgame(request):
                     {
                         'form': select_form,
                         'json_data': basename(json_data.name),
-                        'title': 'Endgame Charts'
+                        'title': 'Endgame Charts',
+                        'tour': tour,
                     }
                 )
             except NoDataFound:
@@ -314,7 +345,8 @@ def endgame(request):
                     {
                         'form': select_form,
                         'error': 'error',
-                        'title': 'Endgame Charts'
+                        'title': 'Endgame Charts',
+                        'tour': tour,
                     }
                 )
 
@@ -325,7 +357,8 @@ def endgame(request):
         'matches/form.html',
         {
             'form': select_form,
-            'title': 'Endgame Charts'
+            'title': 'Endgame Charts',
+            'tour': tour,
         }
     )
 
@@ -333,6 +366,35 @@ def endgame(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[team_endgame_json])
 def team_endgame(request):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts end-of-game data for groups of players."
+        },
+        {
+            'orphan': True,
+            'title': "Example",
+            'content': "For example, you can compare team kills to team assists for any game with the given players on the same team."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Specify which attributes and players you want to render here."
+        },
+        {
+            'element': "ul.nav-tabs",
+            'title': "Other questions",
+            'content': "For other charts, like endgame data for individuals, try other tabs.",
+            'placement': "bottom"
+        },
+        {
+            'orphan': True,
+            'title': "Ready to go!",
+            'content': "Challenge: When Funn1k, Dendi, and XBOCT play together, what KDA2 does their team exceed when they win?"
+        }
+    ]
+    tour = json.dumps(tour)
     if request.GET:
         select_form = TeamEndgameSelect(request.GET)
         if select_form.is_valid():
@@ -352,7 +414,8 @@ def team_endgame(request):
                     {
                         'form': select_form,
                         'json_data': basename(json_data.name),
-                        'title': 'Endgame Charts'
+                        'title': 'Endgame Charts',
+                        'tour': tour,
                     }
                 )
 
@@ -363,7 +426,8 @@ def team_endgame(request):
                     {
                         'form': select_form,
                         'error': 'error',
-                        'title': 'Endgame Charts'
+                        'title': 'Endgame Charts',
+                        'tour': tour,
                     }
                 )
     else:
@@ -373,7 +437,8 @@ def team_endgame(request):
         'matches/form.html',
         {
             'form': select_form,
-            'title': 'Endgame Charts'
+            'title': 'Endgame Charts',
+            'tour': tour,
         }
     )
 
@@ -381,6 +446,40 @@ def team_endgame(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[match_ability_json])
 def ability_build(request):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page is one of the few to chart within-game data: it plots when people place skill points in a game, with the first point placement being 0 minutes."
+        },
+        {
+            'orphan': True,
+            'title': "Example",
+            'content': "For example, you can see how people leveled in game with Dendi on Magnus (550709502)."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Specify which match id you want and output formatting here."
+        },
+        {
+            'orphan': True,
+            'title': "Important note!",
+            'content': "This only works for games we have imported!  The data management page lets qualified users add players to the import process."
+        },
+        {
+            'element': "#main-nav",
+            'title': "Other questions",
+            'content': "For the overview for a player, try players:index.  For the match overview, try /matches/<match-id>",
+            'placement': "bottom"
+        },
+        {
+            'orphan': True,
+            'title': "Ready to go!",
+            'content': "Challenge: in match 550709502, who slowed down when?  When did Slark and Lifesteal crush their enemies?"
+        }
+    ]
+    tour = json.dumps(tour)
     title = 'Match Ability Breakdown'
     if request.GET:
         select_form = MatchAbilitySelect(request.GET)
@@ -405,6 +504,7 @@ def ability_build(request):
                         'title': title,
                         'form': select_form,
                         'extra_notes': extra_notes,
+                        'tour': tour,
                     }
                 )
             except NoDataFound:
@@ -414,7 +514,8 @@ def ability_build(request):
                     {
                         'error': 'error',
                         'title': title,
-                        'form': select_form
+                        'form': select_form,
+                        'tour': tour,
                     }
                 )
     else:
@@ -425,5 +526,6 @@ def ability_build(request):
         {
             'form': select_form,
             'title': title,
+            'tour': tour,
         }
     )

@@ -31,31 +31,9 @@
       backdrop: true
     });
 
-    tour.addSteps([
-      {
-        orphan: true,
-        title: "Welcome!",
-        content: "Player pages let you examine one player in particular."
-      },
-      {
-        element: ".chart-form",
-        title: "Asking questions",
-        content: "Pick what you would like to know about them here."
-      },
-      {
-        element: "ul.nav-tabs",
-        title: "Other questions",
-        content: "Other types of charts about players are here.",
-        placement: "bottom"
-      },
-      {
-        orphan: true,
-        element: "#main-nav",
-        title: "Other resources",
-        content: "Data across players and for heroes are in other locations.",
-        placement: "bottom"
-      }
-    ]);
+    tour.addSteps(
+      {{tour|safe}}
+    );
 
     $(".tourglyph").on("click",function(){
       tour.restart();

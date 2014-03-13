@@ -26,33 +26,13 @@
 {% block tour %}
 <script type="text/javascript">
   $(function () {
-    tour = new Tour({
+    var tour = new Tour({
       backdrop: true
     });
 
-    tour.addSteps([
-      {
-        orphan: true,
-        title: "Welcome!",
-        content: "Match pages let you compare end-of-game data across players."
-      },
-      {
-        element: ".chart-form",
-        title: "Asking questions",
-        content: "Specify who and what to see here."
-      },
-      {
-        element: "ul.nav-tabs",
-        title: "Other questions",
-        content: "For charts about heroes or players themselves, try these subtabs.",
-        placement: "bottom"
-      },
-      {
-        orphan: true,
-        title: "Ready to go!",
-        content: "Challenge: How do your endgame kills compare to [A]kke's when you both win?"
-      }
-    ]);
+    tour.addSteps(
+      {{tour|safe}}
+    );
 
     $(".tourglyph").on("click",function(){
       tour.restart();

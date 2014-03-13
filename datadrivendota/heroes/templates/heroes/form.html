@@ -28,29 +28,9 @@
       backdrop: true
     });
 
-    tour.addSteps([
-      {
-        orphan: true,
-        title: "Welcome!",
-        content: "These hero pages let you chart stats, like endgame kills or effective hp by level, for heroes you are interested in."
-      },
-      {
-        element: ".chart-form",
-        title: "Asking questions",
-        content: "Specify what attributes you want to render here."
-      },
-      {
-        element: "ul.nav-tabs",
-        title: "Other questions",
-        content: "For other charts, try these subtabs.",
-        placement: "bottom"
-      },
-      {
-        orphan: true,
-        title: "Ready to go!",
-        content: "Challenge: how does your favorite hero compare to your least favorite?"
-      }
-    ]);
+    tour.addSteps(
+      {{tour|safe}}
+    );
 
     $(".tourglyph").on("click",function(){
       tour.restart();

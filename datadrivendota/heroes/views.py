@@ -76,6 +76,36 @@ def detail(request, hero_name):
 @permission_required('players.can_look')
 # @devserver_profile(follow=[generateChart])
 def vitals(request):
+
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts stat progression for a few heroes by level."
+        },
+        {
+            'orphan': True,
+            'title': "Example",
+            'content': "For example, you can compare Slark, Riki, and Phantom Lancer on strength and agility progression."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Specify what attributes and heroes you want to render here."
+        },
+        {
+            'element': "ul.nav-tabs",
+            'title': "Other questions",
+            'content': "For other charts, like all heroes lined up for one stat at one level, try these subtabs.",
+            'placement': "bottom"
+        },
+        {
+            'orphan': True,
+            'title': "Ready to go!",
+            'content': "Challenge: how does your favorite hero compare to your least favorite in their primary stats?"
+        }
+    ]
+    tour = json.dumps(tour)
     if request.GET:
         hero_form = HeroVitalsMultiSelect(request.GET)
         if hero_form.is_valid():
@@ -91,6 +121,7 @@ def vitals(request):
                         'form': hero_form,
                         'json_data': basename(json_data.name),
                         'title': "Hero Vitals",
+                        'tour': tour
                     }
                 )
             except NoDataFound:
@@ -101,6 +132,7 @@ def vitals(request):
                         'form': hero_form,
                         'error': 'error',
                         'title': "Hero Vitals",
+                        'tour': tour,
                     }
                 )
 
@@ -112,6 +144,7 @@ def vitals(request):
         {
             'form': hero_form,
             'title': "Hero Vitals",
+            'tour': tour,
         }
     )
 
@@ -119,6 +152,35 @@ def vitals(request):
 @permission_required('players.can_look')
 # @devserver_profile(follow=[lineupChart])
 def lineup(request):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts all heroes at one level for one stat, so you have a sense of distribution."
+        },
+        {
+            'orphan': True,
+            'title': "Example",
+            'content': "For example, you can track Ogre Magi's, Ursa's, and Phoenix's strength at levels 1 and 25 on two pages to see how they move in the distribution."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Specify which attribute and heroes you want to render here."
+        },
+        {
+            'element': "ul.nav-tabs",
+            'title': "Other questions",
+            'content': "For other charts, like all levels of a few heroes for a few vital stats, try these subtabs.",
+            'placement': "bottom"
+        },
+        {
+            'orphan': True,
+            'title': "Ready to go!",
+            'content': "Challenge: how do your favorite strength, intelligence, and agility heroes change in strength at various levels?"
+        }
+    ]
+    tour = json.dumps(tour)
     if request.GET:
         hero_form = HeroLineupMultiSelect(request.GET)
         if hero_form.is_valid():
@@ -136,6 +198,7 @@ def lineup(request):
                         'form': hero_form,
                         'json_data': basename(json_data.name),
                         'title': 'Hero Lineups',
+                        'tour': tour,
                     }
                 )
             except NoDataFound:
@@ -146,6 +209,7 @@ def lineup(request):
                         'form': hero_form,
                         'error': 'error',
                         'title': 'Hero Lineups',
+                        'tour': tour,
                     }
                 )
 
@@ -158,6 +222,7 @@ def lineup(request):
         {
             'form': hero_form,
             'title': 'Hero Lineups',
+            'tour': tour,
         }
     )
 
@@ -165,6 +230,41 @@ def lineup(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[hero_performance_json])
 def hero_performance(request):
+    
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page lets you break out end-of-game data by skill level, according to Valve's skill estimate."
+        },
+        {
+            'orphan': True,
+            'title': "Example",
+            'content': "For example, you can scatter end-of-game kills vs game time for Alchemist (and include your data to compare)."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Specify which attributes and hero you want to render here, optionally adding a player."
+        },
+        {
+            'orphan': True,
+            'title': "Important note!",
+            'content': "Valve automagically determines their own skill bracketing, with 1-2-3 being low-medium-high."
+        },
+        {
+            'element': "#main-nav",
+            'title': "Other questions",
+            'content': "For other charts, head-to-head comparison between players, try other tabs (like the matches:endgame chart).",
+            'placement': "bottom"
+        },
+        {
+            'orphan': True,
+            'title': "Ready to go!",
+            'content': "Challenge: how does your kills-deaths+assists/2 (kda2) on your favorite carry compare?"
+        }
+    ]
+    tour = json.dumps(tour)
     if request.GET:
         hero_form = HeroPlayerPerformance(request.GET)
         if hero_form.is_valid():
@@ -185,6 +285,7 @@ def hero_performance(request):
                     'form': hero_form,
                     'image_name': imagebase,
                     'title': 'Hero Performance',
+                    'tour': tour,
                 }
             )
     else:
@@ -193,6 +294,7 @@ def hero_performance(request):
         request,
         'heroes/form.html',
         {
+            'tour': tour,
             'form': hero_form,
             'title': 'Hero Performance',
         }
@@ -202,6 +304,50 @@ def hero_performance(request):
 @permission_required('players.can_touch')
 @devserver_profile(follow=[hero_progression_json])
 def hero_skill_progression(request):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page is one of the most complicated; do not be overwhelmed!."
+        },
+        {
+            'orphan': True,
+            'title': "Purpose",
+            'content': "This page plots data from within games, showing when skill points get placed in games for one hero by skill bracket."
+        },
+        {
+            'orphan': True,
+            'title': "Example",
+            'content': "For example, you can see how quickly high skill Anti-Mage players farm compared to low skill ones, and include your own data (if you are being imported)."
+        },
+        {
+            'orphan': True,
+            'title': "Inferences",
+            'content': "By observing trends (when farm starts slowing down for a group, or roughly what level high-skill players can reach at any time) you can find room to improve yourself."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Specify which hero you want, and an optional player to compare here."
+        },
+        {
+            'orphan': True,
+            'title': "Important note!",
+            'content': "The skill designation is given automagically by Valve; 1-2-3 correspond to low-medium-high."
+        },
+        {
+            'element': "#main-nav",
+            'title': "Other questions",
+            'content': "For more player comparisons, try the matches or player sections!",
+            'placement': "bottom"
+        },
+        {
+            'orphan': True,
+            'title': "Ready to go!",
+            'content': "Challenge: for your favorite hero, how many more levels can high-skill players have over low skill players at the 30 minute mark?"
+        }
+    ]
+    tour = json.dumps(tour)
     if request.GET:
         hero_form = HeroProgressionForm(request.GET)
         if hero_form.is_valid():
@@ -218,6 +364,7 @@ def hero_skill_progression(request):
                     'form': hero_form,
                     'json_data': basename(json_data.name),
                     'title': 'Hero Skilling',
+                    'tour': tour,
                 }
             )
     else:
@@ -228,6 +375,7 @@ def hero_skill_progression(request):
         {
             'form': hero_form,
             'title': 'Hero Performance',
+            'tour': tour,
         }
     )
 

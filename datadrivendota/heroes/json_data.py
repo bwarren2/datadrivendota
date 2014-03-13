@@ -117,6 +117,7 @@ def hero_lineup_json(heroes, stat, level):
     params['outerHeight'] = 500
     params['x_set'] = xs
     params['padding']['bottom'] = 120
+
     params['tickValues'] = [x for ind, x in enumerate(xs) if ind % 2 == 0]
     return outsourceJson(datalist, params)
 
