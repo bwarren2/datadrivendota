@@ -243,6 +243,7 @@ def timeline(request):
                     'form': timeline_form,
                     'image_name': imagebase,
                     'title': 'Player Timeline',
+                    'tour': tour,
                 }
             )
     else:
@@ -253,7 +254,8 @@ def timeline(request):
         'players/form.html',
         {
             'form': timeline_form,
-            'title': 'Player Timeline'
+            'title': 'Player Timeline',
+            'tour': tour,
         }
     )
 
@@ -310,6 +312,7 @@ def hero_abilities(request):
                         'form': form,
                         'json_data': basename(json_data.name),
                         'title': 'Hero Skilling Comparison',
+                        'tour': tour,
                     }
                 )
             except NoDataFound:
@@ -320,6 +323,7 @@ def hero_abilities(request):
                         'form': form,
                         'error': 'error',
                         'title': 'Hero Skilling Comparison',
+                        'tour': tour,
                     }
                 )
     else:
@@ -331,6 +335,7 @@ def hero_abilities(request):
         {
             'form': form,
             'title': 'Hero Skilling Comparison'
+            'tour': tour,
         }
     )
 
