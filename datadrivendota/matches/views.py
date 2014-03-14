@@ -18,7 +18,7 @@ from .json_data import (
     match_ability_json,
     match_parameter_json
 )
-from players.models import request_to_player
+from players.models import request_to_player, Player
 from utils.exceptions import NoDataFound
 from django.core.urlresolvers import reverse
 
@@ -163,7 +163,6 @@ def match(request, match_id):
 def follow_match_feed(request):
 
     mode = request.GET.get('format', 'lineup_thumbs')
-
     try:
         player = request_to_player(request)
         follow_list = [follow for follow in player.userprofile.following.all()]
@@ -188,58 +187,7 @@ def follow_match_feed(request):
 
         pms_list = PlayerMatchSummary.\
             objects.filter(match__in=match_list).select_related()
-        match_data = {}
-
-        for pms in pms_list:
-            id = pms.match.steam_id
-            side = pms.which_side()
-            if pms.match.steam_id not in match_data.keys():
-                match_data[id] = {}
-                match_data[id]['pms_data'] = {}
-                match_data[id]['pms_data']['Radiant'] = {}
-                match_data[id]['pms_data']['Dire'] = {}
-                match_data[id]['match_data'] = {}
-                match_data[id]['match_data']['Radiant'] = {}
-                match_data[id]['match_data']['Radiant']['Kills'] = 0
-                match_data[id]['match_data']['Radiant']['Deaths'] = 0
-                match_data[id]['match_data']['Radiant']['Assists'] = 0
-                match_data[id]['match_data']['Radiant']['KDA2'] = 0
-                match_data[id]['match_data']['Dire'] = {}
-                match_data[id]['match_data']['Dire']['Kills'] = 0
-                match_data[id]['match_data']['Dire']['Deaths'] = 0
-                match_data[id]['match_data']['Dire']['Assists'] = 0
-                match_data[id]['match_data']['Dire']['KDA2'] = 0
-
-            match_data[id]['match_data']['display_date'] = \
-                datetime.datetime.fromtimestamp(pms.match.start_time)
-
-            match_data[id]['match_data']['display_duration'] = \
-                str(datetime.timedelta(seconds=pms.match.duration))
-
-            match_data[id]['match_data']['game_mode'] = \
-                pms.match.game_mode.description
-
-            match_data[id]['match_data'][side]['Kills'] += pms.kills
-            match_data[id]['match_data'][side]['Deaths'] += pms.deaths
-            match_data[id]['match_data'][side]['Assists'] += pms.assists
-            match_data[id]['match_data'][side]['KDA2'] += pms.kills\
-                - pms.deaths + pms.assists/2
-
-            pms_data = {}
-            pms_data['hero_image'] = pms.hero.thumbshot.url
-            pms_data['hero_name'] = pms.hero.name
-            pms_data['player_slot'] = pms.player_slot
-            pms_data['side'] = side
-            pms_data['KDA2'] = \
-                pms.kills - pms.deaths + pms.assists / 2.0
-            if pms.player.avatar is not None:
-                pms_data['player_image'] = pms.player.avatar
-                pms_data['player_name'] = pms.player.persona_name
-            if pms.player in follow_list:
-                pms_data['followed'] = True
-
-            match_data[id]['pms_data'][side][pms.player_slot] = pms_data
-
+        match_data = annotated_matches(pms_list, follow_list)
         return render(
             request,
             'matches/follow.html',
@@ -251,7 +199,13 @@ def follow_match_feed(request):
         )
 
     except AttributeError:
-        match_list = Match.objects.filter(validity=Match.LEGIT)[:100]
+        pro_list = Player.objects.exclude(pro_name=None)
+        match_list = Match.objects.filter(
+            validity=Match.LEGIT,
+            playermatchsummary__player__in=pro_list
+        )
+        match_list = match_list.select_related()\
+            .distinct().order_by('-start_time')[:500]
 
         paginator = Paginator(match_list, 10)
         page = request.GET.get('page')
@@ -265,18 +219,17 @@ def follow_match_feed(request):
             # results.
             match_list = paginator.page(paginator.num_pages)
 
-        for match in match_list:
-            match.display_date = datetime.datetime.fromtimestamp(
-                match.start_time
-            )
-            match.display_duration = str(datetime.timedelta(
-                seconds=match.duration
-            ))
+        pms_list = PlayerMatchSummary.\
+            objects.filter(match__in=match_list).select_related()
+
+        match_data = annotated_matches(pms_list, [])
         return render(
             request,
-            'matches/index.html',
+            'matches/follow.html',
             {
-                'match_list': match_list
+                'match_list': match_list,
+                'match_data': match_data,
+                mode: 'true'
             }
         )
 
@@ -524,3 +477,58 @@ def ability_build(request):
             'tour': tour,
         }
     )
+
+
+def annotated_matches(pms_list, follow_list):
+    match_data = {}
+
+    for pms in pms_list:
+        id = pms.match.steam_id
+        side = pms.which_side()
+        if pms.match.steam_id not in match_data.keys():
+            match_data[id] = {}
+            match_data[id]['pms_data'] = {}
+            match_data[id]['pms_data']['Radiant'] = {}
+            match_data[id]['pms_data']['Dire'] = {}
+            match_data[id]['match_data'] = {}
+            match_data[id]['match_data']['Radiant'] = {}
+            match_data[id]['match_data']['Radiant']['Kills'] = 0
+            match_data[id]['match_data']['Radiant']['Deaths'] = 0
+            match_data[id]['match_data']['Radiant']['Assists'] = 0
+            match_data[id]['match_data']['Radiant']['KDA2'] = 0
+            match_data[id]['match_data']['Dire'] = {}
+            match_data[id]['match_data']['Dire']['Kills'] = 0
+            match_data[id]['match_data']['Dire']['Deaths'] = 0
+            match_data[id]['match_data']['Dire']['Assists'] = 0
+            match_data[id]['match_data']['Dire']['KDA2'] = 0
+
+        match_data[id]['match_data']['display_date'] = \
+            datetime.datetime.fromtimestamp(pms.match.start_time)
+
+        match_data[id]['match_data']['display_duration'] = \
+            str(datetime.timedelta(seconds=pms.match.duration))
+
+        match_data[id]['match_data']['game_mode'] = \
+            pms.match.game_mode.description
+
+        match_data[id]['match_data'][side]['Kills'] += pms.kills
+        match_data[id]['match_data'][side]['Deaths'] += pms.deaths
+        match_data[id]['match_data'][side]['Assists'] += pms.assists
+        match_data[id]['match_data'][side]['KDA2'] += pms.kills\
+            - pms.deaths + pms.assists/2
+
+        pms_data = {}
+        pms_data['hero_image'] = pms.hero.thumbshot.url
+        pms_data['hero_name'] = pms.hero.name
+        pms_data['player_slot'] = pms.player_slot
+        pms_data['side'] = side
+        pms_data['KDA2'] = \
+            pms.kills - pms.deaths + pms.assists / 2.0
+        if pms.player.avatar is not None:
+            pms_data['player_image'] = pms.player.avatar
+            pms_data['player_name'] = pms.player.persona_name
+        if pms.player in follow_list:
+            pms_data['followed'] = True
+
+        match_data[id]['pms_data'][side][pms.player_slot] = pms_data
+    return match_data
