@@ -66,7 +66,6 @@ def overview(request):
     )
 
 
-@permission_required('players.can_look')
 @devserver_profile()
 def match(request, match_id):
     try:
@@ -160,7 +159,6 @@ def match(request, match_id):
         )
 
 
-@permission_required('players.can_look')
 @devserver_profile(follow=[])
 def follow_match_feed(request):
 
@@ -283,7 +281,6 @@ def follow_match_feed(request):
         )
 
 
-@permission_required('players.can_touch')
 @devserver_profile(follow=[EndgameChart])
 def endgame(request):
     tour = [
@@ -363,7 +360,6 @@ def endgame(request):
     )
 
 
-@permission_required('players.can_touch')
 @devserver_profile(follow=[team_endgame_json])
 def team_endgame(request):
     tour = [
@@ -443,7 +439,6 @@ def team_endgame(request):
     )
 
 
-@permission_required('players.can_touch')
 @devserver_profile(follow=[match_ability_json])
 def ability_build(request):
     tour = [

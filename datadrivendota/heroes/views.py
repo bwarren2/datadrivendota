@@ -44,14 +44,12 @@ except ImportError:
             return wraps(func)(nothing)
 
 
-@permission_required('players.can_look')
 def index(request):
     hero_list = Hero.objects.filter(visible=True).order_by('name').select_related()
 
     return render(request, 'heroes/index.html', {'hero_list': hero_list})
 
 
-@permission_required('players.can_look')
 # @devserver_profile(follow=[HeroPerformanceChart])
 def detail(request, hero_name):
     hero_slug = slugify(hero_name)
@@ -73,7 +71,6 @@ def detail(request, hero_name):
     )
 
 
-@permission_required('players.can_look')
 # @devserver_profile(follow=[generateChart])
 def vitals(request):
 
@@ -149,7 +146,6 @@ def vitals(request):
     )
 
 
-@permission_required('players.can_look')
 # @devserver_profile(follow=[lineupChart])
 def lineup(request):
     tour = [
@@ -227,7 +223,6 @@ def lineup(request):
     )
 
 
-@permission_required('players.can_touch')
 @devserver_profile(follow=[hero_performance_json])
 def hero_performance(request):
     
@@ -301,7 +296,6 @@ def hero_performance(request):
     )
 
 
-@permission_required('players.can_touch')
 @devserver_profile(follow=[hero_progression_json])
 def hero_skill_progression(request):
     tour = [
@@ -380,7 +374,6 @@ def hero_skill_progression(request):
     )
 
 
-@permission_required('players.can_touch')
 @devserver_profile(follow=[HeroSkillLevelBwChart])
 def hero_skill_bars(request):
     if request.GET:

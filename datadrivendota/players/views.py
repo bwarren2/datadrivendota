@@ -43,7 +43,6 @@ except ImportError:
             return wraps(func)(nothing)
 
 
-@permission_required('players.can_look')
 def index(request):
     player_list = Player.objects.filter(updated=True)
     return render(
@@ -68,7 +67,6 @@ def followed_index(request):
     )
 
 
-@permission_required('players.can_look')
 def pro_index(request):
     player_list = Player.objects.exclude(pro_name=None)
     return render(
@@ -80,7 +78,6 @@ def pro_index(request):
     )
 
 
-@permission_required('players.can_look')
 def detail(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
     stats = {}
@@ -124,7 +121,6 @@ def detail(request, player_id=None):
     )
 
 
-@permission_required('players.can_touch')
 @devserver_profile(follow=[CountWinrate])
 def winrate(request):
     tour = [
@@ -197,7 +193,6 @@ def winrate(request):
     )
 
 
-@permission_required('players.can_touch')
 @devserver_profile(follow=[PlayerTimeline])
 def timeline(request):
     tour = [
@@ -260,7 +255,6 @@ def timeline(request):
     )
 
 
-@permission_required('players.can_touch')
 @devserver_profile(follow=[player_hero_abilities_json])
 def hero_abilities(request):
     tour = [
@@ -340,7 +334,6 @@ def hero_abilities(request):
     )
 
 
-@permission_required('players.can_look')
 def player_matches(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
     pms_list = get_playermatchsummaries_for_player(player, 50)
@@ -366,7 +359,7 @@ def player_matches(request, player_id=None):
     )
 
 
-@permission_required('players.can_look')
+@permission_required('players.can_touch')
 def player_management(request):
     player = request_to_player(request)
     if player is not None:
