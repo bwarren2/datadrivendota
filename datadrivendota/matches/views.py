@@ -164,8 +164,8 @@ def follow_match_feed(request):
 
     mode = request.GET.get('format', 'lineup_thumbs')
 
-    player = request_to_player(request)
-    if player is not None:
+    try:
+        player = request_to_player(request)
         follow_list = [follow for follow in player.userprofile.following.all()]
         match_list = Match.objects.filter(
             validity=Match.LEGIT,
@@ -250,7 +250,7 @@ def follow_match_feed(request):
             }
         )
 
-    else:
+    except AttributeError:
         match_list = Match.objects.filter(validity=Match.LEGIT)[:100]
 
         paginator = Paginator(match_list, 10)
