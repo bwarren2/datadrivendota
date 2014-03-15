@@ -18,7 +18,7 @@ class SinglePlayerField(forms.CharField):
                 "Commas in names also trigger this error."
             )
         try:
-            player = Player.objects.get(persona_name=player_name)
+            player = player_by_name(player_name)
         except Player.DoesNotExist:
             raise forms.ValidationError("I do not have a player by that name")
         except MultipleObjectsReturned:
@@ -36,7 +36,7 @@ class MultiPlayerField(forms.CharField):
         return_player_list = []
         for player in player_list:
             try:
-                player = Player.objects.get(persona_name=player)
+                player = player_by_name(player)
             except Player.DoesNotExist:
                 raise ValidationError(
                     "{player} is not a valid player name".format(player=player)
@@ -47,3 +47,14 @@ class MultiPlayerField(forms.CharField):
                 )
             return_player_list.append(player.steam_id)
         return return_player_list
+
+
+def player_by_name(player_name):
+    try:
+        player = Player.objects.get(pro_name=player_name)
+    except Player.DoesNotExist:
+        try:
+            player = Player.objects.get(persona_name=player_name)
+        except Player.DoesNotExist:
+            raise
+    return player

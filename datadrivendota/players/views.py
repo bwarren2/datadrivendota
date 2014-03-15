@@ -396,14 +396,26 @@ def player_list(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
         players = Player.objects.filter(
-            persona_name__icontains=q
+            persona_name__icontains=q,
+            pro_name=None
         )[:20]
+        pros = Player.objects.filter(
+            pro_name__icontains=q
+        )[:20]
+
         results = []
         for player in players:
             player_json = {}
             player_json['id'] = player.steam_id
             player_json['label'] = player.persona_name
             player_json['value'] = player.persona_name
+            results.append(player_json)
+
+        for player in pros:
+            player_json = {}
+            player_json['id'] = player.steam_id
+            player_json['label'] = player.persona_name
+            player_json['value'] = player.persona_name + " (Pro)"
             results.append(player_json)
         data = json.dumps(results)
     else:
