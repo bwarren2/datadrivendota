@@ -414,8 +414,8 @@ def player_list(request):
         for player in pros:
             player_json = {}
             player_json['id'] = player.steam_id
-            player_json['label'] = player.persona_name
-            player_json['value'] = player.persona_name + " (Pro)"
+            player_json['label'] = player.pro_name
+            player_json['value'] = player.pro_name
             results.append(player_json)
         data = json.dumps(results)
     else:
