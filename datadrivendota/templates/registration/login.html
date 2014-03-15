@@ -2,13 +2,12 @@
 
 {% block title %}Login!{%endblock title %}
 
-{% block page_title %}We are in closed beta{%endblock page_title %}
+{% block page_title %}Some parts of our site are currently private.{%endblock page_title %}
 
 {% block content %}
   {% if not request.user.is_anonymous %}
     <p>
-      <a href="{% url 'upgrade' %}">Upgrade</a> your account privileges if you
-      have an invitation code.
+      If you have an invitation code, <a href="{% url 'upgrade' %}">upgrade</a> your account privileges .
     </p>
   {% else %}
     <p>

@@ -207,7 +207,7 @@ def follow_match_feed(request):
         match_list = match_list.select_related()\
             .distinct().order_by('-start_time')[:500]
 
-        paginator = Paginator(match_list, 10)
+        paginator = Paginator(match_list, 20)
         page = request.GET.get('page')
         try:
             match_list = paginator.page(page)

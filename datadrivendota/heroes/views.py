@@ -250,13 +250,13 @@ def hero_performance(request):
         {
             'element': "#main-nav",
             'title': "Other questions",
-            'content': "For other charts, head-to-head comparison between players, try other tabs (like the matches:endgame chart).",
+            'content': "For other charts, such as head-to-head comparison between players, try other tabs (like the matches:endgame chart).",
             'placement': "bottom"
         },
         {
             'orphan': True,
             'title': "Ready to go!",
-            'content': "Challenge: how does your kills-deaths+assists/2 (kda2) on your favorite carry compare?"
+            'content': "Challenge: how does your kills-deaths+assists/2 (kda2) on your favorite carry compare to other skill brackets?"
         }
     ]
     tour = json.dumps(tour)
