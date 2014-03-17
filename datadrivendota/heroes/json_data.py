@@ -38,6 +38,10 @@ def hero_vitals_json(hero_list, stats_list):
                     'y_var': hero_dossier.level_stat(stat, level),
                     'group_var': group,
                     'label': hero_dossier.hero.name,
+                    'tooltip': "{hero}, {val}".format(
+                        hero=hero_dossier.hero.name,
+                        val=hero_dossier.level_stat(stat, level)
+                    ),
                     'split_var': stat,
                 })
                 datalist.append(datadict)
