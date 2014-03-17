@@ -6,11 +6,22 @@ from django.db.models import Count
 from datadrivendota.utilities import error_email
 from matches.models import PlayerMatchSummary, Match
 from heroes.models import Hero
+from optparse import make_option
 
 
 class Command(BaseCommand):
 
+    option_list = BaseCommand.option_list + (
+        make_option(
+            '--full',
+            action='store',
+            dest='full_denorm_check',
+            help='Are we doing absolutely errybody?',
+        ),
+    )
+
     def handle(self, *args, **options):
+        full_check = options['full_denorm_check']
         # Fix non-competitive matches
         matches = Match.objects.filter(
             duration__lte=settings.MIN_MATCH_LENGTH
@@ -47,12 +58,17 @@ class Command(BaseCommand):
             ms = unprocessed.exclude(pk__in=keys)
             ms.update(validity=Match.LEGIT)
 
-        unprocessed = Match.objects.filter(validity=Match.UNPROCESSED)
-        process_matches(unprocessed)
+        if full_check is True:
+            unprocessed = Match.objects.all()
+            process_matches(unprocessed)
 
-        a = datetime.datetime.utcnow()-datetime.timedelta(days=3)
-        unprocessed = Match.objects.filter(start_time__gte=a.strftime('%s'))
-        process_matches(unprocessed)
+        else:
+            unprocessed = Match.objects.filter(validity=Match.UNPROCESSED)
+            process_matches(unprocessed)
+
+            a = datetime.datetime.utcnow()-datetime.timedelta(days=3)
+            unprocessed = Match.objects.filter(start_time__gte=a.strftime('%s'))
+            process_matches(unprocessed)
 
 
         # Match Integrity Checks
