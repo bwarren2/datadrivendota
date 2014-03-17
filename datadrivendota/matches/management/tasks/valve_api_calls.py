@@ -56,6 +56,7 @@ class ApiContext(object):
     steamids = None
     processed = 0
     refresh_records = False
+    date_pull = False
 
     def toUrlDict(self, mode):
         if mode == 'GetPlayerSummaries':
@@ -113,28 +114,31 @@ class BaseTask(Task):
         return super(BaseTask, self).__call__(*args, **kwargs)
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
-        logger.info("Ending {task_id}".format(task_id=task_id))
+#        logger.info("Ending {task_id}".format(task_id=task_id))
+        pass
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        logger.error(
-            "Task failure! {args}, {kwargs}, {task_id} {einfo}".format(
-                args=args,
-                kwargs=kwargs,
-                task_id=task_id,
-                einfo=einfo
-            )
-        )
+        # logger.error(
+        #     "Task failure! {args}, {kwargs}, {task_id} {einfo}".format(
+        #         args=args,
+        #         kwargs=kwargs,
+        #         task_id=task_id,
+        #         einfo=einfo
+        #     )
+        # )
+        pass
 
     def on_retry(self, exc, id, args, kwargs, einfo):
-        logger.info("Task retry! {args}, {kwargs}, {task_id}".format(
-            args=args,
-            kwargs=kwargs,
-            task_id=id
-        ))
+        # logger.info("Task retry! {args}, {kwargs}, {task_id}".format(
+        #     args=args,
+        #     kwargs=kwargs,
+        #     task_id=id
+        # ))
+        pass
 
     def on_success(self, retval, task_id, args, kwargs):
-        logger.info("Task success! {task_id}".format(task_id=task_id))
-
+        # logger.info("Task success! {task_id}".format(task_id=task_id))
+        pass
 
 class ApiFollower(Task):
     abstract = True
@@ -145,29 +149,33 @@ class ApiFollower(Task):
         return super(ApiFollower, self).__call__(*args, **kwargs)
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
-        logger.info("Ending {task_id}".format(task_id=task_id))
+        # logger.info("Ending {task_id}".format(task_id=task_id))
+        pass
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        logger.error(
-            "Task failure! {args}, {kwargs}, {task_id} {einfo}".format(
-                args=args,
-                kwargs=kwargs,
-                task_id=task_id,
-                einfo=einfo
-            )
-        )
+        # logger.error(
+        #     "Task failure! {args}, {kwargs}, {task_id} {einfo}".format(
+        #         args=args,
+        #         kwargs=kwargs,
+        #         task_id=task_id,
+        #         einfo=einfo
+        #     )
+        # )
+        pass
 
     def on_retry(self, exc, id, args, kwargs, einfo):
-        logger.info(
-            "Task retry! {args}, {kwargs}, {task_id}".format(
-                args=args,
-                kwargs=kwargs,
-                task_id=id
-            )
-        )
+        # logger.info(
+        #     "Task retry! {args}, {kwargs}, {task_id}".format(
+        #         args=args,
+        #         kwargs=kwargs,
+        #         task_id=id
+        #     )
+        # )
+        pass
 
     def on_success(self, retval, task_id, args, kwargs):
-        logger.info("Task success! {task_id}".format(task_id=task_id))
+        # logger.info("Task success! {task_id}".format(task_id=task_id))
+        pass
 
 
 # Descendants
@@ -224,9 +232,10 @@ class ValveApiCall(BaseTask):
             url = modeDict[mode]
         except KeyError:
             logger.info("Keyerrors!")
-
+            raise
         URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
-        logger.info("URL: " + URL)
+        if mode == 'GetMatchHistory':
+            logger.error("URL: " + URL)
         # Exception handling for the URL opening.
         try:
             pageaccess = urllib2.urlopen(URL, timeout=5)
@@ -315,51 +324,94 @@ class RetrievePlayerRecords(ApiFollower):
         Recursively pings the valve API to get match data and spawns new tasks
         to deal with the downloaded match IDs.
         """
-        try:
         # Validate
-            if self.result['status'] == 15:
-                logger.error(
-                    "Could not pull data. "
-                    + str(self.api_context.account_id)
-                    + " disallowed it. "
-                )
-                p = Player.objects.get(steam_id=self.api_context.account_id)
-                p.updated = False
-                p.save()
-                return True
-            elif self.result['status'] == 1:
-                # Spawn a bunch of match detail queries
+        if self.result['status'] == 15:
+            logger.error(
+                "Could not pull data. "
+                + str(self.api_context.account_id)
+                + " disallowed it. "
+            )
+            p = Player.objects.get(steam_id=self.api_context.account_id)
+            p.updated = False
+            p.save()
+            return True
+        elif self.result['status'] == 1:
+            # Spawn a bunch of match detail queries
 
-                logger.info("Spawning")
-                self.spawnDetailCalls()
-                # Go around again if there are more records and the last one
-                # was before last scrape.
-                logger.info("Checking for more results")
-                if self.moreResultsLeft():
-                    self.rebound()
-                #Successful closeout
-                else:
-                    logger.info("Cleaning up")
-                    self.cleanup()
-                return True
+            logger.info("Spawning")
+
+            self.spawnDetailCalls()
+
+            # Go around again if there are more records and the last one
+            # was before last scrape.
+            logger.info("Checking for more results")
+            if self.moreResultsLeft():
+                self.rebound()
+            #Successful closeout
             else:
-                logger.error("Unhandled status: "+str(self.result['status']))
-                return True
-        except Exception, err:
-            logger.error("ERROR!:{0}".format(err))
+                logger.info("Cleaning up")
+                self.cleanup()
+            return True
+        else:
+            logger.error("Unhandled status: "+str(self.result['status']))
+            return True
+
+    def spawnDetailCalls(self):
+        for result in self.result['matches']:
+            vac = ValveApiCall()
+            um = UploadMatch()
+            self.api_context.match_id = result['match_id']
+            self.api_context.processed += 1
+            pass_context = deepcopy(self.api_context)
+            chain(vac.s(
+                mode='GetMatchDetails',
+                api_context=pass_context
+            ), um.s()).delay()
+
+    def moreResultsLeft(self):
+
+        if self.api_context.processed >= self.api_context.matches_desired:
+            logger.error("Got what we came for")
             return False
+        elif self.result['results_remaining'] == 0 \
+            and self.api_context.date_pull is True:
+                logger.error("Tried extra hard and failed")
+                return False
+        elif self.result['results_remaining'] == 0 \
+            and self.api_context.date_pull is False:
+
+                self.api_context.date_pull = True
+                logger.error("Tried wimpily")
+                return True
+
+        else:
+            self.api_context.date_pull = False
+            if self.api_context.deepcopy is False:
+                logger.error("Not Deepcopy")
+                return (
+                    self.api_context.last_scrape_time
+                    < self.result['matches'][-1]['start_time']
+                )
+            else:
+                logger.error("More left")
+                return True
 
     def rebound(self):
         logger.info("Rebounding")
-        self.api_context.start_at_match_id = self.result[
-            'matches'
-        ][-1]['match_id']
-        # If we want to poll more than 500 results deep, we need to reset the
-        # valve api's date bounding
-        if self.api_context.deepcopy:
+        if self.api_context.date_pull is False:
+            self.api_context.start_at_match_id = self.result[
+                'matches'
+            ][-1]['match_id']
+            self.api_context.date_max = None
+        else:
+            # If we want to poll more than 500 results deep, we reset the
+            # valve api's date bounding
             self.api_context.date_max = self.result[
                 'matches'
-            ][-1]['start_time']
+                ][-1]['start_time']
+            self.api_context.start_at_match_id = None
+            self.api_context.date_pull = False
+
         vac = ValveApiCall()
         rpr = RetrievePlayerRecords()
         pass_context = deepcopy(self.api_context)
@@ -384,32 +436,6 @@ class RetrievePlayerRecords(ApiFollower):
                 )
             )
 
-    def spawnDetailCalls(self):
-        for result in self.result['matches']:
-            vac = ValveApiCall()
-            um = UploadMatch()
-            self.api_context.match_id = result['match_id']
-            self.api_context.processed += 1
-            pass_context = deepcopy(self.api_context)
-            chain(vac.s(
-                mode='GetMatchDetails',
-                api_context=pass_context
-            ), um.s()).delay()
-
-    def moreResultsLeft(self):
-        if self.result['results_remaining'] == 0:
-            return False
-        elif self.api_context.processed >= self.api_context.matches_desired:
-            return False
-        else:
-            if self.api_context.deepcopy is False:
-                return (
-                    self.api_context.last_scrape_time
-                    < self.result['matches'][-1]['start_time']
-                )
-            else:
-                return True
-
 
 class UploadMatch(ApiFollower):
 
@@ -424,7 +450,6 @@ class UploadMatch(ApiFollower):
         overall match data.
         """
         data = self.result
-
         kwargs = {
             'radiant_win': data['radiant_win'],
             'duration': data['duration'],
