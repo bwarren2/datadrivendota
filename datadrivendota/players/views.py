@@ -97,9 +97,16 @@ def detail(request, player_id=None):
         ).count()
     except IndexError:
         losses = 0
+    try:
+        total = PlayerMatchSummary.objects.filter(
+            player=player,
+        ).count()
+    except IndexError:
+        total = 0
 
     stats['wins'] = wins
     stats['losses'] = losses
+    stats['total'] = total
     stats['winrate'] = round(
         float(wins) / (wins + losses) if wins + losses > 0 else 0,
         2
