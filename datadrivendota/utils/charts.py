@@ -1,3 +1,5 @@
+import random
+from django.conf import settings
 
 def params_dict():
     dictionary = {
@@ -29,3 +31,55 @@ def datapoint_dict():
         'url': None,
     }
     return dictionary
+
+
+def color_scale_params(params, group_list):
+    colors = other_colors()
+    groups = set(group_list)
+    color_domain, color_range = [], []
+    for group in groups:
+        if standard_color_map(group) is not None:
+            color_domain.append(group)
+            color_range.append(standard_color_map(group))
+        else:
+            color_domain.append(group)
+            color_range.append(next(colors))
+    params['color_domain'] = color_domain
+    params['color_range'] = color_range
+    return params
+
+
+def other_colors():
+    n = 0
+    colors = settings.CONTRASTING_10
+    while True:
+        color = colors[n % len(colors)]
+        n += 1
+        yield color
+
+
+def standard_color_map(group):
+    if group == 'Won':
+        return settings.WON_COLOR
+    elif group == 'Lost':
+        return settings.LOST_COLOR
+    elif group == 'Strength':
+            return settings.STRENGTH_COLOR
+    elif group == 'Agility':
+            return settings.AGILITY_COLOR
+    elif group == 'Intelligence':
+            return settings.INTELLIGENCE_COLOR
+    elif group == 'Radiant':
+            return settings.RADIANT_GREEN
+    elif group == 'Dire':
+            return settings.DIRE_RED
+    elif group == '1':
+            return settings.SKILL1_COLOR
+    elif group == '2':
+            return settings.SKILL2_COLOR
+    elif group == '3':
+            return settings.SKILL3_COLOR
+    elif group == 'Player':
+            return settings.SKILLPLAYER_COLOR
+    else:
+        return None

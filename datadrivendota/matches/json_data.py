@@ -11,7 +11,8 @@ from matches.models import (
 )
 from utils.exceptions import NoDataFound
 from utils.file_management import outsourceJson
-from utils.charts import params_dict, datapoint_dict
+from utils.charts import params_dict, datapoint_dict, color_scale_params
+from django.conf import settings
 
 
 def player_endgame_json(
@@ -65,7 +66,7 @@ def player_endgame_json(
     params['x_label'] = xlab
     params['y_label'] = ylab
     params['chart'] = 'xyplot'
-
+    params = color_scale_params(params, group_vector_list)
     return outsourceJson(datalist, params)
 
 
@@ -175,6 +176,8 @@ def team_endgame_json(
     params['x_label'] = xlab
     params['y_label'] = ylab
     params['chart'] = 'xyplot'
+    groups = [elt for elt in group_data.itervalues()]
+    params = color_scale_params(params, groups)
 
     return outsourceJson(datalist, params)
 
@@ -232,14 +235,15 @@ def match_parameter_json(match_id, x_var, y_var):
     if len(pmses) == 0:
         raise NoDataFound
 
-    data_list = []
+    data_list, groups = [], []
     for pms in pmses:
         datadict = datapoint_dict()
-
+        group = fetch_pms_attribute(pms, 'which_side')
+        groups.append(group)
         datadict.update({
             'x_var': fetch_pms_attribute(pms, x_var),
             'y_var': fetch_pms_attribute(pms, y_var),
-            'group_var': fetch_pms_attribute(pms, 'which_side'),
+            'group_var': group,
             'split_var': '{x} vs {y}'.format(x=x_var, y=y_var),
             'label': fetch_pms_attribute(pms, 'hero_name'),
             'tooltip': fetch_pms_attribute(pms, 'hero_name'),
@@ -258,5 +262,6 @@ def match_parameter_json(match_id, x_var, y_var):
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['outerWidth'] = 250
     params['outerHeight'] = 250
+    params = color_scale_params(params, groups)
 
     return outsourceJson(data_list, params)

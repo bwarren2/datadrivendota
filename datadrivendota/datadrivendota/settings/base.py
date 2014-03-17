@@ -521,9 +521,31 @@ PIPELINE_COMPILERS = (
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--with-yanc', '--stop']
 
-DIRE_RED = '#804839'
-RADIANT_GREEN = '#7FEB1B'
 
+#Magic Colors
+DIRE_RED = '#BA3B15'
+RADIANT_GREEN = '#7CD51B'
+WON_COLOR = '#FFD700'
+LOST_COLOR = '#C0C0C0'
+STRENGTH_COLOR = '#CC5240'
+AGILITY_COLOR = '#4BAA49'
+INTELLIGENCE_COLOR = '#618ABE'
+SKILL1_COLOR = '#CC0000'
+SKILL2_COLOR = '#CCAF00'
+SKILL3_COLOR = '#3ACC00'
+SKILLPLAYER_COLOR = '#00CC75'
+CONTRASTING_10 = [
+    '#1f77b4',
+    '#ff7f0e',
+    '#2ca02c',
+    '#d62728',
+    '#9467bd',
+    '#8c564b',
+    '#e377c2',
+    '#7f7f7f',
+    '#bcbd22',
+    '#17becf',
+]
 
 #Stripe
 STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')

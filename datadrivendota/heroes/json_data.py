@@ -2,7 +2,6 @@ import json
 import operator
 
 from itertools import chain
-from django.conf import settings
 from heroes.models import HeroDossier, Hero, invalid_option
 from matches.models import (
     PlayerMatchSummary,
@@ -12,7 +11,7 @@ from matches.models import (
 )
 from utils.exceptions import NoDataFound
 from utils.file_management import outsourceJson
-from utils.charts import datapoint_dict, params_dict
+from utils.charts import datapoint_dict, params_dict, color_scale_params
 
 
 def hero_vitals_json(hero_list, stats_list):
@@ -26,17 +25,18 @@ def hero_vitals_json(hero_list, stats_list):
 
     if len(selected_hero_dossiers) == 0 or invalid_option(stats_list):
         raise NoDataFound
-    datalist = []
-    xs = []
-    ys = []
+    datalist, xs, ys, groups = [], [], [], []
+
     for hero_dossier in selected_hero_dossiers:
+        group = hero_dossier.hero.name
+        groups.append(group)
         for stat in stats_list:
             for level in range(1, 26):
                 datadict = datapoint_dict()
                 datadict.update({
                     'x_var': level,
                     'y_var': hero_dossier.level_stat(stat, level),
-                    'group_var': hero_dossier.hero.name,
+                    'group_var': group,
                     'label': hero_dossier.hero.name,
                     'split_var': stat,
                 })
@@ -55,7 +55,7 @@ def hero_vitals_json(hero_list, stats_list):
     params['chart'] = 'xyplot'
     params['outerWidth'] = 300
     params['outerHeight'] = 300
-
+    params = color_scale_params(params, groups)
     return outsourceJson(datalist, params)
 
 
@@ -81,9 +81,7 @@ def hero_lineup_json(heroes, stat, level):
         )
     except AttributeError:
         raise NoDataFound
-    datalist = []
-    ys = []
-    xs = []
+    datalist, ys, xs, groups = [], [], [], []
 
     hero_value = sorted(
         hero_value.iteritems(),
@@ -92,6 +90,10 @@ def hero_lineup_json(heroes, stat, level):
     )
 
     for key, val in hero_value:
+        group = key.hero.safe_name() \
+            if key.hero.safe_name() in selected_names \
+            else key.alignment.title()
+        groups.append(group)
         datadict = datapoint_dict()
         datadict['x_var'] = key.hero.safe_name()
         datadict['y_var'] = val
@@ -100,9 +102,7 @@ def hero_lineup_json(heroes, stat, level):
             name=key.hero.safe_name(),
             val=val,
         )
-        datadict['group_var'] = key.hero.safe_name() \
-            if key.hero.safe_name() in selected_names \
-            else key.alignment
+        datadict['group_var'] = group
         datadict['split_var'] = 'Hero {stat}'.format(stat=stat)
         datalist.append(datadict)
         ys.append(val)
@@ -117,6 +117,7 @@ def hero_lineup_json(heroes, stat, level):
     params['outerHeight'] = 500
     params['x_set'] = xs
     params['padding']['bottom'] = 120
+    params = color_scale_params(params, groups)
 
     params['tickValues'] = [x for ind, x in enumerate(xs) if ind % 2 == 0]
     return outsourceJson(datalist, params)
@@ -220,10 +221,7 @@ def hero_progression_json(hero, player, game_mode_list, division):
         'player_match_summary__match__steam_id',
         'player_match_summary__player__persona_name',
     )
-    print sbs
-    datalist = []
-    xs = []
-    ys = []
+    datalist, xs, ys, groups = [], [], [], []
 
     for build in sbs:
         if build['level'] == 1:
@@ -244,15 +242,18 @@ def hero_progression_json(hero, player, game_mode_list, division):
             else 'Player'
 
         if division == 'Skill win/loss':
-            datapoint['group_var'] = "{s}, ({win})".format(
+            group = "{s}, ({win})".format(
                 s=skill_value,
                 win=winningness)
         elif division == 'Skill':
-            datapoint['group_var'] = "{s}".format(
+            group = "{s}".format(
                 s=skill_value)
         elif division == 'Win/loss':
-            datapoint['group_var'] = "{win}".format(
+            group = "{win}".format(
                 win=winningness)
+
+        datapoint['group_var'] = group
+        groups.append(group)
 
         datapoint['series_var'] = build[
             'player_match_summary__match__steam_id'
@@ -271,6 +272,7 @@ def hero_progression_json(hero, player, game_mode_list, division):
     params['y_max'] = max(ys)
     params['x_label'] = 'Time (m)'
     params['y_label'] = 'Level'
+    params = color_scale_params(params, groups)
 
     foo = outsourceJson(datalist, params)
     return foo

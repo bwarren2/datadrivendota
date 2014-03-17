@@ -15,6 +15,16 @@ var getVals = function(obj){
    return vals;
 }
 
+function getColorScale(params){
+  if ('color_range' in params && 'color_domain' in params) {
+      var color = d3.scale.ordinal().range(params.color_range)
+            .domain(params.color_domain)
+  } else{
+      var color = d3.scale.category10();
+  }
+
+  return color
+}
 
 function draw_scatterplot(source, placement_div){
     var raw_data = source['data'];
@@ -54,9 +64,9 @@ function draw_scatterplot(source, placement_div){
 
     var xAxis = d3.svg.axis().scale(x).orient("bottom"),
         yAxis = d3.svg.axis().scale(y).orient("left");
-
-    var color = d3.scale.category10();
-
+    
+    var color = getColorScale(params)
+    
     var g = svg.append("g")
         .attr("width", width)
         .attr("height", height)
@@ -195,7 +205,7 @@ function draw_barplot(source, placement_div){
     var xAxis = d3.svg.axis().scale(x).orient("bottom").tickValues(params.tickValues),
         yAxis = d3.svg.axis().scale(y).orient("left");
 
-    var color = d3.scale.category10();
+    var color = getColorScale(params)
 
     var g = svg.append("g")
         .attr("width", width)
@@ -366,7 +376,7 @@ function draw_scatterseries(data, placement_div){
   var xAxis = d3.svg.axis().scale(x).orient("bottom"),
       yAxis = d3.svg.axis().scale(y).orient("left");
 
-  var color = d3.scale.category10();
+  var color = getColorScale(params)
 
   var g = svg.append("g")
       .attr("width", width)
