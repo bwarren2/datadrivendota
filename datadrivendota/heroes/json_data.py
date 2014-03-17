@@ -42,7 +42,7 @@ def hero_vitals_json(hero_list, stats_list):
                         hero=hero_dossier.hero.name,
                         val=hero_dossier.level_stat(stat, level)
                     ),
-                    'split_var': stat,
+                    'split_var': stat.title(),
                 })
                 datalist.append(datadict)
                 xs.append(level)

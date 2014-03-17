@@ -54,7 +54,7 @@ def index(request):
     )
 
 
-@permission_required('players.can_look')
+@permission_required('players.can_touch')
 def followed_index(request):
     player_list = Player.objects.filter(updated=True)
     player_list = request.user.userprofile.following.all()
