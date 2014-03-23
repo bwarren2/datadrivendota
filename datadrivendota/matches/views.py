@@ -518,7 +518,10 @@ def annotated_matches(pms_list, follow_list):
             - pms.deaths + pms.assists/2
 
         pms_data = {}
-        pms_data['hero_image'] = pms.hero.thumbshot.url
+        try:
+            pms_data['hero_image'] = pms.hero.thumbshot.url
+        except ValueError:
+            pms_data['hero_image'] = None
         pms_data['hero_name'] = pms.hero.name
         pms_data['player_slot'] = pms.player_slot
         pms_data['side'] = side
