@@ -25,7 +25,7 @@
     <span id='xp_gold'></span>
   {% endif %}
   </div>
-  
+
   {% if dire_bans %}
     <div class="row">
       <div class="dire-pickban col-md-6">
@@ -121,7 +121,14 @@
       <tbody>
         {% for summary in summaries %}
           <tr{% if summary.is_win %} class="winner"{% endif %}>
+            {% if summary.hero.thumbshot %}
+
             <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
+            {% else %}
+            <td></td>
+
+            {% endif %}
+
             <td>{% player_link summary.player %}</td>
             <td><img src="{{ summary.player.avatar }}" class="summary-hero-thumbshot"></td>
             <td>{{ summary.kills }}</td>
