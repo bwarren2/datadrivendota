@@ -30,33 +30,51 @@ class Command(BaseCommand):
         # .exclude(lobby_type__steam_id=7)
 
         def process_matches(unprocessed):
+            def too_short(unprocessed):
+                ms = unprocessed.exclude(
+                    duration__lte=settings.MIN_MATCH_LENGTH
+                )
+                ms.update(validity=Match.UNCOUNTED)
+
             # Games that do not have ten match summaries are uncounted.
-            ms = unprocessed.annotate(Count('playermatchsummary'))
-            ms = ms.filter(playermatchsummary__count__lt=10)
-            keys = ms.values_list('pk', flat=True)
-            ms = unprocessed.filter(pk__in=keys)
-            ms.update(validity=Match.UNCOUNTED)
+            def player_count(unprocessed):
+                ms = unprocessed.annotate(Count('playermatchsummary'))
+                ms = ms.filter(playermatchsummary__count__lt=10)
+                keys = ms.values_list('pk', flat=True)
+                ms = unprocessed.filter(pk__in=keys)
+                ms.update(validity=Match.UNCOUNTED)
 
             # Games against bots do not count.
-            ms = unprocessed.filter(human_players__lt=10)
-            ms.update(validity=Match.UNCOUNTED)
+            def human_players(unprocessed):
+                ms = unprocessed.filter(human_players__lt=10)
+                ms.update(validity=Match.UNCOUNTED)
 
             # Games with leavers do not count.
-            ms = unprocessed.filter(playermatchsummary__leaver__steam_id__gt=1)
-            ms.update(validity=Match.UNCOUNTED)
+            def leavers(unprocessed):
+                ms = unprocessed.filter(
+                    playermatchsummary__leaver__steam_id__gt=1
+                )
+                ms.update(validity=Match.UNCOUNTED)
 
             # Things with ten human players, longer than min length, where no
             # one left count
-            ms = unprocessed.exclude(duration__lte=settings.MIN_MATCH_LENGTH)
-            ms = ms.exclude(human_players__lt=10)
-            ms = ms.exclude(playermatchsummary__leaver__steam_id__gt=1)
-            sub_selection = ms.annotate(Count('playermatchsummary'))
-            sub_selection = sub_selection.filter(
-                playermatchsummary__count__lt=10
-            )
-            keys = sub_selection.values_list('pk', flat=True)
-            ms = unprocessed.exclude(pk__in=keys)
-            ms.update(validity=Match.LEGIT)
+            def legitimize(unprocessed):
+                ms = unprocessed.exclude(
+                    duration__lte=settings.MIN_MATCH_LENGTH
+                )
+                ms = ms.exclude(human_players__lt=10)
+                ms = ms.exclude(playermatchsummary__leaver__steam_id__gt=1)
+                sub_selection = ms.annotate(Count('playermatchsummary'))
+                sub_selection = sub_selection.filter(
+                    playermatchsummary__count__lt=10
+                )
+                keys = sub_selection.values_list('pk', flat=True)
+                ms = ms.exclude(pk__in=keys)
+                ms.update(validity=Match.LEGIT)
+            player_count(unprocessed)
+            human_players(unprocessed)
+            leavers(unprocessed)
+            legitimize(unprocessed)
 
         if full_check is True:
             unprocessed = Match.objects.all()
@@ -67,7 +85,9 @@ class Command(BaseCommand):
             process_matches(unprocessed)
 
             a = datetime.datetime.utcnow()-datetime.timedelta(days=3)
-            unprocessed = Match.objects.filter(start_time__gte=a.strftime('%s'))
+            unprocessed = Match.objects.filter(
+                start_time__gte=a.strftime('%s')
+            )
             process_matches(unprocessed)
 
 
