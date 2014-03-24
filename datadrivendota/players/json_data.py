@@ -6,8 +6,8 @@ from .models import Player
 from utils.exceptions import NoDataFound
 from utils.file_management import outsourceJson
 from itertools import chain
-from utils.charts import params_dict, datapoint_dict
-from heroes.models import Hero
+from utils.charts import params_dict, datapoint_dict, color_scale_params
+from heroes.models import Hero, Role, HeroDossier
 from matches.models import SkillBuild
 from collections import defaultdict
 
@@ -15,18 +15,24 @@ from collections import defaultdict
 def player_winrate_json(
         player_id,
         game_mode_list=None,
+        role_list=[],
         min_date=datetime.date(2009, 1, 1),
         max_date=None,
+        group_var='alignment',
         width=500,
         height=500
         ):
-    # @todo: This had been "== None". Should always be "is None"
-    # --kit 2014-02-16
+    print role_list
     if max_date is None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
         max_date_utc = mktime(max_date.timetuple())
     min_dt_utc = mktime(min_date.timetuple())
+
+    if role_list == []:
+        roles = Role.objects.all()
+    else:
+        roles = Role.objects.filter(name__in=role_list)
 
     if min_dt_utc > max_date_utc:
         raise NoDataFound
@@ -43,6 +49,7 @@ def player_winrate_json(
     annotations = PlayerMatchSummary.objects.filter(
         player=player,
         match__validity=Match.LEGIT,
+        hero__roles__in=roles,
         match__game_mode__steam_id__in=game_mode_list,
     ).values('hero__name', 'is_win').annotate(Count('is_win'))
 
@@ -66,14 +73,20 @@ def player_winrate_json(
     }
     games = {hero: wins.get(hero, 0) + losses.get(hero, 0) for hero in heroes}
 
-    data_list = []
+    all_heroes = Hero.objects.all().select_related()
+    data_list, groups = [], []
     for hero in heroes:
         datadict = datapoint_dict()
-
+        hero_obj = all_heroes.filter(name=hero)
+        if group_var == 'hero':
+            group = hero_obj[0].name.title()
+        elif group_var == 'alignment':
+            group = hero_obj[0].herodossier.alignment.title()
+        groups.append(group)
         datadict.update({
             'x_var': games[hero],
             'y_var': round(win_rates[hero], 2),
-            'group_var': hero,
+            'group_var': group,
             'split_var': '',
             'label': hero,
             'tooltip': hero,
@@ -88,11 +101,17 @@ def player_winrate_json(
     params['x_label'] = 'Games'
     params['y_label'] = 'Winrate'
     params['draw_path'] = False
-    params['draw_legend'] = False
     params['chart'] = 'xyplot'
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['outerWidth'] = width
     params['outerHeight'] = height
+    if group_var == 'hero':
+        params['draw_legend'] = False
+        group = hero_obj[0]
+    elif group_var == 'alignment':
+        group = hero_obj[0].herodossier.alignment
+        params['draw_legend'] = True
+    params = color_scale_params(params, groups)
 
     return outsourceJson(data_list, params)
 

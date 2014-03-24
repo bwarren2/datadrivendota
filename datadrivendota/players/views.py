@@ -112,7 +112,8 @@ def detail(request, player_id=None):
         2
     )
     pms_list = get_playermatchsummaries_for_player(player, 10)
-    winrate_json = player_winrate_json(player.steam_id,
+    winrate_json = player_winrate_json(
+        player.steam_id,
         width=400,
         height=400
     )
@@ -163,6 +164,8 @@ def winrate(request):
                     game_mode_list=winrate_form.cleaned_data['game_modes'],
                     min_date=winrate_form.cleaned_data['min_date'],
                     max_date=winrate_form.cleaned_data['max_date'],
+                    role_list=winrate_form.cleaned_data['role_list'],
+                    group_var=winrate_form.cleaned_data['group_var'],
                 )
 
                 return render(

@@ -1,13 +1,23 @@
 from django import forms
+from django.forms.widgets import CheckboxSelectMultiple
 import datetime
 from matches.form_fields import MultiGameModeSelect
 from .form_fields import SinglePlayerField
+from heroes.models import Role
 from heroes.form_fields import SingleHeroSelect
 
 thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
 
 
 class PlayerWinrateLevers(forms.Form):
+    GROUP_CHOICES = [
+        (item, item.replace("_", " ").title())
+        for item in ['hero', 'alignment']
+    ]
+    ROLE_LIST = [
+        (role.name, role.name.replace("_", " ").title())
+        for role in Role.objects.all()
+    ]
     player = SinglePlayerField(
         help_text=(
             'The name of a single player.  '
@@ -33,6 +43,17 @@ class PlayerWinrateLevers(forms.Form):
     )
     max_date.widget = forms.TextInput(
         attrs={'class': 'datepicker'}
+    )
+    group_var = forms.ChoiceField(
+        choices=GROUP_CHOICES,
+        required=True,
+        help_text='How should we color the dots?'
+    )
+    role_list = forms.MultipleChoiceField(
+        choices=ROLE_LIST,
+        required=False,
+        help_text='Pick one or more stats to graph',
+        widget=CheckboxSelectMultiple
     )
 
 
