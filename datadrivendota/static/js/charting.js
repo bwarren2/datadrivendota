@@ -133,17 +133,23 @@ function draw_title(params, svg){
 }
 
 function draw_legend(params, svg, color){
+  var outerWidth = get_outer_width(params);
+  var outerHeight = get_outer_height(params);
+  var margin = get_margin(params);
   var legend = svg.append("g");
+  var pctWidth = get_legend_width_pct(params)
+  var pctHeight = get_legend_height_pct(params)
   legend.attr("class", "legend")
-        .attr("height", 100)
-        .attr("width", 100)
-        .attr("transform", "translate(10,20)");
+        .attr("transform", "translate("
+          +outerWidth*pctWidth+
+          ","
+          +outerHeight/10+")");
 
   var rows = legend.selectAll('rect')
         .data(function(d){return d.values;})
         .enter();
       rows.append("rect")
-        .attr("x", 50)
+        .attr("x", 2)
         .attr("y", function(d, i){ return i *  20;})
         .attr("width", 10)
         .attr("height", 10)
@@ -167,9 +173,11 @@ function draw_legend(params, svg, color){
 
   rows.append('text')
     .attr("class", 'legend-text')
-    .attr("x", 62)
+    .attr("x", 14)
     .attr("y", function(d, i){ return 11+(i *  20);})
-    .text(function(d){return d.key;});
+    .text(function(d){return d.key;
+    }
+  );
 }
 
 function draw_path(series, line, color){
@@ -196,12 +204,10 @@ function get_width(params){
   var padding = get_padding(params)
   return get_inner_width(params) - padding.left - padding.right;
 }
-
 function get_height(params){
   var padding = get_padding(params)
   return get_inner_height(params) - padding.top - padding.bottom;
 }
-
 function get_inner_width(params){
   var margin = get_margin(params)
   return get_outer_width(params) - margin.left - margin.right;
@@ -215,6 +221,12 @@ function get_outer_width(params){
 }
 function get_outer_height(params){
   return params.outerHeight;
+}
+function get_legend_width_pct(params){
+  return params.legendWidthPercent;
+}
+function get_legend_height_pct(params){
+  return params.legendHeightPercent;
 }
 
 function draw_scatterplot(source, placement_div){
@@ -434,6 +446,7 @@ function draw_scatterseries(data, placement_div){
       .attr('cx',function(d){return(x(d.x_var)); })
       .attr('cy',function(d){return(y(d.y_var)); })
       .attr('r', 1)
+      .attr('class', 'points')
       .style("fill", function(d) { return color(String(d.group_var));})
       .on("mouseover", function(d) {
         div.transition()

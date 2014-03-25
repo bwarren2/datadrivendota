@@ -1,3 +1,4 @@
+from math import floor
 from django.core.urlresolvers import reverse
 from itertools import chain
 from matches.models import (
@@ -257,9 +258,16 @@ def match_parameter_json(match_id, x_var, y_var):
     params['y_max'] = max([d['y_var'] for d in data_list])
     params['x_label'] = fetch_attribute_label(x_var)
     params['y_label'] = fetch_attribute_label(y_var)
+    if params['y_min'] > 1000:
+        params['y_label'] += ' (K)'
+        for d in data_list:
+            d['y_var'] /= 1000.0
+        params['y_max'] = int(floor(round(params['y_max']/1000.0, 0)))
+        params['y_min'] = int(floor(round(params['y_min']/1000.0, 0)))
     params['draw_path'] = False
     params['chart'] = 'xyplot'
     params['margin']['left'] = 12*len(str(params['y_max']))
+
     params['outerWidth'] = 250
     params['outerHeight'] = 250
     params = color_scale_params(params, groups)

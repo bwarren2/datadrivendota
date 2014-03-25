@@ -105,6 +105,8 @@ def player_winrate_json(
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['outerWidth'] = width
     params['outerHeight'] = height
+    params['legendWidthPercent'] = .7
+    params['legendHeightPercent'] = .1
     if group_var == 'hero':
         params['draw_legend'] = False
         group = hero_obj[0]

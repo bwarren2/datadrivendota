@@ -15,6 +15,8 @@ def params_dict():
         'padding': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
         'outerWidth': 400,
         'outerHeight': 400,
+        'legendWidthPercent': .2,
+        'legendHeightPercent': .1,
         'chart': None,
     }
     return dictionary
