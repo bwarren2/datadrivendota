@@ -13,17 +13,18 @@
     {{ match.game_mode.description }} {{ match.lobby_type.description }},
     {{ match.hms_duration }} @ {{ match.hms_start_time }}
   </div>
-
-  <div id='charts'>
-  {% if abilities_json %}
-    <span id='abilities'></span>
-  {% endif %}
-  {% if kill_dmg_json %}
-    <span id='kill_dmg'></span>
-  {% endif %}
-  {% if xp_gold_json %}
-    <span id='xp_gold'></span>
-  {% endif %}
+  <div class="charts col-md-6">
+    {% if abilities_json %}
+      <span id='abilities'></span>
+    {% endif %}
+  </div>
+  <div class="charts col-md-6">
+    {% if kill_dmg_json %}
+      <span id='kill_dmg'></span>
+    {% endif %}
+    {% if xp_gold_json %}
+      <span id='xp_gold'></span>
+    {% endif %}
   </div>
 
   {% if dire_bans %}
@@ -219,5 +220,10 @@
       })
     {% endif %}
 </script>
-
+<style type="text/css">
+  .charts{
+    margin-top:20px;
+    margin-bottom:20px;
+  }
+</style>
 {% endblock extra_js %}
