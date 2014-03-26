@@ -6,12 +6,13 @@
 
 {% block title %}Match #{{ match.steam_id }}{% endblock title %}
 
-{% block page_title %}Match #{{ match.steam_id }}{% endblock page_title %}
+{% block page_title %}Match #{{ match.steam_id }}
+<small>  {{ match.game_mode.description }} {{ match.lobby_type.description }},
+    {{ match.hms_duration }} @ {{ match.hms_start_time }}</small>{% endblock page_title %}
 
 {% block content %}
   <div class="match-data">
-    {{ match.game_mode.description }} {{ match.lobby_type.description }},
-    {{ match.hms_duration }} @ {{ match.hms_start_time }}
+
   </div>
   <div class="charts col-md-6">
     {% if abilities_json %}
