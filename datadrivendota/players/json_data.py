@@ -22,7 +22,6 @@ def player_winrate_json(
         width=500,
         height=500
         ):
-    print role_list
     if max_date is None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
@@ -90,6 +89,7 @@ def player_winrate_json(
             'split_var': '',
             'label': hero,
             'tooltip': hero,
+            'classes': [group],
         })
         data_list.append(datadict)
 
