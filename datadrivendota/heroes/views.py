@@ -16,7 +16,7 @@ from .json_data import (
     hero_performance_json,
     hero_progression_json
 )
-from .models import Hero, Ability, HeroDossier
+from .models import Hero, Ability, HeroDossier, Role
 
 from .forms import (
     HeroVitalsMultiSelect,
@@ -45,9 +45,13 @@ except ImportError:
 
 
 def index(request):
-    hero_list = Hero.objects.filter(visible=True).order_by('name').select_related()
-
-    return render(request, 'heroes/index.html', {'hero_list': hero_list})
+    hero_list = Hero.objects.filter(visible=True).order_by('name')\
+        .select_related()
+    role_list = Role.objects.all()
+    return render(request, 'heroes/index.html', {
+        'hero_list': hero_list,
+        'role_list': role_list,
+        })
 
 
 # @devserver_profile(follow=[HeroPerformanceChart])
@@ -225,7 +229,7 @@ def lineup(request):
 
 @devserver_profile(follow=[hero_performance_json])
 def hero_performance(request):
-    
+
     tour = [
         {
             'orphan': True,
