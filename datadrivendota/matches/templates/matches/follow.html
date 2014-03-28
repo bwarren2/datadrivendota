@@ -11,7 +11,16 @@
             <div><br> </div>
               <div>
                 {% for key, detail in match.pms_data.Radiant.iteritems %}
-                  <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
+                  <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot"
+                  {% if detail.player_image %}
+                    data-player-image={{detail.player_image}}
+                  {% endif %}
+                  {% if detail.hero_image %}
+                    data-hero-image={{ detail.hero_image }}
+                  {% endif %}
+
+                  >
+
                 {% endfor %}
               </div>
               <div>
