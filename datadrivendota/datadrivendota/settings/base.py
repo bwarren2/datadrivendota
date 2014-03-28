@@ -282,6 +282,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
     # 'social_auth.context_processors.social_auth_by_type_backends',
+    'zinnia.context_processors.version',  # Optional
+
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
@@ -334,8 +336,9 @@ DJANGO_APPS = (
     # Default Django apps:
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.comments',
+    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
@@ -358,6 +361,9 @@ THIRD_PARTY_APPS = (
     'corsheaders',
     'payments',
     'django_forms_bootstrap',
+    'tagging',
+    'mptt',
+    'zinnia',
 )
 
 # Apps specific for this project go here.
@@ -485,7 +491,6 @@ PIPELINE_JS = {
             'js/jquery-ui.js',
             'js/jquery.metadata.js',
             'js/jquery.tablesorter.js',
-            'js/polychart2.standalone.js',
             'messenger/messenger.js',
             'messenger/messenger-theme-future.js',
             'bootstrap/js/transition.js',

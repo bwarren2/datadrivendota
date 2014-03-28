@@ -31,4 +31,6 @@ urlpatterns = patterns(
     ),
     url(r'^upgrade/$', views.upgrade, name='upgrade'),
     url(r'^payments/', include("payments.urls", namespace='payments')),
+    url(r'^comments/', include('django.contrib.comments.urls')),
+    url(r'^blog/', include('zinnia.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
