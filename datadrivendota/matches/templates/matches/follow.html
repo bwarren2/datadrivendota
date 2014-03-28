@@ -16,18 +16,26 @@
               </div>
               <div>
               {% for key, detail in match.pms_data.Dire.iteritems %}
-                <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
+                <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot"
+                {% if detail.player_image %}
+                  data-player-image={{detail.player_image}}
+                {% endif %}
+                {% if detail.hero_image %}
+                  data-hero-image={{ detail.hero_image }}
+                {% endif %}
+
+                >
               {% endfor %}
               </div>
               <div><br> </div>
               <p class='overlayer'>
-                {{ match.match_data.game_mode }} 
+                {{ match.match_data.game_mode }}
                 {{match.match_data.Radiant.Kills}}/{{match.match_data.Radiant.Deaths}}/{{match.match_data.Radiant.Assists}}/{{match.match_data.Radiant.KDA2}} : {{match.match_data.Dire.Kills}}/{{match.match_data.Dire.Deaths}}/{{match.match_data.Dire.Assists}}/{{match.match_data.Dire.KDA2}}
               </p>
               <p class='overlayer-top-right'>{{match.match_data.display_date}}, {{match.match_data.display_duration}}</p>
           </a>
         </div>
-      
+
     {% endfor %}
 </div>
 
@@ -60,13 +68,13 @@
               </div>
               <div><br> </div>
               <p class='overlayer'>
-                {{ match.match_data.game_mode }} 
+                {{ match.match_data.game_mode }}
                 {{match.match_data.Radiant.Kills}}/{{match.match_data.Radiant.Deaths}}/{{match.match_data.Radiant.Assists}}/{{match.match_data.Radiant.KDA2}} : {{match.match_data.Dire.Kills}}/{{match.match_data.Dire.Deaths}}/{{match.match_data.Dire.Assists}}/{{match.match_data.Dire.KDA2}}
               </p>
               <p class='overlayer-top-right'>{{match.match_data.display_date}}, {{match.match_data.display_duration}}</p>
           </a>
         </div>
-      
+
     {% endfor %}
 </div>
 
@@ -79,3 +87,26 @@
   </p>
 {% endif %}
 {% endblock content %}
+{% block extra_js %}
+<script type="text/javascript">
+function rotateImage()
+{
+
+  $('img[data-player-image]').fadeOut('fast', function()
+    {
+      if($(this).attr('src')==$(this).attr('data-player-image')){
+        $(this).attr('src', $(this).attr('data-hero-image'));
+      }else{
+        $(this).attr('src', $(this).attr('data-player-image'));
+      }
+      $(this).fadeIn('fast');
+    }
+  );
+}
+
+$(document).ready(function()
+{
+  setInterval (rotateImage, 2500);
+});
+</script>
+{% endblock extra_js %}
