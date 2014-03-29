@@ -198,7 +198,7 @@ def match_ability_json(match_id, width=400, height=400, split_var='No Split'):
         if split_var == 'No Split':
             split_param = 'No Split'
         elif split_var == 'hero':
-            split_param = hero+'_foo'
+            split_param = hero
         elif split_var == 'side':
             split_param = side
 
