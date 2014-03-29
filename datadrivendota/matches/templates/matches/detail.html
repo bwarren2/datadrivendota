@@ -15,9 +15,11 @@
 
   </div>
   <div class="charts col-md-6">
-    {% if abilities_json %}
-      <span id='abilities'></span>
-    {% endif %}
+    <a href="{% url 'matches:ability_build' %}?split_var=side&match={{match.steam_id}}">
+      {% if abilities_json %}
+        <span id='abilities'></span>
+      {% endif %}
+    </a>
   </div>
   <div class="charts col-md-6">
     {% if kill_dmg_json %}
