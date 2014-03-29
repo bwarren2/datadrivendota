@@ -1,6 +1,6 @@
 {% extends "matches/base.html" %}
 {% block title %}Match Index{% endblock title %}
-{% block page_title %}Matches Index{% endblock page_title %}
+{% block page_title %}Matches Index <small><span id='hero-anchor'>Heroes</span> <span id='player-anchor'>Players</span></small>{% endblock page_title %}
 
 {% block content %}
 {% if match_data and lineup_thumbs %}
@@ -98,24 +98,33 @@
 {% endblock content %}
 {% block extra_js %}
 <script type="text/javascript">
-function rotateImage()
-{
 
+function playerImage()
+{
   $('img[data-player-image]').fadeOut('fast', function()
     {
-      if($(this).attr('src')==$(this).attr('data-player-image')){
-        $(this).attr('src', $(this).attr('data-hero-image'));
-      }else{
-        $(this).attr('src', $(this).attr('data-player-image'));
-      }
+      $(this).attr('src', $(this).attr('data-player-image'));
       $(this).fadeIn('fast');
     }
   );
 }
 
+function heroImage()
+{
+  $('img[data-player-image]').fadeOut('fast', function()
+    {
+      $(this).attr('src', $(this).attr('data-hero-image'));
+      $(this).fadeIn('fast');
+    }
+  );
+}
+
+
 $(document).ready(function()
 {
-  setInterval (rotateImage, 2500);
+  $('#hero-anchor').click(heroImage)
+
+  $('#player-anchor').click(playerImage)
 });
 </script>
 {% endblock extra_js %}
