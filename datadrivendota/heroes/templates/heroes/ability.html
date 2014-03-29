@@ -5,63 +5,79 @@
 {% block page_title %}{{ ability.name }}{% endblock %}
 
 {% block content %}
-  <a class="ability thumbnail">
-    <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
-  </a>
+<div class="ability-card thumbnail">
+  <div class="aligner">
+    <a class="ability thumbnail">
+      <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
+    </a>
+  </div>
   {% if ability.description %}
-    <p>{{ ability.description }}</p>
+    <p class="description">{{ ability.description }}</p>
   {% endif %}
   {% if ability.lore %}
-    <p>{{ ability.lore }}</p>
+    <blockquote class="lore">{{ ability.lore }}</blockquote>
   {% endif %}
   {% if ability.notes %}
-    <p>{{ ability.notes }}</p>
+    <p class="notes">{{ ability.notes }}</p>
   {% endif %}
-  {% if ability.channel_time %}
-    <p>Channel time: {{ ability.channel_time }}</p>
-  {% endif %}
-  {% if ability.damage_type %}
-    <p>Damage Type: {{ ability.damage_type }}</p>
-  {% endif %}
-  {% if ability.damage %}
-    <p>Damage: {{ ability.damage }}</p>
-  {% endif %}
-  {% if ability.cast_range %}
-    <p>Cast Range: {{ ability.cast_range }}</p>
-  {% endif %}
-  {% if ability.mana_cost %}
-    <p>Mana Cost: {{ ability.mana_cost }}</p>
-  {% endif %}
-  {% if ability.cooldown %}
-    <p>Cooldown: {{ ability.cooldown }}</p>
-  {% endif %}  
-  <p> Behavior:
-  {% for b in ability.behavior.all %}
-    {{forloop.counter}}: {{ b.internal_name }}
-  {% endfor %}
-  </p>
+  <ul>
+    {% if ability.channel_time %}
+      <li>Channel time: {{ ability.channel_time }}</li>
+    {% endif %}
+    {% if ability.damage_type %}
+      <li>Damage Type: {{ ability.damage_type }}</li>
+    {% endif %}
+    {% if ability.damage %}
+      <li>Damage: {{ ability.damage }}</li>
+    {% endif %}
+    {% if ability.cast_range %}
+      <li>Cast Range: {{ ability.cast_range }}</li>
+    {% endif %}
+    {% if ability.mana_cost %}
+      <li>Mana Cost: {{ ability.mana_cost }}</li>
+    {% endif %}
+    {% if ability.cooldown %}
+      <li>Cooldown: {{ ability.cooldown }}</li>
+    {% endif %}
+    <li>Behavior:
+      <ul>
+        {% for b in ability.behavior.all %}
+          <li>{{forloop.counter}}: {{ b.internal_name }}</li>
+        {% endfor %}
+      </ul>
+    </li>
 
-  <p> Target flags:
-  {% for b in ability.target_flags.all %}
-    {{forloop.counter}}: {{ b.internal_name }}
-  {% endfor %}
-  </p>
+    <li>Target flags:
+      <ul>
+        {% for b in ability.target_flags.all %}
+          <li>{{forloop.counter}}: {{ b.internal_name }}</li>
+        {% endfor %}
+      </ul>
+    </li>
 
-  <p> Target type:
-  {% for b in ability.target_type.all %}
-    {{forloop.counter}}: {{ b.internal_name }}
-  {% endfor %}
-  </p>
+    <li>Target type:
+      <ul>
+        {% for b in ability.target_type.all %}
+          <li>{{forloop.counter}}: {{ b.internal_name }}</li>
+        {% endfor %}
+      </ul>
+    </li>
 
-  <p> Target team:
-  {% for b in ability.target_team.all %}
-    {{forloop.counter}}: {{ b.internal_name }}
-  {% endfor %}
-  </p>
-  <p> Special Values:
-  {% for b in ability.abilityspecialvalues_set.all %}
-    {{b.key}}: {{ b.value }}
-  {% endfor %}
-  </p>
+    <li>Target team:
+      <ul>
+        {% for b in ability.target_team.all %}
+          <li>{{forloop.counter}}: {{ b.internal_name }}</li>
+        {% endfor %}
+      </ul>
+    </li>
+    <li>Special Values:
+      <ul>
+        {% for b in ability.abilityspecialvalues_set.all %}
+          <li>{{b.key}}: {{ b.value }}</li>
+        {% endfor %}
+      </ul>
+    </li>
+  </ul>
+</div>
 
 {% endblock %}

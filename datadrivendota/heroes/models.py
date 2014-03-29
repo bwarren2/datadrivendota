@@ -35,6 +35,10 @@ class Role(models.Model):
     name = models.CharField(max_length=50, choices=ROLES, unique=True)
     desc = models.TextField()
 
+    @property
+    def url(self):
+        return "images/pips/{}.png".format(self.name.lower())
+
     def __unicode__(self):
         return self.name
 

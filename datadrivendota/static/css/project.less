@@ -70,16 +70,19 @@ img.ability {
   letter-spacing: 0.03em;
 }
 
+.aligner {
+  text-align: center;
+}
+
 .infobox {
   float: right;
-  width: 300px;
+  width: 375px;
 
   a.thumbnail {
     display: inline-block;
   }
 
   img.hero {
-    margin: 0 auto;
   }
 }
 
@@ -171,6 +174,11 @@ a.ability {
     max-width: 102px;
     top: auto;
   }
+}
+
+.ability-card {
+  width: 600px;
+  margin: 0 auto;
 }
 
 /*Enfootening*/
@@ -284,17 +292,35 @@ tr.winner td {
   background-color: rgba(231, 214, 177, 0.25);
 }
 
-.role-magnitude-1 {
-  font-size: 80%;
-  color: green;
+.roles img {
+  margin: 5px;
 }
+
+.role-magnitude-1 {
+  font-size: 90%;
+  color: #90c5a9;// @brand-success;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  box-shadow: 0px 0px 2px #90c5a9;// @brand-success;
+}
+
 .role-magnitude-2 {
   font-size: 120%;
-  color: yellow;
+  color: #f6dca2; // @brand-info;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  box-shadow: 0px 0px 5px #f6dca2; // @brand-info;
 }
+
 .role-magnitude-3 {
-  font-size: 160%;
-  color: red;
+  font-size: 150%;
+  color: #ef6d3b; // @brand-danger;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  box-shadow: 0px 0px 10px #ef6d3b; // @brand-danger;
 }
 
 .match-index-thumbshot{
