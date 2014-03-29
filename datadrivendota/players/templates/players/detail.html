@@ -7,36 +7,46 @@
 
 {% block content %}
 
-  <div class="player-infobox">
-    <img src="{{ player.avatar_full }}">
-    <h2>{{ player.persona_name }}</h2>
-    {% if player.pro_name %}
-      
-      <h3>Pro name: {{ player.pro_name }}</h3>
-    {% endif %}
-    <h6>Wins: {{stats.wins}}</h6>
-    <h6>Losses: {{stats.losses}}</h6>
-    <h6>Winrate: {{stats.winrate}}%</h6>
-    <h6>Total Games: {{stats.total}}</h6>
-  </div>
-  <div class="player-charts">
-    {% if winrate_json %}
-      <span id='winrate_chart'></span>
-    {% endif %}
+  <div class="row">
+    <div class="player-charts col-md-4">
+      {% if winrate_json %}
+        <span id='winrate_chart'></span>
+      {% endif %}
+    </div>
+
+    <div class="col-md-4">
+      <ul>
+        {% for hero in top_5_played_heroes %}
+          <li>{{ hero }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="player-infobox col-md-4">
+      <img src="{{ player.avatar_full }}">
+      <h2>{{ player.persona_name }}</h2>
+      {% if player.pro_name %}
+        <h3>Pro name: {{ player.pro_name }}</h3>
+      {% endif %}
+      <h6>Wins: {{stats.wins}}</h6>
+      <h6>Losses: {{stats.losses}}</h6>
+      <h6>Winrate: {{stats.winrate}}%</h6>
+      <h6>Total Games: {{stats.total}}</h6>
+    </div>
   </div>
   <div id='chart'></div>
 
   <div>
-    <table class="table  table-condensed" id='myTable'>
+    <table class="table table-condensed" id='myTable'>
       <thead>
         <tr>
           <th>Match ID</th>
           <th>Duration</th>
-          <th colspan=2>Hero</th>
+          <th>Hero</th>
           <th>K</th>
           <th>D</th>
           <th>A</th>
-          <th colspan=2>KDA/2</th>
+          <th colspan="2">KDA/2</th>
           <th>Start Time</th>
           <th>Game Mode</th>
         </tr>
@@ -46,10 +56,13 @@
           <tr>
             <td><a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}">{{ pms.match.steam_id }}</a></td>
             <td>{{ pms.display_duration }}</td>
+            <td>
             {% if pms.hero.thumbshot %}
-            <td><img src="{{ pms.hero.thumbshot.url }}" height="60%"></td>
+              <img src="{{ pms.hero.thumbshot.url }}" alt="{{ pms.hero.name }}" title="{{ pms.hero.name }}" height="60%">
+            {% else %}
+              {{ pms.hero.name }}
             {% endif %}
-            <td>{{ pms.hero.name }}</td>
+            </td>
             <td>{{ pms.kills }}</td>
             <td>{{ pms.deaths }}</td>
             <td>{{ pms.assists }}</td>
