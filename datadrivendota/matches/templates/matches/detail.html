@@ -98,7 +98,46 @@
     </div>
   {% endif %}
 
-  <div>
+  <div class='col-md-12'>
+    <div class='radiant-abilities'>
+      {% for summary in radiant_summaries %}
+        <div class='ability-row'>
+          {% if summary.hero.thumbshot %}
+            <span class='ability-row-hero'>
+              <img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" style='height:35px'>
+            </span>
+              {% else %}
+            <span class='ability-row-hero'>
+            </span>
+
+          {% endif %}
+          {% for sb in summary.skillbuild_set.all %}
+              <img class='ability-thumbshot' src="{{sb.ability.picture.url}}">
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class='dire-abilities'>
+      {% for summary in dire_summaries %}
+        <div class='ability-row'>
+          {% if summary.hero.thumbshot %}
+            <span class='ability-row-hero'>
+              <img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" style='height:35px'>
+            </span>
+              {% else %}
+            <span class='ability-row-hero'>
+            </span>
+
+          {% endif %}
+          {% for sb in summary.skillbuild_set.all %}
+              <img class='ability-thumbshot' src="{{sb.ability.picture.url}}">
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div style='margin-top:20px;'>
     <table class="table  table-condensed" id='myTable'>
       <thead>
         <tr>

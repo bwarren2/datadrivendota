@@ -125,6 +125,9 @@ def match(request, match_id):
     except AttributeError:
         abilities_name = None
 
+    radiant_summaries = [summary for summary in summaries if summary.which_side()=='Radiant']
+    dire_summaries = [summary for summary in summaries if summary.which_side()=='Dire']
+
     #Identify any pickbans for templating.
     dire_hero_ids = [
         pms.hero.steam_id for pms in summaries if pms.which_side() == 'Dire'
@@ -163,6 +166,8 @@ def match(request, match_id):
             {
                 'match': match,
                 'summaries': summaries,
+                'radiant_summaries': radiant_summaries,
+                'dire_summaries': dire_summaries,
                 'kill_dmg_json': kill_dmg_json_name,
                 'xp_gold_json': xp_gold_json_name,
                 'abilities_json': abilities_name,
@@ -179,6 +184,8 @@ def match(request, match_id):
             {
                 'match': match,
                 'summaries': summaries,
+                'radiant_summaries': radiant_summaries,
+                'dire_summaries': dire_summaries,
                 'kill_dmg_json': kill_dmg_json_name,
                 'xp_gold_json': xp_gold_json_name,
                 'abilities_json': abilities_name,
