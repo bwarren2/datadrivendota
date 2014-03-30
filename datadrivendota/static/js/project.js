@@ -201,6 +201,17 @@ $(function () {
       return value;
     }
   }
+
+  $('#hero-filter-select').change(function () {
+    var role_select = $(this).val();
+    if (!!role_select) {
+      $('.col-md-2:not(.' + role_select + ')').fadeOut();
+      $('.col-md-2.' + role_select).fadeIn();
+    } else {
+      $('.col-md-2').fadeIn();
+    }
+  });
+
 });
 
 
