@@ -119,7 +119,7 @@
 
           {% endif %}
           {% for sb in summary.skillbuild_set.all %}
-              <a href="{%url 'heroes:ability_detail' hero_name=summary.hero.machine_name ability_name=sb.ability.machine_name%}">
+            <a href="{%url 'heroes:ability_detail' hero_name=summary.hero.machine_name ability_name=sb.ability.machine_name%}">
               <img class='ability-thumbshot' src="{{sb.ability.picture.url}}">
             </a>
           {% endfor %}
@@ -140,7 +140,9 @@
 
           {% endif %}
           {% for sb in summary.skillbuild_set.all %}
+          <a href="{%url 'heroes:ability_detail' hero_name=summary.hero.machine_name ability_name=sb.ability.machine_name%}">
               <img class='ability-thumbshot' src="{{sb.ability.picture.url}}">
+            </a>
           {% endfor %}
         </div>
       {% endfor %}

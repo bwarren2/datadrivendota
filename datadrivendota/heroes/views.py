@@ -465,11 +465,17 @@ def hero_performance_api(request):
 
 
 def ability_detail(request, hero_name, ability_name):
-    ability = get_object_or_404(
-        Ability,
-        machine_name=ability_name,
-        hero__machine_name=hero_name,
-    )
+    if ability_name == 'stats':
+        ability = get_object_or_404(
+            Ability,
+            machine_name=ability_name,
+        )
+    else:
+        ability = get_object_or_404(
+            Ability,
+            machine_name=ability_name,
+            hero__machine_name=hero_name,
+        )
     charts = []
     return render(
         request,
