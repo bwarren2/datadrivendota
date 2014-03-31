@@ -120,6 +120,8 @@ def hero_lineup_json(heroes, stat, level):
     params['outerWidth'] = 800
     params['outerHeight'] = 500
     params['x_set'] = xs
+    params['legendWidthPercent'] = .7
+    params['legendHeightPercent'] = .8
     params['padding']['bottom'] = 120
     params = color_scale_params(params, groups)
 
