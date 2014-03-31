@@ -1,4 +1,5 @@
 import datetime
+from urllib import urlencode
 from time import mktime
 from django.db.models import Count
 from matches.models import PlayerMatchSummary, GameMode, Match
@@ -72,16 +73,20 @@ def player_winrate_json(
     }
     games = {hero: wins.get(hero, 0) + losses.get(hero, 0) for hero in heroes}
 
+
     all_heroes = Hero.objects.all().select_related()
     data_list, groups = [], []
     for hero in heroes:
         datadict = datapoint_dict()
-        hero_obj = all_heroes.filter(name=hero)
+        hero_obj = all_heroes.get(name=hero)
         if group_var == 'hero':
-            group = hero_obj[0].name.title()
+            group = hero_obj.name.title()
         elif group_var == 'alignment':
-            group = hero_obj[0].herodossier.alignment.title()
+            group = hero_obj.herodossier.alignment.title()
         groups.append(group)
+        url_str = '/heroes/skill_progression/?game_modes=1&game_modes=2&game_modes=3&game_modes=4&game_modes=5&division=Skill&{extras}'.format(extras=urlencode({'player': player.display_name(),
+            'hero': hero_obj.name}))
+
         datadict.update({
             'x_var': games[hero],
             'y_var': round(win_rates[hero], 2),
@@ -89,6 +94,7 @@ def player_winrate_json(
             'split_var': '',
             'label': hero,
             'tooltip': hero,
+            'url': url_str,
             'classes': [group],
         })
         data_list.append(datadict)
@@ -109,9 +115,9 @@ def player_winrate_json(
     params['legendHeightPercent'] = .1
     if group_var == 'hero':
         params['draw_legend'] = False
-        group = hero_obj[0]
+        group = []
     elif group_var == 'alignment':
-        group = hero_obj[0].herodossier.alignment
+        group = hero_obj.herodossier.alignment
         params['draw_legend'] = True
     params = color_scale_params(params, groups)
 
@@ -162,16 +168,16 @@ def player_hero_abilities_json(
             else 'Loss'
         if division == 'Player win/loss':
             datapoint['group_var'] = "{p}, ({win})".format(
-                p=build.player_match_summary.player.persona_name,
+                p=build.player_match_summary.player.display_name(),
                 win=winningness)
         elif division == 'Players':
             datapoint['group_var'] = "{p}".format(
-                p=build.player_match_summary.player.persona_name)
+                p=build.player_match_summary.player.display_name())
         elif division == 'Win/loss':
             datapoint['group_var'] = "{win}".format(
                 win=winningness)
         datapoint['series_var'] = build.player_match_summary.match.steam_id
-        datapoint['label'] = build.player_match_summary.player.persona_name
+        datapoint['label'] = build.player_match_summary.player.display_name()
         datapoint['split_var'] = 'Skill Progression'
         datalist.append(datapoint)
 
