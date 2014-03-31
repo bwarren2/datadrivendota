@@ -12,9 +12,10 @@
 
 {% block content %}
   <div class="match-data">
-
   </div>
+
   <div class="charts col-md-6">
+  <h4>Level Progression</h4>
     <a href="{% url 'matches:ability_build' %}?split_var=side&match={{match.steam_id}}">
       {% if abilities_json %}
         <span id='abilities'></span>
@@ -22,6 +23,7 @@
     </a>
   </div>
   <div class="charts col-md-6">
+  <h4>Matchup Data</h4>
     {% if kill_dmg_json %}
       <span id='kill_dmg'></span>
     {% endif %}
@@ -100,8 +102,10 @@
     </div>
   {% endif %}
 
-  <div >
+  <div>
+    <h4>Abilities</h4>
     <div class='radiant-abilities'>
+    <h5>Radiant</h5>
       {% for summary in radiant_summaries %}
         <div class='ability-row'>
           {% if summary.hero.thumbshot %}
@@ -120,6 +124,7 @@
       {% endfor %}
     </div>
     <div class='dire-abilities'>
+    <h5>Dire</h5>
       {% for summary in dire_summaries %}
         <div class='ability-row'>
           {% if summary.hero.thumbshot %}
@@ -223,9 +228,11 @@
 {% block extra_js %}
 <script type="text/javascript">
   $(document).ready(function () {
+    $('.dire-pickban, .radiant-pickban').hide()
     $('#pickban-reveal').click(function () {
-      $('#pickban-reveal').attr('disabled', 'disabled');
       $('.pickban-list li').fadeOut();
+      $('.dire-pickban, .radiant-pickban').show()
+      $('#pickban-reveal').attr('disabled', 'disabled');
       var PICKBAN_LIMIT = 20;
       var PICKBAN_REVEAL_SECONDS = 2;
       for (var i = 0; i < PICKBAN_LIMIT; i++) {
@@ -262,10 +269,4 @@
       })
     {% endif %}
 </script>
-<style type="text/css">
-  .charts{
-    margin-top:20px;
-    margin-bottom:20px;
-  }
-</style>
 {% endblock extra_js %}
