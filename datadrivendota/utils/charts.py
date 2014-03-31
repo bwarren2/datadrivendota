@@ -37,7 +37,7 @@ def datapoint_dict():
 
 def color_scale_params(params, group_list):
     colors = other_colors()
-    groups = sorted(list(set(group_list)))
+    groups = set(group_list)
     color_domain, color_range = [], []
     for group in groups:
         if standard_color_map(group) is not None:
