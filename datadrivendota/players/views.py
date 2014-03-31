@@ -111,7 +111,16 @@ def detail(request, player_id=None):
         float(wins) / (wins + losses) if wins + losses > 0 else 0,
         2
     )
-    pms_list = get_playermatchsummaries_for_player(player, 10)
+    pms_list = get_playermatchsummaries_for_player(player, 36)
+    for pms in pms_list:
+        pms.KDA2 = pms.kills-pms.deaths+pms.assists/2
+        pms.display_date = \
+            datetime.datetime.fromtimestamp(pms.match.start_time).strftime('%Y-%m-%d')
+
+        pms.display_duration = \
+            str(datetime.timedelta(seconds=pms.match.duration))
+
+
     winrate_json = player_winrate_json(
         player.steam_id,
         width=400,

@@ -1,6 +1,6 @@
 {% extends "matches/base.html" %}
 {% block title %}Match Index{% endblock title %}
-{% block page_title %}Matches Index <small><span id='hero-anchor'>Heroes</span>  <span id='player-anchor'>Players</span>    Score:<span id='show-score'>show</span> <span id='hide-score'>hide</span></small>{% endblock page_title %}
+{% block page_title %}Matches Index <small><span id='hero-anchor' class='nav-toggle'>Heroes</span>  <span id='player-anchor' class='nav-toggle'>Players</span>    Score: <span id='show-score' class='nav-toggle'>show</span> <span id='hide-score' class='nav-toggle'>hide</span></small>{% endblock page_title %}
 
 {% block content %}
 {% if match_data and lineup_thumbs %}

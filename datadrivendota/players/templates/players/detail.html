@@ -8,6 +8,7 @@
 {% block content %}
 
   <div class="row">
+  <h4>Hero Winrate</h4>
     <div class="player-charts col-md-4">
       {% if winrate_json %}
         <span id='winrate_chart'></span>
@@ -37,43 +38,19 @@
   <div id='chart'></div>
 
   <div>
-    <table class="table table-condensed" id='myTable'>
-      <thead>
-        <tr>
-          <th>Match ID</th>
-          <th>Duration</th>
-          <th>Hero</th>
-          <th>K</th>
-          <th>D</th>
-          <th>A</th>
-          <th colspan="2">KDA/2</th>
-          <th>Start Time</th>
-          <th>Game Mode</th>
-        </tr>
-      </thead>
-      <tbody>
+        <h4>Recent Matches.  Score: <span id='show-score nav-toggle'>Show</span> <span id='hide-score nav-toggle'>Hide</span></h4>
         {% for pms in pms_list %}
-          <tr>
-            <td><a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}">{{ pms.match.steam_id }}</a></td>
-            <td>{{ pms.display_duration }}</td>
-            <td>
-            {% if pms.hero.thumbshot %}
-              <img src="{{ pms.hero.thumbshot.url }}" alt="{{ pms.hero.name }}" title="{{ pms.hero.name }}" height="60%">
-            {% else %}
-              {{ pms.hero.name }}
-            {% endif %}
-            </td>
-            <td>{{ pms.kills }}</td>
-            <td>{{ pms.deaths }}</td>
-            <td>{{ pms.assists }}</td>
-            <td>{{ pms.kda2 }}</td>
-            <td><div style="width:{{ pms.mag }}px" class="databaru {{ pms.color_class }}"></div></td>
-            <td>{{ pms.display_date|date:"D d M Y" }}</td>
-            <td>{{ pms.match.game_mode.description }}</td>
-          </tr>
+          <div class="{% for assignment in hero.assignment_set.all %}{{assignment.role.name}} {% endfor %}col-md-2">
+            <a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}" class="thumbnail">
+              {% if pms.hero.mugshot %}
+              <img src="{{ pms.hero.mugshot.url }}" alt="{{ hero.name }}" class="player-match-portrait">
+              {% endif %}
+              <p class='overlayer'>{{ pms.hero.name }} <span class='scorebar'>{{ pms.kills }}/{{ pms.deaths }}/{{ pms.assists }}/{{ pms.KDA2 }}</span></p>
+              <p class='overlayer-top-right'>{{pms.display_date}}, {{pms.display_duration}}</p>
+
+            </a>
+          </div>
         {% endfor %}
-      </tbody>
-    </table>
     <a href="{% url 'players:id_matches' player_id=player.steam_id %}">More</a>
   </div>
 {% endblock content %}
@@ -86,6 +63,13 @@
     input_data = source;
     window.d3ening.plot(source, '#winrate_chart')
   });
+</script>
+<script type="text/javascript">
+  $(function(){
+    $('.scorebar').hide();
+    $('#show-score').click(function(){$('.scorebar').fadeIn('fast');});
+    $('#hide-score').click(function(){$('.scorebar').fadeOut('fast');});
+  })
 </script>
 
 {% endblock extra_js %}
