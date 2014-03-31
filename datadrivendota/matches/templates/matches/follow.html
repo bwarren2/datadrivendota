@@ -1,6 +1,6 @@
 {% extends "matches/base.html" %}
 {% block title %}Match Index{% endblock title %}
-{% block page_title %}Matches Index <small><span id='hero-anchor'>Heroes</span> <span id='player-anchor'>Players</span></small>{% endblock page_title %}
+{% block page_title %}Matches Index <small><span id='hero-anchor'>Heroes</span>  <span id='player-anchor'>Players</span>    Score:<span id='show-score'>show</span> <span id='hide-score'>hide</span></small>{% endblock page_title %}
 
 {% block content %}
 {% if match_data and lineup_thumbs %}
@@ -39,7 +39,8 @@
               <div><br> </div>
               <p class='overlayer'>
                 {{ match.match_data.game_mode }}
-                {{match.match_data.Radiant.Kills}}/{{match.match_data.Radiant.Deaths}}/{{match.match_data.Radiant.Assists}}/{{match.match_data.Radiant.KDA2}} : {{match.match_data.Dire.Kills}}/{{match.match_data.Dire.Deaths}}/{{match.match_data.Dire.Assists}}/{{match.match_data.Dire.KDA2}}
+                <span class='scorebar'>{{match.match_data.Radiant.Kills}}/{{match.match_data.Radiant.Deaths}}/{{match.match_data.Radiant.Assists}}/{{match.match_data.Radiant.KDA2}} : {{match.match_data.Dire.Kills}}/{{match.match_data.Dire.Deaths}}/{{match.match_data.Dire.Assists}}/{{match.match_data.Dire.KDA2}}
+                </span>
               </p>
               <p class='overlayer-top-right'>{{match.match_data.display_date}}, {{match.match_data.display_duration}}</p>
           </a>
@@ -122,9 +123,11 @@ function heroImage()
 
 $(document).ready(function()
 {
-  $('#hero-anchor').click(heroImage)
-
-  $('#player-anchor').click(playerImage)
+  $('.scorebar').hide();
+  $('#hero-anchor').click(heroImage);
+  $('#player-anchor').click(playerImage);
+  $('#show-score').click(function(){$('.scorebar').fadeIn('fast');});
+  $('#hide-score').click(function(){$('.scorebar').fadeOut('fast');});
 });
 </script>
 {% endblock extra_js %}

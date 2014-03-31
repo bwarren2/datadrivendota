@@ -1,9 +1,9 @@
 {% extends "players/base.html" %}
 
-{% block page_title %}Player Index! 
+{% block page_title %}Player Index!
 <a href="{% url 'players:pro_index' %}">Pros</a>
-<a href="{% url 'players:followed_index' %}">Followed</a>
-<a href="{% url 'players:index' %}">All</a>
+ <a href="{% url 'players:followed_index' %}">Followed</a>
+ <a href="{% url 'players:index' %}">All</a>
 {% endblock page_title %}
 
 {% block content %}
