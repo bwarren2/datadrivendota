@@ -38,9 +38,9 @@
   <div id='chart'></div>
 
   <div>
-        <h4>Recent Matches.  Score: <span id='show-score nav-toggle'>Show</span> <span id='hide-score nav-toggle'>Hide</span></h4>
+        <h4>Recent Matches.  Score: <span id='show-score' class='nav-toggle'>Show</span> <span id='hide-score' class='nav-toggle'>Hide</span></h4>
         {% for pms in pms_list %}
-          <div class="{% for assignment in hero.assignment_set.all %}{{assignment.role.name}} {% endfor %}col-md-2">
+          <div class="col-md-2">
             <a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}" class="thumbnail">
               {% if pms.hero.mugshot %}
               <img src="{{ pms.hero.mugshot.url }}" alt="{{ hero.name }}" class="player-match-portrait">
