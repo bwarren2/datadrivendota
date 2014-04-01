@@ -1,4 +1,5 @@
 import datetime
+from urllib import urlencode
 from time import mktime
 from django.db.models import Count
 from matches.models import PlayerMatchSummary, GameMode, Match
@@ -82,11 +83,15 @@ def player_winrate_json(
             group = hero_obj.herodossier.alignment.title()
         groups.append(group)
 
+        url_str = '/heroes/skill_progression/?game_modes=1&game_modes=2&game_modes=3&game_modes=4&game_modes=5&division=Skill&{extras}'.format(extras=urlencode({'hero': hero_obj.name,
+            'player': player.display_name()}))
+
         datadict.update({
             'x_var': games[hero],
             'y_var': round(win_rates[hero], 2),
             'group_var': group,
             'split_var': '',
+            'url': url_str,
             'label': hero,
             'tooltip': hero,
             'classes': [group],
