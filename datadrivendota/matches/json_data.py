@@ -11,9 +11,7 @@ from matches.models import (
     SkillBuild
 )
 from utils.exceptions import NoDataFound
-from utils.file_management import outsourceJson
 from utils.charts import params_dict, datapoint_dict, color_scale_params
-from django.conf import settings
 
 
 def player_endgame_json(
@@ -84,22 +82,16 @@ def team_endgame_json(
         compressor
         ):
 
-    # @todo: test this function? These appear to be the same query sets.
-    # --kit 2012-02-16
-    radiant_matches = Match.objects.filter(
-        game_mode__steam_id__in=mode_list,
-        validity=Match.LEGIT
-    )
-    dire_matches = Match.objects.filter(
+    matches = Match.objects.filter(
         game_mode__steam_id__in=mode_list,
         validity=Match.LEGIT
     )
     for player in player_list:
-        radiant_matches = radiant_matches.filter(
+        radiant_matches = matches.filter(
             playermatchsummary__player__steam_id=player,
             playermatchsummary__player_slot__lte=5
         )
-        dire_matches = dire_matches.filter(
+        dire_matches = matches.filter(
             playermatchsummary__player__steam_id=player,
             playermatchsummary__player_slot__gt=5
         )
@@ -183,7 +175,7 @@ def team_endgame_json(
     groups = [elt for elt in group_data.itervalues()]
     params = color_scale_params(params, groups)
 
-    return outsourceJson(datalist, params)
+    return (datalist, params)
 
 
 def match_ability_json(match_id, width=400, height=400, split_var='No Split'):
@@ -231,7 +223,7 @@ def match_ability_json(match_id, width=400, height=400, split_var='No Split'):
     params['outerWidth'] = width
     params['outerHeight'] = height
 
-    return outsourceJson(datalist, params)
+    return (datalist, params)
 
 
 def match_parameter_json(match_id, x_var, y_var):
@@ -275,4 +267,4 @@ def match_parameter_json(match_id, x_var, y_var):
     params['outerHeight'] = 250
     params = color_scale_params(params, groups)
 
-    return outsourceJson(data_list, params)
+    return (data_list, params)

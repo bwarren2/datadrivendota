@@ -84,11 +84,12 @@ def match(request, match_id):
     ).strftime('%H:%M:%S %Y-%m-%d')
 
     try:
-        kill_dmg_json = match_parameter_json(
+        datalist, params = match_parameter_json(
             match_id,
             'kills',
             'hero_damage'
         )
+        kill_dmg_json = outsourceJson(datalist, params)
     except NoDataFound:
         kill_dmg_json = None
 
@@ -98,11 +99,12 @@ def match(request, match_id):
         kill_dmg_json_name = None
 
     try:
-        xp_gold_json = match_parameter_json(
+        datalist, params = match_parameter_json(
             match_id,
             'gold_per_min',
             'xp_per_min'
         )
+        xp_gold_json = outsourceJson(datalist,  params)
     except NoDataFound:
         xp_gold_json = None
 
@@ -112,12 +114,13 @@ def match(request, match_id):
         xp_gold_json_name = None
 
     try:
-        abilities = match_ability_json(
+        datalist, params = match_ability_json(
             match_id=match_id,
-            width=250,
-            height=250,
             split_var='side'
             )
+        params['outerWidth'] = 250
+        params['outerHeight'] = 250
+        abilities = outsourceJson(datalist, params)
     except NoDataFound:
         abilities = None
 
@@ -384,7 +387,7 @@ def team_endgame(request):
         select_form = TeamEndgameSelect(request.GET)
         if select_form.is_valid():
             try:
-                json_data = team_endgame_json(
+                datalist, params = team_endgame_json(
                     player_list=select_form.cleaned_data['players'],
                     mode_list=select_form.cleaned_data['game_modes'],
                     x_var=select_form.cleaned_data['x_var'],
@@ -393,6 +396,7 @@ def team_endgame(request):
                     group_var=select_form.cleaned_data['group_var'],
                     compressor=select_form.cleaned_data['compressor']
                 )
+                json_data = outsourceJson(datalist, params)
                 return render(
                     request,
                     'matches/form.html',
@@ -469,10 +473,12 @@ def ability_build(request):
         select_form = MatchAbilitySelect(request.GET)
         if select_form.is_valid():
             try:
-                json_data = match_ability_json(
+                datalist, params = match_ability_json(
                     match_id=select_form.cleaned_data['match'],
                     split_var=select_form.cleaned_data['split_var']
                 )
+                json_data = outsourceJson(datalist, params)
+
                 match_url = reverse(
                     'matches:match_detail',
                     kwargs={'match_id': select_form.cleaned_data['match']}

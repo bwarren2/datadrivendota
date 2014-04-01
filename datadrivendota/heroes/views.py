@@ -7,7 +7,6 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
-from django.contrib.auth.decorators import permission_required
 from matches.models import GameMode
 from utils.exceptions import NoDataFound
 from .json_data import (
@@ -29,6 +28,9 @@ from .r import (
     HeroPerformanceChart,
     HeroSkillLevelBwChart
 )
+
+from utils.file_management import outsourceJson
+
 try:
     if 'devserver' not in settings.INSTALLED_APPS or not settings.DEBUG:
         raise ImportError
@@ -111,10 +113,11 @@ def vitals(request):
         hero_form = HeroVitalsMultiSelect(request.GET)
         if hero_form.is_valid():
             try:
-                json_data = hero_vitals_json(
+                datalist, params = hero_vitals_json(
                     hero_list=hero_form.cleaned_data['heroes'],
                     stats_list=hero_form.cleaned_data['stats']
                 )
+                json_data = outsourceJson(datalist, params)
                 return render(
                     request,
                     'heroes/form.html',
@@ -185,12 +188,12 @@ def lineup(request):
         hero_form = HeroLineupMultiSelect(request.GET)
         if hero_form.is_valid():
             try:
-                json_data = hero_lineup_json(
+                datalist, params = hero_lineup_json(
                     heroes=hero_form.cleaned_data['heroes'],
                     stat=hero_form.cleaned_data['stats'],
                     level=hero_form.cleaned_data['level']
                 )
-
+                json_data = outsourceJson(datalist, params)
                 return render(
                     request,
                     'heroes/form.html',
@@ -349,12 +352,13 @@ def hero_skill_progression(request):
     if request.GET:
         hero_form = HeroProgressionForm(request.GET)
         if hero_form.is_valid():
-            json_data = hero_progression_json(
+            datalist, params = hero_progression_json(
                 hero=hero_form.cleaned_data['hero'],
                 player=hero_form.cleaned_data['player'],
                 game_mode_list=hero_form.cleaned_data['game_modes'],
                 division=hero_form.cleaned_data['division'],
             )
+            json_data = outsourceJson(datalist, params)
             return render(
                 request,
                 'heroes/form.html',

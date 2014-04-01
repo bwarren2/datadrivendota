@@ -11,7 +11,6 @@ from matches.models import (
     skill_name
 )
 from utils.exceptions import NoDataFound
-from utils.file_management import outsourceJson
 from utils.charts import datapoint_dict, params_dict, color_scale_params
 
 
@@ -61,7 +60,7 @@ def hero_vitals_json(hero_list, stats_list):
     params['outerWidth'] = 300
     params['outerHeight'] = 300
     params = color_scale_params(params, groups)
-    return outsourceJson(datalist, params)
+    return (datalist, params)
 
 
 def hero_lineup_json(heroes, stat, level):
@@ -127,7 +126,7 @@ def hero_lineup_json(heroes, stat, level):
     params = color_scale_params(params, groups)
 
     params['tickValues'] = [x for ind, x in enumerate(xs) if ind % 2 == 0]
-    return outsourceJson(datalist, params)
+    return (datalist, params)
 
 
 def hero_performance_json(
@@ -281,5 +280,4 @@ def hero_progression_json(hero, player, game_mode_list, division):
     params['y_label'] = 'Level'
     params = color_scale_params(params, groups)
 
-    foo = outsourceJson(datalist, params)
-    return foo
+    return (datalist, params)
