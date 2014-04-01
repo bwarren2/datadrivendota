@@ -7,7 +7,8 @@ from matches.models import (
     PlayerMatchSummary,
     Match,
     fetch_match_attributes,
-    SkillBuild
+    SkillBuild,
+    skill_name
 )
 from utils.exceptions import NoDataFound
 from utils.file_management import outsourceJson
@@ -243,8 +244,8 @@ def hero_progression_json(hero, player, game_mode_list, division):
             build['player_match_summary__is_win'] \
             else 'Loss'
 
-        skill_value = build['player_match_summary__match__skill'] if \
-            build['player_match_summary__id'] not in player_game_ids \
+        skill_value = skill_name(build['player_match_summary__match__skill'])\
+            if build['player_match_summary__id'] not in player_game_ids \
             else 'Player'
 
         if division == 'Skill win/loss':

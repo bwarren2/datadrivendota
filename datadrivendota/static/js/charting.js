@@ -159,25 +159,24 @@ function draw_legend(params, svg, color){
         })
         .on("mouseover",
           function (d, i) {
-            d3.selectAll('.series')
-              .filter(function(p){
-                return convertToSlug(p.key)!=convertToSlug(d.key);
-              })
+            slug = convertToSlug(d.key)
+            d3.selectAll('g.series:not(.'+slug+')')
             .transition().duration(1000).style('opacity',0.2);
         })
         .on("mouseout", function(d) {
-              d3.selectAll('.series').filter(function(p){return convertToSlug(p.key)!=convertToSlug(d.key);})
-              .transition().duration(1000).style('opacity',1);
-            }
+            slug = convertToSlug(d.key)
+            d3.selectAll('g.series:not(.'+slug+')')
+            .transition().duration(1000).style('opacity',1);
+          }
         );
 
   rows.append('text')
     .attr("class", 'legend-text')
     .attr("x", 14)
     .attr("y", function(d, i){ return 11+(i *  20);})
-    .text(function(d){return d.key;
-    }
-  );
+    .text(function(d){
+      return d.key;
+    });
 }
 
 function draw_path(series, line, color){
@@ -262,7 +261,9 @@ function draw_scatterplot(source, placement_div){
     var series = g.selectAll('.series').data(function(d){
             return(d.values);
         }).enter().append('g')
-    .attr("class", 'series')
+    .attr("class", function(d){
+      return 'series '+convertToSlug(d.values[0].group_var);
+    })
     .attr("id", function(d){return convertToSlug(d.key);});
 
     series.selectAll('.points').data(function(d){return d.values;}).enter()
@@ -348,12 +349,21 @@ function draw_barplot(source, placement_div){
 
     var series = g.selectAll('.series').data(function(d){
             return(d.values);
-        }).enter().append('g')
-    .attr("class", 'dataset')
+        })
+    .enter()
+    .append('g')
+    .attr("class", function(d) {
+      return 'series '+convertToSlug(d.values[0].group_var);
+    })
     .attr("id", function(d){return convertToSlug(d.key);});
 
-    series.selectAll('.bars').data(function(d){return d.values;}).enter()
-        .append("a").attr("xlink:href", function(d) {if(d.url){return d.url;} else {return '';}})
+    series.selectAll('.bars')
+        .data(function(d){return d.values;}).enter()
+        .append("a")
+        .attr("xlink:href", function(d) {
+          if(d.url){return d.url;}
+          else {return '';}
+        })
     .append('rect')
     .attr("x", function(d) { return x(d.x_var); })
     .attr("width", x.rangeBand())
@@ -432,7 +442,9 @@ function draw_scatterseries(data, placement_div){
               })
               .enter()
               .append("g")
-              .attr("class", 'series')
+              .attr("class", function(d){
+                return 'series '+convertToSlug(d.values[0].group_var);
+              })
               .attr("id", function(d){return convertToSlug(d.key);});
 
   series.selectAll('.points').data(function(d){
@@ -446,7 +458,6 @@ function draw_scatterseries(data, placement_div){
       .attr('cx',function(d){return(x(d.x_var)); })
       .attr('cy',function(d){return(y(d.y_var)); })
       .attr('r', 1)
-      .attr('class', 'points')
       .style("fill", function(d) { return color(String(d.group_var));})
       .on("mouseover", function(d) {
         div.transition()

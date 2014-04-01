@@ -287,6 +287,9 @@ def fetch_pms_attribute(summary, attribute):
         return summary.match.game_mode.description
     elif attribute == 'skill':
         return summary.match.skill
+    elif attribute == 'skill_name':
+        skill = summary.match.skill
+        return skill_name(skill)
     elif attribute == 'hero_name':
         return safen(summary.hero.name)
     elif attribute == 'first_blood_time':
@@ -349,3 +352,14 @@ def fetch_attribute_label(attribute):
     else:
         label = safen(attribute)
     return label
+
+
+def skill_name(skill):
+    if skill == 1:
+        return 'Low Skill'
+    if skill == 2:
+        return 'Medium Skill'
+    if skill == 3:
+        return 'High Skill'
+    else:
+        return skill
