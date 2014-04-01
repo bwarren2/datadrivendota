@@ -21,6 +21,7 @@ from .json_data import (
 from players.models import request_to_player, Player
 from utils.exceptions import NoDataFound
 from django.core.urlresolvers import reverse
+from utils.file_management import outsourceJson
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -303,7 +304,7 @@ def endgame(request):
         select_form = EndgameSelect(request.GET)
         if select_form.is_valid():
             try:
-                json_data = player_endgame_json(
+                datalist, params = player_endgame_json(
                     player_list=select_form.cleaned_data['players'],
                     mode_list=select_form.cleaned_data['game_modes'],
                     x_var=select_form.cleaned_data['x_var'],
@@ -311,6 +312,7 @@ def endgame(request):
                     split_var=select_form.cleaned_data['split_var'],
                     group_var=select_form.cleaned_data['group_var']
                 )
+                json_data = outsourceJson(datalist, params)
 
                 return render(
                     request,

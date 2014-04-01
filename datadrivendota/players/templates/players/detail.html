@@ -8,22 +8,21 @@
 {% block content %}
 
   <div class="row">
-  <h4>Hero Winrate</h4>
     <div class="player-charts col-md-4">
+    <h4>Hero Winrate</h4>
       {% if winrate_json %}
         <span id='winrate_chart'></span>
       {% endif %}
     </div>
 
-    <div class="col-md-4">
-      <ul>
-        {% for hero in top_5_played_heroes %}
-          <li>{{ hero }}</li>
-        {% endfor %}
-      </ul>
+    <div class="player-charts col-md-4">
+      <h4>Endgame Comparison</h4>
+      {% if endgame_json %}
+        <span id='endgame_chart'></span>
+      {% endif %}
     </div>
 
-    <div class="player-infobox col-md-4">
+    <div class="player-infobox col-md-3">
       <img src="{{ player.avatar_full }}">
       <h2>{{ player.persona_name }}</h2>
       {% if player.pro_name %}
@@ -63,6 +62,13 @@
     input_data = source;
     window.d3ening.plot(source, '#winrate_chart')
   });
+
+  d3.json('{{MEDIA_URL}}{{endgame_json}}',function(source){
+    var x;
+    input_data = source;
+    window.d3ening.plot(source, '#endgame_chart')
+  });
+
 </script>
 <script type="text/javascript">
   $(function(){

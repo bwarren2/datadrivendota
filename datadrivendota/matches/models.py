@@ -260,12 +260,17 @@ class SkillBuild(models.Model):
 
 
 def fetch_match_attributes(summaries, attribute):
-    vector_list = [
-        fetch_pms_attribute(summary, attribute)
-        for summary in summaries
-    ]
 
-    label = fetch_attribute_label(attribute)
+    if attribute == 'No Split':
+        vector_list = ['No split' for summary in summaries]
+        label = 'No Split'
+    else:
+        vector_list = [
+            fetch_pms_attribute(summary, attribute)
+            for summary in summaries
+        ]
+
+        label = fetch_attribute_label(attribute)
     return vector_list, label
 
 

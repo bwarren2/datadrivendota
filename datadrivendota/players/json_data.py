@@ -1,5 +1,4 @@
 import datetime
-from urllib import urlencode
 from time import mktime
 from django.db.models import Count
 from matches.models import PlayerMatchSummary, GameMode, Match
@@ -8,7 +7,7 @@ from utils.exceptions import NoDataFound
 from utils.file_management import outsourceJson
 from itertools import chain
 from utils.charts import params_dict, datapoint_dict, color_scale_params
-from heroes.models import Hero, Role, HeroDossier
+from heroes.models import Hero, Role
 from matches.models import SkillBuild
 from collections import defaultdict
 
@@ -66,13 +65,11 @@ def player_winrate_json(
         else:
             losses[row['hero__name']] += 1
 
-    win_rates = {hero:
-        float(wins.get(hero, 0))
-        / (wins.get(hero, 0) + losses.get(hero, 0)) * 100
+    win_rates = {hero: float(wins.get(hero, 0)) / (wins.get(hero, 0)
+        + losses.get(hero, 0)) * 100
         for hero in heroes
     }
     games = {hero: wins.get(hero, 0) + losses.get(hero, 0) for hero in heroes}
-
 
     all_heroes = Hero.objects.all().select_related()
     data_list, groups = [], []
@@ -84,8 +81,6 @@ def player_winrate_json(
         elif group_var == 'alignment':
             group = hero_obj.herodossier.alignment.title()
         groups.append(group)
-        url_str = '/heroes/skill_progression/?game_modes=1&game_modes=2&game_modes=3&game_modes=4&game_modes=5&division=Skill&{extras}'.format(extras=urlencode({'player': player.display_name(),
-            'hero': hero_obj.name}))
 
         datadict.update({
             'x_var': games[hero],
@@ -94,7 +89,6 @@ def player_winrate_json(
             'split_var': '',
             'label': hero,
             'tooltip': hero,
-            'url': url_str,
             'classes': [group],
         })
         data_list.append(datadict)
@@ -121,7 +115,7 @@ def player_winrate_json(
         params['draw_legend'] = True
     params = color_scale_params(params, groups)
 
-    return outsourceJson(data_list, params)
+    return (data_list, params)
 
 
 def player_hero_abilities_json(
@@ -190,5 +184,4 @@ def player_hero_abilities_json(
     params['x_label'] = 'Time (m)'
     params['y_label'] = 'Level'
 
-    foo = outsourceJson(datalist, params)
-    return foo
+    return (datalist, params)

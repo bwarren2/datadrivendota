@@ -24,7 +24,7 @@ class EndgameSelect(forms.Form):
     X_PARAMETERS.insert(0, 'duration')
     X_LIST = [(item, item) for item in X_PARAMETERS]
     Y_LIST = [(item, item) for item in SHARED_PARAMETERS]
-    SPLIT_PARAMS = ['player', 'is_win', 'game_mode']
+    SPLIT_PARAMS = ['player', 'is_win', 'game_mode', 'No Split']
     DOUBLED_PARAM_LIST = [(item, item) for item in SPLIT_PARAMS]
 
     players = MultiPlayerField(

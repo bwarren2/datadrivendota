@@ -32,9 +32,11 @@ def player_endgame_json(
     selected_summaries = selected_summaries.select_related()
     if len(selected_summaries) == 0:
         raise NoDataFound
+
     try:
         x_vector_list, xlab = fetch_match_attributes(selected_summaries, x_var)
         y_vector_list, ylab = fetch_match_attributes(selected_summaries, y_var)
+
         split_vector_list, split_lab = fetch_match_attributes(
             selected_summaries,
             split_var
@@ -59,6 +61,7 @@ def player_endgame_json(
             'group_var': group_vector_list[key],
         })
         datalist.append(datadict)
+
     params = params_dict()
     params['x_min'] = min(x_vector_list)
     params['x_max'] = max(x_vector_list)
@@ -68,7 +71,7 @@ def player_endgame_json(
     params['y_label'] = ylab
     params['chart'] = 'xyplot'
     params = color_scale_params(params, group_vector_list)
-    return outsourceJson(datalist, params)
+    return (datalist, params)
 
 
 def team_endgame_json(

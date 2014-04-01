@@ -7,10 +7,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import permission_required
-from django.db.models import Count
 from os.path import basename
 from .models import Player, UserProfile
-from .r import KDADensity, CountWinrate, PlayerTimeline
+from .r import CountWinrate, PlayerTimeline
 from .forms import (
     PlayerWinrateLevers,
     PlayerTimelineForm,
@@ -27,6 +26,8 @@ from matches.management.tasks.valve_api_calls import (
 from .models import request_to_player
 from utils.exceptions import NoDataFound
 from .json_data import player_winrate_json, player_hero_abilities_json
+from matches.json_data import player_endgame_json
+from utils.file_management import outsourceJson
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -81,6 +82,7 @@ def pro_index(request):
 def detail(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
     stats = {}
+
     try:
         wins = PlayerMatchSummary.objects.filter(
             player=player,
@@ -111,27 +113,49 @@ def detail(request, player_id=None):
         float(wins) / (wins + losses) if wins + losses > 0 else 0,
         2
     )
+
     pms_list = get_playermatchsummaries_for_player(player, 36)
     for pms in pms_list:
         pms.KDA2 = pms.kills-pms.deaths+pms.assists/2
         pms.display_date = \
-            datetime.datetime.fromtimestamp(pms.match.start_time).strftime('%Y-%m-%d')
+            datetime.datetime.fromtimestamp(pms.match.start_time)\
+            .strftime('%Y-%m-%d')
 
         pms.display_duration = \
             str(datetime.timedelta(seconds=pms.match.duration))
 
-
-    winrate_json = player_winrate_json(
+    datalist, params = player_winrate_json(
         player.steam_id,
         width=400,
         height=400
     )
+    params['outerWidth'] = 300
+    params['outerHeight'] = 300
+    winrate_json = outsourceJson(datalist, params)
+
+    #Compare to dendi and s4 by default
+    player_list = [70388657, 41231571, player.steam_id]
+
+    datalist, params = player_endgame_json(
+        player_list=player_list,
+        mode_list=[1, 2, 3, 4, 5],
+        x_var='duration',
+        y_var='K-D+.5*A',
+        split_var='No Split',
+        group_var='player'
+    )
+
+    params['outerWidth'] = 300
+    params['outerHeight'] = 300
+    endgame_json = outsourceJson(datalist, params)
+
     return render(
         request,
         'players/detail.html',
         {
             'player': player,
             'winrate_json': basename(winrate_json.name),
+            'endgame_json': basename(endgame_json.name),
             'stats': stats,
             'pms_list': pms_list
         }
@@ -168,7 +192,7 @@ def winrate(request):
         winrate_form = PlayerWinrateLevers(request.GET)
         if winrate_form.is_valid():
             try:
-                json_data = player_winrate_json(
+                datalist, params = player_winrate_json(
                     player_id=winrate_form.cleaned_data['player'],
                     game_mode_list=winrate_form.cleaned_data['game_modes'],
                     min_date=winrate_form.cleaned_data['min_date'],
@@ -176,7 +200,7 @@ def winrate(request):
                     role_list=winrate_form.cleaned_data['role_list'],
                     group_var=winrate_form.cleaned_data['group_var'],
                 )
-
+                json_data = outsourceJson(datalist, params)
                 return render(
                     request,
                     'players/form.html',
@@ -309,7 +333,7 @@ def hero_abilities(request):
     if request.GET:
         form = HeroAbilitiesForm(request.GET)
         if form.is_valid():
-            json_data = player_hero_abilities_json(
+            datalist, params = player_hero_abilities_json(
                 player_1=form.cleaned_data['player_1'],
                 hero_1=form.cleaned_data['hero_1'],
                 player_2=form.cleaned_data['player_2'],
@@ -317,6 +341,7 @@ def hero_abilities(request):
                 game_modes=form.cleaned_data['game_modes'],
                 division=form.cleaned_data['division'],
             )
+            json_data = outsourceJson(datalist, params)
             try:
                 return render(
                     request,
