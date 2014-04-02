@@ -129,8 +129,8 @@ def detail(request, player_id=None):
         width=400,
         height=400
     )
-    params['outerWidth'] = 300
-    params['outerHeight'] = 300
+    params['outerWidth'] = 350
+    params['outerHeight'] = 350
     winrate_json = outsourceJson(datalist, params)
 
     #Compare to dendi and s4 by default
@@ -145,8 +145,8 @@ def detail(request, player_id=None):
         group_var='player'
     )
 
-    params['outerWidth'] = 300
-    params['outerHeight'] = 300
+    params['outerWidth'] = 350
+    params['outerHeight'] = 350
     endgame_json = outsourceJson(datalist, params)
 
     return render(
