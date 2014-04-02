@@ -18,6 +18,7 @@ def params_dict():
         'legendWidthPercent': .2,
         'legendHeightPercent': .1,
         'chart': None,
+        'path_stroke_width': 3,
     }
     return dictionary
 

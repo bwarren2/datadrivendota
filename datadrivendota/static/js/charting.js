@@ -179,16 +179,16 @@ function draw_legend(params, svg, color){
     });
 }
 
-function draw_path(series, line, color){
+function draw_path(series, line, color, params){
+    var path_stroke_width = get_path_stroke_width(params)
     series.append("svg:path")
     .attr("d", function(d){return(line(d.values));})
     .style("stroke", function(d) {
       return color(String(d.values[0].group_var));
     })
-    .style("stroke-width", 1)
+    .style("stroke-width", path_stroke_width)
     .style("fill", 'none');
 }
-
 
 
 function get_margin(params){
@@ -227,6 +227,10 @@ function get_legend_width_pct(params){
 function get_legend_height_pct(params){
   return params.legendHeightPercent;
 }
+function get_path_stroke_width(params){
+  return params.path_stroke_width;
+}
+
 
 function draw_scatterplot(source, placement_div){
     var raw_data = source['data'];
@@ -289,13 +293,7 @@ function draw_scatterplot(source, placement_div){
         });
 
     if(params['draw_path']){
-      series.append("svg:path")
-      .attr("d", function(d){return(line(d.values));})
-      .attr("class", 'datapath')
-
-      .style("stroke", function(d) { return color(String(d.values[0].group_var));})
-      .style("stroke-width", 3)
-      .style("fill", 'none');
+      draw_path(series, line, color, params)
     }
 
     if(params['draw_legend']){
@@ -384,13 +382,6 @@ function draw_barplot(source, placement_div){
                 .style("opacity", 0);
         });
 
-    if(params['draw_path']){
-      series.append("svg:path").attr("d", function(d){return(line(d.values));})
-      .style("stroke", function(d) { return color(d.values[0].group_var);})
-      .style("stroke-width", 3)
-      .style("fill", 'none');
-    }
-
     if(params['draw_legend']){
       draw_legend(params, svg, color);
     }
@@ -475,7 +466,7 @@ function draw_scatterseries(data, placement_div){
       });
 
   if(params['draw_path']){
-    draw_path(series, line, color);
+    draw_path(series, line, color, params);
   }
 
   if(params['draw_legend']){

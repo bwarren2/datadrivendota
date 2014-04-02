@@ -358,6 +358,7 @@ def hero_skill_progression(request):
                 game_mode_list=hero_form.cleaned_data['game_modes'],
                 division=hero_form.cleaned_data['division'],
             )
+            params['path_stroke_width'] = 1
             json_data = outsourceJson(datalist, params)
             return render(
                 request,

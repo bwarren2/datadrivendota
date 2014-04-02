@@ -1,6 +1,6 @@
 from django import forms
 from players.form_fields import MultiPlayerField
-from .form_fields import MultiGameModeSelect
+from .form_fields import MultiGameModeSelect, MultiMatchSelect
 
 
 class EndgameSelect(forms.Form):
@@ -126,3 +126,14 @@ class MatchAbilitySelect(forms.Form):
     DOUBLED_PARAM_LIST = [(item, item) for item in SPLIT_PARAMS]
     match = forms.IntegerField()
     split_var = forms.ChoiceField(DOUBLED_PARAM_LIST)
+
+
+class MatchListSelect(forms.Form):
+    matches = MultiMatchSelect(
+        required=True,
+        help_text='Pick one or more matches by ID'
+    )
+    players = MultiPlayerField(
+        required=True,
+        help_text='Pick one or more players by name'
+    )

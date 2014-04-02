@@ -9,5 +9,10 @@ urlpatterns = patterns(
     url(r'^team-endgame/$', views.team_endgame, name='team_endgame'),
     url(r'^(?P<match_id>[0-9\-]*)/$', views.match, name="match_detail"),
     url(r'^ability-build/$', views.ability_build, name="ability_build"),
-    url(r'^overview/$', views.overview, name="overview")
+    url(r'^progression-list/$',
+        views.progression_list,
+        name="progession_list"),
+    url(r'^overview/$', views.overview, name="overview"),
+    url(r'^api/getmatches/$', views.match_list, name='match_list'),
+
 )

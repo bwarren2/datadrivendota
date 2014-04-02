@@ -79,6 +79,7 @@ $(function () {
   ajax_select2ify('.multi-player-tags', true, "One or more Players", "/players/api/getplayers");
   ajax_select2ify('.single-hero-tags', false, "One Hero", "/heroes/api/getheroes");
   ajax_select2ify('.multi-hero-tags', true, "One or more Heroes", "/heroes/api/getheroes");
+  ajax_select2ify('.multi-match-tags', true, "One or more Matches", "/matches/api/getmatches");
 
   /* gettext library */
 

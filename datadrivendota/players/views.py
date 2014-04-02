@@ -341,6 +341,7 @@ def hero_abilities(request):
                 game_modes=form.cleaned_data['game_modes'],
                 division=form.cleaned_data['division'],
             )
+            params['path_stroke_width'] = 1
             json_data = outsourceJson(datalist, params)
             try:
                 return render(

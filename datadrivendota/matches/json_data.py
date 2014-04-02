@@ -268,3 +268,65 @@ def match_parameter_json(match_id, x_var, y_var):
     params = color_scale_params(params, groups)
 
     return (data_list, params)
+
+
+def match_list_json(match_list, player_list):
+    pmses = PlayerMatchSummary.objects.filter(
+        match__steam_id__in=match_list,
+        player__steam_id__in=player_list,
+    )
+
+    if len(pmses) == 0:
+        raise NoDataFound
+
+    sbs = SkillBuild.objects.filter(
+        player_match_summary__in=pmses,
+    ).select_related().order_by('player_match_summary', 'level')
+    sbs = sbs.values(
+        'level',
+        'time',
+        'player_match_summary__is_win',
+        'player_match_summary__id',
+        'player_match_summary__match__skill',
+        'player_match_summary__match__steam_id',
+        'player_match_summary__player__persona_name',
+    )
+    datalist, xs, ys, groups = [], [], [], []
+
+    for build in sbs:
+        if build['level'] == 1:
+            subtractor = build['time']/60.0
+
+        datapoint = datapoint_dict()
+        datapoint['x_var'] = round(build['time']/60.0-subtractor, 3)
+        xs.append(round(build['time']/60.0-subtractor, 3))
+        datapoint['y_var'] = build['level']
+        ys.append(build['level'])
+
+        group = "{match}, {name}".format(
+            match=build['player_match_summary__match__steam_id'],
+            name=build['player_match_summary__player__persona_name'],
+        )
+
+        datapoint['group_var'] = group
+        groups.append(group)
+
+        datapoint['series_var'] = group
+
+        datapoint['label'] = build[
+            'player_match_summary__player__persona_name'
+        ]
+        datapoint['split_var'] = 'Skill Progression'
+        datalist.append(datapoint)
+
+    params = params_dict()
+    params['chart'] = 'scatterseries'
+    params['x_min'] = 0
+    params['x_max'] = max(xs)
+    params['y_min'] = min(ys)
+    params['y_max'] = max(ys)
+    params['x_label'] = 'Time (m)'
+    params['y_label'] = 'Level'
+    params = color_scale_params(params, groups)
+
+    return (datalist, params)

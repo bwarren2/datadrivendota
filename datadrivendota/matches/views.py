@@ -1,5 +1,6 @@
 import datetime
 import json
+from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
 from functools import wraps
 from os.path import basename
@@ -7,16 +8,21 @@ from django.http import Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.conf import settings
-from django.contrib.auth.decorators import permission_required
 from heroes.models import Hero
-from .forms import EndgameSelect, TeamEndgameSelect, MatchAbilitySelect
-from .r import EndgameChart, MatchParameterScatterplot
+from .forms import (
+    EndgameSelect,
+    TeamEndgameSelect,
+    MatchAbilitySelect,
+    MatchListSelect
+)
+from .r import EndgameChart
 from .models import Match, PlayerMatchSummary, PickBan
 from .json_data import (
     player_endgame_json,
     team_endgame_json,
     match_ability_json,
-    match_parameter_json
+    match_list_json,
+    match_parameter_json,
 )
 from players.models import request_to_player, Player
 from utils.exceptions import NoDataFound
@@ -224,8 +230,10 @@ def follow_match_feed(request):
             match_list = paginator.page(paginator.num_pages)
 
         pms_list = PlayerMatchSummary.\
-            objects.filter(match__in=match_list).select_related()
+            objects.filter(match__in=match_list)\
+            .select_related().order_by('-match__start_time')[:500]
         match_data = annotated_matches(pms_list, follow_list)
+        print match_data
         return render(
             request,
             'matches/follow.html',
@@ -261,6 +269,7 @@ def follow_match_feed(request):
             objects.filter(match__in=match_list).select_related()
 
         match_data = annotated_matches(pms_list, [])
+        print match_data
         return render(
             request,
             'matches/follow.html',
@@ -431,6 +440,59 @@ def team_endgame(request):
         }
     )
 
+def progression_list(request):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts level progression data for specific players in specific matches."
+        }
+    ]
+    title = 'Match List Hero Progression'
+    if request.GET:
+        select_form = MatchListSelect(request.GET)
+        if select_form.is_valid():
+            try:
+                datalist, params = match_list_json(
+                    match_list=select_form.cleaned_data['matches'],
+                    player_list=select_form.cleaned_data['players']
+                )
+                params['path_stroke_width'] = 2
+                json_data = outsourceJson(datalist, params)
+
+                return render(
+                    request,
+                    'matches/form.html',
+                    {
+                        'json_data': basename(json_data.name),
+                        'title': title,
+                        'form': select_form,
+                        'tour': tour,
+                    }
+                )
+            except NoDataFound:
+                return render(
+                    request,
+                    'matches/form.html',
+                    {
+                        'error': 'error',
+                        'title': title,
+                        'form': select_form,
+                        'tour': tour,
+                    }
+                )
+    else:
+        select_form = MatchListSelect()
+    return render(
+        request,
+        'matches/form.html',
+        {
+            'form': select_form,
+            'title': title,
+            'tour': tour,
+        }
+    )
+
 
 @devserver_profile(follow=[match_ability_json])
 def ability_build(request):
@@ -577,3 +639,22 @@ def annotated_matches(pms_list, follow_list):
 
         match_data[id]['pms_data'][side][pms.player_slot] = pms_data
     return match_data
+
+
+def match_list(request):
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+        matches = Match.objects.filter(steam_id__icontains=q)[:20]
+        results = []
+        print q, matches
+        for i, match in enumerate(matches):
+            match_json = {}
+            match_json['id'] = i
+            match_json['label'] = "M#: {0}".format(match.steam_id)
+            match_json['value'] = "M#: {0}".format(match.steam_id)
+            results.append(match_json)
+        data = json.dumps(results)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
