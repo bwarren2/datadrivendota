@@ -116,7 +116,6 @@ def detail(request, player_id=None):
 
     pms_list = get_playermatchsummaries_for_player(player, 36)
     for pms in pms_list:
-        pms.KDA2 = pms.kills-pms.deaths+pms.assists/2
         pms.display_date = \
             datetime.datetime.fromtimestamp(pms.match.start_time)\
             .strftime('%Y-%m-%d')
@@ -381,9 +380,9 @@ def hero_abilities(request):
 
 def player_matches(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
-    pms_list = get_playermatchsummaries_for_player(player, 50)
+    pms_list = get_playermatchsummaries_for_player(player, 500)
 
-    paginator = Paginator(pms_list, 10)
+    paginator = Paginator(pms_list, 36)
     page = request.GET.get('page')
     try:
         pms_list = paginator.page(page)
@@ -660,13 +659,13 @@ def get_playermatchsummaries_for_player(player, count):
     for pms in pms_list:
         pms.display_date = datetime.datetime.fromtimestamp(
             pms.match.start_time
-        )
+        ).strftime('%Y-%m-%d')
         pms.display_duration = str(datetime.timedelta(
             seconds=pms.match.duration
         ))
-        pms.kda2 = pms.kills - pms.deaths + pms.assists / 2.0
+        pms.KDA2 = pms.kills - pms.deaths + pms.assists / 2.0
         # @todo: Again, postposed conditionals.
         # --kit 2014-02-16
-        pms.color_class = 'pos' if pms.kda2 > 0 else 'neg'
-        pms.mag = abs(pms.kda2)*2
+        pms.color_class = 'pos' if pms.KDA2 > 0 else 'neg'
+        pms.mag = abs(pms.KDA2)*2
     return pms_list

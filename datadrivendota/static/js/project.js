@@ -216,6 +216,13 @@ $(function () {
 });
 
 
+function scorebarToggles(){
+  $('.scorebar').hide();
+  $('#show-score').click(function(){$('.scorebar').fadeIn('fast');});
+  $('#hide-score').click(function(){$('.scorebar').fadeOut('fast');});
+}
+
+
 function convertToSlug(Text)
 {
     return Text

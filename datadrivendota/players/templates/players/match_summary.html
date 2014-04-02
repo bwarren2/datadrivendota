@@ -6,43 +6,15 @@
 
 {% block content %}
   <div>
-    <table class="table  table-condensed" id='myTable'>
-      <thead>
-        <tr>
-          <th>Match ID</th>
-          <th>Duration</th>
-          <th>Hero</th>
-          <th>K</th>
-          <th>D</th>
-          <th>A</th>
-          <th colspan="2">KDA/2</th>
-          <th>Start Time</th>
-          <th>Game Mode</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for pms in pms_list %}
-          <tr>
-            <td><a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}">{{ pms.match.steam_id }}</a></td>
-            <td>{{ pms.display_duration }}</td>
-            <td>
-            {% if pms.hero.thumbshot %}
-              <img src="{{ pms.hero.thumbshot.url }}" alt="{{ pms.hero.name }}" title="{{ pms.hero.name }}" height="60%">
-            {% else %}
-              {{ pms.hero.name }}
-            {% endif %}
-            </td>
-            <td>{{ pms.kills }}</td>
-            <td>{{ pms.deaths }}</td>
-            <td>{{ pms.assists }}</td>
-            <td>{{ pms.kda2 }}</td>
-            <td><div style="width:{{ pms.mag }}px" class="databaru {{ pms.color_class }}"></div></td>
-            <td>{{ pms.display_date|date:"D d M Y" }}</td>
-            <td>{{ pms.match.game_mode.description }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% include "_pagination.html" with pages_list=pms_list page_links_to_display=pms_list.paginator.page_range %}
+<h4>Score: <span id='show-score' class='nav-toggle'>Show</span> <span id='hide-score' class='nav-toggle'>Hide</span></h4>
+        {% include "players/_player_match_cards.html" %}
+      {% include "_pagination.html" with pages_list=pms_list page_links_to_display=pms_list.paginator.page_range %}
   </div>
 {% endblock content %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+  $(scorebarToggles())
+</script>
+
+{% endblock extra_js %}

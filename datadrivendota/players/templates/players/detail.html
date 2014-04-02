@@ -38,18 +38,7 @@
 
   <div>
         <h4>Recent Matches.  Score: <span id='show-score' class='nav-toggle'>Show</span> <span id='hide-score' class='nav-toggle'>Hide</span></h4>
-        {% for pms in pms_list %}
-          <div class="col-md-2">
-            <a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}" class="thumbnail">
-              {% if pms.hero.mugshot %}
-              <img src="{{ pms.hero.mugshot.url }}" alt="{{ hero.name }}" class="player-match-portrait">
-              {% endif %}
-              <p class='overlayer'>{{ pms.hero.name }} <span class='scorebar'>{{ pms.kills }}/{{ pms.deaths }}/{{ pms.assists }}/{{ pms.KDA2 }}</span></p>
-              <p class='overlayer-top-right'>{{pms.display_date}}, {{pms.display_duration}}</p>
-
-            </a>
-          </div>
-        {% endfor %}
+        {% include "players/_player_match_cards.html" %}
     <a href="{% url 'players:id_matches' player_id=player.steam_id %}">More</a>
   </div>
 {% endblock content %}
@@ -71,11 +60,7 @@
 
 </script>
 <script type="text/javascript">
-  $(function(){
-    $('.scorebar').hide();
-    $('#show-score').click(function(){$('.scorebar').fadeIn('fast');});
-    $('#hide-score').click(function(){$('.scorebar').fadeOut('fast');});
-  })
+  $(scorebarToggles())
 </script>
 
 {% endblock extra_js %}
