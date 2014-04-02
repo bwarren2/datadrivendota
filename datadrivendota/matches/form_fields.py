@@ -36,4 +36,5 @@ class MultiMatchSelect(forms.CharField):
             except Match.DoesNotExist:
                 raise ValidationError("%s is not a valid match ID" % match_id)
             return_match_list.append(found_match.steam_id)
+
         return return_match_list
