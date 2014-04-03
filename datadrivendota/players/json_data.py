@@ -190,3 +190,154 @@ def player_hero_abilities_json(
     params['y_label'] = 'Level'
 
     return (datalist, params)
+
+
+def player_versus_winrate_json(
+        player_id_1,
+        player_id_2,
+        game_mode_list=None,
+        role_list=[],
+        min_date=datetime.date(2009, 1, 1),
+        max_date=None,
+        group_var='alignment',
+        plot_var='winrate',
+        ):
+    if max_date is None:
+        max_date_utc = mktime(datetime.datetime.now().timetuple())
+    else:
+        max_date_utc = mktime(max_date.timetuple())
+    min_dt_utc = mktime(min_date.timetuple())
+
+    if role_list == []:
+        roles = Role.objects.all()
+    else:
+        roles = Role.objects.filter(name__in=role_list)
+
+    if min_dt_utc > max_date_utc:
+        raise NoDataFound
+    if game_mode_list is None:
+        game_mode_list = [
+            gm.steam_id
+            for gm in GameMode.objects.filter(is_competitive=True)
+        ]
+
+    try:
+        player_1 = Player.objects.get(steam_id=player_id_1)
+        player_2 = Player.objects.get(steam_id=player_id_2)
+
+    except Player.DoesNotExist:
+        raise NoDataFound
+
+    pmses = PlayerMatchSummary.objects.filter(
+        player__in=[player_1, player_2],
+        match__validity=Match.LEGIT,
+        hero__roles__in=roles,
+        match__game_mode__steam_id__in=game_mode_list,
+    ).select_related().distinct()
+
+    if len(pmses) == 0:
+        raise NoDataFound
+
+    pairings = {}
+    for pms in pmses:
+        if pms.hero not in pairings:
+            pairings[pms.hero] = {
+                player_1: {'wins': 0, 'losses': 0},
+                player_2: {'wins': 0, 'losses': 0},
+            }
+        if pms.is_win:
+            pairings[pms.hero][pms.player]['wins'] += 1
+        else:
+            pairings[pms.hero][pms.player]['losses'] += 1
+
+    for hero in pairings.iterkeys():
+
+        pairings[hero][player_1]['total_games'] = \
+            pairings[hero][player_1]['wins'] \
+            + pairings[hero][player_1]['losses']
+        if pairings[hero][player_1]['total_games'] != 0:
+            pairings[hero][player_1]['winrate'] = \
+                float(pairings[hero][player_1]['wins'])\
+                / pairings[hero][player_1]['total_games']
+        else:
+            pairings[hero][player_1]['winrate'] = 0
+
+        pairings[hero][player_2]['total_games'] = \
+            pairings[hero][player_2]['wins'] \
+            + pairings[hero][player_2]['losses']
+
+        if pairings[hero][player_2]['total_games'] != 0:
+            pairings[hero][player_2]['winrate'] = \
+                float(pairings[hero][player_2]['wins'])\
+                / pairings[hero][player_2]['total_games']
+        else:
+            pairings[hero][player_2]['winrate'] = 0
+
+    data_list, groups = [], []
+    for hero, dataset in pairings.iteritems():
+        datadict = datapoint_dict()
+        if group_var == 'hero':
+            group = hero.name.title()
+        elif group_var == 'alignment':
+            group = hero.herodossier.alignment.title()
+        groups.append(group)
+
+        datadict.update({
+            'group_var': group,
+            'split_var': '',
+            'label': hero.name,
+            'tooltip': hero.name,
+            'classes': [group],
+        })
+        if plot_var == 'winrate':
+            datadict['point_size'] = dataset[player_1]['total_games']
+            datadict['stroke_width'] = dataset[player_2]['total_games']
+
+            datadict['x_var'] = dataset[player_1]['winrate']
+            datadict['y_var'] = dataset[player_2]['winrate']
+        else:
+            datadict['point_size'] = \
+                dataset[player_1]['total_games'] \
+                + dataset[player_2]['total_games']
+            datadict['x_var'] = dataset[player_1]['total_games']
+            datadict['y_var'] = dataset[player_2]['total_games']
+
+        data_list.append(datadict)
+
+    params = params_dict()
+    params['x_min'] = min([d['x_var'] for d in data_list])
+    params['x_max'] = max([d['x_var'] for d in data_list])
+    params['y_min'] = min([d['y_var'] for d in data_list])
+    params['y_max'] = max([d['y_var'] for d in data_list])
+    params['x_label'] = "{name} {pvar}".format(
+        name=player_1.persona_name,
+        pvar=plot_var,
+    )
+    params['y_label'] = "{name} {pvar}".format(
+        name=player_2.persona_name,
+        pvar=plot_var,
+    )
+    params['draw_path'] = False
+    params['chart'] = 'xyplot'
+    params['margin']['left'] = 12*len(str(params['y_max']))
+    params['legendWidthPercent'] = .7
+    params['legendHeightPercent'] = .1
+    params['pointDomainMin'] = 0
+    params['pointDomainMax'] = 10
+    params['pointSizeMin'] = 1
+    params['pointSizeMax'] = 5
+
+    if plot_var == 'winrate':
+        params['strokeDomainMin'] = 0
+        params['strokeDomainMax'] = 10
+        params['strokeSizeMin'] = 0
+        params['strokeSizeMax'] = 2
+    if group_var == 'hero':
+        params['draw_legend'] = False
+        group = []
+    elif group_var == 'alignment':
+        group = hero.herodossier.alignment
+        params['draw_legend'] = True
+    params = color_scale_params(params, groups)
+
+    return (data_list, params)

@@ -17,6 +17,14 @@ def params_dict():
         'outerHeight': 400,
         'legendWidthPercent': .2,
         'legendHeightPercent': .1,
+        'pointSizeMin': 5,
+        'pointSizeMax': 5,
+        'pointDomainMin': 1,
+        'pointDomainMax': 1,
+        'strokeDomainMin': 0,
+        'strokeDomainMax': 0,
+        'strokeSizeMin': 0,
+        'strokeSizeMax': 0,
         'chart': None,
         'path_stroke_width': 3,
     }
@@ -32,6 +40,8 @@ def datapoint_dict():
         'label': None,
         'tooltip': None,
         'url': None,
+        'point_size': 1,
+        'stroke_width': 0,
     }
     return dictionary
 

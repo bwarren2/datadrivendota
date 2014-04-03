@@ -1,0 +1,74 @@
+{% extends "players/base.html" %}
+
+
+{% block title %}Player Comparison{% endblock title %}
+
+{% block page_title %}{{player1.persona_name}} ({{ player1.steam_id }}) vs {{player2.persona_name}} ({{ player2.steam_id }}) {% endblock page_title %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="player-charts col-md-4">
+    <h4>Hero Winrate</h4>
+      {% if winrate_json %}
+        <span id='winrate_chart'></span>
+      {% endif %}
+    </div>
+
+    <div class="player-charts col-md-4">
+    <h4>Hero Usage</h4>
+      {% if usage_json %}
+        <span id='usage_chart'></span>
+      {% endif %}
+    </div>
+
+    <div class="player-charts col-md-4">
+      <h4>Role Comparison</h4>
+      {% if role_json %}
+        <span id='role_chart'></span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="player-charts col-md-4">
+    <h4>Farm</h4>
+      {% if endgame_farm_json %}
+        <span id='farm_chart'></span>
+      {% endif %}
+    </div>
+
+    <div class="player-charts col-md-4">
+    <h4>KDA2</h4>
+      {% if kda_json %}
+        <span id='kda_chart'></span>
+      {% endif %}
+    </div>
+
+
+  </div>
+
+{% endblock content %}
+
+
+{% block extra_js %}
+<script type="text/javascript">
+  var input_data;
+  d3.json('{{MEDIA_URL}}{{winrate_json}}',function(source){
+    var x;
+    input_data = source;
+    window.d3ening.plot(source, '#winrate_chart')
+  });
+
+  d3.json('{{MEDIA_URL}}{{usage_json}}',function(source){
+    var x;
+    input_data = source;
+    window.d3ening.plot(source, '#usage_chart')
+  });
+</script>
+<script type="text/javascript">
+  $(scorebarToggles())
+</script>
+
+{% endblock extra_js %}
+

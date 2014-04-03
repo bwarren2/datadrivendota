@@ -25,7 +25,11 @@ from matches.management.tasks.valve_api_calls import (
 )
 from .models import request_to_player
 from utils.exceptions import NoDataFound
-from .json_data import player_winrate_json, player_hero_abilities_json
+from .json_data import (
+    player_winrate_json,
+    player_hero_abilities_json,
+    player_versus_winrate_json
+    )
 from matches.json_data import player_endgame_json
 from utils.file_management import outsourceJson
 
@@ -399,6 +403,39 @@ def player_matches(request, player_id=None):
         {
             'pms_list': pms_list,
             'player': player
+        }
+    )
+
+
+def comparison(request, player_id_1, player_id_2):
+    player_1 = get_object_or_404(Player, steam_id=player_id_1)
+    player_2 = get_object_or_404(Player, steam_id=player_id_2)
+
+    datalist, params = player_versus_winrate_json(
+        player_id_1=player_1.steam_id,
+        player_id_2=player_2.steam_id,
+        plot_var='winrate',
+        )
+    params['outerHeight'] = 350
+    params['outerWidth'] = 350
+    winrate_json = outsourceJson(datalist, params)
+
+    datalist, params = player_versus_winrate_json(
+        player_id_1=player_1.steam_id,
+        player_id_2=player_2.steam_id,
+        plot_var='usage',
+        )
+    params['outerHeight'] = 350
+    params['outerWidth'] = 350
+    usage_json = outsourceJson(datalist, params)
+    return render(
+        request,
+        'players/comparison.html',
+        {
+            'player1': player_1,
+            'player2': player_2,
+            'winrate_json': basename(winrate_json.name),
+            'usage_json': basename(usage_json.name),
         }
     )
 

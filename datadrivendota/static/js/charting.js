@@ -261,6 +261,15 @@ function draw_scatterplot(source, placement_div){
     draw_y_axis(params, g, yAxis);
     draw_title(params, svg)
 
+    point_size_scale = d3.scale.linear()
+      .domain([params['pointDomainMin'],params['pointDomainMax']])
+      .range([params['pointSizeMin'],params['pointSizeMax']])
+      .clamp(true)
+
+    stroke_width_scale = d3.scale.linear()
+      .domain([params['strokeDomainMin'],params['strokeDomainMax']])
+      .range([params['strokeSizeMin'],params['strokeSizeMax']])
+      .clamp(true)
 
     var series = g.selectAll('.series').data(function(d){
             return(d.values);
@@ -276,8 +285,17 @@ function draw_scatterplot(source, placement_div){
     .attr('cx',function(d){return(x(d.x_var)); })
     .attr('cy',function(d){return(y(d.y_var)); })
     .attr("class", 'points')
-    .attr('r', 5)
+    .attr('r', function(d){
+      return(point_size_scale(d.point_size));
+    })
+    .attr('stroke-width', function(d){
+      return(stroke_width_scale(d.stroke_width));
+    })
     .style("fill", function(d) { return color(String(d.group_var));})
+    .style("stroke", function(d) {
+      return '#000000'
+      // return color(String(d.group_var));
+    })
     .on("mouseover", function(d) {
             div.transition()
                 .duration(200)
@@ -290,7 +308,7 @@ function draw_scatterplot(source, placement_div){
             div.transition()
                 .duration(500)
                 .style("opacity", 0);
-        });
+    });
 
     if(params['draw_path']){
       draw_path(series, line, color, params)

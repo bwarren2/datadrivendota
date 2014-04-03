@@ -30,6 +30,12 @@ urlpatterns = patterns(
         name="id_detail"
     ),
 
+    url(
+        r'^comparison/(?P<player_id_1>[0-9]*)-(?P<player_id_2>[0-9]*)/$',
+        views.comparison,
+        name="comparison"
+    ),
+
     url(r'^api/getplayers/$', views.player_list, name='player_list'),
     url(r'^api/dropfollow/$', views.drop_follow, name='drop_follow'),
     url(r'^api/checkid/$', views.check_id, name='check_id'),
