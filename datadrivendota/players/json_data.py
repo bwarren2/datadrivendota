@@ -231,7 +231,6 @@ def player_versus_winrate_json(
     pmses = PlayerMatchSummary.objects.filter(
         player__in=[player_1, player_2],
         match__validity=Match.LEGIT,
-        hero__roles__in=roles,
         match__game_mode__steam_id__in=game_mode_list,
     ).select_related().distinct()
 
