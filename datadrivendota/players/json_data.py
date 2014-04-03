@@ -258,7 +258,7 @@ def player_versus_winrate_json(
         if pairings[hero][player_1]['total_games'] != 0:
             pairings[hero][player_1]['winrate'] = \
                 float(pairings[hero][player_1]['wins'])\
-                / pairings[hero][player_1]['total_games']
+                / pairings[hero][player_1]['total_games']*100
         else:
             pairings[hero][player_1]['winrate'] = 0
 
@@ -269,7 +269,7 @@ def player_versus_winrate_json(
         if pairings[hero][player_2]['total_games'] != 0:
             pairings[hero][player_2]['winrate'] = \
                 float(pairings[hero][player_2]['wins'])\
-                / pairings[hero][player_2]['total_games']
+                / pairings[hero][player_2]['total_games']*100
         else:
             pairings[hero][player_2]['winrate'] = 0
 
@@ -328,7 +328,8 @@ def player_versus_winrate_json(
     params['pointSizeMax'] = 5
 
     if plot_var == 'winrate':
-        params['y_max'] = 1
+        params['y_max'] = 100
+        params['x_max'] = 100
         params['strokeDomainMin'] = 0
         params['strokeDomainMax'] = 10
         params['strokeSizeMin'] = 0
