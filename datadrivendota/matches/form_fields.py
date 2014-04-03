@@ -29,6 +29,8 @@ class MultiMatchSelect(forms.CharField):
     def clean(self, match_str):
         match_list = match_str.split(',')
         return_match_list = []
+        if match_list == ['']:
+            raise ValidationError("Please enter match ids")
         for match in match_list:
             match_id = match.replace("M#: ", "")
             try:
