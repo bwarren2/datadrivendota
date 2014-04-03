@@ -143,7 +143,7 @@ function draw_legend(params, svg, color){
         .attr("transform", "translate("
           +outerWidth*pctWidth+
           ","
-          +outerHeight/10+")");
+          +outerHeight*pctHeight+")");
 
   var rows = legend.selectAll('rect')
         .data(function(d){return d.values;})

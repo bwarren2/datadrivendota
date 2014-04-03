@@ -416,6 +416,7 @@ def comparison(request, player_id_1, player_id_2):
         player_id_2=player_2.steam_id,
         plot_var='winrate',
         )
+    params['margin']['left'] = 30
     params['outerHeight'] = 350
     params['outerWidth'] = 350
     winrate_json = outsourceJson(datalist, params)
@@ -425,6 +426,7 @@ def comparison(request, player_id_1, player_id_2):
         player_id_2=player_2.steam_id,
         plot_var='usage',
         )
+    params['margin']['left'] = 30
     params['outerHeight'] = 350
     params['outerWidth'] = 350
     usage_json = outsourceJson(datalist, params)

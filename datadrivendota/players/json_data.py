@@ -102,7 +102,7 @@ def player_winrate_json(
     params['x_min'] = min([d['x_var'] for d in data_list])
     params['x_max'] = max([d['x_var'] for d in data_list])
     params['y_min'] = min([d['y_var'] for d in data_list])
-    params['y_max'] = max([d['y_var'] for d in data_list])
+    params['y_max'] = 100
     params['x_label'] = 'Games'
     params['y_label'] = 'Winrate'
     params['draw_path'] = False
@@ -111,7 +111,7 @@ def player_winrate_json(
     params['outerWidth'] = width
     params['outerHeight'] = height
     params['legendWidthPercent'] = .7
-    params['legendHeightPercent'] = .1
+    params['legendHeightPercent'] = .7
     if group_var == 'hero':
         params['draw_legend'] = False
         group = []
@@ -328,6 +328,7 @@ def player_versus_winrate_json(
     params['pointSizeMax'] = 5
 
     if plot_var == 'winrate':
+        params['y_max'] = 1
         params['strokeDomainMin'] = 0
         params['strokeDomainMax'] = 10
         params['strokeSizeMin'] = 0
