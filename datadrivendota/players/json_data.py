@@ -73,6 +73,7 @@ def player_winrate_json(
     games = {hero: wins.get(hero, 0) + losses.get(hero, 0) for hero in heroes}
 
     all_heroes = Hero.objects.all().select_related()
+    a = all_heroes
     data_list, groups = [], []
     for hero in heroes:
         datadict = datapoint_dict()
@@ -296,8 +297,8 @@ def player_versus_winrate_json(
             datadict['y_var'] = dataset[player_2]['winrate']
         else:
             datadict['point_size'] = \
-                dataset[player_1]['total_games'] \
-                + dataset[player_2]['total_games']
+                (dataset[player_1]['total_games'] \
+                + dataset[player_2]['total_games'])/2.0
             datadict['x_var'] = dataset[player_1]['total_games']
             datadict['y_var'] = dataset[player_2]['total_games']
 

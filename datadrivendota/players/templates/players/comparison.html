@@ -38,7 +38,7 @@
       {% endif %}
     </div>
 
-    <div class="player-charts col-md-4">
+    <div class="player-charts col-md-8">
     <h4>KDA2</h4>
       {% if kda_json %}
         <span id='kda_chart'></span>
@@ -65,6 +65,13 @@
     input_data = source;
     window.d3ening.plot(source, '#usage_chart')
   });
+
+  d3.json('{{MEDIA_URL}}{{kda_json}}',function(source){
+    var x;
+    input_data = source;
+    window.d3ening.plot(source, '#kda_chart')
+  });
+
 </script>
 <script type="text/javascript">
   $(scorebarToggles())

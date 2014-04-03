@@ -430,6 +430,20 @@ def comparison(request, player_id_1, player_id_2):
     params['outerHeight'] = 350
     params['outerWidth'] = 350
     usage_json = outsourceJson(datalist, params)
+
+    datalist, params = player_endgame_json(
+        player_list=[player_1.steam_id, player_2.steam_id],
+        mode_list=[1, 2, 3, 4, 5],
+        x_var='duration',
+        y_var='K-D+.5*A',
+        split_var='is_win',
+        group_var='player',
+        )
+    params['outerHeight'] = 350
+    params['outerWidth'] = 350
+    kda_json = outsourceJson(datalist, params)
+
+
     return render(
         request,
         'players/comparison.html',
@@ -438,6 +452,7 @@ def comparison(request, player_id_1, player_id_2):
             'player2': player_2,
             'winrate_json': basename(winrate_json.name),
             'usage_json': basename(usage_json.name),
+            'kda_json': basename(kda_json.name),
         }
     )
 
