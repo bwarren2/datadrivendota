@@ -443,7 +443,6 @@ def comparison(request, player_id_1, player_id_2):
     params['outerWidth'] = 250
     kda_json = outsourceJson(datalist, params)
 
-
     return render(
         request,
         'players/comparison.html',
