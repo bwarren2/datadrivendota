@@ -279,35 +279,44 @@ function draw_scatterplot(source, placement_div){
     })
     .attr("id", function(d){return convertToSlug(d.key);});
 
-    series.selectAll('.points').data(function(d){return d.values;}).enter()
-        .append("a").attr("xlink:href", function(d) {if(d.url){return d.url;} else {return '';}})
-    .append('circle')
-    .attr('cx',function(d){return(x(d.x_var)); })
-    .attr('cy',function(d){return(y(d.y_var)); })
-    .attr("class", 'points')
-    .attr('r', function(d){
-      return(point_size_scale(d.point_size));
-    })
-    .attr('stroke-width', function(d){
-      return(stroke_width_scale(d.stroke_width));
-    })
-    .style("fill", function(d) { return color(String(d.group_var));})
-    .style("stroke", function(d) {
-      return '#000000'
-      // return color(String(d.group_var));
-    })
-    .on("mouseover", function(d) {
-            div.transition()
-                .duration(200)
-                .style("opacity", 0.9);
-            div .html(d.tooltip)
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-            })
-        .on("mouseout", function(d) {
-            div.transition()
-                .duration(500)
-                .style("opacity", 0);
+    series.selectAll('.points')
+      .data(function(d){return d.values;})
+      .enter()
+      .append("a").attr("xlink:href", function(d) {
+        if(d.url){return d.url;} else {return '';}
+      })
+      .append('circle')
+      .attr('cx',function(d){return(x(d.x_var)); })
+      .attr('cy',function(d){return(y(d.y_var)); })
+      .attr("class", function(d){
+          for(var key in d.classes){
+            d.classes[key]=convertToSlug(d.classes[key]);
+          }
+          return 'points '+d.classes.join(' ');
+      })
+      .attr('r', function(d){
+        return(point_size_scale(d.point_size));
+      })
+      .attr('stroke-width', function(d){
+        return(stroke_width_scale(d.stroke_width));
+      })
+      .style("fill", function(d) { return color(String(d.group_var));})
+      .style("stroke", function(d) {
+        return '#000000'
+        // return color(String(d.group_var));
+      })
+      .on("mouseover", function(d) {
+        div.transition()
+          .duration(200)
+          .style("opacity", 0.9);
+        div .html(d.tooltip)
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+        })
+      .on("mouseout", function(d) {
+          div.transition()
+            .duration(500)
+            .style("opacity", 0);
     });
 
     if(params['draw_path']){

@@ -42,6 +42,7 @@ def datapoint_dict():
         'url': None,
         'point_size': 1,
         'stroke_width': 0,
+        'classes': [],
     }
     return dictionary
 

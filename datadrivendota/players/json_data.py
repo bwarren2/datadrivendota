@@ -95,7 +95,7 @@ def player_winrate_json(
             'url': url_str,
             'label': hero,
             'tooltip': hero,
-            'classes': [group],
+            'classes': [group, hero],
         })
         data_list.append(datadict)
 
@@ -287,7 +287,7 @@ def player_versus_winrate_json(
             'split_var': '',
             'label': hero.name,
             'tooltip': hero.name,
-            'classes': [group],
+            'classes': [hero.name, group],
         })
         if plot_var == 'winrate':
             datadict['point_size'] = dataset[player_1]['total_games']

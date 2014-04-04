@@ -34,6 +34,8 @@ def player_endgame_json(
     try:
         x_vector_list, xlab = fetch_match_attributes(selected_summaries, x_var)
         y_vector_list, ylab = fetch_match_attributes(selected_summaries, y_var)
+        name_list, foo = fetch_match_attributes(
+            selected_summaries, 'hero_name')
 
         split_vector_list, split_lab = fetch_match_attributes(
             selected_summaries,
@@ -57,6 +59,7 @@ def player_endgame_json(
             'tooltip': match_list[key],
             'split_var': split_vector_list[key],
             'group_var': group_vector_list[key],
+            'classes': [name_list[key]],
         })
         datalist.append(datadict)
 
@@ -154,6 +157,8 @@ def team_endgame_json(
                     'matches:match_detail',
                     kwargs={'match_id': match_id}
                 ),
+                'classes': [p.hero.name],
+
             })
 
             datalist.append(datadict)

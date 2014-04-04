@@ -417,8 +417,8 @@ def comparison(request, player_id_1, player_id_2):
         plot_var='winrate',
         )
     params['margin']['left'] = 30
-    params['outerHeight'] = 350
-    params['outerWidth'] = 350
+    params['outerHeight'] = 300
+    params['outerWidth'] = 300
     winrate_json = outsourceJson(datalist, params)
 
     datalist, params = player_versus_winrate_json(
@@ -427,8 +427,8 @@ def comparison(request, player_id_1, player_id_2):
         plot_var='usage',
         )
     params['margin']['left'] = 30
-    params['outerHeight'] = 350
-    params['outerWidth'] = 350
+    params['outerHeight'] = 300
+    params['outerWidth'] = 300
     usage_json = outsourceJson(datalist, params)
 
     datalist, params = player_endgame_json(
@@ -439,8 +439,8 @@ def comparison(request, player_id_1, player_id_2):
         split_var='is_win',
         group_var='player',
         )
-    params['outerHeight'] = 350
-    params['outerWidth'] = 350
+    params['outerHeight'] = 250
+    params['outerWidth'] = 250
     kda_json = outsourceJson(datalist, params)
 
 

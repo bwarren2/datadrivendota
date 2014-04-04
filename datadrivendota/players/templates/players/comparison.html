@@ -31,15 +31,15 @@
   </div>
 
   <div class="row">
-    <div class="player-charts col-md-4">
-    <h4>Farm</h4>
+    <div class="player-charts col-md-6">
+    <h4>Team KDA2</h4>
       {% if endgame_farm_json %}
         <span id='farm_chart'></span>
       {% endif %}
     </div>
 
-    <div class="player-charts col-md-8">
-    <h4>KDA2</h4>
+    <div class="player-charts col-md-6">
+    <h4>Personal KDA2</h4>
       {% if kda_json %}
         <span id='kda_chart'></span>
       {% endif %}
@@ -53,29 +53,93 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-  var input_data;
-  d3.json('{{MEDIA_URL}}{{winrate_json}}',function(source){
-    var x;
-    input_data = source;
-    window.d3ening.plot(source, '#winrate_chart')
-  });
 
-  d3.json('{{MEDIA_URL}}{{usage_json}}',function(source){
-    var x;
-    input_data = source;
-    window.d3ening.plot(source, '#usage_chart')
-  });
+  var checkvar = 0;
+  function chart1(callback){
+    d3.json('{{MEDIA_URL}}{{winrate_json}}',function(source){
+      var input_data = source;
+      window.d3ening.plot(source, '#winrate_chart')
+      checkvar+=1;
+      $.event.trigger({
+        type:    "semaphore",
+        message: "Chart 1 done."
+      });
+    });
+  }
 
-  d3.json('{{MEDIA_URL}}{{kda_json}}',function(source){
-    var x;
-    input_data = source;
-    window.d3ening.plot(source, '#kda_chart')
-  });
+  function chart2(callback){
+    d3.json('{{MEDIA_URL}}{{usage_json}}',function(source){
+      var input_data = source;
+      window.d3ening.plot(source, '#usage_chart')
+      checkvar+=2;
+      $.event.trigger({
+        type:    "semaphore",
+        message: "Chart 2 done."
+      });
+    });
+  }
+
+  function chart3(callback){
+    d3.json('{{MEDIA_URL}}{{kda_json}}',function(source){
+      var input_data = source;
+      window.d3ening.plot(source, '#kda_chart')
+      checkvar+=3;
+      $.event.trigger({
+        type:    "semaphore",
+        message: "Chart 3 done."
+      });
+
+    });
+  }
+
+  function addenda(){
+    var div = make_tooltip();
+    d3.selectAll('.points')
+      .on('mouseover.filter',function(d){
+          var str = 'circle:not(.'+convertToSlug(d.label)+')';
+
+          selection = d3.selectAll(str)
+          .transition()
+          .duration(500)
+          .attr('opacity',.1);
+
+          div.transition()
+            .duration(500)
+            .style("opacity", 0.9);
+
+          div .html(d.tooltip)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+
+      })
+      .on('mouseout.filter',function(d){
+
+          var str = 'circle:not(.'+convertToSlug(d.label)+')';
+
+          d3.selectAll(str)
+          .transition()
+          .duration(500)
+          .attr('opacity',1);
+
+        div.transition()
+          .duration(500)
+          .style("opacity", 0);
+
+      });
+  }
+  chart1();
+  chart2();
+  chart3();
+  $(document).on('semaphore', function(evt){
+    if (checkvar>=5){
+
+      addenda()
+    }
+  })
 
 </script>
 <script type="text/javascript">
   $(scorebarToggles())
 </script>
-
 {% endblock extra_js %}
 
