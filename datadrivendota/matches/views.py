@@ -615,6 +615,8 @@ def annotated_matches(pms_list, follow_list):
         match_data[id]['match_data']['game_mode'] = \
             pms.match.game_mode.description
 
+        match_data[id]['match_data']['id'] = id
+
         match_data[id]['match_data'][side]['Kills'] += pms.kills
         match_data[id]['match_data'][side]['Deaths'] += pms.deaths
         match_data[id]['match_data'][side]['Assists'] += pms.assists
@@ -638,7 +640,12 @@ def annotated_matches(pms_list, follow_list):
             pms_data['followed'] = True
 
         match_data[id]['pms_data'][side][pms.player_slot] = pms_data
-    return match_data
+
+    match_list = []
+    for key in sorted(match_data.iterkeys(), reverse=True):
+        match_list.append(match_data[key])
+    print match_list
+    return match_list
 
 
 def match_list(request):

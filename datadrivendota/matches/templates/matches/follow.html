@@ -5,9 +5,9 @@
 {% block content %}
 {% if match_data and lineup_thumbs %}
 <div class="row">
-    {% for key, match in match_data.iteritems %}
+    {% for match in match_data %}
         <div class="col-md-3">
-          <a href="{% url 'matches:match_detail' match_id=key %}" class="thumbnail">
+          <a href="{% url 'matches:match_detail' match_id=match.match_data.id %}" class="thumbnail">
             <div><br> </div>
               <div>
                 {% for key, detail in match.pms_data.Radiant.iteritems %}
@@ -53,9 +53,9 @@
 
 {% elif match_data and players %}
 <div class="row">
-    {% for key, match in match_data.iteritems %}
+    {% for match in match_data %}
         <div class="col-md-3">
-          <a href="{% url 'matches:match_detail' match_id=key %}" class="thumbnail">
+          <a href="{% url 'matches:match_detail' match_id=match.match_data.id %}" class="thumbnail">
             <div><br> </div>
               <div>
                 {% for key, detail in match.pms_data.Radiant.iteritems %}
