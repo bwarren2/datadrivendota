@@ -26,7 +26,7 @@ function getColorScale(params){
   if ('color_range' in params && 'color_domain' in params) {
       var color = d3.scale.ordinal()
               .range(params.color_range)
-              .domain(params.color_domain)
+              .domain(params.color_domain);
   }
   else {
       var color = d3.scale.category10();
@@ -39,7 +39,7 @@ function make_tooltip(){
     var div = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
-    return div
+    return div;
 }
 
 function linear_x_scale(params){
@@ -137,8 +137,8 @@ function draw_legend(params, svg, color){
   var outerHeight = get_outer_height(params);
   var margin = get_margin(params);
   var legend = svg.append("g");
-  var pctWidth = get_legend_width_pct(params)
-  var pctHeight = get_legend_height_pct(params)
+  var pctWidth = get_legend_width_pct(params);
+  var pctHeight = get_legend_height_pct(params);
   legend.attr("class", "legend")
         .attr("transform", "translate("
           +outerWidth*pctWidth+
@@ -148,6 +148,7 @@ function draw_legend(params, svg, color){
   var rows = legend.selectAll('rect')
         .data(function(d){return d.values;})
         .enter();
+
       rows.append("rect")
         .attr("x", 2)
         .attr("y", function(d, i){ return i *  20;})
@@ -200,19 +201,19 @@ function get_padding(params){
 }
 
 function get_width(params){
-  var padding = get_padding(params)
+  var padding = get_padding(params);
   return get_inner_width(params) - padding.left - padding.right;
 }
 function get_height(params){
-  var padding = get_padding(params)
+  var padding = get_padding(params);
   return get_inner_height(params) - padding.top - padding.bottom;
 }
 function get_inner_width(params){
-  var margin = get_margin(params)
+  var margin = get_margin(params);
   return get_outer_width(params) - margin.left - margin.right;
 }
 function get_inner_height(params){
-  var margin = get_margin(params)
+  var margin = get_margin(params);
   return get_outer_height(params) - margin.top - margin.bottom;
 }
 function get_outer_width(params){
@@ -238,7 +239,7 @@ function draw_scatterplot(source, placement_div){
 
     data = d3.nest().key(function(d){return d.split_var;}).key(function(d){return d.group_var;}).entries(raw_data);
 
-    var div = make_tooltip()
+    var div = make_tooltip();
 
     var svg = outer_chart(params, placement_div, data);
 
@@ -253,23 +254,23 @@ function draw_scatterplot(source, placement_div){
     var xAxis = d3.svg.axis().scale(x).orient("bottom"),
         yAxis = d3.svg.axis().scale(y).orient("left");
 
-    var color = getColorScale(params)
+    var color = getColorScale(params);
 
     var g = inner_chart(params, svg);
 
     draw_x_axis(params, g, xAxis);
     draw_y_axis(params, g, yAxis);
-    draw_title(params, svg)
+    draw_title(params, svg);
 
     point_size_scale = d3.scale.linear()
       .domain([params['pointDomainMin'],params['pointDomainMax']])
       .range([params['pointSizeMin'],params['pointSizeMax']])
-      .clamp(true)
+      .clamp(true);
 
     stroke_width_scale = d3.scale.linear()
       .domain([params['strokeDomainMin'],params['strokeDomainMax']])
       .range([params['strokeSizeMin'],params['strokeSizeMax']])
-      .clamp(true)
+      .clamp(true);
 
     var series = g.selectAll('.series').data(function(d){
             return(d.values);
@@ -320,11 +321,11 @@ function draw_scatterplot(source, placement_div){
     });
 
     if(params['draw_path']){
-      draw_path(series, line, color, params)
+      draw_path(series, line, color, params);
     }
 
     if(params['draw_legend']){
-      draw_legend(params, svg, color)
+      draw_legend(params, svg, color);
     }
 }
 function draw_barplot(source, placement_div){
@@ -337,7 +338,7 @@ function draw_barplot(source, placement_div){
 
     data = d3.nest().key(function(d){return d.split_var;}).key(function(d){return d.group_var;}).entries(raw_data);
 
-    var div = make_tooltip()
+    var div = make_tooltip();
     var svg = outer_chart(params, placement_div, data);
 
     var x = d3.scale.ordinal().rangeRoundBands([0, width], 0.1).domain(params.x_set);
@@ -346,10 +347,10 @@ function draw_barplot(source, placement_div){
     var xAxis = d3.svg.axis().scale(x).orient("bottom").tickValues(params.tickValues),
         yAxis = d3.svg.axis().scale(y).orient("left");
 
-    var color = getColorScale(params)
+    var color = getColorScale(params);
     var g = inner_chart(params, svg);
 
-    draw_title(params, svg)
+    draw_title(params, svg);
 
     g.append("g")
         .attr("class", "x-axis")
@@ -396,12 +397,15 @@ function draw_barplot(source, placement_div){
     .attr("height", function(d) { return height - y(d.y_var); })
     .style("fill", function(d) { return color(String(d.group_var));})
     .on("mouseover", function(d) {
+
             div.transition()
-                .duration(200)
-                .style("opacity", 0.9);
-            div .html(d.tooltip)
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
+              .duration(200)
+              .style("opacity", 0.9);
+
+            div.html(d.tooltip)
+              .style("left", (d3.event.pageX) + "px")
+              .style("top", (d3.event.pageY - 28) + "px")
+
             })
         .on("mouseout", function(d) {
             div.transition()
@@ -419,12 +423,12 @@ function draw_scatterseries(data, placement_div){
 
   var raw_data = data['data'];
   var params = data['parameters'];
-      params['draw_path'] = 'True'
-      params['draw_legend'] = 'True'
+      params['draw_path'] = 'True';
+      params['draw_legend'] = 'True';
 
   data = d3.nest().key(function(d){return d.split_var;}).key(function(d){return d.group_var;}).key(function(d){return d.series_var;}).entries(raw_data);
 
-  var div = make_tooltip()
+  var div = make_tooltip();
 
   var svg = outer_chart(params, placement_div, data);
 
@@ -440,14 +444,14 @@ function draw_scatterseries(data, placement_div){
   var xAxis = d3.svg.axis().scale(x).orient("bottom"),
       yAxis = d3.svg.axis().scale(y).orient("left");
 
-  var color = getColorScale(params)
+  var color = getColorScale(params);
 
   var g = inner_chart(params, svg);
 
   draw_x_axis(params, g, xAxis);
   draw_y_axis(params, g, yAxis);
 
-  draw_title(params, svg)
+  draw_title(params, svg);
 
   var groups = g.selectAll('.groups').data(function(d){
           return(d.values);
@@ -497,7 +501,7 @@ function draw_scatterseries(data, placement_div){
   }
 
   if(params['draw_legend']){
-    draw_legend(params, svg, color)
+    draw_legend(params, svg, color);
   }
 }
 
@@ -513,5 +517,5 @@ function plot(source, div){
         draw_scatterseries(source, div);
     }
 }
-window.d3ening = {}
-window.d3ening.plot = plot
+window.d3ening = {};
+window.d3ening.plot = plot;

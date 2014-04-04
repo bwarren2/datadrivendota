@@ -34,6 +34,7 @@ class Role(models.Model):
     )
     name = models.CharField(max_length=50, choices=ROLES, unique=True)
     desc = models.TextField()
+    # thumbshot = models.ImageField(null=True, upload_to='heroes/img/')
 
     @property
     def url(self):
@@ -41,6 +42,7 @@ class Role(models.Model):
 
     def __unicode__(self):
         return self.name
+
 
 
 class Hero(models.Model):
