@@ -15,6 +15,7 @@ from .forms import (
     PlayerTimelineForm,
     PlayerAddFollowForm,
     HeroAbilitiesForm,
+    PlayerAdversarialForm,
 )
 from matches.models import PlayerMatchSummary, Match
 from matches.management.tasks.valve_api_calls import (
@@ -26,6 +27,7 @@ from matches.management.tasks.valve_api_calls import (
 from .models import request_to_player
 from utils.exceptions import NoDataFound
 from .json_data import (
+    player_hero_side_json,
     player_winrate_json,
     player_hero_abilities_json,
     player_versus_winrate_json
@@ -237,6 +239,54 @@ def winrate(request):
             'tour': tour,
         }
     )
+
+
+@devserver_profile(follow=[PlayerTimeline])
+def player_hero_side(request):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts hero adversarial performance."
+        },
+    ]
+    tour = json.dumps(tour)
+
+    if request.GET:
+        form = PlayerAdversarialForm(request.GET)
+        if form.is_valid():
+            datalist, params = player_hero_side_json(
+                player_id=form.cleaned_data['player'],
+                game_mode_list=form.cleaned_data['game_modes'],
+                min_date=datetime.date(2009, 1, 1),
+                max_date=None,
+                group_var='alignment',
+                plot_var=form.cleaned_data['plot_var'],
+            )
+            json_data = outsourceJson(datalist, params)
+            return render(
+                request,
+                'players/form.html',
+                {
+                    'form': form,
+                    'json_data': basename(json_data.name),
+                    'title': 'Player Hero Adversary',
+                    'tour': tour,
+                }
+            )
+    else:
+        form = PlayerAdversarialForm()
+
+    return render(
+        request,
+        'players/form.html',
+        {
+            'form': form,
+            'title': 'Player Hero Adversary',
+            'tour': tour,
+        }
+    )
+
 
 
 @devserver_profile(follow=[PlayerTimeline])

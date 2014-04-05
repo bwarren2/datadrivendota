@@ -8,6 +8,7 @@ urlpatterns = patterns(
     url(r'^all-players/$', views.index, name='index'),
     url(r'^winrate/$', views.winrate, name='player_winrate'),
     url(r'^timeline/$', views.timeline, name='timeline'),
+    url(r'^hero-adversary/$', views.player_hero_side, name='hero_adversary'),
     url(
         r'^hero_ability_comparison/$',
         views.hero_abilities,

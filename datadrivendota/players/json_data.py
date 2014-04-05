@@ -343,3 +343,161 @@ def player_versus_winrate_json(
     params = color_scale_params(params, groups)
 
     return (data_list, params)
+
+
+def player_hero_side_json(
+        player_id,
+        game_mode_list=None,
+        min_date=datetime.date(2009, 1, 1),
+        max_date=None,
+        group_var='alignment',
+        plot_var='winrate',
+        ):
+    if max_date is None:
+        max_date_utc = mktime(datetime.datetime.now().timetuple())
+    else:
+        max_date_utc = mktime(max_date.timetuple())
+    min_dt_utc = mktime(min_date.timetuple())
+
+    if min_dt_utc > max_date_utc:
+        raise NoDataFound
+    if game_mode_list is None:
+        game_mode_list = [
+            gm.steam_id
+            for gm in GameMode.objects.filter(is_competitive=True)
+        ]
+
+    try:
+        player = Player.objects.get(steam_id=player_id)
+
+    except Player.DoesNotExist:
+        raise NoDataFound
+
+    def side_match(pms_set, outcome_dict, given_side):
+        for pms in pms_set:
+            if pms.hero not in outcome_dict:
+                outcome_dict[pms.hero] = {
+                    'same_side': {
+                        'wins': 0,
+                        'losses': 0,
+                    },
+                    'opposite_side': {
+                        'wins': 0,
+                        'losses': 0,
+                    }
+                }
+            if pms.is_win:
+                cat = 'wins'
+            else:
+                cat = 'losses'
+            if pms.which_side() == given_side:
+                side = 'same_side'
+            else:
+                side = 'opposite_side'
+            outcome_dict[pms.hero][side][cat] += 1
+
+    player_radiant_matches = Match.objects.filter(
+        playermatchsummary__player=player,
+        validity=Match.LEGIT,
+        game_mode__steam_id__in=game_mode_list,
+        playermatchsummary__player_slot__lte=6,
+    ).distinct()
+
+    pmses = PlayerMatchSummary.objects.filter(
+        match__in=player_radiant_matches,
+        ).exclude(
+        player=player).select_related()
+
+    outcome_dict = {}
+    side_match(pmses, outcome_dict, 'Radiant')
+
+    player_dire_matches = Match.objects.filter(
+        playermatchsummary__player=player,
+        validity=Match.LEGIT,
+        game_mode__steam_id__in=game_mode_list,
+        playermatchsummary__player_slot__gte=6,
+    ).distinct()
+
+    pmses = PlayerMatchSummary.objects.filter(
+        match__in=player_dire_matches,
+        ).exclude(
+        player=player).select_related()
+
+    side_match(pmses, outcome_dict, 'Dire')
+
+    for dct in outcome_dict.itervalues():
+        for side in dct.itervalues():
+            side['total_games'] = side['wins']+side['losses']
+            divisor = 1 if side['total_games'] == 0 else side['total_games']
+            side['winrate'] = side['wins']/float(divisor)*100.0
+
+    data_list, groups = [], []
+    for hero, dataset in outcome_dict.iteritems():
+        datadict = datapoint_dict()
+        if group_var == 'hero':
+            group = hero.name.title()
+        elif group_var == 'alignment':
+            group = hero.herodossier.alignment.title()
+        groups.append(group)
+
+        datadict.update({
+            'group_var': group,
+            'split_var': '',
+            'label': hero.name,
+            'tooltip': hero.name,
+            'classes': [hero.name, group],
+        })
+        if plot_var == 'winrate':
+            datadict['point_size'] = dataset['same_side']['total_games']
+            datadict['stroke_width'] = dataset['opposite_side']['total_games']
+
+            datadict['x_var'] = dataset['same_side']['winrate']
+            datadict['y_var'] = dataset['opposite_side']['winrate']
+        else:
+            datadict['point_size'] = \
+                (dataset['same_side']['total_games'] \
+                + dataset['opposite_side']['total_games'])/2.0
+            datadict['x_var'] = dataset['same_side']['total_games']
+            datadict['y_var'] = dataset['opposite_side']['total_games']
+
+        data_list.append(datadict)
+
+    params = params_dict()
+    params['x_min'] = min([d['x_var'] for d in data_list])
+    params['x_max'] = max([d['x_var'] for d in data_list])
+    params['y_min'] = min([d['y_var'] for d in data_list])
+    params['y_max'] = max([d['y_var'] for d in data_list])
+    params['x_label'] = "Same-side {pvar}".format(
+        pvar=plot_var,
+    )
+    params['y_label'] = "Opposite-side {pvar}".format(
+        pvar=plot_var,
+    )
+    params['draw_path'] = False
+    params['chart'] = 'xyplot'
+    params['margin']['left'] = 12*len(str(params['y_max']))
+    params['legendWidthPercent'] = .7
+    params['legendHeightPercent'] = .1
+    params['pointDomainMin'] = 0
+    params['pointDomainMax'] = 10
+    params['pointSizeMin'] = 1
+    params['pointSizeMax'] = 5
+
+    if plot_var == 'winrate':
+        params['y_min'] = 0
+        params['x_min'] = 0
+        params['y_max'] = 100
+        params['x_max'] = 100
+        params['strokeDomainMin'] = 0
+        params['strokeDomainMax'] = 10
+        params['strokeSizeMin'] = 0
+        params['strokeSizeMax'] = 2
+    if group_var == 'hero':
+        params['draw_legend'] = False
+        group = []
+    elif group_var == 'alignment':
+        group = hero.herodossier.alignment
+        params['draw_legend'] = True
+    params = color_scale_params(params, groups)
+
+    return (data_list, params)
