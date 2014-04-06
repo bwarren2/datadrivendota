@@ -15,8 +15,9 @@ class PlayerWinrateLevers(forms.Form):
         for item in ['hero', 'alignment']
     ]
     ROLE_LIST = [
-        (role.name, role.name.replace("_", " ").title())
-        for role in Role.objects.all()
+        1
+        # (role.name, role.name.replace("_", " ").title())
+        # for role in Role.objects.all()
     ]
     player = SinglePlayerField(
         help_text=(
@@ -67,8 +68,8 @@ class PlayerAdversarialForm(forms.Form):
         for item in ['winrate', 'usage']
     ]
     ROLE_LIST = [
-        (role.name, role.name.replace("_", " ").title())
-        for role in Role.objects.all()
+        1# (role.name, role.name.replace("_", " ").title())
+        # for role in Role.objects.all()
     ]
     player = SinglePlayerField(
         help_text=(
