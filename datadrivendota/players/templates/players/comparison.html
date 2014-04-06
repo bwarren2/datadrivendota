@@ -107,6 +107,24 @@
 
 
   function addenda(){
+
+    function convertToSlug(Text)
+    {
+        return Text
+            .toLowerCase()
+            .replace(/ /g,'-')
+            .replace(/[^\w-]+/g,'')
+            ;
+    }
+
+    function make_tooltip(){
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+        return div;
+    }
+
+
     var div = make_tooltip();
     d3.selectAll('.points')
       .on('mouseover.filter',function(d){
