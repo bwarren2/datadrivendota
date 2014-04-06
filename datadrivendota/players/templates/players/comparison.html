@@ -33,8 +33,8 @@
   <div class="row">
     <div class="player-charts col-md-6">
     <h4>Team KDA2</h4>
-      {% if endgame_farm_json %}
-        <span id='farm_chart'></span>
+      {% if team_kda_json %}
+        <span id='team_kda_chart'></span>
       {% endif %}
     </div>
 
@@ -92,6 +92,20 @@
     });
   }
 
+  function chart4(callback){
+    d3.json('{{MEDIA_URL}}{{team_kda_json}}',function(source){
+      var input_data = source;
+      window.d3ening.plot(source, '#team_kda_chart')
+      checkvar+=4;
+      $.event.trigger({
+        type:    "semaphore",
+        message: "Chart 4 done."
+      });
+
+    });
+  }
+
+
   function addenda(){
     var div = make_tooltip();
     d3.selectAll('.points')
@@ -101,7 +115,7 @@
           selection = d3.selectAll(str)
           .transition()
           .duration(500)
-          .attr('opacity',.1);
+          .attr('opacity',0);
 
           div.transition()
             .duration(500)
@@ -130,8 +144,9 @@
   chart1();
   chart2();
   chart3();
+  chart4();
   $(document).on('semaphore', function(evt){
-    if (checkvar>=5){
+    if (checkvar>=10){
 
       addenda()
     }

@@ -38,6 +38,7 @@ class Player(models.Model):
         default=0
     )
 
+    @property
     def display_name(self):
 
         if self.pro_name is not None:

@@ -1,5 +1,5 @@
-import random
 from django.conf import settings
+
 
 def params_dict():
     dictionary = {
@@ -27,6 +27,7 @@ def params_dict():
         'strokeSizeMax': 0,
         'chart': None,
         'path_stroke_width': 3,
+        'fadeOpacity': .2,
     }
     return dictionary
 

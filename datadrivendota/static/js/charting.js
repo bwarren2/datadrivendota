@@ -139,6 +139,7 @@ function draw_legend(params, svg, color){
   var legend = svg.append("g");
   var pctWidth = get_legend_width_pct(params);
   var pctHeight = get_legend_height_pct(params);
+  var fadeOpacity = get_fade_opacity(params);
   legend.attr("class", "legend")
         .attr("transform", "translate("
           +outerWidth*pctWidth+
@@ -162,7 +163,7 @@ function draw_legend(params, svg, color){
           function (d, i) {
             slug = convertToSlug(d.key)
             d3.selectAll('g.series:not(.'+slug+')')
-            .transition().duration(1000).style('opacity',0.2);
+            .transition().duration(1000).style('opacity',fadeOpacity);
         })
         .on("mouseout", function(d) {
             slug = convertToSlug(d.key)
@@ -231,13 +232,18 @@ function get_legend_height_pct(params){
 function get_path_stroke_width(params){
   return params.path_stroke_width;
 }
-
+function get_fade_opacity(params){
+  return params.fadeOpacity;
+}
 
 function draw_scatterplot(source, placement_div){
     var raw_data = source['data'];
     var params = source['parameters'];
 
-    data = d3.nest().key(function(d){return d.split_var;}).key(function(d){return d.group_var;}).entries(raw_data);
+    data = d3.nest()
+    .key(function(d){return d.split_var;}).sortKeys(d3.ascending)
+    .key(function(d){return d.group_var;}).sortKeys(d3.ascending)
+    .entries(raw_data);
 
     var div = make_tooltip();
 

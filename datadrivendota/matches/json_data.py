@@ -1,4 +1,5 @@
 from math import floor
+from django.db.models import Sum
 from django.core.urlresolvers import reverse
 from itertools import chain
 from matches.models import (
@@ -12,8 +13,193 @@ from matches.models import (
 )
 from utils.exceptions import NoDataFound
 from utils.charts import params_dict, datapoint_dict, color_scale_params
+from players.models import Player
+
+#This takes a player's games and gives the team's results.
+def player_team_endgame_json(
+        player_list,
+        mode_list,
+        x_var,
+        y_var,
+        split_var,
+        group_var
+        ):
+
+    dictAttributes = {
+        'kills': 'playermatchsummary__kills',
+        'deaths': 'playermatchsummary__deaths',
+        'assists': 'playermatchsummary__assists',
+        'last_hits': 'playermatchsummary__last_hits',
+        'denies': 'playermatchsummary__denies',
+        'hero_damage': 'playermatchsummary__hero_damage',
+        'tower_damage': 'playermatchsummary__tower_damage',
+        'hero_healing': 'playermatchsummary__hero_healing',
+        'level': 'playermatchsummary__level',
+        'gold_total': 'playermatchsummary__gold_per_min',
+        'xp_total': 'playermatchsummary__xp_per_min',
+    }
+
+    dictDerivedAttributes = {
+        'K-D+.5*A': '',
+        'first_blood_time': 'first_blood_time',
+        'gold_total': 'playermatchsummary__gold_per_min',
+        'xp_total': 'playermatchsummary__xp_per_min',
+        'duration': 'duration',
+    }
+
+    def get_var(var, dictAttributes, dictDerivedAttributes):
+        if var in dictDerivedAttributes:
+            if var == 'K-D+.5*A':
+                return annotation.playermatchsummary__kills__sum\
+                    - annotation.playermatchsummary__deaths__sum\
+                    + annotation.playermatchsummary__assists__sum/2
+            if var == 'first_blood_time':
+                return annotation.first_blood_time
+            if var == 'gold_total':
+                return annotation.duration/60\
+                    * annotation.playermatchsummary__gold_per_min__sum
+            if var == 'xp_total':
+                return annotation.duration/60\
+                    * annotation.playermatchsummary__xp_per_min__sum
+            if var == 'duration':
+                return annotation.duration/60
+        if var in dictAttributes:
+            return getattr(annotation, (dictAttributes[var])+'__sum')
+
+    datalist = []
+    for player in player_list:
+
+        player_obj = Player.objects.get(steam_id=player)
+
+        radiant_matches = Match.objects.filter(
+            game_mode__steam_id__in=mode_list,
+            playermatchsummary__player__steam_id=player,
+            playermatchsummary__player_slot__lte=6,
+            validity=Match.LEGIT)
+
+        dire_matches = Match.objects.filter(
+            game_mode__steam_id__in=mode_list,
+            playermatchsummary__player__steam_id=player,
+            playermatchsummary__player_slot__gte=6,
+            validity=Match.LEGIT)
+
+        radiant_annotations = Match.objects.filter(
+            id__in=[m.id for m in radiant_matches],
+            playermatchsummary__player_slot__lte=6)\
+            .annotate(Sum('playermatchsummary__kills'))\
+            .annotate(Sum('playermatchsummary__deaths'))\
+            .annotate(Sum('playermatchsummary__assists'))\
+
+        dire_annotations = Match.objects.filter(
+            id__in=[m.id for m in dire_matches],
+            playermatchsummary__player_slot__gte=6)\
+            .annotate(Sum('playermatchsummary__kills'))\
+            .annotate(Sum('playermatchsummary__deaths'))\
+            .annotate(Sum('playermatchsummary__assists'))\
 
 
+        if x_var in dictAttributes:
+            dire_annotations = \
+                dire_annotations.annotate(Sum(dictAttributes[x_var]))
+            radiant_annotations = \
+                radiant_annotations.annotate(Sum(dictAttributes[x_var]))
+        if y_var in dictAttributes:
+            dire_annotations = \
+                dire_annotations.annotate(Sum(dictAttributes[y_var]))
+            radiant_annotations = \
+                radiant_annotations.annotate(Sum(dictAttributes[y_var]))
+
+        pmses = PlayerMatchSummary.objects.filter(
+            player__steam_id=player,
+            match__validity=Match.LEGIT,
+            ).values(
+            'match__steam_id',
+            'hero__name',
+            'is_win',
+            )
+
+        mapping_dict = {
+            d['match__steam_id']:
+            {'hero': d['hero__name'], 'is_win': d['is_win']}
+            for d in pmses}
+
+        if x_var in dictAttributes:
+            dire_annotations.annotate(Sum(dictAttributes[x_var]))
+            radiant_annotations.annotate(Sum(dictAttributes[x_var]))
+        if y_var in dictAttributes:
+            dire_annotations.annotate(Sum('playermatchsummary__last_hits'))
+            radiant_annotations.annotate(Sum('playermatchsummary__last_hits'))
+
+        for annotation in chain(
+            radiant_annotations.select_related(),
+            dire_annotations.select_related()
+        ):
+
+            plot_x_var = get_var(x_var, dictAttributes, dictDerivedAttributes)
+            plot_y_var = get_var(y_var, dictAttributes, dictDerivedAttributes)
+
+            if split_var == 'No Split':
+                split_param = 'No Split'
+            elif split_var == 'game_mode':
+                split_param = annotation.game_mode.description
+            elif split_var == 'player':
+                split_param = player_obj.display_name
+            elif split_var == 'is_win':
+                if mapping_dict[annotation.steam_id]['is_win']:
+                    split_param = 'Won'
+                else:
+                    split_param = 'Lost'
+
+            if group_var == 'No Split':
+                group_param = 'No Split'
+            elif group_var == 'game_mode':
+                group_param = annotation.game_mode.description
+            elif group_var == 'player':
+                group_param = player_obj.display_name
+            elif group_var == 'is_win':
+                if mapping_dict[annotation.steam_id]['is_win']:
+                    group_param = 'Won'
+                else:
+                    group_param = 'Lost'
+
+
+            datadict = datapoint_dict()
+            datadict.update({
+                'x_var': plot_x_var,
+                'y_var': plot_y_var,
+                'label': annotation.steam_id,
+                'tooltip': annotation.steam_id,
+                'split_var': split_param,
+                'group_var': group_param,
+                'classes': [mapping_dict[annotation.steam_id]['hero']],
+                'url': reverse(
+                    'matches:match_detail',
+                    kwargs={'match_id': annotation.steam_id}
+                )
+            })
+            datalist.append(datadict)
+
+    if len(datalist) == 0:
+        raise NoDataFound
+
+    params = params_dict()
+    params['x_min'] = min([d['x_var'] for d in datalist])
+    params['x_max'] = max([d['x_var'] for d in datalist])
+    params['y_min'] = min([d['y_var'] for d in datalist])
+    params['y_max'] = max([d['y_var'] for d in datalist])
+    params['legendWidthPercent'] = .25
+    if x_var == 'duration':
+        params['x_label'] = 'Duration (m)'
+    else:
+        params['x_label'] = x_var.title()
+    params['y_label'] = y_var.title()
+    params['margin']['left'] = 12*len(str(params['y_max']))
+    params['chart'] = 'xyplot'
+    params = color_scale_params(params, player_list)
+    return (datalist, params)
+
+
+#This gives the player's endgame results
 def player_endgame_json(
         player_list,
         mode_list,
@@ -60,6 +246,11 @@ def player_endgame_json(
             'split_var': split_vector_list[key],
             'group_var': group_vector_list[key],
             'classes': [name_list[key]],
+            'url': reverse(
+                'matches:match_detail',
+                kwargs={'match_id': match_list[key]}
+            )
+
         })
         datalist.append(datadict)
 
@@ -70,11 +261,13 @@ def player_endgame_json(
     params['y_max'] = max(y_vector_list)
     params['x_label'] = xlab
     params['y_label'] = ylab
+    params['margin']['left'] = 12*len(str(params['y_max']))
     params['chart'] = 'xyplot'
     params = color_scale_params(params, group_vector_list)
     return (datalist, params)
 
 
+#This gives the endgame results for any game where the given players were on the same team
 def team_endgame_json(
         player_list,
         mode_list,
@@ -177,6 +370,7 @@ def team_endgame_json(
     params['x_label'] = xlab
     params['y_label'] = ylab
     params['chart'] = 'xyplot'
+    params['margin']['left'] = 12*len(str(params['y_max']))
     groups = [elt for elt in group_data.itervalues()]
     params = color_scale_params(params, groups)
 

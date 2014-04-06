@@ -34,7 +34,7 @@ class Role(models.Model):
     )
     name = models.CharField(max_length=50, choices=ROLES, unique=True)
     desc = models.TextField()
-    # thumbshot = models.ImageField(null=True, upload_to='heroes/img/')
+#    thumbshot = models.ImageField(null=True, upload_to='heroes/img/')
 
     @property
     def url(self):

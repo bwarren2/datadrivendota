@@ -23,6 +23,7 @@ from .json_data import (
     match_ability_json,
     match_list_json,
     match_parameter_json,
+    player_team_endgame_json,
 )
 from players.models import request_to_player, Player
 from utils.exceptions import NoDataFound
@@ -356,6 +357,67 @@ def endgame(request):
         {
             'form': select_form,
             'title': 'Endgame Charts',
+            'tour': tour,
+        }
+    )
+
+
+@devserver_profile(follow=[EndgameChart])
+def own_team_endgame(request):
+
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts end-of-game data for teams for each player of your choosing."
+        }
+    ]
+    tour = json.dumps(tour)
+
+    if request.GET:
+        select_form = EndgameSelect(request.GET)
+        if select_form.is_valid():
+            try:
+                datalist, params = player_team_endgame_json(
+                    player_list=select_form.cleaned_data['players'],
+                    mode_list=select_form.cleaned_data['game_modes'],
+                    x_var=select_form.cleaned_data['x_var'],
+                    y_var=select_form.cleaned_data['y_var'],
+                    split_var=select_form.cleaned_data['split_var'],
+                    group_var=select_form.cleaned_data['group_var']
+                )
+                json_data = outsourceJson(datalist, params)
+
+                return render(
+                    request,
+                    'matches/form.html',
+                    {
+                        'form': select_form,
+                        'json_data': basename(json_data.name),
+                        'title': 'Own-Team Endgame Charts',
+                        'tour': tour,
+                    }
+                )
+            except NoDataFound:
+                return render(
+                    request,
+                    'matches/form.html',
+                    {
+                        'form': select_form,
+                        'error': 'error',
+                        'title': 'Own-Team Endgame Charts',
+                        'tour': tour,
+                    }
+                )
+
+    else:
+        select_form = EndgameSelect()
+    return render(
+        request,
+        'matches/form.html',
+        {
+            'form': select_form,
+            'title': 'Own-Team Endgame Charts',
             'tour': tour,
         }
     )

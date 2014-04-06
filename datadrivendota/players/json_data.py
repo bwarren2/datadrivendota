@@ -85,7 +85,7 @@ def player_winrate_json(
         groups.append(group)
 
         url_str = '/heroes/skill_progression/?game_modes=1&game_modes=2&game_modes=3&game_modes=4&game_modes=5&division=Skill&{extras}'.format(extras=urlencode({'hero': hero_obj.name,
-            'player': player.display_name()}))
+            'player': player.display_name}))
 
         datadict.update({
             'x_var': games[hero],
@@ -168,16 +168,16 @@ def player_hero_abilities_json(
             else 'Loss'
         if division == 'Player win/loss':
             datapoint['group_var'] = "{p}, ({win})".format(
-                p=build.player_match_summary.player.display_name(),
+                p=build.player_match_summary.player.display_name,
                 win=winningness)
         elif division == 'Players':
             datapoint['group_var'] = "{p}".format(
-                p=build.player_match_summary.player.display_name())
+                p=build.player_match_summary.player.display_name)
         elif division == 'Win/loss':
             datapoint['group_var'] = "{win}".format(
                 win=winningness)
         datapoint['series_var'] = build.player_match_summary.match.steam_id
-        datapoint['label'] = build.player_match_summary.player.display_name()
+        datapoint['label'] = build.player_match_summary.player.display_name
         datapoint['split_var'] = 'Skill Progression'
         datalist.append(datapoint)
 
