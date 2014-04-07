@@ -199,7 +199,6 @@ def player_team_endgame_json(
     params = color_scale_params(params,
         [p.display_name for p in player_obj_list]
     )
-    print params
     return (datalist, params)
 
 
@@ -268,7 +267,6 @@ def player_endgame_json(
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['chart'] = 'xyplot'
     params = color_scale_params(params, group_vector_list)
-    print params
     return (datalist, params)
 
 
