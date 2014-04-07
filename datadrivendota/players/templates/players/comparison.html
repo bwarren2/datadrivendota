@@ -175,6 +175,7 @@
             .duration(500)
             .attr('opacity',0);
             $('.click-selector').addClass('clicked')
+            $('.click-selector').text('Unselect hero')
           }else{
             var str = 'circle:not(.'+convertToSlug($('.select2-chosen').text())+')';
 
@@ -183,6 +184,7 @@
             .duration(500)
             .attr('opacity',1);
             $('.click-selector').removeClass('clicked')
+            $('.click-selector').text('Select hero')
           }
       });
   }
