@@ -536,6 +536,7 @@ def hero_style(request, player_id, hero_name):
     )
     params['outerHeight'] = 275
     params['outerWidth'] = 275
+    params['fadeOpacity'] = 0
     hero_progression = outsourceJson(datalist, params)
 
     # datalist, params = player_hero_item_json(
@@ -557,6 +558,7 @@ def hero_style(request, player_id, hero_name):
     )
     params['outerHeight'] = 275
     params['outerWidth'] = 275
+    params['fadeOpacity'] = 0
     hero_kda2_chart_json = outsourceJson(datalist, params)
 
     datalist, params = hero_performance_chart_json(
@@ -570,6 +572,7 @@ def hero_style(request, player_id, hero_name):
     )
     params['outerHeight'] = 275
     params['outerWidth'] = 275
+    params['fadeOpacity'] = 0
     hero_push_json = outsourceJson(datalist, params)
 
     return render(
