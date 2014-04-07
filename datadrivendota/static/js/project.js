@@ -215,6 +215,7 @@ $(function () {
 
 });
 
+window.jsUtils = {}
 
 function scorebarToggles(){
   $('.scorebar').hide();
@@ -222,6 +223,7 @@ function scorebarToggles(){
   $('#hide-score').click(function(){$('.scorebar').fadeOut('fast');});
 }
 
+window.jsUtils.scorebarToggles = scorebarToggles
 
 function convertToSlug(Text)
 {

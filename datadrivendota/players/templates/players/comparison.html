@@ -7,6 +7,11 @@
 
 {% block content %}
 
+<span><input type='text' class='single-hero-tags'></span>
+  <button type='button' class='btn btn-small btn-primary click-selector'>
+  Select Hero</button>
+
+
   <div class="row">
     <div class="player-charts col-md-4">
     <h4>Hero Winrate</h4>
@@ -44,8 +49,6 @@
         <span id='kda_chart'></span>
       {% endif %}
     </div>
-
-
   </div>
 
 {% endblock content %}
@@ -107,7 +110,6 @@
 
 
   function addenda(){
-
     function convertToSlug(Text)
     {
         return Text
@@ -124,7 +126,7 @@
         return div;
     }
 
-
+    // Points manipulation
     var div = make_tooltip();
     d3.selectAll('.points')
       .on('mouseover.filter',function(d){
@@ -158,6 +160,31 @@
           .style("opacity", 0);
 
       });
+
+
+    // Clicker manipulation
+    d3.selectAll('.click-selector')
+      .on('click',function(d){
+          if (!$('.click-selector').hasClass('clicked')){
+            var str = 'circle:not(.'+convertToSlug(
+              $('.select2-chosen').text()
+            )+')';
+
+            selection = d3.selectAll(str)
+            .transition()
+            .duration(500)
+            .attr('opacity',0);
+            $('.click-selector').addClass('clicked')
+          }else{
+            var str = 'circle:not(.'+convertToSlug($('.select2-chosen').text())+')';
+
+            d3.selectAll(str)
+            .transition()
+            .duration(500)
+            .attr('opacity',1);
+            $('.click-selector').removeClass('clicked')
+          }
+      });
   }
   chart1();
   chart2();
@@ -165,14 +192,13 @@
   chart4();
   $(document).on('semaphore', function(evt){
     if (checkvar>=10){
-
       addenda()
     }
   })
 
 </script>
 <script type="text/javascript">
-  $(scorebarToggles())
+
 </script>
 {% endblock extra_js %}
 

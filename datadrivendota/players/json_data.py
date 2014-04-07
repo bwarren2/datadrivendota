@@ -310,11 +310,11 @@ def player_versus_winrate_json(
     params['y_min'] = min([d['y_var'] for d in data_list])
     params['y_max'] = max([d['y_var'] for d in data_list])
     params['x_label'] = "{name} {pvar}".format(
-        name=player_1.persona_name,
+        name=player_1.display_name,
         pvar=plot_var,
     )
     params['y_label'] = "{name} {pvar}".format(
-        name=player_2.persona_name,
+        name=player_2.display_name,
         pvar=plot_var,
     )
     params['draw_path'] = False

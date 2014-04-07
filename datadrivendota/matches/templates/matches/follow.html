@@ -123,11 +123,9 @@ function heroImage()
 
 $(document).ready(function()
 {
-  $('.scorebar').hide();
   $('#hero-anchor').click(heroImage);
   $('#player-anchor').click(playerImage);
-  $('#show-score').click(function(){$('.scorebar').fadeIn('fast');});
-  $('#hide-score').click(function(){$('.scorebar').fadeOut('fast');});
+  $(window.jsUtils.scorebarToggles())
 });
 </script>
 {% endblock extra_js %}

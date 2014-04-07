@@ -525,3 +525,8 @@ function plot(source, div){
 }
 window.d3ening = {};
 window.d3ening.plot = plot;
+
+window.chartUtils = {}
+window.chartUtils.convertToSlug = convertToSlug
+window.chartUtils.toTitleCase = toTitleCase
+window.chartUtils.make_tooltip = make_tooltip
