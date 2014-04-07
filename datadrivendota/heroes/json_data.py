@@ -253,6 +253,7 @@ def hero_performance_chart_json(
                 group_var
             )
         datalist = []
+        grouplist = []
         for key in range(0, len(x_vector_list)):
             datadict = datapoint_dict()
             if group_var == 'skill_name':
@@ -262,7 +263,7 @@ def hero_performance_chart_json(
                     group_var_elt = group_vector_list[key]
             else:
                 group_var_elt = group_vector_list[key]
-            print group_var_elt
+            grouplist.append(group_var_elt)
             datadict.update({
                 'x_var': x_vector_list[key],
                 'y_var': y_vector_list[key],
@@ -290,7 +291,7 @@ def hero_performance_chart_json(
     params['y_label'] = ylab
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['chart'] = 'xyplot'
-    params = color_scale_params(params, group_vector_list)
+    params = color_scale_params(params, grouplist)
     return (datalist, params)
 
 
