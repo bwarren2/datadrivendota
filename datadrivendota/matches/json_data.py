@@ -67,10 +67,11 @@ def player_team_endgame_json(
             return getattr(annotation, (dictAttributes[var])+'__sum')
 
     datalist = []
+    player_obj_list = []
     for player in player_list:
 
         player_obj = Player.objects.get(steam_id=player)
-
+        player_obj_list.append(player_obj)
         radiant_matches = Match.objects.filter(
             game_mode__steam_id__in=mode_list,
             playermatchsummary__player__steam_id=player,
@@ -195,7 +196,10 @@ def player_team_endgame_json(
     params['y_label'] = y_var.title()
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['chart'] = 'xyplot'
-    params = color_scale_params(params, player_list)
+    params = color_scale_params(params,
+        [p.display_name for p in player_obj_list]
+    )
+    print params
     return (datalist, params)
 
 
@@ -264,6 +268,7 @@ def player_endgame_json(
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['chart'] = 'xyplot'
     params = color_scale_params(params, group_vector_list)
+    print params
     return (datalist, params)
 
 

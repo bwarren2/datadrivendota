@@ -280,7 +280,7 @@ def fetch_pms_attribute(summary, attribute):
     elif attribute == 'K-D+.5*A':
         return summary.kills - summary.deaths + summary.assists * .5
     elif attribute == 'player':
-        return summary.player.persona_name
+        return summary.player.display_name
     elif attribute == 'is_win':
         return 'Won' if summary.is_win else 'Lost'
     elif attribute == 'game_mode':
