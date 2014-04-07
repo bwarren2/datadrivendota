@@ -289,16 +289,16 @@ def player_versus_winrate_json(
             'tooltip': hero.name,
             'classes': [hero.name, group],
         })
+        datadict['point_size'] = min(
+            dataset[player_1]['total_games'],
+            dataset[player_2]['total_games']
+            )
+        datadict['stroke_width'] = 2
         if plot_var == 'winrate':
-            datadict['point_size'] = dataset[player_1]['total_games']
-            datadict['stroke_width'] = dataset[player_2]['total_games']
 
             datadict['x_var'] = dataset[player_1]['winrate']
             datadict['y_var'] = dataset[player_2]['winrate']
         else:
-            datadict['point_size'] = \
-                (dataset[player_1]['total_games'] \
-                + dataset[player_2]['total_games'])/2.0
             datadict['x_var'] = dataset[player_1]['total_games']
             datadict['y_var'] = dataset[player_2]['total_games']
 
@@ -324,16 +324,16 @@ def player_versus_winrate_json(
     params['legendHeightPercent'] = .1
     params['pointDomainMin'] = 0
     params['pointDomainMax'] = 10
-    params['pointSizeMin'] = 1
+    params['pointSizeMin'] = 2
     params['pointSizeMax'] = 5
+    params['strokeSizeMin'] = 1
+    params['strokeSizeMax'] = 1
 
     if plot_var == 'winrate':
         params['y_max'] = 100
         params['x_max'] = 100
         params['strokeDomainMin'] = 0
-        params['strokeDomainMax'] = 10
-        params['strokeSizeMin'] = 0
-        params['strokeSizeMax'] = 2
+        params['strokeDomainMax'] = 1
     if group_var == 'hero':
         params['draw_legend'] = False
         group = []
