@@ -30,7 +30,7 @@ urlpatterns = patterns(
         views.detail,
         name="id_detail"
     ),
-
+    url(r'^hero-style/(?P<player_id>[0-9]*)-(?P<hero_name>[a-zA-Z0-9\-]*)$', views.hero_style, name='hero_style'),
     url(
         r'^comparison/(?P<player_id_1>[0-9]*)-(?P<player_id_2>[0-9]*)/$',
         views.comparison,

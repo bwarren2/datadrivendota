@@ -33,7 +33,12 @@ from .json_data import (
     player_versus_winrate_json,
     )
 from matches.json_data import player_endgame_json, player_team_endgame_json
+from heroes.json_data import (
+    hero_progression_json,
+    hero_performance_chart_json
+    )
 from utils.file_management import outsourceJson
+from heroes.models import Hero
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -515,6 +520,67 @@ def comparison(request, player_id_1, player_id_2):
             'usage_json': basename(usage_json.name),
             'kda_json': basename(kda_json.name),
             'team_kda_json': basename(team_kda_json.name),
+        }
+    )
+
+
+def hero_style(request, player_id, hero_name):
+    player = get_object_or_404(Player, steam_id=player_id)
+    hero = get_object_or_404(Hero, machine_name=hero_name)
+
+    datalist, params = hero_progression_json(
+        hero=hero.steam_id,
+        player=player.steam_id,
+        game_mode_list=[1, 2, 3, 4, 5],
+        division='Skill'
+    )
+    params['outerHeight'] = 275
+    params['outerWidth'] = 275
+    hero_progression = outsourceJson(datalist, params)
+
+    # datalist, params = player_hero_item_json(
+    #     )
+    #  = outsourceJson(datalist, params)
+
+    # datalist, params = player_hero_skill_json(
+    #     )
+    #  = outsourceJson(datalist, params)
+
+    datalist, params = hero_performance_chart_json(
+        hero=hero.steam_id,
+        player=player.steam_id,
+        game_mode_list=[1, 2, 3, 4, 5],
+        x_var='duration',
+        y_var='K-D+.5*A',
+        group_var='skill_name',
+        split_var='is_win'
+    )
+    params['outerHeight'] = 275
+    params['outerWidth'] = 275
+    hero_kda2_chart_json = outsourceJson(datalist, params)
+
+    datalist, params = hero_performance_chart_json(
+        hero=hero.steam_id,
+        player=player.steam_id,
+        game_mode_list=[1, 2, 3, 4, 5],
+        x_var='duration',
+        y_var='tower_damage',
+        group_var='skill_name',
+        split_var='is_win'
+    )
+    params['outerHeight'] = 275
+    params['outerWidth'] = 275
+    hero_push_json = outsourceJson(datalist, params)
+
+    return render(
+        request,
+        'players/hero_style.html',
+        {
+            'player': player,
+            'hero': hero,
+            'hero_progression_json': basename(hero_progression.name),
+            'hero_kda2_chart_json': basename(hero_kda2_chart_json.name),
+            'hero_push_json': basename(hero_push_json.name),
         }
     )
 

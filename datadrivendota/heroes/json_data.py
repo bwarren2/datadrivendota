@@ -1,5 +1,6 @@
 import json
 import operator
+from django.core.urlresolvers import reverse
 
 from itertools import chain
 from heroes.models import HeroDossier, Hero, invalid_option
@@ -192,6 +193,105 @@ def hero_performance_json(
         'match_id': match_list,
         })
     return return_json, xlab, ylab, grouplab, split_lab
+
+
+def hero_performance_chart_json(
+    hero,
+    player,
+    game_mode_list,
+    x_var,
+    y_var,
+    group_var,
+    split_var
+):
+
+    # Database pulls and format python objects to go to R
+    matches = PlayerMatchSummary.objects.filter(
+        match__game_mode__in=game_mode_list
+    )
+    # Ignore <10 min games
+    matches = matches.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
+    skill1 = matches.filter(match__skill=1).select_related()[:100]
+    skill2 = matches.filter(match__skill=2).select_related()[:100]
+    skill3 = matches.filter(match__skill=3).select_related()[:100]
+    for game in chain(skill1, skill2, skill3):
+        game.skill_level = game.match.skill
+
+    if player is not None:
+        player_games = matches.filter(player__steam_id=player).select_related()
+        for game in player_games:
+            game.skill_level = 'Player'
+        match_pool = list(chain(skill1, skill2, skill3, player_games))
+        player_game_ids = fetch_match_attributes(player_games, 'match_id')[0]
+    else:
+        match_pool = list(chain(skill1, skill2, skill3))
+
+    if len(match_pool) == 0:
+        raise NoDataFound
+
+    try:
+        x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
+        y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
+        match_list = fetch_match_attributes(match_pool, 'match_id')[0]
+        name_list, foo = fetch_match_attributes(
+            match_pool, 'hero_name')
+
+        if split_var is None:
+            split_vector_list = ['No Split']
+            split_lab = 'No Split'
+        else:
+            split_vector_list, split_lab = fetch_match_attributes(
+                match_pool,
+                split_var
+            )
+        if group_var is None:
+            group_vector_list = ['No Grouping'] * len(x_vector_list)
+            grouplab = 'No Grouping'
+        else:
+            group_vector_list, grouplab = fetch_match_attributes(
+                match_pool,
+                group_var
+            )
+        datalist = []
+        for key in range(0, len(x_vector_list)):
+            datadict = datapoint_dict()
+            if group_var == 'skill_name':
+                if match_list[key] in player_game_ids:
+                    group_var_elt = 'Player'
+                else:
+                    group_var_elt = group_vector_list[key]
+            else:
+                group_var_elt = group_vector_list[key]
+            print group_var_elt
+            datadict.update({
+                'x_var': x_vector_list[key],
+                'y_var': y_vector_list[key],
+                'label': group_vector_list[key],
+                'tooltip': match_list[key],
+                'split_var': split_vector_list[key],
+                'group_var': group_var_elt,
+                'classes': [name_list[key]],
+                'url': reverse(
+                    'matches:match_detail',
+                    kwargs={'match_id': match_list[key]}
+                )
+
+            })
+            datalist.append(datadict)
+    except AttributeError:
+        raise NoDataFound
+
+    params = params_dict()
+    params['x_min'] = min(x_vector_list)
+    params['x_max'] = max(x_vector_list)
+    params['y_min'] = min(y_vector_list)
+    params['y_max'] = max(y_vector_list)
+    params['x_label'] = xlab
+    params['y_label'] = ylab
+    params['margin']['left'] = 12*len(str(params['y_max']))
+    params['chart'] = 'xyplot'
+    params = color_scale_params(params, group_vector_list)
+    return (datalist, params)
 
 
 def hero_progression_json(hero, player, game_mode_list, division):

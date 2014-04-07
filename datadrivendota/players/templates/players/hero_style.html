@@ -1,0 +1,88 @@
+{% extends "players/base.html" %}
+
+
+{% block title %}Player Comparison{% endblock title %}
+
+{% block page_title %}{{player.persona_name}} as {{hero.name}} {% endblock page_title %}
+
+{% block content %}
+
+
+
+  <div class="row">
+    <div class="player-charts col-md-4">
+    <h4>Hero Progression</h4>
+      {% if hero_progression_json %}
+        <span id='hero_progression_chart'></span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="player-charts col-md-6">
+    <h4>Hero KDA2</h4>
+      {% if hero_kda2_chart_json %}
+        <span id='hero_kda2_chart'></span>
+      {% endif %}
+    </div>
+    <div class="player-charts col-md-6">
+    <h4>Hero POOSH</h4>
+      {% if hero_push_json %}
+        <span id='hero_push_chart'></span>
+      {% endif %}
+    </div>
+
+  </div>
+
+{% endblock content %}
+
+
+{% block extra_js %}
+<script type="text/javascript">
+
+  var checkvar = 0;
+  function chart1(callback){
+    d3.json('{{MEDIA_URL}}{{hero_progression_json}}',function(source){
+      var input_data = source;
+      window.d3ening.plot(source, '#hero_progression_chart')
+      checkvar+=1;
+      $.event.trigger({
+        type:    "semaphore",
+        message: "Chart 1 done."
+      });
+    });
+  }
+
+  function chart2(callback){
+    d3.json('{{MEDIA_URL}}{{hero_kda2_chart_json}}',function(source){
+      var input_data = source;
+      window.d3ening.plot(source, '#hero_kda2_chart')
+      checkvar+=2;
+      $.event.trigger({
+        type:    "semaphore",
+        message: "Chart 2 done."
+      });
+    });
+  }
+
+  function chart3(callback){
+    d3.json('{{MEDIA_URL}}{{hero_push_json}}',function(source){
+      var input_data = source;
+      window.d3ening.plot(source, '#hero_push_chart')
+      checkvar+=2;
+      $.event.trigger({
+        type:    "semaphore",
+        message: "Chart 3 done."
+      });
+    });
+  }
+  chart1();
+  chart2();
+  chart3();
+
+</script>
+<script type="text/javascript">
+
+</script>
+{% endblock extra_js %}
+
