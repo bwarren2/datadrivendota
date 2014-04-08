@@ -34,12 +34,9 @@ class Command(BaseCommand):
         for name, information_dict in internal_json.iteritems():
             print name
             id = information_dict['ID']
-            if name == 'courier':
-                # @todo: pdb should NEVER EVER EVER be in production code.
-                # --kit 2014-02-16
-                import pdb; pdb.set_trace()
             id_dict[name]['internal_data'] = information_dict
             id_dict[name]['id'] = id
+            print information_dict
             i = Item.objects.get_or_create(steam_id=id)[0]
             i.save()
         #Get the JSON item data feed.
@@ -80,8 +77,6 @@ class Command(BaseCommand):
                     ][item]
                 except KeyError:
                     print "Could not find external data for {0}".format(item)
-
-#        import pdb; pdb.set_trace()
 
         for clean_item, data_dict in id_dict.iteritems():
             print clean_item
@@ -168,8 +163,6 @@ class Command(BaseCommand):
                     item.thumbshot.save(filename, File(tempfile))
 
         for clean_item in sorted(id_dict):
-            # @todo: print debugging?
-            # --kit 2014-02-16
             print "SKIPPING Comp " + clean_item
             try:
                 for attrib in id_dict[clean_item]['external_data']['attrib']:

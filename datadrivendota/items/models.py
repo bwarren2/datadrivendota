@@ -24,7 +24,7 @@ class Item(models.Model):
     mana_cost = models.IntegerField(null=True)
     cooldown = models.IntegerField(null=True)
     lore = models.TextField(null=True)
-    created = models.BooleanField()
+    created = models.NullBooleanField()
     slug_name = models.CharField(max_length=100)
 
     def __unicode__(self):
