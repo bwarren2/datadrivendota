@@ -1,9 +1,11 @@
 import datetime
 import json
+from random import randint
 from celery import chain
 from functools import wraps
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import permission_required
@@ -94,8 +96,33 @@ def pro_index(request):
 
 def detail(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
-    stats = {}
 
+    if request.user.is_authenticated():
+        compare_url = reverse(
+            'players:comparison',
+            kwargs={
+                'player_id_1': request.user.userprofile.player.steam_id,
+                'player_id_2': player.steam_id,
+            })
+        compare_str = 'Compare me to {p2}!'.format(p2=player.display_name)
+    else:
+        p2 = Player.objects.exclude(
+            pro_name='',
+            steam_id=player.steam_id,
+        )
+        p2 = p2[randint(0, len(p2))]
+        compare_url = reverse(
+            'players:comparison',
+            kwargs={
+                'player_id_1': player.steam_id,
+                'player_id_2': p2.steam_id,
+            })
+        compare_str = 'Compare {p1} to {p2}!'.format(
+            p1=player.display_name,
+            p2=p2.display_name,
+        )
+
+    stats = {}
     try:
         wins = PlayerMatchSummary.objects.filter(
             player=player,
@@ -169,6 +196,8 @@ def detail(request, player_id=None):
             'winrate_json': basename(winrate_json.name),
             'endgame_json': basename(endgame_json.name),
             'stats': stats,
+            'compare_url': compare_url,
+            'compare_str': compare_str,
             'pms_list': pms_list
         }
     )

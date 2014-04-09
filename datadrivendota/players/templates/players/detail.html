@@ -3,7 +3,7 @@
 
 {% block title %}Player Summary{% endblock title %}
 
-{% block page_title %}Steam ID: {{ player.steam_id }}{% endblock page_title %}
+{% block page_title %}Player Summary <a href="{{compare_url}}"><button type='button' class='btn btn-primary'>{{compare_str}}</button></a>{% endblock page_title %}
 
 {% block content %}
 
@@ -23,15 +23,18 @@
     </div>
 
     <div class="player-infobox col-md-3">
-      <img src="{{ player.avatar_full }}">
-      <h2>{{ player.persona_name }}</h2>
+      <img style='margin-top:10px' src="{{ player.avatar_full }}">
+      <h2>{{ player.persona_name }}
       {% if player.pro_name %}
-        <h3>Pro name: {{ player.pro_name }}</h3>
+      <br>
+        <small>AKA: {{ player.pro_name }}</small>
       {% endif %}
+      </h2>
       <h6>Wins: {{stats.wins}}</h6>
       <h6>Losses: {{stats.losses}}</h6>
       <h6>Winrate: {{stats.winrate}}%</h6>
       <h6>Total Games: {{stats.total}}</h6>
+      <h6>Steam ID: {{ player.steam_id }}</h6>
     </div>
   </div>
   <div id='chart'></div>

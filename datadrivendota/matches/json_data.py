@@ -446,6 +446,7 @@ def match_parameter_json(match_id, x_var, y_var):
             'split_var': '{x} vs {y}'.format(x=x_var, y=y_var),
             'label': fetch_pms_attribute(pms, 'hero_name'),
             'tooltip': fetch_pms_attribute(pms, 'hero_name'),
+            'classes': [fetch_pms_attribute(pms, 'hero_name')],
         })
         data_list.append(datadict)
 
