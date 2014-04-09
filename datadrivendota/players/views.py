@@ -107,8 +107,10 @@ def detail(request, player_id=None):
         compare_str = 'Compare me to {p2}!'.format(p2=player.display_name)
     else:
         p2 = Player.objects.exclude(
-            pro_name='',
+            pro_name=None,
             steam_id=player.steam_id,
+        ).filter(
+            updated=True,
         )
         p2 = p2[randint(0, len(p2))]
         compare_url = reverse(

@@ -420,6 +420,7 @@ def hero_skillbuild_winrate_json(
             hero__steam_id=hero_id,
             player__steam_id=player_id,
             level__gte=level,
+            match__validity=Match.LEGIT,
         ).select_related()
         sbs = SkillBuild.objects.filter(
             player_match_summary__match__game_mode__in=game_mode_list,
