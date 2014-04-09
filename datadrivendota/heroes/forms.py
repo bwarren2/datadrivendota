@@ -221,5 +221,5 @@ class HeroBuildForm(forms.Form):
         choices=[(i, i) for i in range(1, 26)],
         required=True,
         initial=[5, 10, 15],
-        help_text='Levels would you like to see?'
+        help_text='Which levels would you like to see?'
     )

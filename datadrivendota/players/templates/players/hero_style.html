@@ -23,6 +23,12 @@
         <span id='item_winrate_chart'></span>
       {% endif %}
     </div>
+    <div class="player-charts col-md-4">
+    <h4>Skill Usage</h4>
+      {% if skill_winrate_json %}
+        <span id='skill_winrate_chart'></span>
+      {% endif %}
+    </div>
   </div>
 
   <div class="row">
@@ -32,10 +38,11 @@
         <span id='hero_kda2_chart'></span>
       {% endif %}
     </div>
+
     <div class="player-charts col-md-6">
-    <h4>Tower Damage</h4>
-      {% if hero_push_json %}
-        <span id='hero_push_chart'></span>
+    <h4>Kills</h4>
+      {% if hero_kills_chart_json %}
+        <span id='hero_kills_chart'></span>
       {% endif %}
     </div>
 
@@ -48,6 +55,12 @@
         <span id='hero_dmg_chart'></span>
       {% endif %}
     </div>
+    <div class="player-charts col-md-6">
+    <h4>Tower Damage</h4>
+      {% if hero_push_json %}
+        <span id='hero_push_chart'></span>
+      {% endif %}
+    </div>
 
   </div>
 
@@ -57,16 +70,10 @@
 {% block extra_js %}
 <script type="text/javascript">
 
-  var checkvar = 0;
   function chart1(callback){
     d3.json('{{MEDIA_URL}}{{hero_progression_json}}',function(source){
       var input_data = source;
       window.d3ening.plot(source, '#hero_progression_chart')
-      checkvar+=1;
-      $.event.trigger({
-        type:    "semaphore",
-        message: "Chart 1 done."
-      });
     });
   }
 
@@ -74,11 +81,6 @@
     d3.json('{{MEDIA_URL}}{{hero_kda2_chart_json}}',function(source){
       var input_data = source;
       window.d3ening.plot(source, '#hero_kda2_chart')
-      checkvar+=2;
-      $.event.trigger({
-        type:    "semaphore",
-        message: "Chart 2 done."
-      });
     });
   }
 
@@ -86,11 +88,6 @@
     d3.json('{{MEDIA_URL}}{{hero_push_json}}',function(source){
       var input_data = source;
       window.d3ening.plot(source, '#hero_push_chart')
-      checkvar+=2;
-      $.event.trigger({
-        type:    "semaphore",
-        message: "Chart 3 done."
-      });
     });
   }
 
@@ -98,11 +95,6 @@
     d3.json('{{MEDIA_URL}}{{item_winrate_json}}',function(source){
       var input_data = source;
       window.d3ening.plot(source, '#item_winrate_chart')
-      checkvar+=2;
-      $.event.trigger({
-        type:    "semaphore",
-        message: "Chart 3 done."
-      });
     });
   }
   function chart5(callback){
@@ -110,10 +102,19 @@
       var input_data = source;
       window.d3ening.plot(source, '#hero_dmg_chart')
       checkvar+=2;
-      $.event.trigger({
-        type:    "semaphore",
-        message: "Chart 3 done."
-      });
+    });
+  }
+  function chart6(callback){
+    d3.json('{{MEDIA_URL}}{{skill_winrate_json}}',function(source){
+      var input_data = source;
+      window.d3ening.plot(source, '#skill_winrate_chart')
+    });
+  }
+
+  function chart7(callback){
+    d3.json('{{MEDIA_URL}}{{hero_kills_chart_json}}',function(source){
+      var input_data = source;
+      window.d3ening.plot(source, '#hero_kills_chart')
     });
   }
 
@@ -122,6 +123,8 @@
   chart3();
   chart4();
   chart5();
+  chart6();
+  chart7();
 
 </script>
 <script type="text/javascript">

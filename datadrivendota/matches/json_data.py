@@ -23,7 +23,7 @@ def player_team_endgame_json(
         x_var,
         y_var,
         split_var,
-        group_var
+        group_var,
         ):
 
     dictAttributes = {

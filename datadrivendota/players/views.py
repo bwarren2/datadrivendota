@@ -35,7 +35,8 @@ from .json_data import (
 from matches.json_data import player_endgame_json, player_team_endgame_json
 from heroes.json_data import (
     hero_progression_json,
-    hero_performance_chart_json
+    hero_performance_chart_json,
+    hero_skillbuild_winrate_json
     )
 from utils.file_management import outsourceJson
 from heroes.models import Hero
@@ -540,10 +541,6 @@ def hero_style(request, player_id, hero_name):
     params['fadeOpacity'] = 0
     hero_progression = outsourceJson(datalist, params)
 
-    # datalist, params = player_hero_item_json(
-    #     )
-    #  = outsourceJson(datalist, params)
-
     datalist, params = item_endgame(
         hero=hero.steam_id,
         player=player.steam_id,
@@ -553,6 +550,16 @@ def hero_style(request, player_id, hero_name):
     params['outerWidth'] = 275
     params['draw_legend'] = False
     item_winrate_json = outsourceJson(datalist, params)
+
+    datalist, params = hero_skillbuild_winrate_json(
+        hero=hero.steam_id,
+        player=player.steam_id,
+        game_modes=game_modes,
+        levels=[5, 10, 15],
+    )
+    params['outerHeight'] = 275
+    params['outerWidth'] = 275
+    skill_winrate_json = outsourceJson(datalist, params)
 
     datalist, params = hero_performance_chart_json(
         hero=hero.steam_id,
@@ -567,9 +574,25 @@ def hero_style(request, player_id, hero_name):
     params['outerWidth'] = 275
     params['legendWidthPercent'] = .3
     params['legendHeightPercent'] = .1
-
     params['fadeOpacity'] = 0
     hero_kda2_chart_json = outsourceJson(datalist, params)
+
+    datalist, params = hero_performance_chart_json(
+        hero=hero.steam_id,
+        player=player.steam_id,
+        game_mode_list=game_modes,
+        x_var='duration',
+        y_var='kills',
+        group_var='skill_name',
+        split_var='is_win'
+    )
+    params['outerHeight'] = 275
+    params['outerWidth'] = 275
+    params['legendWidthPercent'] = .3
+    params['legendHeightPercent'] = .1
+    params['fadeOpacity'] = 0
+    hero_kills_chart_json = outsourceJson(datalist, params)
+
 
     datalist, params = hero_performance_chart_json(
         hero=hero.steam_id,
@@ -614,6 +637,8 @@ def hero_style(request, player_id, hero_name):
             'hero_kda2_chart_json': basename(hero_kda2_chart_json.name),
             'hero_push_json': basename(hero_push_json.name),
             'hero_dmg_json': basename(hero_dmg_json.name),
+            'skill_winrate_json': basename(skill_winrate_json.name),
+            'hero_kills_chart_json': basename(hero_kills_chart_json.name),
         }
     )
 
