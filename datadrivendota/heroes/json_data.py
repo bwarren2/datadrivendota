@@ -491,8 +491,8 @@ def hero_skillbuild_winrate_json(
     params['x_max'] = max([d['x_var'] for d in datalist])
     params['y_min'] = 0
     params['y_max'] = 100
-    params['x_label'] = 'Time (m)'
-    params['y_label'] = 'Level'
+    params['x_label'] = 'Games'
+    params['y_label'] = 'Winrate'
     params = color_scale_params(params, [d['group_var'] for d in datalist])
 
     return (datalist, params)
