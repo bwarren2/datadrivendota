@@ -36,7 +36,6 @@ class Command(BaseCommand):
             id = information_dict['ID']
             id_dict[name]['internal_data'] = information_dict
             id_dict[name]['id'] = id
-            print information_dict
             i = Item.objects.get_or_create(steam_id=id)[0]
             i.save()
         #Get the JSON item data feed.

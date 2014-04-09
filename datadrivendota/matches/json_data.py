@@ -15,6 +15,7 @@ from utils.exceptions import NoDataFound
 from utils.charts import params_dict, datapoint_dict, color_scale_params
 from players.models import Player
 
+
 #This takes a player's games and gives the team's results.
 def player_team_endgame_json(
         player_list,

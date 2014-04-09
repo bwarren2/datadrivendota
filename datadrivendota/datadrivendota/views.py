@@ -1,10 +1,16 @@
+from json import dumps
+from os.path import basename
+
 from django.shortcuts import render
-# from django.contrib.auth.decorators import permission_required
+from django.views.generic import View
+
+from utils.file_management import outsourceJson
+from utils.exceptions import NoDataFound
+
 from datadrivendota.forms import KeyForm
 from players.models import PermissionCode
 
 
-# @permission_required('players.can_look')
 def base(request):
     if (
             request.user.is_anonymous()
@@ -60,3 +66,67 @@ def upgrade(request):
     else:
         form = KeyForm()
         return render(request, 'registration/upgrade.html', {'form': form})
+
+
+class FormView(View):
+
+    tour = None
+    form = None
+    attrs = None
+    json_function = None
+    title = None
+    html = None
+
+    def get(self, request):
+        self.json_tour = dumps(self.tour)
+        if request.GET:
+            bound_form = self.form(request.GET)
+
+            if bound_form.is_valid():
+                try:
+                    kwargs = {
+                        attr: bound_form.cleaned_data[attr]
+                        for attr in self.attrs
+                    }
+                    datalist, params = self.json_function(
+                        **kwargs
+                    )
+                    params = self.amend_params(params)
+                    json_data = outsourceJson(datalist, params)
+
+                except NoDataFound:
+                    return render(
+                        request,
+                        self.html,
+                        {
+                            'form': bound_form,
+                            'error': 'error',
+                            'title': self.title,
+                            'tour': self.json_tour,
+                        }
+                    )
+
+                return render(
+                    request,
+                    self.html,
+                    {
+                        'form': bound_form,
+                        'json_data': basename(json_data.name),
+                        'title': self.title,
+                        'tour': self.json_tour,
+                    }
+                )
+        else:
+            form = self.form
+            return render(
+                request,
+                self.html,
+                {
+                    'form': form,
+                    'title': self.title,
+                    'tour': self.json_tour,
+                }
+            )
+
+    def amend_params(self, params):
+        return params

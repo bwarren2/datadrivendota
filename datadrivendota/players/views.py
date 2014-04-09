@@ -39,6 +39,7 @@ from heroes.json_data import (
     )
 from utils.file_management import outsourceJson
 from heroes.models import Hero
+from items.json_data import item_endgame
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -527,11 +528,11 @@ def comparison(request, player_id_1, player_id_2):
 def hero_style(request, player_id, hero_name):
     player = get_object_or_404(Player, steam_id=player_id)
     hero = get_object_or_404(Hero, machine_name=hero_name)
-
+    game_modes = [1, 2, 3, 4, 5]
     datalist, params = hero_progression_json(
         hero=hero.steam_id,
         player=player.steam_id,
-        game_mode_list=[1, 2, 3, 4, 5],
+        game_mode_list=game_modes,
         division='Skill'
     )
     params['outerHeight'] = 275
@@ -543,14 +544,20 @@ def hero_style(request, player_id, hero_name):
     #     )
     #  = outsourceJson(datalist, params)
 
-    # datalist, params = player_hero_skill_json(
-    #     )
-    #  = outsourceJson(datalist, params)
+    datalist, params = item_endgame(
+        hero=hero.steam_id,
+        player=player.steam_id,
+        game_modes=game_modes,
+    )
+    params['outerHeight'] = 275
+    params['outerWidth'] = 275
+    params['draw_legend'] = False
+    item_winrate_json = outsourceJson(datalist, params)
 
     datalist, params = hero_performance_chart_json(
         hero=hero.steam_id,
         player=player.steam_id,
-        game_mode_list=[1, 2, 3, 4, 5],
+        game_mode_list=game_modes,
         x_var='duration',
         y_var='K-D+.5*A',
         group_var='skill_name',
@@ -558,13 +565,16 @@ def hero_style(request, player_id, hero_name):
     )
     params['outerHeight'] = 275
     params['outerWidth'] = 275
+    params['legendWidthPercent'] = .3
+    params['legendHeightPercent'] = .1
+
     params['fadeOpacity'] = 0
     hero_kda2_chart_json = outsourceJson(datalist, params)
 
     datalist, params = hero_performance_chart_json(
         hero=hero.steam_id,
         player=player.steam_id,
-        game_mode_list=[1, 2, 3, 4, 5],
+        game_mode_list=game_modes,
         x_var='duration',
         y_var='tower_damage',
         group_var='skill_name',
@@ -572,8 +582,26 @@ def hero_style(request, player_id, hero_name):
     )
     params['outerHeight'] = 275
     params['outerWidth'] = 275
+    params['legendWidthPercent'] = .3
+    params['legendHeightPercent'] = .1
     params['fadeOpacity'] = 0
     hero_push_json = outsourceJson(datalist, params)
+
+    datalist, params = hero_performance_chart_json(
+        hero=hero.steam_id,
+        player=player.steam_id,
+        game_mode_list=game_modes,
+        x_var='duration',
+        y_var='hero_damage',
+        group_var='skill_name',
+        split_var='is_win'
+    )
+    params['outerHeight'] = 275
+    params['outerWidth'] = 275
+    params['legendWidthPercent'] = .3
+    params['legendHeightPercent'] = .1
+    params['fadeOpacity'] = 0
+    hero_dmg_json = outsourceJson(datalist, params)
 
     return render(
         request,
@@ -582,8 +610,10 @@ def hero_style(request, player_id, hero_name):
             'player': player,
             'hero': hero,
             'hero_progression_json': basename(hero_progression.name),
+            'item_winrate_json': basename(item_winrate_json.name),
             'hero_kda2_chart_json': basename(hero_kda2_chart_json.name),
             'hero_push_json': basename(hero_push_json.name),
+            'hero_dmg_json': basename(hero_dmg_json.name),
         }
     )
 

@@ -1,0 +1,43 @@
+{% extends "items/base.html" %}
+{% load staticfiles compressed navigation_extras steam_extras intercom_extras %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block page_title %}{{ title }}
+  <div class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></div>
+{% endblock page_title %}
+
+{% block content %}
+  {% include "_image_form_embed.html" %}
+
+  <div>{{extra_notes|safe}}</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+  var data;
+  d3.json('{{MEDIA_URL}}{{json_data}}', function(source){
+    data = source;
+    window.d3ening.plot(source, '#chart')
+  });
+</script>
+{% endblock extra_js %}
+
+{% block tour %}
+<script type="text/javascript">
+  $(function () {
+    var tour = new Tour({
+      backdrop: true
+    });
+
+    tour.addSteps(
+      {{tour|safe}}
+    );
+
+    $(".tourglyph").on("click",function(){
+      tour.restart();
+    })
+
+  });
+</script>
+{% endblock tour %}
