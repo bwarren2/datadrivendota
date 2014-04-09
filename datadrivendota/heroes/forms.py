@@ -205,3 +205,21 @@ class HeroProgressionForm(forms.Form):
         required=True,
         help_text='How should the datasets be partitioned?'
     )
+
+
+class HeroBuildForm(forms.Form):
+    hero = SingleHeroSelect(
+        help_text='Pick exactly one hero'
+    )
+    player = SinglePlayerField(
+        help_text='Optionally, pick one player'
+    )
+    game_modes = MultiGameModeSelect(
+        help_text='Which game modes would you like to sample?'
+    )
+    levels = MultiLeveLSelect(
+        choices=[(i, i) for i in range(1, 26)],
+        required=True,
+        initial=[5, 10, 15],
+        help_text='Levels would you like to see?'
+    )

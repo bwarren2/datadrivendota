@@ -1,9 +1,11 @@
 import json
 import operator
-from django.core.urlresolvers import reverse
-
 from itertools import chain
-from heroes.models import HeroDossier, Hero, invalid_option
+
+from django.core.urlresolvers import reverse
+from django.db.models import Q
+
+from heroes.models import HeroDossier, Hero, invalid_option, Ability
 from matches.models import (
     PlayerMatchSummary,
     Match,
@@ -380,5 +382,117 @@ def hero_progression_json(hero, player, game_mode_list, division):
     params['x_label'] = 'Time (m)'
     params['y_label'] = 'Level'
     params = color_scale_params(params, groups)
+
+    return (datalist, params)
+
+
+def hero_skillbuild_winrate_json(
+    hero,
+    player,
+    game_modes,
+    levels,
+):
+    datalist = []
+    level_list = levels
+    hero_id = hero
+    player_id = player
+    game_mode_list = game_modes
+
+    ability_lst = Ability.objects.filter(
+        Q(hero__steam_id=hero_id) |
+        Q(internal_name='attribute_bonus')
+    ).select_related()
+    id_name_map = {ab.steam_id: ab.name for ab in ability_lst}
+
+    def to_label(strng):
+        choice_lst = strng.split("-")
+        label = ""
+        for choice in set(choice_lst):
+            label += "{name} x{ct} <br>".format(
+                name=id_name_map[int(choice)],
+                ct=len([x for x in choice_lst if x == choice]),
+                )
+        return label
+
+    for level in level_list:
+        pmses = PlayerMatchSummary.objects.filter(
+            match__game_mode__in=game_mode_list,
+            hero__steam_id=hero_id,
+            player__steam_id=player_id,
+            level__gte=level,
+        ).select_related()
+        sbs = SkillBuild.objects.filter(
+            player_match_summary__match__game_mode__in=game_mode_list,
+            player_match_summary__hero__steam_id=hero_id,
+            player_match_summary__player__steam_id=player_id,
+            player_match_summary__level__gte=level,
+            level__lte=level
+        ).select_related()
+
+        match_wins = [pms.match.steam_id for pms in pmses if pms.is_win]
+        match_losses = [pms.match.steam_id for pms in pmses if not pms.is_win]
+
+        match_dict = {}
+        for sb in sbs:
+            match_id = sb.player_match_summary.match.steam_id
+            ability_id = sb.ability.steam_id
+            if match_id not in match_dict:
+                match_dict[match_id] = []
+            match_dict[match_id].append(ability_id)
+
+        match_dict = {
+            key: sorted(value) for key, value in match_dict.iteritems()
+        }
+
+        build_dict = {}
+
+        def to_str(lst):
+            return "-".join((str(id) for id in lst))
+
+        mygen = (to_str(x) for x in match_dict.itervalues())
+
+        dimensions = set(mygen)
+
+        for id_str in dimensions:
+            if id_str not in build_dict:
+                build_dict[id_str] = {}
+            build_dict[id_str]['games'] = len(
+                [key for key in match_dict
+                    if to_str(match_dict[key]) == id_str]
+            )
+            build_dict[id_str]['wins'] = len(
+                [match_id for match_id in match_wins
+                    if to_str(match_dict[match_id]) == id_str]
+            )
+            build_dict[id_str]['losses'] = len(
+                [match_id for match_id in match_losses
+                    if to_str(match_dict[match_id]) == id_str]
+            )
+            denominator = float(
+                build_dict[id_str]['games']
+                if build_dict[id_str]['games'] > 0 else 1
+            )
+            build_dict[id_str]['winrate'] = \
+                build_dict[id_str]['wins'] / denominator*100
+
+        for build, datadict in build_dict.iteritems():
+            datapoint = datapoint_dict()
+            datapoint['x_var'] = datadict['games']
+            datapoint['y_var'] = datadict['winrate']
+            datapoint['group_var'] = "By Level {lvl}".format(lvl=level)
+            datapoint['label'] = to_label(build)
+            datapoint['tooltip'] = to_label(build)
+            datapoint['split_var'] = ''
+            datalist.append(datapoint)
+
+    params = params_dict()
+    params['chart'] = 'xyplot'
+    params['x_min'] = 0
+    params['x_max'] = max([d['x_var'] for d in datalist])
+    params['y_min'] = 0
+    params['y_max'] = 100
+    params['x_label'] = 'Time (m)'
+    params['y_label'] = 'Level'
+    params = color_scale_params(params, [d['group_var'] for d in datalist])
 
     return (datalist, params)

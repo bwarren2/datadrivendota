@@ -8,6 +8,10 @@ urlpatterns = patterns(
     url(r'^lineups/$', views.lineup, name='lineup'),
     url(r'^performance/$', views.hero_performance, name='hero_performance'),
     url(r'^skill_bars/$', views.hero_skill_bars, name='hero_skill_bars'),
+    url(r'^skillbuild_winrate/$',
+        views.HeroBuildLevel.as_view(),
+        name='hero_skill_bars',
+        ),
     url(
         r'^skill_progression/$',
         views.hero_skill_progression,

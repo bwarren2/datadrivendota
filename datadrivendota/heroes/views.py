@@ -7,13 +7,16 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
-from matches.models import GameMode
 from utils.exceptions import NoDataFound
+
+from datadrivendota.views import FormView
+from matches.models import GameMode
 from .json_data import (
     hero_vitals_json,
     hero_lineup_json,
     hero_performance_json,
-    hero_progression_json
+    hero_progression_json,
+    hero_skillbuild_winrate_json,
 )
 from .models import Hero, Ability, HeroDossier, Role
 
@@ -22,7 +25,8 @@ from .forms import (
     HeroLineupMultiSelect,
     HeroPlayerPerformance,
     HeroPlayerSkillBarsForm,
-    HeroProgressionForm
+    HeroProgressionForm,
+    HeroBuildForm,
 )
 from .r import (
     HeroPerformanceChart,
@@ -381,6 +385,30 @@ def hero_skill_progression(request):
             'tour': tour,
         }
     )
+
+
+class HeroBuildLevel(FormView):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts skill usage for a player on a hero at certain levels."
+        },
+        ]
+    form = HeroBuildForm
+    attrs = [
+        'hero',
+        'player',
+        'game_modes',
+        'levels',
+    ]
+    json_function = staticmethod(hero_skillbuild_winrate_json)
+    title = "SkillBuilld Winrate"
+    html = "heroes/form.html"
+
+    def amend_params(self, params):
+        return params
+
 
 
 @devserver_profile(follow=[HeroSkillLevelBwChart])
