@@ -398,10 +398,7 @@ def hero_skillbuild_winrate_json(
     player_id = player
     game_mode_list = game_modes
 
-    ability_lst = Ability.objects.filter(
-        Q(hero__steam_id=hero_id) |
-        Q(internal_name='attribute_bonus')
-    ).select_related()
+    ability_lst = Ability.objects.all().select_related()
     id_name_map = {ab.steam_id: ab.name for ab in ability_lst}
 
     def to_label(strng):
