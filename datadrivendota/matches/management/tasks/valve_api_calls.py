@@ -235,7 +235,7 @@ class ValveApiCall(BaseTask):
             raise
         URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
         if mode == 'GetMatchHistory':
-            logger.error("URL: " + URL)
+            logger.info("URL: " + URL)
         # Exception handling for the URL opening.
         try:
             pageaccess = urllib2.urlopen(URL, timeout=5)
@@ -371,29 +371,29 @@ class RetrievePlayerRecords(ApiFollower):
     def moreResultsLeft(self):
 
         if self.api_context.processed >= self.api_context.matches_desired:
-            logger.error("Got what we came for")
+            logger.info("Got what we came for")
             return False
         elif self.result['results_remaining'] == 0 \
             and self.api_context.date_pull is True:
-                logger.error("Tried extra hard and failed")
+                logger.info("Tried extra hard and failed")
                 return False
         elif self.result['results_remaining'] == 0 \
             and self.api_context.date_pull is False:
 
                 self.api_context.date_pull = True
-                logger.error("Tried wimpily")
+                logger.info("Tried wimpily")
                 return True
 
         else:
             self.api_context.date_pull = False
             if self.api_context.deepcopy is False:
-                logger.error("Not Deepcopy")
+                logger.info("Not Deepcopy")
                 return (
                     self.api_context.last_scrape_time
                     < self.result['matches'][-1]['start_time']
                 )
             else:
-                logger.error("More left")
+                logger.info("More left")
                 return True
 
     def rebound(self):
