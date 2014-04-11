@@ -33,6 +33,7 @@ from .json_data import (
     player_winrate_json,
     player_hero_abilities_json,
     player_versus_winrate_json,
+    player_role_json,
     )
 from matches.json_data import player_endgame_json, player_team_endgame_json
 from heroes.json_data import (
@@ -504,7 +505,7 @@ def comparison(request, player_id_1, player_id_2):
         player_id_2=player_2.steam_id,
         plot_var='winrate',
         )
-    params['margin']['left'] = 30
+    params['margin']['left'] = 33
     params['outerHeight'] = 300
     params['outerWidth'] = 300
     winrate_json = outsourceJson(datalist, params)
@@ -518,6 +519,15 @@ def comparison(request, player_id_1, player_id_2):
     params['outerHeight'] = 300
     params['outerWidth'] = 300
     usage_json = outsourceJson(datalist, params)
+
+    datalist, params = player_role_json(
+        player_1.steam_id,
+        player_2.steam_id,
+        plot_var='games',
+    )
+    params['outerHeight'] = 300
+    params['outerWidth'] = 300
+    role_json = outsourceJson(datalist, params)
 
     datalist, params = player_endgame_json(
         player_list=[player_1.steam_id, player_2.steam_id],
@@ -553,6 +563,7 @@ def comparison(request, player_id_1, player_id_2):
             'usage_json': basename(usage_json.name),
             'kda_json': basename(kda_json.name),
             'team_kda_json': basename(team_kda_json.name),
+            'role_json': basename(role_json.name),
         }
     )
 

@@ -8,6 +8,7 @@
 {% block content %}
   <div class="hero-lore">
     <h1>{{ hero.name }}</h1>
+
     <div class="infobox thumbnail">
       {% if hero.mugshot %}
       <div class="aligner">
@@ -98,6 +99,7 @@
       <div>Day/Night vision: {{ dossier.day_vision }} / {{ dossier.night_vision }}</div>
       <div>HP/Mana regen: {{ dossier.hp_regen }} / {{ dossier.mana_regen }}</div>
     </div>
+    <div id='top_charts'></div>
     <blockquote class="lore">
       {{ hero.lore }}
     </blockquote>
@@ -120,6 +122,12 @@
 
 {% block extra_js %}
   <script type="text/javascript">
+    d3.json('{{MEDIA_URL}}{{player_json}}',function(source){
+      var input_data = source;
+      window.d3ening.plot(source, '#top_charts')
+    });
+
+
     function show_progress_bar (identifier) {
       var progressbar = $("<div>");
       progressbar.attr('id', 'progbar_loading');

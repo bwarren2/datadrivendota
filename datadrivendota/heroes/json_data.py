@@ -13,6 +13,9 @@ from matches.models import (
     SkillBuild,
     skill_name
 )
+from players.models import Player
+from django.db.models import Count
+
 from utils.exceptions import NoDataFound
 from utils.charts import datapoint_dict, params_dict, color_scale_params
 
@@ -482,6 +485,65 @@ def hero_skillbuild_winrate_json(
             datapoint['tooltip'] = to_label(build)
             datapoint['split_var'] = ''
             datalist.append(datapoint)
+
+    params = params_dict()
+    params['chart'] = 'xyplot'
+    params['x_min'] = 0
+    params['x_max'] = max([d['x_var'] for d in datalist])
+    params['y_min'] = 0
+    params['y_max'] = 100
+    params['x_label'] = 'Games'
+    params['y_label'] = 'Winrate'
+    params = color_scale_params(params, [d['group_var'] for d in datalist])
+
+    return (datalist, params)
+
+
+def update_player_winrate(
+    hero,
+    game_modes,
+):
+
+    hero_obj = Hero.objects.get(steam_id=hero)
+    p_games = Player.objects.filter(
+        updated=True,
+        playermatchsummary__hero__steam_id=hero,
+        ).annotate(Count('playermatchsummary__id'))
+
+    dict_games = {p: {'games': p.playermatchsummary__id__count}
+                  for p in p_games}
+
+    p_wins = Player.objects.filter(
+        updated=True,
+        playermatchsummary__hero__steam_id=hero,
+        playermatchsummary__is_win=True,
+        ).annotate(Count('playermatchsummary__id'))
+
+    dict_wins = {p: p.playermatchsummary__id__count for p in p_wins}
+
+    for p in dict_games.iterkeys():
+        dict_games[p]['wins'] = dict_wins.get(p, 0)
+
+    datalist = []
+    for p, info in dict_games.iteritems():
+
+        url_str = reverse(
+            'players:hero_style',
+            kwargs={
+                'hero_name': hero_obj.machine_name,
+                'player_id': p.steam_id,
+            }
+        )
+
+        datapoint = datapoint_dict()
+        datapoint['x_var'] = info['games']
+        datapoint['y_var'] = info['wins']/float(info['games'])*100
+        datapoint['group_var'] = 'Pro' if p.pro_name is not None else 'Player'
+        datapoint['label'] = p.display_name
+        datapoint['tooltip'] = p.display_name
+        datapoint['url'] = url_str
+        datapoint['split_var'] = 'Tracked Player Winrate'
+        datalist.append(datapoint)
 
     params = params_dict()
     params['chart'] = 'xyplot'

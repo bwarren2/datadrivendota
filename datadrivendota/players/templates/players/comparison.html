@@ -81,6 +81,18 @@
       });
     });
   }
+  function chart5(callback){
+      d3.json('{{MEDIA_URL}}{{role_json}}',function(source){
+        var input_data = source;
+        window.d3ening.plot(source, '#role_chart')
+        checkvar+=5;
+        $.event.trigger({
+          type:    "semaphore",
+          message: "Chart 5 done."
+        });
+      });
+  }
+
 
   function chart3(callback){
     d3.json('{{MEDIA_URL}}{{kda_json}}',function(source){
@@ -192,8 +204,9 @@
   chart2();
   chart3();
   chart4();
+  chart5();
   $(document).on('semaphore', function(evt){
-    if (checkvar>=10){
+    if (checkvar>=15){
       addenda()
     }
   })

@@ -505,3 +505,118 @@ def player_hero_side_json(
     params = color_scale_params(params, groups)
 
     return (data_list, params)
+
+
+def player_role_json(
+    player_1,
+    player_2=None,
+    plot_var='performance',
+):
+    roles = Role.objects.all()
+
+    player_id_list = [player_1]
+    p1_obj = Player.objects.get(steam_id=player_1)
+    if player_2 is not None:
+        player_id_list.append(player_2)
+        p2_obj = Player.objects.get(steam_id=player_2)
+
+    dict_roles = {}
+    for role in roles:
+        heroes = role.hero_set.all()
+        if role not in dict_roles:
+            dict_roles[role] = {}
+        for player_id in player_id_list:
+            if player_id not in dict_roles[role]:
+                dict_roles[role][player_id] = {
+                    'wins': 0,
+                    'losses': 0,
+                    'games': 0,
+                    'winrate': 0,
+                }
+            dict_roles[role][player_id]['wins'] = \
+                PlayerMatchSummary.objects.filter(
+                    hero__in=heroes,
+                    match__validity=Match.LEGIT,
+                    player__steam_id=player_id,
+                    is_win=True,
+                ).count()
+            dict_roles[role][player_id]['losses'] = \
+                PlayerMatchSummary.objects.filter(
+                    hero__in=heroes,
+                    match__validity=Match.LEGIT,
+                    player__steam_id=player_id,
+                    is_win=False,
+                ).count()
+            dict_roles[role][player_id]['games'] = \
+                dict_roles[role][player_id]['losses'] \
+                + dict_roles[role][player_id]['wins']
+            denominator = float(dict_roles[role][player_id]['games']) \
+                if dict_roles[role][player_id]['games'] > 0 \
+                else 1.0
+            dict_roles[role][player_id]['winrate'] = \
+                dict_roles[role][player_id]['wins'] \
+                / denominator
+
+    data_list = []
+    params = params_dict()
+
+    for role, info in dict_roles.iteritems():
+        if plot_var == 'performance':
+            for player_id, data in info.iteritems():
+                datadict = datapoint_dict()
+                datadict.update({
+                    'group_var': player_id,
+                    'split_var': '',
+                    'label': role.name,
+                    'tooltip': role.name,
+                    'x_var': data['games'],
+                    'y_var': data['winrate'],
+                    'classes': [],
+                })
+                x_label = "Games"
+                y_label = "Winrate"
+
+        elif plot_var == 'games':
+                datadict = datapoint_dict()
+                datadict.update({
+                    'group_var': role.name,
+                    'split_var': '',
+                    'label': role.name,
+                    'tooltip': role.name,
+                    'x_var': info[player_1]['games'],
+                    'y_var': info[player_2]['games'],
+                    'classes': [],
+                })
+                x_label = "{p} Games".format(p=p1_obj.display_name)
+                y_label = "{p} Games".format(p=p2_obj.display_name)
+
+        elif plot_var == 'winrate':
+                datadict = datapoint_dict()
+                datadict.update({
+                    'group_var': role.name,
+                    'split_var': '',
+                    'label': role.name,
+                    'tooltip': role.name,
+                    'x_var': info[player_1]['winrate'],
+                    'y_var': info[player_2]['winrate'],
+                    'classes': [],
+                })
+                x_label = "{p} Winrate".format(p=p1_obj.display_name)
+                y_label = "{p} Winrate".format(p=p2_obj.display_name)
+        print datadict
+        data_list.append(datadict)
+
+    params['x_min'] = min([d['x_var'] for d in data_list])
+    params['x_max'] = max([d['x_var'] for d in data_list])
+    params['y_min'] = min([d['y_var'] for d in data_list])
+    params['y_max'] = max([d['y_var'] for d in data_list])
+    params['x_label'] = x_label
+    params['y_label'] = y_label
+    params['draw_path'] = False
+    params['chart'] = 'xyplot'
+    params['margin']['left'] = 12*len(str(params['y_max']))
+    params['legendWidthPercent'] = .7
+    params['legendHeightPercent'] = .1
+    params = color_scale_params(params, [d['group_var'] for d in data_list])
+
+    return (data_list, params)

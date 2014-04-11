@@ -17,6 +17,7 @@ from .json_data import (
     hero_performance_json,
     hero_progression_json,
     hero_skillbuild_winrate_json,
+    update_player_winrate,
 )
 from .models import Hero, Ability, HeroDossier, Role
 
@@ -68,7 +69,15 @@ def detail(request, hero_name):
         is_core=True,
         hero=current_hero).order_by('steam_id')
     dossier = HeroDossier.objects.get(hero=current_hero)
-    charts = []
+
+    datalist, params = update_player_winrate(
+        current_hero.steam_id,
+        game_modes=[1, 2, 3, 4, 5],
+    )
+    params['outerWidth'] = 300
+    params['outerHeight'] = 300
+    params['margin']['left'] = 33
+    json_data = outsourceJson(datalist, params)
     return render(
         request,
         'heroes/detail.html',
@@ -76,7 +85,7 @@ def detail(request, hero_name):
             'hero': current_hero,
             'abilities': abilities,
             'dossier': dossier,
-            'charts': charts,
+            'player_json': basename(json_data.name),
         }
     )
 
