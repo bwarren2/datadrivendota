@@ -424,14 +424,14 @@ def hero_skillbuild_winrate_json(
             level__lte=level
         ).select_related()
 
-        match_wins = [
-            sb.playermatchsummary.match.steam_id
-            for sb in sbs if sb.playermatchsummary.is_win
-        ]
-        match_losses = [
-            sb.playermatchsummary.match.steam_id
-            for sb in sbs if not sb.playermatchsummary.is_win
-        ]
+        match_wins = list(set([
+            sb.player_match_summary.match.steam_id
+            for sb in sbs if sb.player_match_summary.is_win
+        ]))
+        match_losses = list(set([
+            sb.player_match_summary.match.steam_id
+            for sb in sbs if not sb.player_match_summary.is_win
+        ]))
 
         match_dict = {}
         for sb in sbs:
