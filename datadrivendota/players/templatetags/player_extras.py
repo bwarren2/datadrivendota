@@ -10,7 +10,7 @@ def player_link(player):
         return "Anonymous"
 
     if player.persona_name:
-        text = player.persona_name
+        text = player.display
     else:
         text = str(player.steam_id)
 

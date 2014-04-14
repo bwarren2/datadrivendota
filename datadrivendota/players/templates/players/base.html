@@ -9,10 +9,10 @@
     <li class="{% active 'players:timeline' %}"><a href="{% url 'players:timeline' %}">Timeline</a></li>
     <li class="{% active 'players:hero_abilities' %}"><a href="{% url 'players:hero_abilities' %}">Hero Skilling Comparison</a></li>
     {% if player %}
-      <li class="{% active 'players:id_detail' %}"><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{ player.persona_name }}</a></li>
+      <li class="{% active 'players:id_detail' %}"><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{ player.display_name }}</a></li>
     {% endif %}
     {% if pms_list %}
-      <li class="{% active 'players:id_matches' %}"><a href="{% url 'players:id_matches' player_id=player.steam_id %}">{{ player.persona_name }}'s Matches</a></li>
+      <li class="{% active 'players:id_matches' %}"><a href="{% url 'players:id_matches' player_id=player.steam_id %}">{{ player.display_name }}'s Matches</a></li>
     {% endif %}
     {% if player_id %}
       <li class="{% active 'players:id_matches' %}">
