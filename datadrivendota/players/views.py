@@ -294,25 +294,38 @@ def player_hero_side(request):
     if request.GET:
         form = PlayerAdversarialForm(request.GET)
         if form.is_valid():
-            datalist, params = player_hero_side_json(
-                player_id=form.cleaned_data['player'],
-                game_mode_list=form.cleaned_data['game_modes'],
-                min_date=datetime.date(2009, 1, 1),
-                max_date=None,
-                group_var='alignment',
-                plot_var=form.cleaned_data['plot_var'],
-            )
-            json_data = outsourceJson(datalist, params)
-            return render(
-                request,
-                'players/form.html',
-                {
-                    'form': form,
-                    'json_data': basename(json_data.name),
-                    'title': 'Player Hero Adversary',
-                    'tour': tour,
-                }
-            )
+            try:
+                datalist, params = player_hero_side_json(
+                    player_id=form.cleaned_data['player'],
+                    game_mode_list=form.cleaned_data['game_modes'],
+                    min_date=form.cleaned_data['min_date'],
+                    max_date=form.cleaned_data['max_date'],
+                    group_var='alignment',
+                    plot_var=form.cleaned_data['plot_var'],
+                )
+                json_data = outsourceJson(datalist, params)
+                return render(
+                    request,
+                    'players/form.html',
+                    {
+                        'form': form,
+                        'json_data': basename(json_data.name),
+                        'title': 'Player Hero Adversary',
+                        'tour': tour,
+                    }
+                )
+            except NoDataFound:
+                return render(
+                    request,
+                    'players/form.html',
+                    {
+                        'form': form,
+                        'error': 'error',
+                        'title': 'Player Hero Adversary',
+                        'tour': tour,
+                    }
+                )
+
     else:
         form = PlayerAdversarialForm()
 

@@ -1,5 +1,4 @@
 import datetime
-from time import mktime
 from django.db.models import Count
 from django.core.urlresolvers import reverse
 from matches.models import PlayerMatchSummary, GameMode, Match
@@ -10,6 +9,7 @@ from utils.charts import params_dict, datapoint_dict, color_scale_params
 from heroes.models import Hero, Role
 from matches.models import SkillBuild
 from collections import defaultdict
+from time import mktime
 
 
 def player_winrate_json(
@@ -48,6 +48,8 @@ def player_winrate_json(
     annotations = PlayerMatchSummary.objects.filter(
         player=player,
         match__validity=Match.LEGIT,
+        match__start_time__gte=min_dt_utc,
+        match__start_time__lte=max_date_utc,
         hero__roles__in=roles,
         match__game_mode__steam_id__in=game_mode_list,
     ).values('hero__name', 'is_win').annotate(Count('is_win'))
@@ -84,12 +86,12 @@ def player_winrate_json(
         groups.append(group)
 
         url_str = reverse(
-                    'players:hero_style',
-                    kwargs={
-                        'hero_name': hero_obj.machine_name,
-                        'player_id': player_id,
-                    }
-                )
+            'players:hero_style',
+            kwargs={
+                'hero_name': hero_obj.machine_name,
+                'player_id': player_id,
+            }
+        )
 
         datadict.update({
             'x_var': games[hero],
@@ -236,6 +238,8 @@ def player_versus_winrate_json(
     pmses = PlayerMatchSummary.objects.filter(
         player__in=[player_1, player_2],
         match__validity=Match.LEGIT,
+        match__start_time__gte=min_dt_utc,
+        match__start_time__lte=max_dt_utc,
         match__game_mode__steam_id__in=game_mode_list,
     ).select_related().distinct()
 
@@ -356,15 +360,21 @@ def player_hero_side_json(
         max_date=None,
         group_var='alignment',
         plot_var='winrate',
-        ):
+):
+    #Not used right now
     if max_date is None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
         max_date_utc = mktime(max_date.timetuple())
+
     min_dt_utc = mktime(min_date.timetuple())
 
     if min_dt_utc > max_date_utc:
         raise NoDataFound
+
+    all_heroes = Hero.objects.all()
+    hero_names = {h.name: h for h in all_heroes}
+
     if game_mode_list is None:
         game_mode_list = [
             gm.steam_id
@@ -377,66 +387,113 @@ def player_hero_side_json(
     except Player.DoesNotExist:
         raise NoDataFound
 
-    def side_match(pms_set, outcome_dict, given_side):
-        for pms in pms_set:
-            if pms.hero not in outcome_dict:
-                outcome_dict[pms.hero] = {
-                    'same_side': {
-                        'wins': 0,
-                        'losses': 0,
-                    },
-                    'opposite_side': {
-                        'wins': 0,
-                        'losses': 0,
-                    }
-                }
-            if pms.is_win:
-                cat = 'wins'
-            else:
-                cat = 'losses'
-            if pms.which_side() == given_side:
-                side = 'same_side'
-            else:
-                side = 'opposite_side'
-            outcome_dict[pms.hero][side][cat] += 1
-
     player_radiant_matches = Match.objects.filter(
         playermatchsummary__player=player,
         validity=Match.LEGIT,
+        start_time__gte=min_dt_utc,
+        start_time__lte=max_date_utc,
         game_mode__steam_id__in=game_mode_list,
-        playermatchsummary__player_slot__lte=6,
+        playermatchsummary__player_slot__lt=6,
     ).distinct()
-
-    pmses = PlayerMatchSummary.objects.filter(
-        match__in=player_radiant_matches,
-        ).exclude(
-        player=player).select_related()
-
-    outcome_dict = {}
-    side_match(pmses, outcome_dict, 'Radiant')
 
     player_dire_matches = Match.objects.filter(
         playermatchsummary__player=player,
         validity=Match.LEGIT,
+        start_time__gte=min_dt_utc,
+        start_time__lte=max_date_utc,
         game_mode__steam_id__in=game_mode_list,
-        playermatchsummary__player_slot__gte=6,
+        playermatchsummary__player_slot__gt=6,
     ).distinct()
 
-    pmses = PlayerMatchSummary.objects.filter(
-        match__in=player_dire_matches,
+    oppose_radiant_pmses = PlayerMatchSummary.objects.filter(
+        match__in=player_radiant_matches,
+        player_slot__gte=6,
         ).exclude(
-        player=player).select_related()
+        player=player).values('hero__name', 'is_win')\
+        .annotate(Count('id')).order_by()
 
-    side_match(pmses, outcome_dict, 'Dire')
+    oppose_dire_pmses = PlayerMatchSummary.objects.filter(
+        match__in=player_dire_matches,
+        player_slot__lte=6,
+        ).exclude(
+        player=player).values('hero__name', 'is_win')\
+        .annotate(Count('id')).order_by()
 
-    for dct in outcome_dict.itervalues():
-        for side in dct.itervalues():
-            side['total_games'] = side['wins']+side['losses']
-            divisor = 1 if side['total_games'] == 0 else side['total_games']
-            side['winrate'] = side['wins']/float(divisor)*100.0
+    sameside_radiant_pmses = PlayerMatchSummary.objects.filter(
+        match__in=player_radiant_matches,
+        player_slot__lte=6,
+        ).exclude(
+        player=player).values('hero__name', 'is_win')\
+        .annotate(Count('id')).order_by()
+
+    sameside_dire_pmses = PlayerMatchSummary.objects.filter(
+        match__in=player_dire_matches,
+        player_slot__gte=6,
+        ).exclude(
+        player=player).values('hero__name', 'is_win')\
+        .annotate(Count('id')).order_by()
+
+    outcome_dict = {}
+    for minidict in chain(oppose_radiant_pmses, oppose_dire_pmses):
+        if minidict['hero__name'] not in outcome_dict.iterkeys():
+            outcome_dict[minidict['hero__name']] = {
+                'same_side': {
+                    'total_games': 0,
+                    'wins': 0,
+                    'winrate': 0,
+                    'losses': 0,
+                },
+                'opposite_side': {
+                    'total_games': 0,
+                    'wins': 0,
+                    'winrate': 0,
+                    'losses': 0,
+                }
+            }
+        if minidict['is_win']:
+            idx = 'wins'
+        else:
+            idx = 'losses'
+        outcome_dict[minidict['hero__name']]['opposite_side'][idx] \
+            += minidict['id__count']
+
+    for minidict in chain(sameside_radiant_pmses, sameside_dire_pmses):
+        if minidict['hero__name'] not in outcome_dict.iterkeys():
+            outcome_dict[minidict['hero__name']] = \
+                {
+                    'same_side': {
+                        'total_games': 0,
+                        'wins': 0,
+                        'winrate': 0,
+                        'losses': 0,
+                    },
+                    'opposing_side': {
+                        'total_games': 0,
+                        'wins': 0,
+                        'winrate': 0,
+                        'losses': 0,
+                    }
+                }
+        if minidict['is_win']:
+            idx = 'wins'
+        else:
+            idx = 'losses'
+        outcome_dict[minidict['hero__name']]['same_side'][idx] \
+            += minidict['id__count']
+
+    if outcome_dict == {}:
+        raise NoDataFound
+
+    for hero, dct in outcome_dict.iteritems():
+        for side, gamedct in dct.iteritems():
+            gamedct['total_games'] = gamedct['wins'] + gamedct['losses']
+            denominator = 1 if gamedct['total_games'] == 0 \
+                else gamedct['total_games']
+            gamedct['winrate'] = gamedct['wins']/float(denominator)*100
 
     data_list, groups = [], []
-    for hero, dataset in outcome_dict.iteritems():
+    for name, dataset in outcome_dict.iteritems():
+        hero = hero_names[name]
         datadict = datapoint_dict()
         if group_var == 'hero':
             group = hero.name.title()
@@ -459,8 +516,8 @@ def player_hero_side_json(
             datadict['y_var'] = dataset['opposite_side']['winrate']
         else:
             datadict['point_size'] = \
-                (dataset['same_side']['total_games'] \
-                + dataset['opposite_side']['total_games'])/2.0
+                (dataset['same_side']['total_games']
+                    + dataset['opposite_side']['total_games'])/2.0
             datadict['x_var'] = dataset['same_side']['total_games']
             datadict['y_var'] = dataset['opposite_side']['total_games']
 
@@ -498,11 +555,9 @@ def player_hero_side_json(
         params['strokeSizeMax'] = 2
     if group_var == 'hero':
         params['draw_legend'] = False
-        group = []
     elif group_var == 'alignment':
-        group = hero.herodossier.alignment
         params['draw_legend'] = True
-    params = color_scale_params(params, groups)
+    params = color_scale_params(params, [d['group_var'] for d in data_list])
 
     return (data_list, params)
 
