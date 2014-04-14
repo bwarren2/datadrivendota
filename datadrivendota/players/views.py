@@ -44,7 +44,7 @@ from heroes.json_data import (
 from utils.file_management import outsourceJson
 from heroes.models import Hero
 from items.json_data import item_endgame
-
+from datadrivendota.views import FormView
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
         raise ImportError
@@ -205,9 +205,7 @@ def detail(request, player_id=None):
         }
     )
 
-
-@devserver_profile(follow=[CountWinrate])
-def winrate(request):
+class Winrate(FormView):
     tour = [
         {
             'orphan': True,
@@ -231,57 +229,22 @@ def winrate(request):
             'content': "Challenge: Who is Dendi's highest winrate hero of those with 15 games?"
         }
     ]
-    tour = json.dumps(tour)
-    if request.GET:
-        winrate_form = PlayerWinrateLevers(request.GET)
-        if winrate_form.is_valid():
-            try:
-                datalist, params = player_winrate_json(
-                    player_id=winrate_form.cleaned_data['player'],
-                    game_mode_list=winrate_form.cleaned_data['game_modes'],
-                    min_date=winrate_form.cleaned_data['min_date'],
-                    max_date=winrate_form.cleaned_data['max_date'],
-                    role_list=winrate_form.cleaned_data['role_list'],
-                    group_var=winrate_form.cleaned_data['group_var'],
-                )
-                json_data = outsourceJson(datalist, params)
-                return render(
-                    request,
-                    'players/form.html',
-                    {
-                        'form': winrate_form,
-                        'json_data': basename(json_data.name),
-                        'title': 'Hero Winrate',
-                        'tour': tour,
-                    }
-                )
-            except NoDataFound:
-                return render(
-                    request,
-                    'players/form.html',
-                    {
-                        'form': winrate_form,
-                        'error': 'error',
-                        'title': 'Hero Winrate',
-                        'tour': tour,
-                    }
-                )
-    else:
-        winrate_form = PlayerWinrateLevers()
+    form = PlayerWinrateLevers
+    attrs = [
+        'player',
+        'game_modes',
+        'min_date',
+        'role_list',
+        'group_var',
+    ]
+    json_function = staticmethod(player_winrate_json)
+    title = "Hero Winrate"
+    html = "players/form.html"
 
-    return render(
-        request,
-        'players/form.html',
-        {
-            'form': winrate_form,
-            'title': 'Hero Winrate',
-            'tour': tour,
-        }
-    )
+    def amend_params(self, params):
+        return params
 
-
-@devserver_profile(follow=[PlayerTimeline])
-def player_hero_side(request):
+class HeroAdversary(FormView):
     tour = [
         {
             'orphan': True,
@@ -289,56 +252,21 @@ def player_hero_side(request):
             'content': "This page charts hero adversarial performance."
         },
     ]
-    tour = json.dumps(tour)
+    form = PlayerAdversarialForm
+    attrs = [
+        'player',
+        'game_modes',
+        'min_date',
+        'max_date',
+        'group_var',
+        'plot_var',
+    ]
+    json_function = staticmethod(player_hero_side_json)
+    title = "Player Hero Adversary"
+    html = "players/form.html"
 
-    if request.GET:
-        form = PlayerAdversarialForm(request.GET)
-        if form.is_valid():
-            try:
-                datalist, params = player_hero_side_json(
-                    player_id=form.cleaned_data['player'],
-                    game_mode_list=form.cleaned_data['game_modes'],
-                    min_date=form.cleaned_data['min_date'],
-                    max_date=form.cleaned_data['max_date'],
-                    group_var='alignment',
-                    plot_var=form.cleaned_data['plot_var'],
-                )
-                json_data = outsourceJson(datalist, params)
-                return render(
-                    request,
-                    'players/form.html',
-                    {
-                        'form': form,
-                        'json_data': basename(json_data.name),
-                        'title': 'Player Hero Adversary',
-                        'tour': tour,
-                    }
-                )
-            except NoDataFound:
-                return render(
-                    request,
-                    'players/form.html',
-                    {
-                        'form': form,
-                        'error': 'error',
-                        'title': 'Player Hero Adversary',
-                        'tour': tour,
-                    }
-                )
-
-    else:
-        form = PlayerAdversarialForm()
-
-    return render(
-        request,
-        'players/form.html',
-        {
-            'form': form,
-            'title': 'Player Hero Adversary',
-            'tour': tour,
-        }
-    )
-
+    def amend_params(self, params):
+        return params
 
 
 @devserver_profile(follow=[PlayerTimeline])
@@ -402,9 +330,7 @@ def timeline(request):
         }
     )
 
-
-@devserver_profile(follow=[player_hero_abilities_json])
-def hero_abilities(request):
+class HeroAbilities(FormView):
     tour = [
         {
             'orphan': True,
@@ -433,55 +359,22 @@ def hero_abilities(request):
             'content': "Challenge: At what level does Dendi's Pudge start falling behind Funnik's Lifestealer?"
         }
     ]
-    tour = json.dumps(tour)
+    form = HeroAbilitiesForm
+    attrs = [
+        'player_1',
+        'hero_1',
+        'player_2',
+        'hero_2',
+        'game_modes',
+        'division',
+    ]
+    json_function = staticmethod(player_hero_abilities_json)
+    title = "Hero Skilling Comparison"
+    html = "players/form.html"
 
-    if request.GET:
-        form = HeroAbilitiesForm(request.GET)
-        if form.is_valid():
-            datalist, params = player_hero_abilities_json(
-                player_1=form.cleaned_data['player_1'],
-                hero_1=form.cleaned_data['hero_1'],
-                player_2=form.cleaned_data['player_2'],
-                hero_2=form.cleaned_data['hero_2'],
-                game_modes=form.cleaned_data['game_modes'],
-                division=form.cleaned_data['division'],
-            )
-            params['path_stroke_width'] = 1
-            json_data = outsourceJson(datalist, params)
-            try:
-                return render(
-                    request,
-                    'players/form.html',
-                    {
-                        'form': form,
-                        'json_data': basename(json_data.name),
-                        'title': 'Hero Skilling Comparison',
-                        'tour': tour,
-                    }
-                )
-            except NoDataFound:
-                return render(
-                    request,
-                    'players/form.html',
-                    {
-                        'form': form,
-                        'error': 'error',
-                        'title': 'Hero Skilling Comparison',
-                        'tour': tour,
-                    }
-                )
-    else:
-        form = HeroAbilitiesForm()
-
-    return render(
-        request,
-        'players/form.html',
-        {
-            'form': form,
-            'title': 'Hero Skilling Comparison',
-            'tour': tour,
-        }
-    )
+    def amend_params(self, params):
+        params['path_stroke_width'] = 1
+        return params
 
 
 def player_matches(request, player_id=None):
@@ -647,7 +540,6 @@ def hero_style(request, player_id, hero_name):
     params['legendHeightPercent'] = .1
     params['fadeOpacity'] = 0
     hero_kills_chart_json = outsourceJson(datalist, params)
-
 
     datalist, params = hero_performance_chart_json(
         hero=hero.steam_id,

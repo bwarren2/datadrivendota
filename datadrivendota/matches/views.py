@@ -15,7 +15,6 @@ from .forms import (
     MatchAbilitySelect,
     MatchListSelect
 )
-from .r import EndgameChart
 from .models import Match, PlayerMatchSummary, PickBan
 from .json_data import (
     player_endgame_json,
@@ -25,6 +24,7 @@ from .json_data import (
     match_parameter_json,
     player_team_endgame_json,
 )
+from datadrivendota.views import FormView
 from players.models import request_to_player, Player
 from utils.exceptions import NoDataFound
 from django.core.urlresolvers import reverse
@@ -282,8 +282,7 @@ def follow_match_feed(request):
         )
 
 
-@devserver_profile(follow=[EndgameChart])
-def endgame(request):
+class Endgame(FormView):
     tour = [
         {
             'orphan': True,
@@ -312,59 +311,24 @@ def endgame(request):
             'content': "Challenge: how do [A]kke's and Funn1k's KDA2s change based on win/loss?  Hint: tweak the group and split vars for different renderings."
         }
     ]
-    tour = json.dumps(tour)
-    if request.GET:
-        select_form = EndgameSelect(request.GET)
-        if select_form.is_valid():
-            try:
-                datalist, params = player_endgame_json(
-                    player_list=select_form.cleaned_data['players'],
-                    mode_list=select_form.cleaned_data['game_modes'],
-                    x_var=select_form.cleaned_data['x_var'],
-                    y_var=select_form.cleaned_data['y_var'],
-                    split_var=select_form.cleaned_data['split_var'],
-                    group_var=select_form.cleaned_data['group_var']
-                )
-                json_data = outsourceJson(datalist, params)
+    form = EndgameSelect
+    attrs = [
+        'players',
+        'game_modes',
+        'x_var',
+        'y_var',
+        'split_var',
+        'group_var',
+    ]
+    json_function = staticmethod(player_endgame_json)
+    title = "Endgame Charts"
+    html = "matches/form.html"
 
-                return render(
-                    request,
-                    'matches/form.html',
-                    {
-                        'form': select_form,
-                        'json_data': basename(json_data.name),
-                        'title': 'Endgame Charts',
-                        'tour': tour,
-                    }
-                )
-            except NoDataFound:
-                return render(
-                    request,
-                    'matches/form.html',
-                    {
-                        'form': select_form,
-                        'error': 'error',
-                        'title': 'Endgame Charts',
-                        'tour': tour,
-                    }
-                )
-
-    else:
-        select_form = EndgameSelect()
-    return render(
-        request,
-        'matches/form.html',
-        {
-            'form': select_form,
-            'title': 'Endgame Charts',
-            'tour': tour,
-        }
-    )
+    def amend_params(self, params):
+        return params
 
 
-@devserver_profile(follow=[EndgameChart])
-def own_team_endgame(request):
-
+class OwnTeamEndgame(FormView):
     tour = [
         {
             'orphan': True,
@@ -372,59 +336,21 @@ def own_team_endgame(request):
             'content': "This page charts end-of-game data for teams for each player of your choosing."
         }
     ]
-    tour = json.dumps(tour)
-
-    if request.GET:
-        select_form = EndgameSelect(request.GET)
-        if select_form.is_valid():
-            try:
-                datalist, params = player_team_endgame_json(
-                    player_list=select_form.cleaned_data['players'],
-                    mode_list=select_form.cleaned_data['game_modes'],
-                    x_var=select_form.cleaned_data['x_var'],
-                    y_var=select_form.cleaned_data['y_var'],
-                    split_var=select_form.cleaned_data['split_var'],
-                    group_var=select_form.cleaned_data['group_var']
-                )
-                json_data = outsourceJson(datalist, params)
-
-                return render(
-                    request,
-                    'matches/form.html',
-                    {
-                        'form': select_form,
-                        'json_data': basename(json_data.name),
-                        'title': 'Own-Team Endgame Charts',
-                        'tour': tour,
-                    }
-                )
-            except NoDataFound:
-                return render(
-                    request,
-                    'matches/form.html',
-                    {
-                        'form': select_form,
-                        'error': 'error',
-                        'title': 'Own-Team Endgame Charts',
-                        'tour': tour,
-                    }
-                )
-
-    else:
-        select_form = EndgameSelect()
-    return render(
-        request,
-        'matches/form.html',
-        {
-            'form': select_form,
-            'title': 'Own-Team Endgame Charts',
-            'tour': tour,
-        }
-    )
+    form = EndgameSelect
+    attrs = [
+        'players',
+        'game_modes',
+        'x_var',
+        'y_var',
+        'split_var',
+        'group_var',
+    ]
+    json_function = staticmethod(player_team_endgame_json)
+    title = "Own-Team Endgame Charts"
+    html = "matches/form.html"
 
 
-@devserver_profile(follow=[team_endgame_json])
-def team_endgame(request):
+class SameTeamEndgame(FormView):
     tour = [
         {
             'orphan': True,
@@ -453,56 +379,24 @@ def team_endgame(request):
             'content': "Challenge: When Funn1k, Dendi, and XBOCT play together, what KDA2 does their team exceed when they win?"
         }
     ]
-    tour = json.dumps(tour)
-    if request.GET:
-        select_form = TeamEndgameSelect(request.GET)
-        if select_form.is_valid():
-            try:
-                datalist, params = team_endgame_json(
-                    player_list=select_form.cleaned_data['players'],
-                    mode_list=select_form.cleaned_data['game_modes'],
-                    x_var=select_form.cleaned_data['x_var'],
-                    y_var=select_form.cleaned_data['y_var'],
-                    split_var=select_form.cleaned_data['split_var'],
-                    group_var=select_form.cleaned_data['group_var'],
-                    compressor=select_form.cleaned_data['compressor']
-                )
-                json_data = outsourceJson(datalist, params)
-                return render(
-                    request,
-                    'matches/form.html',
-                    {
-                        'form': select_form,
-                        'json_data': basename(json_data.name),
-                        'title': 'Endgame Charts',
-                        'tour': tour,
-                    }
-                )
+    form = TeamEndgameSelect
+    attrs = [
+        'players',
+        'game_modes',
+        'x_var',
+        'y_var',
+        'split_var',
+        'group_var',
+        'compressor',
+    ]
+    json_function = staticmethod(team_endgame_json)
+    title = "Same Team Endgame Charts"
+    html = "matches/form.html"
 
-            except NoDataFound:
-                return render(
-                    request,
-                    'matches/form.html',
-                    {
-                        'form': select_form,
-                        'error': 'error',
-                        'title': 'Endgame Charts',
-                        'tour': tour,
-                    }
-                )
-    else:
-        select_form = TeamEndgameSelect()
-    return render(
-        request,
-        'matches/form.html',
-        {
-            'form': select_form,
-            'title': 'Endgame Charts',
-            'tour': tour,
-        }
-    )
+    def amend_params(self, params):
+        return params
 
-def progression_list(request):
+class ProgressionList(FormView):
     tour = [
         {
             'orphan': True,
@@ -510,54 +404,19 @@ def progression_list(request):
             'content': "This page charts level progression data for specific players in specific matches."
         }
     ]
-    title = 'Match List Hero Progression'
-    if request.GET:
-        select_form = MatchListSelect(request.GET)
-        if select_form.is_valid():
-            try:
-                datalist, params = match_list_json(
-                    match_list=select_form.cleaned_data['matches'],
-                    player_list=select_form.cleaned_data['players']
-                )
-                params['path_stroke_width'] = 2
-                json_data = outsourceJson(datalist, params)
+    form = MatchListSelect
+    attrs = [
+        'match_list',
+        'player_list',
+    ]
+    json_function = staticmethod(match_list_json)
+    title = "Match List Hero Progression"
+    html = "matches/form.html"
 
-                return render(
-                    request,
-                    'matches/form.html',
-                    {
-                        'json_data': basename(json_data.name),
-                        'title': title,
-                        'form': select_form,
-                        'tour': tour,
-                    }
-                )
-            except NoDataFound:
-                return render(
-                    request,
-                    'matches/form.html',
-                    {
-                        'error': 'error',
-                        'title': title,
-                        'form': select_form,
-                        'tour': tour,
-                    }
-                )
-    else:
-        select_form = MatchListSelect()
-    return render(
-        request,
-        'matches/form.html',
-        {
-            'form': select_form,
-            'title': title,
-            'tour': tour,
-        }
-    )
+    def amend_params(self, params):
+        return params
 
-
-@devserver_profile(follow=[match_ability_json])
-def ability_build(request):
+class AbilityBuild(FormView):
     tour = [
         {
             'orphan': True,
@@ -591,59 +450,25 @@ def ability_build(request):
             'content': "Challenge: in match 550709502, who slowed down when?  When did Slark and Lifesteal crush their enemies?"
         }
     ]
-    tour = json.dumps(tour)
-    title = 'Match Ability Breakdown'
-    if request.GET:
-        select_form = MatchAbilitySelect(request.GET)
-        if select_form.is_valid():
-            try:
-                datalist, params = match_ability_json(
-                    match_id=select_form.cleaned_data['match'],
-                    split_var=select_form.cleaned_data['split_var']
-                )
-                json_data = outsourceJson(datalist, params)
+    form = MatchAbilitySelect
+    attrs = [
+        'match',
+        'split_var',
+    ]
+    json_function = staticmethod(match_ability_json)
+    title = "Match Ability Breakdown"
+    html = "matches/form.html"
 
-                match_url = reverse(
-                    'matches:match_detail',
-                    kwargs={'match_id': select_form.cleaned_data['match']}
-                )
-                extra_notes = "<a href='{0}'>See this match</a>".format(
-                    match_url
-                )
-                return render(
-                    request,
-                    'matches/form.html',
-                    {
-                        'json_data': basename(json_data.name),
-                        'title': title,
-                        'form': select_form,
-                        'extra_notes': extra_notes,
-                        'tour': tour,
-                    }
-                )
-            except NoDataFound:
-                return render(
-                    request,
-                    'matches/form.html',
-                    {
-                        'error': 'error',
-                        'title': title,
-                        'form': select_form,
-                        'tour': tour,
-                    }
-                )
-    else:
-        select_form = MatchAbilitySelect()
-    return render(
-        request,
-        'matches/form.html',
-        {
-            'form': select_form,
-            'title': title,
-            'tour': tour,
-        }
-    )
-
+    def amend_params(self, params):
+        return params
+    def extra_data(self):
+        match_url = reverse(
+            'matches:match_detail',
+            kwargs={'match_id': select_form.cleaned_data['match']}
+        )
+        extra_notes = "<a href='{0}'>See this match</a>".format(
+            match_url
+        )
 
 def annotated_matches(pms_list, follow_list):
     match_data = {}

@@ -29,13 +29,13 @@ class HeroVitalsMultiSelect(forms.Form):
         help_text='Pick one or more stats to graph',
         widget=CheckboxSelectMultiple
     )
-    unlinked_scales = forms.BooleanField(
-        required=False,
-        help_text=(
-            'The graph scales match across panels by default. '
-            'Want them to render independently?'
-        )
-    )
+    # unlinked_scales = forms.BooleanField(
+    #     required=False,
+    #     help_text=(
+    #         'The graph scales match across panels by default. '
+    #         'Want them to render independently?'
+    #     )
+    # )
 
 
 class HeroLineupMultiSelect(forms.Form):
@@ -64,10 +64,10 @@ class HeroLineupMultiSelect(forms.Form):
         required=True,
         help_text='Pick one or more heroes'
     )
-    stats = forms.ChoiceField(
+    stat = forms.ChoiceField(
         choices=LINEUP_STATS,
         required=True,
-        help_text='Pick one or more stats to graph'
+        help_text='Pick one stat to graph'
     )
     level = forms.ChoiceField(
         choices=[(i, i) for i in range(1, 26)],

@@ -89,10 +89,7 @@ def detail(request, hero_name):
         }
     )
 
-
-# @devserver_profile(follow=[generateChart])
-def vitals(request):
-
+class Vitals(FormView):
     tour = [
         {
             'orphan': True,
@@ -121,53 +118,20 @@ def vitals(request):
             'content': "Challenge: how does your favorite hero compare to your least favorite in their primary stats?"
         }
     ]
-    tour = json.dumps(tour)
-    if request.GET:
-        hero_form = HeroVitalsMultiSelect(request.GET)
-        if hero_form.is_valid():
-            try:
-                datalist, params = hero_vitals_json(
-                    hero_list=hero_form.cleaned_data['heroes'],
-                    stats_list=hero_form.cleaned_data['stats']
-                )
-                json_data = outsourceJson(datalist, params)
-                return render(
-                    request,
-                    'heroes/form.html',
-                    {
-                        'form': hero_form,
-                        'json_data': basename(json_data.name),
-                        'title': "Hero Vitals",
-                        'tour': tour
-                    }
-                )
-            except NoDataFound:
-                return render(
-                    request,
-                    'heroes/form.html',
-                    {
-                        'form': hero_form,
-                        'error': 'error',
-                        'title': "Hero Vitals",
-                        'tour': tour,
-                    }
-                )
+    form = HeroVitalsMultiSelect
+    attrs = [
+        'heroes',
+        'stats',
+    ]
+    json_function = staticmethod(hero_vitals_json)
+    title = "Hero Vitals"
+    html = "heroes/form.html"
 
-    else:
-        hero_form = HeroVitalsMultiSelect()
-    return render(
-        request,
-        'heroes/form.html',
-        {
-            'form': hero_form,
-            'title': "Hero Vitals",
-            'tour': tour,
-        }
-    )
+    def amend_params(self, params):
+        return params
 
 
-# @devserver_profile(follow=[lineupChart])
-def lineup(request):
+class Lineup(FormView):
     tour = [
         {
             'orphan': True,
@@ -196,51 +160,21 @@ def lineup(request):
             'content': "Challenge: how do your favorite strength, intelligence, and agility heroes change in strength at various levels?"
         }
     ]
-    tour = json.dumps(tour)
-    if request.GET:
-        hero_form = HeroLineupMultiSelect(request.GET)
-        if hero_form.is_valid():
-            try:
-                datalist, params = hero_lineup_json(
-                    heroes=hero_form.cleaned_data['heroes'],
-                    stat=hero_form.cleaned_data['stats'],
-                    level=hero_form.cleaned_data['level']
-                )
-                json_data = outsourceJson(datalist, params)
-                return render(
-                    request,
-                    'heroes/form.html',
-                    {
-                        'form': hero_form,
-                        'json_data': basename(json_data.name),
-                        'title': 'Hero Lineups',
-                        'tour': tour,
-                    }
-                )
-            except NoDataFound:
-                return render(
-                    request,
-                    'heroes/form.html',
-                    {
-                        'form': hero_form,
-                        'error': 'error',
-                        'title': 'Hero Lineups',
-                        'tour': tour,
-                    }
-                )
+    form = HeroLineupMultiSelect
+    attrs = [
+        'heroes',
+        'stat',
+        'level',
+    ]
+    json_function = staticmethod(hero_lineup_json)
+    title = "Hero Lineups"
+    html = "heroes/form.html"
 
-    else:
-        hero_form = HeroLineupMultiSelect()
-
-    return render(
-        request,
-        'heroes/form.html',
-        {
-            'form': hero_form,
-            'title': 'Hero Lineups',
-            'tour': tour,
-        }
-    )
+    def amend_params(self, params):
+        params['draw_legend'] = True
+        params['legendWidthPercent'] = .7
+        params['legendHeightPercent'] = .1
+        return params
 
 
 @devserver_profile(follow=[hero_performance_json])
@@ -315,9 +249,7 @@ def hero_performance(request):
         }
     )
 
-
-@devserver_profile(follow=[hero_progression_json])
-def hero_skill_progression(request):
+class HeroSkillProgression(FormView):
     tour = [
         {
             'orphan': True,
@@ -361,39 +293,20 @@ def hero_skill_progression(request):
             'content': "Challenge: for your favorite hero, how many more levels can high-skill players have over low skill players at the 30 minute mark?"
         }
     ]
-    tour = json.dumps(tour)
-    if request.GET:
-        hero_form = HeroProgressionForm(request.GET)
-        if hero_form.is_valid():
-            datalist, params = hero_progression_json(
-                hero=hero_form.cleaned_data['hero'],
-                player=hero_form.cleaned_data['player'],
-                game_mode_list=hero_form.cleaned_data['game_modes'],
-                division=hero_form.cleaned_data['division'],
-            )
-            params['path_stroke_width'] = 1
-            json_data = outsourceJson(datalist, params)
-            return render(
-                request,
-                'heroes/form.html',
-                {
-                    'form': hero_form,
-                    'json_data': basename(json_data.name),
-                    'title': 'Hero Skilling',
-                    'tour': tour,
-                }
-            )
-    else:
-        hero_form = HeroProgressionForm()
-    return render(
-        request,
-        'heroes/form.html',
-        {
-            'form': hero_form,
-            'title': 'Hero Performance',
-            'tour': tour,
-        }
-    )
+    form = HeroProgressionForm
+    attrs = [
+        'hero',
+        'player',
+        'game_modes',
+        'division',
+    ]
+    json_function = staticmethod(hero_progression_json)
+    title = "Hero Skilling"
+    html = "heroes/form.html"
+
+    def amend_params(self, params):
+        params['path_stroke_width'] = 1
+        return params
 
 
 class HeroBuildLevel(FormView):

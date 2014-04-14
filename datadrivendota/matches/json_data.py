@@ -18,8 +18,8 @@ from players.models import Player
 
 #This takes a player's games and gives the team's results.
 def player_team_endgame_json(
-        player_list,
-        mode_list,
+        players,
+        game_modes,
         x_var,
         y_var,
         split_var,
@@ -69,18 +69,18 @@ def player_team_endgame_json(
 
     datalist = []
     player_obj_list = []
-    for player in player_list:
+    for player in players:
 
         player_obj = Player.objects.get(steam_id=player)
         player_obj_list.append(player_obj)
         radiant_matches = Match.objects.filter(
-            game_mode__steam_id__in=mode_list,
+            game_mode__steam_id__in=game_modes,
             playermatchsummary__player__steam_id=player,
             playermatchsummary__player_slot__lte=6,
             validity=Match.LEGIT)
 
         dire_matches = Match.objects.filter(
-            game_mode__steam_id__in=mode_list,
+            game_mode__steam_id__in=game_modes,
             playermatchsummary__player__steam_id=player,
             playermatchsummary__player_slot__gte=6,
             validity=Match.LEGIT)
@@ -164,7 +164,6 @@ def player_team_endgame_json(
                 else:
                     group_param = 'Lost'
 
-
             datadict = datapoint_dict()
             datadict.update({
                 'x_var': plot_x_var,
@@ -205,8 +204,8 @@ def player_team_endgame_json(
 
 #This gives the player's endgame results
 def player_endgame_json(
-        player_list,
-        mode_list,
+        players,
+        game_modes,
         x_var,
         y_var,
         split_var,
@@ -214,8 +213,8 @@ def player_endgame_json(
         ):
 
     selected_summaries = PlayerMatchSummary.objects.filter(
-        player__steam_id__in=player_list,
-        match__game_mode__steam_id__in=mode_list,
+        player__steam_id__in=players,
+        match__game_mode__steam_id__in=game_modes,
         match__validity=Match.LEGIT)
     selected_summaries = selected_summaries.select_related()
     if len(selected_summaries) == 0:
@@ -273,8 +272,8 @@ def player_endgame_json(
 
 #This gives the endgame results for any game where the given players were on the same team
 def team_endgame_json(
-        player_list,
-        mode_list,
+        players,
+        game_modes,
         x_var,
         y_var,
         split_var,
@@ -283,10 +282,10 @@ def team_endgame_json(
         ):
 
     matches = Match.objects.filter(
-        game_mode__steam_id__in=mode_list,
+        game_mode__steam_id__in=game_modes,
         validity=Match.LEGIT
     )
-    for player in player_list:
+    for player in players:
         radiant_matches = matches.filter(
             playermatchsummary__player__steam_id=player,
             playermatchsummary__player_slot__lte=5
@@ -381,10 +380,10 @@ def team_endgame_json(
     return (datalist, params)
 
 
-def match_ability_json(match_id, width=400, height=400, split_var='No Split'):
+def match_ability_json(match, split_var='No Split'):
 
     skill_builds = SkillBuild.objects.filter(
-        player_match_summary__match__steam_id=match_id
+        player_match_summary__match__steam_id=match
     ).select_related().order_by('player_match_summary', 'level')
     if len(skill_builds) == 0:
         raise NoDataFound
@@ -423,8 +422,8 @@ def match_ability_json(match_id, width=400, height=400, split_var='No Split'):
     params['y_label'] = 'Level'
     params['draw_path'] = True
     params['chart'] = 'xyplot'
-    params['outerWidth'] = width
-    params['outerHeight'] = height
+    params['outerWidth'] = 400
+    params['outerHeight'] = 400
 
     return (datalist, params)
 

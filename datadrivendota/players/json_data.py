@@ -13,8 +13,8 @@ from time import mktime
 
 
 def player_winrate_json(
-        player_id,
-        game_mode_list=None,
+        player,
+        game_modes=None,
         role_list=[],
         min_date=datetime.date(2009, 1, 1),
         max_date=None,
@@ -35,14 +35,14 @@ def player_winrate_json(
 
     if min_dt_utc > max_date_utc:
         raise NoDataFound
-    if game_mode_list is None:
-        game_mode_list = [
+    if game_modes is None:
+        game_modes = [
             gm.steam_id
             for gm in GameMode.objects.filter(is_competitive=True)
         ]
 
     try:
-        player = Player.objects.get(steam_id=player_id)
+        player = Player.objects.get(steam_id=player)
     except Player.DoesNotExist:
         raise NoDataFound
     annotations = PlayerMatchSummary.objects.filter(
@@ -51,7 +51,7 @@ def player_winrate_json(
         match__start_time__gte=min_dt_utc,
         match__start_time__lte=max_date_utc,
         hero__roles__in=roles,
-        match__game_mode__steam_id__in=game_mode_list,
+        match__game_mode__steam_id__in=game_modes,
     ).values('hero__name', 'is_win').annotate(Count('is_win'))
 
     if len(annotations) == 0:
@@ -89,7 +89,7 @@ def player_winrate_json(
             'players:hero_style',
             kwargs={
                 'hero_name': hero_obj.machine_name,
-                'player_id': player_id,
+                'player_id': player,
             }
         )
 

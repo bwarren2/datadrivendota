@@ -20,23 +20,23 @@ from utils.exceptions import NoDataFound
 from utils.charts import datapoint_dict, params_dict, color_scale_params
 
 
-def hero_vitals_json(hero_list, stats_list):
+def hero_vitals_json(heroes, stats):
     # Currently, we are violating DRY with the available field listing from
     # the form and the R space being in different places and requiring that
     # they are the same.
 
     selected_hero_dossiers = HeroDossier.objects.filter(
-        hero__steam_id__in=hero_list
+        hero__steam_id__in=heroes
     )
 
-    if len(selected_hero_dossiers) == 0 or invalid_option(stats_list):
+    if len(selected_hero_dossiers) == 0 or invalid_option(stats):
         raise NoDataFound
     datalist, xs, ys, groups = [], [], [], []
 
     for hero_dossier in selected_hero_dossiers:
         group = hero_dossier.hero.name
         groups.append(group)
-        for stat in stats_list:
+        for stat in stats:
             for level in range(1, 26):
                 datadict = datapoint_dict()
                 datadict.update({
@@ -300,9 +300,9 @@ def hero_performance_chart_json(
     return (datalist, params)
 
 
-def hero_progression_json(hero, player, game_mode_list, division):
+def hero_progression_json(hero, player, game_modes, division):
     pmses = PlayerMatchSummary.objects.filter(
-        match__game_mode__in=game_mode_list
+        match__game_mode__in=game_modes
     )
 
     pmses = pmses.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
