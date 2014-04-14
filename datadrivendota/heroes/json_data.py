@@ -415,23 +415,23 @@ def hero_skillbuild_winrate_json(
         return label
 
     for level in level_list:
-        pmses = PlayerMatchSummary.objects.filter(
-            match__game_mode__in=game_mode_list,
-            hero__steam_id=hero_id,
-            player__steam_id=player_id,
-            level__gte=level,
-            match__validity=Match.LEGIT,
-        ).select_related()
         sbs = SkillBuild.objects.filter(
             player_match_summary__match__game_mode__in=game_mode_list,
             player_match_summary__hero__steam_id=hero_id,
             player_match_summary__player__steam_id=player_id,
             player_match_summary__level__gte=level,
+            player_match_summary__match__validity=Match.LEGIT,
             level__lte=level
         ).select_related()
 
-        match_wins = [pms.match.steam_id for pms in pmses if pms.is_win]
-        match_losses = [pms.match.steam_id for pms in pmses if not pms.is_win]
+        match_wins = [
+            sb.playermatchsummary.match.steam_id
+            for sb in sbs if sb.playermatchsummary.is_win
+        ]
+        match_losses = [
+            sb.playermatchsummary.match.steam_id
+            for sb in sbs if not sb.playermatchsummary.is_win
+        ]
 
         match_dict = {}
         for sb in sbs:
