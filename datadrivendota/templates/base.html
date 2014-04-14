@@ -43,6 +43,7 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Heroes <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="{% url 'heroes:index' %}">Index</a></li>
+                <li role="presentation" class="divider"></li>
                 <li><a href="{% url 'heroes:vitals' %}">Vitals</a></li>
                 <li><a href="{% url 'heroes:lineup' %}">Lineups</a></li>
                 <li><a href="{% url 'heroes:hero_performance' %}">Performance</a></li>
@@ -56,6 +57,7 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Matches <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="{% url 'matches:index' %}">Index</a></li>
+                <li role="presentation" class="divider"></li>
                 <li><a href="{% url 'matches:endgame' %}">Endgame Charts</a></li>
                 <li><a href="{% url 'matches:team_endgame' %}">Team Endgame Charts</a></li>
                 <li><a href="{% url 'matches:ability_build' %}">Ability Build</a></li>
@@ -67,6 +69,7 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Players <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="{% url 'players:pro_index' %}">Pro Index</a></li>
+                <li role="presentation" class="divider"></li>
                 <li><a href="{% url 'players:player_winrate' %}">Winrate</a></li>
                 <li><a href="{% url 'players:timeline' %}">Timeline</a></li>
                 <li><a href="{% url 'players:hero_abilities' %}">Ability Comparison</a></li>
