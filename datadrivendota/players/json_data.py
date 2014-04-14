@@ -539,7 +539,7 @@ def player_hero_side_json(
     )
     params['draw_path'] = False
     params['chart'] = 'xyplot'
-    params['margin']['left'] = 12*len(str(params['y_max']))
+    params['margin']['left'] = 35
     params['legendWidthPercent'] = .7
     params['legendHeightPercent'] = .1
     params['pointDomainMin'] = 0
