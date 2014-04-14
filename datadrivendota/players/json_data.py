@@ -6,7 +6,7 @@ from .models import Player
 from utils.exceptions import NoDataFound
 from itertools import chain
 from utils.charts import params_dict, datapoint_dict, color_scale_params
-from heroes.models import Hero, Role
+from heroes.models import Hero, Role, HeroDossier
 from matches.models import SkillBuild
 from collections import defaultdict
 from time import mktime
@@ -361,7 +361,7 @@ def player_hero_side_json(
         group_var='alignment',
         plot_var='winrate',
 ):
-    #Not used right now
+
     if max_date is None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
@@ -498,7 +498,10 @@ def player_hero_side_json(
         if group_var == 'hero':
             group = hero.name.title()
         elif group_var == 'alignment':
-            group = hero.herodossier.alignment.title()
+            try:
+                group = hero.herodossier.alignment.title()
+            except HeroDossier.DoesNotExist:
+                group = ''
         groups.append(group)
 
         datadict.update({
