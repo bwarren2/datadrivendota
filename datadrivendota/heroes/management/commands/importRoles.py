@@ -42,4 +42,4 @@ class Command(BaseCommand):
                 print "No thumbshot for %s!  Error %s" % (role.name, err)
 
             role.save()
-            print role.name
+            print role.name, role.thumbshot.url
