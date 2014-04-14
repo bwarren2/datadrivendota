@@ -239,7 +239,7 @@ def player_versus_winrate_json(
         player__in=[player_1, player_2],
         match__validity=Match.LEGIT,
         match__start_time__gte=min_dt_utc,
-        match__start_time__lte=max_dt_utc,
+        match__start_time__lte=max_date_utc,
         match__game_mode__steam_id__in=game_mode_list,
     ).select_related().distinct()
 
