@@ -467,7 +467,7 @@ def player_hero_side_json(
                         'winrate': 0,
                         'losses': 0,
                     },
-                    'opposing_side': {
+                    'opposite_side': {
                         'total_games': 0,
                         'wins': 0,
                         'winrate': 0,
