@@ -17,9 +17,9 @@
         </a>
         <div class='roles'>
           {% for assignment in hero.assignment_set.all %}
-            <p alt="{{ assignment.role.name }}" title="{{ assignment.role.name }}" class="role-magnitude-{{ assignment.magnitude }}">{{ assignment.role.name }}</p>
+            {# <p alt="{{ assignment.role.name }}" title="{{ assignment.role.name }}" class="role-magnitude-{{ assignment.magnitude }}">{{ assignment.role.name }}</p> #}
 {#             Commenting out to avoid breaks in production due to #129 #}
-            {# <img src="{% static assignment.role.url %}" alt="{{ assignment.role.name }}" title="{{ assignment.role.name }}" class="role-magnitude-{{ assignment.magnitude }}"> #}
+            <img src="{% static assignment.role.url %}" alt="{{ assignment.role.name }}" title="{{ assignment.role.name }}" class="role-magnitude-{{ assignment.magnitude }}">
           {% endfor %}
         </div>
       </div>
