@@ -35,7 +35,7 @@ class Command(BaseCommand):
                 imgdata = urlopen(url)
                 with open('%s.png' % str(uuid4()), 'w+') as f:
                     f.write(imgdata.read())
-                filename = slugify(matchingDict[role.name])
+                filename = matchingDict[role.name]
                 role.thumbshot.save(filename, File(open(f.name)))
             except HTTPError, err:
                 role.thumbshot = None
