@@ -94,6 +94,17 @@ class FormView(View):
                     params = self.amend_params(params)
                     json_data = outsourceJson(datalist, params)
 
+                    return render(
+                        request,
+                        self.html,
+                        {
+                            'form': bound_form,
+                            'json_data': basename(json_data.name),
+                            'title': self.title,
+                            'tour': self.json_tour,
+                        }
+                    )
+
                 except NoDataFound:
                     return render(
                         request,
@@ -106,16 +117,17 @@ class FormView(View):
                         }
                     )
 
+            else:
                 return render(
                     request,
                     self.html,
                     {
                         'form': bound_form,
-                        'json_data': basename(json_data.name),
                         'title': self.title,
                         'tour': self.json_tour,
                     }
                 )
+
         else:
             form = self.form
             return render(
