@@ -481,7 +481,7 @@ def hero_style(request, player_id, hero_name):
     datalist, params = hero_progression_json(
         hero=hero.steam_id,
         player=player.steam_id,
-        game_mode_list=game_modes,
+        game_modes=game_modes,
         division='Skill'
     )
     params['outerHeight'] = 275
