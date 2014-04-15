@@ -31,6 +31,18 @@
       <span id='xp_gold'></span>
     {% endif %}
   </div>
+  <div class="charts col-md-6">
+  <h4>Pushing Damage</h4>
+    {% if tower_damage_json %}
+      <span id='tower_damage'></span>
+    {% endif %}
+  </div>
+  <div class="charts col-md-6">
+  <h4>Last Hits</h4>
+    {% if last_hits_json %}
+      <span id='last_hits'></span>
+    {% endif %}
+  </div>
 
   {% if dire_bans %}
     <div class="row">
@@ -268,10 +280,24 @@
       })
     {% endif %}
     {% if abilities_json %}
-      var xp_raw_data;
+      var abilities_raw;
       d3.json('{{MEDIA_URL}}{{abilities_json}}', function(source){
-        xp_raw_data=source
+        abilities_raw=source
         window.d3ening.plot(source,'#abilities')
+      })
+    {% endif %}
+    {% if tower_damage_json %}
+      var tower_damage_raw;
+      d3.json('{{MEDIA_URL}}{{tower_damage_json}}', function(source){
+        tower_damage_raw=source
+        window.d3ening.plot(source,'#tower_damage')
+      })
+    {% endif %}
+    {% if last_hits_json %}
+      var tower_damage_raw;
+      d3.json('{{MEDIA_URL}}{{last_hits_json}}', function(source){
+        tower_damage_raw=source
+        window.d3ening.plot(source,'#last_hits')
       })
     {% endif %}
 </script>

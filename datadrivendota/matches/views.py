@@ -23,6 +23,7 @@ from .json_data import (
     match_list_json,
     match_parameter_json,
     player_team_endgame_json,
+    single_match_parameter_json,
 )
 from datadrivendota.views import FormView
 from players.models import request_to_player, Player
@@ -132,12 +133,36 @@ def match(request, match_id):
         abilities = None
 
     try:
+        datalist, params = single_match_parameter_json(
+            match_id, 'tower_damage'
+        )
+        params['outerWidth'] = 500
+        params['outerHeight'] = 250
+        tower_damage_json_name = basename(outsourceJson(datalist, params).name)
+    except NoDataFound:
+        tower_damage_json_name = None
+
+    try:
+        datalist, params = single_match_parameter_json(
+            match_id, 'last_hits'
+        )
+        params['outerWidth'] = 500
+        params['outerHeight'] = 250
+        last_hits_json_name = basename(outsourceJson(datalist, params).name)
+    except NoDataFound:
+        last_hits_json_name = None
+
+    try:
         abilities_name = basename(abilities.name)
     except AttributeError:
         abilities_name = None
 
-    radiant_summaries = [summary for summary in summaries if summary.which_side()=='Radiant']
-    dire_summaries = [summary for summary in summaries if summary.which_side()=='Dire']
+    radiant_summaries = [
+        summary for summary in summaries if summary.which_side() == 'Radiant'
+    ]
+    dire_summaries = [
+        summary for summary in summaries if summary.which_side() == 'Dire'
+    ]
 
     #Identify any pickbans for templating.
     dire_hero_ids = [
@@ -186,6 +211,8 @@ def match(request, match_id):
                 'radiant_picks': radiant_picks,
                 'dire_bans': dire_bans,
                 'radiant_bans': radiant_bans,
+                'tower_damage_json': tower_damage_json_name,
+                'last_hits_json': last_hits_json_name,
             }
         )
     except IndexError:
@@ -200,6 +227,8 @@ def match(request, match_id):
                 'kill_dmg_json': kill_dmg_json_name,
                 'xp_gold_json': xp_gold_json_name,
                 'abilities_json': abilities_name,
+                'tower_damage_json': tower_damage_json_name,
+                'last_hits_json': last_hits_json_name,
             }
         )
 

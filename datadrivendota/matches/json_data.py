@@ -473,6 +473,55 @@ def match_parameter_json(match_id, x_var, y_var):
     return (data_list, params)
 
 
+def single_match_parameter_json(match, y_var):
+    pmses = PlayerMatchSummary.objects.filter(match__steam_id=match)
+    if len(pmses) == 0:
+        raise NoDataFound
+
+    data_list = []
+    for pms in pmses:
+        datadict = datapoint_dict()
+        group = fetch_pms_attribute(pms, 'which_side')
+        datadict.update({
+            'x_var': pms.hero.safe_name(),
+            'y_var': fetch_pms_attribute(pms, y_var),
+            'group_var': group,
+            'split_var': 'Tower Damage',
+            'label': pms.hero.safe_name(),
+            'tooltip': pms.hero.safe_name(),
+            'classes': [fetch_pms_attribute(pms, 'hero_name')],
+        })
+        data_list.append(datadict)
+
+    params = params_dict()
+    params['x_set'] = [d['x_var'] for d in data_list]
+    params['y_min'] = min([d['y_var'] for d in data_list])
+    params['y_max'] = max([d['y_var'] for d in data_list])
+    params['x_label'] = 'Hero'
+    params['y_label'] = fetch_attribute_label(y_var)
+    params['legendWidthPercent'] = .8
+    params['legendHeightPercent'] = .05
+
+    params['padding']['bottom'] = 90
+    params['margin']['left'] = 45
+
+    if params['y_max'] > 1000:
+        params['y_label'] += ' (K)'
+        for d in data_list:
+            d['y_var'] /= 1000.0
+        params['y_max'] = int(floor(round(params['y_max']/1000.0, 0)))
+        params['y_min'] = int(floor(round(params['y_min']/1000.0, 0)))
+    # params['draw_path'] = False
+    params['chart'] = 'barplot'
+    # params['margin']['left'] = 12*len(str(params['y_max']))
+
+    # params['outerWidth'] = 250
+    params['outerHeight'] = 250
+    params = color_scale_params(params, [d['group_var'] for d in data_list])
+
+    return (data_list, params)
+
+
 def match_list_json(match_list, player_list):
     pmses = PlayerMatchSummary.objects.filter(
         match__steam_id__in=match_list,
