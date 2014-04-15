@@ -19,19 +19,12 @@ def player_winrate_json(
         min_date=datetime.date(2009, 1, 1),
         max_date=None,
         group_var='alignment',
-        width=500,
-        height=500
         ):
     if max_date is None:
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
         max_date_utc = mktime(max_date.timetuple())
     min_dt_utc = mktime(min_date.timetuple())
-
-    if role_list == []:
-        roles = Role.objects.all()
-    else:
-        roles = Role.objects.filter(name__in=role_list)
 
     if min_dt_utc > max_date_utc:
         raise NoDataFound
@@ -50,9 +43,14 @@ def player_winrate_json(
         match__validity=Match.LEGIT,
         match__start_time__gte=min_dt_utc,
         match__start_time__lte=max_date_utc,
-        hero__roles__in=roles,
         match__game_mode__steam_id__in=game_modes,
-    ).values('hero__name', 'is_win').annotate(Count('is_win'))
+    )
+    if role_list != []:
+        roles = Role.objects.filter(name__in=role_list)
+        annotations = annotations.filter(hero__roles__in=roles)
+
+    annotations = annotations.values('hero__name', 'is_win')\
+        .annotate(Count('is_win'))
 
     if len(annotations) == 0:
         raise NoDataFound
@@ -115,8 +113,8 @@ def player_winrate_json(
     params['draw_path'] = False
     params['chart'] = 'xyplot'
     params['margin']['left'] = 12*len(str(params['y_max']))
-    params['outerWidth'] = width
-    params['outerHeight'] = height
+    params['outerWidth'] = 500
+    params['outerHeight'] = 500
     params['legendWidthPercent'] = .7
     params['legendHeightPercent'] = .7
     if group_var == 'hero':

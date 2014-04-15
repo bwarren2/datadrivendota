@@ -122,7 +122,7 @@ def match(request, match_id):
 
     try:
         datalist, params = match_ability_json(
-            match_id=match_id,
+            match=match_id,
             split_var='side'
             )
         params['outerWidth'] = 250

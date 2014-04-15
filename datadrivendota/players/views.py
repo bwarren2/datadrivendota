@@ -168,8 +168,6 @@ def detail(request, player_id=None):
 
     datalist, params = player_winrate_json(
         player.steam_id,
-        width=400,
-        height=400
     )
     params['outerWidth'] = 350
     params['outerHeight'] = 350
@@ -179,8 +177,8 @@ def detail(request, player_id=None):
     player_list = [70388657, 41231571, player.steam_id]
 
     datalist, params = player_endgame_json(
-        player_list=player_list,
-        mode_list=[1, 2, 3, 4, 5],
+        players=player_list,
+        game_modes=[1, 2, 3, 4, 5],
         x_var='duration',
         y_var='K-D+.5*A',
         split_var='No Split',
@@ -204,6 +202,7 @@ def detail(request, player_id=None):
             'pms_list': pms_list
         }
     )
+
 
 class Winrate(FormView):
     tour = [
