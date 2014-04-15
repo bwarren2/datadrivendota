@@ -296,6 +296,10 @@ def hero_performance_chart_json(
     params['y_label'] = ylab
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['chart'] = 'xyplot'
+    if group_var == 'skill_name':
+        grouplist = ['Low Skill', 'Medium Skill', 'High Skill']
+        if player is not None:
+            grouplist.append('Player')
     params = color_scale_params(params, grouplist)
     return (datalist, params)
 
