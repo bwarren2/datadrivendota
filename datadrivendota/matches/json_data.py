@@ -537,17 +537,17 @@ def match_role_json(match):
                     "Radiant": {},
                     "Dire": {}
                 }
-
+                pass
 
     data_list = []
+    for pms in pmses:
         datadict = datapoint_dict()
         group = fetch_pms_attribute(pms, 'which_side')
-        groups.append(group)
         datadict.update({
-            'x_var': fetch_pms_attribute(pms, x_var),
-            'y_var': fetch_pms_attribute(pms, y_var),
+            'x_var': fetch_pms_attribute(pms, ''),
+            'y_var': fetch_pms_attribute(pms, ''),
             'group_var': group,
-            'split_var': '{x} vs {y}'.format(x=x_var, y=y_var),
+            'split_var': '{x} vs {y}'.format(x='', y=''),
             'label': fetch_pms_attribute(pms, 'hero_name'),
             'tooltip': fetch_pms_attribute(pms, 'hero_name'),
             'classes': [fetch_pms_attribute(pms, 'hero_name')],

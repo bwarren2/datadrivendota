@@ -135,7 +135,7 @@ def match(request, match_id):
     try:
         datalist, params = single_match_parameter_json(
             match_id, 'tower_damage',
-            title, 'Tower Damage',
+            title='Tower Damage',
         )
         params['outerWidth'] = 500
         params['outerHeight'] = 250
@@ -145,8 +145,8 @@ def match(request, match_id):
 
     try:
         datalist, params = single_match_parameter_json(
-            match_id, 'last_hits'
-            title, 'Last Hits',
+            match_id, 'last_hits',
+            title='Last Hits',
         )
         params['outerWidth'] = 500
         params['outerHeight'] = 250
