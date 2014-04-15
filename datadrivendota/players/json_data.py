@@ -354,8 +354,8 @@ def player_versus_winrate_json(
 
 
 def player_hero_side_json(
-        player_id,
-        game_mode_list=None,
+        player,
+        game_modes=None,
         min_date=datetime.date(2009, 1, 1),
         max_date=None,
         group_var='alignment',
@@ -375,14 +375,14 @@ def player_hero_side_json(
     all_heroes = Hero.objects.all()
     hero_names = {h.name: h for h in all_heroes}
 
-    if game_mode_list is None:
-        game_mode_list = [
+    if game_modes is None:
+        game_modes = [
             gm.steam_id
             for gm in GameMode.objects.filter(is_competitive=True)
         ]
 
     try:
-        player = Player.objects.get(steam_id=player_id)
+        player = Player.objects.get(steam_id=player)
 
     except Player.DoesNotExist:
         raise NoDataFound
@@ -392,7 +392,7 @@ def player_hero_side_json(
         validity=Match.LEGIT,
         start_time__gte=min_dt_utc,
         start_time__lte=max_date_utc,
-        game_mode__steam_id__in=game_mode_list,
+        game_mode__steam_id__in=game_modes,
         playermatchsummary__player_slot__lt=6,
     ).distinct()
 
@@ -401,7 +401,7 @@ def player_hero_side_json(
         validity=Match.LEGIT,
         start_time__gte=min_dt_utc,
         start_time__lte=max_date_utc,
-        game_mode__steam_id__in=game_mode_list,
+        game_mode__steam_id__in=game_modes,
         playermatchsummary__player_slot__gt=6,
     ).distinct()
 
