@@ -436,7 +436,7 @@ def comparison(request, player_id_1, player_id_2):
 
     datalist, params = player_endgame_json(
         players=[player_1.steam_id, player_2.steam_id],
-        mode_list=[1, 2, 3, 4, 5],
+        modes=[1, 2, 3, 4, 5],
         x_var='duration',
         y_var='K-D+.5*A',
         split_var='is_win',
@@ -448,7 +448,7 @@ def comparison(request, player_id_1, player_id_2):
 
     datalist, params = player_team_endgame_json(
         players=[player_1.steam_id, player_2.steam_id],
-        mode_list=[1, 2, 3, 4, 5],
+        modes=[1, 2, 3, 4, 5],
         x_var='duration',
         y_var='K-D+.5*A',
         split_var='is_win',
