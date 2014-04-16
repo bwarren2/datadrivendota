@@ -24,6 +24,7 @@ from .json_data import (
     match_parameter_json,
     player_team_endgame_json,
     single_match_parameter_json,
+    match_role_json
 )
 from datadrivendota.views import FormView
 from players.models import request_to_player, Player
@@ -97,13 +98,10 @@ def match(request, match_id):
             'kills',
             'hero_damage'
         )
-        kill_dmg_json = outsourceJson(datalist, params)
+        params['outerWidth'] = 225
+        params['outerHeight'] = 225
+        kill_dmg_json_name = basename(outsourceJson(datalist, params).name)
     except NoDataFound:
-        kill_dmg_json = None
-
-    try:
-        kill_dmg_json_name = basename(kill_dmg_json.name)
-    except AttributeError:
         kill_dmg_json_name = None
 
     try:
@@ -112,6 +110,8 @@ def match(request, match_id):
             'gold_per_min',
             'xp_per_min'
         )
+        params['outerWidth'] = 225
+        params['outerHeight'] = 225
         xp_gold_json = outsourceJson(datalist,  params)
     except NoDataFound:
         xp_gold_json = None
@@ -126,18 +126,28 @@ def match(request, match_id):
             match=match_id,
             split_var='side'
             )
-        params['outerWidth'] = 250
-        params['outerHeight'] = 250
+        params['outerWidth'] = 225
+        params['outerHeight'] = 225
         abilities = outsourceJson(datalist, params)
     except NoDataFound:
         abilities = None
+
+    try:
+        datalist, params = match_role_json(
+            match_id,
+        )
+        params['outerWidth'] = 225
+        params['outerHeight'] = 225
+        roles_json_name = basename(outsourceJson(datalist, params).name)
+    except NoDataFound:
+        roles_json_name = None
 
     try:
         datalist, params = single_match_parameter_json(
             match_id, 'tower_damage',
             title='Tower Damage',
         )
-        params['outerWidth'] = 500
+        params['outerWidth'] = 375
         params['outerHeight'] = 250
         tower_damage_json_name = basename(outsourceJson(datalist, params).name)
     except NoDataFound:
@@ -148,11 +158,23 @@ def match(request, match_id):
             match_id, 'last_hits',
             title='Last Hits',
         )
-        params['outerWidth'] = 500
+        params['outerWidth'] = 375
         params['outerHeight'] = 250
         last_hits_json_name = basename(outsourceJson(datalist, params).name)
     except NoDataFound:
         last_hits_json_name = None
+
+    try:
+        datalist, params = single_match_parameter_json(
+            match_id, 'K-D+.5*A',
+            title='K-D+.5*A (KDA2)',
+        )
+        params['outerWidth'] = 375
+        params['outerHeight'] = 250
+        kda_json_name = basename(outsourceJson(datalist, params).name)
+    except NoDataFound:
+        kda_json_name = None
+
 
     try:
         abilities_name = basename(abilities.name)
@@ -215,6 +237,8 @@ def match(request, match_id):
                 'radiant_bans': radiant_bans,
                 'tower_damage_json': tower_damage_json_name,
                 'last_hits_json': last_hits_json_name,
+                'roles_json': roles_json_name,
+                'kda_json': kda_json_name,
             }
         )
     except IndexError:
@@ -231,6 +255,8 @@ def match(request, match_id):
                 'abilities_json': abilities_name,
                 'tower_damage_json': tower_damage_json_name,
                 'last_hits_json': last_hits_json_name,
+                'roles_json': roles_json_name,
+                'kda_json': kda_json_name,
             }
         )
 

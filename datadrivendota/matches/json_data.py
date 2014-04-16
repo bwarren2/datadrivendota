@@ -534,47 +534,41 @@ def match_role_json(match):
             role_name = assignment.role.name
             if role_name not in role_dict:
                 role_dict[role_name] = {
-                    "Radiant": {},
-                    "Dire": {}
+                    "Radiant": 0,
+                    "Dire": 0
                 }
-                pass
+            role_dict[role_name][pms.which_side()] += assignment.magnitude
 
     data_list = []
-    for pms in pmses:
+    for role, minidict in role_dict.iteritems():
         datadict = datapoint_dict()
-        group = fetch_pms_attribute(pms, 'which_side')
         datadict.update({
-            'x_var': fetch_pms_attribute(pms, ''),
-            'y_var': fetch_pms_attribute(pms, ''),
-            'group_var': group,
-            'split_var': '{x} vs {y}'.format(x='', y=''),
-            'label': fetch_pms_attribute(pms, 'hero_name'),
-            'tooltip': fetch_pms_attribute(pms, 'hero_name'),
-            'classes': [fetch_pms_attribute(pms, 'hero_name')],
+            'x_var': minidict['Radiant'],
+            'y_var': minidict['Dire'],
+            'group_var': role,
+            'split_var': 'Role Breakdown',
+            'label': role,
+            'tooltip': role,
+            'classes': [role],
         })
         data_list.append(datadict)
 
     params = params_dict()
+    xmax = max([d['x_var'] for d in data_list])
+    ymax = max([d['y_var'] for d in data_list])
+    absmax = max(xmax, ymax)
     params['x_min'] = min([d['x_var'] for d in data_list])
-    params['x_max'] = max([d['x_var'] for d in data_list])
+    params['x_max'] = absmax
     params['y_min'] = min([d['y_var'] for d in data_list])
-    params['y_max'] = max([d['y_var'] for d in data_list])
-    params['x_label'] = fetch_attribute_label(x_var)
-    params['y_label'] = fetch_attribute_label(y_var)
-    if params['y_min'] > 1000:
-        params['y_label'] += ' (K)'
-        for d in data_list:
-            d['y_var'] /= 1000.0
-        params['y_max'] = int(floor(round(params['y_max']/1000.0, 0)))
-        params['y_min'] = int(floor(round(params['y_min']/1000.0, 0)))
+    params['y_max'] = absmax
+    params['x_label'] = 'Radiant Role Magnitude'
+    params['y_label'] = 'Dire Role Magnitude'
     params['draw_path'] = False
     params['chart'] = 'xyplot'
-    params['margin']['left'] = 12*len(str(params['y_max']))
-
+    params['margin']['left'] = 30
     params['outerWidth'] = 250
     params['outerHeight'] = 250
-    params = color_scale_params(params, groups)
-
+    params = color_scale_params(params, [d['group_var'] for d in data_list])
     return (data_list, params)
 
 
