@@ -557,9 +557,9 @@ def match_role_json(match):
     xmax = max([d['x_var'] for d in data_list])
     ymax = max([d['y_var'] for d in data_list])
     absmax = max(xmax, ymax)
-    params['x_min'] = min([d['x_var'] for d in data_list])
+    params['x_min'] = 0
     params['x_max'] = absmax
-    params['y_min'] = min([d['y_var'] for d in data_list])
+    params['y_min'] = 0
     params['y_max'] = absmax
     params['x_label'] = 'Radiant Role Magnitude'
     params['y_label'] = 'Dire Role Magnitude'
