@@ -435,7 +435,7 @@ def comparison(request, player_id_1, player_id_2):
     role_json = outsourceJson(datalist, params)
 
     datalist, params = player_endgame_json(
-        player_list=[player_1.steam_id, player_2.steam_id],
+        players=[player_1.steam_id, player_2.steam_id],
         mode_list=[1, 2, 3, 4, 5],
         x_var='duration',
         y_var='K-D+.5*A',
@@ -447,7 +447,7 @@ def comparison(request, player_id_1, player_id_2):
     kda_json = outsourceJson(datalist, params)
 
     datalist, params = player_team_endgame_json(
-        player_list=[player_1.steam_id, player_2.steam_id],
+        players=[player_1.steam_id, player_2.steam_id],
         mode_list=[1, 2, 3, 4, 5],
         x_var='duration',
         y_var='K-D+.5*A',

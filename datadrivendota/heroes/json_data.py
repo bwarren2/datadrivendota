@@ -3,7 +3,6 @@ import operator
 from itertools import chain
 
 from django.core.urlresolvers import reverse
-from django.db.models import Q
 
 from heroes.models import HeroDossier, Hero, invalid_option, Ability
 from matches.models import (
