@@ -138,6 +138,7 @@ def match(request, match_id):
         )
         params['outerWidth'] = 225
         params['outerHeight'] = 225
+        params['draw_legend'] = False
         roles_json_name = basename(outsourceJson(datalist, params).name)
     except NoDataFound:
         roles_json_name = None
