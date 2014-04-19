@@ -1,4 +1,6 @@
 from math import floor
+from collections import defaultdict
+from django.utils.text import slugify
 from django.db.models import Sum
 from django.core.urlresolvers import reverse
 from itertools import chain
@@ -11,8 +13,14 @@ from matches.models import (
     fetch_pms_attribute,
     SkillBuild
 )
+from heroes.models import Assignment, Hero
 from utils.exceptions import NoDataFound
-from utils.charts import params_dict, datapoint_dict, color_scale_params
+from utils.charts import (
+    params_dict,
+    datapoint_dict,
+    color_scale_params,
+    hero_classes_dict
+)
 from players.models import Player
 
 
@@ -26,6 +34,9 @@ def player_team_endgame_json(
         group_var,
         ):
 
+    assignment_dict = defaultdict(list)
+    for assignment in Assignment.objects.all().select_related():
+        assignment_dict[assignment.hero.name].append(assignment.role.name)
     dictAttributes = {
         'kills': 'playermatchsummary__kills',
         'deaths': 'playermatchsummary__deaths',
@@ -114,23 +125,26 @@ def player_team_endgame_json(
         pmses = PlayerMatchSummary.objects.filter(
             player__steam_id=player,
             match__validity=Match.LEGIT,
-            ).values(
-            'match__steam_id',
-            'hero__name',
-            'is_win',
-            )
+            ).select_related().prefetch_related()
 
         mapping_dict = {
-            d['match__steam_id']:
-            {'hero': d['hero__name'], 'is_win': d['is_win']}
-            for d in pmses}
+            d.match.steam_id:
+            {
+                'hero': d.hero.name,
+                'is_win': d.is_win,
+                'pms': d
+            }
+            for d in pmses
+        }
 
         if x_var in dictAttributes:
             dire_annotations.annotate(Sum(dictAttributes[x_var]))
             radiant_annotations.annotate(Sum(dictAttributes[x_var]))
         if y_var in dictAttributes:
-            dire_annotations.annotate(Sum('playermatchsummary__last_hits'))
-            radiant_annotations.annotate(Sum('playermatchsummary__last_hits'))
+            dire_annotations.annotate(Sum(y_var))
+            radiant_annotations.annotate(Sum(y_var))
+
+        hero_classes = hero_classes_dict()
 
         for annotation in chain(
             radiant_annotations.select_related(),
@@ -172,12 +186,21 @@ def player_team_endgame_json(
                 'tooltip': annotation.steam_id,
                 'split_var': split_param,
                 'group_var': group_param,
-                'classes': [mapping_dict[annotation.steam_id]['hero']],
+                'classes': [],
                 'url': reverse(
                     'matches:match_detail',
                     kwargs={'match_id': annotation.steam_id}
                 )
             })
+            if hero_classes[
+                    mapping_dict[annotation.steam_id]['pms'].hero.steam_id
+            ] is not None:
+                datadict['classes'].extend(
+                    hero_classes[
+                        mapping_dict[annotation.steam_id]['pms'].hero.steam_id
+                        ]
+                )
+
             datalist.append(datadict)
 
     if len(datalist) == 0:
@@ -196,7 +219,8 @@ def player_team_endgame_json(
     params['y_label'] = y_var.title()
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['chart'] = 'xyplot'
-    params = color_scale_params(params,
+    params = color_scale_params(
+        params,
         [p.display_name for p in player_obj_list]
     )
     return (datalist, params)
@@ -217,60 +241,49 @@ def player_endgame_json(
         match__game_mode__steam_id__in=game_modes,
         match__validity=Match.LEGIT)
     selected_summaries = selected_summaries.select_related()
+
     if len(selected_summaries) == 0:
         raise NoDataFound
 
-    try:
-        x_vector_list, xlab = fetch_match_attributes(selected_summaries, x_var)
-        y_vector_list, ylab = fetch_match_attributes(selected_summaries, y_var)
-        name_list, foo = fetch_match_attributes(
-            selected_summaries, 'hero_name')
-
-        split_vector_list, split_lab = fetch_match_attributes(
-            selected_summaries,
-            split_var
-        )
-        group_vector_list, grouplab = fetch_match_attributes(
-            selected_summaries,
-            group_var
-        )
-        match_list = fetch_match_attributes(selected_summaries, 'match_id')[0]
-    except AttributeError:
-        raise NoDataFound
+    hero_classes = hero_classes_dict()
 
     datalist = []
-    for key in range(0, len(x_vector_list)):
+    for pms in selected_summaries:
         datadict = datapoint_dict()
         datadict.update({
-            'x_var': x_vector_list[key],
-            'y_var': y_vector_list[key],
-            'label': group_vector_list[key],
-            'tooltip': match_list[key],
-            'split_var': split_vector_list[key],
-            'group_var': group_vector_list[key],
-            'classes': [name_list[key]],
+            'x_var': fetch_pms_attribute(pms, x_var),
+            'y_var': fetch_pms_attribute(pms, y_var),
+            'label': fetch_pms_attribute(pms, group_var),
+            'tooltip': fetch_pms_attribute(pms, 'match_id'),
+            'split_var': fetch_pms_attribute(pms, split_var),
+            'group_var': fetch_pms_attribute(pms, group_var),
+            'classes': [],
             'url': reverse(
                 'matches:match_detail',
-                kwargs={'match_id': match_list[key]}
+                kwargs={'match_id': fetch_pms_attribute(pms, 'match_id')}
             )
 
         })
+        if hero_classes[pms.hero.steam_id] is not None:
+            datadict['classes'].extend(
+                hero_classes[pms.hero.steam_id]
+            )
+
         datalist.append(datadict)
 
     params = params_dict()
-    params['x_min'] = min(x_vector_list)
-    params['x_max'] = max(x_vector_list)
-    params['y_min'] = min(y_vector_list)
-    params['y_max'] = max(y_vector_list)
-    params['x_label'] = xlab
-    params['y_label'] = ylab
+    params['x_min'] = min([d['x_var'] for d in datalist])
+    params['x_max'] = max([d['x_var'] for d in datalist])
+    params['y_min'] = min([d['y_var'] for d in datalist])
+    params['y_max'] = max([d['y_var'] for d in datalist])
+    params['x_label'] = x_var.title()
+    params['y_label'] = y_var.title()
     params['margin']['left'] = 12*len(str(params['y_max']))
     params['chart'] = 'xyplot'
-    params = color_scale_params(params, group_vector_list)
+    params = color_scale_params(params, [d['group_var'] for d in datalist])
     return (datalist, params)
 
 
-#This gives the endgame results for any game where the given players were on the same team
 def team_endgame_json(
         players,
         game_modes,
@@ -280,6 +293,7 @@ def team_endgame_json(
         group_var,
         compressor
         ):
+    """Gives the endgame results for any game where the given players were on the same team"""
 
     matches = Match.objects.filter(
         game_mode__steam_id__in=game_modes,
@@ -297,6 +311,7 @@ def team_endgame_json(
 
     if len(radiant_matches) + len(dire_matches) == 0:
         raise NoDataFound
+
     radiant = PlayerMatchSummary.objects.filter(
         match__in=radiant_matches,
         player_slot__lte=5
@@ -336,6 +351,8 @@ def team_endgame_json(
             compressor=compressor
         )
 
+    hero_classes = hero_classes_dict()
+
     try:
         datalist = []
         for p in pmses:
@@ -353,9 +370,11 @@ def team_endgame_json(
                     'matches:match_detail',
                     kwargs={'match_id': match_id}
                 ),
-                'classes': [p.hero.name],
+                'classes': [],
 
             })
+            if hero_classes[p.hero.steam_id] is not None:
+                datadict['classes'].extend(hero_classes[p.hero.steam_id])
 
             datalist.append(datadict)
             xlab = fetch_attribute_label(attribute=x_var)
@@ -364,7 +383,6 @@ def team_endgame_json(
             )
     except AttributeError:
         raise NoDataFound
-
     params = params_dict()
     params['x_min'] = min(x_data.itervalues())
     params['x_max'] = max(x_data.itervalues())
@@ -387,6 +405,9 @@ def match_ability_json(match, split_var='No Split'):
     ).select_related().order_by('player_match_summary', 'level')
     if len(skill_builds) == 0:
         raise NoDataFound
+
+    hero_classes = hero_classes_dict()
+
     datalist = []
     for build in skill_builds:
 
@@ -407,8 +428,19 @@ def match_ability_json(match, split_var='No Split'):
             'tooltip': build.ability.name,
             'split_var': split_param,
             'group_var': hero,
+            'classes': [],
         }
         datadict.update(minidict)
+        if hero_classes[build.player_match_summary.hero.steam_id] is not None:
+            datadict['classes'].extend(
+                hero_classes[build.player_match_summary.hero.steam_id]
+            )
+        datadict['classes'].append(
+            slugify(
+                unicode(build.player_match_summary.which_side())
+            )
+        )
+
         datalist.append(datadict)
     xs = [build.time/60 for build in skill_builds]
     ys = [build.level for build in skill_builds]
@@ -429,10 +461,12 @@ def match_ability_json(match, split_var='No Split'):
 
 
 def match_parameter_json(match_id, x_var, y_var):
-    pmses = PlayerMatchSummary.objects.filter(match__steam_id=match_id)
+    pmses = PlayerMatchSummary.objects.filter(match__steam_id=match_id)\
+        .select_related()
     if len(pmses) == 0:
         raise NoDataFound
 
+    hero_classes = hero_classes_dict()
     data_list, groups = [], []
     for pms in pmses:
         datadict = datapoint_dict()
@@ -445,8 +479,12 @@ def match_parameter_json(match_id, x_var, y_var):
             'split_var': '{x} vs {y}'.format(x=x_var, y=y_var),
             'label': fetch_pms_attribute(pms, 'hero_name'),
             'tooltip': fetch_pms_attribute(pms, 'hero_name'),
-            'classes': [fetch_pms_attribute(pms, 'hero_name')],
+            'classes': [],
         })
+        if hero_classes[pms.hero.steam_id] is not None:
+            datadict['classes'].extend(hero_classes[pms.hero.steam_id])
+        datadict['classes'].append(slugify(unicode(pms.which_side())))
+
         data_list.append(datadict)
 
     params = params_dict()
@@ -474,10 +512,12 @@ def match_parameter_json(match_id, x_var, y_var):
 
 
 def single_match_parameter_json(match, y_var, title):
-    pmses = PlayerMatchSummary.objects.filter(match__steam_id=match)
+    pmses = PlayerMatchSummary.objects.filter(match__steam_id=match)\
+        .select_related()
     if len(pmses) == 0:
         raise NoDataFound
 
+    hero_classes = hero_classes_dict()
     data_list = []
     for pms in pmses:
         datadict = datapoint_dict()
@@ -489,8 +529,11 @@ def single_match_parameter_json(match, y_var, title):
             'split_var': title,
             'label': pms.hero.safe_name(),
             'tooltip': pms.hero.safe_name(),
-            'classes': [fetch_pms_attribute(pms, 'hero_name')],
+            'classes': [],
         })
+        if hero_classes[pms.hero.steam_id] is not None:
+            datadict['classes'].extend(hero_classes[pms.hero.steam_id])
+        datadict['classes'].append(slugify(unicode(pms.which_side())))
         data_list.append(datadict)
 
     params = params_dict()
@@ -511,11 +554,7 @@ def single_match_parameter_json(match, y_var, title):
             d['y_var'] /= 1000.0
         params['y_max'] = int(floor(round(params['y_max']/1000.0, 0)))
         params['y_min'] = int(floor(round(params['y_min']/1000.0, 0)))
-    # params['draw_path'] = False
     params['chart'] = 'barplot'
-    # params['margin']['left'] = 12*len(str(params['y_max']))
-
-    # params['outerWidth'] = 250
     params['outerHeight'] = 250
     params = color_scale_params(params, [d['group_var'] for d in data_list])
 
@@ -527,29 +566,42 @@ def match_role_json(match):
     if len(pmses) == 0:
         raise NoDataFound
 
-    role_dict = {}
-    for pms in pmses:
-        assignment_set = pms.hero.assignment_set.all()
-        for assignment in assignment_set:
-            role_name = assignment.role.name
-            if role_name not in role_dict:
-                role_dict[role_name] = {
-                    "Radiant": 0,
-                    "Dire": 0
-                }
-            role_dict[role_name][pms.which_side()] += assignment.magnitude
+    dire_annotations = PlayerMatchSummary.objects.filter(
+        match__steam_id=match,
+        player_slot__gte=6).values(
+        'hero__assignment__role__name'
+        ).annotate(Sum('hero__assignment__magnitude')).order_by()
 
+    radiant_annotations = PlayerMatchSummary.objects.filter(
+        match__steam_id=match,
+        player_slot__lte=6).values(
+        'hero__assignment__role__name'
+        ).annotate(Sum('hero__assignment__magnitude')).order_by()
+
+    dire_roles = {
+        d['hero__assignment__role__name']:
+        d['hero__assignment__magnitude__sum']
+        for d in dire_annotations
+        }
+
+    radiant_roles = {
+        d['hero__assignment__role__name']:
+        d['hero__assignment__magnitude__sum']
+        for d in radiant_annotations
+        }
+
+    role_set = set(chain(radiant_roles.iterkeys(), dire_roles.iterkeys()))
     data_list = []
-    for role, minidict in role_dict.iteritems():
+    for role in role_set:
         datadict = datapoint_dict()
         datadict.update({
-            'x_var': minidict['Radiant'],
-            'y_var': minidict['Dire'],
+            'x_var': radiant_roles.get(role, 0),
+            'y_var': dire_roles.get(role, 0),
             'group_var': role,
             'split_var': 'Role Breakdown',
             'label': role,
             'tooltip': role,
-            'classes': [role],
+            'classes': [slugify(role)],
         })
         data_list.append(datadict)
 
@@ -570,8 +622,6 @@ def match_role_json(match):
     params['outerHeight'] = 250
     params = color_scale_params(params, [d['group_var'] for d in data_list])
     return (data_list, params)
-
-
 
 
 def match_list_json(match_list, player_list):

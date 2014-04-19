@@ -1,11 +1,17 @@
 import datetime
 from django.db.models import Count
+from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from matches.models import PlayerMatchSummary, GameMode, Match
 from .models import Player
 from utils.exceptions import NoDataFound
 from itertools import chain
-from utils.charts import params_dict, datapoint_dict, color_scale_params
+from utils.charts import (
+    params_dict,
+    datapoint_dict,
+    color_scale_params,
+    hero_classes_dict
+)
 from heroes.models import Hero, Role, HeroDossier
 from matches.models import SkillBuild
 from collections import defaultdict
@@ -71,12 +77,14 @@ def player_winrate_json(
     }
     games = {hero: wins.get(hero, 0) + losses.get(hero, 0) for hero in heroes}
 
+    hero_classes = hero_classes_dict()
     all_heroes = Hero.objects.all().select_related()
-    a = all_heroes
+    hero_obj_dict = {hero.name: hero for hero in all_heroes}
+
     data_list, groups = [], []
     for hero in heroes:
         datadict = datapoint_dict()
-        hero_obj = all_heroes.get(name=hero)
+        hero_obj = hero_obj_dict[hero]
         if group_var == 'hero':
             group = hero_obj.name.title()
         elif group_var == 'alignment':
@@ -99,8 +107,11 @@ def player_winrate_json(
             'url': url_str,
             'label': hero,
             'tooltip': hero,
-            'classes': [group, hero],
+            'classes': [],
         })
+        if hero_classes[hero.steam_id] is not None:
+            datadict['classes'].extend(hero_classes[hero.steam_id])
+
         data_list.append(datadict)
 
     params = params_dict()
@@ -159,6 +170,7 @@ def player_hero_abilities_json(
     datalist = []
     xs = []
     ys = []
+    hero_classes = hero_classes_dict()
     for build in sbs:
         if build.level == 1:
             subtractor = build.time/60.0
@@ -183,6 +195,10 @@ def player_hero_abilities_json(
         datapoint['series_var'] = build.player_match_summary.match.steam_id
         datapoint['label'] = build.player_match_summary.player.display_name
         datapoint['split_var'] = 'Skill Progression'
+        hero_id = build.player_match_summary.hero.steam_id
+        if hero_classes[hero_id] is not None:
+            datapoint['classes'].extend(hero_classes[hero_id])
+
         datalist.append(datapoint)
 
     params = params_dict()
@@ -201,7 +217,6 @@ def player_versus_winrate_json(
         player_id_1,
         player_id_2,
         game_mode_list=None,
-        role_list=[],
         min_date=datetime.date(2009, 1, 1),
         max_date=None,
         group_var='alignment',
@@ -213,10 +228,7 @@ def player_versus_winrate_json(
         max_date_utc = mktime(max_date.timetuple())
     min_dt_utc = mktime(min_date.timetuple())
 
-    if role_list == []:
-        roles = Role.objects.all()
-    else:
-        roles = Role.objects.filter(name__in=role_list)
+    hero_classes = hero_classes_dict()
 
     if min_dt_utc > max_date_utc:
         raise NoDataFound
@@ -246,15 +258,15 @@ def player_versus_winrate_json(
 
     pairings = {}
     for pms in pmses:
-        if pms.hero not in pairings:
-            pairings[pms.hero] = {
+        if pms.hero.name not in pairings:
+            pairings[pms.hero.name] = {
                 player_1: {'wins': 0, 'losses': 0},
                 player_2: {'wins': 0, 'losses': 0},
             }
         if pms.is_win:
-            pairings[pms.hero][pms.player]['wins'] += 1
+            pairings[pms.hero.name][pms.player]['wins'] += 1
         else:
-            pairings[pms.hero][pms.player]['losses'] += 1
+            pairings[pms.hero.name][pms.player]['losses'] += 1
 
     for hero in pairings.iterkeys():
 
@@ -279,8 +291,13 @@ def player_versus_winrate_json(
         else:
             pairings[hero][player_2]['winrate'] = 0
 
+    all_heroes = HeroDossier.objects.all().select_related()
+    hero_obj_dict = {herodoss.hero.name: herodoss.hero
+                     for herodoss in all_heroes}
+
     data_list, groups = [], []
-    for hero, dataset in pairings.iteritems():
+    for hero_name, dataset in pairings.iteritems():
+        hero = hero_obj_dict[hero_name]
         datadict = datapoint_dict()
         if group_var == 'hero':
             group = hero.name.title()
@@ -293,8 +310,10 @@ def player_versus_winrate_json(
             'split_var': '',
             'label': hero.name,
             'tooltip': hero.name,
-            'classes': [hero.name, group],
+            'classes': [],
         })
+        if hero_classes[hero.steam_id] is not None:
+            datadict['classes'].extend(hero_classes[hero.steam_id])
         datadict['point_size'] = min(
             dataset[player_1]['total_games'],
             dataset[player_2]['total_games']
@@ -342,9 +361,8 @@ def player_versus_winrate_json(
         params['strokeDomainMax'] = 1
     if group_var == 'hero':
         params['draw_legend'] = False
-        group = []
+        groups = []
     elif group_var == 'alignment':
-        group = hero.herodossier.alignment
         params['draw_legend'] = True
     params = color_scale_params(params, groups)
 
@@ -489,6 +507,7 @@ def player_hero_side_json(
                 else gamedct['total_games']
             gamedct['winrate'] = gamedct['wins']/float(denominator)*100
 
+    hero_classes = hero_classes_dict()
     data_list, groups = [], []
     for name, dataset in outcome_dict.iteritems():
         hero = hero_names[name]
@@ -507,8 +526,11 @@ def player_hero_side_json(
             'split_var': '',
             'label': hero.name,
             'tooltip': hero.name,
-            'classes': [hero.name, group],
+            'classes': [],
         })
+        if hero_classes[hero.steam_id] is not None:
+            datadict['classes'].extend(hero_classes[hero.steam_id])
+
         if plot_var == 'winrate':
             datadict['point_size'] = dataset['same_side']['total_games']
             datadict['stroke_width'] = dataset['opposite_side']['total_games']
@@ -568,7 +590,6 @@ def player_role_json(
     player_2=None,
     plot_var='performance',
 ):
-    roles = Role.objects.all()
 
     player_id_list = [player_1]
     p1_obj = Player.objects.get(steam_id=player_1)
@@ -576,58 +597,50 @@ def player_role_json(
         player_id_list.append(player_2)
         p2_obj = Player.objects.get(steam_id=player_2)
 
-    dict_roles = {}
-    for role in roles:
-        heroes = role.hero_set.all()
-        if role not in dict_roles:
-            dict_roles[role] = {}
-        for player_id in player_id_list:
-            if player_id not in dict_roles[role]:
-                dict_roles[role][player_id] = {
-                    'wins': 0,
-                    'losses': 0,
-                    'games': 0,
-                    'winrate': 0,
-                }
-            dict_roles[role][player_id]['wins'] = \
-                PlayerMatchSummary.objects.filter(
-                    hero__in=heroes,
-                    match__validity=Match.LEGIT,
-                    player__steam_id=player_id,
-                    is_win=True,
-                ).count()
-            dict_roles[role][player_id]['losses'] = \
-                PlayerMatchSummary.objects.filter(
-                    hero__in=heroes,
-                    match__validity=Match.LEGIT,
-                    player__steam_id=player_id,
-                    is_win=False,
-                ).count()
-            dict_roles[role][player_id]['games'] = \
-                dict_roles[role][player_id]['losses'] \
-                + dict_roles[role][player_id]['wins']
-            denominator = float(dict_roles[role][player_id]['games']) \
-                if dict_roles[role][player_id]['games'] > 0 \
-                else 1.0
-            dict_roles[role][player_id]['winrate'] = \
-                dict_roles[role][player_id]['wins'] \
-                / denominator
+    role_annotations = PlayerMatchSummary.objects.filter(
+        match__validity=Match.LEGIT,
+        player__steam_id__in=player_id_list,
+    ).values(
+        'hero__assignment__role__name', 'is_win', 'player__steam_id'
+    ).annotate(Count('player_slot')).order_by()
+
+    role_dict = {}
+
+    for annotation in role_annotations:
+        role = annotation['hero__assignment__role__name']
+        if role is None:
+            continue
+
+        player = annotation['player__steam_id']
+        if role not in role_dict:
+            role_dict[role] = {}
+            role_dict[role][player_1] = {True: 0, False: 0}
+            role_dict[role][player_2] = {True: 0, False: 0}
+        is_win = annotation['is_win']
+        games = annotation['player_slot__count']
+        role_dict[role][player][is_win] = games
+    print role_dict
+    for role, minidict in role_dict.iteritems():
+        for player, subdict in minidict.iteritems():
+            subdict['games'] = subdict[True] + subdict[False]
+            denominator = subdict['games'] if subdict['games'] != 0 else 1
+            subdict['winrate'] = subdict[True] / float(denominator) * 100
 
     data_list = []
     params = params_dict()
+    for role, info in role_dict.iteritems():
 
-    for role, info in dict_roles.iteritems():
         if plot_var == 'performance':
             for player_id, data in info.iteritems():
                 datadict = datapoint_dict()
                 datadict.update({
                     'group_var': player_id,
                     'split_var': '',
-                    'label': role.name,
-                    'tooltip': role.name,
+                    'label': role,
+                    'tooltip': role,
                     'x_var': data['games'],
                     'y_var': data['winrate'],
-                    'classes': [],
+                    'classes': [slugify(role)],
                 })
                 x_label = "Games"
                 y_label = "Winrate"
@@ -635,13 +648,13 @@ def player_role_json(
         elif plot_var == 'games':
                 datadict = datapoint_dict()
                 datadict.update({
-                    'group_var': role.name,
+                    'group_var': role,
                     'split_var': '',
-                    'label': role.name,
-                    'tooltip': role.name,
+                    'label': role,
+                    'tooltip': role,
                     'x_var': info[player_1]['games'],
                     'y_var': info[player_2]['games'],
-                    'classes': [],
+                    'classes': [slugify(role)],
                 })
                 x_label = "{p} Games".format(p=p1_obj.display_name)
                 y_label = "{p} Games".format(p=p2_obj.display_name)
@@ -649,17 +662,17 @@ def player_role_json(
         elif plot_var == 'winrate':
                 datadict = datapoint_dict()
                 datadict.update({
-                    'group_var': role.name,
+                    'group_var': role,
                     'split_var': '',
-                    'label': role.name,
-                    'tooltip': role.name,
+                    'label': role,
+                    'tooltip': role,
                     'x_var': info[player_1]['winrate'],
                     'y_var': info[player_2]['winrate'],
-                    'classes': [],
+                    'classes': [slugify(role)],
                 })
+                datadict['classes'].append(slugify(role))
                 x_label = "{p} Winrate".format(p=p1_obj.display_name)
                 y_label = "{p} Winrate".format(p=p2_obj.display_name)
-        print datadict
         data_list.append(datadict)
 
     params['x_min'] = min([d['x_var'] for d in data_list])

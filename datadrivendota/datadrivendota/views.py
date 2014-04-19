@@ -1,14 +1,32 @@
 from json import dumps
 from os.path import basename
+from functools import wraps
 
+
+from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from django.views.generic import View
+from django.conf import settings
 
 from utils.file_management import outsourceJson
 from utils.exceptions import NoDataFound
 
 from datadrivendota.forms import KeyForm
 from players.models import PermissionCode
+
+try:
+    if 'devserver' not in settings.INSTALLED_APPS:
+        raise ImportError
+    from devserver.modules.profile import devserver_profile
+except ImportError:
+    class devserver_profile(object):
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def __call__(self, func):
+            def nothing(*args, **kwargs):
+                return func(*args, **kwargs)
+            return wraps(func)(nothing)
 
 
 def base(request):
@@ -88,6 +106,7 @@ class FormView(View):
                         attr: bound_form.cleaned_data[attr]
                         for attr in self.attrs
                     }
+
                     datalist, params = self.json_function(
                         **kwargs
                     )

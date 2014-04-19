@@ -50,7 +50,7 @@ CACHES = {
 #      #installation
 INSTALLED_APPS += (
     'debug_toolbar',
-#    'devserver',
+    'devserver',
 )
 
 # See: https://github.com/django-debug-toolbar/django-debug-toolbar/

@@ -16,7 +16,12 @@ from players.models import Player
 from django.db.models import Count
 
 from utils.exceptions import NoDataFound
-from utils.charts import datapoint_dict, params_dict, color_scale_params
+from utils.charts import (
+    datapoint_dict,
+    params_dict,
+    color_scale_params,
+    hero_classes_dict
+    )
 
 
 def hero_vitals_json(heroes, stats):
@@ -31,6 +36,8 @@ def hero_vitals_json(heroes, stats):
     if len(selected_hero_dossiers) == 0 or invalid_option(stats):
         raise NoDataFound
     datalist, xs, ys, groups = [], [], [], []
+
+    hero_classes = hero_classes_dict()
 
     for hero_dossier in selected_hero_dossiers:
         group = hero_dossier.hero.name
@@ -48,11 +55,16 @@ def hero_vitals_json(heroes, stats):
                         val=hero_dossier.level_stat(stat, level)
                     ),
                     'split_var': stat.title(),
+                    'classes': [],
                 })
+                if hero_classes[hero_dossier.hero.steam_id] is not None:
+                    datadict['classes'].extend(
+                        hero_classes[hero_dossier.hero.steam_id]
+                    )
+
                 datalist.append(datadict)
                 xs.append(level)
                 ys.append(hero_dossier.level_stat(stat, level))
-
     params = params_dict()
     params['x_min'] = min(xs)
     params['x_max'] = max(xs)
@@ -97,6 +109,7 @@ def hero_lineup_json(heroes, stat, level):
         key=operator.itemgetter(1),
         reverse=True
     )
+    hero_classes = hero_classes_dict()
 
     for key, val in hero_value:
         group = key.hero.safe_name() \
@@ -112,7 +125,14 @@ def hero_lineup_json(heroes, stat, level):
             val=val,
         )
         datadict['group_var'] = group
+        datadict['classes'] = []
         datadict['split_var'] = 'Hero {stat}'.format(stat=stat)
+
+        if hero_classes[key.hero.steam_id] is not None:
+            datadict['classes'].extend(
+                hero_classes[key.hero.steam_id]
+            )
+
         datalist.append(datadict)
         ys.append(val)
         xs.append(key.hero.safe_name())
@@ -234,11 +254,12 @@ def hero_performance_chart_json(
         raise NoDataFound
 
     try:
+        hero_classes = hero_classes_dict()
         x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
         y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
         match_list = fetch_match_attributes(match_pool, 'match_id')[0]
-        name_list, foo = fetch_match_attributes(
-            match_pool, 'hero_name')
+        hero_id_list, foo = fetch_match_attributes(
+            match_pool, 'hero_steam_id')
 
         if split_var is None:
             split_vector_list = ['No Split']
@@ -275,13 +296,18 @@ def hero_performance_chart_json(
                 'tooltip': match_list[key],
                 'split_var': split_vector_list[key],
                 'group_var': group_var_elt,
-                'classes': [name_list[key]],
+                'classes': [],
                 'url': reverse(
                     'matches:match_detail',
                     kwargs={'match_id': match_list[key]}
                 )
 
             })
+            if hero_classes[hero_id_list[key]] is not None:
+                datadict['classes'].extend(
+                    hero_classes[hero_id_list[key]]
+                )
+
             datalist.append(datadict)
     except AttributeError:
         raise NoDataFound
@@ -335,9 +361,10 @@ def hero_progression_json(hero, player, game_modes, division):
         'player_match_summary__match__skill',
         'player_match_summary__match__steam_id',
         'player_match_summary__player__persona_name',
+        'player_match_summary__hero__steam_id',
     )
     datalist, xs, ys, groups = [], [], [], []
-
+    hero_classes = hero_classes_dict()
     for build in sbs:
         if build['level'] == 1:
             subtractor = build['time']/60.0
@@ -377,6 +404,12 @@ def hero_progression_json(hero, player, game_modes, division):
             'player_match_summary__player__persona_name'
         ]
         datapoint['split_var'] = 'Skill Progression'
+        hero_id = build['player_match_summary__hero__steam_id']
+        if hero_classes[hero_id] is not None:
+            datapoint['classes'].extend(
+                hero_classes[hero_id]
+            )
+
         datalist.append(datapoint)
 
     params = params_dict()

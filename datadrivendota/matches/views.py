@@ -15,7 +15,7 @@ from .forms import (
     MatchAbilitySelect,
     MatchListSelect
 )
-from .models import Match, PlayerMatchSummary, PickBan
+from .models import Match, PlayerMatchSummary, PickBan, SkillBuild
 from .json_data import (
     player_endgame_json,
     team_endgame_json,
@@ -176,7 +176,6 @@ def match(request, match_id):
     except NoDataFound:
         kda_json_name = None
 
-
     try:
         abilities_name = basename(abilities.name)
     except AttributeError:
@@ -185,9 +184,42 @@ def match(request, match_id):
     radiant_summaries = [
         summary for summary in summaries if summary.which_side() == 'Radiant'
     ]
+    radiant_infodict = {}
+    for summary in radiant_summaries:
+        radiant_infodict[summary.player_slot] = {
+            'hero_thumbshot': summary.hero.thumbshot,
+            'hero_thumbshot_url': summary.hero.thumbshot.url,
+            'hero_name': summary.hero.name,
+            'hero_machine_name': summary.hero.machine_name,
+            'ability_dict': [
+                {
+                    'machine_name': sb.ability.machine_name,
+                    'picture_url': sb.ability.picture.url
+                } for sb in SkillBuild.objects.filter(
+                    player_match_summary=summary
+                ).select_related()
+            ]
+        }
+
     dire_summaries = [
         summary for summary in summaries if summary.which_side() == 'Dire'
     ]
+    dire_infodict = {}
+    for summary in dire_summaries:
+        dire_infodict[summary.player_slot] = {
+            'hero_thumbshot': summary.hero.thumbshot,
+            'hero_thumbshot_url': summary.hero.thumbshot.url,
+            'hero_name': summary.hero.name,
+            'hero_machine_name': summary.hero.machine_name,
+            'ability_dict': [
+                {
+                    'machine_name': sb.ability.machine_name,
+                    'picture_url': sb.ability.picture.url
+                } for sb in SkillBuild.objects.filter(
+                    player_match_summary=summary
+                ).select_related()
+            ]
+        }
 
     #Identify any pickbans for templating.
     dire_hero_ids = [
@@ -227,8 +259,8 @@ def match(request, match_id):
             {
                 'match': match,
                 'summaries': summaries,
-                'radiant_summaries': radiant_summaries,
-                'dire_summaries': dire_summaries,
+                'radiant_infodict': radiant_infodict,
+                'dire_infodict': dire_infodict,
                 'kill_dmg_json': kill_dmg_json_name,
                 'xp_gold_json': xp_gold_json_name,
                 'abilities_json': abilities_name,
@@ -249,8 +281,8 @@ def match(request, match_id):
             {
                 'match': match,
                 'summaries': summaries,
-                'radiant_summaries': radiant_summaries,
-                'dire_summaries': dire_summaries,
+                'radiant_infodict': radiant_infodict,
+                'dire_infodict': dire_infodict,
                 'kill_dmg_json': kill_dmg_json_name,
                 'xp_gold_json': xp_gold_json_name,
                 'abilities_json': abilities_name,

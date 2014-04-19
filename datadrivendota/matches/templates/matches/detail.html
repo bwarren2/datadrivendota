@@ -136,21 +136,20 @@
     <h4>Abilities</h4>
     <div class='radiant-abilities'>
     <h5>Radiant</h5>
-      {% for summary in radiant_summaries %}
+      {% for key, summary in radiant_infodict.items %}
         <div class='ability-row'>
-          {% if summary.hero.thumbshot %}
+          {% if summary.hero_thumbshot %}
             <span class='ability-row-hero'>
-
-              <img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" style='height:35px'>
+              <img src="{{ summary.hero_thumbshot_url }}" alt="{{ summary.hero_name }}" title="{{ summary.hero_name }}" style='height:35px'>
             </span>
               {% else %}
             <span class='ability-row-hero'>
             </span>
 
           {% endif %}
-          {% for sb in summary.skillbuild_set.all %}
-            <a href="{%url 'heroes:ability_detail' hero_name=summary.hero.machine_name ability_name=sb.ability.machine_name%}">
-              <img class='ability-thumbshot' src="{{sb.ability.picture.url}}">
+          {% for ability in summary.ability_dict %}
+          <a href="{%url 'heroes:ability_detail' hero_name=summary.hero_machine_name ability_name=ability.machine_name%}">
+              <img class='ability-thumbshot' src="{{ability.picture_url}}">
             </a>
           {% endfor %}
         </div>
@@ -158,20 +157,20 @@
     </div>
     <div class='dire-abilities'>
     <h5>Dire</h5>
-      {% for summary in dire_summaries %}
+      {% for key, summary in dire_infodict.items %}
         <div class='ability-row'>
-          {% if summary.hero.thumbshot %}
+          {% if summary.hero_thumbshot %}
             <span class='ability-row-hero'>
-              <img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" style='height:35px'>
+              <img src="{{ summary.hero_thumbshot_url }}" alt="{{ summary.hero_name }}" title="{{ summary.hero_name }}" style='height:35px'>
             </span>
               {% else %}
             <span class='ability-row-hero'>
             </span>
 
           {% endif %}
-          {% for sb in summary.skillbuild_set.all %}
-          <a href="{%url 'heroes:ability_detail' hero_name=summary.hero.machine_name ability_name=sb.ability.machine_name%}">
-              <img class='ability-thumbshot' src="{{sb.ability.picture.url}}">
+          {% for ability in summary.ability_dict %}
+          <a href="{%url 'heroes:ability_detail' hero_name=summary.hero_machine_name ability_name=ability.machine_name%}">
+              <img class='ability-thumbshot' src="{{ability.picture_url}}">
             </a>
           {% endfor %}
         </div>

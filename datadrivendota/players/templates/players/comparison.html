@@ -124,6 +124,7 @@
   function addenda(){
     function convertToSlug(Text)
     {
+        Text = String(Text)
         return Text
             .toLowerCase()
             .replace(/ /g,'-')
@@ -142,7 +143,7 @@
     var div = make_tooltip();
     d3.selectAll('.points')
       .on('mouseover.filter',function(d){
-          var str = 'circle:not(.'+convertToSlug(d.label)+')';
+          var str = '.dataset:not(.'+convertToSlug(d.label)+')';
 
           selection = d3.selectAll(str)
           .transition()
@@ -160,8 +161,7 @@
       })
       .on('mouseout.filter',function(d){
 
-          var str = 'circle:not(.'+convertToSlug(d.label)+')';
-
+          var str = '.dataset:not(.'+convertToSlug(d.label)+')';
           d3.selectAll(str)
           .transition()
           .duration(500)

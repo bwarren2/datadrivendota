@@ -1,4 +1,6 @@
 from django.conf import settings
+from heroes.models import Hero
+from django.utils.text import slugify
 
 
 def params_dict():
@@ -98,3 +100,26 @@ def standard_color_map(group):
             return settings.SKILLPLAYER_COLOR
     else:
         return None
+
+
+def hero_classes_dict():
+    hero_data = Hero.objects.all().values(
+        'steam_id',
+        'herodossier__alignment',
+        'assignment__role__name',
+        'name'
+    )
+
+    hero_classes = {}
+    for dct in hero_data:
+        idx = dct['steam_id']
+        if idx not in hero_classes:
+            hero_classes[idx] = set()
+        if dct['herodossier__alignment'] is not None:
+            hero_classes[idx].add(slugify(dct['herodossier__alignment']))
+        if dct['assignment__role__name'] is not None:
+            hero_classes[idx].add(slugify(dct['assignment__role__name']))
+        if dct['name'] is not None:
+            hero_classes[idx].add(slugify(dct['name']))
+
+    return hero_classes
