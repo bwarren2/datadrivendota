@@ -12,55 +12,58 @@
 
 {% block content %}
 
-  <div class="charts col-md-5">
-  <h4>Level Progression</h4>
-    <a href="{% url 'matches:ability_build' %}?split_var=side&match={{match.steam_id}}">
-      {% if abilities_json %}
-        <span id='abilities'></span>
+  <div class="row">
+    <div class="charts col-md-4">
+    <h4>Level Progression</h4>
+      <a href="{% url 'matches:ability_build' %}?split_var=side&match={{match.steam_id}}">
+        {% if abilities_json %}
+          <span id='abilities'></span>
+        {% endif %}
+      </a>
+    </div>
+
+    <div class="charts col-md-4">
+    <h4>Matchup Data</h4>
+      {% if kill_dmg_json %}
+        <span id='kill_dmg'></span>
       {% endif %}
-    </a>
+      {% if xp_gold_json %}
+        <span id='xp_gold'></span>
+      {% endif %}
+    </div>
+
+    <div class="charts col-md-4">
+    <h4>Roles</h4>
+      {% if roles_json %}
+        <span id='roles'></span>
+      {% endif %}
+    </div>
   </div>
 
-  <div class="charts col-md-5">
-  <h4>Matchup Data</h4>
-    {% if kill_dmg_json %}
-      <span id='kill_dmg'></span>
-    {% endif %}
-    {% if xp_gold_json %}
-      <span id='xp_gold'></span>
-    {% endif %}
+  <div class="row">
+    <div class="charts col-md-5 col-md-offset-1">
+    <h4>Pushing Damage</h4>
+      {% if tower_damage_json %}
+        <span id='tower_damage'></span>
+      {% endif %}
+    </div>
+    <div class="charts col-md-5">
+
+    <h4>Last Hits</h4>
+      {% if last_hits_json %}
+        <span id='last_hits'></span>
+      {% endif %}
+    </div>
   </div>
 
-  <div class="charts col-md-2">
-  <h4>Roles</h4>
-    {% if roles_json %}
-      <span id='roles'></span>
-    {% endif %}
+  <div class="row">
+    <div class="charts col-md-6 col-md-offset-3">
+    <h4>KDA2</h4>
+      {% if kda_json %}
+        <span id='kda'></span>
+      {% endif %}
+    </div>
   </div>
-
-  <div class="charts col-md-4">
-  <h4>Pushing Damage</h4>
-    {% if tower_damage_json %}
-      <span id='tower_damage'></span>
-    {% endif %}
-  </div>
-  <div class="charts col-md-4">
-
-  <h4>Last Hits</h4>
-    {% if last_hits_json %}
-      <span id='last_hits'></span>
-    {% endif %}
-  </div>
-
-  <div class="charts col-md-4">
-  <h4>KDA2</h4>
-    {% if kda_json %}
-      <span id='kda'></span>
-    {% endif %}
-  </div>
-
-
-
 
   {% if dire_bans %}
     <div class="row">
@@ -132,131 +135,135 @@
     </div>
   {% endif %}
 
-  <div class='col-md-11' style='margin-top:20px'>
-    <h4>Abilities</h4>
-    <div class='radiant-abilities'>
-    <h5>Radiant</h5>
-      {% for key, summary in radiant_infodict.items %}
-        <div class='ability-row'>
-          {% if summary.hero_thumbshot %}
-            <span class='ability-row-hero'>
-              <img src="{{ summary.hero_thumbshot_url }}" alt="{{ summary.hero_name }}" title="{{ summary.hero_name }}" style='height:35px'>
-            </span>
-              {% else %}
-            <span class='ability-row-hero'>
-            </span>
+  <div class="row">
+    <div class='col-md-12'>
+      <h4>Abilities</h4>
+      <div class='radiant-abilities'>
+      <h5>Radiant</h5>
+        {% for key, summary in radiant_infodict.items %}
+          <div class='ability-row'>
+            {% if summary.hero_thumbshot %}
+              <span class='ability-row-hero'>
+                <img src="{{ summary.hero_thumbshot_url }}" alt="{{ summary.hero_name }}" title="{{ summary.hero_name }}" style='height:35px'>
+              </span>
+                {% else %}
+              <span class='ability-row-hero'>
+              </span>
 
-          {% endif %}
-          {% for ability in summary.ability_dict %}
-          <a href="{%url 'heroes:ability_detail' hero_name=summary.hero_machine_name ability_name=ability.machine_name%}">
-              <img class='ability-thumbshot' src="{{ability.picture_url}}">
-            </a>
-          {% endfor %}
-        </div>
-      {% endfor %}
-    </div>
-    <div class='dire-abilities'>
-    <h5>Dire</h5>
-      {% for key, summary in dire_infodict.items %}
-        <div class='ability-row'>
-          {% if summary.hero_thumbshot %}
-            <span class='ability-row-hero'>
-              <img src="{{ summary.hero_thumbshot_url }}" alt="{{ summary.hero_name }}" title="{{ summary.hero_name }}" style='height:35px'>
-            </span>
-              {% else %}
-            <span class='ability-row-hero'>
-            </span>
+            {% endif %}
+            {% for ability in summary.ability_dict %}
+            <a href="{%url 'heroes:ability_detail' hero_name=summary.hero_machine_name ability_name=ability.machine_name%}">
+                <img class='ability-thumbshot' src="{{ability.picture_url}}">
+              </a>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class='dire-abilities'>
+      <h5>Dire</h5>
+        {% for key, summary in dire_infodict.items %}
+          <div class='ability-row'>
+            {% if summary.hero_thumbshot %}
+              <span class='ability-row-hero'>
+                <img src="{{ summary.hero_thumbshot_url }}" alt="{{ summary.hero_name }}" title="{{ summary.hero_name }}" style='height:35px'>
+              </span>
+                {% else %}
+              <span class='ability-row-hero'>
+              </span>
 
-          {% endif %}
-          {% for ability in summary.ability_dict %}
-          <a href="{%url 'heroes:ability_detail' hero_name=summary.hero_machine_name ability_name=ability.machine_name%}">
-              <img class='ability-thumbshot' src="{{ability.picture_url}}">
-            </a>
-          {% endfor %}
-        </div>
-      {% endfor %}
+            {% endif %}
+            {% for ability in summary.ability_dict %}
+            <a href="{%url 'heroes:ability_detail' hero_name=summary.hero_machine_name ability_name=ability.machine_name%}">
+                <img class='ability-thumbshot' src="{{ability.picture_url}}">
+              </a>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
 
-  <div class='col-md-11' style='margin-top:20px;'>
-    <h4>Endgame Table</h4>
-    <table class="table  table-condensed" id='myTable'>
-      <thead>
-        <tr>
-          <th>Hero</th>
-          <th colspan="2">Player</th>
-          <th title='Kills'>K</th>
-          <th title='Deaths'>D</th>
-          <th title='Assists'>A</th>
-          <th title='Kills - Deaths + Assists/2'>K-D+A/2</th>
-          <th title='Items'>Items</th>
-          <th title='Level'>Lvl</th>
-          <th title='Last Hits'>LH</th>
-          <th title='Denies'>DN</th>
-          <th title='Gold per minute'>GPM</th>
-          <th title='Experience per minute'>XPM</th>
-          <th title='Damage to heroes'>Hero Dmg</th>
-          <th title='Damage to Towers'>Tower Dmg</th>
-          <th title='Heal to heroes'>Hero Heal</th>
-          <th title='Which side did they play for?'>Side</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for summary in summaries %}
-          <tr{% if summary.is_win %} class="winner"{% endif %}>
-            {% if summary.hero.thumbshot %}
-
-            <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
-            {% else %}
-            <td></td>
-
-            {% endif %}
-
-            <td>{% player_link summary.player %}</td>
-            <td><img src="{{ summary.player.avatar }}" class="summary-hero-thumbshot"></td>
-            <td>{{ summary.kills }}</td>
-            <td>{{ summary.deaths }}</td>
-            <td>{{ summary.assists }}</td>
-            <td>{{ summary.kda }}</td>
-
-            <td class="match-summary-images">
-              {% if summary.item_0.mugshot %}
-                <img src="{{ summary.item_0.thumbshot.url }}">
-              {% endif %}
-              {% if summary.item_1.thumbshot %}
-                <img src="{{ summary.item_1.thumbshot.url }}">
-              {% endif %}
-              {% if summary.item_2.thumbshot %}
-                <img src="{{ summary.item_2.thumbshot.url }}">
-              {% endif %}
-              {% if summary.item_3.thumbshot %}
-                <img src="{{ summary.item_3.thumbshot.url }}">
-              {% endif %}
-              {% if summary.item_4.thumbshot %}
-                <img src="{{ summary.item_4.thumbshot.url }}">
-              {% endif %}
-              {% if summary.item_5.thumbshot %}
-                <img src="{{ summary.item_5.thumbshot.url }}">
-              {% endif %}
-
-            </td>
-
-            <td>{{ summary.level }}</td>
-            <td>{{ summary.last_hits }}</td>
-            <td>{{ summary.denies }}</td>
-            <td>{{ summary.gold_per_min }}</td>
-            <td>{{ summary.xp_per_min }}</td>
-            <td>{{ summary.hero_damage }}</td>
-            <td>{{ summary.tower_damage }}</td>
-            <td>{{ summary.hero_healing }}</td>
-            <td>
-              {{ summary.which_side }}
-              {% if summary.is_win %} (win){% endif %}
-            </td>
+  <div class="row">
+    <div class='col-md-12'>
+      <h4>Endgame Table</h4>
+      <table class="table  table-condensed" id='myTable'>
+        <thead>
+          <tr>
+            <th>Hero</th>
+            <th colspan="2">Player</th>
+            <th title='Kills'>K</th>
+            <th title='Deaths'>D</th>
+            <th title='Assists'>A</th>
+            <th title='Kills - Deaths + Assists/2'>K-D+A/2</th>
+            <th title='Items'>Items</th>
+            <th title='Level'>Lvl</th>
+            <th title='Last Hits'>LH</th>
+            <th title='Denies'>DN</th>
+            <th title='Gold per minute'>GPM</th>
+            <th title='Experience per minute'>XPM</th>
+            <th title='Damage to heroes'>Hero Dmg</th>
+            <th title='Damage to Towers'>Tower Dmg</th>
+            <th title='Heal to heroes'>Hero Heal</th>
+            <th title='Which side did they play for?'>Side</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for summary in summaries %}
+            <tr{% if summary.is_win %} class="winner"{% endif %}>
+              {% if summary.hero.thumbshot %}
+
+              <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
+              {% else %}
+              <td></td>
+
+              {% endif %}
+
+              <td>{% player_link summary.player %}</td>
+              <td><img src="{{ summary.player.avatar }}" class="summary-hero-thumbshot"></td>
+              <td>{{ summary.kills }}</td>
+              <td>{{ summary.deaths }}</td>
+              <td>{{ summary.assists }}</td>
+              <td>{{ summary.kda }}</td>
+
+              <td class="match-summary-images">
+                {% if summary.item_0.mugshot %}
+                  <img src="{{ summary.item_0.thumbshot.url }}">
+                {% endif %}
+                {% if summary.item_1.thumbshot %}
+                  <img src="{{ summary.item_1.thumbshot.url }}">
+                {% endif %}
+                {% if summary.item_2.thumbshot %}
+                  <img src="{{ summary.item_2.thumbshot.url }}">
+                {% endif %}
+                {% if summary.item_3.thumbshot %}
+                  <img src="{{ summary.item_3.thumbshot.url }}">
+                {% endif %}
+                {% if summary.item_4.thumbshot %}
+                  <img src="{{ summary.item_4.thumbshot.url }}">
+                {% endif %}
+                {% if summary.item_5.thumbshot %}
+                  <img src="{{ summary.item_5.thumbshot.url }}">
+                {% endif %}
+
+              </td>
+
+              <td>{{ summary.level }}</td>
+              <td>{{ summary.last_hits }}</td>
+              <td>{{ summary.denies }}</td>
+              <td>{{ summary.gold_per_min }}</td>
+              <td>{{ summary.xp_per_min }}</td>
+              <td>{{ summary.hero_damage }}</td>
+              <td>{{ summary.tower_damage }}</td>
+              <td>{{ summary.hero_healing }}</td>
+              <td>
+                {{ summary.which_side }}
+                {% if summary.is_win %} (win){% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 {% endblock content %}
 

@@ -373,7 +373,7 @@ def hero_performance_api(request):
         json_data = outsourceJson(datalist, params)
         response_data = {}
         response_data['result'] = 'success'
-        response_data['url'] = settings.MEDIA_URL+basename(json_data).name
+        response_data['url'] = settings.MEDIA_URL + basename(json_data).name
         return HttpResponse(
             json.dumps(response_data),
             content_type="application/json"
