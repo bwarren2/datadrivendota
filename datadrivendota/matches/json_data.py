@@ -596,17 +596,18 @@ def match_role_json(match):
     role_set = set(chain(radiant_roles.iterkeys(), dire_roles.iterkeys()))
     data_list = []
     for role in role_set:
-        datadict = datapoint_dict()
-        datadict.update({
-            'x_var': radiant_roles.get(role, 0),
-            'y_var': dire_roles.get(role, 0),
-            'group_var': role,
-            'split_var': 'Role Breakdown',
-            'label': role,
-            'tooltip': role,
-            'classes': [slugify(role)],
-        })
-        data_list.append(datadict)
+        if role is not None:
+            datadict = datapoint_dict()
+            datadict.update({
+                'x_var': radiant_roles.get(role, 0),
+                'y_var': dire_roles.get(role, 0),
+                'group_var': role,
+                'split_var': 'Role Breakdown',
+                'label': role,
+                'tooltip': role,
+                'classes': [slugify(role)],
+            })
+            data_list.append(datadict)
 
     params = params_dict()
     xmax = max([d['x_var'] for d in data_list])
