@@ -6,7 +6,6 @@
   <ul class='nav nav-tabs'>
     <li class="{% active 'players:index' %}"><a href="{% url 'players:index' %}">Index</a></li>
     <li class="{% active 'players:player_winrate' %}"><a href="{% url 'players:player_winrate' %}">Winrate</a></li>
-    <li class="{% active 'players:timeline' %}"><a href="{% url 'players:timeline' %}">Timeline</a></li>
     <li class="{% active 'players:hero_abilities' %}"><a href="{% url 'players:hero_abilities' %}">Hero Skilling Comparison</a></li>
     {% if player %}
       <li class="{% active 'players:id_detail' %}"><a href="{% url 'players:id_detail' player_id=player.steam_id %}">{{ player.display_name }}</a></li>
