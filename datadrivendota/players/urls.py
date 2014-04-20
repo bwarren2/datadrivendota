@@ -11,7 +11,6 @@ urlpatterns = patterns(
         views.Winrate.as_view(),
         name='player_winrate'
     ),
-    url(r'^timeline/$', views.timeline, name='timeline'),
     url(
         r'^hero-adversary/$',
         views.HeroAdversary.as_view(),

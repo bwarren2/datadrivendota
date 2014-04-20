@@ -11,10 +11,8 @@ from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import permission_required
 from os.path import basename
 from .models import Player, UserProfile
-from .r import CountWinrate, PlayerTimeline
 from .forms import (
     PlayerWinrateLevers,
-    PlayerTimelineForm,
     PlayerAddFollowForm,
     HeroAbilitiesForm,
     PlayerAdversarialForm,
@@ -27,7 +25,9 @@ from matches.management.tasks.valve_api_calls import (
     AcquirePlayerData
 )
 from .models import request_to_player
+
 from utils.exceptions import NoDataFound
+
 from .json_data import (
     player_hero_side_json,
     player_winrate_json,
@@ -267,67 +267,6 @@ class HeroAdversary(FormView):
     def amend_params(self, params):
         return params
 
-
-@devserver_profile(follow=[PlayerTimeline])
-def timeline(request):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts player activity over time."
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Pick a player and time bracketing to see trends in play."
-        },
-        {
-            'element': "#main-nav",
-            'title': "Other questions",
-            'content': "For other charts, like data about heroes stats, try other tabs.",
-            'placement': "bottom"
-        },
-        {
-            'orphan': True,
-            'title': "Ready to go!",
-            'content': "Challenge: About how many games has Funn1k played per week in the last month?"
-        }
-    ]
-    tour = json.dumps(tour)
-
-    if request.GET:
-        timeline_form = PlayerTimelineForm(request.GET)
-        if timeline_form.is_valid():
-            image = PlayerTimeline(
-                player_id=timeline_form.cleaned_data['player'],
-                min_date=timeline_form.cleaned_data['min_date'],
-                max_date=timeline_form.cleaned_data['max_date'],
-                bucket_var=timeline_form.cleaned_data['bucket_var'],
-                plot_var=timeline_form.cleaned_data['plot_var']
-            )
-            imagebase = basename(image.name)
-            return render(
-                request,
-                'players/form.html',
-                {
-                    'form': timeline_form,
-                    'image_name': imagebase,
-                    'title': 'Player Timeline',
-                    'tour': tour,
-                }
-            )
-    else:
-        timeline_form = PlayerTimelineForm()
-
-    return render(
-        request,
-        'players/form.html',
-        {
-            'form': timeline_form,
-            'title': 'Player Timeline',
-            'tour': tour,
-        }
-    )
 
 class HeroAbilities(FormView):
     tour = [

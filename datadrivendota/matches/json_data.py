@@ -141,8 +141,8 @@ def player_team_endgame_json(
             dire_annotations.annotate(Sum(dictAttributes[x_var]))
             radiant_annotations.annotate(Sum(dictAttributes[x_var]))
         if y_var in dictAttributes:
-            dire_annotations.annotate(Sum(y_var))
-            radiant_annotations.annotate(Sum(y_var))
+            dire_annotations.annotate(Sum(dictAttributes[y_var]))
+            radiant_annotations.annotate(Sum(dictAttributes[y_var]))
 
         hero_classes = hero_classes_dict()
 

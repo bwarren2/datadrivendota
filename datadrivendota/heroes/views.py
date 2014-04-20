@@ -16,6 +16,7 @@ from .json_data import (
     hero_lineup_json,
     hero_performance_json,
     hero_progression_json,
+    hero_performance_chart_json,
     hero_skillbuild_winrate_json,
     update_player_winrate,
 )
@@ -28,10 +29,6 @@ from .forms import (
     HeroPlayerSkillBarsForm,
     HeroProgressionForm,
     HeroBuildForm,
-)
-from .r import (
-    HeroPerformanceChart,
-    HeroSkillLevelBwChart
 )
 
 from utils.file_management import outsourceJson
@@ -61,7 +58,6 @@ def index(request):
         })
 
 
-# @devserver_profile(follow=[HeroPerformanceChart])
 def detail(request, hero_name):
     hero_slug = slugify(hero_name)
     current_hero = get_object_or_404(Hero, machine_name=hero_slug)
@@ -177,7 +173,7 @@ class Lineup(FormView):
         return params
 
 
-@devserver_profile(follow=[hero_performance_json])
+#@devserver_profile(follow=[hero_performance_json])
 def hero_performance(request):
 
     tour = [
@@ -217,7 +213,7 @@ def hero_performance(request):
     if request.GET:
         hero_form = HeroPlayerPerformance(request.GET)
         if hero_form.is_valid():
-            image = HeroPerformanceChart(
+            datalist, params = hero_performance_chart_json(
                 hero=hero_form.cleaned_data['hero'],
                 player=hero_form.cleaned_data['player'],
                 game_mode_list=hero_form.cleaned_data['game_modes'],
@@ -226,13 +222,13 @@ def hero_performance(request):
                 group_var=hero_form.cleaned_data['group_var'],
                 split_var=hero_form.cleaned_data['split_var'],
             )
-            imagebase = basename(image.name)
+            json_data = outsourceJson(datalist, params)
             return render(
                 request,
                 'heroes/form.html',
                 {
                     'form': hero_form,
-                    'image_name': imagebase,
+                    'json_data': basename(json_data.name),
                     'title': 'Hero Performance',
                     'tour': tour,
                 }
@@ -248,6 +244,7 @@ def hero_performance(request):
             'title': 'Hero Performance',
         }
     )
+
 
 class HeroSkillProgression(FormView):
     tour = [
@@ -333,38 +330,6 @@ class HeroBuildLevel(FormView):
 
 
 
-@devserver_profile(follow=[HeroSkillLevelBwChart])
-def hero_skill_bars(request):
-    if request.GET:
-        hero_form = HeroPlayerSkillBarsForm(request.GET)
-        if hero_form.is_valid():
-            image = HeroSkillLevelBwChart(
-                hero=hero_form.cleaned_data['hero'],
-                player=hero_form.cleaned_data['player'],
-                game_mode_list=hero_form.cleaned_data['game_modes'],
-                levels=hero_form.cleaned_data['levels'],
-            )
-            imagebase = basename(image.name)
-            return render(
-                request,
-                'heroes/form.html',
-                {
-                    'form': hero_form,
-                    'imagebase': imagebase,
-                    'title': 'Hero Skill Times',
-                }
-            )
-    else:
-        hero_form = HeroPlayerSkillBarsForm
-    return render(
-        request,
-        'heroes/form.html',
-        {
-            'form': hero_form,
-            'title': 'Hero Skill Times',
-        }
-    )
-
 
 def hero_list(request):
     if request.is_ajax():
@@ -394,7 +359,7 @@ def hero_performance_api(request):
         hero = Hero.objects.get(name=hero_name)
         game_modes = GameMode.objects.filter(is_competitive=True)
         game_mode_list = [gm.steam_id for gm in game_modes]
-        image = HeroPerformanceChart(
+        datalist, params = hero_performance_chart_json(
             hero=hero.steam_id,
             player=None,
             game_mode_list=game_mode_list,
@@ -405,10 +370,10 @@ def hero_performance_api(request):
             width=350,
             height=350
         )
-        imagebase = basename(image.name)
+        json_data = outsourceJson(datalist, params)
         response_data = {}
         response_data['result'] = 'success'
-        response_data['url'] = settings.MEDIA_URL+imagebase
+        response_data['url'] = settings.MEDIA_URL+basename(json_data).name
         return HttpResponse(
             json.dumps(response_data),
             content_type="application/json"

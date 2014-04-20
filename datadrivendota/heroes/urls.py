@@ -7,7 +7,6 @@ urlpatterns = patterns(
     url(r'^vitals/$', views.Vitals.as_view(), name='vitals'),
     url(r'^lineups/$', views.Lineup.as_view(), name='lineup'),
     url(r'^performance/$', views.hero_performance, name='hero_performance'),
-    url(r'^skill_bars/$', views.hero_skill_bars, name='hero_skill_bars'),
     url(r'^skillbuild_winrate/$',
         views.HeroBuildLevel.as_view(),
         name='hero_skill_bars',
