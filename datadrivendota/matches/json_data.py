@@ -255,7 +255,6 @@ def player_endgame_json(
             'y_var': fetch_pms_attribute(pms, y_var),
             'label': fetch_pms_attribute(pms, group_var),
             'tooltip': fetch_pms_attribute(pms, 'match_id'),
-            'split_var': fetch_pms_attribute(pms, split_var),
             'group_var': fetch_pms_attribute(pms, group_var),
             'classes': [],
             'url': reverse(
@@ -264,6 +263,10 @@ def player_endgame_json(
             )
 
         })
+        if split_var is None or split_var == 'No Split':
+            datadict['split_var'] = '',
+        else:
+            datadict['split_var'] = fetch_pms_attribute(pms, split_var),
         if hero_classes[pms.hero.steam_id] is not None:
             datadict['classes'].extend(
                 hero_classes[pms.hero.steam_id]

@@ -109,8 +109,8 @@ def player_winrate_json(
             'tooltip': hero,
             'classes': [],
         })
-        if hero_classes[hero.steam_id] is not None:
-            datadict['classes'].extend(hero_classes[hero.steam_id])
+        if hero_classes[hero_obj.steam_id] is not None:
+            datadict['classes'].extend(hero_classes[hero_obj.steam_id])
 
         data_list.append(datadict)
 

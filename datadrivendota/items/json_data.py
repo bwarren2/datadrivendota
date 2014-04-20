@@ -22,7 +22,7 @@ def item_endgame(
         pmses = pmses.filter(player__steam_id=player)
 
     itemDict = {}
-    print len(pmses)
+    pmses = pmses.select_related()
     for p in pmses:
         for attr in [
             'item_0',

@@ -28,7 +28,6 @@ def hero_vitals_json(heroes, stats):
     # Currently, we are violating DRY with the available field listing from
     # the form and the R space being in different places and requiring that
     # they are the same.
-
     selected_hero_dossiers = HeroDossier.objects.filter(
         hero__steam_id__in=heroes
     )
@@ -228,7 +227,6 @@ def hero_performance_chart_json(
     group_var,
     split_var
 ):
-
     # Database pulls and format python objects to go to R
     matches = PlayerMatchSummary.objects.filter(
         match__game_mode__in=game_mode_list
@@ -258,8 +256,7 @@ def hero_performance_chart_json(
         x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
         y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
         match_list = fetch_match_attributes(match_pool, 'match_id')[0]
-        hero_id_list, foo = fetch_match_attributes(
-            match_pool, 'hero_steam_id')
+        hero_id_list, foo = fetch_match_attributes(match_pool, 'hero_steam_id')
 
         if split_var is None:
             split_vector_list = ['No Split']

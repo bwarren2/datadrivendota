@@ -293,7 +293,7 @@ def fetch_pms_attribute(summary, attribute):
     elif attribute == 'hero_name':
         return safen(summary.hero.name)
     elif attribute == 'hero_steam_id':
-        return safen(summary.hero.steam_id)
+        return summary.hero.steam_id
     elif attribute == 'first_blood_time':
         return summary.match.first_blood_time/60.0
     elif attribute == 'match_id':
