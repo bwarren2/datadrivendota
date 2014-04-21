@@ -4,14 +4,20 @@ from matches.models import (
 )
 from utils.exceptions import NoDataFound
 from utils.charts import params_dict, datapoint_dict, color_scale_params
+from matches.models import GameMode
 
 
 def item_endgame(
     hero=None,
     player=None,
-    game_modes=[1, 2, 3, 4, 5],
+    game_modes=[],
     *args, **kwargs
 ):
+    if game_modes == []:
+        game_modes = [
+            mode.steam_id
+            for mode in GameMode.objects.filter(is_competitive=True)
+        ]
 
     if hero is None and player is None:
         raise NoDataFound

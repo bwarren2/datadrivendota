@@ -327,6 +327,12 @@ def hero_performance_chart_json(
 
 
 def hero_progression_json(hero, player, game_modes, division):
+    if game_modes == []:
+        game_modes = [
+            mode.steam_id
+            for mode in GameMode.objects.filter(is_competitive=True)
+        ]
+
     pmses = PlayerMatchSummary.objects.filter(
         match__game_mode__in=game_modes
     )

@@ -65,10 +65,12 @@ def detail(request, hero_name):
         is_core=True,
         hero=current_hero).order_by('steam_id')
     dossier = HeroDossier.objects.get(hero=current_hero)
-
+    competitive_modes = [
+        mode.steam_id for mode in GameMode.objects.filter(is_competitive=True)
+    ]
     datalist, params = update_player_winrate(
         current_hero.steam_id,
-        game_modes=[1, 2, 3, 4, 5],
+        game_modes=competitive_modes,
     )
     params['outerWidth'] = 300
     params['outerHeight'] = 300
@@ -84,6 +86,7 @@ def detail(request, hero_name):
             'player_json': basename(json_data.name),
         }
     )
+
 
 class Vitals(FormView):
     tour = [

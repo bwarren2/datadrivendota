@@ -17,7 +17,7 @@ from .forms import (
     HeroAbilitiesForm,
     PlayerAdversarialForm,
 )
-from matches.models import PlayerMatchSummary, Match
+from matches.models import PlayerMatchSummary, Match, GameMode
 from matches.management.tasks.valve_api_calls import (
     ApiContext,
     ValveApiCall,
@@ -25,8 +25,6 @@ from matches.management.tasks.valve_api_calls import (
     AcquirePlayerData
 )
 from .models import request_to_player
-
-from utils.exceptions import NoDataFound
 
 from .json_data import (
     player_hero_side_json,
@@ -176,9 +174,13 @@ def detail(request, player_id=None):
     #Compare to dendi and s4 by default
     player_list = [70388657, 41231571, player.steam_id]
 
+    game_modes = [
+        mode.steam_id for mode in GameMode.objects.filter(is_competitive=True)
+    ]
+
     datalist, params = player_endgame_json(
         players=player_list,
-        game_modes=[1, 2, 3, 4, 5],
+        game_modes=game_modes,
         x_var='duration',
         y_var='K-D+.5*A',
         split_var='No Split',
@@ -373,9 +375,13 @@ def comparison(request, player_id_1, player_id_2):
     params['outerWidth'] = 300
     role_json = outsourceJson(datalist, params)
 
+    game_modes = [
+        mode.steam_id for mode in GameMode.objects.filter(is_competitive=True)
+    ]
+
     datalist, params = player_endgame_json(
         players=[player_1.steam_id, player_2.steam_id],
-        game_modes=[1, 2, 3, 4, 5],
+        game_modes=game_modes,
         x_var='duration',
         y_var='K-D+.5*A',
         split_var='is_win',
@@ -387,7 +393,7 @@ def comparison(request, player_id_1, player_id_2):
 
     datalist, params = player_team_endgame_json(
         players=[player_1.steam_id, player_2.steam_id],
-        game_modes=[1, 2, 3, 4, 5],
+        game_modes=game_modes,
         x_var='duration',
         y_var='K-D+.5*A',
         split_var='is_win',
@@ -415,7 +421,9 @@ def comparison(request, player_id_1, player_id_2):
 def hero_style(request, player_id, hero_name):
     player = get_object_or_404(Player, steam_id=player_id)
     hero = get_object_or_404(Hero, machine_name=hero_name)
-    game_modes = [1, 2, 3, 4, 5]
+    game_modes = [
+        mode.steam_id for mode in GameMode.objects.filter(is_competitive=True)
+    ]
     datalist, params = hero_progression_json(
         hero=hero.steam_id,
         player=player.steam_id,
