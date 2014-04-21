@@ -619,7 +619,6 @@ def player_role_json(
         is_win = annotation['is_win']
         games = annotation['player_slot__count']
         role_dict[role][player][is_win] = games
-    print role_dict
     for role, minidict in role_dict.iteritems():
         for player, subdict in minidict.iteritems():
             subdict['games'] = subdict[True] + subdict[False]
