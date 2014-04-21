@@ -24,7 +24,6 @@ from utils.charts import (
 from players.models import Player
 
 
-#This takes a player's games and gives the team's results.
 def player_team_endgame_json(
         players,
         game_modes,
@@ -33,10 +32,8 @@ def player_team_endgame_json(
         split_var,
         group_var,
         ):
+    #Takes a player's games and gives the team's results.
 
-    assignment_dict = defaultdict(list)
-    for assignment in Assignment.objects.all().select_related():
-        assignment_dict[assignment.hero.name].append(assignment.role.name)
     dictAttributes = {
         'kills': 'playermatchsummary__kills',
         'deaths': 'playermatchsummary__deaths',
@@ -59,22 +56,22 @@ def player_team_endgame_json(
         'duration': 'duration',
     }
 
-    def get_var(var, dictAttributes, dictDerivedAttributes):
+    def get_var(annotation, var, dictAttributes, dictDerivedAttributes):
         if var in dictDerivedAttributes:
             if var == 'K-D+.5*A':
                 return annotation.playermatchsummary__kills__sum\
                     - annotation.playermatchsummary__deaths__sum\
-                    + annotation.playermatchsummary__assists__sum/2
+                    + annotation.playermatchsummary__assists__sum/2.0
             if var == 'first_blood_time':
                 return annotation.first_blood_time
             if var == 'gold_total':
-                return annotation.duration/60\
+                return annotation.duration/60.0\
                     * annotation.playermatchsummary__gold_per_min__sum
             if var == 'xp_total':
-                return annotation.duration/60\
+                return annotation.duration/60.0\
                     * annotation.playermatchsummary__xp_per_min__sum
             if var == 'duration':
-                return annotation.duration/60
+                return annotation.duration/60.0
         if var in dictAttributes:
             return getattr(annotation, (dictAttributes[var])+'__sum')
 
@@ -136,23 +133,23 @@ def player_team_endgame_json(
             }
             for d in pmses
         }
-
-        if x_var in dictAttributes:
-            dire_annotations.annotate(Sum(dictAttributes[x_var]))
-            radiant_annotations.annotate(Sum(dictAttributes[x_var]))
-        if y_var in dictAttributes:
-            dire_annotations.annotate(Sum(dictAttributes[y_var]))
-            radiant_annotations.annotate(Sum(dictAttributes[y_var]))
-
         hero_classes = hero_classes_dict()
-
         for annotation in chain(
-            radiant_annotations.select_related(),
-            dire_annotations.select_related()
+            radiant_annotations,
+            dire_annotations
         ):
-
-            plot_x_var = get_var(x_var, dictAttributes, dictDerivedAttributes)
-            plot_y_var = get_var(y_var, dictAttributes, dictDerivedAttributes)
+            plot_x_var = get_var(
+                annotation,
+                x_var,
+                dictAttributes,
+                dictDerivedAttributes
+                )
+            plot_y_var = get_var(
+                annotation,
+                y_var,
+                dictAttributes,
+                dictDerivedAttributes
+                )
 
             if split_var == 'No Split':
                 split_param = 'No Split'
@@ -315,59 +312,99 @@ def team_endgame_json(
     if len(radiant_matches) + len(dire_matches) == 0:
         raise NoDataFound
 
-    radiant = PlayerMatchSummary.objects.filter(
-        match__in=radiant_matches,
-        player_slot__lte=5
-    ).select_related()
-    dire = PlayerMatchSummary.objects.filter(
-        match__in=dire_matches,
-        player_slot__gte=5
-    ).select_related()
+    dictAttributes = {
+        'kills': 'playermatchsummary__kills',
+        'deaths': 'playermatchsummary__deaths',
+        'assists': 'playermatchsummary__assists',
+        'last_hits': 'playermatchsummary__last_hits',
+        'denies': 'playermatchsummary__denies',
+        'hero_damage': 'playermatchsummary__hero_damage',
+        'tower_damage': 'playermatchsummary__tower_damage',
+        'hero_healing': 'playermatchsummary__hero_healing',
+        'level': 'playermatchsummary__level',
+        'gold_total': 'playermatchsummary__gold_per_min',
+        'xp_total': 'playermatchsummary__xp_per_min',
+    }
 
-    pmses = list(chain(radiant, dire))
-    if len(pmses) == 0:
-        raise NoDataFound
-    x_data = dict([(p.match.steam_id, 0) for p in pmses])
-    y_data = dict([(p.match.steam_id, 0) for p in pmses])
-    group_data = dict([(p.match.steam_id, False) for p in pmses])
-    split_data = dict([(p.match.steam_id, False) for p in pmses])
+    dictDerivedAttributes = {
+        'K-D+.5*A': '',
+        'first_blood_time': 'first_blood_time',
+        'gold_total': 'playermatchsummary__gold_per_min',
+        'xp_total': 'playermatchsummary__xp_per_min',
+        'duration': 'duration',
+    }
 
-    for p in pmses:
-        x_data[p.match.steam_id] += fetch_single_attribute(
-            summary=p,
-            attribute=x_var,
-            compressor=compressor
-        )
-        y_data[p.match.steam_id] += fetch_single_attribute(
-            summary=p,
-            attribute=y_var,
-            compressor=compressor
-        )
-        group_data[p.match.steam_id] = fetch_single_attribute(
-            summary=p,
-            attribute=group_var,
-            compressor=compressor
-        )
-        split_data[p.match.steam_id] = fetch_single_attribute(
-            summary=p,
-            attribute=split_var,
-            compressor=compressor
-        )
+    def get_var(annotation, var, dictAttributes, dictDerivedAttributes):
+        if var in dictDerivedAttributes:
+            if var == 'K-D+.5*A':
+                return annotation.playermatchsummary__kills__sum\
+                    - annotation.playermatchsummary__deaths__sum\
+                    + annotation.playermatchsummary__assists__sum/2.0
+            if var == 'first_blood_time':
+                return annotation.first_blood_time
+            if var == 'gold_total':
+                return annotation.duration/60.0\
+                    * annotation.playermatchsummary__gold_per_min__sum
+            if var == 'xp_total':
+                return annotation.duration/60.0\
+                    * annotation.playermatchsummary__xp_per_min__sum
+            if var == 'duration':
+                return annotation.duration/60.0
+        if var in dictAttributes:
+            return getattr(annotation, (dictAttributes[var])+'__sum')
 
-    hero_classes = hero_classes_dict()
+    radiant_annotations = Match.objects.filter(
+        id__in=[m.id for m in radiant_matches],
+        playermatchsummary__player_slot__lte=6)\
+        .annotate(Sum('playermatchsummary__kills'))\
+        .annotate(Sum('playermatchsummary__deaths'))\
+        .annotate(Sum('playermatchsummary__assists'))\
+
+    dire_annotations = Match.objects.filter(
+        id__in=[m.id for m in dire_matches],
+        playermatchsummary__player_slot__gte=6)\
+        .annotate(Sum('playermatchsummary__kills'))\
+        .annotate(Sum('playermatchsummary__deaths'))\
+        .annotate(Sum('playermatchsummary__assists'))\
+
+
+    if x_var in dictAttributes:
+        dire_annotations = \
+            dire_annotations.annotate(Sum(dictAttributes[x_var]))
+        radiant_annotations = \
+            radiant_annotations.annotate(Sum(dictAttributes[x_var]))
+    if y_var in dictAttributes:
+        dire_annotations = \
+            dire_annotations.annotate(Sum(dictAttributes[y_var]))
+        radiant_annotations = \
+            radiant_annotations.annotate(Sum(dictAttributes[y_var]))
 
     try:
         datalist = []
-        for p in pmses:
-            match_id = p.match.steam_id
+        for annotation in chain(radiant_annotations, dire_annotations):
+            match_id = annotation.steam_id
+
             datadict = datapoint_dict()
 
+            plot_x_var = get_var(
+                annotation,
+                x_var,
+                dictAttributes,
+                dictDerivedAttributes
+                )
+            plot_y_var = get_var(
+                annotation,
+                y_var,
+                dictAttributes,
+                dictDerivedAttributes
+                )
+
             datadict.update({
-                'x_var': x_data[match_id],
-                'y_var': y_data[match_id],
-                'group_var': group_data[match_id],
-                'split_var': split_data[match_id],
-                'label': group_data[match_id],
+                'x_var': plot_x_var,
+                'y_var': plot_y_var,
+                'group_var': False,
+                'split_var': False,
+                'label': match_id,
                 'tooltip': match_id,
                 'url': reverse(
                     'matches:match_detail',
@@ -376,26 +413,22 @@ def team_endgame_json(
                 'classes': [],
 
             })
-            if hero_classes[p.hero.steam_id] is not None:
-                datadict['classes'].extend(hero_classes[p.hero.steam_id])
 
             datalist.append(datadict)
             xlab = fetch_attribute_label(attribute=x_var)
-            ylab = fetch_attribute_label(attribute=y_var) + " ({})".format(
-                compressor
-            )
+            ylab = fetch_attribute_label(attribute=y_var)
     except AttributeError:
         raise NoDataFound
     params = params_dict()
-    params['x_min'] = min(x_data.itervalues())
-    params['x_max'] = max(x_data.itervalues())
-    params['y_min'] = min(y_data.itervalues())
-    params['y_max'] = max(y_data.itervalues())
+    params['x_min'] = min([d['x_var'] for d in datalist])
+    params['x_max'] = max([d['x_var'] for d in datalist])
+    params['y_min'] = min([d['y_var'] for d in datalist])
+    params['y_max'] = max([d['y_var'] for d in datalist])
     params['x_label'] = xlab
     params['y_label'] = ylab
     params['chart'] = 'xyplot'
     params['margin']['left'] = 12*len(str(params['y_max']))
-    groups = [elt for elt in group_data.itervalues()]
+    groups = [False]
     params = color_scale_params(params, groups)
 
     return (datalist, params)
