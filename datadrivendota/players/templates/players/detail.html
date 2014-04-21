@@ -8,21 +8,13 @@
 {% block content %}
 
   <div class="row">
-    <div class="player-charts col-md-4">
-    <h4>Hero Winrate</h4>
+    <div class="player-charts col-md-4 col-md-offset-2">
+      <h4>Hero Winrate</h4>
       {% if winrate_json %}
         <span id='winrate_chart'></span>
       {% endif %}
     </div>
-
-    <div class="player-charts col-md-4">
-      <h4>Endgame Comparison</h4>
-      {% if endgame_json %}
-        <span id='endgame_chart'></span>
-      {% endif %}
-    </div>
-
-    <div class="player-infobox col-md-3">
+    <div class="player-infobox col-md-4 col-md-offset-1">
       <img style='margin-top:10px' src="{{ player.avatar_full }}">
       <h2>{{ player.display_name }}
       {% if player.pro_name %}
@@ -37,6 +29,16 @@
       <h6>Steam ID: {{ player.steam_id }}</h6>
     </div>
   </div>
+
+  <div class="row">
+    <div class="player-charts col-md-4 col-md-offset-2">
+      <h4>Endgame Comparison</h4>
+      {% if endgame_json %}
+        <span id='endgame_chart'></span>
+      {% endif %}
+    </div>
+  </div>
+
   <div id='chart'></div>
 
   <div>

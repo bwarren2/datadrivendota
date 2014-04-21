@@ -1,12 +1,1 @@
 {% extends "base.html" %}
-
-{% load navigation_extras %}
-
-{% block extra_nav %}
-{% endblock extra_nav %}
-<ul class="nav nav-tabs">
- {#  {% if match %}
-    <li class="{% active 'matches:match_detail' %}"><a href="{% url 'matches:match_detail' match_id=match.steam_id %}">Match #{{ match.steam_id }}</a></li>
-  {% endif %}
- #}
- </ul>

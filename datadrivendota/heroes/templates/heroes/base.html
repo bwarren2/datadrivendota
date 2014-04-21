@@ -1,19 +1,1 @@
 {% extends "base.html" %}
-
-{% load navigation_extras %}
-
-{% block extra_nav %}
-  <ul class="nav nav-tabs">
-    <li class="{% active 'heroes:index' %}"><a href="{% url 'heroes:index' %}">Index</a></li>
-    <li class="{% active 'heroes:vitals' %}"><a href="{% url 'heroes:vitals' %}">Vitals</a></li>
-    <li class="{% active 'heroes:lineup' %}"><a href="{% url 'heroes:lineup' %}">Lineups</a></li>
-    <li class="{% active 'heroes:hero_performance' %}"><a href="{% url 'heroes:hero_performance' %}">Performance</a></li>
-    <li class="{% active 'heroes:hero_skill_progression' %}"><a href="{% url 'heroes:hero_skill_progression' %}">Skill Progression</a></li>
-    {% if hero %}
-      <li class="{% active 'heroes:detail' %}"><a href="{% url 'heroes:detail' hero_name=hero.machine_name %}">{{ hero.name }}</a></li>
-    {% endif %}
-    {% if ability %}
-      <li class="{% active 'heroes:ability_detail' %}"><a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name hero_name=ability.hero.machine_name %}">{{ ability.name }}</a></li>
-    {% endif %}
-  </ul>
-{% endblock extra_nav %}

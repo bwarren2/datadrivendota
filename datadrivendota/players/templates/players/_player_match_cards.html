@@ -4,9 +4,8 @@
       {% if pms.hero.mugshot %}
       <img src="{{ pms.hero.mugshot.url }}" alt="{{ hero.name }}" class="player-match-portrait">
       {% endif %}
-      <p class='overlayer'>{{ pms.hero.name }} <span class='scorebar'>{{ pms.kills }}/{{ pms.deaths }}/{{ pms.assists }}/{{ pms.KDA2 }}</span></p>
+      <p class='overlayer'>{{ pms.hero.name }}<span class='scorebar'><br />{{ pms.kills }}/{{ pms.deaths }}/{{ pms.assists }}/{{ pms.KDA2 }}</span></p>
       <p class='overlayer-top-right'>{{pms.display_date}}, {{pms.display_duration}}</p>
-
     </a>
   </div>
 {% endfor %}
