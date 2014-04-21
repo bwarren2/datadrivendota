@@ -33,6 +33,7 @@ class Role(models.Model):
         (SUPPORT, 'Support')
     )
     name = models.CharField(max_length=50, choices=ROLES, unique=True)
+    machine_name = models.CharField(max_length=50)
     desc = models.TextField()
     thumbshot = models.ImageField(null=True, upload_to='heroes/img/')
 
@@ -42,6 +43,10 @@ class Role(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.machine_name = slugify(self.name)
+        super(Role, self).save(*args, **kwargs)
 
 
 class Hero(models.Model):

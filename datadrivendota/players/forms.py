@@ -5,18 +5,30 @@ from matches.form_fields import MultiGameModeSelect
 from .form_fields import SinglePlayerField
 from heroes.models import Role
 from heroes.form_fields import SingleHeroSelect
-
 thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
 
 
+def get_roles():
+    return [
+        (role.name, role.name.replace("_", " ").title())
+        for role in Role.objects.all()
+    ]
+
+
 class PlayerWinrateLevers(forms.Form):
+
+    def init(self, *args, **kwargs):
+        super(PlayerWinrateLevers, self).init(*args, **kwargs)
+        self.fields['role_list'] = forms.MultipleChoiceField(
+            choices=get_roles(),
+            required=False,
+            help_text='Pick one or more stats to graph',
+            widget=CheckboxSelectMultiple
+        )
+
     GROUP_CHOICES = [
         (item, item.replace("_", " ").title())
         for item in ['hero', 'alignment']
-    ]
-    ROLE_LIST = [
-        (role.name, role.name.replace("_", " ").title())
-        for role in Role.objects.all()
     ]
     player = SinglePlayerField(
         help_text=(
@@ -49,12 +61,6 @@ class PlayerWinrateLevers(forms.Form):
         required=True,
         help_text='How should we color the dots?'
     )
-    role_list = forms.MultipleChoiceField(
-        choices=ROLE_LIST,
-        required=False,
-        help_text='Pick one or more stats to graph',
-        widget=CheckboxSelectMultiple
-    )
 
 
 class PlayerAdversarialForm(forms.Form):
@@ -66,10 +72,7 @@ class PlayerAdversarialForm(forms.Form):
         (item, item.replace("_", " ").title())
         for item in ['winrate', 'usage']
     ]
-    ROLE_LIST = [
-        (role.name, role.name.replace("_", " ").title())
-        for role in Role.objects.all()
-    ]
+
     player = SinglePlayerField(
         help_text=(
             'The name of a single player.  '
