@@ -169,7 +169,7 @@ class Ability(models.Model):
         return self.internal_name+' ('+str(self.steam_id)+')'
 
     def save(self, *args, **kwargs):
-        self.machine_name = slugify(self.name)
+        self.machine_name = slugify(self.internal_name)
         super(Ability, self).save(*args, **kwargs)
 
 

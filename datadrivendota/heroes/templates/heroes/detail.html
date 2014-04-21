@@ -105,7 +105,7 @@
   </div>
   <div class="hero-ability-list">
     {% for ability in abilities %}
-      <a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name hero_name=ability.hero.machine_name %}" class="ability thumbnail">
+      <a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name %}" class="ability thumbnail">
         <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
         <p class='overlayer'>{{ ability.name }}</p>
       </a>

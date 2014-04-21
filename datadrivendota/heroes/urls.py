@@ -17,7 +17,7 @@ urlpatterns = patterns(
         name='hero_skill_progression'
     ),
     url(
-        r'^ability/(?P<hero_name>[a-zA-Z0-9\-]*)_(?P<ability_name>[a-zA-Z0-9\-]*)/$',
+        r'^ability/(?P<ability_name>[a-zA-Z0-9\-\_]*)/$',
         views.ability_detail,
         name='ability_detail'
     ),

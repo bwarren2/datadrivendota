@@ -173,7 +173,7 @@
 
             {% endif %}
             {% for ability in summary.ability_dict %}
-            <a href="{%url 'heroes:ability_detail' hero_name=summary.hero_machine_name ability_name=ability.machine_name%}">
+            <a href="{%url 'heroes:ability_detail' ability_name=ability.machine_name%}">
                 <img class='ability-thumbshot' src="{{ability.picture_url}}">
               </a>
             {% endfor %}
