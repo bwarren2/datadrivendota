@@ -44,7 +44,6 @@ class Role(models.Model):
         return self.name
 
 
-
 class Hero(models.Model):
     name = models.CharField(
         max_length=200,
@@ -52,7 +51,8 @@ class Hero(models.Model):
     )
     machine_name = models.SlugField(
         max_length=200,
-        help_text="What goes in URLs.  See slugify()"
+        help_text="What goes in URLs.  See slugify()",
+        unique=True
     )
     internal_name = models.CharField(
         max_length=200,
@@ -102,7 +102,8 @@ class Ability(models.Model):
     )
     machine_name = models.CharField(
         help_text="Valve's underscore name",
-        max_length=150
+        max_length=150,
+        unique=True
     )
     channel_time = models.CharField(
         help_text="Spaced channel time by level",
