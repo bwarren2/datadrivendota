@@ -1,4 +1,5 @@
 import datetime
+from django.conf import settings
 from django.db.models import Count
 from django.utils.text import slugify
 from django.core.urlresolvers import reverse
@@ -17,7 +18,44 @@ from matches.models import SkillBuild
 from collections import defaultdict
 from time import mktime
 
+if settings.VERBOSE_PROFILING:
+    try:
+        from line_profiler import LineProfiler
 
+        def do_profile(follow=[]):
+            def inner(func):
+                def profiled_func(*args, **kwargs):
+                    try:
+                        profiler = LineProfiler()
+                        profiler.add_function(func)
+                        for f in follow:
+                            profiler.add_function(f)
+                        profiler.enable_by_count()
+                        return func(*args, **kwargs)
+                    finally:
+                        profiler.print_stats()
+                return profiled_func
+            return inner
+
+    except ImportError:
+        def do_profile(follow=[]):
+            "Helpful if you accidentally leave in production!"
+            def inner(func):
+                def nothing(*args, **kwargs):
+                    return func(*args, **kwargs)
+                return nothing
+            return inner
+else:
+    def do_profile(follow=[]):
+        "Helpful if you accidentally leave in production!"
+        def inner(func):
+            def nothing(*args, **kwargs):
+                return func(*args, **kwargs)
+            return nothing
+        return inner
+
+
+@do_profile()
 def player_winrate_json(
         player,
         game_modes=None,
@@ -78,23 +116,34 @@ def player_winrate_json(
     games = {hero: wins.get(hero, 0) + losses.get(hero, 0) for hero in heroes}
 
     hero_classes = hero_classes_dict()
-    all_heroes = Hero.objects.all().select_related()
-    hero_obj_dict = {hero.name: hero for hero in all_heroes}
+    all_heroes = Hero.objects.filter(visible=True).values(
+        'machine_name',
+        'name',
+        'herodossier__alignment',
+        'steam_id',
+        )
+    hero_info_dict = {hero['name']:
+                    {
+                        'name': hero['name'],
+                        'machine_name': hero['machine_name'],
+                        'alignment': hero['herodossier__alignment'],
+                        'steam_id': hero['steam_id'],
+                    } for hero in all_heroes
+    }
 
     data_list, groups = [], []
     for hero in heroes:
         datadict = datapoint_dict()
-        hero_obj = hero_obj_dict[hero]
         if group_var == 'hero':
-            group = hero_obj.name.title()
+            group = hero_info_dict[hero]['name']
         elif group_var == 'alignment':
-            group = hero_obj.herodossier.alignment.title()
+            group = hero_info_dict[hero]['alignment'].title()
         groups.append(group)
 
         url_str = reverse(
             'players:hero_style',
             kwargs={
-                'hero_name': hero_obj.machine_name,
+                'hero_name': hero_info_dict[hero]['machine_name'],
                 'player_id': player,
             }
         )
@@ -109,8 +158,10 @@ def player_winrate_json(
             'tooltip': hero,
             'classes': [],
         })
-        if hero_classes[hero_obj.steam_id] is not None:
-            datadict['classes'].extend(hero_classes[hero_obj.steam_id])
+        if hero_classes[hero_info_dict[hero]['steam_id']] is not None:
+            datadict['classes'].extend(
+                hero_classes[hero_info_dict[hero]['steam_id']]
+            )
 
         data_list.append(datadict)
 
@@ -128,17 +179,17 @@ def player_winrate_json(
     params['outerHeight'] = 500
     params['legendWidthPercent'] = .7
     params['legendHeightPercent'] = .7
+    groups = [d['group_var'] for d in data_list]
     if group_var == 'hero':
         params['draw_legend'] = False
-        group = []
     elif group_var == 'alignment':
-        group = hero_obj.herodossier.alignment
         params['draw_legend'] = True
     params = color_scale_params(params, groups)
 
     return (data_list, params)
 
 
+@do_profile()
 def player_hero_abilities_json(
         player_1,
         hero_1,
@@ -213,6 +264,7 @@ def player_hero_abilities_json(
     return (datalist, params)
 
 
+@do_profile()
 def player_versus_winrate_json(
         player_id_1,
         player_id_2,
@@ -291,29 +343,41 @@ def player_versus_winrate_json(
         else:
             pairings[hero][player_2]['winrate'] = 0
 
-    all_heroes = HeroDossier.objects.all().select_related()
-    hero_obj_dict = {herodoss.hero.name: herodoss.hero
-                     for herodoss in all_heroes}
+    all_heroes = Hero.objects.filter(visible=True).values(
+        'machine_name',
+        'name',
+        'herodossier__alignment',
+        'steam_id',
+        )
+    hero_info_dict = {hero['name']:
+                    {
+                        'name': hero['name'],
+                        'machine_name': hero['machine_name'],
+                        'alignment': hero['herodossier__alignment'],
+                        'steam_id': hero['steam_id'],
+                    } for hero in all_heroes
+    }
 
     data_list, groups = [], []
     for hero_name, dataset in pairings.iteritems():
-        hero = hero_obj_dict[hero_name]
         datadict = datapoint_dict()
         if group_var == 'hero':
-            group = hero.name.title()
+            group = hero_info_dict[hero_name]['name']
         elif group_var == 'alignment':
-            group = hero.herodossier.alignment.title()
+            group = hero_info_dict[hero_name]['alignment'].title()
         groups.append(group)
 
         datadict.update({
             'group_var': group,
             'split_var': '',
-            'label': hero.name,
-            'tooltip': hero.name,
+            'label': hero_info_dict[hero_name]['name'],
+            'tooltip': hero_info_dict[hero_name]['name'],
             'classes': [],
         })
-        if hero_classes[hero.steam_id] is not None:
-            datadict['classes'].extend(hero_classes[hero.steam_id])
+        if hero_classes[hero_info_dict[hero_name]['steam_id']] is not None:
+            datadict['classes'].extend(hero_classes[hero_info_dict[
+                hero_name]['steam_id']
+                ])
         datadict['point_size'] = min(
             dataset[player_1]['total_games'],
             dataset[player_2]['total_games']
@@ -334,6 +398,7 @@ def player_versus_winrate_json(
     params['x_max'] = max([d['x_var'] for d in data_list])
     params['y_min'] = min([d['y_var'] for d in data_list])
     params['y_max'] = max([d['y_var'] for d in data_list])
+    params['groups'] = [d['group_var'] for d in data_list]
     params['x_label'] = "{name} {pvar}".format(
         name=player_1.display_name,
         pvar=plot_var,
@@ -361,7 +426,6 @@ def player_versus_winrate_json(
         params['strokeDomainMax'] = 1
     if group_var == 'hero':
         params['draw_legend'] = False
-        groups = []
     elif group_var == 'alignment':
         params['draw_legend'] = True
     params = color_scale_params(params, groups)
@@ -369,6 +433,7 @@ def player_versus_winrate_json(
     return (data_list, params)
 
 
+@do_profile()
 def player_hero_side_json(
         player,
         game_modes=None,
@@ -585,6 +650,7 @@ def player_hero_side_json(
     return (data_list, params)
 
 
+@do_profile()
 def player_role_json(
     player_1,
     player_2=None,

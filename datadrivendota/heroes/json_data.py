@@ -2,6 +2,7 @@ import json
 import operator
 from itertools import chain
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from heroes.models import HeroDossier, Hero, invalid_option, Ability
@@ -22,8 +23,44 @@ from utils.charts import (
     color_scale_params,
     hero_classes_dict
     )
+if settings.VERBOSE_PROFILING:
+    try:
+        from line_profiler import LineProfiler
+
+        def do_profile(follow=[]):
+            def inner(func):
+                def profiled_func(*args, **kwargs):
+                    try:
+                        profiler = LineProfiler()
+                        profiler.add_function(func)
+                        for f in follow:
+                            profiler.add_function(f)
+                        profiler.enable_by_count()
+                        return func(*args, **kwargs)
+                    finally:
+                        profiler.print_stats()
+                return profiled_func
+            return inner
+
+    except ImportError:
+        def do_profile(follow=[]):
+            "Helpful if you accidentally leave in production!"
+            def inner(func):
+                def nothing(*args, **kwargs):
+                    return func(*args, **kwargs)
+                return nothing
+            return inner
+else:
+    def do_profile(follow=[]):
+        "Helpful if you accidentally leave in production!"
+        def inner(func):
+            def nothing(*args, **kwargs):
+                return func(*args, **kwargs)
+            return nothing
+        return inner
 
 
+@do_profile()
 def hero_vitals_json(heroes, stats):
     # Currently, we are violating DRY with the available field listing from
     # the form and the R space being in different places and requiring that
@@ -79,6 +116,7 @@ def hero_vitals_json(heroes, stats):
     return (datalist, params)
 
 
+@do_profile()
 def hero_lineup_json(heroes, stat, level):
     # Database pulls and format python objects to go to R
     hero_dossiers = HeroDossier.objects.filter(
@@ -153,6 +191,7 @@ def hero_lineup_json(heroes, stat, level):
     return (datalist, params)
 
 
+@do_profile()
 def hero_performance_json(
         hero,
         player,
@@ -218,6 +257,7 @@ def hero_performance_json(
     return return_json, xlab, ylab, grouplab, split_lab
 
 
+@do_profile()
 def hero_performance_chart_json(
     hero,
     player,
@@ -247,6 +287,7 @@ def hero_performance_chart_json(
         player_game_ids = fetch_match_attributes(player_games, 'match_id')[0]
     else:
         match_pool = list(chain(skill1, skill2, skill3))
+        player_game_ids = []
 
     if len(match_pool) == 0:
         raise NoDataFound
@@ -326,6 +367,7 @@ def hero_performance_chart_json(
     return (datalist, params)
 
 
+@do_profile()
 def hero_progression_json(hero, player, game_modes, division):
     if game_modes == []:
         game_modes = [
@@ -428,6 +470,7 @@ def hero_progression_json(hero, player, game_modes, division):
     return (datalist, params)
 
 
+@do_profile()
 def hero_skillbuild_winrate_json(
     hero,
     player,
@@ -538,6 +581,7 @@ def hero_skillbuild_winrate_json(
     return (datalist, params)
 
 
+@do_profile()
 def update_player_winrate(
     hero,
     game_modes,

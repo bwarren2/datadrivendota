@@ -362,6 +362,10 @@ def hero_performance_api(request):
         hero = Hero.objects.get(name=hero_name)
         game_modes = GameMode.objects.filter(is_competitive=True)
         game_mode_list = [gm.steam_id for gm in game_modes]
+        print '============='
+        print group_var
+        print '============='
+
         datalist, params = hero_performance_chart_json(
             hero=hero.steam_id,
             player=None,
@@ -370,9 +374,8 @@ def hero_performance_api(request):
             y_var=y_var,
             group_var=group_var,
             split_var=split_var,
-            width=350,
-            height=350
         )
+        print datalist, params
         json_data = outsourceJson(datalist, params)
         response_data = {}
         response_data['result'] = 'success'

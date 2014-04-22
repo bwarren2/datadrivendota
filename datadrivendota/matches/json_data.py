@@ -1,5 +1,5 @@
 from math import floor
-from collections import defaultdict
+from django.conf import settings
 from django.utils.text import slugify
 from django.db.models import Sum
 from django.core.urlresolvers import reverse
@@ -13,7 +13,7 @@ from matches.models import (
     fetch_pms_attribute,
     SkillBuild
 )
-from heroes.models import Assignment, Hero
+from heroes.models import Assignment
 from utils.exceptions import NoDataFound
 from utils.charts import (
     params_dict,
@@ -23,7 +23,44 @@ from utils.charts import (
 )
 from players.models import Player
 
+if settings.VERBOSE_PROFILING:
+    try:
+        from line_profiler import LineProfiler
 
+        def do_profile(follow=[]):
+            def inner(func):
+                def profiled_func(*args, **kwargs):
+                    try:
+                        profiler = LineProfiler()
+                        profiler.add_function(func)
+                        for f in follow:
+                            profiler.add_function(f)
+                        profiler.enable_by_count()
+                        return func(*args, **kwargs)
+                    finally:
+                        profiler.print_stats()
+                return profiled_func
+            return inner
+
+    except ImportError:
+        def do_profile(follow=[]):
+            "Helpful if you accidentally leave in production!"
+            def inner(func):
+                def nothing(*args, **kwargs):
+                    return func(*args, **kwargs)
+                return nothing
+            return inner
+else:
+    def do_profile(follow=[]):
+        "Helpful if you accidentally leave in production!"
+        def inner(func):
+            def nothing(*args, **kwargs):
+                return func(*args, **kwargs)
+            return nothing
+        return inner
+
+
+@do_profile()
 def player_team_endgame_json(
         players,
         game_modes,
@@ -121,23 +158,33 @@ def player_team_endgame_json(
 
         pmses = PlayerMatchSummary.objects.filter(
             player__steam_id=player,
+            match__game_mode__steam_id__in=game_modes,
             match__validity=Match.LEGIT,
-            ).select_related().prefetch_related()
-
+            ).values(
+            'hero__name',
+            'hero__steam_id',
+            'match__steam_id',
+            'is_win',
+            )
         mapping_dict = {
-            d.match.steam_id:
+            d['match__steam_id']:
             {
-                'hero': d.hero.name,
-                'is_win': d.is_win,
-                'pms': d
+                'hero': d['hero__name'],
+                'is_win': d['is_win'],
+                'hero_id': d['hero__steam_id']
             }
             for d in pmses
         }
         hero_classes = hero_classes_dict()
-        for annotation in chain(
+
+        datasection = [datapoint_dict()
+                    for x in range(0, (
+                        len(radiant_annotations)+len(dire_annotations))
+                    )]
+        for i, annotation in enumerate(chain(
             radiant_annotations,
             dire_annotations
-        ):
+        )):
             plot_x_var = get_var(
                 annotation,
                 x_var,
@@ -175,7 +222,7 @@ def player_team_endgame_json(
                 else:
                     group_param = 'Lost'
 
-            datadict = datapoint_dict()
+            datadict = datasection[i]
             datadict.update({
                 'x_var': plot_x_var,
                 'y_var': plot_y_var,
@@ -184,22 +231,19 @@ def player_team_endgame_json(
                 'split_var': split_param,
                 'group_var': group_param,
                 'classes': [],
-                'url': reverse(
-                    'matches:match_detail',
-                    kwargs={'match_id': annotation.steam_id}
-                )
+                'url': 'matches/{0}'.format(annotation.steam_id)
             })
             if hero_classes[
-                    mapping_dict[annotation.steam_id]['pms'].hero.steam_id
+                    mapping_dict[annotation.steam_id]['hero_id']
             ] is not None:
                 datadict['classes'].extend(
                     hero_classes[
-                        mapping_dict[annotation.steam_id]['pms'].hero.steam_id
+                        mapping_dict[annotation.steam_id]['hero_id']
                         ]
                 )
 
-            datalist.append(datadict)
-
+            datasection.append(datadict)
+        datalist.extend(datasection)
     if len(datalist) == 0:
         raise NoDataFound
 
@@ -223,7 +267,7 @@ def player_team_endgame_json(
     return (datalist, params)
 
 
-#This gives the player's endgame results
+@do_profile()
 def player_endgame_json(
         players,
         game_modes,
@@ -232,6 +276,7 @@ def player_endgame_json(
         split_var,
         group_var
         ):
+    #Gives the player's endgame results
 
     selected_summaries = PlayerMatchSummary.objects.filter(
         player__steam_id__in=players,
@@ -284,6 +329,7 @@ def player_endgame_json(
     return (datalist, params)
 
 
+@do_profile()
 def team_endgame_json(
         players,
         game_modes,
@@ -434,6 +480,7 @@ def team_endgame_json(
     return (datalist, params)
 
 
+@do_profile()
 def match_ability_json(match, split_var='No Split'):
 
     skill_builds = SkillBuild.objects.filter(
@@ -496,6 +543,7 @@ def match_ability_json(match, split_var='No Split'):
     return (datalist, params)
 
 
+@do_profile()
 def match_parameter_json(match_id, x_var, y_var):
     pmses = PlayerMatchSummary.objects.filter(match__steam_id=match_id)\
         .select_related()
@@ -547,6 +595,7 @@ def match_parameter_json(match_id, x_var, y_var):
     return (data_list, params)
 
 
+@do_profile()
 def single_match_parameter_json(match, y_var, title):
     pmses = PlayerMatchSummary.objects.filter(match__steam_id=match)\
         .select_related()
@@ -597,6 +646,7 @@ def single_match_parameter_json(match, y_var, title):
     return (data_list, params)
 
 
+@do_profile()
 def match_role_json(match):
     pmses = PlayerMatchSummary.objects.filter(match__steam_id=match)
     if len(pmses) == 0:
@@ -661,6 +711,7 @@ def match_role_json(match):
     return (data_list, params)
 
 
+@do_profile()
 def match_list_json(match_list, player_list):
     pmses = PlayerMatchSummary.objects.filter(
         match__steam_id__in=match_list,

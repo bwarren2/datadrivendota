@@ -2,6 +2,7 @@ import datetime
 import json
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
+from django.utils.decorators import method_decorator
 from functools import wraps
 from os.path import basename
 from django.http import Http404
@@ -438,6 +439,12 @@ class OwnTeamEndgame(FormView):
     json_function = staticmethod(player_team_endgame_json)
     title = "Own-Team Endgame Charts"
     html = "matches/form.html"
+
+    def get(self, *args, **kwargs):
+        super(OwnTeamEndgame, self).get(*args, **kwargs)
+
+
+# OwnTeamEndgame.get = method_decorator(devserver_profile(follow=['player_team_endgame_json']))
 
 
 class SameTeamEndgame(FormView):

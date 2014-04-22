@@ -14,13 +14,13 @@ class Command(BaseCommand):
         s = timeit.Timer("""hero_vitals_json(
                 [68],
                 ['strength']
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
         fn = 'hero_lineup_json'
         setup = "from heroes.json_data import {0}".format(fn)
         s = timeit.Timer("""hero_lineup_json([68],
-                'strength', 1)""", setup=setup).repeat(5, 1)
+                'strength', 1)""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
         fn = 'hero_performance_chart_json'
@@ -33,7 +33,7 @@ class Command(BaseCommand):
             y_var='duration',
             group_var='skill_name',
             split_var='is_win'
-        )""", setup=setup).repeat(5, 1)
+        )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
         fn = 'hero_progression_json'
@@ -43,7 +43,7 @@ class Command(BaseCommand):
             player=85045426,
             game_modes=[1,2,3,4,5],
             division='Skill'
-        )""", setup=setup).repeat(5, 1)
+        )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
         fn = 'hero_skillbuild_winrate_json'
@@ -53,7 +53,7 @@ class Command(BaseCommand):
             player=85045426,
             game_modes=[1,2,3,4,5],
             levels=[5,10,15]
-        )""", setup=setup).repeat(5, 1)
+        )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
 
@@ -62,7 +62,7 @@ class Command(BaseCommand):
         s = timeit.Timer("""update_player_winrate(
             hero=53,
             game_modes=[1,2,3,4,5],
-        )""", setup=setup).repeat(5, 1)
+        )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
         ##Matches
@@ -76,7 +76,7 @@ class Command(BaseCommand):
                 split_var='is_win',
                 group_var='none',
                 compressor='sum'
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
         fn = 'player_team_endgame_json'
@@ -88,7 +88,7 @@ class Command(BaseCommand):
                 y_var='K-D+.5*A',
                 split_var='is_win',
                 group_var='No Split',
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
 
@@ -101,14 +101,14 @@ class Command(BaseCommand):
                 y_var='K-D+.5*A',
                 split_var='No Split',
                 group_var='is_win',
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
         fn = 'match_ability_json'
         setup = "from matches.json_data import {0}".format(fn)
         s = timeit.Timer("""match_ability_json(
                 match=528300921
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
 
@@ -118,7 +118,7 @@ class Command(BaseCommand):
                 match_id=528300921,
                 x_var='kills',
                 y_var='hero_damage',
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
 
@@ -128,7 +128,7 @@ class Command(BaseCommand):
                 match=528300921,
                 y_var='hero_damage',
                 title='hero_damage',
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
 
@@ -136,7 +136,7 @@ class Command(BaseCommand):
         setup = "from matches.json_data import {0}".format(fn)
         s = timeit.Timer("""match_role_json(
                 match=528300921,
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
 
@@ -145,7 +145,7 @@ class Command(BaseCommand):
         s = timeit.Timer("""match_list_json(
                 match_list=[528300921,528019632],
                 player_list=[85045426]
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
         fn = 'player_winrate_json'
@@ -158,7 +158,7 @@ import datetime""".format(fn)
                 min_date=datetime.date(2009, 1, 1),
                 max_date=None,
                 group_var='alignment',
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
 
         output_print(s, fn)
 
@@ -171,7 +171,7 @@ import datetime""".format(fn)
                 hero_2=54,
                 game_modes=[1,2,3,4,5],
                 division=None
-                )""", setup=setup).repeat(5, 1)
+                )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
         fn = 'player_versus_winrate_json'
@@ -186,7 +186,7 @@ import datetime""".format(fn)
                 group_var='alignment',
                 plot_var='winrate',
                 )
-        """, setup=setup).repeat(5, 1)
+        """, setup=setup).repeat(1, 1)
         output_print(s, fn)
 
         fn = 'player_hero_side_json'
@@ -200,7 +200,7 @@ import datetime""".format(fn)
                 group_var='alignment',
                 plot_var='winrate',
         )
-        """, setup=setup).repeat(5, 1)
+        """, setup=setup).repeat(1, 1)
         output_print(s, fn)
 
 
@@ -212,6 +212,6 @@ import datetime""".format(fn)
             player_2=103611462,
             plot_var='performance',
         )
-        """, setup=setup).repeat(5, 1)
+        """, setup=setup).repeat(1, 1)
         output_print(s, fn)
 

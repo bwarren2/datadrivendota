@@ -106,7 +106,7 @@ class HeroPlayerPerformance(forms.Form):
     X_PARAMETERS.insert(0, 'duration')
     X_LIST = [(item, item) for item in X_PARAMETERS]
     Y_LIST = [(item, item) for item in SHARED_PARAMETERS]
-    SPLIT_PARAMS = ['is_win', 'game_mode', 'skill_level']
+    SPLIT_PARAMS = ['is_win', 'game_mode', 'skill_name']
     DOUBLE_PARAMS = [(item, item) for item in SPLIT_PARAMS]
 
     hero = SingleHeroSelect(
