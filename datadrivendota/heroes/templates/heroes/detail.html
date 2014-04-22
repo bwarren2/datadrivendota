@@ -127,77 +127,77 @@
     });
 
 
-    function show_progress_bar (identifier) {
-      var progressbar = $("<div>");
-      progressbar.attr('id', 'progbar_loading');
-      progressbar.addClass("progress");
-      progressbar.addClass("progress-striped active");
+    // function show_progress_bar (identifier) {
+    //   var progressbar = $("<div>");
+    //   progressbar.attr('id', 'progbar_loading');
+    //   progressbar.addClass("progress");
+    //   progressbar.addClass("progress-striped active");
 
-      var progressbar_inner = $("<div>");
-      progressbar_inner.addClass("progress-bar");
-      progressbar_inner.attr('role', "progressbar");
-      progressbar_inner.attr('aria-valuenow', "100");
-      progressbar_inner.attr('aria-valuemin', "0");
-      progressbar_inner.attr('aria-valuemax', "100");
-      progressbar_inner.css('width', '100%');
+    //   var progressbar_inner = $("<div>");
+    //   progressbar_inner.addClass("progress-bar");
+    //   progressbar_inner.attr('role', "progressbar");
+    //   progressbar_inner.attr('aria-valuenow', "100");
+    //   progressbar_inner.attr('aria-valuemin', "0");
+    //   progressbar_inner.attr('aria-valuemax', "100");
+    //   progressbar_inner.css('width', '100%');
 
-      progressbar.append(progressbar_inner);
+    //   progressbar.append(progressbar_inner);
 
-      $(identifier).append(progressbar);
-    }
+    //   $(identifier).append(progressbar);
+    // }
 
-    $(function() {
-      show_progress_bar('#chart1');
-      show_progress_bar('#chart2');
-      show_progress_bar('#chart3');
-      $.get(
-        '{% url "heroes:hero_performance_api" %}',
-        {
-          hero: '{{ hero.name }}',
-          x_var: 'duration',
-          y_var: 'kills',
-          group_var: 'skill',
-          split_var: '',
-        },
-        function(json){
-          $('chart1#progressbar').remove()
-          $("#chart1").html('<img src=' + json['url'] + ' />');
-        },
-        'json'
-      );
+    // $(function() {
+    //   show_progress_bar('#chart1');
+    //   show_progress_bar('#chart2');
+    //   show_progress_bar('#chart3');
+    //   $.get(
+    //     '{% url "heroes:hero_performance_api" %}',
+    //     {
+    //       hero: '{{ hero.name }}',
+    //       x_var: 'duration',
+    //       y_var: 'kills',
+    //       group_var: 'skill',
+    //       split_var: '',
+    //     },
+    //     function(json){
+    //       $('chart1#progressbar').remove()
+    //       $("#chart1").html('<img src=' + json['url'] + ' />');
+    //     },
+    //     'json'
+    //   );
 
-      $.get(
-        '{% url "heroes:hero_performance_api" %}',
-        {
-          hero: '{{ hero.name }}',
-          x_var: 'duration',
-          y_var: 'K-D+.5*A',
-          group_var: 'skill',
-          split_var: '',
-        },
-        function(json){
-          $('chart2#progressbar').remove()
-          $("#chart2").html('<img src=' + json['url'] + ' />')
-        },
-        'json'
-      );
+    //   $.get(
+    //     '{% url "heroes:hero_performance_api" %}',
+    //     {
+    //       hero: '{{ hero.name }}',
+    //       x_var: 'duration',
+    //       y_var: 'K-D+.5*A',
+    //       group_var: 'skill',
+    //       split_var: '',
+    //     },
+    //     function(json){
+    //       $('chart2#progressbar').remove()
+    //       $("#chart2").html('<img src=' + json['url'] + ' />')
+    //     },
+    //     'json'
+    //   );
 
-      $.get(
-        '{% url "heroes:hero_performance_api" %}',
-        {
-          hero: '{{ hero.name }}',
-          x_var: 'duration',
-          y_var: 'gold_total',
-          group_var: 'skill',
-          split_var: '',
-        },
-        function(json){
-          $('chart3#progressbar').remove()
-          $("#chart3").html('<img src=' + json['url'] + ' />')
-        },
-        'json'
-      );
-    });
+    //   $.get(
+    //     '{% url "heroes:hero_performance_api" %}',
+    //     {
+    //       hero: '{{ hero.name }}',
+    //       x_var: 'duration',
+    //       y_var: 'gold_total',
+    //       group_var: 'skill',
+    //       split_var: '',
+    //     },
+    //     function(json){
+    //       $('chart3#progressbar').remove()
+    //       $("#chart3").html('<img src=' + json['url'] + ' />')
+    //     },
+    //     'json'
+    //   );
+    // });
   </script>
 {% endblock extra_js  %}
 

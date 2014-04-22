@@ -235,7 +235,6 @@ class Winrate(FormView):
         'player',
         'game_modes',
         'min_date',
-        'role_list',
         'group_var',
     ]
     json_function = staticmethod(player_winrate_json)
