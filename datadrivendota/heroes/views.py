@@ -20,7 +20,7 @@ from .json_data import (
     hero_skillbuild_winrate_json,
     update_player_winrate,
 )
-from .models import Hero, Ability, HeroDossier, Role
+from .models import Hero, Ability, HeroDossier, Role, Assignment
 
 from .forms import (
     HeroVitalsMultiSelect,
@@ -49,9 +49,21 @@ except ImportError:
 
 
 def index(request):
-    hero_list = Hero.objects.filter(visible=True).order_by('name')\
-        .select_related()
+    hero_list = Hero.objects.filter(visible=True).order_by('name')
     role_list = Role.objects.all()
+    assignments = Assignment.objects.all().select_related()
+    dictAssignments = {}
+    for a in assignments:
+        if a.hero.name not in dictAssignments:
+            dictAssignments[a.hero.name] = []
+        dictAssignments[a.hero.name].append(a.role.name)
+
+    for hero in hero_list:
+        try:
+            hero.classes = " ".join(dictAssignments[hero.name])
+        #Some annoying people, like Abaddon, lack assignments.
+        except KeyError:
+            hero.classes = ''
     return render(request, 'heroes/index.html', {
         'hero_list': hero_list,
         'role_list': role_list,
@@ -352,34 +364,41 @@ def hero_list(request):
     return HttpResponse(data, mimetype)
 
 
-def hero_performance_api(request):
+def hero_chart_api(request):
     if request.is_ajax():
-        hero_name = request.GET.get('hero', None)
-        x_var = request.GET.get('x_var', None)
-        y_var = request.GET.get('y_var', None)
-        group_var = request.GET.get('group_var', None)
-        split_var = request.GET.get('split_var', None)
-        hero = Hero.objects.get(name=hero_name)
-        game_modes = GameMode.objects.filter(is_competitive=True)
-        game_mode_list = [gm.steam_id for gm in game_modes]
+        try:
+            if request.GET.get('chart', None) == 'hero_performance_chart':
+                hero_name = request.GET.get('hero', None)
+                x_var = request.GET.get('x_var', None)
+                y_var = request.GET.get('y_var', None)
+                group_var = request.GET.get('group_var', None)
+                split_var = request.GET.get('split_var', None)
+                hero = Hero.objects.get(name=hero_name)
+                game_modes = GameMode.objects.filter(is_competitive=True)
+                game_mode_list = [gm.steam_id for gm in game_modes]
 
-        datalist, params = hero_performance_chart_json(
-            hero=hero.steam_id,
-            player=None,
-            game_mode_list=game_mode_list,
-            x_var=x_var,
-            y_var=y_var,
-            group_var=group_var,
-            split_var=split_var,
-        )
-        json_data = outsourceJson(datalist, params)
-        response_data = {}
-        response_data['result'] = 'success'
-        response_data['url'] = settings.MEDIA_URL + basename(json_data).name
-        return HttpResponse(
-            json.dumps(response_data),
-            content_type="application/json"
-        )
+                datalist, params = hero_performance_chart_json(
+                    hero=hero.steam_id,
+                    player=None,
+                    game_mode_list=game_mode_list,
+                    x_var=x_var,
+                    y_var=y_var,
+                    group_var=group_var,
+                    split_var=split_var,
+                )
+                json_data = outsourceJson(datalist, params)
+                response_data = {}
+                response_data['result'] = 'success'
+                response_data['url'] = settings.MEDIA_URL + basename(json_data.name)
+                return HttpResponse(
+                    json.dumps(response_data),
+                    content_type="application/json"
+                )
+        except Exception:
+            data = 'fail'
+            mimetype = 'application/json'
+            return HttpResponse(data, mimetype)
+
     else:
         data = 'fail'
         mimetype = 'application/json'
