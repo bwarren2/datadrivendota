@@ -10,9 +10,7 @@
   <div class="row">
     <div class="player-charts col-md-4 col-md-offset-2">
       <h4>Hero Winrate</h4>
-      {% if winrate_json %}
         <span id='winrate_chart'></span>
-      {% endif %}
     </div>
     <div class="player-infobox col-md-4 col-md-offset-1">
       <img style='margin-top:10px' src="{{ player.avatar_full }}">
@@ -33,9 +31,7 @@
   <div class="row">
     <div class="player-charts col-md-4 col-md-offset-2">
       <h4>Endgame Comparison</h4>
-      {% if endgame_json %}
         <span id='endgame_chart'></span>
-      {% endif %}
     </div>
   </div>
 
@@ -50,18 +46,49 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-  var input_data;
-  d3.json('{{MEDIA_URL}}{{winrate_json}}',function(source){
-    var x;
-    input_data = source;
-    window.d3ening.plot(source, '#winrate_chart')
-  });
+  window.apiHit(
+    "#winrate_chart",
+    '{% url "players:api_winrate_chart" %}',
+      $.param({
+        player: '{{player.persona_name}}',
+        game_modes: [1, 2, 3, 4, 5],
+        group_var: 'alignment',
+        width: 350,
+        height: 350,
+      }, true
+    )
+  );
 
-  d3.json('{{MEDIA_URL}}{{endgame_json}}',function(source){
-    var x;
-    input_data = source;
-    window.d3ening.plot(source, '#endgame_chart')
-  });
+  window.apiHit(
+    "#endgame_chart",
+    '{% url "matches:api_endgame_chart" %}',
+      $.param({
+
+        players: '{{endgame_chart_names}}',
+        game_modes: [1, 2, 3, 4, 5],
+        x_var: 'duration',
+        y_var: 'K-D+.5*A',
+        panel_var: 'None',
+        group_var: 'player',
+        width: 350,
+        height: 350,
+      }, true
+    )
+  );
+
+
+  // var input_data;
+  // d3.json('{{MEDIA_URL}}{{winrate_json}}',function(source){
+  //   var x;
+  //   input_data = source;
+  //   window.d3ening.plot(source, '#winrate_chart')
+  // });
+
+  // d3.json('{{MEDIA_URL}}{{endgame_json}}',function(source){
+  //   var x;
+  //   input_data = source;
+  //   window.d3ening.plot(source, '#endgame_chart')
+  // });
 
 </script>
 <script type="text/javascript">

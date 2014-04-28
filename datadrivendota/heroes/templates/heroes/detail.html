@@ -126,78 +126,65 @@
       window.d3ening.plot(source, '#top_charts')
     });
 
+    window.apiHit(
+      "#top_charts",
+      '{% url "heroes:api_update_player_winrate_chart" %}',
+        $.param({
+          hero: '{{ hero.name }}',
+          game_modes: [1,2,3,4,5],
+        }, true
+      )
+    );
 
-    // function show_progress_bar (identifier) {
-    //   var progressbar = $("<div>");
-    //   progressbar.attr('id', 'progbar_loading');
-    //   progressbar.addClass("progress");
-    //   progressbar.addClass("progress-striped active");
+    window.apiHit(
+      "#chart3",
+      '{% url "heroes:api_hero_performance_chart" %}',
+        $.param({
+          hero: '{{ hero.name }}',
+          x_var: 'duration',
+          y_var: 'gold_total',
+          group_var: 'skill_name',
+          panel_var: 'None',
+          chart: 'hero_performance_chart',
+          width: 300,
+          height: 300,
+          game_modes: [1,2,3,4,5],
+        }, true
+      )
+    );
+    window.apiHit(
+      "#chart1",
+      '{% url "heroes:api_hero_performance_chart" %}',
+        $.param({
+          hero: '{{ hero.name }}',
+          x_var: 'duration',
+          y_var: 'kills',
+          group_var: 'skill_name',
+          panel_var: 'None',
+          chart: 'hero_performance_chart',
+          width: 300,
+          height: 300,
+          game_modes: [1,2,3,4,5],
+        }, true
+      )
+    );
+    window.apiHit(
+      "#chart2",
+      '{% url "heroes:api_hero_performance_chart" %}',
+        $.param({
+          hero: '{{ hero.name }}',
+          x_var: 'duration',
+          y_var: 'K-D+.5*A',
+          group_var: 'skill_name',
+          panel_var: 'None',
+          chart: 'hero_performance_chart',
+          game_modes: [1,2,3,4,5],
+          width: 300,
+          height: 300,
+        }, true
+      )
+    );
 
-    //   var progressbar_inner = $("<div>");
-    //   progressbar_inner.addClass("progress-bar");
-    //   progressbar_inner.attr('role', "progressbar");
-    //   progressbar_inner.attr('aria-valuenow', "100");
-    //   progressbar_inner.attr('aria-valuemin', "0");
-    //   progressbar_inner.attr('aria-valuemax', "100");
-    //   progressbar_inner.css('width', '100%');
-
-    //   progressbar.append(progressbar_inner);
-
-    //   $(identifier).append(progressbar);
-    // }
-
-    // $(function() {
-    //   show_progress_bar('#chart1');
-    //   show_progress_bar('#chart2');
-    //   show_progress_bar('#chart3');
-    //   $.get(
-    //     '{% url "heroes:hero_performance_api" %}',
-    //     {
-    //       hero: '{{ hero.name }}',
-    //       x_var: 'duration',
-    //       y_var: 'kills',
-    //       group_var: 'skill',
-    //       split_var: '',
-    //     },
-    //     function(json){
-    //       $('chart1#progressbar').remove()
-    //       $("#chart1").html('<img src=' + json['url'] + ' />');
-    //     },
-    //     'json'
-    //   );
-
-    //   $.get(
-    //     '{% url "heroes:hero_performance_api" %}',
-    //     {
-    //       hero: '{{ hero.name }}',
-    //       x_var: 'duration',
-    //       y_var: 'K-D+.5*A',
-    //       group_var: 'skill',
-    //       split_var: '',
-    //     },
-    //     function(json){
-    //       $('chart2#progressbar').remove()
-    //       $("#chart2").html('<img src=' + json['url'] + ' />')
-    //     },
-    //     'json'
-    //   );
-
-    //   $.get(
-    //     '{% url "heroes:hero_performance_api" %}',
-    //     {
-    //       hero: '{{ hero.name }}',
-    //       x_var: 'duration',
-    //       y_var: 'gold_total',
-    //       group_var: 'skill',
-    //       split_var: '',
-    //     },
-    //     function(json){
-    //       $('chart3#progressbar').remove()
-    //       $("#chart3").html('<img src=' + json['url'] + ' />')
-    //     },
-    //     'json'
-    //   );
-    // });
   </script>
 {% endblock extra_js  %}
 

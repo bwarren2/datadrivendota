@@ -1,4 +1,3 @@
-import json
 import operator
 from itertools import chain
 
@@ -11,18 +10,22 @@ from matches.models import (
     Match,
     fetch_match_attributes,
     SkillBuild,
-    skill_name
+    skill_name,
+    fetch_pms_attribute,
+    GameMode,
+    fetch_attribute_label,
 )
 from players.models import Player
 from django.db.models import Count
 
 from utils.exceptions import NoDataFound
 from utils.charts import (
-    datapoint_dict,
-    params_dict,
-    color_scale_params,
-    hero_classes_dict
+    hero_classes_dict,
+    DataPoint,
+    XYPlot, BarPlot, TasselPlot, TasselDataPoint,
+    valid_panel_var
     )
+
 if settings.VERBOSE_PROFILING:
     try:
         from line_profiler import LineProfiler
@@ -62,66 +65,50 @@ else:
 
 @do_profile()
 def hero_vitals_json(heroes, stats):
-    # Currently, we are violating DRY with the available field listing from
-    # the form and the R space being in different places and requiring that
-    # they are the same.
     selected_hero_dossiers = HeroDossier.objects.filter(
         hero__steam_id__in=heroes
     )
 
     if len(selected_hero_dossiers) == 0 or invalid_option(stats):
         raise NoDataFound
-    datalist, xs, ys, groups = [], [], [], []
 
     hero_classes = hero_classes_dict()
-
+    c = XYPlot()
     for hero_dossier in selected_hero_dossiers:
-        group = hero_dossier.hero.name
-        groups.append(group)
         for stat in stats:
             for level in range(1, 26):
-                datadict = datapoint_dict()
-                datadict.update({
-                    'x_var': level,
-                    'y_var': hero_dossier.level_stat(stat, level),
-                    'group_var': group,
-                    'label': hero_dossier.hero.name,
-                    'tooltip': "{hero}, {val}".format(
-                        hero=hero_dossier.hero.name,
-                        val=hero_dossier.level_stat(stat, level)
-                    ),
-                    'split_var': stat.title(),
-                    'classes': [],
-                })
+                d = DataPoint()
+                d.x_var = level
+                d.y_var = hero_dossier.level_stat(stat, level)
+                d.group_var = hero_dossier.hero.name
+                d.label = hero_dossier.hero.name
+                d.tooltip = "{hero}, {val}".format(
+                    hero=hero_dossier.hero.name,
+                    val=hero_dossier.level_stat(stat, level)
+                )
+                d.panel_var = stat.title()
+
                 if hero_classes[hero_dossier.hero.steam_id] is not None:
-                    datadict['classes'].extend(
+                    d.classes.extend(
                         hero_classes[hero_dossier.hero.steam_id]
                     )
 
-                datalist.append(datadict)
-                xs.append(level)
-                ys.append(hero_dossier.level_stat(stat, level))
-    params = params_dict()
-    params['x_min'] = min(xs)
-    params['x_max'] = max(xs)
-    params['y_min'] = min(ys)
-    params['y_max'] = max(ys)
-    params['x_label'] = 'Level'
-    params['y_label'] = 'Quantity'
-    params['draw_path'] = True
-    params['chart'] = 'xyplot'
-    params['outerWidth'] = 300
-    params['outerHeight'] = 300
-    params = color_scale_params(params, groups)
-    return (datalist, params)
+                c.datalist.append(d)
+    c.params.x_label = 'Level'
+    c.params.y_label = 'Quantity'
+    c.params.draw_path = True
+    c.params.outerWidth = 300
+    c.params.outerHeight = 300
+    return c
 
 
 @do_profile()
 def hero_lineup_json(heroes, stat, level):
-    # Database pulls and format python objects to go to R
+
     hero_dossiers = HeroDossier.objects.filter(
         hero__visible=True
     ).select_related()
+
     selected_names = [h.name for h in Hero.objects.filter(steam_id__in=heroes)]
     # @todo: An idiomatic way of doing this would be "if not len(foo)"
     # It's hard to explain when and why I would use "not" followed by an
@@ -139,237 +126,149 @@ def hero_lineup_json(heroes, stat, level):
         )
     except AttributeError:
         raise NoDataFound
-    datalist, ys, xs, groups = [], [], [], []
 
     hero_value = sorted(
         hero_value.iteritems(),
         key=operator.itemgetter(1),
         reverse=True
     )
-    hero_classes = hero_classes_dict()
 
+    hero_classes = hero_classes_dict()
+    c = BarPlot()
+    xs = []
     for key, val in hero_value:
+
+        d = DataPoint()
         group = key.hero.safe_name() \
             if key.hero.safe_name() in selected_names \
             else key.alignment.title()
-        groups.append(group)
-        datadict = datapoint_dict()
-        datadict['x_var'] = key.hero.safe_name()
-        datadict['y_var'] = val
-        datadict['label'] = key.hero.safe_name()
-        datadict['tooltip'] = "{name} ({val})".format(
+        xs.append(key.hero.safe_name())
+        d.x_var = key.hero.safe_name()
+        d.y_var = val
+        d.label = key.hero.safe_name()
+        d.tooltip = "{name} ({val})".format(
             name=key.hero.safe_name(),
             val=val,
         )
-        datadict['group_var'] = group
-        datadict['classes'] = []
-        datadict['split_var'] = 'Hero {stat}'.format(stat=stat)
+        d.group_var = group
+        d.classes = []
+        d.panel_var = 'Hero {stat}'.format(stat=stat)
 
         if hero_classes[key.hero.steam_id] is not None:
-            datadict['classes'].extend(
+            d.classes.extend(
                 hero_classes[key.hero.steam_id]
             )
 
-        datalist.append(datadict)
-        ys.append(val)
-        xs.append(key.hero.safe_name())
-    params = params_dict()
-    params['y_min'] = 0
-    params['y_max'] = max(ys)
-    params['x_label'] = 'Hero'
-    params['y_label'] = stat
-    params['chart'] = 'barplot'
-    params['outerWidth'] = 800
-    params['outerHeight'] = 500
-    params['x_set'] = xs
-    params['legendWidthPercent'] = .7
-    params['legendHeightPercent'] = .8
-    params['padding']['bottom'] = 120
-    params = color_scale_params(params, groups)
+        c.datalist.append(d)
 
-    params['tickValues'] = [x for ind, x in enumerate(xs) if ind % 2 == 0]
-    return (datalist, params)
-
-
-@do_profile()
-def hero_performance_json(
-        hero,
-        player,
-        game_mode_list,
-        x_var,
-        y_var,
-        group_var,
-        split_var
-        ):
-    # Database pulls and format python objects to go to R
-    matches = PlayerMatchSummary.objects.filter(
-        match__game_mode__in=game_mode_list
-    )
-    # Ignore <10 min games
-    matches = matches.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
-    skill1 = matches.filter(match__skill=1).select_related()[:100]
-    skill2 = matches.filter(match__skill=2).select_related()[:100]
-    skill3 = matches.filter(match__skill=3).select_related()[:100]
-    for game in chain(skill1, skill2, skill3):
-        game.skill_level = game.match.skill
-
-    if player is not None:
-        player_games = matches.filter(player__steam_id=player).select_related()
-        for game in player_games:
-            game.skill_level = 'Player'
-        match_pool = list(chain(skill1, skill2, skill3, player_games))
-    else:
-        match_pool = list(chain(skill1, skill2, skill3))
-
-    if len(match_pool) == 0:
-        raise NoDataFound
-
-    try:
-        x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
-        y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
-        match_list = fetch_match_attributes(match_pool, 'match_id')[0]
-        if split_var is None:
-            split_vector_list = ['No Split']
-            split_lab = 'No Split'
-        else:
-            split_vector_list, split_lab = fetch_match_attributes(
-                match_pool,
-                split_var
-            )
-        if group_var is None:
-            group_vector_list = ['No Grouping'] * len(x_vector_list)
-            grouplab = 'No Grouping'
-        else:
-            group_vector_list, grouplab = fetch_match_attributes(
-                match_pool,
-                group_var
-            )
-    except AttributeError:
-        raise NoDataFound
-
-    return_json = json.dumps({
-        'x_var': x_vector_list,
-        'y_var': y_vector_list,
-        'group_var': group_vector_list,
-        'split_var': split_vector_list,
-        'match_id': match_list,
-        })
-    return return_json, xlab, ylab, grouplab, split_lab
+    c.params.y_min = 0
+    c.params.x_label = 'Hero'
+    c.params.y_label = stat
+    c.params.outerWidth = 800
+    c.params.outerHeight = 500
+    c.params.legendWidthPercent = .7
+    c.params.legendHeightPercent = .8
+    c.params.padding['bottom'] = 120
+    c.params.tick_values = [x for ind, x in enumerate(xs) if ind % 2 == 0]
+    return c
 
 
 @do_profile()
 def hero_performance_chart_json(
     hero,
     player,
-    game_mode_list,
     x_var,
     y_var,
     group_var,
-    split_var
+    panel_var,
+    game_modes=None,
 ):
-    # Database pulls and format python objects to go to R
-    matches = PlayerMatchSummary.objects.filter(
-        match__game_mode__in=game_mode_list
+    if game_modes is None:
+        game_modes = [
+            mode.steam_id
+            for mode in GameMode.objects.filter(is_competitive=True)
+        ]
+
+    #Make an iterable of data
+    superset_pmses = PlayerMatchSummary.objects.filter(
+        match__game_mode__steam_id__in=game_modes,
+        hero__steam_id=hero,
+        match__validity=Match.LEGIT
     )
-    # Ignore <10 min games
-    matches = matches.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
-    skill1 = matches.filter(match__skill=1).select_related()[:100]
-    skill2 = matches.filter(match__skill=2).select_related()[:100]
-    skill3 = matches.filter(match__skill=3).select_related()[:100]
-    for game in chain(skill1, skill2, skill3):
-        game.skill_level = game.match.skill
+    skill1 = superset_pmses.filter(match__skill=1)\
+        .order_by('-match__start_time').select_related()[:100]
+    skill2 = superset_pmses.filter(match__skill=2)\
+        .order_by('-match__start_time').select_related()[:100]
+    skill3 = superset_pmses.filter(match__skill=3)\
+        .order_by('-match__start_time').select_related()[:100]
 
     if player is not None:
-        player_games = matches.filter(player__steam_id=player).select_related()
-        for game in player_games:
-            game.skill_level = 'Player'
-        match_pool = list(chain(skill1, skill2, skill3, player_games))
+        player_games = superset_pmses.filter(
+            player__steam_id=player
+        ).select_related()
+        pms_pool = list(chain(skill1, skill2, skill3, player_games))
         player_game_ids = fetch_match_attributes(player_games, 'match_id')[0]
     else:
-        match_pool = list(chain(skill1, skill2, skill3))
+        pms_pool = list(chain(skill1, skill2, skill3))
         player_game_ids = []
 
-    if len(match_pool) == 0:
+    if len(pms_pool) == 0:
         raise NoDataFound
 
+    matching = PlayerMatchSummary.objects.filter(
+        id__in=[p.id for p in pms_pool]
+        ).values('match__steam_id', 'id')
+
+    match_dict = {d['id']: d['match__steam_id'] for d in matching}
+
+    #Iterate through it, making data points for the chart
     try:
         hero_classes = hero_classes_dict()
-        x_vector_list, xlab = fetch_match_attributes(match_pool, x_var)
-        y_vector_list, ylab = fetch_match_attributes(match_pool, y_var)
-        match_list = fetch_match_attributes(match_pool, 'match_id')[0]
-        hero_id_list, foo = fetch_match_attributes(match_pool, 'hero_steam_id')
+        c = XYPlot()
+        for pms in pms_pool:
+            d = DataPoint()
+            d.x_var = fetch_pms_attribute(pms, x_var)
+            d.y_var = fetch_pms_attribute(pms, y_var)
+            d.label = match_dict[pms.id]
+            d.tooltip = match_dict[pms.id]
+            d.url = '/matches/'+str(match_dict[pms.id])
+            if hero_classes[pms.hero.steam_id] is not None:
+                d.classes.extend(
+                    hero_classes[pms.hero.steam_id]
+                )
 
-        if split_var is None:
-            split_vector_list = ['No Split']
-            split_lab = 'No Split'
-        else:
-            split_vector_list, split_lab = fetch_match_attributes(
-                match_pool,
-                split_var
-            )
-        if group_var is None:
-            group_vector_list = ['No Grouping'] * len(x_vector_list)
-            grouplab = 'No Grouping'
-        else:
-            group_vector_list, grouplab = fetch_match_attributes(
-                match_pool,
-                group_var
-            )
-        datalist = []
-        grouplist = []
-        for key in range(0, len(x_vector_list)):
-            datadict = datapoint_dict()
-            if group_var == 'skill_name':
-                if match_list[key] in player_game_ids:
-                    group_var_elt = 'Player'
+            #Ajax API requests can't send None over the wire
+            if valid_panel_var(group_var):
+                if group_var == 'skill_name'\
+                        and pms.match.steam_id in player_game_ids:
+                            d.group_var = 'Player'
                 else:
-                    group_var_elt = group_vector_list[key]
+                    d.group_var = fetch_pms_attribute(pms, group_var)
+
+            if valid_panel_var(panel_var):
+                d.panel_var = fetch_pms_attribute(pms, panel_var)
             else:
-                group_var_elt = group_vector_list[key]
-            grouplist.append(group_var_elt)
-            datadict.update({
-                'x_var': x_vector_list[key],
-                'y_var': y_vector_list[key],
-                'label': group_vector_list[key],
-                'tooltip': match_list[key],
-                'split_var': split_vector_list[key],
-                'group_var': group_var_elt,
-                'classes': [],
-                'url': reverse(
-                    'matches:match_detail',
-                    kwargs={'match_id': match_list[key]}
+                d.panel_var = "{y} vs {x}".format(
+                    y=fetch_attribute_label(y_var),
+                    x=fetch_attribute_label(x_var),
                 )
+            c.datalist.append(d)
 
-            })
-            if hero_classes[hero_id_list[key]] is not None:
-                datadict['classes'].extend(
-                    hero_classes[hero_id_list[key]]
-                )
-
-            datalist.append(datadict)
     except AttributeError:
         raise NoDataFound
 
-    params = params_dict()
-    params['x_min'] = min(x_vector_list)
-    params['x_max'] = max(x_vector_list)
-    params['y_min'] = min(y_vector_list)
-    params['y_max'] = max(y_vector_list)
-    params['x_label'] = xlab
-    params['y_label'] = ylab
-    params['margin']['left'] = 12*len(str(params['y_max']))
-    params['chart'] = 'xyplot'
+    c.params.x_label = fetch_attribute_label(x_var)
+    c.params.y_label = fetch_attribute_label(y_var)
     if group_var == 'skill_name':
-        grouplist = ['Low Skill', 'Medium Skill', 'High Skill']
-        if player is not None:
-            grouplist.append('Player')
-    params = color_scale_params(params, grouplist)
-    return (datalist, params)
+        c.groups = ['Low Skill', 'Medium Skill', 'High Skill']
+    if player is not None and c.groups is not None:
+        c.groups.append('Player')
+    return c
 
 
 @do_profile()
-def hero_progression_json(hero, player, game_modes, division):
-    if game_modes == []:
+def hero_progression_json(hero, player, division, game_modes=None):
+    if game_modes == [] or game_modes is None:
         game_modes = [
             mode.steam_id
             for mode in GameMode.objects.filter(is_competitive=True)
@@ -408,17 +307,16 @@ def hero_progression_json(hero, player, game_modes, division):
         'player_match_summary__player__persona_name',
         'player_match_summary__hero__steam_id',
     )
-    datalist, xs, ys, groups = [], [], [], []
     hero_classes = hero_classes_dict()
+
+    c = TasselPlot()
     for build in sbs:
         if build['level'] == 1:
             subtractor = build['time']/60.0
 
-        datapoint = datapoint_dict()
-        datapoint['x_var'] = round(build['time']/60.0-subtractor, 3)
-        xs.append(round(build['time']/60.0-subtractor, 3))
-        datapoint['y_var'] = build['level']
-        ys.append(build['level'])
+        d = TasselDataPoint()
+        d.x_var = round(build['time']/60.0-subtractor, 3)
+        d.y_var = build['level']
 
         winningness = 'Win' if \
             build['player_match_summary__is_win'] \
@@ -439,35 +337,28 @@ def hero_progression_json(hero, player, game_modes, division):
             group = "{win}".format(
                 win=winningness)
 
-        datapoint['group_var'] = group
-        groups.append(group)
+        d.group_var = group
 
-        datapoint['series_var'] = build[
+        d.series_var = build[
             'player_match_summary__match__steam_id'
         ]
-        datapoint['label'] = build[
+        d.label = build[
             'player_match_summary__player__persona_name'
         ]
-        datapoint['split_var'] = 'Skill Progression'
+        d.panel_var = 'Skill Progression'
         hero_id = build['player_match_summary__hero__steam_id']
         if hero_classes[hero_id] is not None:
-            datapoint['classes'].extend(
+            d.classes.extend(
                 hero_classes[hero_id]
             )
 
-        datalist.append(datapoint)
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['chart'] = 'scatterseries'
-    params['x_min'] = 0
-    params['x_max'] = max(xs)
-    params['y_min'] = min(ys)
-    params['y_max'] = max(ys)
-    params['x_label'] = 'Time (m)'
-    params['y_label'] = 'Level'
-    params = color_scale_params(params, groups)
+    c.params.x_min = 0
+    c.params.x_label = 'Time (m)'
+    c.params.y_label = 'Level'
 
-    return (datalist, params)
+    return c
 
 
 @do_profile()
@@ -477,7 +368,6 @@ def hero_skillbuild_winrate_json(
     game_modes,
     levels,
 ):
-    datalist = []
     level_list = levels
     hero_id = hero
     player_id = player
@@ -495,7 +385,7 @@ def hero_skillbuild_winrate_json(
                 ct=len([x for x in choice_lst if x == choice]),
                 )
         return label
-
+    c = XYPlot()
     for level in level_list:
         sbs = SkillBuild.objects.filter(
             player_match_summary__match__game_mode__in=game_mode_list,
@@ -559,26 +449,21 @@ def hero_skillbuild_winrate_json(
                 build_dict[id_str]['wins'] / denominator*100
 
         for build, datadict in build_dict.iteritems():
-            datapoint = datapoint_dict()
-            datapoint['x_var'] = datadict['games']
-            datapoint['y_var'] = datadict['winrate']
-            datapoint['group_var'] = "By Level {lvl}".format(lvl=level)
-            datapoint['label'] = to_label(build)
-            datapoint['tooltip'] = to_label(build)
-            datapoint['split_var'] = ''
-            datalist.append(datapoint)
+            d = DataPoint()
 
-    params = params_dict()
-    params['chart'] = 'xyplot'
-    params['x_min'] = 0
-    params['x_max'] = max([d['x_var'] for d in datalist])
-    params['y_min'] = 0
-    params['y_max'] = 100
-    params['x_label'] = 'Games'
-    params['y_label'] = 'Winrate'
-    params = color_scale_params(params, [d['group_var'] for d in datalist])
+            d.x_var = datadict['games']
+            d.y_var = datadict['winrate']
+            d.group_var = "By Level {lvl}".format(lvl=level)
+            d.label = to_label(build)
+            d.tooltip = to_label(build)
+            c.datalist.append(d)
 
-    return (datalist, params)
+    c.params.x_min = 0
+    c.params.y_min = 0
+    c.params.y_max = 100
+    c.params.x_label = 'Games'
+    c.params.y_label = 'Winrate'
+    return c
 
 
 @do_profile()
@@ -607,7 +492,7 @@ def update_player_winrate(
     for p in dict_games.iterkeys():
         dict_games[p]['wins'] = dict_wins.get(p, 0)
 
-    datalist = []
+    c = XYPlot()
     for p, info in dict_games.iteritems():
 
         url_str = reverse(
@@ -618,24 +503,20 @@ def update_player_winrate(
             }
         )
 
-        datapoint = datapoint_dict()
-        datapoint['x_var'] = info['games']
-        datapoint['y_var'] = info['wins']/float(info['games'])*100
-        datapoint['group_var'] = 'Pro' if p.pro_name is not None else 'Player'
-        datapoint['label'] = p.display_name
-        datapoint['tooltip'] = p.display_name
-        datapoint['url'] = url_str
-        datapoint['split_var'] = 'Tracked Player Winrate'
-        datalist.append(datapoint)
+        d = DataPoint()
+        d.x_var = info['games']
+        d.y_var = info['wins']/float(info['games'])*100
+        d.group_var = 'Pro' if p.pro_name is not None else 'Player'
+        d.label = p.display_name
+        d.tooltip = p.display_name
+        d.url = url_str
+        d.panel_var = 'Tracked Player Winrate'
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['chart'] = 'xyplot'
-    params['x_min'] = 0
-    params['x_max'] = max([d['x_var'] for d in datalist])
-    params['y_min'] = 0
-    params['y_max'] = 100
-    params['x_label'] = 'Games'
-    params['y_label'] = 'Winrate'
-    params = color_scale_params(params, [d['group_var'] for d in datalist])
+    c.params.x_min = 0
+    c.params.y_min = 0
+    c.params.y_max = 100
+    c.params.x_label = 'Games'
+    c.params.y_label = 'Winrate'
 
-    return (datalist, params)
+    return c

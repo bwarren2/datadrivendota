@@ -2,36 +2,27 @@ from os.path import basename
 import json
 from functools import wraps
 
-
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
-from utils.exceptions import NoDataFound
 
-from datadrivendota.views import FormView
+from datadrivendota.views import ChartFormView, ApiView
+from utils.file_management import outsourceJson, moveJson
+
 from matches.models import GameMode
 from .json_data import (
-    hero_vitals_json,
-    hero_lineup_json,
-    hero_performance_json,
-    hero_progression_json,
-    hero_performance_chart_json,
-    hero_skillbuild_winrate_json,
     update_player_winrate,
 )
 from .models import Hero, Ability, HeroDossier, Role, Assignment
-
-from .forms import (
-    HeroVitalsMultiSelect,
-    HeroLineupMultiSelect,
-    HeroPlayerPerformance,
-    HeroPlayerSkillBarsForm,
-    HeroProgressionForm,
-    HeroBuildForm,
-)
-
-from utils.file_management import outsourceJson
+from .mixins import (
+    VitalsMixin,
+    LineupMixin,
+    HeroPerformanceMixin,
+    HeroSkillProgressionMixin,
+    HeroBuildLevelMixin,
+    UpdatePlayerWinrateMixin,
+    )
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS or not settings.DEBUG:
@@ -80,14 +71,14 @@ def detail(request, hero_name):
     competitive_modes = [
         mode.steam_id for mode in GameMode.objects.filter(is_competitive=True)
     ]
-    datalist, params = update_player_winrate(
+    chart = update_player_winrate(
         current_hero.steam_id,
         game_modes=competitive_modes,
     )
-    params['outerWidth'] = 300
-    params['outerHeight'] = 300
-    params['margin']['left'] = 33
-    json_data = outsourceJson(datalist, params)
+    chart.params.outerWidth = 300
+    chart.params.outerHeight = 300
+    chart.params.margin['left'] = 33
+    json_data = moveJson(chart.as_JSON())
     return render(
         request,
         'heroes/detail.html',
@@ -100,7 +91,7 @@ def detail(request, hero_name):
     )
 
 
-class Vitals(FormView):
+class Vitals(VitalsMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -129,20 +120,14 @@ class Vitals(FormView):
             'content': "Challenge: how does your favorite hero compare to your least favorite in their primary stats?"
         }
     ]
-    form = HeroVitalsMultiSelect
-    attrs = [
-        'heroes',
-        'stats',
-    ]
-    json_function = staticmethod(hero_vitals_json)
     title = "Hero Vitals"
     html = "heroes/form.html"
 
-    def amend_params(self, params):
-        return params
+    def amend_params(self, chart):
+        return chart
 
 
-class Lineup(FormView):
+class Lineup(LineupMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -171,26 +156,17 @@ class Lineup(FormView):
             'content': "Challenge: how do your favorite strength, intelligence, and agility heroes change in strength at various levels?"
         }
     ]
-    form = HeroLineupMultiSelect
-    attrs = [
-        'heroes',
-        'stat',
-        'level',
-    ]
-    json_function = staticmethod(hero_lineup_json)
     title = "Hero Lineups"
     html = "heroes/form.html"
 
-    def amend_params(self, params):
-        params['draw_legend'] = True
-        params['legendWidthPercent'] = .7
-        params['legendHeightPercent'] = .1
-        return params
+    def amend_params(self, chart):
+        chart.params.draw_legend = True
+        chart.params.legendWidthPercent = .7
+        chart.params.legendHeightPercent = .1
+        return chart
 
 
-#@devserver_profile(follow=[hero_performance_json])
-def hero_performance(request):
-
+class HeroPerformance(HeroPerformanceMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -224,44 +200,17 @@ def hero_performance(request):
             'content': "Challenge: how does your kills-deaths+assists/2 (kda2) on your favorite carry compare to other skill brackets?"
         }
     ]
-    tour = json.dumps(tour)
-    if request.GET:
-        hero_form = HeroPlayerPerformance(request.GET)
-        if hero_form.is_valid():
-            datalist, params = hero_performance_chart_json(
-                hero=hero_form.cleaned_data['hero'],
-                player=hero_form.cleaned_data['player'],
-                game_mode_list=hero_form.cleaned_data['game_modes'],
-                x_var=hero_form.cleaned_data['x_var'],
-                y_var=hero_form.cleaned_data['y_var'],
-                group_var=hero_form.cleaned_data['group_var'],
-                split_var=hero_form.cleaned_data['split_var'],
-            )
-            json_data = outsourceJson(datalist, params)
-            return render(
-                request,
-                'heroes/form.html',
-                {
-                    'form': hero_form,
-                    'json_data': basename(json_data.name),
-                    'title': 'Hero Performance',
-                    'tour': tour,
-                }
-            )
-    else:
-        hero_form = HeroPlayerPerformance()
-    return render(
-        request,
-        'heroes/form.html',
-        {
-            'tour': tour,
-            'form': hero_form,
-            'title': 'Hero Performance',
-        }
-    )
+    title = "Hero Performance"
+    html = "heroes/form.html"
+
+    def amend_params(self, chart):
+        chart.params.draw_legend = True
+        chart.params.legendWidthPercent = .7
+        chart.params.legendHeightPercent = .1
+        return chart
 
 
-class HeroSkillProgression(FormView):
+class HeroSkillProgression(HeroSkillProgressionMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -305,23 +254,15 @@ class HeroSkillProgression(FormView):
             'content': "Challenge: for your favorite hero, how many more levels can high-skill players have over low skill players at the 30 minute mark?"
         }
     ]
-    form = HeroProgressionForm
-    attrs = [
-        'hero',
-        'player',
-        'game_modes',
-        'division',
-    ]
-    json_function = staticmethod(hero_progression_json)
     title = "Hero Skilling"
     html = "heroes/form.html"
 
-    def amend_params(self, params):
-        params['path_stroke_width'] = 1
-        return params
+    def amend_params(self, chart):
+        chart.params.path_stroke_width = 2
+        return chart
 
 
-class HeroBuildLevel(FormView):
+class HeroBuildLevel(HeroBuildLevelMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -329,21 +270,11 @@ class HeroBuildLevel(FormView):
             'content': "This page charts skill usage for a player on a hero at certain levels."
         },
         ]
-    form = HeroBuildForm
-    attrs = [
-        'hero',
-        'player',
-        'game_modes',
-        'levels',
-    ]
-    json_function = staticmethod(hero_skillbuild_winrate_json)
-    title = "SkillBuilld Winrate"
+    title = "SkillBuild Winrate"
     html = "heroes/form.html"
 
     def amend_params(self, params):
         return params
-
-
 
 
 def hero_list(request):
@@ -364,48 +295,32 @@ def hero_list(request):
     return HttpResponse(data, mimetype)
 
 
-def hero_chart_api(request):
-    if request.is_ajax():
-        try:
-            if request.GET.get('chart', None) == 'hero_performance_chart':
-                hero_name = request.GET.get('hero', None)
-                x_var = request.GET.get('x_var', None)
-                y_var = request.GET.get('y_var', None)
-                group_var = request.GET.get('group_var', None)
-                split_var = request.GET.get('split_var', None)
-                hero = Hero.objects.get(name=hero_name)
-                game_modes = GameMode.objects.filter(is_competitive=True)
-                game_mode_list = [gm.steam_id for gm in game_modes]
-
-                datalist, params = hero_performance_chart_json(
-                    hero=hero.steam_id,
-                    player=None,
-                    game_mode_list=game_mode_list,
-                    x_var=x_var,
-                    y_var=y_var,
-                    group_var=group_var,
-                    split_var=split_var,
-                )
-                json_data = outsourceJson(datalist, params)
-                response_data = {}
-                response_data['result'] = 'success'
-                response_data['url'] = settings.MEDIA_URL + basename(json_data.name)
-                return HttpResponse(
-                    json.dumps(response_data),
-                    content_type="application/json"
-                )
-        except Exception:
-            data = 'fail'
-            mimetype = 'application/json'
-            return HttpResponse(data, mimetype)
-
-    else:
-        data = 'fail'
-        mimetype = 'application/json'
-        return HttpResponse(data, mimetype)
+#API endpoints
+class ApiVitalsChart(VitalsMixin, ApiView):
+    pass
 
 
-def ability_detail(request, hero_name, ability_name):
+class ApiLineupChart(LineupMixin, ApiView):
+    pass
+
+
+class ApiHeroPerformanceChart(HeroPerformanceMixin, ApiView):
+    pass
+
+
+class ApiSkillProgressionChart(HeroSkillProgressionMixin, ApiView):
+    pass
+
+
+class ApiBuildLevelChart(HeroBuildLevelMixin, ApiView):
+    pass
+
+
+class ApiUpdatePlayerWinrateChart(UpdatePlayerWinrateMixin, ApiView):
+    pass
+
+
+def ability_detail(request, ability_name):
     if ability_name == 'stats':
         ability = get_object_or_404(
             Ability,
@@ -415,7 +330,6 @@ def ability_detail(request, hero_name, ability_name):
         ability = get_object_or_404(
             Ability,
             machine_name=ability_name,
-            hero__machine_name=hero_name,
         )
     charts = []
     return render(

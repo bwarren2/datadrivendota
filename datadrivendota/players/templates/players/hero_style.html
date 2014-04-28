@@ -1,49 +1,36 @@
 {% extends "players/base.html" %}
 
 
-{% block title %}Player Comparison{% endblock title %}
+{% block title %}Hero Style{% endblock title %}
 
 {% block page_title %}{{player.display_name}} as {{hero.name}} {% endblock page_title %}
 
 {% block content %}
-
-
-
   <div class="row">
     <div class="player-charts col-md-4">
     <h4>Level Progression</h4>
-      {% if hero_progression_json %}
         <span id='hero_progression_chart'></span>
-      {% endif %}
     </div>
 
     <div class="player-charts col-md-4">
     <h4>Item Usage</h4>
-      {% if item_winrate_json %}
         <span id='item_winrate_chart'></span>
-      {% endif %}
     </div>
     <div class="player-charts col-md-4">
     <h4>Skill Usage</h4>
-      {% if skill_winrate_json %}
         <span id='skill_winrate_chart'></span>
-      {% endif %}
     </div>
   </div>
 
   <div class="row">
     <div class="player-charts col-md-6">
     <h4>KDA2</h4>
-      {% if hero_kda2_chart_json %}
         <span id='hero_kda2_chart'></span>
-      {% endif %}
     </div>
 
     <div class="player-charts col-md-6">
     <h4>Kills</h4>
-      {% if hero_kills_chart_json %}
         <span id='hero_kills_chart'></span>
-      {% endif %}
     </div>
 
   </div>
@@ -51,15 +38,11 @@
   <div class="row">
     <div class="player-charts col-md-6">
     <h4>Hero Damage</h4>
-      {% if hero_dmg_json %}
         <span id='hero_dmg_chart'></span>
-      {% endif %}
     </div>
     <div class="player-charts col-md-6">
     <h4>Tower Damage</h4>
-      {% if hero_push_json %}
         <span id='hero_push_chart'></span>
-      {% endif %}
     </div>
 
   </div>
@@ -70,61 +53,120 @@
 {% block extra_js %}
 <script type="text/javascript">
 
-  function chart1(callback){
-    d3.json('{{MEDIA_URL}}{{hero_progression_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#hero_progression_chart')
-    });
-  }
+  window.apiHit(
+    "#hero_progression_chart",
+    '{% url "heroes:api_skill_progression_chart" %}',
+      $.param({
+        hero: '{{hero.name}}',
+        player: '{{player.persona_name}}',
+        game_modes: [1, 2, 3, 4, 5],
+        division: 'Skill',
+        width: 275,
+        height: 275,
+      }, true
+    )
+  );
 
-  function chart2(callback){
-    d3.json('{{MEDIA_URL}}{{hero_kda2_chart_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#hero_kda2_chart')
-    });
-  }
+  window.apiHit(
+    "#hero_kda2_chart",
+    '{% url "heroes:api_hero_performance_chart" %}',
+      $.param({
+        hero: '{{hero.name}}',
+        player: '{{player.persona_name}}',
+        game_modes: [1, 2, 3, 4, 5],
+        division: 'Skill',
+        x_var: 'duration',
+        y_var: 'K-D+.5*A',
+        group_var: 'skill_name',
+        panel_var: 'is_win',
 
-  function chart3(callback){
-    d3.json('{{MEDIA_URL}}{{hero_push_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#hero_push_chart')
-    });
-  }
+        width: 275,
+        height: 275,
+      }, true
+    )
+  );
 
-  function chart4(callback){
-    d3.json('{{MEDIA_URL}}{{item_winrate_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#item_winrate_chart')
-    });
-  }
-  function chart5(callback){
-    d3.json('{{MEDIA_URL}}{{hero_dmg_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#hero_dmg_chart')
-      checkvar+=2;
-    });
-  }
-  function chart6(callback){
-    d3.json('{{MEDIA_URL}}{{skill_winrate_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#skill_winrate_chart')
-    });
-  }
+  window.apiHit(
+    "#hero_push_chart",
+    '{% url "heroes:api_hero_performance_chart" %}',
+      $.param({
+        hero: '{{hero.name}}',
+        player: '{{player.persona_name}}',
+        game_modes: [1, 2, 3, 4, 5],
+        division: 'Skill',
+        x_var: 'duration',
+        y_var: 'tower_damage',
+        group_var: 'skill_name',
+        panel_var: 'is_win',
 
-  function chart7(callback){
-    d3.json('{{MEDIA_URL}}{{hero_kills_chart_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#hero_kills_chart')
-    });
-  }
+        width: 275,
+        height: 275,
+      }, true
+    )
+  );
+  window.apiHit(
+    "#hero_dmg_chart",
+    '{% url "heroes:api_hero_performance_chart" %}',
+      $.param({
+        hero: '{{hero.name}}',
+        player: '{{player.persona_name}}',
+        game_modes: [1, 2, 3, 4, 5],
+        division: 'Skill',
+        x_var: 'duration',
+        y_var: 'hero_damage',
+        group_var: 'skill_name',
+        panel_var: 'is_win',
 
-  chart1();
-  chart2();
-  chart3();
-  chart4();
-  chart5();
-  chart6();
-  chart7();
+        width: 275,
+        height: 275,
+      }, true
+    )
+  );
+  window.apiHit(
+    "#hero_kills_chart",
+    '{% url "heroes:api_hero_performance_chart" %}',
+      $.param({
+        hero: '{{hero.name}}',
+        player: '{{player.persona_name}}',
+        game_modes: [1, 2, 3, 4, 5],
+        division: 'Skill',
+        x_var: 'duration',
+        y_var: 'kills',
+        group_var: 'skill_name',
+        panel_var: 'is_win',
+
+        width: 275,
+        height: 275,
+      }, true
+    )
+  );
+  window.apiHit(
+    "#item_winrate_chart",
+    '{% url "items:api_item_endgame_chart" %}',
+      $.param({
+        hero: '{{hero.name}}',
+        player: '{{player.persona_name}}',
+        game_modes: [1, 2, 3, 4, 5],
+        no_legend: true,
+        width: 275,
+        height: 275,
+      }, true
+    )
+  );
+  window.apiHit(
+    "#skill_winrate_chart",
+    '{% url "heroes:api_build_level_chart" %}',
+      $.param({
+        hero: '{{hero.name}}',
+        player: '{{player.persona_name}}',
+        game_modes: [1, 2, 3, 4, 5],
+        levels: [5, 10, 15],
+        width: 275,
+        height: 275,
+      }, true
+    )
+  );
+
 
 </script>
 <script type="text/javascript">

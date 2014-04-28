@@ -15,39 +15,29 @@
   <div class="row">
     <div class="player-charts col-md-4">
     <h4>Hero Winrate</h4>
-      {% if winrate_json %}
         <span id='winrate_chart'></span>
-      {% endif %}
     </div>
 
     <div class="player-charts col-md-4">
     <h4>Hero Usage</h4>
-      {% if usage_json %}
         <span id='usage_chart'></span>
-      {% endif %}
     </div>
 
     <div class="player-charts col-md-4">
       <h4>Role Comparison</h4>
-      {% if role_json %}
         <span id='role_chart'></span>
-      {% endif %}
     </div>
   </div>
 
   <div class="row">
     <div class="player-charts col-md-6">
     <h4>Team KDA2</h4>
-      {% if team_kda_json %}
         <span id='team_kda_chart'></span>
-      {% endif %}
     </div>
 
     <div class="player-charts col-md-6">
     <h4>Personal KDA2</h4>
-      {% if kda_json %}
         <span id='kda_chart'></span>
-      {% endif %}
     </div>
   </div>
 
@@ -58,66 +48,99 @@
 <script type="text/javascript">
 
   var checkvar = 0;
-  function chart1(callback){
-    d3.json('{{MEDIA_URL}}{{winrate_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#winrate_chart')
-      checkvar+=1;
-      $.event.trigger({
-        type:    "semaphore",
-        message: "Chart 1 done."
-      });
-    });
-  }
-
-  function chart2(callback){
-    d3.json('{{MEDIA_URL}}{{usage_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#usage_chart')
-      checkvar+=2;
-      $.event.trigger({
-        type:    "semaphore",
-        message: "Chart 2 done."
-      });
-    });
-  }
-  function chart5(callback){
-      d3.json('{{MEDIA_URL}}{{role_json}}',function(source){
-        var input_data = source;
-        window.d3ening.plot(source, '#role_chart')
-        checkvar+=5;
+  var semaphorefunc = function(num){
+        checkvar+=num;
         $.event.trigger({
           type:    "semaphore",
-          message: "Chart 5 done."
+          message: "Chart 1 done."
         });
-      });
+      }
+
+  function chart1(callback){
+      window.apiHit(
+        "#usage_chart",
+        '{% url "players:api_versus_winrate_chart" %}',
+        $.param({
+          player_1: '{{player1.persona_name}}',
+          player_2: '{{player2.persona_name}}',
+          game_modes: [1, 2, 3, 4, 5],
+          group_var: 'alignment',
+          plot_var: 'usage',
+          width: 300,
+          height: 300,
+        }, true),
+        semaphorefunc(1)
+      );
+    }
+
+  function chart2(callback){
+      window.apiHit(
+        "#winrate_chart",
+        '{% url "players:api_versus_winrate_chart" %}',
+        $.param({
+          player_1: '{{player1.persona_name}}',
+          player_2: '{{player2.persona_name}}',
+          game_modes: [1, 2, 3, 4, 5],
+          group_var: 'alignment',
+          plot_var: 'winrate',
+          width: 300,
+          height: 300,
+        }, true),
+        semaphorefunc(2)
+      );
+  }
+  function chart5(callback){
+      window.apiHit(
+        "#kda_chart",
+        '{% url "matches:api_endgame_chart" %}',
+        $.param({
+          players: '{{player1.persona_name}},{{player2.persona_name}}',
+          game_modes: [1, 2, 3, 4, 5],
+          x_var: 'duration',
+          y_var: 'K-D+.5*A',
+          panel_var: 'is_win',
+          group_var: 'player',
+          width: 300,
+          height: 300,
+        }, true),
+        semaphorefunc(5)
+      );
   }
 
 
   function chart3(callback){
-    d3.json('{{MEDIA_URL}}{{kda_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#kda_chart')
-      checkvar+=3;
-      $.event.trigger({
-        type:    "semaphore",
-        message: "Chart 3 done."
-      });
-
-    });
+      window.apiHit(
+        "#team_kda_chart",
+        '{% url "matches:api_own_team_endgame_chart" %}',
+        $.param({
+          players: '{{player1.persona_name}},{{player2.persona_name}}',
+          game_modes: [1, 2, 3, 4, 5],
+          x_var: 'duration',
+          y_var: 'K-D+.5*A',
+          group_var: 'player',
+          panel_var: 'is_win',
+          compressor: 'sum',
+          width: 300,
+          height: 300,
+        }, true),
+        semaphorefunc(3)
+      );
   }
 
   function chart4(callback){
-    d3.json('{{MEDIA_URL}}{{team_kda_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#team_kda_chart')
-      checkvar+=4;
-      $.event.trigger({
-        type:    "semaphore",
-        message: "Chart 4 done."
-      });
-
-    });
+      window.apiHit(
+        "#role_chart",
+        '{% url "players:api_role_chart" %}',
+        $.param({
+          player_1: '{{player1.persona_name}}',
+          player_2: '{{player2.persona_name}}',
+          plot_var: 'games',
+          width: 300,
+          height: 300,
+        }, true),
+        semaphorefunc(4)
+      );
+    return false
   }
 
 
@@ -200,6 +223,8 @@
           }
       });
   }
+
+
   chart1();
   chart2();
   chart3();

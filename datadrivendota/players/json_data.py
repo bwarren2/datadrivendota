@@ -8,10 +8,10 @@ from .models import Player
 from utils.exceptions import NoDataFound
 from itertools import chain
 from utils.charts import (
-    params_dict,
-    datapoint_dict,
-    color_scale_params,
-    hero_classes_dict
+    hero_classes_dict,
+    XYPlot,
+    DataPoint,
+    TasselPlot
 )
 from heroes.models import Hero, Role, HeroDossier
 from matches.models import SkillBuild
@@ -60,7 +60,7 @@ def player_winrate_json(
         player,
         game_modes=None,
         role_list=[],
-        min_date=datetime.date(2009, 1, 1),
+        min_date=None,
         max_date=None,
         group_var='alignment',
         ):
@@ -68,9 +68,12 @@ def player_winrate_json(
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
         max_date_utc = mktime(max_date.timetuple())
-    min_dt_utc = mktime(min_date.timetuple())
+    if min_date is None:
+        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
+    else:
+        min_date_utc = mktime(min_date.timetuple())
 
-    if min_dt_utc > max_date_utc:
+    if min_date_utc > max_date_utc:
         raise NoDataFound
     if game_modes is None:
         game_modes = [
@@ -85,7 +88,7 @@ def player_winrate_json(
     annotations = PlayerMatchSummary.objects.filter(
         player=player,
         match__validity=Match.LEGIT,
-        match__start_time__gte=min_dt_utc,
+        match__start_time__gte=min_date_utc,
         match__start_time__lte=max_date_utc,
         match__game_mode__steam_id__in=game_modes,
     )
@@ -123,22 +126,20 @@ def player_winrate_json(
         'steam_id',
         )
     hero_info_dict = {hero['name']:
-                    {
-                        'name': hero['name'],
-                        'machine_name': hero['machine_name'],
-                        'alignment': hero['herodossier__alignment'],
-                        'steam_id': hero['steam_id'],
-                    } for hero in all_heroes
+                        {
+                            'name': hero['name'],
+                            'machine_name': hero['machine_name'],
+                            'alignment': hero['herodossier__alignment'],
+                            'steam_id': hero['steam_id'],
+                        } for hero in all_heroes
     }
 
-    data_list, groups = [], []
+    c = XYPlot()
     for hero in heroes:
-        datadict = datapoint_dict()
         if group_var == 'hero':
             group = hero_info_dict[hero]['name']
         elif group_var == 'alignment':
             group = hero_info_dict[hero]['alignment'].title()
-        groups.append(group)
 
         url_str = reverse(
             'players:hero_style',
@@ -148,45 +149,35 @@ def player_winrate_json(
             }
         )
 
-        datadict.update({
-            'x_var': games[hero],
-            'y_var': round(win_rates[hero], 2),
-            'group_var': group,
-            'split_var': '',
-            'url': url_str,
-            'label': hero,
-            'tooltip': hero,
-            'classes': [],
-        })
+        d = DataPoint()
+
+        d.x_var = games[hero]
+        d.y_var = round(win_rates[hero], 2)
+        d.group_var = group
+        d.url = url_str
+        d.label = hero
+        d.tooltip = hero
+        d.classes = []
         if hero_classes[hero_info_dict[hero]['steam_id']] is not None:
-            datadict['classes'].extend(
+            d.classes.extend(
                 hero_classes[hero_info_dict[hero]['steam_id']]
             )
 
-        data_list.append(datadict)
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['x_min'] = min([d['x_var'] for d in data_list])
-    params['x_max'] = max([d['x_var'] for d in data_list])
-    params['y_min'] = min([d['y_var'] for d in data_list])
-    params['y_max'] = 100
-    params['x_label'] = 'Games'
-    params['y_label'] = 'Winrate'
-    params['draw_path'] = False
-    params['chart'] = 'xyplot'
-    params['margin']['left'] = 12*len(str(params['y_max']))
-    params['outerWidth'] = 500
-    params['outerHeight'] = 500
-    params['legendWidthPercent'] = .7
-    params['legendHeightPercent'] = .7
-    groups = [d['group_var'] for d in data_list]
-    if group_var == 'hero':
-        params['draw_legend'] = False
-    elif group_var == 'alignment':
-        params['draw_legend'] = True
-    params = color_scale_params(params, groups)
+    if group_var!='alignment':
+        c.params.draw_legend = False
 
-    return (data_list, params)
+    c.params.y_max = 100
+    c.params.x_label = 'Games'
+    c.params.y_label = 'Winrate'
+    c.params.draw_path = False
+    c.params.margin['left'] = 24
+    c.params.outerWidth = 500
+    c.params.outerHeight = 500
+    c.params.legendWidthPercent = .7
+    c.params.legendHeightPercent = .7
+    return c
 
 
 @do_profile()
@@ -218,58 +209,50 @@ def player_hero_abilities_json(
         sbs = sb1
     else:
         raise NoDataFound
-    datalist = []
-    xs = []
-    ys = []
+
+    c = TasselPlot()
     hero_classes = hero_classes_dict()
     for build in sbs:
         if build.level == 1:
             subtractor = build.time/60.0
-        datapoint = datapoint_dict()
-        datapoint['x_var'] = round(build.time/60.0-subtractor, 3)
-        xs.append(round(build.time/60.0-subtractor, 3))
-        datapoint['y_var'] = build.level
-        ys.append(build.level)
+        d = DataPoint()
+        d.x_var = round(build.time/60.0-subtractor, 3)
+        d.y_var = build.level
         winningness = 'Win' if \
             build.player_match_summary.is_win \
             else 'Loss'
         if division == 'Player win/loss':
-            datapoint['group_var'] = "{p}, ({win})".format(
+            d.group_var = "{p}, ({win})".format(
                 p=build.player_match_summary.player.display_name,
                 win=winningness)
         elif division == 'Players':
-            datapoint['group_var'] = "{p}".format(
+            d.group_var = "{p}".format(
                 p=build.player_match_summary.player.display_name)
         elif division == 'Win/loss':
-            datapoint['group_var'] = "{win}".format(
+            d.group_var = "{win}".format(
                 win=winningness)
-        datapoint['series_var'] = build.player_match_summary.match.steam_id
-        datapoint['label'] = build.player_match_summary.player.display_name
-        datapoint['split_var'] = 'Skill Progression'
+        d.series_var = build.player_match_summary.match.steam_id
+        d.label = build.player_match_summary.player.display_name
+        d.panel_var = 'Skill Progression'
         hero_id = build.player_match_summary.hero.steam_id
         if hero_classes[hero_id] is not None:
-            datapoint['classes'].extend(hero_classes[hero_id])
+            d.classes.extend(hero_classes[hero_id])
 
-        datalist.append(datapoint)
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['chart'] = 'scatterseries'
-    params['x_min'] = 0
-    params['x_max'] = max(xs)
-    params['y_min'] = min(ys)
-    params['y_max'] = max(ys)
-    params['x_label'] = 'Time (m)'
-    params['y_label'] = 'Level'
+    c.params.x_min = 0
+    c.params.x_label = 'Time (m)'
+    c.params.y_label = 'Level'
 
-    return (datalist, params)
+    return c
 
 
 @do_profile()
 def player_versus_winrate_json(
-        player_id_1,
-        player_id_2,
-        game_mode_list=None,
-        min_date=datetime.date(2009, 1, 1),
+        player_1,
+        player_2,
+        game_modes=None,
+        min_date=None,
         max_date=None,
         group_var='alignment',
         plot_var='winrate',
@@ -278,21 +261,24 @@ def player_versus_winrate_json(
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
         max_date_utc = mktime(max_date.timetuple())
-    min_dt_utc = mktime(min_date.timetuple())
+    if min_date is None:
+        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
+    else:
+        min_date_utc = mktime(min_date.timetuple())
 
     hero_classes = hero_classes_dict()
 
-    if min_dt_utc > max_date_utc:
+    if min_date_utc > max_date_utc:
         raise NoDataFound
-    if game_mode_list is None:
-        game_mode_list = [
+    if game_modes is None:
+        game_modes = [
             gm.steam_id
             for gm in GameMode.objects.filter(is_competitive=True)
         ]
 
     try:
-        player_1 = Player.objects.get(steam_id=player_id_1)
-        player_2 = Player.objects.get(steam_id=player_id_2)
+        player_1 = Player.objects.get(steam_id=player_1)
+        player_2 = Player.objects.get(steam_id=player_2)
 
     except Player.DoesNotExist:
         raise NoDataFound
@@ -300,9 +286,9 @@ def player_versus_winrate_json(
     pmses = PlayerMatchSummary.objects.filter(
         player__in=[player_1, player_2],
         match__validity=Match.LEGIT,
-        match__start_time__gte=min_dt_utc,
+        match__start_time__gte=min_date_utc,
         match__start_time__lte=max_date_utc,
-        match__game_mode__steam_id__in=game_mode_list,
+        match__game_mode__steam_id__in=game_modes,
     ).select_related().distinct()
 
     if len(pmses) == 0:
@@ -358,79 +344,63 @@ def player_versus_winrate_json(
                     } for hero in all_heroes
     }
 
-    data_list, groups = [], []
+    c = XYPlot()
     for hero_name, dataset in pairings.iteritems():
-        datadict = datapoint_dict()
+        d = DataPoint()
         if group_var == 'hero':
             group = hero_info_dict[hero_name]['name']
         elif group_var == 'alignment':
             group = hero_info_dict[hero_name]['alignment'].title()
-        groups.append(group)
 
-        datadict.update({
-            'group_var': group,
-            'split_var': '',
-            'label': hero_info_dict[hero_name]['name'],
-            'tooltip': hero_info_dict[hero_name]['name'],
-            'classes': [],
-        })
+            d.group_var = group,
+            d.label = hero_info_dict[hero_name]['name'],
+            d.tooltip = hero_info_dict[hero_name]['name'],
+
         if hero_classes[hero_info_dict[hero_name]['steam_id']] is not None:
-            datadict['classes'].extend(hero_classes[hero_info_dict[
+            d.classes.extend(hero_classes[hero_info_dict[
                 hero_name]['steam_id']
                 ])
-        datadict['point_size'] = min(
+        d.point_size = min(
             dataset[player_1]['total_games'],
             dataset[player_2]['total_games']
             )
-        datadict['stroke_width'] = 2
+        d.stroke_width = 2
         if plot_var == 'winrate':
 
-            datadict['x_var'] = dataset[player_1]['winrate']
-            datadict['y_var'] = dataset[player_2]['winrate']
+            d.x_var = dataset[player_1]['winrate']
+            d.y_var = dataset[player_2]['winrate']
         else:
-            datadict['x_var'] = dataset[player_1]['total_games']
-            datadict['y_var'] = dataset[player_2]['total_games']
+            d.x_var = dataset[player_1]['total_games']
+            d.y_var = dataset[player_2]['total_games']
 
-        data_list.append(datadict)
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['x_min'] = min([d['x_var'] for d in data_list])
-    params['x_max'] = max([d['x_var'] for d in data_list])
-    params['y_min'] = min([d['y_var'] for d in data_list])
-    params['y_max'] = max([d['y_var'] for d in data_list])
-    params['groups'] = [d['group_var'] for d in data_list]
-    params['x_label'] = "{name} {pvar}".format(
+    c.params.x_label = "{name} {pvar}".format(
         name=player_1.display_name,
         pvar=plot_var,
     )
-    params['y_label'] = "{name} {pvar}".format(
+    c.params.y_label = "{name} {pvar}".format(
         name=player_2.display_name,
         pvar=plot_var,
     )
-    params['draw_path'] = False
-    params['chart'] = 'xyplot'
-    params['margin']['left'] = 12*len(str(params['y_max']))
-    params['legendWidthPercent'] = .7
-    params['legendHeightPercent'] = .1
-    params['pointDomainMin'] = 0
-    params['pointDomainMax'] = 10
-    params['pointSizeMin'] = 2
-    params['pointSizeMax'] = 5
-    params['strokeSizeMin'] = 1
-    params['strokeSizeMax'] = 1
+    c.params.pointDomainMin = 0
+    c.params.pointDomainMax = 10
+    c.params.pointSizeMin = 2
+    c.params.pointSizeMax = 5
+    c.params.strokeSizeMin = 1
+    c.params.strokeSizeMax = 1
 
     if plot_var == 'winrate':
-        params['y_max'] = 100
-        params['x_max'] = 100
-        params['strokeDomainMin'] = 0
-        params['strokeDomainMax'] = 1
+        c.params.y_max = 100
+        c.params.x_max = 100
+        c.params.strokeDomainMin = 0
+        c.params.strokeDomainMax = 1
     if group_var == 'hero':
-        params['draw_legend'] = False
+        c.params.draw_legend = False
     elif group_var == 'alignment':
-        params['draw_legend'] = True
-    params = color_scale_params(params, groups)
+        c.params.draw_legend = True
 
-    return (data_list, params)
+    return c
 
 
 @do_profile()
@@ -447,10 +417,12 @@ def player_hero_side_json(
         max_date_utc = mktime(datetime.datetime.now().timetuple())
     else:
         max_date_utc = mktime(max_date.timetuple())
+    if min_date is None:
+        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
+    else:
+        min_date_utc = mktime(min_date.timetuple())
 
-    min_dt_utc = mktime(min_date.timetuple())
-
-    if min_dt_utc > max_date_utc:
+    if min_date_utc > max_date_utc:
         raise NoDataFound
 
     all_heroes = Hero.objects.all()
@@ -471,7 +443,7 @@ def player_hero_side_json(
     player_radiant_matches = Match.objects.filter(
         playermatchsummary__player=player,
         validity=Match.LEGIT,
-        start_time__gte=min_dt_utc,
+        start_time__gte=min_date_utc,
         start_time__lte=max_date_utc,
         game_mode__steam_id__in=game_modes,
         playermatchsummary__player_slot__lt=6,
@@ -480,7 +452,7 @@ def player_hero_side_json(
     player_dire_matches = Match.objects.filter(
         playermatchsummary__player=player,
         validity=Match.LEGIT,
-        start_time__gte=min_dt_utc,
+        start_time__gte=min_date_utc,
         start_time__lte=max_date_utc,
         game_mode__steam_id__in=game_modes,
         playermatchsummary__player_slot__gt=6,
@@ -573,10 +545,10 @@ def player_hero_side_json(
             gamedct['winrate'] = gamedct['wins']/float(denominator)*100
 
     hero_classes = hero_classes_dict()
-    data_list, groups = [], []
+    c = XYPlot()
     for name, dataset in outcome_dict.iteritems():
         hero = hero_names[name]
-        datadict = datapoint_dict()
+        d = DataPoint()
         if group_var == 'hero':
             group = hero.name.title()
         elif group_var == 'alignment':
@@ -584,70 +556,55 @@ def player_hero_side_json(
                 group = hero.herodossier.alignment.title()
             except HeroDossier.DoesNotExist:
                 group = ''
-        groups.append(group)
 
-        datadict.update({
-            'group_var': group,
-            'split_var': '',
-            'label': hero.name,
-            'tooltip': hero.name,
-            'classes': [],
-        })
+        d.group_var = group
+        d.label = hero.name
+        d.tooltip = hero.name
         if hero_classes[hero.steam_id] is not None:
-            datadict['classes'].extend(hero_classes[hero.steam_id])
+            d.classes.extend(hero_classes[hero.steam_id])
 
         if plot_var == 'winrate':
-            datadict['point_size'] = dataset['same_side']['total_games']
-            datadict['stroke_width'] = dataset['opposite_side']['total_games']
+            d.point_size = dataset['same_side']['total_games']
+            d.stroke_width = dataset['opposite_side']['total_games']
 
-            datadict['x_var'] = dataset['same_side']['winrate']
-            datadict['y_var'] = dataset['opposite_side']['winrate']
+            d.x_var = dataset['same_side']['winrate']
+            d.y_var = dataset['opposite_side']['winrate']
         else:
-            datadict['point_size'] = \
+            d.point_size = \
                 (dataset['same_side']['total_games']
                     + dataset['opposite_side']['total_games'])/2.0
-            datadict['x_var'] = dataset['same_side']['total_games']
-            datadict['y_var'] = dataset['opposite_side']['total_games']
+            d.x_var = dataset['same_side']['total_games']
+            d.y_var = dataset['opposite_side']['total_games']
 
-        data_list.append(datadict)
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['x_min'] = min([d['x_var'] for d in data_list])
-    params['x_max'] = max([d['x_var'] for d in data_list])
-    params['y_min'] = min([d['y_var'] for d in data_list])
-    params['y_max'] = max([d['y_var'] for d in data_list])
-    params['x_label'] = "Same-side {pvar}".format(
+    c.params.x_label = "Same-side {pvar}".format(
         pvar=plot_var,
     )
-    params['y_label'] = "Opposite-side {pvar}".format(
+    c.params.y_label = "Opposite-side {pvar}".format(
         pvar=plot_var,
     )
-    params['draw_path'] = False
-    params['chart'] = 'xyplot'
-    params['margin']['left'] = 35
-    params['legendWidthPercent'] = .7
-    params['legendHeightPercent'] = .1
-    params['pointDomainMin'] = 0
-    params['pointDomainMax'] = 10
-    params['pointSizeMin'] = 1
-    params['pointSizeMax'] = 5
+    c.params.margin['left'] = 35
+    c.params.pointDomainMin = 0
+    c.params.pointDomainMax = 10
+    c.params.pointSizeMin = 1
+    c.params.pointSizeMax = 5
 
     if plot_var == 'winrate':
-        params['y_min'] = 0
-        params['x_min'] = 0
-        params['y_max'] = 100
-        params['x_max'] = 100
-        params['strokeDomainMin'] = 0
-        params['strokeDomainMax'] = 10
-        params['strokeSizeMin'] = 0
-        params['strokeSizeMax'] = 2
+        c.params.y_min = 0
+        c.params.x_min = 0
+        c.params.y_max = 100
+        c.params.x_max = 100
+        c.params.strokeDomainMin = 0
+        c.params.strokeDomainMax = 10
+        c.params.strokeSizeMin = 0
+        c.params.strokeSizeMax = 2
     if group_var == 'hero':
-        params['draw_legend'] = False
+        c.params.draw_legend = False
     elif group_var == 'alignment':
-        params['draw_legend'] = True
-    params = color_scale_params(params, [d['group_var'] for d in data_list])
+        c.params.draw_legend = True
 
-    return (data_list, params)
+    return c
 
 
 @do_profile()
@@ -691,66 +648,47 @@ def player_role_json(
             denominator = subdict['games'] if subdict['games'] != 0 else 1
             subdict['winrate'] = subdict[True] / float(denominator) * 100
 
-    data_list = []
-    params = params_dict()
+    c = XYPlot()
     for role, info in role_dict.iteritems():
 
         if plot_var == 'performance':
             for player_id, data in info.iteritems():
-                datadict = datapoint_dict()
-                datadict.update({
-                    'group_var': player_id,
-                    'split_var': '',
-                    'label': role,
-                    'tooltip': role,
-                    'x_var': data['games'],
-                    'y_var': data['winrate'],
-                    'classes': [slugify(role)],
-                })
+                d = DataPoint()
+                d.group_var = player_id
+                d.label = role
+                d.tooltip = role
+                d.x_var = data['games']
+                d.y_var = data['winrate']
+                d.classes.extend([slugify(role)])
                 x_label = "Games"
                 y_label = "Winrate"
 
         elif plot_var == 'games':
-                datadict = datapoint_dict()
-                datadict.update({
-                    'group_var': role,
-                    'split_var': '',
-                    'label': role,
-                    'tooltip': role,
-                    'x_var': info[player_1]['games'],
-                    'y_var': info[player_2]['games'],
-                    'classes': [slugify(role)],
-                })
+                d = DataPoint()
+                d.group_var = role
+                d.panel_var = ''
+                d.label = role
+                d.tooltip = role
+                d.x_var = info[player_1]['games']
+                d.y_var = info[player_2]['games']
+                d.classes.extend([slugify(role)])
                 x_label = "{p} Games".format(p=p1_obj.display_name)
                 y_label = "{p} Games".format(p=p2_obj.display_name)
 
         elif plot_var == 'winrate':
-                datadict = datapoint_dict()
-                datadict.update({
-                    'group_var': role,
-                    'split_var': '',
-                    'label': role,
-                    'tooltip': role,
-                    'x_var': info[player_1]['winrate'],
-                    'y_var': info[player_2]['winrate'],
-                    'classes': [slugify(role)],
-                })
-                datadict['classes'].append(slugify(role))
+                d = DataPoint()
+                d.group_var = role
+                d.panel_var = ''
+                d.label = role
+                d.tooltip = role
+                d.x_var = info[player_1]['winrate']
+                d.y_var = info[player_2]['winrate']
+                d.classes.extend([slugify(role)])
                 x_label = "{p} Winrate".format(p=p1_obj.display_name)
                 y_label = "{p} Winrate".format(p=p2_obj.display_name)
-        data_list.append(datadict)
+        c.datalist.append(d)
 
-    params['x_min'] = min([d['x_var'] for d in data_list])
-    params['x_max'] = max([d['x_var'] for d in data_list])
-    params['y_min'] = min([d['y_var'] for d in data_list])
-    params['y_max'] = max([d['y_var'] for d in data_list])
-    params['x_label'] = x_label
-    params['y_label'] = y_label
-    params['draw_path'] = False
-    params['chart'] = 'xyplot'
-    params['margin']['left'] = 12*len(str(params['y_max']))
-    params['legendWidthPercent'] = .7
-    params['legendHeightPercent'] = .1
-    params = color_scale_params(params, [d['group_var'] for d in data_list])
+    c.params.x_label = x_label
+    c.params.y_label = y_label
 
-    return (data_list, params)
+    return c

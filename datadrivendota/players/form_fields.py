@@ -2,6 +2,7 @@ from django import forms
 from .models import Player
 from django.forms import ValidationError
 from django.core.exceptions import MultipleObjectsReturned
+from urllib import unquote
 
 
 class SinglePlayerField(forms.CharField):
@@ -17,6 +18,7 @@ class SinglePlayerField(forms.CharField):
                 "Only one player please. "
                 "Commas in names also trigger this error."
             )
+        player_name = unquote(player_name)
         try:
             player = player_by_name(player_name)
         except Player.DoesNotExist:
@@ -35,6 +37,7 @@ class MultiPlayerField(forms.CharField):
         player_list = player.split(',')
         return_player_list = []
         for player in player_list:
+            player = unquote(player)
             try:
                 player = player_by_name(player)
             except Player.DoesNotExist:

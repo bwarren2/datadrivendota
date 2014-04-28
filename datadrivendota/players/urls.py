@@ -50,5 +50,30 @@ urlpatterns = patterns(
     url(r'^api/dropfollow/$', views.drop_follow, name='drop_follow'),
     url(r'^api/checkid/$', views.check_id, name='check_id'),
     url(r'^api/addtrack/$', views.add_track, name='add_track'),
+    url(
+        r'^api/winrate/$',
+        views.ApiWinrateChart.as_view(),
+        name='api_winrate_chart'
+        ),
+    url(
+        r'^api/hero-adversary/$',
+        views.HeroAdversary.as_view(),
+        name='api_hero_adversary_chart'
+        ),
+    url(
+        r'^api/hero-abilities/$',
+        views.ApiHeroAbilities.as_view(),
+        name='api_hero_abilities_chart'
+        ),
+    url(
+        r'^api/versus-winrate/$',
+        views.ApiVersusWinrate.as_view(),
+        name='api_versus_winrate_chart'
+        ),
+    url(
+        r'^api/role/$',
+        views.ApiRole.as_view(),
+        name='api_role_chart'
+        ),
 
 )

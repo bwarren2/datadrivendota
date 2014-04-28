@@ -106,7 +106,7 @@ class HeroPlayerPerformance(forms.Form):
     X_PARAMETERS.insert(0, 'duration')
     X_LIST = [(item, item) for item in X_PARAMETERS]
     Y_LIST = [(item, item) for item in SHARED_PARAMETERS]
-    SPLIT_PARAMS = ['is_win', 'game_mode', 'skill_name']
+    SPLIT_PARAMS = ['is_win', 'game_mode', 'skill_name', None]
     DOUBLE_PARAMS = [(item, item) for item in SPLIT_PARAMS]
 
     hero = SingleHeroSelect(
@@ -130,7 +130,7 @@ class HeroPlayerPerformance(forms.Form):
         required=True,
         help_text='What goes on the Y axis?'
     )
-    split_var = forms.ChoiceField(
+    panel_var = forms.ChoiceField(
         choices=DOUBLE_PARAMS,
         initial='is_win',
         required=True,
@@ -222,4 +222,15 @@ class HeroBuildForm(forms.Form):
         required=True,
         initial=[5, 10, 15],
         help_text='Which levels would you like to see?'
+    )
+
+
+class UpdatePlayerWinrateForm(forms.Form):
+
+    hero = SingleHeroSelect(
+        required=True,
+        help_text='Pick only one hero'
+    )
+    game_modes = MultiGameModeSelect(
+        help_text='Which game modes would you like to sample?'
     )

@@ -73,8 +73,8 @@ DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 
 DEVSERVER_MODULES = (
-    'devserver.modules.sql.SQLRealTimeModule',
-    'devserver.modules.sql.SQLSummaryModule',
+#    'devserver.modules.sql.SQLRealTimeModule',
+#    'devserver.modules.sql.SQLSummaryModule',
     'devserver.modules.profile.ProfileSummaryModule',
 
     # Modules not enabled by default
@@ -86,3 +86,4 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 VERBOSE_PROFILING = True
+DEVSERVER_AUTO_PROFILE = True

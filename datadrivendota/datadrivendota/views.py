@@ -2,13 +2,13 @@ from json import dumps
 from os.path import basename
 from functools import wraps
 
-
-from django.utils.decorators import method_decorator
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
 from django.conf import settings
+from django.core.exceptions import SuspiciousOperation
 
-from utils.file_management import outsourceJson
+from utils.file_management import outsourceJson, moveJson
 from utils.exceptions import NoDataFound
 
 from datadrivendota.forms import KeyForm
@@ -55,7 +55,6 @@ def upgrade(request):
         form = KeyForm(request.POST)
 
         if request.user.is_authenticated():
-            print request.user
             if form.is_valid():
                 code = form.cleaned_data['code']
                 try:
@@ -161,3 +160,150 @@ class FormView(View):
 
     def amend_params(self, params):
         return params
+
+
+class ChartFormView(View):
+
+    tour = None
+    form = None
+    attrs = None
+    json_function = None
+    title = None
+    html = None
+
+    def get(self, request):
+        self.json_tour = dumps(self.tour)
+        if request.GET:
+            bound_form = self.form(request.GET)
+
+            if bound_form.is_valid():
+                try:
+                    kwargs = {
+                        attr: bound_form.cleaned_data[attr]
+                        for attr in self.attrs
+                    }
+
+                    chart = self.json_function(
+                        **kwargs
+                    )
+                    self.amend_params(chart)
+                    json_data = moveJson(chart.as_JSON())
+
+                    return render(
+                        request,
+                        self.html,
+                        {
+                            'form': bound_form,
+                            'json_data': basename(json_data.name),
+                            'title': self.title,
+                            'tour': self.json_tour,
+                        }
+                    )
+
+                except NoDataFound:
+                    return render(
+                        request,
+                        self.html,
+                        {
+                            'form': bound_form,
+                            'error': 'error',
+                            'title': self.title,
+                            'tour': self.json_tour,
+                        }
+                    )
+
+            else:
+                return render(
+                    request,
+                    self.html,
+                    {
+                        'form': bound_form,
+                        'title': self.title,
+                        'tour': self.json_tour,
+                    }
+                )
+
+        else:
+            form = self.form
+            return render(
+                request,
+                self.html,
+                {
+                    'form': form,
+                    'title': self.title,
+                    'tour': self.json_tour,
+                }
+            )
+
+    def amend_params(self, chart):
+        return chart
+
+
+class ApiView(View):
+
+    def get(self, request):
+        if (request.is_ajax() and request.GET) or True:
+            try:
+                bound_form = self.form(request.GET)
+                if bound_form.is_valid():
+                    kwargs = {}
+                    for attr in self.attrs:
+                        try:
+                            kwargs.update(
+                                {attr: bound_form.cleaned_data[attr]}
+                            )
+                        except KeyError:
+                            pass
+
+                    chart = self.json_function(
+                        **kwargs
+                    )
+                    self.amend_params(request, chart)
+                    json_data = moveJson(chart.as_JSON())
+
+                    return self.succeed(json_data)
+
+                else:
+                    print bound_form.errors
+                    return self.fail()
+
+            except NoDataFound:
+                return self.fail()
+        else:
+            # raise SuspiciousOperation
+            return self.fail()
+
+    def amend_params(self, request, chart):
+        doctorVars = {
+            'width': 'outerWidth',
+            'height': 'outerHeight',
+            'draw_legend': 'draw_legend',
+        }
+        for var, adjust in doctorVars.iteritems():
+            reqvar = request.GET.get(var, None)
+            if reqvar is not None:
+                setattr(chart.params, adjust, reqvar)
+
+        flagVars = [
+            'no_legend'
+        ]
+        for var in flagVars:
+            reqvar = request.GET.get(var, None)
+            if reqvar is not None:
+                if var == 'no_legend':
+                    chart.params.draw_legend = False
+
+    def succeed(self, json_data):
+        response_data = {}
+        response_data['result'] = 'success'
+        response_data['url'] = settings.MEDIA_URL\
+            + basename(json_data.name)
+        return HttpResponse(
+            dumps(response_data),
+            content_type="application/json"
+        )
+
+    def fail(self):
+        data = 'fail'
+        mimetype = 'application/json'
+        return HttpResponse(data, mimetype)

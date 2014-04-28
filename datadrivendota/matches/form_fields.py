@@ -40,3 +40,17 @@ class MultiMatchSelect(forms.CharField):
             return_match_list.append(found_match.steam_id)
 
         return return_match_list
+
+
+class SingleMatchSelect(forms.CharField):
+    widget = forms.HiddenInput(attrs={'class': 'single-match-tags'})
+
+    def clean(self, match):
+        if ',' in match:
+            raise ValidationError("Only one match at a time.")
+        try:
+            match = Match.objects.get(steam_id=match)
+        except Match.DoesNotExist:
+            raise ValidationError("We don't have that match.")
+
+        return match.steam_id

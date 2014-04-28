@@ -1,6 +1,6 @@
 import datetime
 import json
-from random import randint
+from random import choice
 from celery import chain
 from functools import wraps
 from django.conf import settings
@@ -12,10 +12,7 @@ from django.contrib.auth.decorators import permission_required
 from os.path import basename
 from .models import Player, UserProfile
 from .forms import (
-    PlayerWinrateLevers,
     PlayerAddFollowForm,
-    HeroAbilitiesForm,
-    PlayerAdversarialForm,
 )
 from matches.models import PlayerMatchSummary, Match, GameMode
 from matches.management.tasks.valve_api_calls import (
@@ -27,22 +24,22 @@ from matches.management.tasks.valve_api_calls import (
 from .models import request_to_player
 
 from .json_data import (
-    player_hero_side_json,
-    player_winrate_json,
-    player_hero_abilities_json,
     player_versus_winrate_json,
     player_role_json,
     )
-from matches.json_data import player_endgame_json, player_team_endgame_json
-from heroes.json_data import (
-    hero_progression_json,
-    hero_performance_chart_json,
-    hero_skillbuild_winrate_json
+from .mixins import (
+    WinrateMixin,
+    HeroAdversaryMixin,
+    HeroAbilitiesMixin,
+    VersusWinrateMixin,
+    RoleMixin,
     )
-from utils.file_management import outsourceJson
+
+from matches.json_data import player_endgame_json, player_team_endgame_json
+from utils.file_management import outsourceJson, moveJson
 from heroes.models import Hero
-from items.json_data import item_endgame
-from datadrivendota.views import FormView
+from datadrivendota.views import ChartFormView, ApiView
+
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
         raise ImportError
@@ -107,11 +104,12 @@ def detail(request, player_id=None):
     else:
         p2 = Player.objects.exclude(
             pro_name=None,
+        ).exclude(
             steam_id=player.steam_id,
         ).filter(
             updated=True,
         )
-        p2 = p2[randint(0, len(p2))]
+        p2 = choice([p for p in p2])
         compare_url = reverse(
             'players:comparison',
             kwargs={
@@ -164,40 +162,17 @@ def detail(request, player_id=None):
         pms.display_duration = \
             str(datetime.timedelta(seconds=pms.match.duration))
 
-    datalist, params = player_winrate_json(
-        player.steam_id,
-    )
-    params['outerWidth'] = 350
-    params['outerHeight'] = 350
-    winrate_json = outsourceJson(datalist, params)
-
     #Compare to dendi and s4 by default
     player_list = [70388657, 41231571, player.steam_id]
-
-    game_modes = [
-        mode.steam_id for mode in GameMode.objects.filter(is_competitive=True)
-    ]
-
-    datalist, params = player_endgame_json(
-        players=player_list,
-        game_modes=game_modes,
-        x_var='duration',
-        y_var='K-D+.5*A',
-        split_var='No Split',
-        group_var='player'
-    )
-
-    params['outerWidth'] = 350
-    params['outerHeight'] = 350
-    endgame_json = outsourceJson(datalist, params)
+    endgame_players = Player.objects.filter(steam_id__in=player_list)
+    player_names = ",".join([p.persona_name for p in endgame_players])
 
     return render(
         request,
         'players/detail.html',
         {
             'player': player,
-            'winrate_json': basename(winrate_json.name),
-            'endgame_json': basename(endgame_json.name),
+            'endgame_chart_names': player_names,
             'stats': stats,
             'compare_url': compare_url,
             'compare_str': compare_str,
@@ -206,7 +181,7 @@ def detail(request, player_id=None):
     )
 
 
-class Winrate(FormView):
+class Winrate(WinrateMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -230,21 +205,11 @@ class Winrate(FormView):
             'content': "Challenge: Who is Dendi's highest winrate hero of those with 15 games?"
         }
     ]
-    form = PlayerWinrateLevers
-    attrs = [
-        'player',
-        'game_modes',
-        'min_date',
-        'group_var',
-    ]
-    json_function = staticmethod(player_winrate_json)
     title = "Hero Winrate"
     html = "players/form.html"
 
-    def amend_params(self, params):
-        return params
 
-class HeroAdversary(FormView):
+class HeroAdversary(HeroAdversaryMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -252,24 +217,12 @@ class HeroAdversary(FormView):
             'content': "This page charts hero adversarial performance."
         },
     ]
-    form = PlayerAdversarialForm
-    attrs = [
-        'player',
-        'game_modes',
-        'min_date',
-        'max_date',
-        'group_var',
-        'plot_var',
-    ]
-    json_function = staticmethod(player_hero_side_json)
     title = "Player Hero Adversary"
     html = "players/form.html"
 
-    def amend_params(self, params):
-        return params
 
 
-class HeroAbilities(FormView):
+class HeroAbilities(HeroAbilitiesMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -298,22 +251,12 @@ class HeroAbilities(FormView):
             'content': "Challenge: At what level does Dendi's Pudge start falling behind Funnik's Lifestealer?"
         }
     ]
-    form = HeroAbilitiesForm
-    attrs = [
-        'player_1',
-        'hero_1',
-        'player_2',
-        'hero_2',
-        'game_modes',
-        'division',
-    ]
-    json_function = staticmethod(player_hero_abilities_json)
     title = "Hero Skilling Comparison"
     html = "players/form.html"
 
-    def amend_params(self, params):
-        params['path_stroke_width'] = 1
-        return params
+    def amend_params(self, chart):
+        chart.params.path_stroke_width = 1
+        return chart
 
 
 def player_matches(request, player_id=None):
@@ -345,178 +288,20 @@ def comparison(request, player_id_1, player_id_2):
     player_1 = get_object_or_404(Player, steam_id=player_id_1)
     player_2 = get_object_or_404(Player, steam_id=player_id_2)
 
-    datalist, params = player_versus_winrate_json(
-        player_id_1=player_1.steam_id,
-        player_id_2=player_2.steam_id,
-        plot_var='winrate',
-        )
-    params['margin']['left'] = 33
-    params['outerHeight'] = 300
-    params['outerWidth'] = 300
-    winrate_json = outsourceJson(datalist, params)
-
-    datalist, params = player_versus_winrate_json(
-        player_id_1=player_1.steam_id,
-        player_id_2=player_2.steam_id,
-        plot_var='usage',
-        )
-    params['margin']['left'] = 30
-    params['outerHeight'] = 300
-    params['outerWidth'] = 300
-    usage_json = outsourceJson(datalist, params)
-
-    datalist, params = player_role_json(
-        player_1.steam_id,
-        player_2.steam_id,
-        plot_var='games',
-    )
-    params['outerHeight'] = 300
-    params['outerWidth'] = 300
-    role_json = outsourceJson(datalist, params)
-
-    game_modes = [
-        mode.steam_id for mode in GameMode.objects.filter(is_competitive=True)
-    ]
-
-    datalist, params = player_endgame_json(
-        players=[player_1.steam_id, player_2.steam_id],
-        game_modes=game_modes,
-        x_var='duration',
-        y_var='K-D+.5*A',
-        split_var='is_win',
-        group_var='player',
-        )
-    params['outerHeight'] = 250
-    params['outerWidth'] = 250
-    kda_json = outsourceJson(datalist, params)
-
-    datalist, params = player_team_endgame_json(
-        players=[player_1.steam_id, player_2.steam_id],
-        game_modes=game_modes,
-        x_var='duration',
-        y_var='K-D+.5*A',
-        split_var='is_win',
-        group_var='player',
-        )
-    params['outerHeight'] = 250
-    params['outerWidth'] = 250
-    team_kda_json = outsourceJson(datalist, params)
-
     return render(
         request,
         'players/comparison.html',
         {
             'player1': player_1,
             'player2': player_2,
-            'winrate_json': basename(winrate_json.name),
-            'usage_json': basename(usage_json.name),
-            'kda_json': basename(kda_json.name),
-            'team_kda_json': basename(team_kda_json.name),
-            'role_json': basename(role_json.name),
         }
     )
 
 
 def hero_style(request, player_id, hero_name):
+    #So much magic in the template!
     player = get_object_or_404(Player, steam_id=player_id)
     hero = get_object_or_404(Hero, machine_name=hero_name)
-    game_modes = [
-        mode.steam_id for mode in GameMode.objects.filter(is_competitive=True)
-    ]
-    datalist, params = hero_progression_json(
-        hero=hero.steam_id,
-        player=player.steam_id,
-        game_modes=game_modes,
-        division='Skill'
-    )
-    params['outerHeight'] = 275
-    params['outerWidth'] = 275
-    params['fadeOpacity'] = 0
-    hero_progression = outsourceJson(datalist, params)
-
-    datalist, params = item_endgame(
-        hero=hero.steam_id,
-        player=player.steam_id,
-        game_modes=game_modes,
-    )
-    params['outerHeight'] = 275
-    params['outerWidth'] = 275
-    params['draw_legend'] = False
-    item_winrate_json = outsourceJson(datalist, params)
-
-    datalist, params = hero_skillbuild_winrate_json(
-        hero=hero.steam_id,
-        player=player.steam_id,
-        game_modes=game_modes,
-        levels=[5, 10, 15],
-    )
-    params['outerHeight'] = 275
-    params['outerWidth'] = 275
-    skill_winrate_json = outsourceJson(datalist, params)
-
-    datalist, params = hero_performance_chart_json(
-        hero=hero.steam_id,
-        player=player.steam_id,
-        game_mode_list=game_modes,
-        x_var='duration',
-        y_var='K-D+.5*A',
-        group_var='skill_name',
-        split_var='is_win'
-    )
-    params['outerHeight'] = 275
-    params['outerWidth'] = 275
-    params['legendWidthPercent'] = .3
-    params['legendHeightPercent'] = .1
-    params['fadeOpacity'] = 0
-    hero_kda2_chart_json = outsourceJson(datalist, params)
-
-    datalist, params = hero_performance_chart_json(
-        hero=hero.steam_id,
-        player=player.steam_id,
-        game_mode_list=game_modes,
-        x_var='duration',
-        y_var='kills',
-        group_var='skill_name',
-        split_var='is_win'
-    )
-    params['outerHeight'] = 275
-    params['outerWidth'] = 275
-    params['legendWidthPercent'] = .3
-    params['legendHeightPercent'] = .1
-    params['fadeOpacity'] = 0
-    hero_kills_chart_json = outsourceJson(datalist, params)
-
-    datalist, params = hero_performance_chart_json(
-        hero=hero.steam_id,
-        player=player.steam_id,
-        game_mode_list=game_modes,
-        x_var='duration',
-        y_var='tower_damage',
-        group_var='skill_name',
-        split_var='is_win'
-    )
-    params['outerHeight'] = 275
-    params['outerWidth'] = 275
-    params['legendWidthPercent'] = .3
-    params['legendHeightPercent'] = .1
-    params['fadeOpacity'] = 0
-    hero_push_json = outsourceJson(datalist, params)
-
-    datalist, params = hero_performance_chart_json(
-        hero=hero.steam_id,
-        player=player.steam_id,
-        game_mode_list=game_modes,
-        x_var='duration',
-        y_var='hero_damage',
-        group_var='skill_name',
-        split_var='is_win'
-    )
-    params['outerHeight'] = 275
-    params['outerWidth'] = 275
-    params['legendWidthPercent'] = .3
-    params['legendHeightPercent'] = .1
-    params['fadeOpacity'] = 0
-    hero_dmg_json = outsourceJson(datalist, params)
 
     return render(
         request,
@@ -524,13 +309,6 @@ def hero_style(request, player_id, hero_name):
         {
             'player': player,
             'hero': hero,
-            'hero_progression_json': basename(hero_progression.name),
-            'item_winrate_json': basename(item_winrate_json.name),
-            'hero_kda2_chart_json': basename(hero_kda2_chart_json.name),
-            'hero_push_json': basename(hero_push_json.name),
-            'hero_dmg_json': basename(hero_dmg_json.name),
-            'skill_winrate_json': basename(skill_winrate_json.name),
-            'hero_kills_chart_json': basename(hero_kills_chart_json.name),
         }
     )
 
@@ -801,3 +579,25 @@ def get_playermatchsummaries_for_player(player, count):
         pms.color_class = 'pos' if pms.KDA2 > 0 else 'neg'
         pms.mag = abs(pms.KDA2)*2
     return pms_list
+
+
+class ApiWinrateChart(WinrateMixin, ApiView):
+    pass
+
+
+class ApiHeroAdversary(HeroAdversaryMixin, ApiView):
+    pass
+
+
+class ApiHeroAbilities(HeroAbilitiesMixin, ApiView):
+    pass
+
+
+class ApiVersusWinrate(VersusWinrateMixin, ApiView):
+    pass
+
+
+class ApiRole(RoleMixin, ApiView):
+    pass
+
+

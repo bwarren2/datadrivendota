@@ -1,22 +1,28 @@
 import datetime
 import json
-from django.http import HttpResponse
-from django.contrib.auth.decorators import user_passes_test
-from django.utils.decorators import method_decorator
 from functools import wraps
 from os.path import basename
+
+from django.http import HttpResponse
+from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.conf import settings
+from django.core.urlresolvers import reverse
+
 from heroes.models import Hero
-from .forms import (
-    EndgameSelect,
-    TeamEndgameSelect,
-    MatchAbilitySelect,
-    MatchListSelect
-)
 from .models import Match, PlayerMatchSummary, PickBan, SkillBuild
+from .mixins import (
+    EndgameMixin,
+    OwnTeamEndgameMixin,
+    SameTeamEndgameMixin,
+    ProgressionListMixin,
+    AbilityBuildMixin,
+    MatchParameterMixin,
+    SingleMatchParameterMixin,
+    RoleMixin,
+)
 from .json_data import (
     player_endgame_json,
     team_endgame_json,
@@ -27,11 +33,10 @@ from .json_data import (
     single_match_parameter_json,
     match_role_json
 )
-from datadrivendota.views import FormView
+from datadrivendota.views import ChartFormView, ApiView
 from players.models import request_to_player, Player
 from utils.exceptions import NoDataFound
-from django.core.urlresolvers import reverse
-from utils.file_management import outsourceJson
+from utils.file_management import outsourceJson, moveJson
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -80,7 +85,7 @@ def overview(request):
 @devserver_profile()
 def match(request, match_id):
     try:
-        match = Match.objects.select_related().get(steam_id=match_id)
+        match = Match.objects.get(steam_id=match_id)
     except Match.DoesNotExist:
         raise Http404
     summaries = PlayerMatchSummary.objects.filter(
@@ -93,94 +98,6 @@ def match(request, match_id):
         match.start_time
     ).strftime('%H:%M:%S %Y-%m-%d')
 
-    try:
-        datalist, params = match_parameter_json(
-            match_id,
-            'kills',
-            'hero_damage'
-        )
-        params['outerWidth'] = 225
-        params['outerHeight'] = 225
-        kill_dmg_json_name = basename(outsourceJson(datalist, params).name)
-    except NoDataFound:
-        kill_dmg_json_name = None
-
-    try:
-        datalist, params = match_parameter_json(
-            match_id,
-            'gold_per_min',
-            'xp_per_min'
-        )
-        params['outerWidth'] = 225
-        params['outerHeight'] = 225
-        xp_gold_json = outsourceJson(datalist,  params)
-    except NoDataFound:
-        xp_gold_json = None
-
-    try:
-        xp_gold_json_name = basename(xp_gold_json.name)
-    except AttributeError:
-        xp_gold_json_name = None
-
-    try:
-        datalist, params = match_ability_json(
-            match=match_id,
-            split_var='side'
-            )
-        params['outerWidth'] = 225
-        params['outerHeight'] = 225
-        abilities = outsourceJson(datalist, params)
-    except NoDataFound:
-        abilities = None
-
-    try:
-        datalist, params = match_role_json(
-            match_id,
-        )
-        params['outerWidth'] = 225
-        params['outerHeight'] = 225
-        params['draw_legend'] = False
-        roles_json_name = basename(outsourceJson(datalist, params).name)
-    except NoDataFound:
-        roles_json_name = None
-
-    try:
-        datalist, params = single_match_parameter_json(
-            match_id, 'tower_damage',
-            title='Tower Damage',
-        )
-        params['outerWidth'] = 375
-        params['outerHeight'] = 250
-        tower_damage_json_name = basename(outsourceJson(datalist, params).name)
-    except NoDataFound:
-        tower_damage_json_name = None
-
-    try:
-        datalist, params = single_match_parameter_json(
-            match_id, 'last_hits',
-            title='Last Hits',
-        )
-        params['outerWidth'] = 375
-        params['outerHeight'] = 250
-        last_hits_json_name = basename(outsourceJson(datalist, params).name)
-    except NoDataFound:
-        last_hits_json_name = None
-
-    try:
-        datalist, params = single_match_parameter_json(
-            match_id, 'K-D+.5*A',
-            title='K-D+.5*A (KDA2)',
-        )
-        params['outerWidth'] = 375
-        params['outerHeight'] = 250
-        kda_json_name = basename(outsourceJson(datalist, params).name)
-    except NoDataFound:
-        kda_json_name = None
-
-    try:
-        abilities_name = basename(abilities.name)
-    except AttributeError:
-        abilities_name = None
 
     radiant_summaries = [
         summary for summary in summaries if summary.which_side() == 'Radiant'
@@ -262,17 +179,10 @@ def match(request, match_id):
                 'summaries': summaries,
                 'radiant_infodict': radiant_infodict,
                 'dire_infodict': dire_infodict,
-                'kill_dmg_json': kill_dmg_json_name,
-                'xp_gold_json': xp_gold_json_name,
-                'abilities_json': abilities_name,
                 'dire_picks': dire_picks,
                 'radiant_picks': radiant_picks,
                 'dire_bans': dire_bans,
                 'radiant_bans': radiant_bans,
-                'tower_damage_json': tower_damage_json_name,
-                'last_hits_json': last_hits_json_name,
-                'roles_json': roles_json_name,
-                'kda_json': kda_json_name,
             }
         )
     except IndexError:
@@ -284,13 +194,6 @@ def match(request, match_id):
                 'summaries': summaries,
                 'radiant_infodict': radiant_infodict,
                 'dire_infodict': dire_infodict,
-                'kill_dmg_json': kill_dmg_json_name,
-                'xp_gold_json': xp_gold_json_name,
-                'abilities_json': abilities_name,
-                'tower_damage_json': tower_damage_json_name,
-                'last_hits_json': last_hits_json_name,
-                'roles_json': roles_json_name,
-                'kda_json': kda_json_name,
             }
         )
 
@@ -325,7 +228,6 @@ def follow_match_feed(request):
             objects.filter(match__in=match_list)\
             .select_related().order_by('-match__start_time')[:500]
         match_data = annotated_matches(pms_list, follow_list)
-        print match_data
         return render(
             request,
             'matches/follow.html',
@@ -361,7 +263,6 @@ def follow_match_feed(request):
             objects.filter(match__in=match_list).select_related()
 
         match_data = annotated_matches(pms_list, [])
-        print match_data
         return render(
             request,
             'matches/follow.html',
@@ -373,7 +274,7 @@ def follow_match_feed(request):
         )
 
 
-class Endgame(FormView):
+class Endgame(EndgameMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -402,16 +303,6 @@ class Endgame(FormView):
             'content': "Challenge: how do [A]kke's and Funn1k's KDA2s change based on win/loss?  Hint: tweak the group and split vars for different renderings."
         }
     ]
-    form = EndgameSelect
-    attrs = [
-        'players',
-        'game_modes',
-        'x_var',
-        'y_var',
-        'split_var',
-        'group_var',
-    ]
-    json_function = staticmethod(player_endgame_json)
     title = "Endgame Charts"
     html = "matches/form.html"
 
@@ -419,7 +310,7 @@ class Endgame(FormView):
         return params
 
 
-class OwnTeamEndgame(FormView):
+class OwnTeamEndgame(OwnTeamEndgameMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -427,16 +318,6 @@ class OwnTeamEndgame(FormView):
             'content': "This page charts end-of-game data for teams for each player of your choosing."
         }
     ]
-    form = EndgameSelect
-    attrs = [
-        'players',
-        'game_modes',
-        'x_var',
-        'y_var',
-        'split_var',
-        'group_var',
-    ]
-    json_function = staticmethod(player_team_endgame_json)
     title = "Own-Team Endgame Charts"
     html = "matches/form.html"
 
@@ -444,10 +325,7 @@ class OwnTeamEndgame(FormView):
         super(OwnTeamEndgame, self).get(*args, **kwargs)
 
 
-# OwnTeamEndgame.get = method_decorator(devserver_profile(follow=['player_team_endgame_json']))
-
-
-class SameTeamEndgame(FormView):
+class SameTeamEndgame(SameTeamEndgameMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -476,24 +354,14 @@ class SameTeamEndgame(FormView):
             'content': "Challenge: When Funn1k, Dendi, and XBOCT play together, what KDA2 does their team exceed when they win?"
         }
     ]
-    form = TeamEndgameSelect
-    attrs = [
-        'players',
-        'game_modes',
-        'x_var',
-        'y_var',
-        'split_var',
-        'group_var',
-        'compressor',
-    ]
-    json_function = staticmethod(team_endgame_json)
     title = "Same Team Endgame Charts"
     html = "matches/form.html"
 
     def amend_params(self, params):
         return params
 
-class ProgressionList(FormView):
+
+class ProgressionList(ProgressionListMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -501,19 +369,14 @@ class ProgressionList(FormView):
             'content': "This page charts level progression data for specific players in specific matches."
         }
     ]
-    form = MatchListSelect
-    attrs = [
-        'match_list',
-        'player_list',
-    ]
-    json_function = staticmethod(match_list_json)
     title = "Match List Hero Progression"
     html = "matches/form.html"
 
     def amend_params(self, params):
         return params
 
-class AbilityBuild(FormView):
+
+class AbilityBuild(AbilityBuildMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
@@ -547,25 +410,12 @@ class AbilityBuild(FormView):
             'content': "Challenge: in match 550709502, who slowed down when?  When did Slark and Lifesteal crush their enemies?"
         }
     ]
-    form = MatchAbilitySelect
-    attrs = [
-        'match',
-        'split_var',
-    ]
-    json_function = staticmethod(match_ability_json)
     title = "Match Ability Breakdown"
     html = "matches/form.html"
 
     def amend_params(self, params):
         return params
-    def extra_data(self):
-        match_url = reverse(
-            'matches:match_detail',
-            kwargs={'match_id': select_form.cleaned_data['match']}
-        )
-        extra_notes = "<a href='{0}'>See this match</a>".format(
-            match_url
-        )
+
 
 def annotated_matches(pms_list, follow_list):
     match_data = {}
@@ -628,7 +478,6 @@ def annotated_matches(pms_list, follow_list):
     match_list = []
     for key in sorted(match_data.iterkeys(), reverse=True):
         match_list.append(match_data[key])
-    print match_list
     return match_list
 
 
@@ -637,7 +486,6 @@ def match_list(request):
         q = request.GET.get('term', '')
         matches = Match.objects.filter(steam_id__icontains=q)[:20]
         results = []
-        print q, matches
         for i, match in enumerate(matches):
             match_json = {}
             match_json['id'] = i
@@ -649,3 +497,35 @@ def match_list(request):
         data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
+
+
+class ApiEndgameChart(EndgameMixin, ApiView):
+    pass
+
+
+class ApiOwnTeamEndgameChart(OwnTeamEndgameMixin, ApiView):
+    pass
+
+
+class ApiSameTeamEndgameChart(SameTeamEndgameMixin, ApiView):
+    pass
+
+
+class ApiProgressionListChart(ProgressionListMixin, ApiView):
+    pass
+
+
+class ApiAbilityBuildChart(AbilityBuildMixin, ApiView):
+    pass
+
+
+class ApiMatchScatterChart(MatchParameterMixin, ApiView):
+    pass
+
+
+class ApiMatchBarChart(SingleMatchParameterMixin, ApiView):
+    pass
+
+
+class ApiRoleChart(RoleMixin, ApiView):
+    pass

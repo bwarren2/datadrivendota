@@ -116,7 +116,7 @@ function draw_y_axis(params, g, yAxis){
 
 }
 
-function draw_title(params, svg){
+function draw_title(params, panels, svg){
     var outerWidth = get_outer_width(params);
     svg.append("g")
     .attr('class','chart-title-g')
@@ -127,19 +127,25 @@ function draw_title(params, svg){
       .attr("class", 'chart-title')
       .style("text-anchor", "middle")
       .text(function(d){
-        return toTitleCase(d.key);
+        return panels[d.key]['display_name'];
       });
 
 }
 
-function draw_legend(params, svg, color){
+function draw_legend(params, groups, svg, color){
   var outerWidth = get_outer_width(params);
   var outerHeight = get_outer_height(params);
   var margin = get_margin(params);
-  var legend = svg.append("g");
   var pctWidth = get_legend_width_pct(params);
   var pctHeight = get_legend_height_pct(params);
   var fadeOpacity = get_fade_opacity(params);
+
+  var legend = svg.append("g");
+
+  data = d3.nest()
+    .key(function(d){return d.index;}).sortKeys(d3.ascending)
+    .entries(groups);
+
   legend.attr("class", "legend")
         .attr("transform", "translate("
           +outerWidth*pctWidth+
@@ -156,19 +162,17 @@ function draw_legend(params, svg, color){
         .attr("width", 10)
         .attr("height", 10)
         .style("fill", function(d) {
-           var return_color = color(d['key']);
+           var return_color = groups[d['key']]['color'];
            return return_color;
         })
         .on("mouseover",
           function (d, i) {
-            slug = convertToSlug(d.key)
-            str = '.dataset:not(.'+slug+')'
+            str = '.dataset:not(.'+groups[d['key']]['class_selector']+')'
             d3.selectAll(str)
             .transition().duration(1000).style('opacity',fadeOpacity);
         })
         .on("mouseout", function(d) {
-            slug = convertToSlug(d.key)
-            d3.selectAll('.dataset:not(.'+slug+')')
+            d3.selectAll('.dataset:not(.'+groups[d['key']]['class_selector']+')')
             .transition().duration(1000).style('opacity',1);
           }
         );
@@ -178,25 +182,34 @@ function draw_legend(params, svg, color){
     .attr("x", 14)
     .attr("y", function(d, i){ return 11+(i *  20);})
     .text(function(d){
-      return d.key;
+      return groups[d['key']]['display_name'];
     });
 }
 
-function draw_path(dataset, line, color, params){
+function draw_path(dataset, groups,  line, color, params){
     var path_stroke_width = get_path_stroke_width(params)
     dataset.append("svg:path")
     .attr("d", function(d){return(line(d.values));})
     .style("stroke", function(d) {
-      return color(String(d.values[0].group_var));
+      return groups[d.values[0].group_var]['color'];
     })
     .style("stroke-width", path_stroke_width)
     .style("fill", 'none')
     .attr("class", function(d){
-      for(var key in d.values[0].classes){
-        d.values[0].classes[key]=convertToSlug(d.values[0].classes[key]);
-      }
-    return 'dataset lines '+d.values[0].classes.join(' ');
+      return 'dataset lines '+d.values[0].classes.join(' ');
     });
+}
+
+function append_datasets(g, groups){
+  return g.selectAll('.dataset')
+  .data(function(d){return(d.values);})
+  .enter()
+  .append('g')
+  .attr("class", function(d){
+    return 'datagroup '+groups[d.values[0].group_var]['class_selector'];
+  })
+  .attr("id", function(d){return convertToSlug(d.key);});
+
 }
 
 
@@ -246,9 +259,10 @@ function get_fade_opacity(params){
 function draw_scatterplot(source, placement_div){
     var raw_data = source['data'];
     var params = source['parameters'];
-
+    var groups = source['groups'];
+    var panels = source['panels'];
     data = d3.nest()
-    .key(function(d){return d.split_var;}).sortKeys(d3.ascending)
+    .key(function(d){return d.panel_var;}).sortKeys(d3.ascending)
     .key(function(d){return d.group_var;}).sortKeys(d3.ascending)
     .entries(raw_data);
 
@@ -273,7 +287,7 @@ function draw_scatterplot(source, placement_div){
 
     draw_x_axis(params, g, xAxis);
     draw_y_axis(params, g, yAxis);
-    draw_title(params, svg);
+    draw_title(params, panels, svg);
 
     point_size_scale = d3.scale.linear()
       .domain([params['pointDomainMin'],params['pointDomainMax']])
@@ -285,13 +299,7 @@ function draw_scatterplot(source, placement_div){
       .range([params['strokeSizeMin'],params['strokeSizeMax']])
       .clamp(true);
 
-    var dataset = g.selectAll('.dataset').data(function(d){
-            return(d.values);
-        }).enter().append('g')
-    .attr("class", function(d){
-      return 'datagroup '+convertToSlug(d.values[0].group_var);
-    })
-    .attr("id", function(d){return convertToSlug(d.key);});
+    var dataset = append_datasets(g, groups)
 
     dataset.selectAll('.points')
       .data(function(d){return d.values;})
@@ -300,7 +308,9 @@ function draw_scatterplot(source, placement_div){
         if(d.url){return d.url;} else {return '';}
       })
       .append('circle')
-      .attr('cx',function(d){return(x(d.x_var)); })
+      .attr('cx',function(d){
+        return(x(d.x_var));
+      })
       .attr('cy',function(d){return(y(d.y_var)); })
       .attr("class", function(d){
           for(var key in d.classes){
@@ -314,7 +324,7 @@ function draw_scatterplot(source, placement_div){
       .attr('stroke-width', function(d){
         return(stroke_width_scale(d.stroke_width));
       })
-      .style("fill", function(d) { return color(String(d.group_var));})
+      .style("fill", function(d) { return groups[d.group_var]['color']})
       .style("stroke", function(d) {
         return '#000000'
         // return color(String(d.group_var));
@@ -332,120 +342,123 @@ function draw_scatterplot(source, placement_div){
             .duration(500)
             .style("opacity", 0);
     });
-
     if(params['draw_path']){
-      draw_path(dataset, line, color, params);
+      draw_path(dataset, groups, line, color, params);
     }
 
     if(params['draw_legend']){
-      draw_legend(params, svg, color);
+      draw_legend(params, groups, svg, color);
     }
 }
 function draw_barplot(source, placement_div){
-    var raw_data = source['data'];
-    var params = source['parameters'];
+  var raw_data = source['data'];
+  var params = source['parameters'];
+  var groups = source['groups'];
+  var panels = source['panels'];
 
+  var width = get_width(params),
+      height = get_height(params);
 
-    var width = get_width(params),
-        height = get_height(params);
+  data = d3.nest()
+  .key(function(d){return d.panel_var;})
+  .key(function(d){return d.group_var;})
+  .entries(raw_data);
 
-    data = d3.nest().key(function(d){return d.split_var;}).key(function(d){return d.group_var;}).entries(raw_data);
+  var div = make_tooltip();
+  var svg = outer_chart(params, placement_div, data);
 
-    var div = make_tooltip();
-    var svg = outer_chart(params, placement_div, data);
+  var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], 0.1)
+    .domain(params.x_set);
+  var y = linear_y_scale(params);
 
-    var x = d3.scale.ordinal().rangeRoundBands([0, width], 0.1).domain(params.x_set);
-    var y = linear_y_scale(params);
+  var xAxis = d3.svg.axis().scale(x).orient("bottom")
+              .tickValues(params.tick_values),
+      yAxis = d3.svg.axis().scale(y).orient("left");
 
-    var xAxis = d3.svg.axis().scale(x).orient("bottom").tickValues(params.tickValues),
-        yAxis = d3.svg.axis().scale(y).orient("left");
+  var color = getColorScale(params);
+  var g = inner_chart(params, svg);
 
-    var color = getColorScale(params);
-    var g = inner_chart(params, svg);
+  draw_title(params, panels, svg);
 
-    draw_title(params, svg);
-
-    g.append("g")
-        .attr("class", "x-axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        .selectAll("text")
-            .style("text-anchor", "end")
-            .attr("dx", "-1em")
-            .attr("dy", "-0.3em")
-            .attr("transform", function(d) {
-                return "rotate(-90)";
-                })
-        .append("text")
-          .attr("y", -16)
-          .attr("x", width)
-          .attr("dy", ".71em")
+  g.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll("text")
           .style("text-anchor", "end")
-          .text(params['x_label']);
+          .attr("dx", "-1em")
+          .attr("dy", "-0.3em")
+          .attr("transform", function(d) {
+              return "rotate(-90)";
+              })
+      .append("text")
+        .attr("y", -16)
+        .attr("x", width)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(params['x_label']);
 
-    draw_y_axis(params, g, yAxis);
+  draw_y_axis(params, g, yAxis);
+
+  var dataset = append_datasets(g, groups)
 
 
-    var dataset = g.selectAll('.dataset').data(function(d){
-            return(d.values);
-        })
-    .enter()
-    .append('g')
-    .attr("class", function(d) {
-      return 'datagroup '+convertToSlug(d.values[0].group_var);
-    })
-    .attr("id", function(d){return convertToSlug(d.key);});
-
-    dataset.selectAll('.bars')
-        .data(function(d){return d.values;}).enter()
-        .append("a")
-        .attr("xlink:href", function(d) {
-          if(d.url){return d.url;}
-          else {return '';}
-        })
-    .append('rect')
-    .attr("class", function(d){
-          for(var key in d.classes){
-            d.classes[key]=convertToSlug(d.classes[key]);
-          }
-          return 'dataset points '+d.classes.join(' ');
+  dataset.selectAll('.bars')
+      .data(function(d){return d.values;}).enter()
+      .append("a")
+      .attr("xlink:href", function(d) {
+        if(d.url){return d.url;}
+        else {return '';}
       })
-    .attr("x", function(d) { return x(d.x_var); })
-    .attr("width", x.rangeBand())
-    .attr("y", function(d) { return y(d.y_var); })
-    .attr("height", function(d) { return height - y(d.y_var); })
-    .style("fill", function(d) { return color(String(d.group_var));})
-    .on("mouseover", function(d) {
+  .append('rect')
+  .attr("class", function(d){
+        for(var key in d.classes){
+          d.classes[key]=convertToSlug(d.classes[key]);
+        }
+        return 'dataset points '+d.classes.join(' ');
+    })
+  .attr("x", function(d) { return x(d.x_var); })
+  .attr("width", x.rangeBand())
+  .attr("y", function(d) { return y(d.y_var); })
+  .attr("height", function(d) { return height - y(d.y_var); })
+  .style("fill", function(d) { return groups[d.group_var]['color'];})
+  .on("mouseover", function(d) {
 
-            div.transition()
-              .duration(200)
-              .style("opacity", 0.9);
+          div.transition()
+            .duration(200)
+            .style("opacity", 0.9);
 
-            div.html(d.tooltip)
-              .style("left", (d3.event.pageX) + "px")
-              .style("top", (d3.event.pageY - 28) + "px")
+          div.html(d.tooltip)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px")
 
-            })
-        .on("mouseout", function(d) {
-            div.transition()
-                .duration(500)
-                .style("opacity", 0);
-        });
+          })
+      .on("mouseout", function(d) {
+          div.transition()
+              .duration(500)
+              .style("opacity", 0);
+      });
 
-    if(params['draw_legend']){
-      draw_legend(params, svg, color);
-    }
+  if(params['draw_legend']){
+    draw_legend(params, groups, svg, color);
+  }
 }
 
 
-function draw_scatterseries(data, placement_div){
+function draw_scatterseries(source, placement_div){
+  var raw_data = source['data'];
+  var params = source['parameters'];
+  var groups = source['groups'];
+  var panels = source['panels'];
+  params['draw_path'] = 'True';
+  params['draw_legend'] = 'True';
 
-  var raw_data = data['data'];
-  var params = data['parameters'];
-      params['draw_path'] = 'True';
-      params['draw_legend'] = 'True';
-
-  data = d3.nest().key(function(d){return d.split_var;}).key(function(d){return d.group_var;}).key(function(d){return d.series_var;}).entries(raw_data);
+  data = d3.nest()
+  .key(function(d){return d.panel_var;})
+  .key(function(d){return d.group_var;})
+  .key(function(d){return d.series_var;})
+  .entries(raw_data);
 
   var div = make_tooltip();
 
@@ -470,23 +483,24 @@ function draw_scatterseries(data, placement_div){
   draw_x_axis(params, g, xAxis);
   draw_y_axis(params, g, yAxis);
 
-  draw_title(params, svg);
+  draw_title(params, panels, svg);
 
-  var groups = g.selectAll('.groups').data(function(d){
+  var datagroups = g.selectAll('.groups').data(function(d){
           return(d.values);
       }).enter().append('g')
   .attr("class", 'group')
   .attr("id", function(d){return convertToSlug(d.key);});
 
-  var dataset = groups.selectAll('.dataset').data(function(d){
-              return d.values;
-              })
-              .enter()
-              .append("g")
-              .attr("class", function(d){
-                return 'datagroup '+convertToSlug(d.values[0].group_var);
-              })
-              .attr("id", function(d){return convertToSlug(d.key);});
+
+  var dataset = datagroups.selectAll('.dataset')
+    .data(function(d){return d.values;})
+    .enter()
+    .append("g")
+    .attr("class", function(d){
+      return ''
+      // return 'datagroup '+groups[d.values[0].group_var]['class_selector'];
+    })
+    .attr("id", function(d){return d.key;});
 
   dataset.selectAll('.points').data(function(d){
         return d.values;}
@@ -522,11 +536,11 @@ function draw_scatterseries(data, placement_div){
       });
 
   if(params['draw_path']){
-    draw_path(dataset, line, color, params);
+    draw_path(dataset, groups, line, color, params);
   }
 
   if(params['draw_legend']){
-    draw_legend(params, svg, color);
+    draw_legend(params, groups, svg, color);
   }
 }
 

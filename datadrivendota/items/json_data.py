@@ -1,9 +1,8 @@
-from django.core.urlresolvers import reverse
 from matches.models import (
     PlayerMatchSummary,
 )
 from utils.exceptions import NoDataFound
-from utils.charts import params_dict, datapoint_dict, color_scale_params
+from utils.charts import XYPlot, DataPoint
 from matches.models import GameMode
 
 
@@ -48,7 +47,8 @@ def item_endgame(
                 itemDict[itm]['wins'].add(p.match.steam_id)
             else:
                 itemDict[itm]['losses'].add(p.match.steam_id)
-    datalist = []
+
+    chart = XYPlot()
     for itm in itemDict:
         itemDict[itm]['games'] = \
             len(itemDict[itm]['losses']) + len(itemDict[itm]['wins'])
@@ -57,38 +57,32 @@ def item_endgame(
         itemDict[itm]['winrate'] = len(itemDict[itm]['wins'])\
             / float(denominator) * 100
 
-        datadict = datapoint_dict()
-        datadict.update({
-            'x_var': itemDict[itm]['games'],
-            'y_var': itemDict[itm]['winrate'],
-            'label': itm.name,
-            'tooltip': itm.name,
-            'split_var': '',
-            'group_var': '',
-            'point_size': itm.cost,
-            # 'url': reverse(
-            #     'items:detail',
-            #     kwargs={'item_name': itm.name}
-            # )
-        })
-        datalist.append(datadict)
+        d = DataPoint()
+        d.x_var = itemDict[itm]['games']
+        d.y_var = itemDict[itm]['winrate']
+        d.label = itm.name
+        d.tooltip = itm.name
+        d.split_var = ''
+        d.group_var = ''
+        d.point_size = itm.cost
+        # 'url': reverse(
+        #     'items:detail',
+        #     kwargs={'item_name': itm.name}
+        # )
+        chart.datalist.append(d)
 
-    if len(datalist) == 0:
+    if len(chart.datalist) == 0:
         raise NoDataFound
 
-    params = params_dict()
-    params['x_min'] = 0
-    params['x_max'] = max([d['x_var'] for d in datalist])
-    params['y_min'] = 0
-    params['y_max'] = 100
-    params['legendWidthPercent'] = .25
-    params['x_label'] = 'Games'
-    params['y_label'] = 'Winrate'
-    params['margin']['left'] = 12*len(str(params['y_max']))
-    params['chart'] = 'xyplot'
-    params['pointDomainMin'] = 0
-    params['pointDomainMax'] = 5000
-    params['pointSizeMin'] = 2
-    params['pointSizeMax'] = 5
-    params = color_scale_params(params, [d['label'] for d in datalist])
-    return (datalist, params)
+    chart.params.x_min = 0
+    chart.params.y_min = 0
+    chart.params.y_max = 100
+    chart.params.legendWidthPercent = .25
+    chart.params.x_label = 'Games'
+    chart.params.y_label = 'Winrate'
+    chart.params.margin['left'] = 24
+    chart.params.pointDomainMin = 0
+    chart.params.pointDomainMax = 5000
+    chart.params.pointSizeMin = 2
+    chart.params.pointSizeMax = 5
+    return chart

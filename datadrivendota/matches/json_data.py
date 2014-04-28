@@ -7,19 +7,15 @@ from itertools import chain
 from matches.models import (
     PlayerMatchSummary,
     Match,
-    fetch_match_attributes,
-    fetch_single_attribute,
     fetch_attribute_label,
     fetch_pms_attribute,
     SkillBuild
 )
-from heroes.models import Assignment
 from utils.exceptions import NoDataFound
 from utils.charts import (
-    params_dict,
-    datapoint_dict,
-    color_scale_params,
-    hero_classes_dict
+    hero_classes_dict,
+    XYPlot, DataPoint, BarPlot, TasselPlot,
+    valid_var
 )
 from players.models import Player
 
@@ -66,7 +62,7 @@ def player_team_endgame_json(
         game_modes,
         x_var,
         y_var,
-        split_var,
+        panel_var,
         group_var,
         ):
     #Takes a player's games and gives the team's results.
@@ -112,12 +108,10 @@ def player_team_endgame_json(
         if var in dictAttributes:
             return getattr(annotation, (dictAttributes[var])+'__sum')
 
-    datalist = []
-    player_obj_list = []
+    c = XYPlot()
     for player in players:
 
         player_obj = Player.objects.get(steam_id=player)
-        player_obj_list.append(player_obj)
         radiant_matches = Match.objects.filter(
             game_mode__steam_id__in=game_modes,
             playermatchsummary__player__steam_id=player,
@@ -177,14 +171,11 @@ def player_team_endgame_json(
         }
         hero_classes = hero_classes_dict()
 
-        datasection = [datapoint_dict()
-                    for x in range(0, (
-                        len(radiant_annotations)+len(dire_annotations))
-                    )]
         for i, annotation in enumerate(chain(
             radiant_annotations,
             dire_annotations
         )):
+            d = DataPoint()
             plot_x_var = get_var(
                 annotation,
                 x_var,
@@ -198,20 +189,20 @@ def player_team_endgame_json(
                 dictDerivedAttributes
                 )
 
-            if split_var == 'No Split':
-                split_param = 'No Split'
-            elif split_var == 'game_mode':
+            if not valid_var(panel_var):
+                pass
+            elif panel_var == 'game_mode':
                 split_param = annotation.game_mode.description
-            elif split_var == 'player':
+            elif panel_var == 'player':
                 split_param = player_obj.display_name
-            elif split_var == 'is_win':
+            elif panel_var == 'is_win':
                 if mapping_dict[annotation.steam_id]['is_win']:
                     split_param = 'Won'
                 else:
                     split_param = 'Lost'
 
-            if group_var == 'No Split':
-                group_param = 'No Split'
+            if not valid_var(group_var):
+                pass
             elif group_var == 'game_mode':
                 group_param = annotation.game_mode.description
             elif group_var == 'player':
@@ -222,49 +213,33 @@ def player_team_endgame_json(
                 else:
                     group_param = 'Lost'
 
-            datadict = datasection[i]
-            datadict.update({
-                'x_var': plot_x_var,
-                'y_var': plot_y_var,
-                'label': annotation.steam_id,
-                'tooltip': annotation.steam_id,
-                'split_var': split_param,
-                'group_var': group_param,
-                'classes': [],
-                'url': 'matches/{0}'.format(annotation.steam_id)
-            })
+            d.x_var = plot_x_var
+            d.y_var = plot_y_var
+            d.label = annotation.steam_id
+            d.tooltip = annotation.steam_id
+            d.panel_var = split_param
+            d.group_var = group_param
+            d.url = 'matches/{0}'.format(annotation.steam_id)
             if hero_classes[
                     mapping_dict[annotation.steam_id]['hero_id']
             ] is not None:
-                datadict['classes'].extend(
+                d.classes.extend(
                     hero_classes[
                         mapping_dict[annotation.steam_id]['hero_id']
                         ]
                 )
 
-            datasection.append(datadict)
-        datalist.extend(datasection)
-    if len(datalist) == 0:
+            c.datalist.append(d)
+    if len(c.datalist) == 0:
         raise NoDataFound
 
-    params = params_dict()
-    params['x_min'] = min([d['x_var'] for d in datalist])
-    params['x_max'] = max([d['x_var'] for d in datalist])
-    params['y_min'] = min([d['y_var'] for d in datalist])
-    params['y_max'] = max([d['y_var'] for d in datalist])
-    params['legendWidthPercent'] = .25
+    c.params.legendWidthPercent = .25
     if x_var == 'duration':
-        params['x_label'] = 'Duration (m)'
+        c.params.x_label = 'Duration (m)'
     else:
-        params['x_label'] = x_var.title()
-    params['y_label'] = y_var.title()
-    params['margin']['left'] = 12*len(str(params['y_max']))
-    params['chart'] = 'xyplot'
-    params = color_scale_params(
-        params,
-        [p.display_name for p in player_obj_list]
-    )
-    return (datalist, params)
+        c.params.x_label = x_var.title()
+    c.params.y_label = y_var.title()
+    return c
 
 
 @do_profile()
@@ -273,7 +248,7 @@ def player_endgame_json(
         game_modes,
         x_var,
         y_var,
-        split_var,
+        panel_var,
         group_var
         ):
     #Gives the player's endgame results
@@ -289,44 +264,31 @@ def player_endgame_json(
 
     hero_classes = hero_classes_dict()
 
-    datalist = []
+    c = XYPlot()
     for pms in selected_summaries:
-        datadict = datapoint_dict()
-        datadict.update({
-            'x_var': fetch_pms_attribute(pms, x_var),
-            'y_var': fetch_pms_attribute(pms, y_var),
-            'label': fetch_pms_attribute(pms, group_var),
-            'tooltip': fetch_pms_attribute(pms, 'match_id'),
-            'group_var': fetch_pms_attribute(pms, group_var),
-            'classes': [],
-            'url': reverse(
-                'matches:match_detail',
-                kwargs={'match_id': fetch_pms_attribute(pms, 'match_id')}
-            )
-
-        })
-        if split_var is None or split_var == 'No Split':
-            datadict['split_var'] = '',
-        else:
-            datadict['split_var'] = fetch_pms_attribute(pms, split_var),
+        d = DataPoint()
+        d.x_var = fetch_pms_attribute(pms, x_var)
+        d.y_var = fetch_pms_attribute(pms, y_var)
+        d.label = fetch_pms_attribute(pms, group_var)
+        d.tooltip = fetch_pms_attribute(pms, 'match_id')
+        d.url = reverse(
+            'matches:match_detail',
+            kwargs={'match_id': fetch_pms_attribute(pms, 'match_id')}
+        )
+        if valid_var(group_var):
+            d.group_var = fetch_pms_attribute(pms, group_var)
+        if valid_var(panel_var):
+            d.panel_var = fetch_pms_attribute(pms, panel_var)
         if hero_classes[pms.hero.steam_id] is not None:
-            datadict['classes'].extend(
+            d.classes.extend(
                 hero_classes[pms.hero.steam_id]
             )
 
-        datalist.append(datadict)
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['x_min'] = min([d['x_var'] for d in datalist])
-    params['x_max'] = max([d['x_var'] for d in datalist])
-    params['y_min'] = min([d['y_var'] for d in datalist])
-    params['y_max'] = max([d['y_var'] for d in datalist])
-    params['x_label'] = x_var.title()
-    params['y_label'] = y_var.title()
-    params['margin']['left'] = 12*len(str(params['y_max']))
-    params['chart'] = 'xyplot'
-    params = color_scale_params(params, [d['group_var'] for d in datalist])
-    return (datalist, params)
+    c.params.x_label = x_var.title()
+    c.params.y_label = y_var.title()
+    return c
 
 
 @do_profile()
@@ -335,7 +297,7 @@ def team_endgame_json(
         game_modes,
         x_var,
         y_var,
-        split_var,
+        panel_var,
         group_var,
         compressor
         ):
@@ -426,11 +388,11 @@ def team_endgame_json(
             radiant_annotations.annotate(Sum(dictAttributes[y_var]))
 
     try:
-        datalist = []
+        c = XYPlot()
         for annotation in chain(radiant_annotations, dire_annotations):
             match_id = annotation.steam_id
 
-            datadict = datapoint_dict()
+            d = DataPoint()
 
             plot_x_var = get_var(
                 annotation,
@@ -445,43 +407,28 @@ def team_endgame_json(
                 dictDerivedAttributes
                 )
 
-            datadict.update({
-                'x_var': plot_x_var,
-                'y_var': plot_y_var,
-                'group_var': False,
-                'split_var': False,
-                'label': match_id,
-                'tooltip': match_id,
-                'url': reverse(
-                    'matches:match_detail',
-                    kwargs={'match_id': match_id}
-                ),
-                'classes': [],
+            d.x_var = plot_x_var
+            d.y_var = plot_y_var
+            d.label = match_id
+            d.tooltip = match_id
+            d.url = reverse(
+                'matches:match_detail',
+                kwargs={'match_id': match_id}
+            )
 
-            })
-
-            datalist.append(datadict)
+            c.datalist.append(d)
             xlab = fetch_attribute_label(attribute=x_var)
             ylab = fetch_attribute_label(attribute=y_var)
     except AttributeError:
         raise NoDataFound
-    params = params_dict()
-    params['x_min'] = min([d['x_var'] for d in datalist])
-    params['x_max'] = max([d['x_var'] for d in datalist])
-    params['y_min'] = min([d['y_var'] for d in datalist])
-    params['y_max'] = max([d['y_var'] for d in datalist])
-    params['x_label'] = xlab
-    params['y_label'] = ylab
-    params['chart'] = 'xyplot'
-    params['margin']['left'] = 12*len(str(params['y_max']))
-    groups = [False]
-    params = color_scale_params(params, groups)
+    c.params.x_label = xlab
+    c.params.y_label = ylab
 
-    return (datalist, params)
+    return c
 
 
 @do_profile()
-def match_ability_json(match, split_var='No Split'):
+def match_ability_json(match, panel_var=None):
 
     skill_builds = SkillBuild.objects.filter(
         player_match_summary__match__steam_id=match
@@ -491,56 +438,45 @@ def match_ability_json(match, split_var='No Split'):
 
     hero_classes = hero_classes_dict()
 
-    datalist = []
+    c = XYPlot()
     for build in skill_builds:
 
         side = build.player_match_summary.which_side()
         hero = build.player_match_summary.hero.name
-        if split_var == 'No Split':
-            split_param = 'No Split'
-        elif split_var == 'hero':
+        if not valid_var(panel_var):
+            pass
+        elif panel_var == 'hero':
             split_param = hero
-        elif split_var == 'side':
+        elif panel_var == 'side':
             split_param = side
 
-        datadict = datapoint_dict()
-        minidict = {
-            'x_var': round(build.time / 60.0, 3),
-            'y_var': build.level,
-            'label': hero,
-            'tooltip': build.ability.name,
-            'split_var': split_param,
-            'group_var': hero,
-            'classes': [],
-        }
-        datadict.update(minidict)
+        d = DataPoint()
+        d.x_var = round(build.time / 60.0, 3),
+        d.y_var = build.level
+        d.label = hero
+        d.tooltip = build.ability.name
+        d.panel_var = split_param
+        d.group_var = hero
+
         if hero_classes[build.player_match_summary.hero.steam_id] is not None:
-            datadict['classes'].extend(
+            d.classes.extend(
                 hero_classes[build.player_match_summary.hero.steam_id]
             )
-        datadict['classes'].append(
+        d.classes.append(
             slugify(
                 unicode(build.player_match_summary.which_side())
             )
         )
 
-        datalist.append(datadict)
-    xs = [build.time/60 for build in skill_builds]
-    ys = [build.level for build in skill_builds]
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['x_min'] = min(xs)
-    params['x_max'] = max(xs)
-    params['y_min'] = min(ys)
-    params['y_max'] = max(ys)
-    params['x_label'] = 'Time (m)'
-    params['y_label'] = 'Level'
-    params['draw_path'] = True
-    params['chart'] = 'xyplot'
-    params['outerWidth'] = 400
-    params['outerHeight'] = 400
+    c.params.x_label = 'Time (m)'
+    c.params.y_label = 'Level'
+    c.params.draw_path = True
+    c.params.outerWidth = 400
+    c.params.outerHeight = 400
 
-    return (datalist, params)
+    return c
 
 
 @do_profile()
@@ -551,99 +487,77 @@ def match_parameter_json(match_id, x_var, y_var):
         raise NoDataFound
 
     hero_classes = hero_classes_dict()
-    data_list, groups = [], []
+    c = XYPlot()
     for pms in pmses:
-        datadict = datapoint_dict()
+        d = DataPoint()
         group = fetch_pms_attribute(pms, 'which_side')
-        groups.append(group)
-        datadict.update({
-            'x_var': fetch_pms_attribute(pms, x_var),
-            'y_var': fetch_pms_attribute(pms, y_var),
-            'group_var': group,
-            'split_var': '{x} vs {y}'.format(x=x_var, y=y_var),
-            'label': fetch_pms_attribute(pms, 'hero_name'),
-            'tooltip': fetch_pms_attribute(pms, 'hero_name'),
-            'classes': [],
-        })
+        d.x_var = fetch_pms_attribute(pms, x_var)
+        d.y_var = fetch_pms_attribute(pms, y_var)
+        d.group_var = group
+        d.panel_var = '{x} vs {y}'.format(x=x_var, y=y_var)
+        d.label = fetch_pms_attribute(pms, 'hero_name')
+        d.tooltip = fetch_pms_attribute(pms, 'hero_name')
+        d.classes = []
         if hero_classes[pms.hero.steam_id] is not None:
-            datadict['classes'].extend(hero_classes[pms.hero.steam_id])
-        datadict['classes'].append(slugify(unicode(pms.which_side())))
+            d.classes.extend(hero_classes[pms.hero.steam_id])
+        d.classes.append(slugify(unicode(pms.which_side())))
 
-        data_list.append(datadict)
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['x_min'] = min([d['x_var'] for d in data_list])
-    params['x_max'] = max([d['x_var'] for d in data_list])
-    params['y_min'] = min([d['y_var'] for d in data_list])
-    params['y_max'] = max([d['y_var'] for d in data_list])
-    params['x_label'] = fetch_attribute_label(x_var)
-    params['y_label'] = fetch_attribute_label(y_var)
-    if params['y_min'] > 1000:
-        params['y_label'] += ' (K)'
-        for d in data_list:
-            d['y_var'] /= 1000.0
-        params['y_max'] = int(floor(round(params['y_max']/1000.0, 0)))
-        params['y_min'] = int(floor(round(params['y_min']/1000.0, 0)))
-    params['draw_path'] = False
-    params['chart'] = 'xyplot'
-    params['margin']['left'] = 12*len(str(params['y_max']))
+    c.params.x_label = fetch_attribute_label(x_var)
+    c.params.y_label = fetch_attribute_label(y_var)
+    if c.params.y_min > 1000:
+        c.params.y_label += ' (K)'
+        for d in c.data_list:
+            d.y_var /= 1000.0
+        c.params.y_max = int(floor(round(c.params.y_max/1000.0, 0)))
+        c.params.y_min = int(floor(round(c.params.y_min/1000.0, 0)))
+    c.params.draw_path = False
 
-    params['outerWidth'] = 250
-    params['outerHeight'] = 250
-    params = color_scale_params(params, groups)
+    c.params.outerWidth = 250
+    c.params.outerHeight = 250
 
-    return (data_list, params)
+    return c
 
 
 @do_profile()
-def single_match_parameter_json(match, y_var, title):
+def single_match_parameter_json(match, y_var):
     pmses = PlayerMatchSummary.objects.filter(match__steam_id=match)\
         .select_related()
     if len(pmses) == 0:
         raise NoDataFound
 
     hero_classes = hero_classes_dict()
-    data_list = []
+    c = BarPlot()
     for pms in pmses:
-        datadict = datapoint_dict()
+        d = DataPoint()
         group = fetch_pms_attribute(pms, 'which_side')
-        datadict.update({
-            'x_var': pms.hero.safe_name(),
-            'y_var': fetch_pms_attribute(pms, y_var),
-            'group_var': group,
-            'split_var': title,
-            'label': pms.hero.safe_name(),
-            'tooltip': pms.hero.safe_name(),
-            'classes': [],
-        })
+        d.x_var = pms.hero.safe_name()
+        d.y_var = fetch_pms_attribute(pms, y_var)
+        d.group_var = group
+        d.label = pms.hero.safe_name()
+        d.tooltip = pms.hero.safe_name()
         if hero_classes[pms.hero.steam_id] is not None:
-            datadict['classes'].extend(hero_classes[pms.hero.steam_id])
-        datadict['classes'].append(slugify(unicode(pms.which_side())))
-        data_list.append(datadict)
+            d.classes.extend(hero_classes[pms.hero.steam_id])
+            d.classes.append(slugify(unicode(pms.which_side())))
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['x_set'] = [d['x_var'] for d in data_list]
-    params['y_min'] = min([d['y_var'] for d in data_list])
-    params['y_max'] = max([d['y_var'] for d in data_list])
-    params['x_label'] = 'Hero'
-    params['y_label'] = fetch_attribute_label(y_var)
-    params['legendWidthPercent'] = .8
-    params['legendHeightPercent'] = .05
+    c.params.x_label = 'Hero'
+    c.params.y_label = fetch_attribute_label(y_var)
+    c.params.legendWidthPercent = .8
+    c.params.legendHeightPercent = .05
 
-    params['padding']['bottom'] = 90
-    params['margin']['left'] = 45
+    c.params.padding['bottom'] = 90
+    c.params.margin['left'] = 45
 
-    if params['y_max'] > 1000:
-        params['y_label'] += ' (K)'
-        for d in data_list:
-            d['y_var'] /= 1000.0
-        params['y_max'] = int(floor(round(params['y_max']/1000.0, 0)))
-        params['y_min'] = int(floor(round(params['y_min']/1000.0, 0)))
-    params['chart'] = 'barplot'
-    params['outerHeight'] = 250
-    params = color_scale_params(params, [d['group_var'] for d in data_list])
-
-    return (data_list, params)
+    if c.params.y_max > 1000:
+        c.params.y_label += ' (K)'
+        for d in c.data_list:
+            d.y_var /= 1000.0
+        c.params.y_max = int(floor(round(c.params.y_max/1000.0, 0)))
+        c.params.y_min = int(floor(round(c.params.y_min/1000.0, 0)))
+    c.params.outerHeight = 250
+    return c
 
 
 @do_profile()
@@ -677,38 +591,32 @@ def match_role_json(match):
         }
 
     role_set = set(chain(radiant_roles.iterkeys(), dire_roles.iterkeys()))
-    data_list = []
+    c = XYPlot()
     for role in role_set:
         if role is not None:
-            datadict = datapoint_dict()
-            datadict.update({
-                'x_var': radiant_roles.get(role, 0),
-                'y_var': dire_roles.get(role, 0),
-                'group_var': role,
-                'split_var': 'Role Breakdown',
-                'label': role,
-                'tooltip': role,
-                'classes': [slugify(role)],
-            })
-            data_list.append(datadict)
+            d = DataPoint()
+            d.x_var = radiant_roles.get(role, 0)
+            d.y_var = dire_roles.get(role, 0)
+            d.group_var = role
+            d.panel_var = 'Role Breakdown'
+            d.label = role
+            d.tooltip = role
+            d.classes = [slugify(role)]
+            c.datalist.append(d)
 
-    params = params_dict()
-    xmax = max([d['x_var'] for d in data_list])
-    ymax = max([d['y_var'] for d in data_list])
+    xmax = max([d.x_var for d in c.datalist])
+    ymax = max([d.y_var for d in c.datalist])
     absmax = max(xmax, ymax)
-    params['x_min'] = 0
-    params['x_max'] = absmax
-    params['y_min'] = 0
-    params['y_max'] = absmax
-    params['x_label'] = 'Radiant Role Magnitude'
-    params['y_label'] = 'Dire Role Magnitude'
-    params['draw_path'] = False
-    params['chart'] = 'xyplot'
-    params['margin']['left'] = 30
-    params['outerWidth'] = 250
-    params['outerHeight'] = 250
-    params = color_scale_params(params, [d['group_var'] for d in data_list])
-    return (data_list, params)
+    c.params.x_min = 0
+    c.params.x_max = absmax
+    c.params.y_min = 0
+    c.params.y_max = absmax
+    c.params.x_label = 'Radiant Role Magnitude'
+    c.params.y_label = 'Dire Role Magnitude'
+    c.params.margin['left'] = 30
+    c.params.outerWidth = 250
+    c.params.outerHeight = 250
+    return c
 
 
 @do_profile()
@@ -733,42 +641,32 @@ def match_list_json(match_list, player_list):
         'player_match_summary__match__steam_id',
         'player_match_summary__player__persona_name',
     )
-    datalist, xs, ys, groups = [], [], [], []
 
+    c = TasselPlot()
     for build in sbs:
         if build['level'] == 1:
             subtractor = build['time']/60.0
 
-        datapoint = datapoint_dict()
-        datapoint['x_var'] = round(build['time']/60.0-subtractor, 3)
-        xs.append(round(build['time']/60.0-subtractor, 3))
-        datapoint['y_var'] = build['level']
-        ys.append(build['level'])
+        d = DataPoint()
+        d.x_var = round(build['time']/60.0-subtractor, 3)
+        d.y_var = build['level']
 
         group = "{match}, {name}".format(
             match=build['player_match_summary__match__steam_id'],
             name=build['player_match_summary__player__persona_name'],
         )
 
-        datapoint['group_var'] = group
-        groups.append(group)
+        d.group_var = group
+        d.series_var = group
 
-        datapoint['series_var'] = group
-
-        datapoint['label'] = build[
+        d.label = build[
             'player_match_summary__player__persona_name'
         ]
-        datapoint['split_var'] = 'Skill Progression'
-        datalist.append(datapoint)
+        d.panel_var = 'Skill Progression'
+        c.datalist.append(d)
 
-    params = params_dict()
-    params['chart'] = 'scatterseries'
-    params['x_min'] = 0
-    params['x_max'] = max(xs)
-    params['y_min'] = min(ys)
-    params['y_max'] = max(ys)
-    params['x_label'] = 'Time (m)'
-    params['y_label'] = 'Level'
-    params = color_scale_params(params, groups)
+    c.params.x_min = 0
+    c.params.x_label = 'Time (m)'
+    c.params.y_label = 'Level'
 
-    return (datalist, params)
+    return c

@@ -1,6 +1,10 @@
 from django import forms
 from players.form_fields import MultiPlayerField
-from .form_fields import MultiGameModeSelect, MultiMatchSelect
+from .form_fields import (
+    MultiGameModeSelect,
+    MultiMatchSelect,
+    SingleMatchSelect,
+    )
 
 
 class EndgameSelect(forms.Form):
@@ -24,7 +28,7 @@ class EndgameSelect(forms.Form):
     X_PARAMETERS.insert(0, 'duration')
     X_LIST = [(item, item) for item in X_PARAMETERS]
     Y_LIST = [(item, item) for item in SHARED_PARAMETERS]
-    SPLIT_PARAMS = ['player', 'is_win', 'game_mode', 'No Split']
+    SPLIT_PARAMS = ['player', 'is_win', 'game_mode', 'None']
     DOUBLED_PARAM_LIST = [(item, item) for item in SPLIT_PARAMS]
 
     players = MultiPlayerField(
@@ -45,7 +49,7 @@ class EndgameSelect(forms.Form):
         required=True,
         help_text='What goes on the y axis?'
     )
-    split_var = forms.ChoiceField(
+    panel_var = forms.ChoiceField(
         choices=DOUBLED_PARAM_LIST,
         required=True,
         help_text='Which variable splits data between panels?',
@@ -79,7 +83,7 @@ class TeamEndgameSelect(forms.Form):
     X_PARAMETERS.insert(0, 'duration')
     X_LIST = [(item, item) for item in X_PARAMETERS]
     Y_LIST = [(item, item) for item in SHARED_PARAMETERS]
-    SPLIT_PARAMS = ['is_win', 'game_mode', 'none']
+    SPLIT_PARAMS = ['is_win', 'game_mode', 'none', 'player']
     DOUBLED_PARAM_LIST = [(item, item) for item in SPLIT_PARAMS]
     COMPRESSOR_LIST = [(item, item) for item in ['sum', 'avg']]
 
@@ -101,7 +105,7 @@ class TeamEndgameSelect(forms.Form):
         required=True,
         help_text='What goes on the y axis?'
     )
-    split_var = forms.ChoiceField(
+    panel_var = forms.ChoiceField(
         choices=DOUBLED_PARAM_LIST,
         required=True,
         help_text='Which variable splits data between panels?',
@@ -122,10 +126,10 @@ class TeamEndgameSelect(forms.Form):
 
 
 class MatchAbilitySelect(forms.Form):
-    SPLIT_PARAMS = ['side', 'hero', 'No Split']
+    SPLIT_PARAMS = ['side', 'hero', 'None']
     DOUBLED_PARAM_LIST = [(item, item) for item in SPLIT_PARAMS]
     match = forms.IntegerField()
-    split_var = forms.ChoiceField(DOUBLED_PARAM_LIST)
+    panel_var = forms.ChoiceField(DOUBLED_PARAM_LIST)
 
 
 class MatchListSelect(forms.Form):
@@ -136,4 +140,77 @@ class MatchListSelect(forms.Form):
     players = MultiPlayerField(
         required=True,
         help_text='Pick one or more players by name'
+    )
+
+
+class MatchParameterSelect(forms.Form):
+    match_id = SingleMatchSelect(
+        required=True,
+        help_text='Pick one match by ID'
+    )
+    SHARED_PARAMETERS = [
+        'kills',
+        'deaths',
+        'assists',
+        'gold_total',
+        'gold_per_min',
+        'xp_total',
+        'xp_per_min',
+        'last_hits',
+        'denies',
+        'hero_damage',
+        'tower_damage',
+        'hero_healing',
+        'level',
+        'K-D+.5*A'
+    ]
+    X_PARAMETERS = list(SHARED_PARAMETERS)
+    X_PARAMETERS.insert(0, 'duration')
+    X_LIST = [(item, item) for item in X_PARAMETERS]
+    Y_LIST = [(item, item) for item in SHARED_PARAMETERS]
+    x_var = forms.ChoiceField(
+        choices=X_LIST,
+        required=True,
+        help_text='What goes on the x axis?'
+    )
+    y_var = forms.ChoiceField(
+        choices=Y_LIST,
+        required=True,
+        help_text='What goes on the y axis?'
+    )
+
+
+class SingleMatchParameterSelect(forms.Form):
+    match = SingleMatchSelect(
+        required=True,
+        help_text='Pick one match by ID'
+    )
+    SHARED_PARAMETERS = [
+        'kills',
+        'deaths',
+        'assists',
+        'gold_total',
+        'gold_per_min',
+        'xp_total',
+        'xp_per_min',
+        'last_hits',
+        'denies',
+        'hero_damage',
+        'tower_damage',
+        'hero_healing',
+        'level',
+        'K-D+.5*A'
+    ]
+    Y_LIST = [(item, item) for item in SHARED_PARAMETERS]
+    y_var = forms.ChoiceField(
+        choices=Y_LIST,
+        required=True,
+        help_text='What goes on the y axis?'
+    )
+
+
+class RoleSelect(forms.Form):
+    match = SingleMatchSelect(
+        required=True,
+        help_text='Pick one match by ID'
     )

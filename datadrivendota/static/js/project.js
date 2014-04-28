@@ -80,6 +80,7 @@ $(function () {
   ajax_select2ify('.single-hero-tags', false, "One Hero", "/heroes/api/getheroes");
   ajax_select2ify('.multi-hero-tags', true, "One or more Heroes", "/heroes/api/getheroes");
   ajax_select2ify('.multi-match-tags', true, "One or more Matches", "/matches/api/getmatches");
+  ajax_select2ify('.single-match-tags', true, "One Match", "/matches/api/getmatches");
 
   /* gettext library */
 
@@ -240,4 +241,50 @@ var getVals = function(obj){
       vals.push(obj[key]);
    }
    return vals;
+}
+
+function apiHit (targetDestination, api_url, api_params, callback){
+  show_progress_bar(targetDestination);
+  $.get(
+          api_url,
+          api_params,
+          function(json){
+            d3.json(json['url'],function(source){
+              var input_data = source;
+              window.d3ening.plot(source, targetDestination)
+            });
+          },
+          'json'
+        )
+    .done(function() {
+      if (callback){
+        callback();
+      }
+    })
+    .fail(function() {})
+    .always(function() {
+      $(targetDestination + ' .progress-bar').remove()
+      $(targetDestination + ' #progbar_loading').remove()
+    });
+}
+
+window.apiHit = apiHit;
+
+function show_progress_bar (identifier) {
+      var progressbar = $("<div>");
+      progressbar.attr('id', 'progbar_loading');
+      progressbar.addClass("progress");
+      progressbar.addClass("progress-striped active");
+
+      var progressbar_inner = $("<div>");
+      progressbar_inner.addClass("progress-bar");
+      progressbar_inner.attr('role', "progressbar");
+      progressbar_inner.attr('aria-valuenow', "100");
+      progressbar_inner.attr('aria-valuemin', "0");
+      progressbar_inner.attr('aria-valuemax', "100");
+      progressbar_inner.css('width', '100%');
+
+      progressbar.append(progressbar_inner);
+
+      $(identifier).append(progressbar);
 }

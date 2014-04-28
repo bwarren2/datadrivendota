@@ -16,52 +16,38 @@
     <div class="charts col-md-4">
     <h4>Level Progression</h4>
       <a href="{% url 'matches:ability_build' %}?split_var=side&match={{match.steam_id}}">
-        {% if abilities_json %}
           <span id='abilities'></span>
-        {% endif %}
       </a>
     </div>
 
     <div class="charts col-md-4">
     <h4>Matchup Data</h4>
-      {% if kill_dmg_json %}
         <span id='kill_dmg'></span>
-      {% endif %}
-      {% if xp_gold_json %}
         <span id='xp_gold'></span>
-      {% endif %}
     </div>
 
     <div class="charts col-md-4">
     <h4>Roles</h4>
-      {% if roles_json %}
         <span id='roles'></span>
-      {% endif %}
     </div>
   </div>
 
   <div class="row">
     <div class="charts col-md-5 col-md-offset-1">
     <h4>Pushing Damage</h4>
-      {% if tower_damage_json %}
         <span id='tower_damage'></span>
-      {% endif %}
     </div>
     <div class="charts col-md-5">
 
     <h4>Last Hits</h4>
-      {% if last_hits_json %}
         <span id='last_hits'></span>
-      {% endif %}
     </div>
   </div>
 
   <div class="row">
     <div class="charts col-md-6 col-md-offset-3">
     <h4>KDA2</h4>
-      {% if kda_json %}
         <span id='kda'></span>
-      {% endif %}
     </div>
   </div>
 
@@ -289,54 +275,87 @@
   });
 </script>
 <script type="text/javascript">
-    {% if kill_dmg_json %}
-      var kill_raw_data;
-      d3.json('{{MEDIA_URL}}{{kill_dmg_json}}', function(source){
-        raw_data=source
-        window.d3ening.plot(source,'#kill_dmg')
-      })
-    {% endif %}
-    {% if xp_gold_json %}
-      var xp_raw_data;
-      d3.json('{{MEDIA_URL}}{{xp_gold_json}}', function(source){
-        xp_raw_data=source
-        window.d3ening.plot(source,'#xp_gold')
-      })
-    {% endif %}
-    {% if abilities_json %}
-      var abilities_raw;
-      d3.json('{{MEDIA_URL}}{{abilities_json}}', function(source){
-        abilities_raw=source
-        window.d3ening.plot(source,'#abilities')
-      })
-    {% endif %}
-    {% if tower_damage_json %}
-      var tower_damage_raw;
-      d3.json('{{MEDIA_URL}}{{tower_damage_json}}', function(source){
-        tower_damage_raw=source
-        window.d3ening.plot(source,'#tower_damage')
-      })
-    {% endif %}
-    {% if last_hits_json %}
-      var tower_damage_raw;
-      d3.json('{{MEDIA_URL}}{{last_hits_json}}', function(source){
-        tower_damage_raw=source
-        window.d3ening.plot(source,'#last_hits')
-      })
-    {% endif %}
-    {% if roles_json %}
-      var tower_damage_raw;
-      d3.json('{{MEDIA_URL}}{{roles_json}}', function(source){
-        tower_damage_raw=source
-        window.d3ening.plot(source,'#roles')
-      })
-    {% endif %}
-    {% if kda_json %}
-      var tower_damage_raw;
-      d3.json('{{MEDIA_URL}}{{kda_json}}', function(source){
-        tower_damage_raw=source
-        window.d3ening.plot(source,'#kda')
-      })
-    {% endif %}
+
+    window.apiHit(
+      "#kill_dmg",
+      '{% url "matches:api_match_scatter_chart" %}',
+        $.param({
+          match_id: '{{ match.steam_id }}',
+          x_var: 'kills',
+          y_var: 'hero_damage',
+          width: 225,
+          height: 225,
+        }, true
+      )
+    );
+
+    window.apiHit(
+      "#xp_gold",
+      '{% url "matches:api_match_scatter_chart" %}',
+        $.param({
+          match_id: '{{ match.steam_id }}',
+          x_var: 'gold_per_min',
+          y_var: 'xp_per_min',
+          width: 225,
+          height: 225,
+        }, true
+      )
+    );
+    window.apiHit(
+      "#abilities",
+      '{% url "matches:api_ability_build_chart" %}',
+        $.param({
+          match: '{{ match.steam_id }}',
+          panel_var: 'side',
+          width: 225,
+          height: 225,
+        }, true
+      )
+    );
+    window.apiHit(
+      "#last_hits",
+      '{% url "matches:api_match_bar_chart" %}',
+        $.param({
+          match: '{{ match.steam_id }}',
+          y_var: 'last_hits',
+          width: 375,
+        }, true
+      )
+    );
+
+    window.apiHit(
+      "#kda",
+      '{% url "matches:api_match_bar_chart" %}',
+        $.param({
+          match: '{{ match.steam_id }}',
+          y_var: 'K-D+.5*A',
+          width: 375,
+        }, true
+      )
+    );
+
+    window.apiHit(
+      "#tower_damage",
+      '{% url "matches:api_match_bar_chart" %}',
+        $.param({
+          match: '{{ match.steam_id }}',
+          y_var: 'tower_damage',
+          width: 375,
+        }, true
+      )
+    );
+
+    window.apiHit(
+      "#roles",
+      '{% url "matches:api_role_chart" %}',
+        $.param({
+          match: '{{ match.steam_id }}',
+          width: 225,
+          height: 225,
+          no_legend: true,
+        }, true
+      )
+    );
+
 </script>
 {% endblock extra_js %}
