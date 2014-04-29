@@ -286,7 +286,7 @@ var comboBox = function(){
         $('.click-selector').addClass('clicked')
         $('.click-selector').text('Unselect')
       }else{
-        var str = 'circle:not(.'+convertToSlug($('.select2-chosen').text())+')';
+        var str = 'circle';
 
         d3.selectAll(str)
         .transition()

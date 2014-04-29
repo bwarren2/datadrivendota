@@ -489,9 +489,10 @@ def combobox_tags(request):
         q = request.GET.get('term', '')
         heroes = [h.name for h in Hero.objects.filter(name__icontains=q)[:5]]
         alignments = ['Strength', 'Agility', 'Intelligence']
+        matched_alignments = [s for s in alignments if q.lower() in s.lower()]
         roles = [r.name for r in Role.objects.filter(name__icontains=q)[:5]]
         results = []
-        for i, string in enumerate(chain(heroes, alignments, roles)):
+        for i, string in enumerate(chain(heroes, matched_alignments, roles)):
             match_json = {}
             match_json['id'] = i
             match_json['label'] = string
