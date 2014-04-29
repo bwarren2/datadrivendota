@@ -28,11 +28,11 @@ class Command(BaseCommand):
         s = timeit.Timer("""hero_performance_chart_json(
             hero=53,
             player=85045426,
-            game_mode_list=[1,2,3,4,5],
+            game_modes=[1,2,3,4,5],
             x_var='duration',
             y_var='duration',
             group_var='skill_name',
-            split_var='is_win'
+            panel_var='is_win'
         )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 game_modes=[1,2,3,4,5],
                 x_var='duration',
                 y_var='kills',
-                split_var='is_win',
+                panel_var='is_win',
                 group_var='none',
                 compressor='sum'
                 )""", setup=setup).repeat(1, 1)
@@ -86,8 +86,8 @@ class Command(BaseCommand):
                 game_modes=[1,2,3,4,5],
                 x_var='duration',
                 y_var='K-D+.5*A',
-                split_var='is_win',
-                group_var='No Split',
+                panel_var='is_win',
+                group_var=None,
                 )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
@@ -99,7 +99,7 @@ class Command(BaseCommand):
                 game_modes=[1,2,3,4,5],
                 x_var='duration',
                 y_var='K-D+.5*A',
-                split_var='No Split',
+                panel_var=None,
                 group_var='is_win',
                 )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
@@ -127,7 +127,6 @@ class Command(BaseCommand):
         s = timeit.Timer("""single_match_parameter_json(
                 match=528300921,
                 y_var='hero_damage',
-                title='hero_damage',
                 )""", setup=setup).repeat(1, 1)
         output_print(s, fn)
 
@@ -178,9 +177,9 @@ import datetime""".format(fn)
         setup = """from players.json_data import {0}
 import datetime""".format(fn)
         s = timeit.Timer("""player_versus_winrate_json(
-                player_id_1=103611462,
-                player_id_2=85045426,
-                game_mode_list=None,
+                player_1=103611462,
+                player_2=85045426,
+                game_modes=None,
                 min_date=datetime.date(2009, 1, 1),
                 max_date=None,
                 group_var='alignment',

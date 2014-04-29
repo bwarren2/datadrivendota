@@ -202,6 +202,7 @@ def player_team_endgame_json(
                     split_param = 'Lost'
 
             if not valid_var(group_var):
+                group_param = None
                 pass
             elif group_var == 'game_mode':
                 group_param = annotation.game_mode.description
@@ -212,7 +213,8 @@ def player_team_endgame_json(
                     group_param = 'Won'
                 else:
                     group_param = 'Lost'
-
+            else:
+                print group_var
             d.x_var = plot_x_var
             d.y_var = plot_y_var
             d.label = annotation.steam_id
@@ -444,6 +446,7 @@ def match_ability_json(match, panel_var=None):
         side = build.player_match_summary.which_side()
         hero = build.player_match_summary.hero.name
         if not valid_var(panel_var):
+            split_param = None
             pass
         elif panel_var == 'hero':
             split_param = hero
