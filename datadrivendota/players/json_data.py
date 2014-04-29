@@ -351,10 +351,9 @@ def player_versus_winrate_json(
             group = hero_info_dict[hero_name]['name']
         elif group_var == 'alignment':
             group = hero_info_dict[hero_name]['alignment'].title()
-
-            d.group_var = group,
-            d.label = hero_info_dict[hero_name]['name'],
-            d.tooltip = hero_info_dict[hero_name]['name'],
+            d.group_var = group
+            d.label = hero_info_dict[hero_name]['name']
+            d.tooltip = hero_info_dict[hero_name]['name']
 
         if hero_classes[hero_info_dict[hero_name]['steam_id']] is not None:
             d.classes.extend(hero_classes[hero_info_dict[

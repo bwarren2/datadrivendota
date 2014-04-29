@@ -6,7 +6,7 @@
 
 {% block content %}
   {% if request.user.is_authenticated %}
-    
+
     <button type='submit' class='stripe-button btn btn-small btn-primary'>Upgrade</button>
 
 
@@ -30,7 +30,7 @@
   <h4>{{ message }}</h4>
 {% endblock content %}
 {% comment %}
-  
+
 {% block extra_js %}
   <script src="https://checkout.stripe.com/checkout.js"
     class="stripe-button"
@@ -41,4 +41,4 @@
     data-image="http://www.icon2s.com/img128/128x128-black-white-metro-google-web-search-icon.png">
 </script>
 {% endcomment %}
-{% endblock extra_js %}
+{# {% endblock extra_js %} #}
