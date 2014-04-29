@@ -219,10 +219,10 @@ class Params(object):
     pointSizeMax = 5
     strokeDomainMin = 0
     strokeDomainMax = 0
-    strokeSizeMin = 0
-    strokeSizeMax = 0
+    strokeSizeMin = 1
+    strokeSizeMax = 1
     path_stroke_width = 3
-    fadeOpacity = .2
+    fadeOpacity = .1
     chart = None
 
     def __init__(self):
@@ -327,7 +327,7 @@ class DataPoint(object):
     tooltip = None
     url = None
     point_size = 1
-    stroke_width = 0
+    stroke_width = 1
     classes = None
 
     def __init__(self):

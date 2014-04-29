@@ -236,6 +236,8 @@ function convertToSlug(Text)
         ;
 }
 
+window.jsUtils.convertToSlug = convertToSlug
+
 var getVals = function(obj){
    var vals = [];
    for(var key in obj){
@@ -275,10 +277,9 @@ var comboBox = function(){
   d3.selectAll('.click-selector')
     .on('click',function(d){
       if (!$('.click-selector').hasClass('clicked')){
-        var str = 'circle:not(.'+convertToSlug(
+        var str = 'circle:not(.'+window.jsUtils.convertToSlug(
           $('.select2-chosen').text()
         )+')';
-
         selection = d3.selectAll(str)
         .transition()
         .duration(500)
