@@ -273,7 +273,7 @@ function apiHit (targetDestination, api_url, api_params, callback){
 
 window.apiHit = apiHit;
 
-var comboBox = function(){
+function comboBox(){
   d3.selectAll('.click-selector')
     .on('click',function(d){
       if (!$('.click-selector').hasClass('clicked')){

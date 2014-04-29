@@ -131,9 +131,12 @@
     <!-- Placed at the end of the document so the pages load faster -->
     {% comment %}
 
-   <script type="text/javascript" src='/assets/js/eldarion-ajax.min.js'></script>
     {% endcomment %}
     {% compressed_js 'all' %}
+      <script type="text/javascript">
+      window.comboBox();
+      </script>
+
     {% block extra_js %}
 
     {% endblock extra_js %}
@@ -232,9 +235,6 @@
             }
           };
         })()
-      </script>
-      <script type="text/javascript">
-      window.comboBox();
       </script>
     {% endif %}
   </body>
