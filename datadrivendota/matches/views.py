@@ -321,8 +321,6 @@ class OwnTeamEndgame(OwnTeamEndgameMixin, ChartFormView):
     title = "Own-Team Endgame Charts"
     html = "matches/form.html"
 
-    def get(self, *args, **kwargs):
-        super(OwnTeamEndgame, self).get(*args, **kwargs)
 
 
 class SameTeamEndgame(SameTeamEndgameMixin, ChartFormView):
