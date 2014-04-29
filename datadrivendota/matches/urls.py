@@ -71,5 +71,10 @@ urlpatterns = patterns(
         views.ApiRoleChart.as_view(),
         name='api_role_chart'
         ),
+    url(
+        r'^api/gettags/$',
+        views.combobox_tags,
+        name='combobox_tags'
+        ),
 
 )

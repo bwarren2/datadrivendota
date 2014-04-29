@@ -86,7 +86,11 @@
               <a target="_blank" href="mailto:contact@datadrivendota.com">Contact</a>
             </li>
 
+
           </ul>
+          <span><input type='text' class='combobox-tags' style='margin-top:5px' >
+            <button type='button' class='btn btn-small btn-primary click-selector' style='margin-top:8px; margin-left:3px'>Select</button></span>
+
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_active %}
             <li><a href="{% url 'players:management' %}">Data Management</a></li>
@@ -121,7 +125,6 @@
         Steam</a>, Privacy stuff <a href="{% url 'privacy' %}">here</a>.
       </div>
     </div>
-
 
     <!-- Le javascript
     ================================================== -->
@@ -229,6 +232,9 @@
             }
           };
         })()
+      </script>
+      <script type="text/javascript">
+      window.comboBox()
       </script>
     {% endif %}
   </body>

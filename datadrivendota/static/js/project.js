@@ -81,6 +81,7 @@ $(function () {
   ajax_select2ify('.multi-hero-tags', true, "One or more Heroes", "/heroes/api/getheroes");
   ajax_select2ify('.multi-match-tags', true, "One or more Matches", "/matches/api/getmatches");
   ajax_select2ify('.single-match-tags', true, "One Match", "/matches/api/getmatches");
+  ajax_select2ify('.combobox-tags', false, "One Selector", "/matches/api/gettags");
 
   /* gettext library */
 
@@ -269,6 +270,36 @@ function apiHit (targetDestination, api_url, api_params, callback){
 }
 
 window.apiHit = apiHit;
+
+var comboBox = function(){
+  d3.selectAll('.click-selector')
+    .on('click',function(d){
+      if (!$('.click-selector').hasClass('clicked')){
+        var str = 'circle:not(.'+convertToSlug(
+          $('.select2-chosen').text()
+        )+')';
+
+        selection = d3.selectAll(str)
+        .transition()
+        .duration(500)
+        .attr('opacity',0);
+        $('.click-selector').addClass('clicked')
+        $('.click-selector').text('Unselect')
+      }else{
+        var str = 'circle:not(.'+convertToSlug($('.select2-chosen').text())+')';
+
+        d3.selectAll(str)
+        .transition()
+        .duration(500)
+        .attr('opacity',1);
+        $('.click-selector').removeClass('clicked')
+        $('.click-selector').text('Select')
+      }
+    }
+  );
+}
+
+window.comboBox = comboBox;
 
 function show_progress_bar (identifier) {
       var progressbar = $("<div>");

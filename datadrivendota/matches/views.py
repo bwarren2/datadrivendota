@@ -1,7 +1,7 @@
 import datetime
 import json
 from functools import wraps
-from os.path import basename
+from itertools import chain
 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
@@ -9,9 +9,8 @@ from django.http import Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.conf import settings
-from django.core.urlresolvers import reverse
 
-from heroes.models import Hero
+from heroes.models import Hero, Role
 from .models import Match, PlayerMatchSummary, PickBan, SkillBuild
 from .mixins import (
     EndgameMixin,
@@ -23,20 +22,8 @@ from .mixins import (
     SingleMatchParameterMixin,
     RoleMixin,
 )
-from .json_data import (
-    player_endgame_json,
-    team_endgame_json,
-    match_ability_json,
-    match_list_json,
-    match_parameter_json,
-    player_team_endgame_json,
-    single_match_parameter_json,
-    match_role_json
-)
 from datadrivendota.views import ChartFormView, ApiView
 from players.models import request_to_player, Player
-from utils.exceptions import NoDataFound
-from utils.file_management import outsourceJson, moveJson
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -489,6 +476,26 @@ def match_list(request):
             match_json['id'] = i
             match_json['label'] = "M#: {0}".format(match.steam_id)
             match_json['value'] = "M#: {0}".format(match.steam_id)
+            results.append(match_json)
+        data = json.dumps(results)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
+
+
+def combobox_tags(request):
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+        heroes = [h.name for h in Hero.objects.filter(name__icontains=q)[:5]]
+        alignments = ['Strength', 'Agility', 'Intelligence']
+        roles = [r.name for r in Role.objects.filter(name__icontains=q)[:5]]
+        results = []
+        for i, string in enumerate(chain(heroes, alignments, roles)):
+            match_json = {}
+            match_json['id'] = i
+            match_json['label'] = string
+            match_json['value'] = string
             results.append(match_json)
         data = json.dumps(results)
     else:
