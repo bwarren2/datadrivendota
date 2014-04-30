@@ -6,16 +6,27 @@
 {% block page_title %}{{player.display_name}} as {{hero.name}} {% endblock page_title %}
 
 {% block content %}
+
   <div class="row">
+    <div class="player-charts col-md-8">
+    <h4>KDA2</h4>
+        <span id='hero_kda2_chart'></span>
+    </div>
+
     <div class="player-charts col-md-4">
     <h4>Level Progression</h4>
         <span id='hero_progression_chart'></span>
     </div>
 
-    <div class="player-charts col-md-4">
-    <h4>Item Usage</h4>
-        <span id='item_winrate_chart'></span>
+  </div>
+
+
+  <div class="row">
+    <div class="player-charts col-md-8">
+    <h4>Kills</h4>
+        <span id='hero_kills_chart'></span>
     </div>
+
     <div class="player-charts col-md-4">
     <h4>Skill Usage</h4>
         <span id='skill_winrate_chart'></span>
@@ -23,28 +34,22 @@
   </div>
 
   <div class="row">
-    <div class="player-charts col-md-6">
-    <h4>KDA2</h4>
-        <span id='hero_kda2_chart'></span>
-    </div>
-
-    <div class="player-charts col-md-6">
-    <h4>Kills</h4>
-        <span id='hero_kills_chart'></span>
-    </div>
-
-  </div>
-
-  <div class="row">
-    <div class="player-charts col-md-6">
+    <div class="player-charts col-md-8">
     <h4>Hero Damage</h4>
         <span id='hero_dmg_chart'></span>
     </div>
-    <div class="player-charts col-md-6">
+
+    <div class="player-charts col-md-4">
+    <h4>Item Usage</h4>
+        <span id='item_winrate_chart'></span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="player-charts col-md-8">
     <h4>Tower Damage</h4>
         <span id='hero_push_chart'></span>
     </div>
-
   </div>
 
 {% endblock content %}
