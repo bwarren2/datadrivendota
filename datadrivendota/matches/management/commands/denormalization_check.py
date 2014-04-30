@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db.models import Count
 from datadrivendota.utilities import error_email
 from matches.models import PlayerMatchSummary, Match
-from heroes.models import Hero
+from heroes.models import Hero, Role
 from optparse import make_option
 
 
@@ -112,6 +112,16 @@ class Command(BaseCommand):
             error_email(
                 'Database alert!',
                 'We have denormalization for dire players and iswin=True'
+            )
+
+        thumbshot_badness = Role.objects.filter(
+            thumbshot=''
+        )
+        if len(dire_badness) != 0:
+            roles = ", ".join([r.name for r in thumbshot_badness])
+            error_email(
+                'Database alert!',
+                'We have roles without thumbshots: {0}'.format(roles)
             )
 
         matches = Match.objects.filter(duration__gte=settings.MIN_MATCH_LENGTH)
