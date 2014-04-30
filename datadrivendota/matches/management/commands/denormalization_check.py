@@ -127,6 +127,9 @@ class Command(BaseCommand):
         matches = Match.objects.filter(duration__gte=settings.MIN_MATCH_LENGTH)
         matches = matches.annotate(Count('playermatchsummary'))
 
+        # pmses =PlayerMatchSummary.objects.filter(
+        #     match__validity=Match.LEGIT,
+        #     ).exclude(skill_build__level=1)
         bad_matches = []
         for match in matches:
             if match.playermatchsummary__count < 10:
