@@ -62,7 +62,7 @@ class SameTeamEndgameMixin(object):
 class ProgressionListMixin(object):
     form = MatchListSelect
     attrs = [
-        'match_list',
+        'matches',
         'player_list',
     ]
     json_function = staticmethod(match_list_json)
