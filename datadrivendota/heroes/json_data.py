@@ -26,9 +26,8 @@ from utils.charts import (
     hero_classes_dict,
     DataPoint,
     XYPlot, BarPlot, TasselPlot, TasselDataPoint,
-    valid_panel_var
+    valid_var,
     )
-from utils import safen
 
 if settings.VERBOSE_PROFILING:
     try:
@@ -162,7 +161,7 @@ def hero_lineup_json(heroes, stat, level):
     c.params.y_min = 0
     c.params.x_label = 'Hero'
     c.params.y_label = stat
-    c.params.outerWidth = 800
+    c.params.outerWidth = 705
     c.params.outerHeight = 500
     c.params.legendWidthPercent = .7
     c.params.legendHeightPercent = .8
@@ -236,14 +235,14 @@ def hero_performance_chart_json(
                 )
 
             #Ajax API requests can't send None over the wire
-            if valid_panel_var(group_var):
+            if valid_var(group_var):
                 if group_var == 'skill_name'\
                         and pms.match.steam_id in player_game_ids:
                             d.group_var = 'Player'
                 else:
                     d.group_var = fetch_pms_attribute(pms, group_var)
 
-            if valid_panel_var(panel_var):
+            if valid_var(panel_var):
                 d.panel_var = fetch_pms_attribute(pms, panel_var)
             else:
                 d.panel_var = "{y} vs {x}".format(
@@ -611,7 +610,7 @@ def hero_performance_lineup(
     c.params.y_min = min([d.y_var for d in c.datalist])-1
     c.params.x_label = 'Hero'
     c.params.y_label = stat
-    c.params.outerWidth = 800
+    c.params.outerWidth = 705
     c.params.outerHeight = 500
     c.params.legendWidthPercent = .7
     c.params.legendHeightPercent = .2

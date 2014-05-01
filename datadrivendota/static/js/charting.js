@@ -375,6 +375,7 @@ function draw_barplot(source, placement_div){
     .rangeRoundBands([0, width], 0.1)
     .domain(params.x_set);
   var y = linear_y_scale(params);
+  // alert(length(params.x_set))
   var xAxis = d3.svg.axis().scale(x).orient("bottom")
               .tickValues(params.tick_values),
       yAxis = d3.svg.axis().scale(y).orient("left");
