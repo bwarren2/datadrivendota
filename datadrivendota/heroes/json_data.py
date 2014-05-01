@@ -1,8 +1,11 @@
 import operator
 from itertools import chain
+from time import mktime
+import datetime
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.db.models import Avg
 
 from heroes.models import HeroDossier, Hero, invalid_option, Ability
 from matches.models import (
@@ -25,6 +28,7 @@ from utils.charts import (
     XYPlot, BarPlot, TasselPlot, TasselDataPoint,
     valid_panel_var
     )
+from utils import safen
 
 if settings.VERBOSE_PROFILING:
     try:
@@ -110,12 +114,6 @@ def hero_lineup_json(heroes, stat, level):
     ).select_related()
 
     selected_names = [h.name for h in Hero.objects.filter(steam_id__in=heroes)]
-    # @todo: An idiomatic way of doing this would be "if not len(foo)"
-    # It's hard to explain when and why I would use "not" followed by an
-    # expression that evaluates to zero, and when I would use "== 0". But for
-    # lists, it's that you don't care about the length of the list as such,
-    # it's that you care about whether it "meaningfully exists"
-    # --kit 2014-02-16
     if len(hero_dossiers) == 0:
         raise NoDataFound
 
@@ -522,4 +520,101 @@ def update_player_winrate(
     c.params.x_label = 'Games'
     c.params.y_label = 'Winrate'
 
+    return c
+
+
+def hero_performance_lineup(
+    stat,
+    skill_level,
+    is_win,
+    heroes,
+    min_date=None,
+    max_date=None,
+):
+
+    if max_date is None:
+        max_date_utc = mktime(datetime.datetime.now().timetuple())
+    else:
+        max_date_utc = mktime(max_date.timetuple())
+    if min_date is None:
+        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
+    else:
+        min_date_utc = mktime(min_date.timetuple())
+
+    selected_names = [h.name for h in Hero.objects.filter(steam_id__in=heroes)]
+
+    annotations = PlayerMatchSummary.objects.filter(
+        match__validity=Match.LEGIT,
+        match__skill=skill_level,
+        match__start_time__gte=min_date_utc,
+        match__start_time__lte=max_date_utc,
+        hero__visible=True,
+        )
+    if is_win == 'win':
+        annotations = annotations.filter(is_win=True)
+
+        annotations = annotations.values(
+            'is_win', 'hero__name', 'hero__steam_id'
+            ).annotate(Avg(stat))
+    elif is_win == 'loss':
+        annotations = annotations.filter(is_win=False)
+        annotations = annotations.values(
+            'is_win', 'hero__name', 'hero__steam_id'
+            ).annotate(Avg(stat))
+    elif is_win == 'both':
+        annotations = annotations.values(
+            'hero__name', 'hero__steam_id'
+            ).annotate(Avg(stat))
+    else:
+        raise Exception
+    annotations = annotations.order_by()
+    annotations = [a for a in annotations]
+    annotations.sort(
+        key=lambda x: x[stat+'__avg'],
+        reverse=True
+    )
+
+    if len(annotations) == 0:
+        raise NoDataFound
+
+    hero_classes = hero_classes_dict()
+    heroes = {
+        h.name: h.herodossier.alignment.title()
+        for h in Hero.objects.filter(visible=True).select_related()
+        }
+    c = BarPlot()
+    xs = []
+    for annotation in annotations:
+        d = DataPoint()
+        group = annotation['hero__name'] \
+            if annotation['hero__name'] in selected_names \
+            else heroes[annotation['hero__name']]
+        x = annotation['hero__name']
+        xs.append(x)
+        d.x_var = x
+        d.y_var = annotation[stat+'__avg']
+        d.label = annotation['hero__name']
+        d.tooltip = "{name} ({val})".format(
+            name=annotation['hero__name'],
+            val=annotation[stat+'__avg'],
+        )
+        d.group_var = group
+        d.classes = []
+        d.panel_var = 'Hero {stat} (Avg)'.format(stat=stat).title()
+
+        if hero_classes[annotation['hero__steam_id']] is not None:
+            d.classes.extend(
+                hero_classes[annotation['hero__steam_id']]
+            )
+
+        c.datalist.append(d)
+    c.params.y_min = min([d.y_var for d in c.datalist])-1
+    c.params.x_label = 'Hero'
+    c.params.y_label = stat
+    c.params.outerWidth = 800
+    c.params.outerHeight = 500
+    c.params.legendWidthPercent = .7
+    c.params.legendHeightPercent = .2
+    c.params.padding['bottom'] = 120
+    c.params.tick_values = [x for ind, x in enumerate(xs) if ind % 2 == 0]
     return c

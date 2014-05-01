@@ -9,6 +9,11 @@ urlpatterns = patterns(
     url(r'^performance/$',
         views.HeroPerformance.as_view(),
         name='hero_performance'),
+    url(
+        r'^performance-lineup/$',
+        views.HeroPerformanceLineup.as_view(),
+        name='hero_performance_lineup'
+    ),
     url(r'^skillbuild_winrate/$',
         views.HeroBuildLevel.as_view(),
         name='hero_skill_bars',
@@ -52,6 +57,11 @@ urlpatterns = patterns(
         r'^api/update_player_winrate$',
         views.ApiUpdatePlayerWinrateChart.as_view(),
         name='api_update_player_winrate_chart'
+    ),
+    url(
+        r'^api/hero_performance_lineup$',
+        views.ApiHeroPerformanceLineupChart.as_view(),
+        name='api_hero_performance_lineup_chart'
     ),
 
     url(r'^api/getheroes/$', views.hero_list, name='hero_list'),

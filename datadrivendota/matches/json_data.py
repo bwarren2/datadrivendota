@@ -497,7 +497,9 @@ def match_parameter_json(match_id, x_var, y_var):
         d.x_var = fetch_pms_attribute(pms, x_var)
         d.y_var = fetch_pms_attribute(pms, y_var)
         d.group_var = group
-        d.panel_var = '{x} vs {y}'.format(x=x_var, y=y_var)
+        d.panel_var = '{x} vs {y}'.format(
+            x=fetch_attribute_label(x_var),
+            y=fetch_attribute_label(y_var))
         d.label = fetch_pms_attribute(pms, 'hero_name')
         d.tooltip = fetch_pms_attribute(pms, 'hero_name')
         d.classes = []
@@ -550,7 +552,7 @@ def single_match_parameter_json(match, y_var):
     c.params.legendWidthPercent = .8
     c.params.legendHeightPercent = .05
 
-    c.params.padding['bottom'] = 90
+    c.params.padding['bottom'] = 115
     c.params.margin['left'] = 45
 
     if c.params.y_max > 1000:

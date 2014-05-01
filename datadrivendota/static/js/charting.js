@@ -278,8 +278,12 @@ function draw_scatterplot(source, placement_div){
     var x = linear_x_scale(params);
     var y = linear_y_scale(params);
 
-    var xAxis = d3.svg.axis().scale(x).orient("bottom"),
-        yAxis = d3.svg.axis().scale(y).orient("left");
+    var xAxis = d3.svg.axis()
+                .scale(x).orient("bottom")
+                .tickFormat(d3.format("d")),
+        yAxis = d3.svg.axis()
+                .scale(y).orient("left")
+                .tickFormat(d3.format("d"));
 
     var color = getColorScale(params);
 
@@ -371,7 +375,6 @@ function draw_barplot(source, placement_div){
     .rangeRoundBands([0, width], 0.1)
     .domain(params.x_set);
   var y = linear_y_scale(params);
-
   var xAxis = d3.svg.axis().scale(x).orient("bottom")
               .tickValues(params.tick_values),
       yAxis = d3.svg.axis().scale(y).orient("left");

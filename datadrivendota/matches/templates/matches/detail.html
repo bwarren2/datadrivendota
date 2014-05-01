@@ -13,17 +13,11 @@
 {% block content %}
 
   <div class="row">
-    <div class="charts col-md-4">
+    <div class="charts col-md-6">
     <h4>Level Progression</h4>
       <a href="{% url 'matches:ability_build' %}?split_var=side&match={{match.steam_id}}">
           <span id='abilities'></span>
       </a>
-    </div>
-
-    <div class="charts col-md-4">
-    <h4>Matchup Data</h4>
-        <span id='kill_dmg'></span>
-        <span id='xp_gold'></span>
     </div>
 
     <div class="charts col-md-4">
@@ -33,19 +27,26 @@
   </div>
 
   <div class="row">
-    <div class="charts col-md-5 col-md-offset-1">
+    <div class="charts col-md-6">
+    <h4>Matchup Data</h4>
+        <span id='kill_dmg'></span>
+        <span id='xp_gold'></span>
+    </div>
+
+    <div class="charts col-md-">
     <h4>Pushing Damage</h4>
         <span id='tower_damage'></span>
     </div>
-    <div class="charts col-md-5">
 
-    <h4>Last Hits</h4>
-        <span id='last_hits'></span>
-    </div>
   </div>
 
   <div class="row">
-    <div class="charts col-md-6 col-md-offset-3">
+    <div class="charts col-md-6">
+    <h4>Last Hits</h4>
+        <span id='last_hits'></span>
+    </div>
+
+    <div class="charts col-md-6">
     <h4>KDA2</h4>
         <span id='kda'></span>
     </div>

@@ -1,3 +1,4 @@
+import datetime
 from django import forms
 from django.forms import ValidationError
 from django.forms.widgets import CheckboxSelectMultiple
@@ -5,6 +6,7 @@ from matches.form_fields import MultiGameModeSelect
 from players.form_fields import SinglePlayerField
 from .form_fields import MultiHeroSelect, SingleHeroSelect, MultiLeveLSelect
 from utils import list_to_choice_list
+thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
 
 
 class HeroVitalsMultiSelect(forms.Form):
@@ -233,4 +235,54 @@ class UpdatePlayerWinrateForm(forms.Form):
     )
     game_modes = MultiGameModeSelect(
         help_text='Which game modes would you like to sample?'
+    )
+
+
+class HeroPerformanceLineupForm(forms.Form):
+    STAT_POOL = [
+        'kills',
+        'deaths',
+        'assists',
+        'xp_per_min',
+        'gold_per_min',
+    ]
+    Y_LIST = list_to_choice_list(STAT_POOL)
+    SKILL_LEVELS = [
+        (1, 'Low Skill'),
+        (2, 'Medium Skill'),
+        (3, 'High Skill'),
+    ]
+    IS_WIN_LIST = ['win', 'loss', 'both']
+    IS_WIN_CHOICES = list_to_choice_list(IS_WIN_LIST)
+
+    stat = forms.ChoiceField(
+        choices=Y_LIST,
+        required=True,
+        help_text='What goes on the Y axis?'
+    )
+    skill_level = forms.ChoiceField(
+        choices=SKILL_LEVELS,
+        required=True,
+        help_text='What goes on the Y axis?'
+    )
+    min_date = forms.DateField(
+        required=False,
+        initial=thirty_days_ago,
+        help_text='Start times for included games must be on or after this'
+    )
+    min_date.widget = forms.TextInput(attrs={'class': 'datepicker'})
+    max_date = forms.DateField(
+        required=False,
+        initial=datetime.date.today,
+        help_text='Start times for included dates must be on or before this'
+    )
+    max_date.widget = forms.TextInput(attrs={'class': 'datepicker'})
+    is_win = forms.ChoiceField(
+        choices=IS_WIN_CHOICES,
+        required=True,
+        help_text='Games where they win, lose, or both?'
+    )
+    heroes = MultiHeroSelect(
+        required=True,
+        help_text='Pick one or more heroes'
     )

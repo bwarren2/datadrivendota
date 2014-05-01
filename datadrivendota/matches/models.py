@@ -349,6 +349,10 @@ def fetch_attribute_label(attribute):
         label = 'HeroName'
     elif attribute == 'first_blood_time':
         label = 'FirstBloodTime(m)'
+    elif attribute == 'gold_per_min':
+        label = 'Gold Per Min'
+    elif attribute == 'xp_per_min':
+        label = 'XP Per Min'
     elif attribute == 'none':
         label = ''
     else:

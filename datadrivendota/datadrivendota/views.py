@@ -12,7 +12,8 @@ from utils.file_management import outsourceJson, moveJson
 from utils.exceptions import NoDataFound
 
 from datadrivendota.forms import KeyForm
-from players.models import PermissionCode
+from players.models import PermissionCode, Player
+
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -39,6 +40,8 @@ def base(request):
         extra_dict = request.user.social_auth.filter(
             provider='steam'
         )[0].extra_data
+        p = Player.objects.get(steam_id=70388657)
+        extra_dict.update({'chart_player': p})
     return render(request, 'base.html', extra_dict)
 
 
@@ -188,7 +191,6 @@ class ChartFormView(View):
                     )
                     self.amend_params(chart)
                     json_data = moveJson(chart.as_JSON())
-
                     return render(
                         request,
                         self.html,

@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
 
 from datadrivendota.views import ChartFormView, ApiView
-from utils.file_management import outsourceJson, moveJson
+from utils.file_management import moveJson
 
 from matches.models import GameMode
 from .json_data import (
@@ -22,6 +22,7 @@ from .mixins import (
     HeroSkillProgressionMixin,
     HeroBuildLevelMixin,
     UpdatePlayerWinrateMixin,
+    HeroPerformanceLineupMixin,
     )
 
 try:
@@ -273,8 +274,17 @@ class HeroBuildLevel(HeroBuildLevelMixin, ChartFormView):
     title = "SkillBuild Winrate"
     html = "heroes/form.html"
 
-    def amend_params(self, params):
-        return params
+
+class HeroPerformanceLineup(HeroPerformanceLineupMixin, ChartFormView):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts a stat across all heroes, in games of a skill level."
+        },
+        ]
+    title = "Hero Performance Lineup"
+    html = "heroes/form.html"
 
 
 def hero_list(request):
@@ -317,6 +327,10 @@ class ApiBuildLevelChart(HeroBuildLevelMixin, ApiView):
 
 
 class ApiUpdatePlayerWinrateChart(UpdatePlayerWinrateMixin, ApiView):
+    pass
+
+
+class ApiHeroPerformanceLineupChart(HeroPerformanceLineupMixin, ApiView):
     pass
 
 
