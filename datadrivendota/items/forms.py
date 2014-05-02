@@ -12,7 +12,7 @@ class ItemWinrateForm(forms.Form):
     ]
 
     player = SinglePlayerField(
-        required=True,
+        required=False,
         help_text='Pick one player.  Use the autocomplete.'
     )
     hero = SingleHeroSelect(
@@ -25,7 +25,7 @@ class ItemWinrateForm(forms.Form):
     )
     skill_level = forms.ChoiceField(
         choices=SKILL_LEVELS,
-        required=True,
+        required=False,
         help_text='What goes on the Y axis?'
     )
 
