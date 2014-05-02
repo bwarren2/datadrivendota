@@ -5,6 +5,11 @@ from matches.form_fields import MultiGameModeSelect
 
 
 class ItemWinrateForm(forms.Form):
+    SKILL_LEVELS = [
+        (1, 'Low Skill'),
+        (2, 'Medium Skill'),
+        (3, 'High Skill'),
+    ]
 
     player = SinglePlayerField(
         required=True,
@@ -18,3 +23,9 @@ class ItemWinrateForm(forms.Form):
         required=True,
         help_text='Which game modes would you like to sample?'
     )
+    skill_level = forms.ChoiceField(
+        choices=SKILL_LEVELS,
+        required=True,
+        help_text='What goes on the Y axis?'
+    )
+

@@ -9,6 +9,7 @@ from matches.models import GameMode
 def item_endgame(
     hero=None,
     player=None,
+    skill_level=None,
     game_modes=[],
     *args, **kwargs
 ):
@@ -20,11 +21,15 @@ def item_endgame(
 
     if hero is None and player is None:
         raise NoDataFound
+
     pmses = PlayerMatchSummary.objects.all()
+
     if hero is not None:
         pmses = pmses.filter(hero__steam_id=hero)
     if player is not None:
         pmses = pmses.filter(player__steam_id=player)
+    if skill_level is not None:
+        pmses = pmses.filter(match__skill=skill_level)
 
     itemDict = {}
     pmses = pmses.select_related()
@@ -65,10 +70,6 @@ def item_endgame(
         d.split_var = ''
         d.group_var = ''
         d.point_size = itm.cost
-        # 'url': reverse(
-        #     'items:detail',
-        #     kwargs={'item_name': itm.name}
-        # )
         chart.datalist.append(d)
 
     if len(chart.datalist) == 0:

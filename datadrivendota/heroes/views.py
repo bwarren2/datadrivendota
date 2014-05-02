@@ -69,17 +69,6 @@ def detail(request, hero_name):
         is_core=True,
         hero=current_hero).order_by('steam_id')
     dossier = HeroDossier.objects.get(hero=current_hero)
-    competitive_modes = [
-        mode.steam_id for mode in GameMode.objects.filter(is_competitive=True)
-    ]
-    chart = update_player_winrate(
-        current_hero.steam_id,
-        game_modes=competitive_modes,
-    )
-    chart.params.outerWidth = 300
-    chart.params.outerHeight = 300
-    chart.params.margin['left'] = 33
-    json_data = moveJson(chart.as_JSON())
     return render(
         request,
         'heroes/detail.html',
@@ -87,7 +76,6 @@ def detail(request, hero_name):
             'hero': current_hero,
             'abilities': abilities,
             'dossier': dossier,
-            'player_json': basename(json_data.name),
         }
     )
 

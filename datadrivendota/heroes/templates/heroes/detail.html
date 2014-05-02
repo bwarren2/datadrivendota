@@ -98,7 +98,13 @@
       <div>Day/Night vision: {{ dossier.day_vision }} / {{ dossier.night_vision }}</div>
       <div>HP/Mana regen: {{ dossier.hp_regen }} / {{ dossier.mana_regen }}</div>
     </div>
-    <div id='top_charts'></div>
+    <div id='top_charts'>
+      <h4>Winrate by Player</h4>
+      <div id='player_winrate'></div>
+      <h4>High-Skill Item Use</h4>
+      <div id='high_skill_item_winrate'></div>
+
+    </div>
     <blockquote class="lore">
       {{ hero.lore }}
     </blockquote>
@@ -121,20 +127,31 @@
 
 {% block extra_js %}
   <script type="text/javascript">
-    d3.json('{{MEDIA_URL}}{{player_json}}',function(source){
-      var input_data = source;
-      window.d3ening.plot(source, '#top_charts')
-    });
 
     window.apiHit(
-      "#top_charts",
+      "#player_winrate",
       '{% url "heroes:api_update_player_winrate_chart" %}',
         $.param({
           hero: '{{ hero.name }}',
           game_modes: [1,2,3,4,5],
+          width: 300,
+          height: 300,
         }, true
       )
     );
+  window.apiHit(
+    "#high_skill_item_winrate",
+    '{% url "items:api_item_endgame_chart" %}',
+      $.param({
+        hero: '{{hero.name}}',
+        skill_level: '3',
+        game_modes: [1, 2, 3, 4, 5],
+        no_legend: true,
+        width: 275,
+        height: 275,
+      }, true
+    )
+  );
 
     window.apiHit(
       "#chart3",
