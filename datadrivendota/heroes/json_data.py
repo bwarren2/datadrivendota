@@ -588,6 +588,7 @@ def hero_performance_lineup(
         group = annotation['hero__name'] \
             if annotation['hero__name'] in selected_names \
             else heroes[annotation['hero__name']]
+
         x = annotation['hero__name']
         xs.append(x)
         d.x_var = x
@@ -607,6 +608,7 @@ def hero_performance_lineup(
             )
 
         c.datalist.append(d)
+    print len(xs)
     c.params.y_min = min([d.y_var for d in c.datalist])-1
     c.params.x_label = 'Hero'
     c.params.y_label = stat
