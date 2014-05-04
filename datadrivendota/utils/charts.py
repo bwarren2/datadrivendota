@@ -4,7 +4,6 @@ from django.utils.text import slugify
 import json
 
 
-
 def color_scale_params(params, group_list):
     colors = other_colors()
     groups = set(group_list)
@@ -340,6 +339,7 @@ class Chart(object):
             raise Exception(
                 '{0} datapoints have bad x values'.format(bad_ys)
             )
+        self.set_y_min_max()
 
     def postprocess(self):
 
@@ -404,6 +404,12 @@ class Chart(object):
 
         return chart_panel_list
 
+    def set_y_min_max(self):
+        if self.params.y_min is None:
+            self.params.y_min = min([d.y_var for d in self.datalist])
+        if self.params.y_max is None:
+            self.params.y_max = max([d.y_var for d in self.datalist])
+
 
 class XYPlot(Chart):
 
@@ -421,10 +427,6 @@ class XYPlot(Chart):
             self.params.x_min = min([d.x_var for d in self.datalist])
         if self.params.x_max is None:
             self.params.x_max = max([d.x_var for d in self.datalist])
-        if self.params.y_min is None:
-            self.params.y_min = min([d.y_var for d in self.datalist])
-        if self.params.y_max is None:
-            self.params.y_max = max([d.y_var for d in self.datalist])
         self.params.margin['left'] = 9*len(str(round(self.params.y_max)))
 
 
@@ -444,10 +446,6 @@ class TasselPlot(Chart):
             self.params.x_min = min([d.x_var for d in self.datalist])
         if self.params.x_max is None:
             self.params.x_max = max([d.x_var for d in self.datalist])
-        if self.params.y_min is None:
-            self.params.y_min = min([d.y_var for d in self.datalist])
-        if self.params.y_max is None:
-            self.params.y_max = max([d.y_var for d in self.datalist])
         self.params.margin['left'] = 9*len(str(round(self.params.y_max)))
 
 
@@ -461,11 +459,4 @@ class BarPlot(Chart):
 
     def validate_data(self):
         super(BarPlot, self).validate_data()
-
         self.params.x_set = [d.x_var for d in self.datalist]
-
-        #Set the min maxes
-        if self.params.y_min is None:
-            self.params.y_min = min([d.y_var for d in self.datalist])
-        if self.params.y_max is None:
-            self.params.y_max = max([d.y_var for d in self.datalist])
