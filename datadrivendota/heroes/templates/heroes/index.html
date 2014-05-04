@@ -2,18 +2,22 @@
 
 {% block title %}Hero List{% endblock %}
 
-{% block page_title %}Hero Index{% endblock %}
+{% block page_title %}
+  Hero Index
+  <form id="hero-filter" class="form-inline pull-right" role="form">
+    <div class="form-group">
+      <label class="sr-only" for="hero-filter-select">Filter by role:</label>
+      <select id="hero-filter-select" class="form-control">
+        <option value=''>Select role&hellip;</option>
+        {% for role in role_list %}
+          <option value="{{ role.name }}">{{ role.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+{% endblock %}
 
 {% block content %}
-  <div id="hero-filter">
-    <label for-"hero-filter-select">Filter by role:</label>
-    <select id="hero-filter-select" class="form-control">
-      <option value=''>Select role&hellip;</option>
-      {% for role in role_list %}
-        <option value="{{ role.name }}">{{ role.name }}</option>
-      {% endfor %}
-    </select>
-  </div>
   <div class="row">
     {% for hero in hero_list %}
       {% if hero.thumbshot and hero.name %}
