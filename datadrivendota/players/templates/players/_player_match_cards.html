@@ -1,11 +1,11 @@
 {% for pms in pms_list %}
-  <div class="col-md-2">
+  <div class="col-md-2 player-match-row">
     <a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}" class="thumbnail">
       {% if pms.hero.mugshot %}
       <img src="{{ pms.hero.mugshot.url }}" alt="{{ hero.name }}" class="player-match-portrait">
       {% endif %}
       <p class='overlayer'>{{ pms.hero.name }}<span class='scorebar'><br />{{ pms.kills }}/{{ pms.deaths }}/{{ pms.assists }}/{{ pms.KDA2 }}</span></p>
-      <p class='overlayer-top-right'>{{pms.display_date}}, {{pms.display_duration}}</p>
+      <p class='overlayer-top-right small-date'>{{pms.display_date}}, {{pms.display_duration}}</p>
     </a>
   </div>
 {% endfor %}
