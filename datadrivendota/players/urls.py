@@ -16,7 +16,7 @@ urlpatterns = patterns(
         views.HeroAdversary.as_view(),
         name='hero_adversary'),
     url(
-        r'^hero_ability_comparison/$',
+        r'^hero-ability-comparison/$',
         views.HeroAbilities.as_view(),
         name='hero_abilities'
     ),

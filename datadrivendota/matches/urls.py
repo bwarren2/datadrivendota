@@ -29,7 +29,7 @@ urlpatterns = patterns(
     url(r'^progression-list/$',
         views.ProgressionList.as_view(),
         name="progession_list"),
-    url(r'^overview/$', views.overview, name="overview"),
+    # url(r'^overview/$', views.overview, name="overview"),
     url(r'^api/getmatches/$', views.match_list, name='match_list'),
     url(
         r'^api/endgame/$',

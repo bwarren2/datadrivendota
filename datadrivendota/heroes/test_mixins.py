@@ -3,8 +3,10 @@ from .models import Hero
 
 class HeroValidityMixin(object):
     def setUp(self):
-        self.valid_hero = 8
-        self.invalid_hero = 800
+        self.valid_hero_id = 8
+        self.invalid_hero_id = 800
+        self.valid_hero_name = 'Juggernaut'
+        self.invalid_hero_id = 'Becky the Kite Flyer'
         self.invalid_stat = 'effervescence'
         self.valid_stat = 'strength'
         self.valid_level = 6

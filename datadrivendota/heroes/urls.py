@@ -14,12 +14,12 @@ urlpatterns = patterns(
         views.HeroPerformanceLineup.as_view(),
         name='hero_performance_lineup'
     ),
-    url(r'^skillbuild_winrate/$',
+    url(r'^skillbuild-winrate/$',
         views.HeroBuildLevel.as_view(),
         name='hero_skill_bars',
         ),
     url(
-        r'^skill_progression/$',
+        r'^skill-progression/$',
         views.HeroSkillProgression.as_view(),
         name='hero_skill_progression'
     ),
