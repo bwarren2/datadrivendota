@@ -29,37 +29,37 @@ urlpatterns = patterns(
         name='ability_detail'
     ),
     url(
-        r'^api/vitals_chart$',
+        r'^api/vitals_chart/$',
         views.ApiVitalsChart.as_view(),
         name='api_vitals_chart'
     ),
     url(
-        r'^api/lineup_chart$',
+        r'^api/lineup_chart/$',
         views.ApiLineupChart.as_view(),
         name='api_lineup_chart'
     ),
     url(
-        r'^api/skill_progression_chart$',
+        r'^api/skill_progression_chart/$',
         views.ApiSkillProgressionChart.as_view(),
         name='api_skill_progression_chart'
     ),
     url(
-        r'^api/build_level_chart$',
+        r'^api/build_level_chart/$',
         views.ApiBuildLevelChart.as_view(),
         name='api_build_level_chart'
     ),
     url(
-        r'^api/hero_performance_chart$',
+        r'^api/hero_performance_chart/$',
         views.ApiHeroPerformanceChart.as_view(),
         name='api_hero_performance_chart'
     ),
     url(
-        r'^api/update_player_winrate$',
+        r'^api/update_player_winrate/$',
         views.ApiUpdatePlayerWinrateChart.as_view(),
         name='api_update_player_winrate_chart'
     ),
     url(
-        r'^api/hero_performance_lineup$',
+        r'^api/hero_performance_lineup/$',
         views.ApiHeroPerformanceLineupChart.as_view(),
         name='api_hero_performance_lineup_chart'
     ),

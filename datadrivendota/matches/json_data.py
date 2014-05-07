@@ -260,8 +260,15 @@ def player_endgame_json(
         match__game_mode__steam_id__in=game_modes,
         match__validity=Match.LEGIT)
     selected_summaries = selected_summaries.select_related()
-
     if len(selected_summaries) == 0:
+        print  PlayerMatchSummary.objects.filter(
+            player__steam_id__in=players,
+            match__game_mode__steam_id__in=game_modes,
+            match__validity=Match.LEGIT)
+        print  PlayerMatchSummary.objects.filter(
+                    player__steam_id__in=players,
+                    match__validity=Match.LEGIT,)
+
         raise NoDataFound
 
     hero_classes = hero_classes_dict()

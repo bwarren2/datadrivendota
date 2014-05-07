@@ -395,7 +395,6 @@ def hero_skillbuild_winrate_json(
             player_match_summary__match__validity=Match.LEGIT,
             level__lte=level
         ).select_related()
-
         match_wins = list(set([
             sb.player_match_summary.match.steam_id
             for sb in sbs if sb.player_match_summary.is_win
@@ -458,6 +457,9 @@ def hero_skillbuild_winrate_json(
             d.tooltip = to_label(build)
             c.datalist.append(d)
 
+    if c.datalist == []:
+        raise NoDataFound
+
     c.params.x_min = 0
     c.params.y_min = 0
     c.params.y_max = 100
@@ -491,6 +493,9 @@ def update_player_winrate(
 
     for p in dict_games.iterkeys():
         dict_games[p]['wins'] = dict_wins.get(p, 0)
+
+    if len(dict_games) == 0:
+        raise NoDataFound
 
     c = XYPlot()
     for p, info in dict_games.iteritems():
@@ -608,7 +613,6 @@ def hero_performance_lineup(
             )
 
         c.datalist.append(d)
-    print len(xs)
     c.params.y_min = min([d.y_var for d in c.datalist])-1
     c.params.x_label = 'Hero'
     c.params.y_label = stat
