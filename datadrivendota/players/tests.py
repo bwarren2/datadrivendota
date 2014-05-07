@@ -5,7 +5,7 @@ from django.test.client import Client
 
 ###TESTS
 class SimplePlayerUrlTest(TestCase):
-    fixtures = ['datadrivendota/heroes/test_fixture.json']
+    fixtures = ['test_fixture.json']
 
     def test_urls_OK(self):
         urls = [
