@@ -13,7 +13,6 @@ from datadrivendota.test_mixins import UrlTestMixin
 
 class SimpleHeroUrlTest(UrlTestMixin, TestCase):
     fixtures = ['test_fixture.json']
-
     prefix = '/heroes/'
     simple_urls = [
         '',

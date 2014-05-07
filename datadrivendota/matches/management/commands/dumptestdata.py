@@ -9,6 +9,7 @@ from matches.models import (
     Match
     )
 from heroes.models import Hero, HeroDossier, Role, Assignment
+import sys
 from items.models import Item, ItemAttributes, ItemComponents
 """Currently, the various Ability helper models are unsupported, as are UserProfiles"""
 
@@ -49,7 +50,7 @@ class Command(BaseCommand):
             skillbuild__level=10,
         ).order_by('-match__start_time')[0]
         pms_list.append(dendijugg)
-
+        sys.stderr.write(str(dendijugg.match.steam_id))
         #Dendi
         s4 = PlayerMatchSummary.objects.filter(
             player__steam_id=41231571,

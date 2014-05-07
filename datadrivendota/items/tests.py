@@ -1,12 +1,9 @@
 from django.test import TestCase
+from datadrivendota.test_mixins import UrlTestMixin
 
 
-class SimpleItemUrlTest(TestCase):
+class SimpleItemUrlTest(UrlTestMixin, TestCase):
     fixtures = ['test_fixture.json']
-
-    def test_urls(self):
-        urls = ['', 'winrate/']
-        for url in urls:
-            strng = "/items/"+url
-            resp = self.client.get(strng)
-            self.assertEqual(resp.status_code, 200)
+    prefix = '/items/'
+    simple_urls = ['', 'winrate/']
+    api_urls = []
