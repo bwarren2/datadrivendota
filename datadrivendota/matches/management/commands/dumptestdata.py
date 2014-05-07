@@ -51,13 +51,21 @@ class Command(BaseCommand):
         ).order_by('-match__start_time')[0]
         pms_list.append(dendijugg)
         sys.stderr.write(str(dendijugg.match.steam_id))
-        #Dendi
+
+        #s4
         s4 = PlayerMatchSummary.objects.filter(
             player__steam_id=41231571,
             match__validity=Match.LEGIT,
         ).order_by('-match__start_time')[0:num_matches]
         pms_list.extend([c for c in s4])
 
+        s4jugg = PlayerMatchSummary.objects.filter(
+            player__steam_id=41231571,
+            hero__name='Juggernaut',
+            match__validity=Match.LEGIT,
+            skillbuild__level=10,
+        ).order_by('-match__start_time')[0]
+        pms_list.append(s4jugg)
 
         sample_matches = [s.match for s in pms_list]
         pms = PlayerMatchSummary.objects.filter(match__in=sample_matches)
