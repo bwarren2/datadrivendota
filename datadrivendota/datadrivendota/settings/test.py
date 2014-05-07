@@ -23,3 +23,5 @@ DATABASES = {
         "PORT": "",
     },
 }
+
+VERBOSE_PROFILING = False

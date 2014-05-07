@@ -6,6 +6,7 @@ from matches.models import (
     GameMode,
     LeaverStatus,
     LobbyType,
+    Match
     )
 from heroes.models import Hero, HeroDossier, Role, Assignment
 from items.models import Item, ItemAttributes, ItemComponents
@@ -29,19 +30,30 @@ class Command(BaseCommand):
             pms_list.extend(skill_sample_matches)
 
         cms = PlayerMatchSummary.objects.filter(
-            hero=testing_hero, match__game_mode__description="Captains Mode"
+            hero=testing_hero, match__game_mode__description="Captains Mode",
+            match__validity=Match.LEGIT,
         ).order_by('-match__start_time')[0:num_matches]
         pms_list.extend([c for c in cms])
 
         #Dendi
         dendiboss = PlayerMatchSummary.objects.filter(
-            player__steam_id=70388657
+            player__steam_id=70388657,
+            match__validity=Match.LEGIT,
         ).order_by('-match__start_time')[0:num_matches]
         pms_list.extend([c for c in dendiboss])
 
+        dendijugg = PlayerMatchSummary.objects.filter(
+            player__steam_id=70388657,
+            hero__name='Juggernaut',
+            match__validity=Match.LEGIT,
+            skillbuild__level=10,
+        ).order_by('-match__start_time')[0]
+        pms_list.append(dendijugg)
+
         #Dendi
         s4 = PlayerMatchSummary.objects.filter(
-            player__steam_id=41231571
+            player__steam_id=41231571,
+            match__validity=Match.LEGIT,
         ).order_by('-match__start_time')[0:num_matches]
         pms_list.extend([c for c in s4])
 
@@ -116,7 +128,6 @@ class Command(BaseCommand):
 
         for pb in pickbans:
             serializing_list.append(item)
-
 
         self.stdout.ending = None
         serializers.serialize('json', serializing_list, stream=self.stdout)
