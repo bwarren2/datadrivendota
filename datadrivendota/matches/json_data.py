@@ -7,9 +7,11 @@ from itertools import chain
 from matches.models import (
     PlayerMatchSummary,
     Match,
+    SkillBuild,
     fetch_attribute_label,
     fetch_pms_attribute,
-    SkillBuild
+    pms_db_args,
+    fetch_db_attribute
 )
 from utils.exceptions import NoDataFound
 from utils.charts import (
@@ -18,6 +20,7 @@ from utils.charts import (
     valid_var
 )
 from players.models import Player
+from utils import db_arg_map
 
 if settings.VERBOSE_PROFILING:
     try:
@@ -254,21 +257,18 @@ def player_endgame_json(
         group_var
         ):
     #Gives the player's endgame results
+    print [x_var, y_var, panel_var, group_var]
+    db_args = db_arg_map(
+        [x_var, y_var, panel_var, group_var, 'match_id', 'hero'],
+        pms_db_args
+    )
 
     selected_summaries = PlayerMatchSummary.objects.filter(
         player__steam_id__in=players,
         match__game_mode__steam_id__in=game_modes,
-        match__validity=Match.LEGIT)
-    selected_summaries = selected_summaries.select_related()
-    if len(selected_summaries) == 0:
-        print  PlayerMatchSummary.objects.filter(
-            player__steam_id__in=players,
-            match__game_mode__steam_id__in=game_modes,
-            match__validity=Match.LEGIT)
-        print  PlayerMatchSummary.objects.filter(
-                    player__steam_id__in=players,
-                    match__validity=Match.LEGIT,)
+        match__validity=Match.LEGIT).values(*db_args)
 
+    if len(selected_summaries) == 0:
         raise NoDataFound
 
     hero_classes = hero_classes_dict()
@@ -276,21 +276,23 @@ def player_endgame_json(
     c = XYPlot()
     for pms in selected_summaries:
         d = DataPoint()
-        d.x_var = fetch_pms_attribute(pms, x_var)
-        d.y_var = fetch_pms_attribute(pms, y_var)
-        d.label = fetch_pms_attribute(pms, group_var)
-        d.tooltip = fetch_pms_attribute(pms, 'match_id')
-        d.url = reverse(
-            'matches:match_detail',
-            kwargs={'match_id': fetch_pms_attribute(pms, 'match_id')}
-        )
+        d.x_var = fetch_db_attribute(pms, x_var)
+        d.y_var = fetch_db_attribute(pms, y_var)
+        d.label = fetch_db_attribute(pms, group_var)
+        d.tooltip = fetch_db_attribute(pms, 'match_id')
+        # Too slow
+        # d.url = reverse(
+        #     'matches:match_detail',
+        #     kwargs={'match_id': fetch_db_attribute(pms, 'match_id')}
+        # )
+        d.url = '/matches/'+str(fetch_db_attribute(pms, 'match_id'))
         if valid_var(group_var):
-            d.group_var = fetch_pms_attribute(pms, group_var)
+            d.group_var = fetch_db_attribute(pms, group_var)
         if valid_var(panel_var):
-            d.panel_var = fetch_pms_attribute(pms, panel_var)
-        if hero_classes[pms.hero.steam_id] is not None:
+            d.panel_var = fetch_db_attribute(pms, panel_var)
+        if hero_classes[fetch_db_attribute(pms, 'hero_steam_id')] is not None:
             d.classes.extend(
-                hero_classes[pms.hero.steam_id]
+                hero_classes[fetch_db_attribute(pms, 'hero_steam_id')]
             )
 
         c.datalist.append(d)

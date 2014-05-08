@@ -308,6 +308,89 @@ def fetch_pms_attribute(summary, attribute):
         return getattr(summary, attribute)
 
 
+def pms_db_args(var):
+    print var
+    if var == 'kills':
+        return ['kills']
+    if var == 'deaths':
+        return ['deaths']
+    if var == 'assists':
+        return ['assists']
+    if var == 'gold_total':
+        return ['gold_per_min', 'duration']
+    if var == 'xp_total':
+        return ['xp_per_min', 'duration']
+    if var == 'last_hits':
+        return ['last_hits']
+    if var == 'denies':
+        return ['denies']
+    if var == 'hero_damage':
+        return ['hero_damage']
+    if var == 'tower_damage':
+        return ['tower_damage']
+    if var == 'hero_healing':
+        return ['hero_healing']
+    if var == 'level':
+        return ['level']
+    if var == 'K-D+.5*A':
+        return ['kills', 'deaths', 'assists']
+    if var == 'first_blood_time':
+        return ['first_blood_time']
+    if var == 'player':
+        return ['player', 'player__persona_name', 'player__pro_name']
+    if var == 'is_win':
+        return ['is_win']
+    if var == 'game_mode':
+        return ['match__game_mode', 'match__game_mode__description']
+    if var == 'duration':
+        return ['match__duration']
+    if var == 'match_id':
+        return ['match__steam_id']
+    if var == 'hero':
+        return ['hero__name', 'hero__steam_id']
+    if var == 'None' or var is None:
+        return []
+
+    print var
+    print "FREAKOUT!"
+    return []
+
+
+def fetch_db_attribute(summary, attribute):
+    if attribute == 'duration':
+        return summary['match__duration']/60.0
+    elif attribute == 'K-D+.5*A':
+        return summary['kills'] - summary['deaths'] + summary['assists'] * .5
+    elif attribute == 'player':
+        if summary['player__pro_name'] is not None:
+            return summary['player__pro_name']
+        else:
+            return summary['player__persona_name']
+    elif attribute == 'is_win':
+        return 'Won' if summary['is_win'] else 'Lost'
+    elif attribute == 'game_mode':
+        return summary['match__game_mode__description']
+    elif attribute == 'skill':
+        return summary['match__skill']
+    elif attribute == 'skill_name':
+        skill = summary['match__skill']
+        return skill_name(skill)
+    elif attribute == 'hero_name':
+        return safen(summary['hero__name'])
+    elif attribute == 'hero_steam_id':
+        return summary['hero__steam_id']
+    elif attribute == 'first_blood_time':
+        return summary['match__first_blood_time']/60.0
+    elif attribute == 'match_id':
+        return summary['match__steam_id']
+    elif attribute == 'gold_total':
+        return summary['gold_per_min']*summary['match__duration']/60
+    elif attribute == 'xp_total':
+        return summary['xp_per_min']*summary['match__duration']/60
+    else:
+        return summary.get(attribute)
+
+
 def fetch_single_attribute(summary, attribute, compressor='sum'):
     if compressor == 'sum':
         denominator = 1
