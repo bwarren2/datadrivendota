@@ -257,7 +257,6 @@ def player_endgame_json(
         group_var
         ):
     #Gives the player's endgame results
-    print [x_var, y_var, panel_var, group_var]
     db_args = db_arg_map(
         [x_var, y_var, panel_var, group_var, 'match_id', 'hero'],
         pms_db_args

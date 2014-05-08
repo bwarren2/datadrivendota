@@ -309,7 +309,6 @@ def fetch_pms_attribute(summary, attribute):
 
 
 def pms_db_args(var):
-    print var
     if var == 'kills':
         return ['kills']
     if var == 'deaths':
