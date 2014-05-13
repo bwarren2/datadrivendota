@@ -200,7 +200,7 @@ import datetime""".format(fn)
         fn = 'player_versus_winrate_json'
         if test_fn == fn or test_fn is None:
             setup = """from players.json_data import {0}
-    import datetime""".format(fn)
+import datetime""".format(fn)
             s = timeit.Timer("""player_versus_winrate_json(
                     player_1=103611462,
                     player_2=85045426,
@@ -216,7 +216,7 @@ import datetime""".format(fn)
         fn = 'player_hero_side_json'
         if test_fn == fn or test_fn is None:
             setup = """from players.json_data import {0}
-    import datetime""".format(fn)
+import datetime""".format(fn)
             s = timeit.Timer("""player_hero_side_json(
                     player=85045426,
                     game_modes=None,
@@ -231,7 +231,7 @@ import datetime""".format(fn)
         fn = 'player_role_json'
         if test_fn == fn or test_fn is None:
             setup = """from players.json_data import {0}
-    import datetime""".format(fn)
+import datetime""".format(fn)
             s = timeit.Timer("""player_role_json(
                 player_1=85045426,
                 player_2=103611462,
