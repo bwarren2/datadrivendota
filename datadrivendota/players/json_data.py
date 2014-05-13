@@ -296,34 +296,38 @@ def player_versus_winrate_json(
         ]
 
     try:
-        player_1 = Player.objects.get(steam_id=player_1)
-        player_2 = Player.objects.get(steam_id=player_2)
+        player_1_obj = Player.objects.get(steam_id=player_1)
+        player_2_obj = Player.objects.get(steam_id=player_2)
 
     except Player.DoesNotExist:
         raise NoDataFound
 
     pmses = PlayerMatchSummary.objects.filter(
-        player__in=[player_1, player_2],
+        player__steam_id__in=[player_1, player_2],
         match__validity=Match.LEGIT,
         match__start_time__gte=min_date_utc,
         match__start_time__lte=max_date_utc,
         match__game_mode__steam_id__in=game_modes,
-    ).select_related().distinct()
+    ).values(
+        'hero__name',
+        'is_win',
+        'player__steam_id',
+    ).distinct()
 
     if len(pmses) == 0:
         raise NoDataFound
 
     pairings = {}
     for pms in pmses:
-        if pms.hero.name not in pairings:
-            pairings[pms.hero.name] = {
+        if pms['hero__name'] not in pairings:
+            pairings[pms['hero__name']] = {
                 player_1: {'wins': 0, 'losses': 0},
                 player_2: {'wins': 0, 'losses': 0},
             }
-        if pms.is_win:
-            pairings[pms.hero.name][pms.player]['wins'] += 1
+        if pms['is_win']:
+            pairings[pms['hero__name']][pms['player__steam_id']]['wins'] += 1
         else:
-            pairings[pms.hero.name][pms.player]['losses'] += 1
+            pairings[pms['hero__name']][pms['player__steam_id']]['losses'] += 1
 
     for hero in pairings.iterkeys():
 
@@ -392,13 +396,12 @@ def player_versus_winrate_json(
             d.y_var = dataset[player_2]['total_games']
 
         c.datalist.append(d)
-
     c.params.x_label = "{name} {pvar}".format(
-        name=player_1.display_name,
+        name=player_1_obj.display_name,
         pvar=plot_var,
     )
     c.params.y_label = "{name} {pvar}".format(
-        name=player_2.display_name,
+        name=player_2_obj.display_name,
         pvar=plot_var,
     )
     c.params.pointDomainMin = 0
