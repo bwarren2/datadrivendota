@@ -296,8 +296,7 @@ def hero_progression_json(hero, player, division, game_modes=None):
 
     sbs = SkillBuild.objects.filter(
         player_match_summary__in=pmses_pool,
-    ).select_related().order_by('player_match_summary', 'level')
-    sbs = sbs.values(
+    ).values(
         'level',
         'time',
         'player_match_summary__is_win',
@@ -306,7 +305,7 @@ def hero_progression_json(hero, player, division, game_modes=None):
         'player_match_summary__match__steam_id',
         'player_match_summary__player__persona_name',
         'player_match_summary__hero__steam_id',
-    )
+    ).order_by('player_match_summary', 'level')
     hero_classes = hero_classes_dict()
 
     c = TasselPlot()
