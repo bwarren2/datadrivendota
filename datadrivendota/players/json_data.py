@@ -195,7 +195,15 @@ def player_hero_abilities_json(
     sb1 = SkillBuild.objects.filter(
         player_match_summary__hero=h1,
         player_match_summary__player=p1,
-    ).select_related().order_by('player_match_summary', 'level')
+    ).values(
+        'time',
+        'level',
+        'player_match_summary__is_win',
+        'player_match_summary__match__steam_id',
+        'player_match_summary__hero__steam_id',
+        'player_match_summary__player__persona_name',
+        'player_match_summary__player__pro_name',
+    ).order_by('player_match_summary', 'level')
     if player_2 is not None and hero_2 is not None:
         p2 = Player.objects.get(steam_id=player_2)
         h2 = Hero.objects.get(steam_id=hero_2)
@@ -203,7 +211,15 @@ def player_hero_abilities_json(
         sb2 = SkillBuild.objects.filter(
             player_match_summary__hero=h2,
             player_match_summary__player=p2,
-        ).select_related().order_by('player_match_summary', 'level')
+        ).values(
+            'time',
+            'level',
+            'player_match_summary__is_win',
+            'player_match_summary__match__steam_id',
+            'player_match_summary__hero__steam_id',
+            'player_match_summary__player__persona_name',
+            'player_match_summary__player__pro_name',
+        ).order_by('player_match_summary', 'level')
         sbs = chain(sb1, sb2)
     elif player_2 is None and hero_2 is None:
         sbs = sb1
@@ -213,28 +229,31 @@ def player_hero_abilities_json(
     c = TasselPlot()
     hero_classes = hero_classes_dict()
     for build in sbs:
-        if build.level == 1:
-            subtractor = build.time/60.0
+        name = build['player_match_summary__player__persona_name']
+        pro_name = build['player_match_summary__player__pro_name']
+        display_name = pro_name if pro_name is not None else name
+        if build['level'] == 1:
+            subtractor = build['time']/60.0
         d = DataPoint()
-        d.x_var = round(build.time/60.0-subtractor, 3)
-        d.y_var = build.level
+        d.x_var = round(build['time']/60.0-subtractor, 3)
+        d.y_var = build['level']
         winningness = 'Win' if \
-            build.player_match_summary.is_win \
+            build['player_match_summary__is_win'] \
             else 'Loss'
         if division == 'Player win/loss':
             d.group_var = "{p}, ({win})".format(
-                p=build.player_match_summary.player.display_name,
+                p=display_name,
                 win=winningness)
         elif division == 'Players':
             d.group_var = "{p}".format(
-                p=build.player_match_summary.player.display_name)
+                p=display_name)
         elif division == 'Win/loss':
             d.group_var = "{win}".format(
                 win=winningness)
-        d.series_var = build.player_match_summary.match.steam_id
-        d.label = build.player_match_summary.player.display_name
+        d.series_var = build['player_match_summary__match__steam_id']
+        d.label = display_name
         d.panel_var = 'Skill Progression'
-        hero_id = build.player_match_summary.hero.steam_id
+        hero_id = build['player_match_summary__hero__steam_id']
         if hero_classes[hero_id] is not None:
             d.classes.extend(hero_classes[hero_id])
 
