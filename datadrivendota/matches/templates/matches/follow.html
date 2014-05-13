@@ -1,131 +1,128 @@
 {% extends "matches/base.html" %}
 {% block title %}Match Index{% endblock title %}
-{% block page_title %}Matches Index <small><span id='hero-anchor' class='nav-toggle'>Heroes</span>  <span id='player-anchor' class='nav-toggle'>Players</span>    Score: <span id='show-score' class='nav-toggle'>show</span> <span id='hide-score' class='nav-toggle'>hide</span></small>{% endblock page_title %}
+{% block page_title %}Matches Index <small><span id='hero-anchor' class='nav-toggle'>Heroes</span>  <span id='player-anchor' class='nav-toggle'>Players</span>  Score: <span id='show-score' class='nav-toggle'>show</span> <span id='hide-score' class='nav-toggle'>hide</span></small>{% endblock page_title %}
 
 {% block content %}
 {% if match_data and lineup_thumbs %}
-<div class="row">
-    {% for match in match_data %}
-        <div class="col-md-3">
-          <a href="{% url 'matches:match_detail' match_id=match.match_data.id %}" class="thumbnail">
-            <div><br> </div>
-              <div>
-                {% for key, detail in match.pms_data.Radiant.iteritems %}
-                  <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot"
-                  {% if detail.player_image %}
-                    data-player-image={{detail.player_image}}
-                  {% endif %}
-                  {% if detail.hero_image %}
-                    data-hero-image={{ detail.hero_image }}
-                  {% endif %}
-
-                  >
-
-                {% endfor %}
-              </div>
-              <div>
-              {% for key, detail in match.pms_data.Dire.iteritems %}
-                <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot"
-                {% if detail.player_image %}
-                  data-player-image={{detail.player_image}}
-                {% endif %}
-                {% if detail.hero_image %}
-                  data-hero-image={{ detail.hero_image }}
-                {% endif %}
-
-                >
-              {% endfor %}
-              </div>
-              <div><br> </div>
-              <p class='overlayer'>
-                {{ match.match_data.game_mode }}
-                <span class='scorebar'>{{match.match_data.Radiant.Kills}}/{{match.match_data.Radiant.Deaths}}/{{match.match_data.Radiant.Assists}}/{{match.match_data.Radiant.KDA2}} : {{match.match_data.Dire.Kills}}/{{match.match_data.Dire.Deaths}}/{{match.match_data.Dire.Assists}}/{{match.match_data.Dire.KDA2}}
-                </span>
-              </p>
-              <p class='overlayer-top-right'>{{match.match_data.display_date}}, {{match.match_data.display_duration}}</p>
-          </a>
+  {% for match in match_data %}
+    <a href="{% url 'matches:match_detail' match_id=match.match_data.id %}" class="thumbnail">
+    <div class="container">
+      <div class="row">
+        <div class="radiant col-md-6">
+        {% for key, detail in match.pms_data.Radiant.iteritems %}
+          <img
+            src="{{ detail.hero_image }}"
+            alt="{{ detail.hero_name }}"
+            class="match-index-thumbshot"
+            {% if detail.player_image %}
+              data-player-image="{{detail.player_image}}"
+            {% endif %}
+            {% if detail.hero_image %}
+              data-hero-image="{{ detail.hero_image }}"
+            {% endif %}
+          >
+        {% endfor %}
         </div>
-
-    {% endfor %}
-</div>
-
-{% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range %}
-
+        <div class="dire col-md-6">
+        {% for key, detail in match.pms_data.Dire.iteritems %}
+        <img
+          src="{{ detail.hero_image }}"
+          alt="{{ detail.hero_name }}"
+          class="match-index-thumbshot"
+          {% if detail.player_image %}
+            data-player-image="{{detail.player_image}}"
+          {% endif %}
+          {% if detail.hero_image %}
+            data-hero-image="{{ detail.hero_image }}"
+          {% endif %}
+        >
+        {% endfor %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <p class=''>
+            {{ match.match_data.game_mode }}
+            <span class='scorebar'>
+              {{match.match_data.Radiant.Kills}}/
+              {{match.match_data.Radiant.Deaths}}/
+              {{match.match_data.Radiant.Assists}}/
+              {{match.match_data.Radiant.KDA2}}:
+              {{match.match_data.Dire.Kills}}/
+              {{match.match_data.Dire.Deaths}}/
+              {{match.match_data.Dire.Assists}}/
+              {{match.match_data.Dire.KDA2}}
+            </span>
+          </p>
+          <p class='small-date'>{{match.match_data.display_date}}, {{match.match_data.display_duration}}</p>
+        </div>
+      </div>
+  </div>
+  </a>
+  {% endfor %}
+  {% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range %}
 {% elif match_data and players %}
-<div class="row">
+  <div class="row">
     {% for match in match_data %}
-        <div class="col-md-3">
-          <a href="{% url 'matches:match_detail' match_id=match.match_data.id %}" class="thumbnail">
-            <div><br> </div>
-              <div>
-                {% for key, detail in match.pms_data.Radiant.iteritems %}
-                  {% if detail.player_image %}
-                    <img src="{{ detail.player_image }}" alt="{{ detail.player_name }}" class="match-index-thumbshot">
-                  {% else %}
-                    <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
-                  {% endif %}
-                {% endfor %}
-              </div>
-              <div>
-              {% for key, detail in match.pms_data.Dire.iteritems %}
-                  {% if detail.player_image %}
-                    <img src="{{ detail.player_image }}" alt="{{ detail.player_name }}" class="match-index-thumbshot">
-                  {% else %}
-                    <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
-                  {% endif %}
-
-              {% endfor %}
-              </div>
-              <div><br> </div>
-              <p class='overlayer'>
-                {{ match.match_data.game_mode }}
-                {{match.match_data.Radiant.Kills}}/{{match.match_data.Radiant.Deaths}}/{{match.match_data.Radiant.Assists}}/{{match.match_data.Radiant.KDA2}} : {{match.match_data.Dire.Kills}}/{{match.match_data.Dire.Deaths}}/{{match.match_data.Dire.Assists}}/{{match.match_data.Dire.KDA2}}
-              </p>
-              <p class='overlayer-top-right'>{{match.match_data.display_date}}, {{match.match_data.display_duration}}</p>
-          </a>
+      <div class="col-md-3">
+        <a href="{% url 'matches:match_detail' match_id=match.match_data.id %}" class="thumbnail">
+        <div>
+        {% for key, detail in match.pms_data.Radiant.iteritems %}
+          {% if detail.player_image %}
+          <img src="{{ detail.player_image }}" alt="{{ detail.player_name }}" class="match-index-thumbshot">
+          {% else %}
+          <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
+          {% endif %}
+        {% endfor %}
         </div>
+        <div>
+        {% for key, detail in match.pms_data.Dire.iteritems %}
+          {% if detail.player_image %}
+          <img src="{{ detail.player_image }}" alt="{{ detail.player_name }}" class="match-index-thumbshot">
+          {% else %}
+          <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
+          {% endif %}
 
+        {% endfor %}
+        </div>
+        <p class='overlayer'>
+        {{ match.match_data.game_mode }}
+        {{match.match_data.Radiant.Kills}}/{{match.match_data.Radiant.Deaths}}/{{match.match_data.Radiant.Assists}}/{{match.match_data.Radiant.KDA2}} : {{match.match_data.Dire.Kills}}/{{match.match_data.Dire.Deaths}}/{{match.match_data.Dire.Assists}}/{{match.match_data.Dire.KDA2}}
+        </p>
+        <p class='overlayer-top-right'>{{match.match_data.display_date}}, {{match.match_data.display_duration}}</p>
+        </a>
+      </div>
     {% endfor %}
-</div>
-
-
+  </div>
 {% else %}
   <p>
-    You do not seem to have any feeds active.  Add players to follow in the
-    <a href="{% url 'players:management' %}">management panel</a> to track
-    new games here!
+  You do not seem to have any feeds active.  Add players to follow in the
+  <a href="{% url 'players:management' %}">management panel</a> to track
+  new games here!
   </p>
 {% endif %}
 {% endblock content %}
+
 {% block extra_js %}
 <script type="text/javascript">
-
-function playerImage()
-{
-  $('img[data-player-image]').fadeOut('fast', function()
-    {
-      $(this).attr('src', $(this).attr('data-player-image'));
-      $(this).fadeIn('fast');
-    }
-  );
+function playerImage() {
+  $('img[data-player-image]').fadeOut('fast', function() {
+    $(this).attr('src', $(this).attr('data-player-image'));
+    $(this).fadeIn('fast');
+  });
 }
 
-function heroImage()
-{
-  $('img[data-player-image]').fadeOut('fast', function()
-    {
-      $(this).attr('src', $(this).attr('data-hero-image'));
-      $(this).fadeIn('fast');
-    }
-  );
+function heroImage() {
+  $('img[data-player-image]').fadeOut('fast', function() {
+    $(this).attr('src', $(this).attr('data-hero-image'));
+    $(this).fadeIn('fast');
+  });
 }
 
-
-$(document).ready(function()
-{
+$(document).ready(function() {
   $('#hero-anchor').click(heroImage);
   $('#player-anchor').click(playerImage);
-  $(window.jsUtils.scorebarToggles())
+  window.jsUtils.scorebarToggles();
 });
 </script>
 {% endblock extra_js %}
