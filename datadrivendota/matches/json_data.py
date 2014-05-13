@@ -11,7 +11,7 @@ from matches.models import (
     fetch_attribute_label,
     fetch_pms_attribute,
     pms_db_args,
-    fetch_db_attribute
+    display_attr,
 )
 from utils.exceptions import NoDataFound
 from utils.charts import (
@@ -20,7 +20,7 @@ from utils.charts import (
     valid_var
 )
 from players.models import Player
-from utils import db_arg_map
+from utils import db_arg_map, match_url
 
 if settings.VERBOSE_PROFILING:
     try:
@@ -275,23 +275,25 @@ def player_endgame_json(
     c = XYPlot()
     for pms in selected_summaries:
         d = DataPoint()
-        d.x_var = fetch_db_attribute(pms, x_var)
-        d.y_var = fetch_db_attribute(pms, y_var)
-        d.label = fetch_db_attribute(pms, group_var)
-        d.tooltip = fetch_db_attribute(pms, 'match_id')
+        d.x_var = pms_db_args(x_var, pms)
+        d.y_var = pms_db_args(y_var, pms)
+        d.label = display_attr(group_var, pms)
+        d.tooltip = pms_db_args('match_id', pms)
+
         # Too slow
         # d.url = reverse(
         #     'matches:match_detail',
-        #     kwargs={'match_id': fetch_db_attribute(pms, 'match_id')}
+        #     kwargs={'match_id': pms_db_args('match_id', pms)}
         # )
-        d.url = '/matches/'+str(fetch_db_attribute(pms, 'match_id'))
+
+        d.url = match_url(pms_db_args('match_id', pms))
         if valid_var(group_var):
-            d.group_var = fetch_db_attribute(pms, group_var)
+            d.group_var = display_attr(group_var, pms)
         if valid_var(panel_var):
-            d.panel_var = fetch_db_attribute(pms, panel_var)
-        if hero_classes[fetch_db_attribute(pms, 'hero_steam_id')] is not None:
+            d.panel_var = display_attr(panel_var, pms)
+        if hero_classes[pms_db_args('hero_steam_id', pms)] is not None:
             d.classes.extend(
-                hero_classes[fetch_db_attribute(pms, 'hero_steam_id')]
+                hero_classes[pms_db_args('hero_steam_id', pms)]
             )
 
         c.datalist.append(d)

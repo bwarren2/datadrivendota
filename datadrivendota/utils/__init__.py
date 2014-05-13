@@ -20,3 +20,8 @@ def db_arg_map(lst, fn):
     l = []
     map(l.extend, [fn(x) for x in lst])
     return l
+
+
+def match_url(match_id):
+    """Yes, I know.  This is a dumb hack because calling reverse() a million times starts taking up a meaningful fraction of the load time.  At least this way the hack is centralized, and this function can be gutted if needed."""
+    return '/matches/'+str(match_id)
