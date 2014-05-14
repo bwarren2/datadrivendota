@@ -98,26 +98,40 @@
       <div>Day/Night vision: {{ dossier.day_vision }} / {{ dossier.night_vision }}</div>
       <div>HP/Mana regen: {{ dossier.hp_regen }} / {{ dossier.mana_regen }}</div>
     </div>
-    <div id='top_charts'>
-      <h4>Winrate by Player</h4>
-      <div id='player_winrate'></div>
-      <h4>High-Skill Item Use</h4>
-      <div id='high_skill_item_winrate'></div>
+  </div>
+
+    <div class='row'>
+
+      <div class='col-md-4'>
+        <h4>Winrate by Player</h4>
+        <span id='player_winrate'></span>
+      </div>
+
+      <div class='col-md-4'>
+        <h4>High-Skill Item Use</h4>
+        <span id='high_skill_item_winrate'></span>
+      </div>
+
+      <div class="hero-ability-list col-md-8">
+        <h4>Abilities</h4>
+        {% for ability in abilities %}
+          <a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name %}" class="ability thumbnail">
+            <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
+            <p class='overlayer'>{{ ability.name }}</p>
+          </a>
+        {% endfor %}
+        <div class="clearfix"></div>
+      </div>
 
     </div>
+
+    <h4>Lore</h4>
+
     <blockquote class="lore">
       {{ hero.lore }}
     </blockquote>
-  </div>
-  <div class="hero-ability-list">
-    {% for ability in abilities %}
-      <a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name %}" class="ability thumbnail">
-        <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
-        <p class='overlayer'>{{ ability.name }}</p>
-      </a>
-    {% endfor %}
-    <div class="clearfix"></div>
-  </div>
+
+
 
 <h4>Hero Performance by Skill Bracket</h4>
 <div class="hero-chart-list">
@@ -150,8 +164,8 @@
         skill_level: '3',
         game_modes: [1, 2, 3, 4, 5],
         no_legend: true,
-        width: 275,
-        height: 275,
+        width: 300,
+        height: 300,
       }, true
     )
   );
