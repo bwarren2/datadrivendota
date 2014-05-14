@@ -92,9 +92,13 @@
             <ul class="pickban-list" id="dire-ban">
               {% for pb in radiant_bans %}
                 <li data-pborder="{{ pb.order }}">
+                  {% if pb.hero.mugshot %}
                   <a href="#" class="thumbnail">
                     <img src="{{ pb.hero.thumbshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
                   </a>
+                  {% else %}
+                  {{ pb.hero.name }}
+                  {% endif %}
                 </li>
               {% endfor %}
             </ul>
@@ -108,6 +112,8 @@
                     <a href="#" class="thumbnail">
                       <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
                     </a>
+                  {% else %}
+                  {{ pb.hero.name }}
                   {% endif %}
                 </li>
               {% endfor %}
