@@ -104,9 +104,11 @@
             <ul class="pickban-list" id="dire-pick">
               {% for pb in radiant_picks %}
                 <li data-pborder="{{ pb.order }}">
-                  <a href="#" class="thumbnail">
-                    <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
-                  </a>
+                  {% if pb.hero.mugshot %}
+                    <a href="#" class="thumbnail">
+                      <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                    </a>
+                  {% endif %}
                 </li>
               {% endfor %}
             </ul>
