@@ -3,36 +3,40 @@
 
 {% block title %}Player Comparison{% endblock title %}
 
-{% block page_title %}{{player1.persona_name}} ({{ player1.steam_id }}) vs {{player2.persona_name}} ({{ player2.steam_id }}) {% endblock page_title %}
+{% block page_title %}{{player1.display_name}} ({{ player1.steam_id }}) vs {{player2.display_name}} ({{ player2.steam_id }}) {% endblock page_title %}
 
 {% block content %}
 
   <div class="row">
+    <div class="player-charts col-md-8">
+    <h4>Personal KDA2</h4>
+        <span id='kda_chart'></span>
+    </div>
+
     <div class="player-charts col-md-4">
     <h4>Hero Winrate</h4>
         <span id='winrate_chart'></span>
     </div>
 
+
+  </div>
+
+  <div class="row">
+    <div class="player-charts col-md-8">
+    <h4>Team KDA2</h4>
+        <span id='team_kda_chart'></span>
+    </div>
     <div class="player-charts col-md-4">
     <h4>Hero Usage</h4>
         <span id='usage_chart'></span>
     </div>
 
-    <div class="player-charts col-md-4">
-      <h4>Role Comparison</h4>
-        <span id='role_chart'></span>
-    </div>
   </div>
 
   <div class="row">
-    <div class="player-charts col-md-6">
-    <h4>Team KDA2</h4>
-        <span id='team_kda_chart'></span>
-    </div>
-
-    <div class="player-charts col-md-6">
-    <h4>Personal KDA2</h4>
-        <span id='kda_chart'></span>
+    <div class="player-charts col-md-4 col-md-offset-8">
+      <h4>Role Comparison</h4>
+        <span id='role_chart'></span>
     </div>
   </div>
 
