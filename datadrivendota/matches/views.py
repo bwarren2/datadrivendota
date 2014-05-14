@@ -125,20 +125,36 @@ def match(request, match_id):
     ]
     dire_infodict = {}
     for summary in dire_summaries:
-        dire_infodict[summary.player_slot] = {
-            'hero_thumbshot': summary.hero.thumbshot,
-            'hero_thumbshot_url': summary.hero.thumbshot.url,
-            'hero_name': summary.hero.name,
-            'hero_machine_name': summary.hero.machine_name,
-            'ability_dict': [
-                {
-                    'machine_name': sb.ability.machine_name,
-                    'picture_url': sb.ability.picture.url
-                } for sb in SkillBuild.objects.filter(
-                    player_match_summary=summary
-                ).select_related()
-            ]
-        }
+        try:
+            dire_infodict[summary.player_slot] = {
+                'hero_thumbshot': summary.hero.thumbshot,
+                'hero_thumbshot_url': summary.hero.thumbshot.url,
+                'hero_name': summary.hero.name,
+                'hero_machine_name': summary.hero.machine_name,
+                'ability_dict': [
+                    {
+                        'machine_name': sb.ability.machine_name,
+                        'picture_url': sb.ability.picture.url
+                    } for sb in SkillBuild.objects.filter(
+                        player_match_summary=summary
+                    ).select_related()
+                ]
+            }
+        except ValueError:
+            dire_infodict[summary.player_slot] = {
+                'hero_thumbshot': '',
+                'hero_thumbshot_url': '',
+                'hero_name': summary.hero.name,
+                'hero_machine_name': summary.hero.machine_name,
+                'ability_dict': [
+                    {
+                        'machine_name': sb.ability.machine_name,
+                        'picture_url': sb.ability.picture.url
+                    } for sb in SkillBuild.objects.filter(
+                        player_match_summary=summary
+                    ).select_related()
+                ]
+            }
 
     #Identify any pickbans for templating.
     dire_hero_ids = [
