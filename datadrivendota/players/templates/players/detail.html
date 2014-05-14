@@ -8,11 +8,16 @@
 {% block content %}
 
   <div class="row">
-    <div class="player-charts col-md-4 col-md-offset-2">
+    <div class="player-charts col-md-4">
       <h4>Hero Winrate</h4>
         <span id='winrate_chart'></span>
     </div>
-    <div class="player-infobox col-md-4 col-md-offset-1">
+    <div class="player-charts col-md-4">
+      <h4>Endgame Comparison</h4>
+        <span id='endgame_chart'></span>
+    </div>
+
+    <div class="player-infobox col-md-4">
       <img style='margin-top:10px' src="{{ player.avatar_full }}">
       <h2>{{ player.display_name }}
       {% if player.pro_name %}
@@ -29,10 +34,6 @@
   </div>
 
   <div class="row">
-    <div class="player-charts col-md-4 col-md-offset-2">
-      <h4>Endgame Comparison</h4>
-        <span id='endgame_chart'></span>
-    </div>
   </div>
 
   <div id='chart'></div>
@@ -53,8 +54,8 @@
         player: '{{player.persona_name}}',
         game_modes: [1, 2, 3, 4, 5],
         group_var: 'alignment',
-        width: 350,
-        height: 350,
+        width: 300,
+        height: 300,
       }, true
     )
   );
@@ -70,8 +71,8 @@
         y_var: 'K-D+.5*A',
         panel_var: 'None',
         group_var: 'player',
-        width: 350,
-        height: 350,
+        width: 300,
+        height: 300,
       }, true
     )
   );
