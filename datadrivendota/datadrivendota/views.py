@@ -31,16 +31,16 @@ except ImportError:
 
 
 def base(request):
+    p = Player.objects.get(steam_id=70388657)
     if (
-            request.user.is_anonymous()
-            or request.user.social_auth.filter(provider='steam').count() == 0
-            ):
-        extra_dict = {}
+        request.user.is_anonymous()
+        or request.user.social_auth.filter(provider='steam').count() == 0
+    ):
+        extra_dict = {'chart_player': p}
     else:
         extra_dict = request.user.social_auth.filter(
             provider='steam'
         )[0].extra_data
-        p = Player.objects.get(steam_id=70388657)
         extra_dict.update({'chart_player': p})
     return render(request, 'base.html', extra_dict)
 

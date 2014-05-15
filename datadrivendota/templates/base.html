@@ -86,8 +86,10 @@
 
 
           </ul>
-          <span><input type='text' class='combobox-tags' style='margin-top:5px' >
-            <button type='button' class='btn btn-small btn-primary click-selector' style='margin-top:8px; margin-left:3px'>Select</button></span>
+          <span id='combobox'>
+            <input type='text' class='combobox-tags' style='margin-top:5px' >
+            <button type='button' class='btn btn-small btn-primary click-selector' style='margin-top:8px; margin-left:3px'>Select</button>
+          </span>
 
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_active %}
@@ -107,10 +109,22 @@
           <h2>{% block page_title %}Hello!{% endblock page_title %}</h2>
 
           {% block content %}
-            <div style='text-align:center' ><div class='glyphicon glyphicon-question-sign tourglyph'  title='Click me!' style='font-size:200px'></div>
-            <br><br><p>(Click it)</p>
+
+            <div id='hidden-feature' class='row'>
+              <div id='slark-chart' class='col-md-8'>
+                <h4>Slark Tower Damage by Skill Level, with Dendi Games</h4>
+              </div>
+
+              <div id='endgame-chart' class='col-md-4'>
+                <h4>Dendi's End-of-Game Kills</h4>
+              </div>
             </div>
-            <div id='hidden-feature'></div>
+
+            <div style='text-align:center' ><div class='glyphicon glyphicon-question-sign tourglyph'  title='Click me!' style='font-size:200px'></div>
+            <p>(Click it)</p>
+            </div>
+
+
           {% endblock content %}
 
         </div>
@@ -141,7 +155,7 @@
       $('#hidden-feature').hide();
 
       window.apiHit(
-        "#hidden-feature",
+        "#slark-chart",
         '{% url "heroes:api_hero_performance_chart" %}',
           $.param({
             hero: 'Slark',
@@ -153,13 +167,31 @@
             group_var: 'skill_name',
             panel_var: 'is_win',
 
-            width: 275,
-            height: 275,
+            width: 300,
+            height: 300,
           }, true
         )
       );
-    </script>
 
+
+      window.apiHit(
+        "#endgame-chart",
+        '{% url "matches:api_endgame_chart" %}',
+          $.param({
+
+            players: '{{chart_player.persona_name}}',
+            game_modes: [1, 2, 3, 4, 5],
+            x_var: 'duration',
+            y_var: 'kills',
+            panel_var: 'None',
+            group_var: 'player',
+            width: 300,
+            height: 300,
+          }, true
+        )
+      );
+
+    </script>
     {% endblock extra_js %}
 
     {% block tour %}
@@ -179,19 +211,25 @@
               element: "div#hidden-feature",
               title: "Charts",
               content: "These guys are everywhere, and they are interactive.",
-              placement: "right"
+              placement: "bottom"
             },
             {
-              element: "div#hidden-feature",
+              element: ".legend-box",
               title: "Legend",
-              content: "Mouse over the legend boxes to filter the data.",
+              content: "Mouse over the squares in legends to filter the data.",
               placement: "right"
             },
             {
-              element: "div#hidden-feature",
+              element: "#slark-chart",
               title: "Datapoints",
               content: "Click the points to go to their links.  These go to the matches they represent.  (Right click to open in new tabs. )",
-              placement: "right"
+              placement: "bottom"
+            },
+            {
+              element: "span#combobox",
+              title: "Filter Box",
+              content: "Use this selector to fade out data that does not match a filter.  Try filtering on 'Slark' to get Dendi's Slark kills in the right chart.",
+              placement: "bottom"
             },
             {
               element: "#IntercomDefaultWidget",
@@ -220,6 +258,7 @@
 
           $(".tourglyph").on("click",function(){
             $('#hidden-feature').show();
+            $('g.legend:first').attr('class','legend-box');
             tour.restart();
           })
 
