@@ -486,8 +486,8 @@ def match_ability_json(match, panel_var=None):
     c.params.x_label = 'Time (m)'
     c.params.y_label = 'Level'
     c.params.draw_path = True
-    c.params.outerWidth = 400
-    c.params.outerHeight = 400
+    c.params.outerWidth = 300
+    c.params.outerHeight = 300
 
     return c
 
@@ -529,8 +529,8 @@ def match_parameter_json(match_id, x_var, y_var):
         c.params.y_min = int(floor(round(c.params.y_min/1000.0, 0)))
     c.params.draw_path = False
 
-    c.params.outerWidth = 250
-    c.params.outerHeight = 250
+    c.params.outerWidth = 300
+    c.params.outerHeight = 300
 
     return c
 
@@ -629,8 +629,8 @@ def match_role_json(match):
     c.params.x_label = 'Radiant Role Magnitude'
     c.params.y_label = 'Dire Role Magnitude'
     c.params.margin['left'] = 30
-    c.params.outerWidth = 250
-    c.params.outerHeight = 250
+    c.params.outerWidth = 300
+    c.params.outerHeight = 300
     return c
 
 

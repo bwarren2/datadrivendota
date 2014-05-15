@@ -173,8 +173,8 @@ def player_winrate_json(
     c.params.y_label = 'Winrate'
     c.params.draw_path = False
     c.params.margin['left'] = 24
-    c.params.outerWidth = 500
-    c.params.outerHeight = 500
+    c.params.outerWidth = 300
+    c.params.outerHeight = 300
     c.params.legendWidthPercent = .7
     c.params.legendHeightPercent = .7
     return c
