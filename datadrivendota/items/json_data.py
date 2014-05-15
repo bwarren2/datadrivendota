@@ -28,7 +28,7 @@ def item_endgame(
         pmses = pmses.filter(hero__steam_id=hero)
     if player is not None:
         pmses = pmses.filter(player__steam_id=player)
-    if skill_level is not None:
+    if skill_level is not None and skill_level != '':
         pmses = pmses.filter(match__skill=skill_level)
 
     itemDict = {}
@@ -67,7 +67,7 @@ def item_endgame(
         d.y_var = itemDict[itm]['winrate']
         d.label = itm.name
         d.tooltip = itm.name
-        d.split_var = ''
+        d.panel_var = ''
         d.group_var = ''
         d.point_size = itm.cost
         chart.datalist.append(d)
