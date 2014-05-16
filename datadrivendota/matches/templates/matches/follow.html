@@ -20,24 +20,16 @@
                 </p>
               </span>
             </div>
-            <div class="col-md-6">
+
+            <div class="radiant col-md-6">
+
               <div class='scorebar'
                     data-raw-score='{{ match.match_data.Radiant.kills }}/{{ match.match_data.Radiant.deaths }}/{{ match.match_data.Radiant.assists }}'
                     data-kda2='{{ match.match_data.Radiant.KDA2}}'
               >
                 {{match.match_data.Radiant.kills}}/{{match.match_data.Radiant.deaths}}/{{match.match_data.Radiant.assists}}
               </div>
-            </div>
-            <div class="col-md-6">
-              <div class='scorebar'
-                    data-raw-score='{{ match.match_data.Dire.kills }}/{{ match.match_data.Dire.deaths }}/{{ match.match_data.Dire.assists }}'
-                    data-kda2='{{ match.match_data.Dire.KDA2}}'
-              >
-                {{match.match_data.Dire.kills}}/{{match.match_data.Dire.deaths}}/{{match.match_data.Dire.assists}}
-              </div>
-            </div>
 
-            <div class="radiant col-md-6">
               <div class='row'>
               {% for key, detail in match.pms_data.Radiant.iteritems %}
                 <div class="col-md-2">
@@ -73,6 +65,14 @@
             </div>
 
             <div class="dire col-md-6">
+
+              <div class='scorebar'
+                    data-raw-score='{{ match.match_data.Dire.kills }}/{{ match.match_data.Dire.deaths }}/{{ match.match_data.Dire.assists }}'
+                    data-kda2='{{ match.match_data.Dire.KDA2}}'
+              >
+                {{match.match_data.Dire.kills}}/{{match.match_data.Dire.deaths}}/{{match.match_data.Dire.assists}}
+              </div>
+
               <div class='row'>
                 {% for key, detail in match.pms_data.Dire.iteritems %}
                   <div class="col-md-2">

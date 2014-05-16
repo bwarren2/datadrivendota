@@ -300,7 +300,6 @@ def follow_match_feed(request):
     #Using the form to submit
     else:
         form = FollowMatchForm(request.POST)
-        print form
         if form.is_valid():
             match_list = Match.objects.filter(
                 validity=Match.LEGIT,
@@ -546,7 +545,7 @@ def annotated_matches(pms_list, follow_list):
         match_data[id]['match_data'][side]['deaths'] += pms.deaths
         match_data[id]['match_data'][side]['assists'] += pms.assists
         match_data[id]['match_data'][side]['KDA2'] += pms.kills\
-            - pms.deaths + pms.assists/2
+            - pms.deaths + pms.assists/2.0
 
         pms_data = {}
         try:
