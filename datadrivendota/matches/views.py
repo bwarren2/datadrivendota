@@ -2,6 +2,7 @@ import datetime
 import json
 from functools import wraps
 from itertools import chain
+from time import mktime
 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
@@ -23,6 +24,7 @@ from .mixins import (
     RoleMixin,
 )
 from datadrivendota.views import ChartFormView, ApiView
+from datadrivendota.forms import FollowMatchForm
 from players.models import request_to_player, Player
 
 try:
@@ -187,79 +189,153 @@ def match(request, match_id):
 
 @devserver_profile(follow=[])
 def follow_match_feed(request):
+    results_per_page = 20
+    total_results = 500
 
-    mode = request.GET.get('format', 'lineup_thumbs')
-    try:
-        player = request_to_player(request)
-        follow_list = [follow for follow in player.userprofile.following.all()]
-        match_list = Match.objects.filter(
-            validity=Match.LEGIT,
-            playermatchsummary__player__in=follow_list
-        )
-        match_list = match_list.select_related()\
-            .distinct().order_by('-start_time')[:500]
-
-        paginator = Paginator(match_list, 20)
-        page = request.GET.get('page')
+    #One of the default load methods, without the form.
+    if request.method != 'POST':
+        form = FollowMatchForm()
         try:
-            match_list = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            match_list = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of
-            # results.
-            match_list = paginator.page(paginator.num_pages)
+            player = request_to_player(request)
+            follow_list = [
+                follow for follow in player.userprofile.following.all()
+            ]
+            match_list = Match.objects.filter(
+                validity=Match.LEGIT,
+                playermatchsummary__player__in=follow_list
+            )
+            match_list = match_list.select_related()\
+                .distinct().order_by('-start_time')[:total_results]
 
-        pms_list = PlayerMatchSummary.\
-            objects.filter(match__in=match_list)\
-            .select_related().order_by('-match__start_time')[:500]
-        match_data = annotated_matches(pms_list, follow_list)
-        return render(
-            request,
-            'matches/follow.html',
-            {
-                'match_list': match_list,
-                'match_data': match_data,
-                mode: 'true'
-            }
-        )
+            paginator = Paginator(match_list, results_per_page)
+            page = request.GET.get('page')
+            try:
+                match_list = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                match_list = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of
+                # results.
+                match_list = paginator.page(paginator.num_pages)
 
-    except AttributeError:
-        pro_list = Player.objects.exclude(pro_name=None)
-        match_list = Match.objects.filter(
-            validity=Match.LEGIT,
-            playermatchsummary__player__in=pro_list
-        )
-        match_list = match_list.select_related()\
-            .distinct().order_by('-start_time')[:500]
+            pms_list = PlayerMatchSummary.\
+                objects.filter(match__in=match_list)\
+                .select_related().order_by('-match__start_time')[:500]
+            match_data = annotated_matches(pms_list, follow_list)
+            return render(
+                request,
+                'matches/follow.html',
+                {
+                    'form': form,
+                    'match_list': match_list,
+                    'match_data': match_data,
+                }
+            )
 
-        paginator = Paginator(match_list, 20)
-        page = request.GET.get('page')
-        try:
-            match_list = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            match_list = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of
-            # results.
-            match_list = paginator.page(paginator.num_pages)
+        except AttributeError:
+            pro_list = Player.objects.exclude(pro_name=None)
+            match_list = Match.objects.filter(
+                validity=Match.LEGIT,
+                playermatchsummary__player__in=pro_list
+            )
+            match_list = match_list.select_related()\
+                .distinct().order_by('-start_time')[:total_results]
 
-        pms_list = PlayerMatchSummary.\
-            objects.filter(match__in=match_list).select_related()
+            paginator = Paginator(match_list, results_per_page)
+            page = request.GET.get('page')
+            try:
+                match_list = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                match_list = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of
+                # results.
+                match_list = paginator.page(paginator.num_pages)
 
-        match_data = annotated_matches(pms_list, [])
-        return render(
-            request,
-            'matches/follow.html',
-            {
-                'match_list': match_list,
-                'match_data': match_data,
-                mode: 'true'
-            }
-        )
+            pms_list = PlayerMatchSummary.\
+                objects.filter(match__in=match_list).select_related()
 
+            match_data = annotated_matches(pms_list, [])
+            return render(
+                request,
+                'matches/follow.html',
+                {
+                    'form': form,
+                    'match_list': match_list,
+                    'match_data': match_data,
+                }
+            )
+    #Using the form to submit
+    else:
+        form = FollowMatchForm(request.POST)
+        print form
+        if form.is_valid():
+            match_list = Match.objects.filter(
+                validity=Match.LEGIT,
+            )
+            if form.cleaned_data['hero'] is not None:
+                match_list = match_list.filter(
+                    playermatchsummary__hero__steam_id=
+                    form.cleaned_data['hero'],
+                )
+            if form.cleaned_data['player'] is not None:
+                match_list = match_list.filter(
+                    playermatchsummary__player__steam_id=
+                    form.cleaned_data['player'],
+                )
+            if form.cleaned_data['min_date'] is not None:
+                min_date_utc = mktime(
+                    form.cleaned_data['min_date'].timetuple()
+                    )
+                match_list = match_list.filter(
+                    start_time__gte=min_date_utc,
+                )
+            if form.cleaned_data['max_date'] is not None:
+                max_date_utc = mktime(
+                    form.cleaned_data['max_date'].timetuple()
+                    )
+                match_list = match_list.filter(
+                    start_time__lte=max_date_utc,
+                )
+
+            match_list = match_list.select_related()\
+                .distinct().order_by('-start_time')[:total_results]
+
+            paginator = Paginator(match_list, results_per_page)
+            page = request.GET.get('page')
+            try:
+                match_list = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                match_list = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of
+                # results.
+                match_list = paginator.page(paginator.num_pages)
+
+            pms_list = PlayerMatchSummary.\
+                objects.filter(match__in=match_list).select_related()
+
+            match_data = annotated_matches(pms_list, [])
+            return render(
+                request,
+                'matches/follow.html',
+                {
+                    'form': form,
+                    'match_list': match_list,
+                    'match_data': match_data,
+                }
+            )
+        else:
+            return render(
+                request,
+                'matches/follow.html',
+                {
+                    'form': form,
+                }
+            )
 
 class Endgame(EndgameMixin, ChartFormView):
     tour = [
@@ -415,14 +491,14 @@ def annotated_matches(pms_list, follow_list):
             match_data[id]['pms_data']['Dire'] = {}
             match_data[id]['match_data'] = {}
             match_data[id]['match_data']['Radiant'] = {}
-            match_data[id]['match_data']['Radiant']['Kills'] = 0
-            match_data[id]['match_data']['Radiant']['Deaths'] = 0
-            match_data[id]['match_data']['Radiant']['Assists'] = 0
+            match_data[id]['match_data']['Radiant']['kills'] = 0
+            match_data[id]['match_data']['Radiant']['deaths'] = 0
+            match_data[id]['match_data']['Radiant']['assists'] = 0
             match_data[id]['match_data']['Radiant']['KDA2'] = 0
             match_data[id]['match_data']['Dire'] = {}
-            match_data[id]['match_data']['Dire']['Kills'] = 0
-            match_data[id]['match_data']['Dire']['Deaths'] = 0
-            match_data[id]['match_data']['Dire']['Assists'] = 0
+            match_data[id]['match_data']['Dire']['kills'] = 0
+            match_data[id]['match_data']['Dire']['deaths'] = 0
+            match_data[id]['match_data']['Dire']['assists'] = 0
             match_data[id]['match_data']['Dire']['KDA2'] = 0
 
         match_data[id]['match_data']['display_date'] = \
@@ -436,9 +512,9 @@ def annotated_matches(pms_list, follow_list):
 
         match_data[id]['match_data']['id'] = id
 
-        match_data[id]['match_data'][side]['Kills'] += pms.kills
-        match_data[id]['match_data'][side]['Deaths'] += pms.deaths
-        match_data[id]['match_data'][side]['Assists'] += pms.assists
+        match_data[id]['match_data'][side]['kills'] += pms.kills
+        match_data[id]['match_data'][side]['deaths'] += pms.deaths
+        match_data[id]['match_data'][side]['assists'] += pms.assists
         match_data[id]['match_data'][side]['KDA2'] += pms.kills\
             - pms.deaths + pms.assists/2
 
@@ -450,6 +526,9 @@ def annotated_matches(pms_list, follow_list):
         pms_data['hero_name'] = pms.hero.name
         pms_data['player_slot'] = pms.player_slot
         pms_data['side'] = side
+        pms_data['kills'] = pms.kills
+        pms_data['deaths'] = pms.deaths
+        pms_data['assists'] = pms.assists
         pms_data['KDA2'] = \
             pms.kills - pms.deaths + pms.assists / 2.0
         if pms.player.avatar is not None:

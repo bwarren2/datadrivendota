@@ -5,7 +5,10 @@ from matches.form_fields import MultiGameModeSelect
 from .form_fields import SinglePlayerField
 from heroes.models import Role
 from heroes.form_fields import SingleHeroSelect
-thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
+
+
+def thirty_days_ago():
+    return datetime.date.today() - datetime.timedelta(days=30)
 
 
 def get_roles():

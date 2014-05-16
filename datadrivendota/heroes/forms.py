@@ -9,6 +9,10 @@ from utils import list_to_choice_list
 thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
 
 
+def thirty_days_ago():
+    return datetime.date.today() - datetime.timedelta(days=30)
+
+
 class HeroVitalsMultiSelect(forms.Form):
     VITAL_STAT_POOL = [
         'strength',
