@@ -1,131 +1,202 @@
 {% extends "matches/base.html" %}
 {% block title %}Match Index{% endblock title %}
-{% block page_title %}Matches Index <small><span id='hero-anchor' class='nav-toggle'>Heroes</span>  <span id='player-anchor' class='nav-toggle'>Players</span>    Score: <span id='show-score' class='nav-toggle'>show</span> <span id='hide-score' class='nav-toggle'>hide</span></small>{% endblock page_title %}
+{% block page_title %}Matches Index {% endblock page_title %}
 
 {% block content %}
-{% if match_data and lineup_thumbs %}
-<div class="row">
-    {% for match in match_data %}
-        <div class="col-md-3">
-          <a href="{% url 'matches:match_detail' match_id=match.match_data.id %}" class="thumbnail">
-            <div><br> </div>
-              <div>
-                {% for key, detail in match.pms_data.Radiant.iteritems %}
-                  <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot"
-                  {% if detail.player_image %}
-                    data-player-image={{detail.player_image}}
-                  {% endif %}
-                  {% if detail.hero_image %}
-                    data-hero-image={{ detail.hero_image }}
-                  {% endif %}
+{% if match_data %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
 
-                  >
+      {% for match in match_data %}
+        <a href="{% url 'matches:match_detail' match_id=match.match_data.id %}" class="thumbnail">
+          <div class="row">
 
-                {% endfor %}
+            <div class="col-md-12">
+              <span class='match-topbar'>
+                <p class='small-date' style='background-color:#222222'>
+                  {{match.match_data.display_date}}, {{match.match_data.display_duration}}
+                  {{ match.match_data.game_mode }}
+                </p>
+              </span>
+            </div>
+            <div class="col-md-6">
+              <div class='scorebar'
+                    data-raw-score='{{ match.match_data.Radiant.kills }}/{{ match.match_data.Radiant.deaths }}/{{ match.match_data.Radiant.assists }}'
+                    data-kda2='{{ match.match_data.Radiant.KDA2}}'
+              >
+                {{match.match_data.Radiant.kills}}/{{match.match_data.Radiant.deaths}}/{{match.match_data.Radiant.assists}}
               </div>
-              <div>
-              {% for key, detail in match.pms_data.Dire.iteritems %}
-                <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot"
-                {% if detail.player_image %}
-                  data-player-image={{detail.player_image}}
-                {% endif %}
-                {% if detail.hero_image %}
-                  data-hero-image={{ detail.hero_image }}
-                {% endif %}
+            </div>
+            <div class="col-md-6">
+              <div class='scorebar'
+                    data-raw-score='{{ match.match_data.Dire.kills }}/{{ match.match_data.Dire.deaths }}/{{ match.match_data.Dire.assists }}'
+                    data-kda2='{{ match.match_data.Dire.KDA2}}'
+              >
+                {{match.match_data.Dire.kills}}/{{match.match_data.Dire.deaths}}/{{match.match_data.Dire.assists}}
+              </div>
+            </div>
 
-                >
+            <div class="radiant col-md-6">
+              <div class='row'>
+              {% for key, detail in match.pms_data.Radiant.iteritems %}
+                <div class="col-md-2">
+                  <img
+                    src="{{ detail.hero_image }}"
+                    alt="{{ detail.hero_name }}"
+                    class="match-index-thumbshot"
+                    {% if detail.player_image %}
+                      data-player-image="{{detail.player_image}}"
+                    {% endif %}
+                    {% if detail.hero_image %}
+                      data-hero-image="{{ detail.hero_image }}"
+                    {% endif %}
+                  >
+                  {% if detail.player_image %}
+                    <img
+                      src="{{ detail.player_image }}"
+                      alt="{{ detail.player_name }}"
+                      class="match-index-thumbshot"
+                    >
+                  {% else %}
+                    <div alt="None/Anonymous" class="match-index-thumbshot"></div>
+                  {% endif %}
+                    <div class='scorebar'
+                    data-raw-score='{{ detail.kills }}/{{ detail.deaths }}/{{ detail.assists }}'
+                    data-kda2='{{ detail.KDA2}}'
+                    >
+                    {{ detail.kills }}/{{ detail.deaths }}/{{ detail.assists }}
+                    </div>
+                </div>
               {% endfor %}
               </div>
-              <div><br> </div>
-              <p class='overlayer'>
-                {{ match.match_data.game_mode }}
-                <span class='scorebar'>{{match.match_data.Radiant.Kills}}/{{match.match_data.Radiant.Deaths}}/{{match.match_data.Radiant.Assists}}/{{match.match_data.Radiant.KDA2}} : {{match.match_data.Dire.Kills}}/{{match.match_data.Dire.Deaths}}/{{match.match_data.Dire.Assists}}/{{match.match_data.Dire.KDA2}}
-                </span>
-              </p>
-              <p class='overlayer-top-right'>{{match.match_data.display_date}}, {{match.match_data.display_duration}}</p>
-          </a>
-        </div>
+            </div>
 
-    {% endfor %}
+            <div class="dire col-md-6">
+              <div class='row'>
+                {% for key, detail in match.pms_data.Dire.iteritems %}
+                  <div class="col-md-2">
+                    <img
+                      src="{{ detail.hero_image }}"
+                      alt="{{ detail.hero_name }}"
+                      class="match-index-thumbshot"
+                      {% if detail.player_image %}
+                        data-player-image="{{detail.player_image}}"
+                      {% endif %}
+                      {% if detail.hero_image %}
+                        data-hero-image="{{ detail.hero_image }}"
+                      {% endif %}
+                    >
+                    {% if detail.player_image %}
+                      <img
+                        src="{{ detail.player_image }}"
+                        alt="{{ detail.player_name }}"
+                        class="match-index-thumbshot"
+                      >
+                    {% else %}
+                      <div alt="None/Anonymous" class="match-index-thumbshot"></div>
+                    {% endif %}
+                    <div class='scorebar'
+                    data-raw-score='{{ detail.kills }}/{{ detail.deaths }}/{{ detail.assists }}'
+                    data-kda2='{{ detail.KDA2}}'
+                    >
+                    {{ detail.kills }}/{{ detail.deaths }}/{{ detail.assists }}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    <div class='col-md-4'>
+      <div>
+        <h4>Score Toggles</h4>
+        <div class='row'>
+          <div class='col-md-6'>
+            <button id='show-score' type="button" class="btn btn-primary btn-lg btn-block">Show Scores</button>
+          </div>
+          <div class='col-md-6'>
+            <button id='hide-score' type="button" class="btn btn-primary btn-lg btn-block">Hide Scores</button>
+          </div>
+        </div>
+        <br>
+        <div class='row'>
+          <div class='col-md-6'>
+            <button id='score-format-raw' type="button" class="btn btn-primary btn-lg btn-block">K/D/A</button>
+          </div>
+          <div class='col-md-6'>
+            <button id='score-format-kda2' type="button" class="btn btn-primary btn-lg btn-block">K-D+A/2</button>
+          </div>
+        </div>
+      </div>
+      <h4>Match Filtration</h4>
+      <div class='form-container'>
+        <form class='chart-form' action="" method='POST'>
+          {% include "_form.html" %}
+          {% csrf_token %}
+          <div class="control-group">
+            <div class="controls pull-right">
+              <button type="submit" class="btn btn-small btn-primary">Submit</button>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </form>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 {% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range %}
 
-{% elif match_data and players %}
-<div class="row">
-    {% for match in match_data %}
-        <div class="col-md-3">
-          <a href="{% url 'matches:match_detail' match_id=match.match_data.id %}" class="thumbnail">
-            <div><br> </div>
-              <div>
-                {% for key, detail in match.pms_data.Radiant.iteritems %}
-                  {% if detail.player_image %}
-                    <img src="{{ detail.player_image }}" alt="{{ detail.player_name }}" class="match-index-thumbshot">
-                  {% else %}
-                    <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
-                  {% endif %}
-                {% endfor %}
-              </div>
-              <div>
-              {% for key, detail in match.pms_data.Dire.iteritems %}
-                  {% if detail.player_image %}
-                    <img src="{{ detail.player_image }}" alt="{{ detail.player_name }}" class="match-index-thumbshot">
-                  {% else %}
-                    <img src="{{ detail.hero_image }}" alt="{{ detail.hero_name }}" class="match-index-thumbshot">
-                  {% endif %}
-
-              {% endfor %}
-              </div>
-              <div><br> </div>
-              <p class='overlayer'>
-                {{ match.match_data.game_mode }}
-                {{match.match_data.Radiant.Kills}}/{{match.match_data.Radiant.Deaths}}/{{match.match_data.Radiant.Assists}}/{{match.match_data.Radiant.KDA2}} : {{match.match_data.Dire.Kills}}/{{match.match_data.Dire.Deaths}}/{{match.match_data.Dire.Assists}}/{{match.match_data.Dire.KDA2}}
-              </p>
-              <p class='overlayer-top-right'>{{match.match_data.display_date}}, {{match.match_data.display_duration}}</p>
-          </a>
-        </div>
-
-    {% endfor %}
-</div>
-
-
 {% else %}
   <p>
-    You do not seem to have any feeds active.  Add players to follow in the
-    <a href="{% url 'players:management' %}">management panel</a> to track
-    new games here!
+  You do not seem to have any feeds active.  Add players to follow in the
+  <a href="{% url 'players:management' %}">management panel</a> to track
+  new games here!
   </p>
 {% endif %}
 {% endblock content %}
+
 {% block extra_js %}
 <script type="text/javascript">
-
-function playerImage()
-{
-  $('img[data-player-image]').fadeOut('fast', function()
-    {
-      $(this).attr('src', $(this).attr('data-player-image'));
-      $(this).fadeIn('fast');
-    }
-  );
+function playerImage() {
+  $('img[data-player-image]').fadeOut('fast', function() {
+    $(this).attr('src', $(this).attr('data-player-image'));
+    $(this).fadeIn('fast');
+  });
 }
 
-function heroImage()
-{
-  $('img[data-player-image]').fadeOut('fast', function()
-    {
-      $(this).attr('src', $(this).attr('data-hero-image'));
-      $(this).fadeIn('fast');
-    }
-  );
+function heroImage() {
+  $('img[data-player-image]').fadeOut('fast', function() {
+    $(this).attr('src', $(this).attr('data-hero-image'));
+    $(this).fadeIn('fast');
+  });
+}
+
+function raw_score() {
+  $('div.scorebar').fadeOut('fast', function() {
+    $(this).html($(this).attr('data-raw-score'));
+    $(this).fadeIn('fast');
+  });
+}
+
+function kda2_score() {
+  $('div.scorebar').fadeOut('fast', function() {
+    $(this).html($(this).attr('data-kda2'));
+    $(this).fadeIn('fast');
+  });
 }
 
 
-$(document).ready(function()
-{
+$(document).ready(function() {
   $('#hero-anchor').click(heroImage);
   $('#player-anchor').click(playerImage);
-  $(window.jsUtils.scorebarToggles())
+  $('#score-format-raw').click(raw_score);
+  $('#score-format-kda2').click(kda2_score);
+  window.jsUtils.scorebarToggles();
 });
 </script>
 {% endblock extra_js %}
