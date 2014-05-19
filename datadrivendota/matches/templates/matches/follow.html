@@ -53,10 +53,10 @@
                     <div><img
                       src="{{ detail.player_image }}"
                       alt="{{ detail.player_name }}"
-                      class="match-index-thumbshot"
+                      class="match-index-player"
                     ></div>
                   {% else %}
-                    <div alt="None/Anonymous" class="match-index-thumbshot"></div>
+                    <div alt="None/Anonymous" class="match-index-player"></div>
                   {% endif %}
                     <div class='scorebar'
                     data-raw-score='{{ detail.kills }}/{{ detail.deaths }}/{{ detail.assists }}'
@@ -98,10 +98,10 @@
                       <img
                         src="{{ detail.player_image }}"
                         alt="{{ detail.player_name }}"
-                        class="match-index-thumbshot"
+                        class="match-index-player"
                       >
                     {% else %}
-                      <div alt="None/Anonymous" class="match-index-thumbshot"></div>
+                      <div alt="None/Anonymous" class="match-index-player"></div>
                     {% endif %}
                     <div class='scorebar'
                     data-raw-score='{{ detail.kills }}/{{ detail.deaths }}/{{ detail.assists }}'
