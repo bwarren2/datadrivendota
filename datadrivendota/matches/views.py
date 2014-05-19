@@ -513,6 +513,7 @@ def annotated_matches(pms_list, follow_list):
     for pms in pms_list:
         id = pms.match.steam_id
         side = pms.which_side()
+        print side
         if pms.match.steam_id not in match_data.keys():
             match_data[id] = {}
             match_data[id]['pms_data'] = {}
@@ -520,11 +521,13 @@ def annotated_matches(pms_list, follow_list):
             match_data[id]['pms_data']['Dire'] = {}
             match_data[id]['match_data'] = {}
             match_data[id]['match_data']['Radiant'] = {}
+            match_data[id]['match_data']['Radiant']['is_win'] = False
             match_data[id]['match_data']['Radiant']['kills'] = 0
             match_data[id]['match_data']['Radiant']['deaths'] = 0
             match_data[id]['match_data']['Radiant']['assists'] = 0
             match_data[id]['match_data']['Radiant']['KDA2'] = 0
             match_data[id]['match_data']['Dire'] = {}
+            match_data[id]['match_data']['Dire']['is_win'] = False
             match_data[id]['match_data']['Dire']['kills'] = 0
             match_data[id]['match_data']['Dire']['deaths'] = 0
             match_data[id]['match_data']['Dire']['assists'] = 0
@@ -538,6 +541,9 @@ def annotated_matches(pms_list, follow_list):
 
         match_data[id]['match_data']['game_mode'] = \
             pms.match.game_mode.description
+
+        if pms.is_win:
+            match_data[id]['match_data'][side]['is_win'] = True
 
         match_data[id]['match_data']['id'] = id
 

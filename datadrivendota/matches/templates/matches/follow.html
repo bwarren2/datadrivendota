@@ -21,9 +21,12 @@
               </span>
             </div>
 
-            <div class="radiant col-md-6">
+            <div class="radiant col-md-6
+              {% if match.match_data.Radiant.is_win %}
+              winner
+              {% endif %}">
 
-              <div class='scorebar'
+              <div class='scorebar topscore'
                     data-raw-score='{{ match.match_data.Radiant.kills }}/{{ match.match_data.Radiant.deaths }}/{{ match.match_data.Radiant.assists }}'
                     data-kda2='{{ match.match_data.Radiant.KDA2}}'
               >
@@ -33,23 +36,25 @@
               <div class='row'>
               {% for key, detail in match.pms_data.Radiant.iteritems %}
                 <div class="col-md-2">
-                  <img
-                    src="{{ detail.hero_image }}"
-                    alt="{{ detail.hero_name }}"
-                    class="match-index-thumbshot"
-                    {% if detail.player_image %}
-                      data-player-image="{{detail.player_image}}"
-                    {% endif %}
-                    {% if detail.hero_image %}
-                      data-hero-image="{{ detail.hero_image }}"
-                    {% endif %}
-                  >
-                  {% if detail.player_image %}
+                  <div>
                     <img
+                      src="{{ detail.hero_image }}"
+                      alt="{{ detail.hero_name }}"
+                      class="match-index-thumbshot"
+                      {% if detail.player_image %}
+                        data-player-image="{{detail.player_image}}"
+                      {% endif %}
+                      {% if detail.hero_image %}
+                        data-hero-image="{{ detail.hero_image }}"
+                      {% endif %}
+                    >
+                  </div>
+                  {% if detail.player_image %}
+                    <div><img
                       src="{{ detail.player_image }}"
                       alt="{{ detail.player_name }}"
                       class="match-index-thumbshot"
-                    >
+                    ></div>
                   {% else %}
                     <div alt="None/Anonymous" class="match-index-thumbshot"></div>
                   {% endif %}
@@ -64,9 +69,11 @@
               </div>
             </div>
 
-            <div class="dire col-md-6">
+            <div class="dire col-md-6 {% if match.match_data.Dire.is_win %}
+              winner
+              {% endif %}">
 
-              <div class='scorebar'
+              <div class='scorebar topscore'
                     data-raw-score='{{ match.match_data.Dire.kills }}/{{ match.match_data.Dire.deaths }}/{{ match.match_data.Dire.assists }}'
                     data-kda2='{{ match.match_data.Dire.KDA2}}'
               >
