@@ -196,7 +196,7 @@ function draw_path(dataset, groups,  line, color, params){
     .style("stroke-width", path_stroke_width)
     .style("fill", 'none')
     .attr("class", function(d){
-      return 'dataset lines '+d.values[0].classes.join(' ');
+      return 'data-toggleable dataset lines '+d.values[0].classes.join(' ');
     });
 }
 
@@ -320,7 +320,7 @@ function draw_scatterplot(source, placement_div){
           for(var key in d.classes){
             d.classes[key]=convertToSlug(d.classes[key]);
           }
-          return 'dataset points '+d.classes.join(' ');
+          return 'data-toggleable dataset points '+d.classes.join(' ');
       })
       .attr('r', function(d){
         return(point_size_scale(d.point_size));
@@ -419,7 +419,7 @@ function draw_barplot(source, placement_div){
         for(var key in d.classes){
           d.classes[key]=convertToSlug(d.classes[key]);
         }
-        return 'dataset points '+d.classes.join(' ');
+        return 'data-toggleable dataset points '+d.classes.join(' ');
     })
   .attr("x", function(d) { return x(d.x_var); })
   .attr("width", x.rangeBand())
@@ -500,7 +500,7 @@ function draw_scatterseries(source, placement_div){
     .enter()
     .append("g")
     .attr("class", function(d){
-      return ''
+      return 'data-toggleable'
       // return 'datagroup '+groups[d.values[0].group_var]['class_selector'];
     })
     .attr("id", function(d){return d.key;});
@@ -518,7 +518,7 @@ function draw_scatterseries(source, placement_div){
           for(var key in d.classes){
             d.classes[key]=convertToSlug(d.classes[key]);
           }
-          return 'dataset points '+d.classes.join(' ');
+          return 'data-toggleable dataset points '+d.classes.join(' ');
       })
       .attr('cy',function(d){return(y(d.y_var)); })
       .attr('r', 1)

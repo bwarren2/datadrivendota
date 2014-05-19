@@ -277,7 +277,7 @@ function comboBox(){
   d3.selectAll('.click-selector')
     .on('click',function(d){
       if (!$('.click-selector').hasClass('clicked')){
-        var str = 'circle:not(.'+window.jsUtils.convertToSlug(
+        var str = '.data-toggleable:not(.'+window.jsUtils.convertToSlug(
           $('.select2-chosen').text()
         )+')';
         selection = d3.selectAll(str)
@@ -287,7 +287,7 @@ function comboBox(){
         $('.click-selector').addClass('clicked')
         $('.click-selector').text('Unselect')
       }else{
-        var str = 'circle';
+        var str = '.data-toggleable';
 
         d3.selectAll(str)
         .transition()
