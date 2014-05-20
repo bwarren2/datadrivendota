@@ -151,20 +151,19 @@
                 <img src="{{ summary.hero_thumbshot_url }}" alt="{{ summary.hero_name }}" title="{{ summary.hero_name }}" style='height:35px'>
               </span>
             {% else %}
-              <span class='ability-row-hero'>
-              </span>
+              <span class='ability-row-hero'></span>
             {% endif %}
 
             {% if summary.ability_dict %}
               {% for ability in summary.ability_dict %}
-              <a href="{%url 'heroes:ability_detail' ability_name=ability.machine_name%}">
-                  <img class='ability-thumbshot' src="{{ability.picture_url}}">
+                <a href="{%url 'heroes:ability_detail' ability_name=ability.machine_name%}">
+                    <img class='ability-thumbshot' src="{{ability.picture_url}}">
                 </a>
-            {% endfor %}
+              {% endfor %}
+            {% else %}
+                <text>Not given :(</text>
+            {% endif %}
           </div>
-          {% else %}
-              <text>Not given :(</text>
-          {% endif %}
         {% endfor %}
       </div>
       <div class='dire-abilities'>
