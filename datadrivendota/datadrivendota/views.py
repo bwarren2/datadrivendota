@@ -280,6 +280,8 @@ class ApiView(View):
             'width': 'outerWidth',
             'height': 'outerHeight',
             'draw_legend': 'draw_legend',
+            'x_ticks': 'x_ticks',
+            'y_ticks': 'y_ticks',
         }
         for var, adjust in doctorVars.iteritems():
             reqvar = request.GET.get(var, None)

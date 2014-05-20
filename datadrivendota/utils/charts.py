@@ -133,6 +133,8 @@ class ChartPanel(object):
 class Params(object):
     y_min = None
     y_max = None
+    y_ticks = None
+    x_ticks = None
     x_label = None
     y_label = None
     draw_path = False
@@ -170,6 +172,8 @@ class Params(object):
             'chart': self.chart,
             'x_label': self.x_label,
             'y_label': self.y_label,
+            'x_ticks': self.x_ticks,
+            'y_ticks': self.y_ticks,
             'draw_path': self.draw_path,
             'draw_legend': self.draw_legend,
             'margin': self.margin,

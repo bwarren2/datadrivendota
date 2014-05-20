@@ -285,6 +285,9 @@ function draw_scatterplot(source, placement_div){
                 .scale(y).orient("left")
                 .tickFormat(d3.format("d"));
 
+    if (params.x_ticks) {xAxis = xAxis.ticks(params.x_ticks)};
+    if (params.y_ticks) {yAxis = yAxis.ticks(params.y_ticks)};
+
     var color = getColorScale(params);
 
     var g = inner_chart(params, svg);
@@ -376,8 +379,10 @@ function draw_barplot(source, placement_div){
     .domain(params.x_set);
   var y = linear_y_scale(params);
   var xAxis = d3.svg.axis().scale(x).orient("bottom")
-              .tickValues(params.tick_values),
-      yAxis = d3.svg.axis().scale(y).orient("left");
+              .tickValues(params.tick_values)
+  if (params.x_ticks) {xAxis = xAxis.ticks(params.x_ticks)};
+  var yAxis = d3.svg.axis().scale(y).orient("left")
+  if (params.y_ticks) {yAxis = yAxis.ticks(params.y_ticks)};
 
   var color = getColorScale(params);
   var g = inner_chart(params, svg);
@@ -478,6 +483,9 @@ function draw_scatterseries(source, placement_div){
 
   var xAxis = d3.svg.axis().scale(x).orient("bottom"),
       yAxis = d3.svg.axis().scale(y).orient("left");
+
+  if (params.x_ticks) {xAxis = xAxis.ticks(params.x_ticks)};
+  if (params.y_ticks) {yAxis = yAxis.ticks(params.y_ticks)};
 
   var color = getColorScale(params);
 

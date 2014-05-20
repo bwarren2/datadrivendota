@@ -21,7 +21,7 @@
     </div>
 
     <div class="charts col-md-4">
-    <h4>Roles</h4>
+    <h4>Total Role Level (Stars)</h4>
         <span id='roles'></span>
     </div>
   </div>
@@ -304,6 +304,8 @@
           y_var: 'hero_damage',
           width: 225,
           height: 225,
+          x_ticks: 5,
+          y_ticks: 5,
         }, true
       )
     );
@@ -317,6 +319,8 @@
           y_var: 'xp_per_min',
           width: 225,
           height: 225,
+          y_ticks: 5,
+          x_ticks: 5,
         }, true
       )
     );
@@ -328,6 +332,8 @@
           panel_var: 'side',
           width: 225,
           height: 225,
+          y_ticks: 7,
+          x_ticks: 5,
         }, true
       )
     );
@@ -338,6 +344,7 @@
           match: '{{ match.steam_id }}',
           y_var: 'last_hits',
           width: 375,
+          y_ticks: 5,
         }, true
       )
     );
@@ -349,6 +356,8 @@
           match: '{{ match.steam_id }}',
           y_var: 'K-D+.5*A',
           width: 375,
+          y_ticks: 5,
+          x_ticks: 5,
         }, true
       )
     );
@@ -360,6 +369,7 @@
           match: '{{ match.steam_id }}',
           y_var: 'tower_damage',
           width: 375,
+          y_ticks: 5,
         }, true
       )
     );
@@ -372,6 +382,8 @@
           width: 225,
           height: 225,
           no_legend: true,
+          y_ticks: 5,
+          x_ticks: 5,
         }, true
       )
     );
