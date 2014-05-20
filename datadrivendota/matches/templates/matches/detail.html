@@ -305,7 +305,7 @@
   $(document).ready(function(){
 
     if ({{ min_skill_length }}==0){
-      $('#abilities').hide();
+        $('div#abilities').toggle('fast');
     }
 
     $('#abilities-reveal').click(function () {
