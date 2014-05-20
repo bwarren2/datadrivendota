@@ -91,6 +91,7 @@ def match(request, match_id):
         summary for summary in summaries if summary.which_side() == 'Radiant'
     ]
     radiant_infodict = {}
+    min_skill_length = 10  # Check if a row lacks data, aka things are borked.
     for summary in radiant_summaries:
         try:
             radiant_infodict[summary.player_slot] = {
@@ -122,6 +123,10 @@ def match(request, match_id):
                     ).select_related()
                 ]
             }
+        min_skill_length = min(
+            min_skill_length,
+            len(radiant_infodict[summary.player_slot]['ability_dict'])
+        )
     dire_summaries = [
         summary for summary in summaries if summary.which_side() == 'Dire'
     ]
@@ -157,6 +162,10 @@ def match(request, match_id):
                     ).select_related()
                 ]
             }
+        min_skill_length = min(
+            min_skill_length,
+            len(dire_infodict[summary.player_slot]['ability_dict'])
+        )
 
     #Identify any pickbans for templating.
     dire_hero_ids = [
@@ -202,6 +211,7 @@ def match(request, match_id):
                 'radiant_picks': radiant_picks,
                 'dire_bans': dire_bans,
                 'radiant_bans': radiant_bans,
+                'min_skill_length': min_skill_length,
             }
         )
     except IndexError:
@@ -213,6 +223,7 @@ def match(request, match_id):
                 'summaries': summaries,
                 'radiant_infodict': radiant_infodict,
                 'dire_infodict': dire_infodict,
+                'min_skill_length': min_skill_length,
             }
         )
 
