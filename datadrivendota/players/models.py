@@ -89,6 +89,22 @@ class UserProfile(models.Model):
         )
 
 
+class Applicant(models.Model):
+    steam_id = models.BigIntegerField(
+        # help_text="Valve's internal map",
+    )
+    email = models.EmailField()
+
+    def save(self, *args, **kwargs):
+        # That magic number is the valve 32bit -64bit adder.
+        # Steam ids are 32 bit by convention.
+        self.steam_id = self.steam_id % ADDER_32_BIT
+        super(Applicant, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return "{0}, {1}".format(self.steam_id, self.email)
+
+
 class PermissionCode(models.Model):
 
     LOOK = 1

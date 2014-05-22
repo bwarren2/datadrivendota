@@ -45,6 +45,11 @@ urlpatterns = patterns(
         views.comparison,
         name="comparison"
     ),
+    url(
+        r'^data-request/$',
+        views.data_applicant,
+        name="data_applicant"
+    ),
 
     url(r'^api/getplayers/$', views.player_list, name='player_list'),
     url(r'^api/dropfollow/$', views.drop_follow, name='drop_follow'),

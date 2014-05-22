@@ -9,24 +9,20 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import permission_required
-from os.path import basename
 from .models import Player, UserProfile
 from .forms import (
     PlayerAddFollowForm,
+    ApplicantForm
 )
-from matches.models import PlayerMatchSummary, Match, GameMode
+from matches.models import PlayerMatchSummary, Match
 from matches.management.tasks.valve_api_calls import (
     ApiContext,
     ValveApiCall,
     UpdatePlayerPersonas,
     AcquirePlayerData
 )
-from .models import request_to_player
+from .models import request_to_player, Applicant
 
-from .json_data import (
-    player_versus_winrate_json,
-    player_role_json,
-    )
 from .mixins import (
     WinrateMixin,
     HeroAdversaryMixin,
@@ -35,8 +31,6 @@ from .mixins import (
     RoleMixin,
     )
 
-from matches.json_data import player_endgame_json, player_team_endgame_json
-from utils.file_management import outsourceJson, moveJson
 from heroes.models import Hero
 from datadrivendota.views import ChartFormView, ApiView
 
@@ -64,6 +58,50 @@ def index(request):
             'player_list': player_list
         }
     )
+
+
+def data_applicant(request):
+    if request.method == 'POST':
+        form = ApplicantForm(request.POST)
+        if form.is_valid():
+
+            """This is some stupid hacky stuff.  What we really want to do is have a uniqueness criterion on the model, a 32bit validator on the field, and a clean() method on the field that takes % 32bit.  We'll do it later."""
+            try:
+                modulo_id = form.cleaned_data['steam_id'] \
+                    % settings.ADDER_32_BIT
+                test = Applicant.objects.get(
+                    steam_id=modulo_id
+                )
+                status = 'preexisting'
+            except Applicant.DoesNotExist:
+                form.save()
+                status = 'success'
+
+            return render(
+                request,
+                'players/data_applicant.html',
+                {
+                    'form': form,
+                    status: status
+                }
+            )
+        else:
+            status = 'error'
+            return render(
+                request,
+                'players/data_applicant.html',
+                {
+                    'form': form,
+                    status: status
+                }
+            )
+    else:
+        form = ApplicantForm()
+        return render(
+            request,
+            'players/data_applicant.html',
+            {'form': form}
+        )
 
 
 @permission_required('players.can_touch')
