@@ -56,7 +56,14 @@
     <h4>Picks and Bans</h4>
     <div class="row controls-button">
       <div class="col-sm-12 text-center">
-        <button class="btn btn-default" id="pickban-reveal">Reveal pick/ban</button>
+        <div>
+          Pick/ban
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-default" id="pickban-backward"><i class="glyphicon glyphicon-backward"></i></button>
+          <button class="btn btn-default" id="pickban-reveal"><i class="glyphicon glyphicon-play"></i></button>
+          <button class="btn btn-default" id="pickban-forward"><i class="glyphicon glyphicon-forward"></i></button>
+        </div>
       </div>
     </div>
 
@@ -282,12 +289,34 @@
 {% block extra_js %}
 <script type="text/javascript">
   $(document).ready(function () {
-    $('.dire-pickban, .radiant-pickban').hide()
+    var PICKBAN_LIMIT = 20;
+    window.PickBanPosition = -1;
+    // Set-up:
+    $('.dire-pickban, .radiant-pickban').hide();
+    $('.pickban-list li').hide();
+    // Manual cycling:
+    $('#pickban-forward').click(function () {
+      if (window.PickBanPosition === PICKBAN_LIMIT) {
+        return;
+      }
+      $('.dire-pickban, .radiant-pickban').show();
+      window.PickBanPosition++;
+      $('[data-pborder=' + window.PickBanPosition + ']').fadeIn();
+    });
+    $('#pickban-backward').click(function () {
+      if (window.PickBanPosition === -1) {
+        return;
+      }
+      $('.dire-pickban, .radiant-pickban').show();
+      $('[data-pborder=' + window.PickBanPosition + ']').fadeOut();
+      window.PickBanPosition--;
+    });
+    // Autoplay:
     $('#pickban-reveal').click(function () {
       $('.pickban-list li').fadeOut();
-      $('.dire-pickban, .radiant-pickban').show()
+      $('.dire-pickban, .radiant-pickban').show();
       $('#pickban-reveal').attr('disabled', 'disabled');
-      var PICKBAN_LIMIT = 20;
+      $('#pickban-reveal').html('<i class="glyphicon glyphicon-pause"></i>');
       var PICKBAN_REVEAL_SECONDS = 2;
       for (var i = 0; i < PICKBAN_LIMIT; i++) {
         setTimeout(function (count) {
@@ -296,6 +325,7 @@
       }
       setTimeout(function () {
         $('#pickban-reveal').removeAttr("disabled");
+        $('#pickban-reveal').html('<i class="glyphicon glyphicon-play"></i>');
       }, i * PICKBAN_REVEAL_SECONDS * 1000);
     });
   });
