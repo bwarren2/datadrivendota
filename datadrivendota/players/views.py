@@ -34,19 +34,41 @@ from .mixins import (
 from heroes.models import Hero
 from datadrivendota.views import ChartFormView, ApiView
 
-try:
-    if 'devserver' not in settings.INSTALLED_APPS:
-        raise ImportError
-    from devserver.modules.profile import devserver_profile
-except ImportError:
-    class devserver_profile(object):
-        def __init__(self, *args, **kwargs):
-            pass
+if settings.VERBOSE_PROFILING:
+    try:
+        from line_profiler import LineProfiler
 
-        def __call__(self, func):
+        def do_profile(follow=[]):
+            def inner(func):
+                def profiled_func(*args, **kwargs):
+                    try:
+                        profiler = LineProfiler()
+                        profiler.add_function(func)
+                        for f in follow:
+                            profiler.add_function(f)
+                        profiler.enable_by_count()
+                        return func(*args, **kwargs)
+                    finally:
+                        profiler.print_stats()
+                return profiled_func
+            return inner
+
+    except ImportError:
+        def do_profile(follow=[]):
+            "Helpful if you accidentally leave in production!"
+            def inner(func):
+                def nothing(*args, **kwargs):
+                    return func(*args, **kwargs)
+                return nothing
+            return inner
+else:
+    def do_profile(follow=[]):
+        "Helpful if you accidentally leave in production!"
+        def inner(func):
             def nothing(*args, **kwargs):
                 return func(*args, **kwargs)
-            return wraps(func)(nothing)
+            return nothing
+        return inner
 
 
 def index(request):
@@ -116,7 +138,7 @@ def followed_index(request):
         }
     )
 
-
+@do_profile()
 def pro_index(request):
     player_list = Player.objects.exclude(pro_name=None)
     return render(

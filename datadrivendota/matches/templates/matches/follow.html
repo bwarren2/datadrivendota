@@ -21,11 +21,12 @@
               </span>
             </div>
 
-            <div class="radiant col-md-6
-              {% if match.match_data.Radiant.is_win %}
-              winner
-              {% endif %}">
 
+            <div class="radiant col-md-6">
+
+              {% if match.match_data.Radiant.is_win %}
+              <div class='winner'>
+              {% endif %}
               <div class='scorebar topscore'
                     data-raw-score='{{ match.match_data.Radiant.kills }}/{{ match.match_data.Radiant.deaths }}/{{ match.match_data.Radiant.assists }}'
                     data-kda2='{{ match.match_data.Radiant.KDA2}}'
@@ -53,7 +54,7 @@
                     <div><img
                       src="{{ detail.player_image }}"
                       alt="{{ detail.player_name }}"
-                      class="text-center center-block image-thumbnail"
+                      class="match-index-player"
                     ></div>
                   {% else %}
                     <div alt="None/Anonymous" class="match-index-player"></div>
@@ -68,10 +69,14 @@
               {% endfor %}
               </div>
             </div>
+              {% if match.match_data.Radiant.is_win %}
+              </div>
+              {% endif %}
 
-            <div class="dire col-md-6 {% if match.match_data.Dire.is_win %}
-              winner
-              {% endif %}">
+            <div class="dire col-md-6 ">
+              {% if match.match_data.Dire.is_win %}
+              <div class='winner'>
+              {% endif %}
 
               <div class='scorebar topscore'
                     data-raw-score='{{ match.match_data.Dire.kills }}/{{ match.match_data.Dire.deaths }}/{{ match.match_data.Dire.assists }}'
@@ -113,6 +118,10 @@
                 {% endfor %}
               </div>
             </div>
+              {% if match.match_data.Dire.is_win %}
+              </div>
+              {% endif %}
+
           </div>
         </a>
       {% endfor %}

@@ -524,7 +524,6 @@ def annotated_matches(pms_list, follow_list):
     for pms in pms_list:
         id = pms.match.steam_id
         side = pms.which_side()
-        print side
         if pms.match.steam_id not in match_data.keys():
             match_data[id] = {}
             match_data[id]['pms_data'] = {}
