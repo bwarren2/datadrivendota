@@ -1,6 +1,15 @@
 {% for pms in pms_list %}
   <div class="col-md-2 player-match-row">
-    <a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}" class="thumbnail">
+    <a href="{% url 'matches:match_detail' match_id=pms.match.steam_id %}" class="thumbnail"
+        {% if pms.mag %}
+            style='box-shadow: 0 0 {{pms.mag}}px
+            {% if pms.pos %}
+            rgba(0, 200, 0, 0.7)
+            {% elif pms.neg %}
+            rgba(200, 0, 0, 0.7)
+            {% endif %}'
+        {% endif %}
+        >
       {% if pms.hero.mugshot %}
       <img src="{{ pms.hero.mugshot.url }}" alt="{{ hero.name }}" class="player-match-portrait">
       {% endif %}

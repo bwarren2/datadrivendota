@@ -256,6 +256,25 @@ class RoleForm(forms.Form):
     )
 
 
+class PlayerMatchesFilterForm(forms.Form):
+    hero = SingleHeroSelect(
+        required=True,
+        help_text='Pick exactly one hero.  Use the autocomplete.'
+    )
+    min_date = forms.DateField(
+        required=False,
+        initial=thirty_days_ago,
+        help_text='Start times for included games must be on or after this'
+    )
+    min_date.widget = forms.TextInput(attrs={'class': 'datepicker'})
+    max_date = forms.DateField(
+        required=False,
+        initial=datetime.date.today,
+        help_text='Start times for included dates must be on or before this'
+    )
+    max_date.widget = forms.TextInput(attrs={'class': 'datepicker'})
+
+
 class ApplicantForm(forms.ModelForm):
     class Meta:
         model = Applicant

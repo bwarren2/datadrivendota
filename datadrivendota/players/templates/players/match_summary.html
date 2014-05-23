@@ -5,11 +5,30 @@
 {% block page_title %}{{ player.display_name }}'s Matches{% endblock page_title %}
 
 {% block content %}
-  <div>
-<h4>Score: <span id='show-score' class='nav-toggle'>Show</span> <span id='hide-score' class='nav-toggle'>Hide</span></h4>
+    <div class='row'>
+
+
+        <h4>Match Filtration</h4>
+        <div class='form-container'>
+            <form class='chart-form' action="" method='POST'>
+              {% include "_form.html" %}
+              {% csrf_token %}
+              <div class="control-group">
+                <div class="controls pull-right">
+                  <button type="submit" class="btn btn-small btn-primary">Submit</button>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </form>
+        </div>
+        <h4>Score:
+            <span id='show-score' class='nav-toggle'>Show</span> <span id='hide-score' class='nav-toggle'>Hide</span>
+        </h4>
         {% include "players/_player_match_cards.html" %}
+    </div>
+    <div>
       {% include "_pagination.html" with pages_list=pms_list page_links_to_display=pms_list.paginator.page_range %}
-  </div>
+    </div>
 {% endblock content %}
 
 {% block extra_js %}

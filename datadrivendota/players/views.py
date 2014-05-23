@@ -1,5 +1,6 @@
 import datetime
 import json
+from time import mktime
 from random import choice
 from celery import chain
 from functools import wraps
@@ -12,7 +13,8 @@ from django.contrib.auth.decorators import permission_required
 from .models import Player, UserProfile
 from .forms import (
     PlayerAddFollowForm,
-    ApplicantForm
+    ApplicantForm,
+    PlayerMatchesFilterForm
 )
 from matches.models import PlayerMatchSummary, Match
 from matches.management.tasks.valve_api_calls import (
@@ -321,7 +323,42 @@ class HeroAbilities(HeroAbilitiesMixin, ChartFormView):
 
 def player_matches(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
-    pms_list = get_playermatchsummaries_for_player(player, 500)
+    total_results = 500
+    if request.method == 'POST':
+        form = PlayerMatchesFilterForm(request.POST)
+        if form.is_valid():
+            print form.cleaned_data
+            pms_list = PlayerMatchSummary.objects.select_related()
+            pms_list = pms_list.filter(
+                player=player
+            )
+            if form.cleaned_data['hero'] is not None:
+                pms_list = pms_list.filter(
+                    hero__steam_id=form.cleaned_data['hero']
+                )
+            if form.cleaned_data['min_date'] is not None:
+                min_date_utc = mktime(
+                    form.cleaned_data['min_date'].timetuple()
+                    )
+                pms_list = pms_list.filter(
+                    match__start_time__gte=min_date_utc,
+                )
+            if form.cleaned_data['max_date'] is not None:
+                max_date_utc = mktime(
+                    form.cleaned_data['max_date'].timetuple()
+                    )
+                pms_list = pms_list.filter(
+                    match__start_time__lte=max_date_utc,
+                )
+            pms_list = pms_list.order_by('-match__start_time')[0:total_results]
+            pms_list = date_notate_pms_list(pms_list)
+        else:
+            pms_list = get_playermatchsummaries_for_player(
+                player, total_results
+            )
+    else:
+        form = PlayerMatchesFilterForm()
+        pms_list = get_playermatchsummaries_for_player(player, total_results)
 
     paginator = Paginator(pms_list, 36)
     page = request.GET.get('page')
@@ -339,7 +376,8 @@ def player_matches(request, player_id=None):
         'players/match_summary.html',
         {
             'pms_list': pms_list,
-            'player': player
+            'player': player,
+            'form': form
         }
     )
 
@@ -626,6 +664,11 @@ def get_playermatchsummaries_for_player(player, count):
     pms_list = pms_list.filter(
         player=player
     ).order_by('-match__start_time')[0:count]
+    pms_list = date_notate_pms_list(pms_list)
+    return pms_list
+
+
+def date_notate_pms_list(pms_list):
     for pms in pms_list:
         pms.display_date = datetime.datetime.fromtimestamp(
             pms.match.start_time
@@ -636,8 +679,15 @@ def get_playermatchsummaries_for_player(player, count):
         pms.KDA2 = pms.kills - pms.deaths + pms.assists / 2.0
         # @todo: Again, postposed conditionals.
         # --kit 2014-02-16
-        pms.color_class = 'pos' if pms.KDA2 > 0 else 'neg'
-        pms.mag = abs(pms.KDA2)*2
+        if pms.KDA2 > 0:
+            pms.color_class = 'pos'
+            pms.pos = True
+        else:
+            pms.color_class = 'neg'
+            pms.neg = True
+
+        pms.mag = abs(pms.KDA2)*3
+
     return pms_list
 
 
