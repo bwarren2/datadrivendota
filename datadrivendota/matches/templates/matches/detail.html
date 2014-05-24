@@ -52,7 +52,7 @@
     </div>
   </div>
 
-  {% if dire_bans %}
+  {% if dire_bans or radiant_bans %}
     <h4>Picks and Bans</h4>
     <div class="row controls-button">
       <div class="col-sm-12 text-center">
@@ -61,7 +61,7 @@
         </div>
         <div class="btn-group">
           <button class="btn btn-default" id="pickban-backward"><i class="glyphicon glyphicon-backward"></i></button>
-          <button class="btn btn-default" id="pickban-reveal"><i class="glyphicon glyphicon-play"></i></button>
+          <button class="btn btn-default disabled" id="pickban-reveal">Pick/Ban</button>
           <button class="btn btn-default" id="pickban-forward"><i class="glyphicon glyphicon-forward"></i></button>
         </div>
       </div>
@@ -230,11 +230,9 @@
           {% for summary in summaries %}
             <tr{% if summary.is_win %} class="winner"{% endif %}>
               {% if summary.hero.thumbshot %}
-
-              <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
+                <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
               {% else %}
-              <td></td>
-
+                <td></td>
               {% endif %}
 
               <td>{% player_link summary.player %}</td>
@@ -289,44 +287,29 @@
 {% block extra_js %}
 <script type="text/javascript">
   $(document).ready(function () {
-    var PICKBAN_LIMIT = 20;
-    window.PickBanPosition = -1;
+    // @todo: store the pickban items in an array, so we know things like how many there are.
+    var PICKBAN_LIMIT = {{ pickban_length }};
+    var pickban_position = -1;
+
     // Set-up:
-    $('.dire-pickban, .radiant-pickban').hide();
     $('.pickban-list li').hide();
+
     // Manual cycling:
     $('#pickban-forward').click(function () {
-      if (window.PickBanPosition === PICKBAN_LIMIT) {
+      if (pickban_position === PICKBAN_LIMIT - 1) {
         return;
       }
       $('.dire-pickban, .radiant-pickban').show();
-      window.PickBanPosition++;
-      $('[data-pborder=' + window.PickBanPosition + ']').fadeIn();
+      pickban_position++;
+      $('[data-pborder=' + pickban_position + ']').fadeIn();
     });
     $('#pickban-backward').click(function () {
-      if (window.PickBanPosition === -1) {
+      if (pickban_position === -1) {
         return;
       }
       $('.dire-pickban, .radiant-pickban').show();
-      $('[data-pborder=' + window.PickBanPosition + ']').fadeOut();
-      window.PickBanPosition--;
-    });
-    // Autoplay:
-    $('#pickban-reveal').click(function () {
-      $('.pickban-list li').fadeOut();
-      $('.dire-pickban, .radiant-pickban').show();
-      $('#pickban-reveal').attr('disabled', 'disabled');
-      $('#pickban-reveal').html('<i class="glyphicon glyphicon-pause"></i>');
-      var PICKBAN_REVEAL_SECONDS = 2;
-      for (var i = 0; i < PICKBAN_LIMIT; i++) {
-        setTimeout(function (count) {
-          $('[data-pborder=' + count + ']').fadeIn();
-        }, i * PICKBAN_REVEAL_SECONDS * 1000, i);
-      }
-      setTimeout(function () {
-        $('#pickban-reveal').removeAttr("disabled");
-        $('#pickban-reveal').html('<i class="glyphicon glyphicon-play"></i>');
-      }, i * PICKBAN_REVEAL_SECONDS * 1000);
+      $('[data-pborder=' + pickban_position + ']').fadeOut();
+      pickban_position--;
     });
   });
 </script>
