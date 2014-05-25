@@ -199,6 +199,13 @@ def match(request, match_id):
             is_pick=False
         ).exclude(team=dire_flag).select_related()
 
+        pickban_length = (
+            dire_picks.count() +
+            dire_bans.count() +
+            radiant_picks.count() +
+            radiant_bans.count()
+        )
+
         return render(
             request,
             'matches/detail.html',
@@ -212,6 +219,7 @@ def match(request, match_id):
                 'dire_bans': dire_bans,
                 'radiant_bans': radiant_bans,
                 'min_skill_length': min_skill_length,
+                'pickban_length': pickban_length,
             }
         )
     except IndexError:
