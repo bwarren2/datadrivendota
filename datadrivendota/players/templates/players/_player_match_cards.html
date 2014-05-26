@@ -10,6 +10,10 @@
             {% endif %}'
         {% endif %}
         >
+      {% if pms.is_win %}
+      <div class='glyphicon glyphicon-ok-sign win-glyph' title='Won'></div>
+      {% endif %}
+
       {% if pms.hero.mugshot %}
       <img src="{{ pms.hero.mugshot.url }}" alt="{{ hero.name }}" class="player-match-portrait">
       {% endif %}
