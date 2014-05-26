@@ -44,11 +44,17 @@ class Command(BaseCommand):
         keep_going = False
         for ability, data_dict in abilities.iteritems():
             print ability
+            # if ability == 'oracle_fortunes_end':
+            #     import pdb;pdb.set_trace()
             if ability == 'greevil_miniboss_orange_light_strike_array':
                 keep_going = False
             if keep_going:
                 continue
-            ab = Ability.objects.get_or_create(steam_id=data_dict['ID'])[0]
+            ab = Ability.objects.get_or_create(
+                steam_id=data_dict['ID'],
+                #is_ultimate=False,
+                )[0]
+                #I am not sure why the is_ultimate flag is needed.  The field looks optional to me.  Ask Kit.
             for key, value in mapping_dict.iteritems():
                 try:
                     trait = data_dict.get(key)

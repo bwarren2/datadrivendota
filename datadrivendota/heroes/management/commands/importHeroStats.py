@@ -129,19 +129,23 @@ class Command(BaseCommand):
 
                 dos.save()
 
-                key = "Role"
-                role_list = data_dict.get(key).split(",")
-                key = "Rolelevels"
-                role_level_list = data_dict.get(key).split(",")
-                if role_list != ['']:
-                    role_data = zip(role_list, role_level_list)
-                    for role, level in role_data:
-                        r = Role.objects.get_or_create(name=role)[0]
-                        assignment = Assignment.objects.get_or_create(
-                            hero=hero,
-                            role=r,
-                            magnitude=int(level))[0]
-                        assignment.save()
+                try:
+                    key = "Role"
+                    role_list = data_dict.get(key).split(",")
+                    key = "Rolelevels"
+                    role_level_list = data_dict.get(key).split(",")
+                    if role_list != ['']:
+                        role_data = zip(role_list, role_level_list)
+                        for role, level in role_data:
+                            r = Role.objects.get_or_create(name=role)[0]
+                            assignment = Assignment.objects.get_or_create(
+                                hero=hero,
+                                role=r,
+                                magnitude=int(level))[0]
+                            assignment.save()
+                except AttributeError:
+                    pass
+                    #This means roles are not defined.  Sometimes happens with heroes in the prerelease phase.
         # Backswings
         # Sometimes the wiki does not purge old heroes (skeleton king)
         banned_list = ['Skeleton King']
@@ -188,4 +192,4 @@ class Command(BaseCommand):
                     print hero_name, dos.atk_backswing
                     dos.save()
         except HTTPError, err:
-            print "No Cast animations pulled!  Error %s" % (err)
+            print "No Attack animations pulled!  Error %s" % (err)

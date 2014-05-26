@@ -152,7 +152,8 @@ class Ability(models.Model):
     )
     is_ultimate = models.BooleanField(
         help_text="Is this an ultimate?",
-        blank=True
+        blank=True,
+        default=False
     )
     behavior = models.ManyToManyField('AbilityBehavior')
     target_flags = models.ManyToManyField('AbilityUnitTargetFlags')
