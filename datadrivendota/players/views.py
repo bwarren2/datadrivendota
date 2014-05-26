@@ -688,6 +688,14 @@ def date_notate_pms_list(pms_list):
 
         pms.mag = abs(pms.KDA2)*3
 
+        if pms.match.validity == Match.LEGIT:
+            pms.legit = True
+        elif pms.match.validity == Match.UNCOUNTED:
+            pms.invalid = True
+        elif pms.match.validity == Match.UNPROCESSED:
+            pms.unprocessed = True
+
+
     return pms_list
 
 
