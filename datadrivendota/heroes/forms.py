@@ -290,3 +290,39 @@ class HeroPerformanceLineupForm(forms.Form):
         required=True,
         help_text='Pick one or more heroes'
     )
+
+
+class HeroPickRateForm(forms.Form):
+    CHOICE_LIST = [
+        'pick_count',
+        'pick_rate',
+        'ban_count',
+        'ban_rate',
+        'pick_or_ban_count',
+        'pick_or_ban_rate',
+    ]
+    Y_LIST = list_to_choice_list(CHOICE_LIST)
+    SKILL_LEVELS = [
+        (1, 'Low Skill'),
+        (2, 'Medium Skill'),
+        (3, 'High Skill'),
+    ]
+
+    var = forms.ChoiceField(
+        choices=Y_LIST,
+        required=True,
+        help_text='What goes on the Y axis?'
+    )
+    skill_level = forms.ChoiceField(
+        choices=SKILL_LEVELS,
+        required=True,
+        help_text='What goes on the Y axis?'
+    )
+    player = SinglePlayerField(
+        required=False,
+        help_text='Optionally, pick one player'
+    )
+    heroes = MultiHeroSelect(
+        required=True,
+        help_text='Pick one or more heroes'
+    )

@@ -6,6 +6,7 @@ from .json_data import (
     hero_skillbuild_winrate_json,
     update_player_winrate,
     hero_performance_lineup,
+    hero_pick_rate_lineup,
 )
 
 from .forms import (
@@ -16,6 +17,7 @@ from .forms import (
     HeroBuildForm,
     UpdatePlayerWinrateForm,
     HeroPerformanceLineupForm,
+    HeroPickRateForm,
 )
 
 
@@ -96,3 +98,14 @@ class HeroPerformanceLineupMixin(object):
         'heroes',
     ]
     json_function = staticmethod(hero_performance_lineup)
+
+
+class HeroPickRateMixin(object):
+    form = HeroPickRateForm
+    attrs = [
+        'var',
+        'skill_level',
+        'player',
+        'heroes'
+    ]
+    json_function = staticmethod(hero_pick_rate_lineup)

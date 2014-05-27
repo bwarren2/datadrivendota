@@ -17,6 +17,7 @@ from matches.models import (
     fetch_pms_attribute,
     GameMode,
     fetch_attribute_label,
+    PickBan
 )
 from players.models import Player
 from django.db.models import Count
@@ -615,6 +616,123 @@ def hero_performance_lineup(
     c.params.y_min = min([d.y_var for d in c.datalist])-1
     c.params.x_label = 'Hero'
     c.params.y_label = stat
+    c.params.outerWidth = 705
+    c.params.outerHeight = 500
+    c.params.legendWidthPercent = .7
+    c.params.legendHeightPercent = .2
+    c.params.padding['bottom'] = 120
+    c.params.tick_values = [x for ind, x in enumerate(xs) if ind % 2 == 0]
+    return c
+
+
+def hero_pick_rate_lineup(var, skill_level, player, heroes):
+
+    print var, skill_level, player, heroes
+
+    match_pool = Match.objects.filter(
+        game_mode__steam_id__in=[2],
+        validity=Match.LEGIT
+        )
+
+    if player:
+        match_pool = match_pool.filter(playermatchsummary__steam_id=player)
+
+    if skill_level:
+        match_pool = match_pool.filter(skill=skill_level)
+
+    pbs = PickBan.objects.filter(
+        match__in=match_pool
+        ).values(
+        'hero', 'is_pick', 'hero__name', 'hero__steam_id'
+        ).annotate(
+        Count('is_pick')
+        ).order_by()
+
+    if len(pbs) == 0:
+        raise NoDataFound
+
+    match_total = match_pool.count()
+    hero_classes = hero_classes_dict()
+    selected_names = [h.name for h in Hero.objects.filter(steam_id__in=heroes)]
+    heroes = {
+        h.name: h.herodossier.alignment.title()
+        for h in Hero.objects.filter(visible=True).select_related()
+        }
+
+    annotations = {}
+    for pb in pbs:
+        if pb['hero__steam_id'] not in annotations:
+            annotations[pb['hero__steam_id']] = {
+                'picks': 0,
+                'bans': 0,
+                'hero__name': pb['hero__name'],
+                'hero__steam_id': pb['hero__steam_id'],
+            }
+
+        if pb['is_pick'] is True:
+            annotations[pb['hero__steam_id']]['picks'] = pb['is_pick__count']
+        elif pb['is_pick'] is False:
+            annotations[pb['hero__steam_id']]['bans'] = pb['is_pick__count']
+
+    sorted_annotations = [a for a in annotations.itervalues()]
+    if var in ['pick_count', 'pick_rate']:
+        sorted_annotations.sort(
+            key=lambda x: x['picks'],
+            reverse=True
+        )
+    elif var in ['ban_count', 'ban_rate']:
+        sorted_annotations.sort(
+            key=lambda x: x['bans'],
+            reverse=True
+        )
+    elif var in ['pick_or_ban_count', 'pick_or_ban_rate']:
+        sorted_annotations.sort(
+            key=lambda x: x['bans']+x['picks'],
+            reverse=True
+        )
+
+    c = BarPlot()
+    xs = []
+    for annotation in sorted_annotations:
+        d = DataPoint()
+        group = annotation['hero__name'] \
+            if annotation['hero__name'] in selected_names \
+            else heroes[annotation['hero__name']]
+
+        x = annotation['hero__name']
+        xs.append(x)
+        d.x_var = x
+        if var == 'pick_count':
+            d.y_var = annotation['picks']
+        elif var == 'pick_rate':
+            d.y_var = annotation['picks']/match_total
+        if var == 'ban_count':
+            d.y_var = annotation['bans']
+        elif var == 'ban_rate':
+            d.y_var = annotation['bans']/match_total
+        if var == 'pick_or_ban_count':
+            d.y_var = annotation['picks']+annotation['bans']
+        elif var == 'pick_or_ban_rate':
+            d.y_var = (annotation['picks']+annotation['bans'])/match_total
+
+        d.label = annotation['hero__name']
+        d.tooltip = "{name} ({val})".format(
+            name=annotation['hero__name'],
+            val=d.y_var,
+        )
+        d.group_var = group
+        d.classes = []
+        d.panel_var = 'Hero {var} (Avg)'.format(var=var).title()
+
+        if hero_classes[annotation['hero__steam_id']] is not None:
+            d.classes.extend(
+                hero_classes[annotation['hero__steam_id']]
+            )
+
+        c.datalist.append(d)
+    c.params.y_min = min([d.y_var for d in c.datalist])-1
+    c.params.x_label = 'Hero'
+    c.params.y_label = var
     c.params.outerWidth = 705
     c.params.outerHeight = 500
     c.params.legendWidthPercent = .7

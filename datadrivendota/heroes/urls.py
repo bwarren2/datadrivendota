@@ -24,6 +24,11 @@ urlpatterns = patterns(
         name='hero_skill_progression'
     ),
     url(
+        r'^pick-ban-rate/$',
+        views.HeroPickBanLineup.as_view(),
+        name='pick_ban_rate'
+    ),
+    url(
         r'^ability/(?P<ability_name>[a-zA-Z0-9\-\_]*)/$',
         views.ability_detail,
         name='ability_detail'

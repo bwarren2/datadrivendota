@@ -23,6 +23,7 @@ from .mixins import (
     HeroBuildLevelMixin,
     UpdatePlayerWinrateMixin,
     HeroPerformanceLineupMixin,
+    HeroPickRateMixin,
     )
 
 try:
@@ -264,6 +265,17 @@ class HeroBuildLevel(HeroBuildLevelMixin, ChartFormView):
 
 
 class HeroPerformanceLineup(HeroPerformanceLineupMixin, ChartFormView):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts a stat across all heroes, in games of a skill level."
+        },
+        ]
+    title = "Hero Performance Lineup"
+    html = "heroes/form.html"
+
+class HeroPickBanLineup(HeroPickRateMixin, ChartFormView):
     tour = [
         {
             'orphan': True,
