@@ -705,15 +705,16 @@ def hero_pick_rate_lineup(var, skill_level, player, heroes):
         if var == 'pick_count':
             d.y_var = annotation['picks']
         elif var == 'pick_rate':
-            d.y_var = annotation['picks']/match_total
+            d.y_var = annotation['picks']/float(match_total)
         if var == 'ban_count':
             d.y_var = annotation['bans']
         elif var == 'ban_rate':
-            d.y_var = annotation['bans']/match_total
+            d.y_var = annotation['bans']/float(match_total)
         if var == 'pick_or_ban_count':
             d.y_var = annotation['picks']+annotation['bans']
         elif var == 'pick_or_ban_rate':
-            d.y_var = (annotation['picks']+annotation['bans'])/match_total
+            d.y_var = (annotation['picks']+annotation['bans'])\
+                / float(match_total)
 
         d.label = annotation['hero__name']
         d.tooltip = "{name} ({val})".format(
