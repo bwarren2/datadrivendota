@@ -20,6 +20,10 @@ def hp():
     local(heroku_migrate())
 
 
+def rabbit_reset():
+    return local('sh convenience\ files/rabbit_reset')
+
+
 def heroku_migrate():
     return local("heroku run python datadrivendota/manage.py migrate --no-initial-data")
 
