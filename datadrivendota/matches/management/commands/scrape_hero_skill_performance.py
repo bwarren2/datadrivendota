@@ -21,7 +21,6 @@ class Command(BaseCommand):
         match_count = options['match_count']
         if match_count <= 0:
             raise Exception("How many matches per hero? (Use --match-count)")
-
         heroes = Hero.objects.all()
         for hero in heroes:
             c = ApiContext()

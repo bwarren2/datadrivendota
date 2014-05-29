@@ -140,6 +140,7 @@ class BaseTask(Task):
         # logger.info("Task success! {task_id}".format(task_id=task_id))
         pass
 
+
 class ApiFollower(Task):
     abstract = True
 
