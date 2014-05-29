@@ -13,6 +13,7 @@ def index(request):
 
 def detail(request, item_name):
     item_slug = slugify(item_name)
+    print item_name, item_slug
     current_item = get_object_or_404(Item, slug_name=item_slug)
     return render(request, 'items/detail.html', {'item': current_item})
 
