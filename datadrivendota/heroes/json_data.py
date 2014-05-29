@@ -640,6 +640,7 @@ def hero_pick_rate_lineup(var, skill_level, player, heroes):
     if skill_level:
         match_pool = match_pool.filter(skill=skill_level)
 
+    match_pool = match_pool[:500]
     pbs = PickBan.objects.filter(
         match__in=match_pool
         ).values(
