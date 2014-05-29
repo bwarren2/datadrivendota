@@ -635,10 +635,10 @@ def match_role_json(match):
 
 
 @do_profile()
-def match_list_json(matches, player_list):
+def match_list_json(matches, players):
     pmses = PlayerMatchSummary.objects.filter(
         match__steam_id__in=matches,
-        player__steam_id__in=player_list,
+        player__steam_id__in=players,
     )
 
     if len(pmses) == 0:
