@@ -115,10 +115,15 @@
       <div class="hero-ability-list col-md-8">
         <h4>Abilities</h4>
         {% for ability in abilities %}
-          <a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name %}" class="ability thumbnail">
-            <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
-            <p class='overlayer'>{{ ability.name }}</p>
-          </a>
+          {% if  ability.picture %}
+
+            <a href="{% url 'heroes:ability_detail' ability_name=ability.machine_name %}" class="ability thumbnail">
+              <img src="{{ ability.picture.url }}" alt="{{ ability.name }}" class="ability">
+              <p class='overlayer'>{{ ability.name }}</p>
+            </a>
+          {% else %}
+            {{ability}}
+          {% endif %}
         {% endfor %}
         <div class="clearfix"></div>
       </div>
