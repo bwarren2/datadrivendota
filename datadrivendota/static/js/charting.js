@@ -167,13 +167,13 @@ function draw_legend(params, groups, svg, color){
         })
         .on("mouseover",
           function (d, i) {
-            str = '.dataset:not(.'+groups[d['key']]['class_selector']+')'
+            str = '.data-toggleable:not(.'+groups[d['key']]['class_selector']+')'
             d3.selectAll(str)
-            .transition().duration(1000).style('opacity',fadeOpacity);
+            .transition().duration(1000).attr('opacity',fadeOpacity);
         })
         .on("mouseout", function(d) {
-            d3.selectAll('.dataset:not(.'+groups[d['key']]['class_selector']+')')
-            .transition().duration(1000).style('opacity',1);
+            d3.selectAll('.data-toggleable:not(.'+groups[d['key']]['class_selector']+')')
+            .transition().duration(1000).attr('opacity',1);
           }
         );
 

@@ -283,16 +283,15 @@ function comboBox(){
         selection = d3.selectAll(str)
         .transition()
         .duration(500)
-        .attr('opacity',0);
+        .style('opacity',0);
         $('.click-selector').addClass('clicked')
         $('.click-selector').text('Unselect')
       }else{
         var str = '.data-toggleable';
-
         d3.selectAll(str)
         .transition()
         .duration(500)
-        .attr('opacity',1);
+        .style('opacity',1);
         $('.click-selector').removeClass('clicked')
         $('.click-selector').text('Select')
       }
