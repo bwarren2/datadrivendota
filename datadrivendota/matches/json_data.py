@@ -655,10 +655,19 @@ def match_list_json(matches, players):
         'player_match_summary__match__skill',
         'player_match_summary__match__steam_id',
         'player_match_summary__player__persona_name',
+        'player_match_summary__player__steam_id',
+    )
+    ordered_sbs = sorted(sbs, key=lambda x:
+        str(players.index(x['player_match_summary__player__steam_id']))\
+        + str(matches.index(x['player_match_summary__match__steam_id']))
     )
 
     c = TasselPlot()
-    for build in sbs:
+    print "=+=+=+"
+    print ordered_sbs
+    print "=+=+=+"
+    groups = []
+    for build in ordered_sbs:
         if build['level'] == 1:
             subtractor = build['time']/60.0
 
@@ -670,7 +679,8 @@ def match_list_json(matches, players):
             match=build['player_match_summary__match__steam_id'],
             name=build['player_match_summary__player__persona_name'],
         )
-
+        if group not in groups:
+            groups.append(group)
         d.group_var = group
         d.series_var = group
 
@@ -679,8 +689,10 @@ def match_list_json(matches, players):
         ]
         d.panel_var = 'Skill Progression'
         c.datalist.append(d)
-
+    c.groups = groups
+    print groups
     c.params.x_min = 0
+    c.params.path_stroke_width = 3
     c.params.x_label = 'Time (m)'
     c.params.y_label = 'Level'
 
