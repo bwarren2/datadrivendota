@@ -165,7 +165,7 @@ def player_winrate_json(
 
         c.datalist.append(d)
 
-    if group_var!='alignment':
+    if group_var != 'alignment':
         c.params.draw_legend = False
 
     c.params.y_max = 100
