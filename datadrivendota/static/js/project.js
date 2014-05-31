@@ -278,7 +278,7 @@ function comboBox(){
     .on('click',function(d){
       if (!$('.click-selector').hasClass('clicked')){
         var str = '.data-toggleable:not(.'+window.jsUtils.convertToSlug(
-          $('.select2-chosen').text()
+          $('span#combobox .select2-chosen').text()
         )+')';
         selection = d3.selectAll(str)
         .transition()
