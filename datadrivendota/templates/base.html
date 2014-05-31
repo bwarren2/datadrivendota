@@ -127,6 +127,7 @@
 
         <div class="row">
 
+{% block topbar %}
       {# Adsense #}
       <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
       <!-- Big Bar -->
@@ -137,6 +138,7 @@
       <script>
         (adsbygoogle = window.adsbygoogle || []).push({});
       </script>
+{% endblock topbar %}
 
           {% block extra_nav %}{% endblock extra_nav %}
 
@@ -183,9 +185,6 @@
       <script type="text/javascript">
       window.comboBox();
       </script>
-
-    {% block extra_js %}
-    {% endblock extra_js %}
     <script type="text/javascript">
       $('#hidden-feature').hide();
 
@@ -227,6 +226,9 @@
       );
 
     </script>
+
+    {% block extra_js %}
+    {% endblock extra_js %}
 
     {% block tour %}
       <script type="text/javascript">

@@ -5,9 +5,11 @@
     <ul class="slides">
       {% for entry in entries %}
       <li class="slide slide-{{ forloop.counter }}">
+        {% if entry.image %}
         <a href="{{ entry.get_absolute_url }}" title="{{ entry.title }}">
-          <img src="{% if entry.image %}{{ entry.image.url }}{% endif %}" alt="{{ entry.title }}" />
+          <img src="{{ entry.image.url }}" alt="{{ entry.title }}" />
         </a>
+        {% endif %}
         <div class="slide-content">
           <h2>
             <a href="{{ entry.get_absolute_url }}" rel="bookmark"

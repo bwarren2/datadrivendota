@@ -482,6 +482,12 @@ PIPELINE_CSS = {
             'media': 'screen,projection',
         },
     },
+    'blog': {
+        'source_filenames': (
+            'css/blog.less',
+        ),
+        'output_filename': 'css/blog.css',
+    }
 }
 
 PIPELINE_JS = {
