@@ -169,11 +169,15 @@ function draw_legend(params, groups, svg, color){
           function (d, i) {
             str = '.data-toggleable:not(.'+groups[d['key']]['class_selector']+')'
             d3.selectAll(str)
-            .transition().duration(1000).style('opacity',fadeOpacity);
+            .transition()
+            .duration(1000)
+            .style('opacity',fadeOpacity);
         })
         .on("mouseout", function(d) {
             d3.selectAll('.data-toggleable:not(.'+groups[d['key']]['class_selector']+')')
-            .transition().duration(1000).style('opacity',1);
+            .transition()
+            .duration(1000)
+            .style('opacity',1);
           }
         );
 

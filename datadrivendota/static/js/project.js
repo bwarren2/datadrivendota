@@ -283,7 +283,9 @@ function comboBox(){
         selection = d3.selectAll(str)
         .transition()
         .duration(500)
-        .style('opacity',0);
+        .style('opacity',0)
+        .transition().duration(0)
+        .style('visibility', 'hidden');
         $('.click-selector').addClass('clicked')
         $('.click-selector').text('Unselect')
       }else{
@@ -291,7 +293,8 @@ function comboBox(){
         d3.selectAll(str)
         .transition()
         .duration(500)
-        .style('opacity',1);
+        .style('opacity',1)
+        .style('visibility', 'visible');
         $('.click-selector').removeClass('clicked')
         $('.click-selector').text('Select')
       }
