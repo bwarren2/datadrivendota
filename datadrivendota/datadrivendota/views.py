@@ -42,7 +42,7 @@ def base(request):
             provider='steam'
         )[0].extra_data
         extra_dict.update({'chart_player': p})
-    return render(request, 'base.html', extra_dict)
+    return render(request, 'home.html', extra_dict)
 
 
 def about(request):
