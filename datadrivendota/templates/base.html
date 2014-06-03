@@ -127,16 +127,15 @@
           <div id='main-block'>
 
           {% block topbar %}
-                {# Adsense #}
-                <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                <!-- Big Bar -->
-                <ins class="adsbygoogle"
-                  style="display:inline-block;width:728px;height:90px"
-                  data-ad-client="ca-pub-5103417759775678"
-                  data-ad-slot="2268065548"></ins>
-                <script>
-                  (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
+            <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            <!-- Mid Leaderboard -->
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:970px;height:90px"
+                 data-ad-client="ca-pub-5103417759775678"
+                 data-ad-slot="9512130742"></ins>
+            <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
           {% endblock topbar %}
 
           {% block extra_nav %}{% endblock extra_nav %}
@@ -144,21 +143,6 @@
           <h2>{% block page_title %}Hello!{% endblock page_title %}</h2>
 
           {% block content %}
-
-            <div id='hidden-feature' class='row'>
-              <div id='slark-chart' class='col-md-8'>
-                <h4>Slark Tower Damage by Skill Level, with Dendi Games</h4>
-              </div>
-
-              <div id='endgame-chart' class='col-md-4'>
-                <h4>Dendi's End-of-Game Kills</h4>
-              </div>
-            </div>
-
-            <div style='text-align:center' ><div class='glyphicon glyphicon-question-sign tourglyph'  title='Click me!' style='font-size:200px'></div>
-            </div>
-
-
           {% endblock content %}
           </div>
         </div>
@@ -181,128 +165,13 @@
     {% endcomment %}
     {% compressed_js 'all' %}
       <script type="text/javascript">
-      window.comboBox();
+        window.comboBox();
       </script>
-    <script type="text/javascript">
-      $('#hidden-feature').hide();
-
-      window.apiHit(
-        "#slark-chart",
-        '{% url "heroes:api_hero_performance_chart" %}',
-          $.param({
-            hero: 'Slark',
-            player: '{{chart_player.persona_name}}',
-            game_modes: [1, 2, 3, 4, 5],
-            division: 'Skill',
-            x_var: 'duration',
-            y_var: 'tower_damage',
-            group_var: 'skill_name',
-            panel_var: 'is_win',
-
-            width: 300,
-            height: 300,
-          }, true
-        )
-      );
-
-
-      window.apiHit(
-        "#endgame-chart",
-        '{% url "matches:api_endgame_chart" %}',
-          $.param({
-
-            players: '{{chart_player.persona_name}}',
-            game_modes: [1, 2, 3, 4, 5],
-            x_var: 'duration',
-            y_var: 'kills',
-            panel_var: 'None',
-            group_var: 'player',
-            width: 300,
-            height: 300,
-          }, true
-        )
-      );
-
-    </script>
 
     {% block extra_js %}
     {% endblock extra_js %}
 
     {% block tour %}
-      <script type="text/javascript">
-        $(function () {
-          var tour = new Tour({
-            backdrop: true
-          });
-
-          tour.addSteps([
-            {
-              orphan: true,
-              title: "Welcome!",
-              content: "Welcome to DataDrivenDota!"
-            },
-            {
-              orphan: true,
-              title: "Intro",
-              content: "We are a bit different, so let's overview a couple big things."
-            },
-            {
-              element: "div#hidden-feature",
-              title: "Charts",
-              content: "These guys are everywhere, and they are interactive.",
-              placement: "bottom"
-            },
-            {
-              element: "rect:first",
-              title: "Legend",
-              content: "Mouse over the squares in legends to filter the data.",
-              placement: "right"
-            },
-            {
-              element: "#slark-chart",
-              title: "Datapoints",
-              content: "Click the points to go to their links.  These go to the matches they represent.  (Right click to open in new tabs. )",
-              placement: "bottom"
-            },
-            {
-              element: "span#combobox",
-              title: "Filter Box",
-              content: "Use this selector to fade out data that does not match a filter.  Try filtering on 'Slark' to get Dendi's Slark kills in the right chart.",
-              placement: "bottom"
-            },
-            {
-              element: "#IntercomDefaultWidget",
-              title: "Feedback",
-              content: "If you have any problems, questions, or feature requests, message the devs here!",
-              placement: "left"
-            },
-            {
-              element: "#main-nav",
-              title: "Navigation",
-              content: "Find tools to use here.  Basically everything that is not an index is a chart.",
-              placement: "bottom"
-            },
-            {
-              element: ".tourglyph",
-              title: "Guidance",
-              content: "Smaller cousins of this guy are available for tours of other pages.",
-              placement: "bottom"
-            },
-            {
-              orphan: true,
-              title: "Ready to go!",
-              content: "That's it for now. Happy hunting!"
-            }
-          ]);
-
-          $(".tourglyph").on("click",function(){
-            $('#hidden-feature').show();
-            $('g.legend:first').attr('class','legend-box');
-            tour.restart();
-          })
-
-        });
-      </script>
     {% endblock tour %}
 
     {% if user.is_authenticated %}
