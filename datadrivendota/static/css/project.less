@@ -1,5 +1,8 @@
 /* Mixins */
 
+@interest-color: #AA37CA;
+@interest-focus: #B63BD9;
+
 .rounded-corners (@radius: 5px) {
   -webkit-border-radius: @radius;
   -moz-border-radius: @radius;
@@ -35,6 +38,14 @@
   color: lightgreen;
 }
 
+.tourglyph{
+  color: @interest-color;
+}
+
+.tourglyph:hover{
+  color: @interest-focus;
+
+}
 .validity-glyph{
   position: absolute;
   right: 7px;
@@ -42,6 +53,10 @@
   font-size:15px;
   color: red;
 }
+
+// div.select2-result-label {
+//   color:black;
+// }
 
 body {
   background-image: url('../images/background.png');
@@ -91,11 +106,10 @@ img.ability {
 }
 
 
-
 .infobox {
   float: right;
   width: 300px;
-
+  background-color: #333333;
   a.thumbnail {
     display: inline-block;
   }
@@ -161,7 +175,7 @@ div#IntercomDefaultWidget {
 
 a.thumbnail:hover,
 a.thumbnail:focus {
-  border-color: #ef6d3b; /* @brand-danger, but it looks good. */
+  border-color: #B63BD9; /* @brand-danger, but it looks good. */
 }
 
 a.item.thumbnail {
@@ -170,8 +184,8 @@ a.item.thumbnail {
   position: relative;
 
   img {
-    height: 64px;
-    width: 84px;
+    height: 84px;
+    width: 111px;
   }
 
   p.overlayer {
@@ -279,7 +293,7 @@ img.hero-portrait {
 }
 
 svg {
-  background: #534a80;
+  background: #444444;
 }
 
 text {
@@ -297,7 +311,7 @@ div.tooltip {
   height: auto;
   padding: 2px;
   font: 12px sans-serif;
-  background: lightsteelblue;
+  background: #770055;
   border: 0px;
   border-radius: 8px;
   pointer-events: none;
@@ -401,6 +415,70 @@ div.winner {
 }
 
 /* Bloggity */
+div.hfeed{
+  background-color: #46365F;
+}
+
+.inset{
+  float:right;
+}
+span.inset-img{
+  border-radius: 2px;
+  border-color: black;
+}
+.caption{
+  font-family: Arial
+}
+
+div#content, div#main-block{
+  // padding:5px;
+  overflow:auto;
+  background-color: #333333;
+  background-image: url('../images/whitenoise-361x370.png');
+  border-radius: 10px 10px 10px 10px;
+  -moz-border-radius: 10px 10px 10px 10px;
+  -webkit-border-radius: 10px 10px 10px 10px;
+  border: 0px solid #000000;
+}
+div#sidebar{
+  background-color: #17181A;
+  background-image: url('../images/whitenoise-361x370.png');
+  border-radius: 10px 0px 10px 0px;
+  -moz-border-radius: 10px 0px 10px 0px;
+  -webkit-border-radius: 10px 0px 10px 0px;
+  border: 0px solid #000000;
+}
+
+a:link, a:visited {
+  color: @interest-color;
+}
+a:hover {
+  color: #B63BD9;
+}
+
+h1, h2, h3, h4, h5, h6, li{
+  color: #FFFFFF;
+}
+
+
+div#search {
+  padding-top: 10px;
+}
+
+ol.breadcrumb{
+  background-color: #686868;
+
+}
+
+p {
+  color: #CCCCCC
+}
+
+div#header ol.breadcrumb li a:visited, div#header ol.breadcrumb li a:link{
+  color: white
+}
+
+
 .entry-info {
   font-style: italic;
 }
