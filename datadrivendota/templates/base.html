@@ -123,22 +123,21 @@
 
 
       <div id="body" class="container">
-
-
         <div class="row">
+          <div id='main-block'>
 
-{% block topbar %}
-      {# Adsense #}
-      <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-      <!-- Big Bar -->
-      <ins class="adsbygoogle"
-        style="display:inline-block;width:728px;height:90px"
-        data-ad-client="ca-pub-5103417759775678"
-        data-ad-slot="2268065548"></ins>
-      <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-{% endblock topbar %}
+          {% block topbar %}
+                {# Adsense #}
+                <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                <!-- Big Bar -->
+                <ins class="adsbygoogle"
+                  style="display:inline-block;width:728px;height:90px"
+                  data-ad-client="ca-pub-5103417759775678"
+                  data-ad-slot="2268065548"></ins>
+                <script>
+                  (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+          {% endblock topbar %}
 
           {% block extra_nav %}{% endblock extra_nav %}
 
@@ -157,12 +156,11 @@
             </div>
 
             <div style='text-align:center' ><div class='glyphicon glyphicon-question-sign tourglyph'  title='Click me!' style='font-size:200px'></div>
-            <p>(Click it)</p>
             </div>
 
 
           {% endblock content %}
-
+          </div>
         </div>
       </div> <!-- /container -->
     </div>
@@ -241,6 +239,11 @@
             {
               orphan: true,
               title: "Welcome!",
+              content: "Welcome to DataDrivenDota!"
+            },
+            {
+              orphan: true,
+              title: "Intro",
               content: "We are a bit different, so let's overview a couple big things."
             },
             {
@@ -250,7 +253,7 @@
               placement: "bottom"
             },
             {
-              element: ".legend-box",
+              element: "rect:first",
               title: "Legend",
               content: "Mouse over the squares in legends to filter the data.",
               placement: "right"
