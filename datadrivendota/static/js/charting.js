@@ -161,6 +161,7 @@ function draw_legend(params, groups, svg, color){
         .attr("y", function(d, i){ return i *  20;})
         .attr("width", 10)
         .attr("height", 10)
+        .attr("class", function(d) {return groups[d['key']]['class_selector']})
         .style("fill", function(d) {
            var return_color = groups[d['key']]['color'];
            return return_color;
@@ -182,7 +183,9 @@ function draw_legend(params, groups, svg, color){
         );
 
   rows.append('text')
-    .attr("class", 'legend-text')
+    .attr("class", function(d){
+      return 'legend-text '+String(groups[d['key']]['class_selector']);
+    })
     .attr("x", 14)
     .attr("y", function(d, i){ return 11+(i *  20);})
     .text(function(d){
