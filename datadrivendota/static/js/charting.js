@@ -166,6 +166,8 @@ function draw_legend(params, groups, svg, color){
            var return_color = groups[d['key']]['color'];
            return return_color;
         })
+        .style('stroke-width',1)
+        .style('stroke','#000000')
         .on("mouseover",
           function (d, i) {
             str = '.data-toggleable:not(.'+groups[d['key']]['class_selector']+')'
@@ -563,7 +565,7 @@ function draw_scatterseries(source, placement_div){
 }
 
 
-function plot(source, div){
+function plot(source, div, callback){
     if(source.parameters['chart']=='xyplot'){
         draw_scatterplot(source, div);
     }
@@ -573,6 +575,10 @@ function plot(source, div){
     else if(source.parameters['chart']=='scatterseries'){
         draw_scatterseries(source, div);
     }
+    if (callback){
+      callback();
+    }
+
 }
 window.d3ening = {};
 window.d3ening.plot = plot;
