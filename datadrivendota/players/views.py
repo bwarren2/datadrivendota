@@ -5,7 +5,6 @@ from random import choice
 from celery import chain
 from functools import wraps
 from django.conf import settings
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, render
@@ -16,6 +15,9 @@ from .forms import (
     ApplicantForm,
     PlayerMatchesFilterForm
 )
+
+from utils.pagination import SmarterPaginator
+
 from matches.models import PlayerMatchSummary, Match
 from matches.management.tasks.valve_api_calls import (
     ApiContext,
@@ -360,16 +362,13 @@ def player_matches(request, player_id=None):
         form = PlayerMatchesFilterForm()
         pms_list = get_playermatchsummaries_for_player(player, total_results)
 
-    paginator = Paginator(pms_list, 36)
     page = request.GET.get('page')
-    try:
-        pms_list = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        pms_list = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        pms_list = paginator.page(paginator.num_pages)
+    paginator = SmarterPaginator(
+        object_list=pms_list,
+        per_page=36,
+        current_page=page
+    )
+    pms_list = paginator.current_page
 
     return render(
         request,

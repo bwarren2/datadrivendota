@@ -6,11 +6,16 @@
       <li class="disabled"><span>&laquo;</span></li>
     {% endif %}
 
-    {% for page_number in page_links_to_display %}
-      {% if page_number != pages_list.number %}
-        <li><a href="?page={{ page_number }}">{{ page_number }}</a></li>
-      {% else %}
-        <li class="active"><span>{{ page_number }}<span class="sr-only"> (current)</span></span></li>
+    {% for page_group in page_links_to_display %}
+      {% for page_number in page_group %}
+        {% if page_number != pages_list.number %}
+          <li><a href="?page={{ page_number }}">{{ page_number }}</a></li>
+        {% else %}
+          <li class="active"><span>{{ page_number }}<span class="sr-only"> (current)</span></span></li>
+        {% endif %}
+      {% endfor %}
+      {% if not forloop.last %}
+      <li class="disabled"><a href="#">&hellip;</a></li>
       {% endif %}
     {% endfor %}
 
