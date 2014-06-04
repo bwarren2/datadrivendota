@@ -1,4 +1,4 @@
-{% load staticfiles compressed navigation_extras steam_extras intercom_extras %}
+{% load staticfiles compressed navigation_extras steam_extras intercom_extras i18n %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -123,8 +123,7 @@
 
 
       <div id="body" class="container">
-        <div class="row">
-          <div id='main-block'>
+        <div id='main-block'class="row">
 
           {% block topbar %}
             <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -144,7 +143,6 @@
 
           {% block content %}
           {% endblock content %}
-          </div>
         </div>
       </div> <!-- /container -->
     </div>
