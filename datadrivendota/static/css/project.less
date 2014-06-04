@@ -2,6 +2,7 @@
 
 @interest-color: #AA37CA;
 @interest-focus: #B63BD9;
+@rich_background: #770055;
 
 .rounded-corners (@radius: 5px) {
   -webkit-border-radius: @radius;
@@ -30,6 +31,7 @@
   .rotate;
 }
 
+// Glyphs
 .win-glyph{
   position: absolute;
   left: 7px;
@@ -44,8 +46,8 @@
 
 .tourglyph:hover{
   color: @interest-focus;
-
 }
+
 .validity-glyph{
   position: absolute;
   right: 7px;
@@ -54,9 +56,9 @@
   color: red;
 }
 
-// div.select2-result-label {
-//   color:black;
-// }
+.select2-results, .select2-result-label{
+  color:black;
+}
 
 body {
   background-image: url('../images/background.png');
@@ -311,7 +313,7 @@ div.tooltip {
   height: auto;
   padding: 2px;
   font: 12px sans-serif;
-  background: #770055;
+  background: @rich_background;
   border: 0px;
   border-radius: 8px;
   pointer-events: none;
