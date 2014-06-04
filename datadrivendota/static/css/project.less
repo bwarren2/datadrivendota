@@ -3,6 +3,7 @@
 @interest-color: #AA37CA;
 @interest-focus: #B63BD9;
 @rich_background: #770055;
+@main_block_background: #333333;
 
 .rounded-corners (@radius: 5px) {
   -webkit-border-radius: @radius;
@@ -412,10 +413,9 @@ img.summary-hero-thumbshot {
 }
 
 /* Bloggity */
-div.hfeed{
-  background-color: #46365F;
-}
-
+// div.hfeed{
+//   background-color: #46365F;
+// }
 .inset{
   float:right;
 }
@@ -430,7 +430,8 @@ span.inset-img{
 div#content, div#main-block{
   // padding:5px;
   overflow:visible;
-  background-color: #333333;
+  padding: 10px;
+  background-color: @main_block_background;
   background-image: url('../images/whitenoise-361x370.png');
   border-radius: 10px 10px 10px 10px;
   -moz-border-radius: 10px 10px 10px 10px;
