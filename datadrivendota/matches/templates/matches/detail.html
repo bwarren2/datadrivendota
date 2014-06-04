@@ -224,11 +224,12 @@
             <th title='Damage to Towers'>Tower Dmg</th>
             <th title='Heal to heroes'>Hero Heal</th>
             <th title='Which side did they play for?'>Side</th>
+            <th title='Did they win?'>Win?</th>
           </tr>
         </thead>
         <tbody>
           {% for summary in summaries %}
-            <tr{% if summary.is_win %} class="winner"{% endif %}>
+            <tr>
               {% if summary.hero.thumbshot %}
                 <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
               {% else %}
@@ -274,8 +275,8 @@
               <td>{{ summary.hero_healing }}</td>
               <td>
                 {{ summary.which_side }}
-                {% if summary.is_win %} (win){% endif %}
               </td>
+              <td>{% if summary.is_win %} <div class='glyphicon glyphicon-ok-circle win-glyph' title='Won' style='font-size:15px'></div>{% endif %}</td>
             </tr>
           {% endfor %}
         </tbody>

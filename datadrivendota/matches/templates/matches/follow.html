@@ -24,9 +24,6 @@
 
             <div class="radiant col-md-6">
 
-              {% if match.match_data.Radiant.is_win %}
-              <div class='winner'>
-              {% endif %}
               <div class='scorebar topscore'
                     data-raw-score='{{ match.match_data.Radiant.kills }}/{{ match.match_data.Radiant.deaths }}/{{ match.match_data.Radiant.assists }}'
                     data-kda2='{{ match.match_data.Radiant.KDA2}}'
@@ -67,16 +64,13 @@
                     </div>
                 </div>
               {% endfor %}
+              {% if match.match_data.Radiant.is_win %}
+              <div class='col-md-2 glyphicon glyphicon-ok-circle win-glyph' title='Won'></div>
+              {% endif %}
               </div>
             </div>
-              {% if match.match_data.Radiant.is_win %}
-              </div>
-              {% endif %}
 
             <div class="dire col-md-6 ">
-              {% if match.match_data.Dire.is_win %}
-              <div class='winner'>
-              {% endif %}
 
               <div class='scorebar topscore'
                     data-raw-score='{{ match.match_data.Dire.kills }}/{{ match.match_data.Dire.deaths }}/{{ match.match_data.Dire.assists }}'
@@ -116,11 +110,12 @@
                     </div>
                   </div>
                 {% endfor %}
+              {% if match.match_data.Dire.is_win %}
+              <div class='col-md-2 glyphicon glyphicon-ok-circle win-glyph' title='Won'></div>
+              {% endif %}
+
               </div>
             </div>
-              {% if match.match_data.Dire.is_win %}
-              </div>
-              {% endif %}
 
           </div>
         </a>
