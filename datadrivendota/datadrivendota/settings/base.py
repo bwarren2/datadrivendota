@@ -493,7 +493,6 @@ PIPELINE_CSS = {
 PIPELINE_JS = {
     'all': {
         'source_filenames': (
-            'js/jquery-1.10.2.js',
             'js/jquery-ui.js',
             'js/jquery.metadata.js',
             'js/jquery.tablesorter.js',
@@ -519,7 +518,14 @@ PIPELINE_JS = {
             'js/project.js',
         ),
         'output_filename': 'js/all.js',
+    },
+    'jquery': {
+        'source_filenames': (
+            'js/jquery-1.10.2.js',
+        ),
+        'output_filename': 'js/jq.js',
     }
+
 }
 
 PIPELINE_COMPILERS = (
