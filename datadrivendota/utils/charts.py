@@ -344,6 +344,8 @@ class Chart(object):
                 '{0} datapoints have bad x values'.format(bad_ys)
             )
         self.set_y_min_max()
+        self.params.margin['left'] = calc_left_margin(
+            self.params.y_max, self.params.y_min)
 
     def postprocess(self):
 
@@ -431,7 +433,6 @@ class XYPlot(Chart):
             self.params.x_min = min([d.x_var for d in self.datalist])
         if self.params.x_max is None:
             self.params.x_max = max([d.x_var for d in self.datalist])
-        self.params.margin['left'] = calc_left_margin(self.params.y_max)
 
 
 class TasselPlot(Chart):
@@ -450,7 +451,6 @@ class TasselPlot(Chart):
             self.params.x_min = min([d.x_var for d in self.datalist])
         if self.params.x_max is None:
             self.params.x_max = max([d.x_var for d in self.datalist])
-        self.params.margin['left'] = calc_left_margin(self.params.y_max)
 
 
 class BarPlot(Chart):
@@ -466,15 +466,26 @@ class BarPlot(Chart):
         self.params.x_set = [d.x_var for d in self.datalist]
 
 
-def calc_left_margin(num):
-    if num > 1000:
-        num /= 1000
-    """There is an assumption in the charting data that things greater than a thousand get rounded down."""
-    margin = 9 * len(
-        str(
-            round(
-                num
-            )
-        )
-    )
+def calc_left_margin(max_num, min_num):
+    avg = (max_num + min_num)/2
+    k_ness = 0
+    if max_num > 1000:
+        max_num /= 1000
+        k_ness = 1
+    if min_num > 1000:
+        min_num /= 1000
+        avg /= 1000
+
+
+    """There is an assumption in the charting data that things greater than a thousand get rounded down.  However, what happens when the scale goes to 1000?  The 800 is still 3 digits."""
+    margin = 8 * (max(
+        int_length(min_num),
+        int_length(max_num),
+        int_length(avg),
+    ) + k_ness) + 12
+    print min_num, max_num, avg, int_length(min_num), int_length(max_num), int_length(avg), k_ness, margin
     return margin
+
+
+def int_length(number):
+    return len(str(round(number)))-2
