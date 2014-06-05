@@ -635,8 +635,8 @@ def match_list(request):
         for i, match in enumerate(matches):
             match_json = {}
             match_json['id'] = i
-            match_json['label'] = "M#: {0}".format(match.steam_id)
-            match_json['value'] = "M#: {0}".format(match.steam_id)
+            match_json['label'] = "{0}".format(match.steam_id)
+            match_json['value'] = "{0}".format(match.steam_id)
             results.append(match_json)
         data = json.dumps(results)
     else:
