@@ -385,6 +385,35 @@ def follow_match_feed(request):
                 }
             )
 
+
+class MatchParameterChart(MatchParameterMixin, ChartFormView):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page scatterplots end-of-game data for a match of your choice."
+        },
+        {
+            'orphan': True,
+            'title': "Example",
+            'content': "For example, you can compare kills and hero damage to see who was killstealing in a match, or hero damage and gold to see who was producing a return on investment."
+        },
+        {
+            'element': ".chart-form",
+            'title': "Asking questions",
+            'content': "Specify which attributes and match you want to render here."
+        },
+        {
+            'element': "ul.nav-tabs",
+            'title': "Other questions",
+            'content': "For other charts, like endgame data for teams, try other tabs.",
+            'placement': "bottom"
+        },
+    ]
+    title = "Match Parameter Scatter"
+    html = "matches/form.html"
+
+
 class Endgame(EndgameMixin, ChartFormView):
     tour = [
         {

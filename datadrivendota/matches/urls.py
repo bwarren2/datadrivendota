@@ -20,6 +20,11 @@ urlpatterns = patterns(
         views.OwnTeamEndgame.as_view(),
         name='own_team_endgame'
     ),
+    url(
+        r'^match-parameter-scatter/$',
+        views.MatchParameterChart.as_view(),
+        name='match_parameter_scatter'
+    ),
     url(r'^(?P<match_id>[0-9\-]*)/$', views.match, name="match_detail"),
     url(
         r'^ability-build/$',
