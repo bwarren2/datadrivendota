@@ -6,7 +6,7 @@ from .form_fields import SinglePlayerField
 from heroes.models import Role
 from heroes.form_fields import SingleHeroSelect
 from .models import Applicant
-from django.conf import settings
+
 
 def thirty_days_ago():
     return datetime.date.today() - datetime.timedelta(days=30)
