@@ -575,9 +575,9 @@ function plot(source, div, callback){
     else if(source.parameters['chart']=='scatterseries'){
         draw_scatterseries(source, div);
     }
-    if (callback){
-      callback();
-    }
+    // if (typeof callback === 'function'){
+    //   callback();
+    // }
 
 }
 window.d3ening = {};

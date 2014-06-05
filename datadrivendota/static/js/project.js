@@ -254,15 +254,12 @@ function apiHit (targetDestination, api_url, api_params, callback){
           function(json){
             d3.json(json['url'],function(source){
               var input_data = source;
-              window.d3ening.plot(source, targetDestination)
+              window.d3ening.plot(source, targetDestination, callback)
             });
           },
           'json'
         )
     .done(function() {
-      if (callback){
-        callback();
-      }
     })
     .fail(function() {})
     .always(function() {
