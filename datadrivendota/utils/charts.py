@@ -431,7 +431,7 @@ class XYPlot(Chart):
             self.params.x_min = min([d.x_var for d in self.datalist])
         if self.params.x_max is None:
             self.params.x_max = max([d.x_var for d in self.datalist])
-        self.params.margin['left'] = 9*len(str(round(self.params.y_max)))
+        self.params.margin['left'] = calc_left_margin(self.params.y_max)
 
 
 class TasselPlot(Chart):
@@ -450,7 +450,7 @@ class TasselPlot(Chart):
             self.params.x_min = min([d.x_var for d in self.datalist])
         if self.params.x_max is None:
             self.params.x_max = max([d.x_var for d in self.datalist])
-        self.params.margin['left'] = 9*len(str(round(self.params.y_max)))
+        self.params.margin['left'] = calc_left_margin(self.params.y_max)
 
 
 class BarPlot(Chart):
@@ -464,3 +464,17 @@ class BarPlot(Chart):
     def validate_data(self):
         super(BarPlot, self).validate_data()
         self.params.x_set = [d.x_var for d in self.datalist]
+
+
+def calc_left_margin(num):
+    if num > 1000:
+        num /= 1000
+    """There is an assumption in the charting data that things greater than a thousand get rounded down."""
+    margin = 9 * len(
+        str(
+            round(
+                num
+            )
+        )
+    )
+    return margin

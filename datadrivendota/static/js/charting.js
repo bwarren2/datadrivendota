@@ -289,10 +289,21 @@ function draw_scatterplot(source, placement_div){
 
     var xAxis = d3.svg.axis()
                 .scale(x).orient("bottom")
-                .tickFormat(d3.format("d")),
+                .tickFormat(function (d) {
+                    if ((d / 1000) >= 1) {
+                      d = d / 1000 + "K";
+                    }
+                    return d;
+                }),
         yAxis = d3.svg.axis()
                 .scale(y).orient("left")
-                .tickFormat(d3.format("d"));
+                .tickFormat(function (d) {
+                    if ((d / 1000) >= 1) {
+                      d = d / 1000 + "K";
+                    }
+                    return d;
+                })
+                // .tickFormat(d3.format("d"));
 
     if (params.x_ticks) {xAxis = xAxis.ticks(params.x_ticks)};
     if (params.y_ticks) {yAxis = yAxis.ticks(params.y_ticks)};
@@ -390,7 +401,15 @@ function draw_barplot(source, placement_div){
   var xAxis = d3.svg.axis().scale(x).orient("bottom")
               .tickValues(params.tick_values)
   if (params.x_ticks) {xAxis = xAxis.ticks(params.x_ticks)};
-  var yAxis = d3.svg.axis().scale(y).orient("left")
+  var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(function (d) {
+                    if ((d / 1000) >= 1) {
+                      d = d / 1000 + "K";
+                    }
+                    return d;
+                })
   if (params.y_ticks) {yAxis = yAxis.ticks(params.y_ticks)};
 
   var color = getColorScale(params);
@@ -491,7 +510,16 @@ function draw_scatterseries(source, placement_div){
   var y = linear_y_scale(params);
 
   var xAxis = d3.svg.axis().scale(x).orient("bottom"),
-      yAxis = d3.svg.axis().scale(y).orient("left");
+      yAxis = d3.svg
+        .axis()
+        .scale(y)
+        .orient("left")
+        .tickFormat(function (d) {
+                    if ((d / 1000) >= 1) {
+                      d = d / 1000 + "K";
+                    }
+                    return d;
+                });
 
   if (params.x_ticks) {xAxis = xAxis.ticks(params.x_ticks)};
   if (params.y_ticks) {yAxis = yAxis.ticks(params.y_ticks)};
