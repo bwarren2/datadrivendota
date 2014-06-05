@@ -531,6 +531,7 @@ def match_parameter_json(match_id, x_var, y_var):
 
     c.params.outerWidth = 300
     c.params.outerHeight = 300
+    c.params.x_ticks = 7
 
     return c
 
