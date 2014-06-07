@@ -343,11 +343,10 @@ class RetrievePlayerRecords(ApiFollower):
 
             self.spawnDetailCalls()
 
-            # Go around again if there are more records and the last one
-            # was before last scrape.
             logger.info("Checking for more results")
             if self.moreResultsLeft():
                 self.rebound()
+
             #Successful closeout
             else:
                 logger.info("Cleaning up")
@@ -370,32 +369,8 @@ class RetrievePlayerRecords(ApiFollower):
             ), um.s()).delay()
 
     def moreResultsLeft(self):
-
-        if self.api_context.processed >= self.api_context.matches_desired:
-            logger.info("Got what we came for")
-            return False
-        elif self.result['results_remaining'] == 0 \
-            and self.api_context.date_pull is True:
-                logger.info("Tried extra hard and failed")
-                return False
-        elif self.result['results_remaining'] == 0 \
-            and self.api_context.date_pull is False:
-
-                self.api_context.date_pull = True
-                logger.info("Tried wimpily")
-                return True
-
-        else:
-            self.api_context.date_pull = False
-            if self.api_context.deepcopy is False:
-                logger.info("Not Deepcopy")
-                return (
-                    self.api_context.last_scrape_time
-                    < self.result['matches'][-1]['start_time']
-                )
-            else:
-                logger.info("More left")
-                return True
+        return False
+        #Until the date_max problem is fixed, rebounding cannot work.
 
     def rebound(self):
         logger.info("Rebounding")
@@ -422,20 +397,24 @@ class RetrievePlayerRecords(ApiFollower):
         ), rpr.s()).delay()
 
     def cleanup(self):
-        try:
-            player = Player.objects.get(steam_id=self.api_context.account_id)
-            if self.api_context.start_scrape_time:
-                new_last_scrape = self.api_context.start_scrape_time
-            else:
-                new_last_scrape = now()
-            player.last_scrape_time = new_last_scrape
-            player.save()
-        except Player.DoesNotExist:
-            logger.error(
-                "ERROR! Player does not exist {0}".format(
-                    self.api_context.account_id
+        #If there is a player we have been focusing on
+        if self.api_context.account_id is not None:
+            try:
+                player = Player.objects.get(
+                    steam_id=self.api_context.account_id
                 )
-            )
+                if self.api_context.start_scrape_time:
+                    new_last_scrape = self.api_context.start_scrape_time
+                else:
+                    new_last_scrape = now()
+                player.last_scrape_time = new_last_scrape
+                player.save()
+            except Player.DoesNotExist:
+                logger.error(
+                    "ERROR! Player does not exist {0}".format(
+                        self.api_context.account_id
+                    )
+                )
 
 
 class UploadMatch(ApiFollower):
@@ -667,7 +646,6 @@ class AcquirePlayerData(BaseTask):
 class AcquireHeroSkillData(BaseTask):
 
     def run(self):
-        logger.info("Starting")
         if (
                 self.api_context.account_id is not None
                 or self.api_context.hero_id is None
@@ -677,17 +655,14 @@ class AcquireHeroSkillData(BaseTask):
             )
         else:
 
-            logger.info("Context Checking")
             if self.api_context.matches_requested is None:
                 self.api_context.matches_requested = 100
             self.api_context.deepcopy = False
             if self.api_context.matches_desired is None:
                 self.api_context.matches_desired = 100
             self.api_context.skill_levels = [1, 2, 3]
-            logger.info("Looping")
             for skill in self.api_context.skill_levels:
                 self.api_context.skill = skill
-
                 vac = ValveApiCall()
                 rpr = RetrievePlayerRecords()
                 pass_context = deepcopy(self.api_context)
