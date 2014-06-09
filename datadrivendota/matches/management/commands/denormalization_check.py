@@ -22,19 +22,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         full_check = options['full_denorm_check']
-        # Fix non-competitive matches
-        matches = Match.objects.filter(
-            duration__lte=settings.MIN_MATCH_LENGTH
-        )
-        matches.update(validity=Match.UNCOUNTED)
+        #Everything that is too short is uncounted
         # .exclude(lobby_type__steam_id=7)
 
         def process_matches(unprocessed):
             def too_short(unprocessed):
-                ms = unprocessed.exclude(
+                matches = unprocessed.filter(
                     duration__lte=settings.MIN_MATCH_LENGTH
                 )
-                ms.update(validity=Match.UNCOUNTED)
+                matches.update(validity=Match.UNCOUNTED)
 
             # Games that do not have ten match summaries are uncounted.
             def player_count(unprocessed):
@@ -56,14 +52,22 @@ class Command(BaseCommand):
                 )
                 ms.update(validity=Match.UNCOUNTED)
 
+            # Games with leavers do not count.
+            def game_mode_check(unprocessed):
+                ms = unprocessed.exclude(
+                    lobby_type__steam_id__in=[0, 2, 6, 7]
+                )
+                ms.update(validity=Match.UNCOUNTED)
+
             # Things with ten human players, longer than min length, where no
-            # one left count
+            # one left, in the right lobby types, count
             def legitimize(unprocessed):
                 ms = unprocessed.exclude(
                     duration__lte=settings.MIN_MATCH_LENGTH
                 )
                 ms = ms.exclude(human_players__lt=10)
                 ms = ms.exclude(playermatchsummary__leaver__steam_id__gt=1)
+                ms = ms.filter(lobby_type__steam_id__in=[0, 2, 6, 7])
                 sub_selection = ms.annotate(Count('playermatchsummary'))
                 sub_selection = sub_selection.filter(
                     playermatchsummary__count__lt=10
@@ -71,12 +75,16 @@ class Command(BaseCommand):
                 keys = sub_selection.values_list('pk', flat=True)
                 ms = ms.exclude(pk__in=keys)
                 ms.update(validity=Match.LEGIT)
+
+            too_short(unprocessed)
             player_count(unprocessed)
             human_players(unprocessed)
             leavers(unprocessed)
+            game_mode_check(unprocessed)
             legitimize(unprocessed)
 
-        if full_check is True:
+        if full_check is not None:
+            print "Doing all"
             unprocessed = Match.objects.all()
             process_matches(unprocessed)
 
