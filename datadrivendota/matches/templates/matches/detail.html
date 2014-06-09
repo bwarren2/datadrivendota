@@ -297,8 +297,13 @@
               <td>{{ summary.hero_damage }}</td>
               <td>{{ summary.tower_damage }}</td>
               <td>{{ summary.hero_healing }}</td>
-              <td>
-                {{ summary.which_side }}
+              <td class="match-summary-images">
+                {% if summary.is_radiant %}
+                  <img src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.which_side }}'>
+                {% else %}
+                  <img src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.which_side }}'>
+                {% endif %}
+
               </td>
               <td>{% if summary.is_win %} <div class='glyphicon glyphicon-ok-circle win-glyph' title='Won' style='font-size:15px'></div>{% endif %}</td>
             </tr>

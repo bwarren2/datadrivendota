@@ -82,6 +82,10 @@ def match(request, match_id):
     ).select_related().order_by('player_slot')
     for summary in summaries:
         summary.kda = summary.kills - summary.deaths + .5*summary.assists
+        if summary.which_side() == 'Radiant':
+            summary.is_radiant = True
+        else:
+            summary.is_dire = True
     match.hms_duration = datetime.timedelta(seconds=match.duration)
     match.hms_start_time = datetime.datetime.fromtimestamp(
         match.start_time
