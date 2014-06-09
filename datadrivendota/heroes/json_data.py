@@ -363,7 +363,6 @@ def hero_progression_json(hero, player, division, game_modes=None):
     c.params.x_min = 0
     c.params.x_label = 'Time (m)'
     c.params.y_label = 'Level'
-
     return c
 
 
@@ -378,6 +377,9 @@ def hero_skillbuild_winrate_json(
     hero_id = hero
     player_id = player
     game_mode_list = game_modes
+
+    def group_format(lvl):
+        return "By Level {lvl}".format(lvl=lvl)
 
     ability_lst = Ability.objects.all().select_related()
     id_name_map = {ab.steam_id: ab.name for ab in ability_lst}
@@ -458,7 +460,7 @@ def hero_skillbuild_winrate_json(
 
             d.x_var = datadict['games']
             d.y_var = datadict['winrate']
-            d.group_var = "By Level {lvl}".format(lvl=level)
+            d.group_var = group_format(level)
             d.label = to_label(build)
             d.tooltip = to_label(build)
             c.datalist.append(d)
@@ -470,7 +472,11 @@ def hero_skillbuild_winrate_json(
     #     c.groups = ['Low Skill', 'Medium Skill', 'High Skill']
     # if player is not None and c.groups is not None:
     #     c.groups.append('Player')
-
+    c.groups = [
+        group_format(x) for x in sorted(
+            level_list, key=lambda x: int(x)
+        )
+    ]
     c.params.x_min = 0
     c.params.y_min = 0
     c.params.y_max = 100
