@@ -548,7 +548,7 @@ function draw_scatterseries(source, placement_div){
     .enter()
     .append("g")
     .attr("class", function(d){
-      return 'data-toggleable'
+      return '';//data-toggleable'
       // return 'datagroup '+groups[d.values[0].group_var]['class_selector'];
     })
     .attr("id", function(d){return d.key;});
