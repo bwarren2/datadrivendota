@@ -217,7 +217,7 @@ def player_team_endgame_json(
                 else:
                     group_param = 'Lost'
             else:
-                print group_var
+                raise NoDataFound
             d.x_var = plot_x_var
             d.y_var = plot_y_var
             d.label = annotation.steam_id
@@ -664,9 +664,6 @@ def match_list_json(matches, players):
     )
 
     c = TasselPlot()
-    print "=+=+=+"
-    print ordered_sbs
-    print "=+=+=+"
     groups = []
     for build in ordered_sbs:
         if build['level'] == 1:
@@ -691,7 +688,6 @@ def match_list_json(matches, players):
         d.panel_var = 'Skill Progression'
         c.datalist.append(d)
     c.groups = groups
-    print groups
     c.params.x_min = 0
     c.params.path_stroke_width = 3
     c.params.x_label = 'Time (m)'
