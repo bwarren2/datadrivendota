@@ -333,6 +333,12 @@ def hero_progression_json(hero, player, division, game_modes=None):
         elif division == 'Skill':
             group = "{s}".format(
                 s=skill_value)
+
+            #Contextual ordering
+            c.groups = ['Low Skill', 'Medium Skill', 'High Skill']
+            if player is not None and c.groups is not None:
+                c.groups.append('Player')
+
         elif division == 'Win/loss':
             group = "{win}".format(
                 win=winningness)
