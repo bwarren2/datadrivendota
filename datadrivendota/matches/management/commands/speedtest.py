@@ -166,7 +166,7 @@ class Command(BaseCommand):
             setup = "from matches.json_data import {0}".format(fn)
             s = timeit.Timer("""match_list_json(
                     matches=[528300921,528019632],
-                    player_list=[85045426]
+                    players=[85045426]
                     )""", setup=setup).repeat(1, 1)
             output_print(s, fn)
 

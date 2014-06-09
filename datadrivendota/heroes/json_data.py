@@ -466,6 +466,11 @@ def hero_skillbuild_winrate_json(
     if c.datalist == []:
         raise NoDataFound
 
+    #     if group_var == 'skill_name':
+    #     c.groups = ['Low Skill', 'Medium Skill', 'High Skill']
+    # if player is not None and c.groups is not None:
+    #     c.groups.append('Player')
+
     c.params.x_min = 0
     c.params.y_min = 0
     c.params.y_max = 100
@@ -632,8 +637,6 @@ def hero_performance_lineup(
 
 
 def hero_pick_rate_lineup(var, skill_level, player, heroes):
-
-    print var, skill_level, player, heroes
 
     match_pool = Match.objects.filter(
         game_mode__steam_id__in=[2],
