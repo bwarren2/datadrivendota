@@ -101,6 +101,7 @@ def match(request, match_id):
                 'hero_machine_name': summary.hero.machine_name,
                 'ability_dict': [
                     {
+                        'name': sb.ability.name,
                         'machine_name': sb.ability.machine_name,
                         'picture_url': sb.ability.picture.url
                     } for sb in SkillBuild.objects.filter(
@@ -116,6 +117,7 @@ def match(request, match_id):
                 'hero_machine_name': summary.hero.machine_name,
                 'ability_dict': [
                     {
+                        'name': sb.ability.name,
                         'machine_name': sb.ability.machine_name,
                         'picture_url': sb.ability.picture.url
                     } for sb in SkillBuild.objects.filter(
