@@ -169,6 +169,8 @@ def player_winrate_json(
         c.params.draw_legend = False
 
     c.params.y_max = 100
+    c.params.y_min = 0
+    c.params.x_min = 0
     c.params.x_label = 'Games'
     c.params.y_label = 'Winrate'
     c.params.draw_path = False
