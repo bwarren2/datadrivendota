@@ -711,6 +711,8 @@ def player_role_json(
                 y_label = "{p} Winrate".format(p=p2_obj.display_name)
         c.datalist.append(d)
 
+    c.params.x_ticks = 7
+    c.params.x_ticks = 7
     c.params.x_label = x_label
     c.params.y_label = y_label
 
