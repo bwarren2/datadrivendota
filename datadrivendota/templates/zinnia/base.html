@@ -24,11 +24,11 @@
 
 {% block sidebar %}
 <div id="search" class="widget">
-  <form method="get" action="{% url 'zinnia_entry_search' %}">
-    <p>
-      <input type="text" name="pattern" placeholder="{% trans "Keywords..." %}" {% if pattern %}value="{{ pattern }}"{% endif %} />
-      <input type="submit" class="submitbutton" value="OK" />
-    </p>
+  <form action="{% url 'zinnia_entry_search' %}" role="search" class="form-inline">
+    <div class="form-group">
+      <input type="text" class="form-control" name="pattern" placeholder="{% trans "Keywords..." %}"{% if pattern %} value="{{ pattern }}"{% endif %}>
+    </div>
+    <button type="submit" class="btn btn-default">OK</button>
   </form>
 </div>
 <div id="widget-categories" class="widget">
