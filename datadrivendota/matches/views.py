@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404
 from django.shortcuts import render
 from django.conf import settings
+from django.views.generic.base import TemplateView
 
 from utils.pagination import SmarterPaginator
 from heroes.models import Hero, Role
@@ -378,6 +379,10 @@ def follow_match_feed(request):
                     'form': form,
                 }
             )
+
+
+class MatchHeroContext(TemplateView):
+    template_name = 'matches/match_hero_context.html'
 
 
 class MatchParameterChart(MatchParameterMixin, ChartFormView):

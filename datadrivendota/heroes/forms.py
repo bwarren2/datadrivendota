@@ -2,8 +2,9 @@ import datetime
 from django import forms
 from django.forms import ValidationError
 from django.forms.widgets import CheckboxSelectMultiple
-from matches.form_fields import MultiGameModeSelect
+from matches.form_fields import MultiGameModeSelect, MultiMatchSelect
 from players.form_fields import SinglePlayerField
+from datadrivendota.form_fields import OutcomeField
 from .form_fields import MultiHeroSelect, SingleHeroSelect, MultiLeveLSelect
 from utils import list_to_choice_list
 thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
@@ -98,6 +99,7 @@ class HeroPlayerPerformance(forms.Form):
         'kills',
         'deaths',
         'assists',
+        'K-D+.5*A',
         'gold_total',
         'xp_total',
         'last_hits',
@@ -106,7 +108,8 @@ class HeroPlayerPerformance(forms.Form):
         'tower_damage',
         'hero_healing',
         'level',
-        'K-D+.5*A',
+        'gold_per_min',
+        'xp_per_min',
     ]
     X_PARAMETERS = list(SHARED_PARAMETERS)
     X_PARAMETERS.insert(0, 'duration')
@@ -118,13 +121,6 @@ class HeroPlayerPerformance(forms.Form):
     hero = SingleHeroSelect(
         required=True,
         help_text='Pick only one hero'
-    )
-    player = SinglePlayerField(
-        required=False,
-        help_text='Pick only one player'
-    )
-    game_modes = MultiGameModeSelect(
-        help_text='Which game modes would you like to sample?'
     )
     x_var = forms.ChoiceField(
         choices=X_LIST, initial='duration',
@@ -156,6 +152,18 @@ class HeroPlayerPerformance(forms.Form):
             "1 is normal, 2 is high, 3 is very high."
         )
     )
+    player = SinglePlayerField(
+        required=False,
+        help_text='Pick only one player'
+    )
+    game_modes = MultiGameModeSelect(
+        help_text='Which game modes would you like to sample?'
+    )
+    matches = MultiMatchSelect(
+        required=False,
+        help_text='Optionally plot some matches here'
+    )
+    outcome = OutcomeField(required=False)
 
 
 class HeroPlayerSkillBarsForm(forms.Form):
@@ -211,6 +219,11 @@ class HeroProgressionForm(forms.Form):
         required=True,
         help_text='How should the datasets be partitioned?'
     )
+    matches = MultiMatchSelect(
+        required=False,
+        help_text='Optionally plot some matches here'
+    )
+    outcome = OutcomeField(required=False)
 
 
 class HeroBuildForm(forms.Form):
@@ -281,8 +294,7 @@ class HeroPerformanceLineupForm(forms.Form):
         help_text='Start times for included dates must be on or before this'
     )
     max_date.widget = forms.TextInput(attrs={'class': 'datepicker'})
-    is_win = forms.ChoiceField(
-        choices=IS_WIN_CHOICES,
+    outcome = OutcomeField(
         required=True,
         help_text='Games where they win, lose, or both?'
     )
