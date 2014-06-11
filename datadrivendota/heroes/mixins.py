@@ -50,6 +50,8 @@ class HeroPerformanceMixin(object):
         'y_var',
         'group_var',
         'panel_var',
+        'matches',
+        'outcome',
     ]
     json_function = staticmethod(hero_performance_chart_json)
 
@@ -61,6 +63,8 @@ class HeroSkillProgressionMixin(object):
         'player',
         'game_modes',
         'division',
+        'matches',
+        'outcome',
     ]
     json_function = staticmethod(hero_progression_json)
 
@@ -94,7 +98,7 @@ class HeroPerformanceLineupMixin(object):
         'skill_level',
         'min_date',
         'max_date',
-        'is_win',
+        'outcome',
         'heroes',
     ]
     json_function = staticmethod(hero_performance_lineup)

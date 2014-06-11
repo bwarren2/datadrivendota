@@ -89,6 +89,7 @@ def upgrade(request):
 
 
 class FormView(View):
+    """This is an outdated method of dispatching and altering charts, scheduled for deprecation.  You can tell by the datalist, params entrypoint of times gone by, before class based charts.  ChartFormView is the preferred method now."""
 
     tour = None
     form = None
