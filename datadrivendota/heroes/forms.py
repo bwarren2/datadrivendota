@@ -281,8 +281,7 @@ class HeroPerformanceLineupForm(forms.Form):
         help_text='Start times for included dates must be on or before this'
     )
     max_date.widget = forms.TextInput(attrs={'class': 'datepicker'})
-    is_win = forms.ChoiceField(
-        choices=IS_WIN_CHOICES,
+    outcome = OutcomeField(
         required=True,
         help_text='Games where they win, lose, or both?'
     )
