@@ -7,10 +7,10 @@ from time import mktime
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.conf import settings
 
+from utils.pagination import SmarterPaginator
 from heroes.models import Hero, Role
 from .models import Match, PlayerMatchSummary, PickBan, SkillBuild
 from .mixins import (
@@ -262,17 +262,13 @@ def follow_match_feed(request):
             match_list = match_list.select_related()\
                 .distinct().order_by('-start_time')[:total_results]
 
-            paginator = Paginator(match_list, results_per_page)
             page = request.GET.get('page')
-            try:
-                match_list = paginator.page(page)
-            except PageNotAnInteger:
-                # If page is not an integer, deliver first page.
-                match_list = paginator.page(1)
-            except EmptyPage:
-                # If page is out of range (e.g. 9999), deliver last page of
-                # results.
-                match_list = paginator.page(paginator.num_pages)
+            paginator = SmarterPaginator(
+                object_list=match_list,
+                per_page=results_per_page,
+                current_page=page
+            )
+            match_list = paginator.current_page
 
             pms_list = PlayerMatchSummary.\
                 objects.filter(match__in=match_list)\
@@ -297,17 +293,13 @@ def follow_match_feed(request):
             match_list = match_list.select_related()\
                 .distinct().order_by('-start_time')[:total_results]
 
-            paginator = Paginator(match_list, results_per_page)
             page = request.GET.get('page')
-            try:
-                match_list = paginator.page(page)
-            except PageNotAnInteger:
-                # If page is not an integer, deliver first page.
-                match_list = paginator.page(1)
-            except EmptyPage:
-                # If page is out of range (e.g. 9999), deliver last page of
-                # results.
-                match_list = paginator.page(paginator.num_pages)
+            paginator = SmarterPaginator(
+                object_list=match_list,
+                per_page=results_per_page,
+                current_page=page
+            )
+            match_list = paginator.current_page
 
             pms_list = PlayerMatchSummary.\
                 objects.filter(match__in=match_list).select_related()
@@ -357,17 +349,13 @@ def follow_match_feed(request):
             match_list = match_list.select_related()\
                 .distinct().order_by('-start_time')[:total_results]
 
-            paginator = Paginator(match_list, results_per_page)
             page = request.GET.get('page')
-            try:
-                match_list = paginator.page(page)
-            except PageNotAnInteger:
-                # If page is not an integer, deliver first page.
-                match_list = paginator.page(1)
-            except EmptyPage:
-                # If page is out of range (e.g. 9999), deliver last page of
-                # results.
-                match_list = paginator.page(paginator.num_pages)
+            paginator = SmarterPaginator(
+                object_list=match_list,
+                per_page=results_per_page,
+                current_page=page
+            )
+            match_list = paginator.current_page
 
             pms_list = PlayerMatchSummary.\
                 objects.filter(match__in=match_list).select_related()
