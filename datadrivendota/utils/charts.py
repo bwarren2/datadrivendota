@@ -483,7 +483,6 @@ def calc_left_margin(max_num, min_num):
         int_length(max_num),
         int_length(avg),
     ) + k_ness) + 12
-    print min_num, max_num, avg, int_length(min_num), int_length(max_num), int_length(avg), k_ness, margin
     return margin
 
 

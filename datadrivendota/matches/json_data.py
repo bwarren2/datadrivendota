@@ -254,7 +254,7 @@ def player_endgame_json(
         x_var,
         y_var,
         panel_var,
-        group_var
+        group_var,
         ):
     #Gives the player's endgame results
     db_args = db_arg_map(
