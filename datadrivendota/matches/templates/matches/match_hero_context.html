@@ -1,0 +1,182 @@
+{% extends "matches/base.html" %}
+
+{% block title %}Contextualizer{% endblock title %}
+
+{% block page_title %}Contextualizer
+  {# <div class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></div> #}
+{% endblock page_title %}
+
+{% block content %}
+
+  <h4><a href="{% url "heroes:detail" hero_name=hero_name %}">{{hero_name}}</a> in {{matches}} against game outcome: {{win}}</h4>
+  <div class="row">
+    <div class="player-charts col-md-4">
+    <h4>KDA2</h4>
+        <span id='hero_kda2_chart'></span>
+    </div>
+    <div class="player-charts col-md-4">
+    <h4>Hero Damage vs. Gold</h4>
+        <span id='roi_chart'></span>
+    </div>
+    <div class="player-charts col-md-4">
+    <h4>Last Hits vs. Denies</h4>
+        <span id='hit_deny'></span>
+    </div>
+
+  </div>
+  <div class="row">
+    <div class="player-charts col-md-4">
+    <h4>Gold/min vs. XP/min</h4>
+        <span id='gold_xp'></span>
+    </div>
+    <div class="player-charts col-md-4">
+    <h4>Tower Damage</h4>
+        <span id='tower_damage'></span>
+    </div>
+
+    <div class="player-charts col-md-4">
+    <h4>Level Progression</h4>
+        <span id='hero_progression_chart'></span>
+    </div>
+
+  </div>
+
+
+
+{% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+  window.apiHit(
+    "#hero_progression_chart",
+    '{% url "heroes:api_skill_progression_chart" %}',
+      $.param({
+        hero: "{{hero_name}}",
+        matches: "{{matches}}",
+        outcome: "{{win}}",
+        game_modes: [1, 2, 3, 4, 5],
+        division: 'Skill',
+        width: 300,
+        height: 300,
+      }, true
+    )
+  );
+
+    window.apiHit(
+      "#tower_damage",
+      '{% url "heroes:api_hero_performance_chart" %}',
+        $.param({
+          hero: "{{ hero_name|safe }}",
+          matches: "{{matches}}",
+          outcome: "{{win}}",
+          x_var: 'duration',
+          y_var: 'tower_damage',
+          group_var: 'skill_name',
+          panel_var: 'None',
+          chart: 'hero_performance_chart',
+          width: 300,
+          height: 300,
+          game_modes: [1,2,3,4,5],
+          x_ticks: 6,
+        }, true
+      )
+    );
+    window.apiHit(
+      "#gold_xp",
+      '{% url "heroes:api_hero_performance_chart" %}',
+        $.param({
+          hero: "{{ hero_name|safe }}",
+          matches: "{{matches}}",
+          outcome: "{{win}}",
+          x_var: 'gold_per_min',
+          y_var: 'xp_per_min',
+          group_var: 'skill_name',
+          panel_var: 'None',
+          chart: 'hero_performance_chart',
+          width: 300,
+          height: 300,
+          game_modes: [1,2,3,4,5],
+          x_ticks: 6,
+        }, true
+      )
+    );
+    window.apiHit(
+      "#hit_deny",
+      '{% url "heroes:api_hero_performance_chart" %}',
+        $.param({
+          hero: "{{ hero_name|safe }}",
+          matches: "{{matches}}",
+          outcome: "{{win}}",
+          x_var: 'last_hits',
+          y_var: 'denies',
+          group_var: 'skill_name',
+          panel_var: 'None',
+          chart: 'hero_performance_chart',
+          width: 300,
+          height: 300,
+          game_modes: [1,2,3,4,5],
+          x_ticks: 6,
+        }, true
+      )
+    );
+
+    window.apiHit(
+      "#hero_kda2_chart",
+      '{% url "heroes:api_hero_performance_chart" %}',
+        $.param({
+          hero: "{{ hero_name|safe }}",
+          matches: "{{matches}}",
+          outcome: "{{win}}",
+          x_var: 'duration',
+          y_var: 'K-D+.5*A',
+          group_var: 'skill_name',
+          panel_var: 'None',
+          chart: 'hero_performance_chart',
+          width: 300,
+          height: 300,
+          game_modes: [1,2,3,4,5],
+          x_ticks: 6,
+        }, true
+      )
+    );
+    window.apiHit(
+      "#roi_chart",
+      '{% url "heroes:api_hero_performance_chart" %}',
+        $.param({
+          hero: "{{ hero_name|safe }}",
+          matches: "{{matches}}",
+          outcome: "{{win}}",
+          x_var: 'gold_total',
+          y_var: 'hero_damage',
+          group_var: 'skill_name',
+          panel_var: 'None',
+          chart: 'hero_performance_chart',
+          width: 300,
+          height: 300,
+          game_modes: [1,2,3,4,5],
+          x_ticks: 6,
+        }, true
+      )
+    );
+</script>
+{% endblock extra_js %}
+
+{# {% block tour %}
+<script type="text/javascript">
+  $(function () {
+    var tour = new Tour({
+      backdrop: true
+    });
+
+    tour.addSteps(
+      {{tour|safe}}
+    );
+
+    $(".tourglyph").on("click",function(){
+      tour.restart();
+    })
+
+  });
+</script>
+{% endblock tour %}
+ #}

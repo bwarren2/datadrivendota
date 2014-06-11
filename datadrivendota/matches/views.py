@@ -10,6 +10,7 @@ from django.http import Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.conf import settings
+from django.views.generic.base import TemplateView
 
 from heroes.models import Hero, Role
 from .models import Match, PlayerMatchSummary, PickBan, SkillBuild
@@ -390,6 +391,10 @@ def follow_match_feed(request):
                     'form': form,
                 }
             )
+
+
+class MatchHeroContext(TemplateView):
+    template_name = 'matches/match_hero_context.html'
 
 
 class MatchParameterChart(MatchParameterMixin, ChartFormView):

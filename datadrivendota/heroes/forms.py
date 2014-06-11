@@ -99,6 +99,7 @@ class HeroPlayerPerformance(forms.Form):
         'kills',
         'deaths',
         'assists',
+        'K-D+.5*A',
         'gold_total',
         'xp_total',
         'last_hits',
@@ -107,7 +108,8 @@ class HeroPlayerPerformance(forms.Form):
         'tower_damage',
         'hero_healing',
         'level',
-        'K-D+.5*A',
+        'gold_per_min',
+        'xp_per_min',
     ]
     X_PARAMETERS = list(SHARED_PARAMETERS)
     X_PARAMETERS.insert(0, 'duration')
@@ -161,7 +163,7 @@ class HeroPlayerPerformance(forms.Form):
         required=False,
         help_text='Optionally plot some matches here'
     )
-    outcome = OutcomeField()
+    outcome = OutcomeField(required=False)
 
 
 class HeroPlayerSkillBarsForm(forms.Form):
@@ -217,6 +219,11 @@ class HeroProgressionForm(forms.Form):
         required=True,
         help_text='How should the datasets be partitioned?'
     )
+    matches = MultiMatchSelect(
+        required=False,
+        help_text='Optionally plot some matches here'
+    )
+    outcome = OutcomeField(required=False)
 
 
 class HeroBuildForm(forms.Form):

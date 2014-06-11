@@ -63,6 +63,8 @@ class HeroSkillProgressionMixin(object):
         'player',
         'game_modes',
         'division',
+        'matches',
+        'outcome',
     ]
     json_function = staticmethod(hero_progression_json)
 
