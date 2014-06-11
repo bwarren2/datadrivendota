@@ -553,7 +553,7 @@ def update_player_winrate(
 def hero_performance_lineup(
     stat,
     skill_level,
-    is_win,
+    outcome,
     heroes,
     min_date=None,
     max_date=None,

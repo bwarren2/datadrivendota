@@ -94,7 +94,7 @@ class HeroPerformanceLineupMixin(object):
         'skill_level',
         'min_date',
         'max_date',
-        'is_win',
+        'outcome',
         'heroes',
     ]
     json_function = staticmethod(hero_performance_lineup)
