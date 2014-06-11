@@ -50,6 +50,8 @@ class HeroPerformanceMixin(object):
         'y_var',
         'group_var',
         'panel_var',
+        'matches',
+        'outcome',
     ]
     json_function = staticmethod(hero_performance_chart_json)
 

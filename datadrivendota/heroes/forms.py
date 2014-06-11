@@ -120,13 +120,6 @@ class HeroPlayerPerformance(forms.Form):
         required=True,
         help_text='Pick only one hero'
     )
-    player = SinglePlayerField(
-        required=False,
-        help_text='Pick only one player'
-    )
-    game_modes = MultiGameModeSelect(
-        help_text='Which game modes would you like to sample?'
-    )
     x_var = forms.ChoiceField(
         choices=X_LIST, initial='duration',
         required=True,
@@ -157,6 +150,18 @@ class HeroPlayerPerformance(forms.Form):
             "1 is normal, 2 is high, 3 is very high."
         )
     )
+    player = SinglePlayerField(
+        required=False,
+        help_text='Pick only one player'
+    )
+    game_modes = MultiGameModeSelect(
+        help_text='Which game modes would you like to sample?'
+    )
+    matches = MultiMatchSelect(
+        required=False,
+        help_text='Optionally plot some matches here'
+    )
+    outcome = OutcomeField()
 
 
 class HeroPlayerSkillBarsForm(forms.Form):

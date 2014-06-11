@@ -180,6 +180,8 @@ def hero_performance_chart_json(
     group_var,
     panel_var,
     game_modes=None,
+    matches=None,
+    outcome='both',
 ):
     if game_modes is None:
         game_modes = [
@@ -193,6 +195,12 @@ def hero_performance_chart_json(
         hero__steam_id=hero,
         match__validity=Match.LEGIT
     )
+
+    if outcome == 'win':
+        superset_pmses.filter(is_win=True)
+    elif outcome == 'loss':
+        superset_pmses.filter(is_win=False)
+
     skill1 = superset_pmses.filter(match__skill=1)\
         .order_by('-match__start_time').select_related()[:100]
     skill2 = superset_pmses.filter(match__skill=2)\
@@ -209,6 +217,17 @@ def hero_performance_chart_json(
     else:
         pms_pool = list(chain(skill1, skill2, skill3))
         player_game_ids = []
+
+    """If you are explicitly telling me you want certain information, there is minimal filtration occurring."""
+    if matches is not None:
+        requested_pmses = PlayerMatchSummary.objects.filter(
+            hero__steam_id=hero,
+            match__steam_id__in=matches,
+        )
+        pms_pool.extend(list(requested_pmses))
+        requested_game_ids = fetch_match_attributes(
+            requested_pmses, 'match_id'
+        )[0]
 
     if len(pms_pool) == 0:
         raise NoDataFound
@@ -237,9 +256,13 @@ def hero_performance_chart_json(
 
             #Ajax API requests can't send None over the wire
             if valid_var(group_var):
-                if group_var == 'skill_name'\
-                        and pms.match.steam_id in player_game_ids:
-                            d.group_var = 'Player'
+                if group_var == 'skill_name':
+                    if pms.match.steam_id in requested_game_ids:
+                        d.group_var = 'Specified'
+                    elif pms.match.steam_id in player_game_ids:
+                        d.group_var = 'Player'
+                    else:
+                        d.group_var = fetch_pms_attribute(pms, group_var)
                 else:
                     d.group_var = fetch_pms_attribute(pms, group_var)
 
@@ -261,6 +284,8 @@ def hero_performance_chart_json(
         c.groups = ['Low Skill', 'Medium Skill', 'High Skill']
     if player is not None and c.groups is not None:
         c.groups.append('Player')
+    if matches is not None and c.groups is not None:
+        c.groups.append('Specified')
     return c
 
 
