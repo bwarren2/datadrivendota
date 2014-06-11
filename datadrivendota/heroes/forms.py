@@ -2,8 +2,9 @@ import datetime
 from django import forms
 from django.forms import ValidationError
 from django.forms.widgets import CheckboxSelectMultiple
-from matches.form_fields import MultiGameModeSelect
+from matches.form_fields import MultiGameModeSelect, MultiMatchSelect
 from players.form_fields import SinglePlayerField
+from datadrivendota.form_fields import OutcomeField
 from .form_fields import MultiHeroSelect, SingleHeroSelect, MultiLeveLSelect
 from utils import list_to_choice_list
 thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
