@@ -34,7 +34,9 @@ urlpatterns = patterns(
     url(r'^progression-list/$',
         views.ProgressionList.as_view(),
         name="progession_list"),
-    url(r'^(?P<matches>[0-9\,]*)_(?P<hero_name>[a-zA-Z0-9\-\_]*)_(?P<win>[a-z]*)/$',
+
+    url(
+        r'^(?P<matches>[0-9\,]*)_(?P<hero_name>[a-zA-Z0-9 \-\_\']*)_(?P<win>[a-z]*)/$',
         views.MatchHeroContext.as_view(),
         name="match_hero_context"),
     # url(r'^overview/$', views.overview, name="overview"),
