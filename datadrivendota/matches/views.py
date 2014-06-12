@@ -89,8 +89,8 @@ def match(request, match_id):
             summary.is_dire = True
         if summary.leaver.steam_id != 0:
             summary.improper_player = True
-        else:
-            summary.improper_player = False
+        if summary.is_win:
+            summary.won = True
     match.hms_duration = datetime.timedelta(seconds=match.duration)
     match.hms_start_time = datetime.datetime.fromtimestamp(
         match.start_time
