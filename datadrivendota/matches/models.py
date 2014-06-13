@@ -450,7 +450,7 @@ def fetch_attribute_label(attribute):
     elif attribute == 'game_mode':
         label = 'GameMode'
     elif attribute == 'skill':
-        label = 'Skill(3=High)'
+        label = 'Skill(3=VeryHigh)'
     elif attribute == 'hero_name':
         label = 'HeroName'
     elif attribute == 'first_blood_time':
@@ -468,11 +468,11 @@ def fetch_attribute_label(attribute):
 
 def skill_name(skill):
     if skill == 1:
-        return 'Low Skill'
+        return 'Normal Skill'
     if skill == 2:
-        return 'Medium Skill'
-    if skill == 3:
         return 'High Skill'
+    if skill == 3:
+        return 'Very High Skill'
     else:
         return skill
 
