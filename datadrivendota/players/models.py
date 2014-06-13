@@ -72,6 +72,8 @@ class UserProfile(models.Model):
     following = models.ManyToManyField('Player', related_name='quarry')
     tracking = models.ManyToManyField('Player', related_name='feed')
     track_limit = models.IntegerField(default=7)
+    requested = models.ForeignKey('MatchRequest', null=True)
+    track_limit = models.IntegerField(default=10)
 
     def add_tracking(self, player):
         if len(self.tracking >= int(self.track_limit)):
@@ -87,6 +89,10 @@ class UserProfile(models.Model):
             unicode(self.user),
             unicode(self.player)
         )
+
+
+class MatchRequest(models.Model):
+    match_id = models.IntegerField()
 
 
 class Applicant(models.Model):
