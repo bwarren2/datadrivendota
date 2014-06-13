@@ -44,11 +44,11 @@ def standard_color_map(group):
             return settings.RADIANT_GREEN
     elif group == 'Dire':
             return settings.DIRE_RED
-    elif group == 'Low Skill':
+    elif group == 'Normal Skill':
             return settings.SKILL1_COLOR
-    elif group == 'Medium Skill':
-            return settings.SKILL2_COLOR
     elif group == 'High Skill':
+            return settings.SKILL2_COLOR
+    elif group == 'Very High Skill':
             return settings.SKILL3_COLOR
     elif group == 'Player':
             return settings.SKILLPLAYER_COLOR
