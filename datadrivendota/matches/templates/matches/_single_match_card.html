@@ -22,7 +22,7 @@
     <img class='cast-player-image' src="{{summary.player_image}}" title='{{summary.player_name}}'>
   {% endif %}
 
-  <a href="{% url 'matches:match_hero_context' matches=match.steam_id hero_name=summary.hero.name win='both'%}">
+  <a href="{% url 'matches:match_hero_context' matches=match.steam_id hero_name=summary.hero_name win='both'%}">
   <i class='glyphicon glyphicon-signal chart-pip'  title='Click me!' style='display:inline-block'></i>
   </a>
 {% else %}
