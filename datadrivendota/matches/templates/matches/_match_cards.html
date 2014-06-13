@@ -1,5 +1,12 @@
+{% load staticfiles player_extras %}
+
 <div class="row" style='padding-top:10px'>
-<div class="cast col-md-1"></div>
+<div class="cast col-md-1">
+  <img class='side-pip' src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.which_side }}' title='Radiant'>
+  {% if radiant_cast_list.0.is_win %}
+    <div class='glyphicon glyphicon-ok-circle win-glyph side-win-pip ' title='Won'></div>
+  {% endif %}
+</div>
   {% for summary in radiant_cast_list %}
     <div class="cast radiant col-md-2">
       {% include "matches/_single_match_card.html" %}
@@ -7,7 +14,12 @@
   {% endfor %}
 </div>
 <div class="row" style='padding-top:10px'>
-  <div class="cast col-md-1"></div>
+  <div class="cast col-md-1">
+    <img class='side-pip' src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.which_side }}'  title='Dire'>
+  {% if dire_cast_list.0.is_win %}
+    <div class='glyphicon glyphicon-ok-circle win-glyph side-win-pip' title='Won'></div>
+  {% endif %}
+  </div>
   {% for summary in dire_cast_list %}
     <div class="cast dire col-md-2">
       {% include "matches/_single_match_card.html" %}
