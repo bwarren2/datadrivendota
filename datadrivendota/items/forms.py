@@ -6,9 +6,9 @@ from matches.form_fields import MultiGameModeSelect
 
 class ItemWinrateForm(forms.Form):
     SKILL_LEVELS = [
-        (1, 'Low Skill'),
-        (2, 'Medium Skill'),
-        (3, 'High Skill'),
+        (1, 'Normal Skill'),
+        (2, 'High Skill'),
+        (3, 'Very High Skill'),
     ]
 
     player = SinglePlayerField(

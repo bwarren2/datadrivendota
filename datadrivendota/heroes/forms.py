@@ -265,9 +265,9 @@ class HeroPerformanceLineupForm(forms.Form):
     ]
     Y_LIST = list_to_choice_list(STAT_POOL)
     SKILL_LEVELS = [
-        (1, 'Low Skill'),
-        (2, 'Medium Skill'),
-        (3, 'High Skill'),
+        (1, 'Normal Skill'),
+        (2, 'High Skill'),
+        (3, 'Very High Skill'),
     ]
     IS_WIN_LIST = ['win', 'loss', 'both']
     IS_WIN_CHOICES = list_to_choice_list(IS_WIN_LIST)
@@ -315,9 +315,9 @@ class HeroPickRateForm(forms.Form):
     ]
     Y_LIST = list_to_choice_list(CHOICE_LIST)
     SKILL_LEVELS = [
-        (1, 'Low Skill'),
-        (2, 'Medium Skill'),
-        (3, 'High Skill'),
+        (1, 'Normal Skill'),
+        (2, 'High Skill'),
+        (3, 'Very High Skill'),
     ]
 
     var = forms.ChoiceField(

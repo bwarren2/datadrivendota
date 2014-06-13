@@ -176,7 +176,7 @@ class HeroPerformance(HeroPerformanceMixin, ChartFormView):
         {
             'orphan': True,
             'title': "Important note!",
-            'content': "Valve automagically determines their own skill bracketing, with 1-2-3 being low-medium-high."
+            'content': "Valve automagically determines their own skill bracketing, with 1-2-3 being normal-high-very high."
         },
         {
             'element': "#main-nav",
@@ -215,7 +215,7 @@ class HeroSkillProgression(HeroSkillProgressionMixin, ChartFormView):
         {
             'orphan': True,
             'title': "Example",
-            'content': "For example, you can see how quickly high skill Anti-Mage players farm compared to low skill ones, and include your own data (if you are being imported)."
+            'content': "For example, you can see how quickly very-high skill Anti-Mage players farm compared to normal skill ones, and include your own data (if you are being imported)."
         },
         {
             'orphan': True,
@@ -230,7 +230,7 @@ class HeroSkillProgression(HeroSkillProgressionMixin, ChartFormView):
         {
             'orphan': True,
             'title': "Important note!",
-            'content': "The skill designation is given automagically by Valve; 1-2-3 correspond to low-medium-high."
+            'content': "The skill designation is given automagically by Valve; 1-2-3 correspond to normal-high-very high."
         },
         {
             'element': "#main-nav",
@@ -241,7 +241,7 @@ class HeroSkillProgression(HeroSkillProgressionMixin, ChartFormView):
         {
             'orphan': True,
             'title': "Ready to go!",
-            'content': "Challenge: for your favorite hero, how many more levels can high-skill players have over low skill players at the 30 minute mark?"
+            'content': "Challenge: for your favorite hero, how many more levels can high-skill players have over normal skill players at the 30 minute mark?"
         }
     ]
     title = "Hero Skilling"
