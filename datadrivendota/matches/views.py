@@ -11,9 +11,10 @@ from django.shortcuts import render
 from django.conf import settings
 from django.views.generic.base import TemplateView
 
+from utils.views import cast_dict, ability_infodict
 from utils.pagination import SmarterPaginator
 from heroes.models import Hero, Role
-from .models import Match, PlayerMatchSummary, PickBan, SkillBuild
+from .models import Match, PlayerMatchSummary, PickBan
 from .mixins import (
     EndgameMixin,
     OwnTeamEndgameMixin,
@@ -81,6 +82,12 @@ def match(request, match_id):
     summaries = PlayerMatchSummary.objects.filter(
         match=match
     ).select_related().order_by('player_slot')
+    radiant_slots = sorted(
+        [s.player_slot for s in summaries if s.which_side() == 'Radiant']
+    )
+    dire_slots = sorted(
+        [s.player_slot for s in summaries if s.which_side() == 'Radiant']
+    )
     for summary in summaries:
         summary.kda = summary.kills - summary.deaths + .5*summary.assists
         if summary.which_side() == 'Radiant':
@@ -100,40 +107,11 @@ def match(request, match_id):
         summary for summary in summaries if summary.which_side() == 'Radiant'
     ]
     radiant_infodict = {}
+    radiant_cast_list = []
     min_skill_length = 10  # Check if a row lacks data, aka things are borked.
     for summary in radiant_summaries:
-        try:
-            radiant_infodict[summary.player_slot] = {
-                'hero_thumbshot': summary.hero.thumbshot,
-                'hero_thumbshot_url': summary.hero.thumbshot.url,
-                'hero_name': summary.hero.name,
-                'hero_machine_name': summary.hero.machine_name,
-                'ability_dict': [
-                    {
-                        'name': sb.ability.name,
-                        'machine_name': sb.ability.machine_name,
-                        'picture_url': sb.ability.picture.url
-                    } for sb in SkillBuild.objects.filter(
-                        player_match_summary=summary
-                    ).select_related()
-                ]
-            }
-        except ValueError:
-            radiant_infodict[summary.player_slot] = {
-                'hero_thumbshot': '',
-                'hero_thumbshot_url': '',
-                'hero_name': summary.hero.name,
-                'hero_machine_name': summary.hero.machine_name,
-                'ability_dict': [
-                    {
-                        'name': sb.ability.name,
-                        'machine_name': sb.ability.machine_name,
-                        'picture_url': sb.ability.picture.url
-                    } for sb in SkillBuild.objects.filter(
-                        player_match_summary=summary
-                    ).select_related()
-                ]
-            }
+        radiant_cast_list.append(cast_dict(summary))
+        radiant_infodict[summary.player_slot] = ability_infodict(summary)
         min_skill_length = min(
             min_skill_length,
             len(radiant_infodict[summary.player_slot]['ability_dict'])
@@ -142,37 +120,10 @@ def match(request, match_id):
         summary for summary in summaries if summary.which_side() == 'Dire'
     ]
     dire_infodict = {}
+    dire_cast_list = []
     for summary in dire_summaries:
-        try:
-            dire_infodict[summary.player_slot] = {
-                'hero_thumbshot': summary.hero.thumbshot,
-                'hero_thumbshot_url': summary.hero.thumbshot.url,
-                'hero_name': summary.hero.name,
-                'hero_machine_name': summary.hero.machine_name,
-                'ability_dict': [
-                    {
-                        'machine_name': sb.ability.machine_name,
-                        'picture_url': sb.ability.picture.url
-                    } for sb in SkillBuild.objects.filter(
-                        player_match_summary=summary
-                    ).select_related()
-                ]
-            }
-        except ValueError:
-            dire_infodict[summary.player_slot] = {
-                'hero_thumbshot': '',
-                'hero_thumbshot_url': '',
-                'hero_name': summary.hero.name,
-                'hero_machine_name': summary.hero.machine_name,
-                'ability_dict': [
-                    {
-                        'machine_name': sb.ability.machine_name,
-                        'picture_url': sb.ability.picture.url
-                    } for sb in SkillBuild.objects.filter(
-                        player_match_summary=summary
-                    ).select_related()
-                ]
-            }
+        dire_cast_list.append(cast_dict(summary))
+        dire_infodict[summary.player_slot] = ability_infodict(summary)
         min_skill_length = min(
             min_skill_length,
             len(dire_infodict[summary.player_slot]['ability_dict'])
@@ -223,6 +174,8 @@ def match(request, match_id):
             {
                 'match': match,
                 'summaries': summaries,
+                'radiant_cast_list': radiant_cast_list,
+                'dire_cast_list': dire_cast_list,
                 'radiant_infodict': radiant_infodict,
                 'dire_infodict': dire_infodict,
                 'dire_picks': dire_picks,
@@ -240,6 +193,8 @@ def match(request, match_id):
             {
                 'match': match,
                 'summaries': summaries,
+                'radiant_cast_list': radiant_cast_list,
+                'dire_cast_list': dire_cast_list,
                 'radiant_infodict': radiant_infodict,
                 'dire_infodict': dire_infodict,
                 'min_skill_length': min_skill_length,

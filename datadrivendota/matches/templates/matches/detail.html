@@ -12,50 +12,7 @@
 
 {% block content %}
 
-  <div class="row" style='padding-top:10px'>
-    <div class="charts col-md-1">
-    </div>
-    {% for summary in summaries %}
-    <div class="charts col-md-1">
-      {% if summary.hero.thumbshot %}
-        <div>
-          <img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="topbar-hero-thumbshot thumbnail">
-          {% if summary.is_radiant %}
-            <img class='side-pip' src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.which_side }}' title='Radiant'>
-          {% else %}
-            <img class='side-pip' src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.which_side }}'  title='Dire'>
-          {% endif %}
-        </div>
-
-        {% else %}
-          <div></div>
-        {% endif %}
-        {% if summary.is_win %}
-        <div class='glyphicon glyphicon-ok-circle card-win-pip win-glyph' title='Won'></div>
-        {% endif %}
-
-
-        {% if summary.improper_player %}
-        <div class='glyphicon glyphicon-remove-circle validity-glyph' title='Improper Player (Left/Did Not Connect/Bot)'></div>
-        {% endif %}
-
-        <div>{% player_link summary.player %}</div>
-
-        <a href="{% url 'matches:match_hero_context' matches=match.steam_id hero_name=summary.hero.name win='both'%}">
-        <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
-        </a>
-        <a href="{% url 'players:hero_style' player_id=summary.player.steam_id hero_name=summary.hero.machine_name%}">
-        <i class='glyphicon glyphicon-signal'  title='Click me!' style='display:inline-block'></i>
-        </a>
-
-
-        {% comment %}
-        <div><img src="{{ summary.player.avatar }}" class="summary-hero-thumbshot"></div>
-        {% endcomment %}
-
-    </div>
-    {% endfor %}
-  </div>
+  {% include "matches/_match_cards.html" %}
 
   <div class="row">
     <div class="charts col-md-6">

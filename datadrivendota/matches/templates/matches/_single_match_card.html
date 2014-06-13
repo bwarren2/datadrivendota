@@ -1,0 +1,30 @@
+{% load staticfiles player_extras %}
+
+{% if summary.hero_mugshot %}
+  <div>
+    <img src="{{ summary.hero_mugshot_url }}" alt="{{ summary.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail">
+    {% if summary.is_radiant %}
+      <img class='side-pip' src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.which_side }}' title='Radiant'>
+    {% else %}
+      <img class='side-pip' src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.which_side }}'  title='Dire'>
+    {% endif %}
+  </div>
+
+  {% if summary.is_win %}
+    <div class='glyphicon glyphicon-ok-circle card-win-pip win-glyph' title='Won' style='font-size:19px;position:absolute;left:5px;top:-10px;'></div>
+  {% endif %}
+
+  {% if summary.improper_player %}
+    <div class='glyphicon glyphicon-remove-circle validity-glyph' title='Improper Player (Left/Did Not Connect/Bot)'></div>
+  {% endif %}
+
+  {% if summary.player_image %}
+    <img class='cast-player-image' src="{{summary.player_image}}" title='{{summary.player_name}}'>
+  {% endif %}
+
+  <a href="{% url 'matches:match_hero_context' matches=match.steam_id hero_name=summary.hero.name win='both'%}">
+  <i class='glyphicon glyphicon-signal chart-pip'  title='Click me!' style='display:inline-block'></i>
+  </a>
+{% else %}
+  <div></div>
+{% endif %}

@@ -1,0 +1,20 @@
+<div class="row" style='padding-top:10px'>
+<div class="cast col-md-1"></div>
+  {% for summary in radiant_cast_list %}
+    <div class="cast radiant col-md-2">
+      {% include "matches/_single_match_card.html" %}
+    </div>
+  {% endfor %}
+</div>
+<div class="row" style='padding-top:10px'>
+  <div class="cast col-md-1"></div>
+  {% for summary in dire_cast_list %}
+    <div class="cast dire col-md-2">
+      {% include "matches/_single_match_card.html" %}
+    </div>
+  {% endfor %}
+</div>
+
+
+
+
