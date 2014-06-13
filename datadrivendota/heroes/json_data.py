@@ -281,7 +281,7 @@ def hero_performance_chart_json(
     c.params.x_label = fetch_attribute_label(x_var)
     c.params.y_label = fetch_attribute_label(y_var)
     if group_var == 'skill_name':
-        c.groups = ['Low Skill', 'Medium Skill', 'High Skill']
+        c.groups = ['Normal Skill', 'High Skill', 'Very High Skill']
     if player is not None and c.groups is not None:
         c.groups.append('Player')
     if matches is not None and c.groups is not None:
@@ -390,7 +390,8 @@ def hero_progression_json(
                 group = "{s}".format(
                     s=skill_value)
                 #Contextual ordering
-                c.groups = ['Low Skill', 'Medium Skill', 'High Skill']
+
+                c.groups = ['Normal Skill', 'High Skill', 'Very High Skill']
                 if player is not None and c.groups is not None:
                     c.groups.append('Player')
 
@@ -531,10 +532,6 @@ def hero_skillbuild_winrate_json(
     if c.datalist == []:
         raise NoDataFound
 
-    #     if group_var == 'skill_name':
-    #     c.groups = ['Low Skill', 'Medium Skill', 'High Skill']
-    # if player is not None and c.groups is not None:
-    #     c.groups.append('Player')
     c.groups = [
         group_format(x) for x in sorted(
             level_list, key=lambda x: int(x)
