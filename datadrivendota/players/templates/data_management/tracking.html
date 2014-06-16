@@ -1,0 +1,181 @@
+{% extends "players/base.html" %}
+
+{% block page_title %}Follow Management! <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>{% endblock page_title %}
+
+{% block content %}
+<div class='container'>
+  <div class="row">
+
+    <div class="col-md-12">
+
+      <div>
+        <h6>Players you are importing ({{ track_list|length }}/{{ track_limit }})</h6>
+        <table class="table table-condensed" id='importTable'>
+          <thead>
+            <tr>
+              <th>Steam ID</th>
+              <th>Name</th>
+              <th>Avatar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for player in track_list %}
+              <tr id="{{ player.steam_id }}">
+                <td>
+                  <a href="{% url 'players:id_detail' player_id=player.steam_id %}">
+                    {{ player.steam_id }}
+                  </a>
+                </td>
+                <td>
+                  <a href="{% url 'players:id_detail' player_id=player.steam_id %}">
+                    {{ player.persona_name }}
+                  </a>
+                </td>
+                <td>
+                  <img src="{{ player.avatar }}">
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <table class="table table-condensed" id='checkTable'>
+          <thead>
+            <tr>
+              <th>Player Exists</th>
+              <th>Steam ID</th>
+              <th>Name</th>
+              <th>Image</th>
+              <th>Public Info</th>
+              <th>Currently Tracked</th>
+              <th>Add Button</th>
+
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div>
+        <form id="steam_id_form" method="POST">
+          <div class="form-group">
+            <label class="control-label" for="steam_id_input">Steam ID</label>
+            <input type='text' id='steam_id_input' class="form-control">
+          </div>
+          <div class="form-group">
+            <input type="button" class="pull-right btn btn-primary" id="steam_id_validator" name="Check availability" value="Check" />
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+<script type="text/javascript">
+function column_count (identifier) {
+  var colCount = 0;
+  $(identifier + ' tr:nth-child(1) th').each(function () {
+    if ($(this).attr('colspan')) {
+      colCount += +$(this).attr('colspan');
+    } else {
+      colCount++;
+    }
+  });
+  return colCount;
+}
+
+function show_progress_bar (identifier) {
+  var tr = $('<tr>');
+  tr.attr('id', "progressbar");
+
+  var td = $('<td>');
+  td.attr('colspan', column_count(identifier));
+
+  tr.append(td);
+
+  var progressbar = $("<div>");
+  progressbar.attr('id', 'steam_id_validator_loading');
+  progressbar.addClass("progress");
+  progressbar.addClass("progress-striped active");
+
+  td.append(progressbar);
+
+  var progressbar_inner = $("<div>");
+  progressbar_inner.addClass("progress-bar");
+  progressbar_inner.attr('role', "progressbar");
+  progressbar_inner.attr('aria-valuenow', "100");
+  progressbar_inner.attr('aria-valuemin', "0");
+  progressbar_inner.attr('aria-valuemax', "100");
+  progressbar_inner.css('width', '100%');
+
+  progressbar.append(progressbar_inner);
+
+  $(identifier + ' > tbody').append(tr);
+}
+
+function hide_progress_bar () {
+  $('tr#progressbar').remove();
+}
+
+function do_steam_id_import_form () {
+  show_progress_bar('#checkTable');
+
+  $.ajax({
+    type: "POST",
+    url: "{% url 'players:check_id' %}",
+    data: {
+      'steam_id': $('#steam_id_input').val(),
+      'csrfmiddlewaretoken': '{{ csrf_token }}'
+    },
+    dataType: "text",
+    success: function(response) {
+      $('#checkTable > tbody:last').append(response);
+      $("#add_track").click(function(){
+        $.ajax({
+          type:'POST',
+          url:'{% url "players:add_track" %}',
+          data:{
+            "steam_id": $("#add_track").attr('name'),
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+          },
+          dataType: "text",
+          success: function(response) {
+            Messenger().post({
+              message: "Success!",
+              type: 'success'
+            });
+            hide_progress_bar();
+          },
+          error: function(rs, e) {
+            Messenger().post({
+              message: rs.responseText,
+              type: 'error'
+            });
+            hide_progress_bar();
+          }
+        });
+      });
+      hide_progress_bar();
+    },
+    error: function(rs, e) {
+      Messenger().post({
+        message: rs.responseText,
+        type: 'error'
+      });
+      hide_progress_bar();
+    }
+  });
+}
+
+$('#steam_id_validator').click(function(){
+  do_steam_id_import_form();
+});
+
+$('form#steam_id_form').submit(function () {
+  do_steam_id_import_form();
+  return false;
+});
+</script>
