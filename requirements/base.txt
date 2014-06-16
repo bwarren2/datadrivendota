@@ -22,7 +22,7 @@ django-storages==1.1.8
 django-stripe-payments==2.0b34
 django-tagging==0.3.2
 django-xmlrpc==0.1.5
-Django==1.6.2
+Django==1.6.5
 docutils==0.10
 ecdsa==0.10
 Fabric==1.6.0
