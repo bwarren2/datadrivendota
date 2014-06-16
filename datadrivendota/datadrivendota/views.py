@@ -2,10 +2,12 @@ from json import dumps
 from os.path import basename
 from functools import wraps
 
+from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
 
 from utils.file_management import outsourceJson, moveJson
@@ -86,6 +88,13 @@ def upgrade(request):
     else:
         form = KeyForm()
         return render(request, 'registration/upgrade.html', {'form': form})
+
+
+class LoginRequiredView(View):
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(LoginRequiredView, self).dispatch(*args, **kwargs)
 
 
 class FormView(View):
@@ -273,7 +282,7 @@ class ApiView(View):
             except NoDataFound:
                 return self.fail()
         else:
-            # raise SuspiciousOperation
+            raise SuspiciousOperation
             return self.fail()
 
     def amend_params(self, request, chart):

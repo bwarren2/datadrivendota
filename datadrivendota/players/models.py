@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from uuid import uuid4
+from utils.exceptions import DataCapReached, ValidationException
 
 
 def get_code():
@@ -72,9 +73,11 @@ class UserProfile(models.Model):
     following = models.ManyToManyField('Player', related_name='quarry')
     tracking = models.ManyToManyField('Player', related_name='feed')
     track_limit = models.IntegerField(default=7)
+    requested = models.ManyToManyField('MatchRequest', null=True)
+    request_limit = models.IntegerField(default=10)
 
     def add_tracking(self, player):
-        if len(self.tracking >= int(self.track_limit)):
+        if self.tracking.count() >= int(self.track_limit):
             return False
         else:
             self.tracking.add(player)
@@ -87,6 +90,33 @@ class UserProfile(models.Model):
             unicode(self.user),
             unicode(self.player)
         )
+
+
+class MatchRequest(models.Model):
+    match_id = models.IntegerField(unique=True)
+
+    @staticmethod
+    def create_for_user(user, match_id):
+        try:
+            profile = UserProfile.objects.get(user=user)
+
+            #Is the user allowed to do this?
+            if profile.requested is None \
+                    or profile.request_limit > profile.requested.count():
+                if MatchRequest.objects.filter(
+                    match_id=match_id
+                ).count() == 0:
+                    obj = MatchRequest.objects.create(match_id=match_id)
+                    profile.requested.add(obj)
+                    return obj
+                else:
+                    msg = "We already have that, no request needed."
+                    raise ValidationException(msg)
+            else:
+                raise DataCapReached
+        except UserProfile.DoesNotExist:
+            msg = "You don't seem to be logged in, which is required."
+            raise ValidationException(msg)
 
 
 class Applicant(models.Model):

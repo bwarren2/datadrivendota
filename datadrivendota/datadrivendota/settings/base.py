@@ -1,6 +1,7 @@
 """Common settings and globals."""
 
 
+from django.contrib.messages import constants as message_constants
 from os.path import abspath, basename, dirname, join, normpath
 from os import getenv
 from sys import path
@@ -197,6 +198,14 @@ USE_L10N = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
+
+#Bootstrap support of messages
+MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
+                message_constants.INFO: 'info',
+                message_constants.SUCCESS: 'success',
+                message_constants.WARNING: 'warning',
+                message_constants.ERROR: 'danger',
+                }
 ########## END GENERAL CONFIGURATION
 
 ####STORAGES####

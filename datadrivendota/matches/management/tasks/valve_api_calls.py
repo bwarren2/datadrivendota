@@ -673,6 +673,23 @@ class AcquireHeroSkillData(BaseTask):
             logger.info("Done")
 
 
+class AcquireMatches(Task):
+
+    def run(self, matches=[]):
+        for match in matches:
+            print "Requesting match {0}".format(match)
+            c = ApiContext()
+            c.matches_requested = 1
+            c.matches_desired = 1
+            c.refresh_records = True
+            c.match_id = match
+            c.refresh_records = True
+            vac = ValveApiCall()
+            um = UploadMatch()
+            c = chain(vac.s(api_context=c, mode='GetMatchDetails'), um.s())
+            c.delay()
+
+
 def upload_match_summary(players, parent_match, refresh_records):
     """
     Populates the endgame summary data that is associated with a match
