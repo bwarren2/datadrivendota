@@ -291,7 +291,6 @@ class HeroAdversary(HeroAdversaryMixin, ChartFormView):
     html = "players/form.html"
 
 
-
 class HeroAbilities(HeroAbilitiesMixin, ChartFormView):
     tour = [
         {
@@ -744,7 +743,6 @@ def date_notate_pms_list(pms_list):
         elif pms.match.validity == Match.UNPROCESSED:
             pms.unprocessed = True
 
-
     return pms_list
 
 
@@ -766,5 +764,3 @@ class ApiVersusWinrate(VersusWinrateMixin, ApiView):
 
 class ApiRole(RoleMixin, ApiView):
     pass
-
-
