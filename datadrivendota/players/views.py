@@ -41,7 +41,6 @@ from .mixins import (
 
 from heroes.models import Hero
 from datadrivendota.views import ChartFormView, ApiView, LoginRequiredView
-from datadrivendota.mixins import RequestStashMixin
 from utils.exceptions import DataCapReached, ValidationException
 
 if settings.VERBOSE_PROFILING:
