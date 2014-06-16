@@ -26,6 +26,11 @@ urlpatterns = patterns(
         name="management"
     ),
     url(
+        r'^management/match-request/$',
+        views.MatchRequestView.as_view(),
+        name="match_request"
+    ),
+    url(
         r'^(?P<player_id>[0-9]*)/matches/$',
         views.player_matches,
         name="id_matches"

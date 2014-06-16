@@ -2,10 +2,12 @@ from json import dumps
 from os.path import basename
 from functools import wraps
 
+from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
 
 from utils.file_management import outsourceJson, moveJson

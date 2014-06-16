@@ -37,3 +37,7 @@ class FollowMatchForm(forms.Form):
     max_date.widget = forms.TextInput(
         attrs={'class': 'datepicker'}
     )
+
+
+class MatchRequestForm(forms.Form):
+    match_id = forms.IntegerField()
