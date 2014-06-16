@@ -90,6 +90,13 @@ def upgrade(request):
         return render(request, 'registration/upgrade.html', {'form': form})
 
 
+class LoginRequiredView(View):
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(LoginRequiredView, self).dispatch(*args, **kwargs)
+
+
 class FormView(View):
     """This is an outdated method of dispatching and altering charts, scheduled for deprecation.  You can tell by the datalist, params entrypoint of times gone by, before class based charts.  ChartFormView is the preferred method now."""
 
@@ -275,7 +282,7 @@ class ApiView(View):
             except NoDataFound:
                 return self.fail()
         else:
-            # raise SuspiciousOperation
+            raise SuspiciousOperation
             return self.fail()
 
     def amend_params(self, request, chart):
