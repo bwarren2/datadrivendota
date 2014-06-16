@@ -77,7 +77,7 @@ class UserProfile(models.Model):
     request_limit = models.IntegerField(default=10)
 
     def add_tracking(self, player):
-        if len(self.tracking >= int(self.track_limit)):
+        if self.tracking.count() >= int(self.track_limit):
             return False
         else:
             self.tracking.add(player)
