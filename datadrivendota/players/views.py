@@ -429,7 +429,7 @@ def player_management(request):
         track_list = [track for track in player.userprofile.tracking.all()]
         return render(
             request,
-            'players/management.html',
+            'data_management/management.html',
             {
                 'follow_list': follow_list,
                 'track_list': track_list,
@@ -449,7 +449,7 @@ def player_management(request):
 
 class MatchRequestView(FormView):
     form_class = MatchRequestForm
-    template_name = 'players/match_import_request.html'
+    template_name = 'data_management/match_import_request.html'
     initial = {}
 
     def form_invalid(self, form):
