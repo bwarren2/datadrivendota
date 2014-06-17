@@ -631,18 +631,18 @@ def hero_performance_lineup(
         match__start_time__lte=max_date_utc,
         hero__visible=True,
         )
-    if is_win == 'win':
+    if outcome == 'win':
         annotations = annotations.filter(is_win=True)
 
         annotations = annotations.values(
             'is_win', 'hero__name', 'hero__steam_id'
             ).annotate(Avg(stat))
-    elif is_win == 'loss':
+    elif outcome == 'loss':
         annotations = annotations.filter(is_win=False)
         annotations = annotations.values(
             'is_win', 'hero__name', 'hero__steam_id'
             ).annotate(Avg(stat))
-    elif is_win == 'both':
+    elif outcome == 'both':
         annotations = annotations.values(
             'hero__name', 'hero__steam_id'
             ).annotate(Avg(stat))
