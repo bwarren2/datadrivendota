@@ -162,7 +162,7 @@ def hero_lineup_json(heroes, stat, level):
     c.params.y_min = 0
     c.params.x_label = 'Hero'
     c.params.y_label = stat
-    c.params.outerWidth = 705
+    c.params.outerWidth = 685
     c.params.outerHeight = 500
     c.params.legendWidthPercent = .7
     c.params.legendHeightPercent = .8
@@ -693,7 +693,7 @@ def hero_performance_lineup(
     c.params.y_min = min([d.y_var for d in c.datalist])-1
     c.params.x_label = 'Hero'
     c.params.y_label = stat
-    c.params.outerWidth = 705
+    c.params.outerWidth = 685
     c.params.outerHeight = 500
     c.params.legendWidthPercent = .7
     c.params.legendHeightPercent = .2
@@ -810,7 +810,7 @@ def hero_pick_rate_lineup(var, skill_level, player, heroes):
     c.params.y_min = min([d.y_var for d in c.datalist])-1
     c.params.x_label = 'Hero'
     c.params.y_label = var
-    c.params.outerWidth = 705
+    c.params.outerWidth = 685
     c.params.outerHeight = 500
     c.params.legendWidthPercent = .7
     c.params.legendHeightPercent = .2

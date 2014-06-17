@@ -59,6 +59,8 @@ class HeroLineupMultiSelect(forms.Form):
         'night_vision',
         'atk_point',
         'atk_backswing',
+        'cast_point',
+        'cast_backswing',
         'turn_rate',
         'movespeed',
         'projectile_speed',

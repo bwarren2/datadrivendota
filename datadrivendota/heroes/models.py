@@ -311,6 +311,8 @@ class HeroDossier(models.Model):
             'night_vision',
             'atk_point',
             'atk_backswing',
+            'cast_point',
+            'cast_backswing',
             'turn_rate',
             'legs',
             'movespeed',
