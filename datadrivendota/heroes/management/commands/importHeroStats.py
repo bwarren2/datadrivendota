@@ -1,10 +1,14 @@
 from optparse import make_option
-from json import loads
-from django.core.management.base import BaseCommand
-from heroes.models import HeroDossier, Hero, Role, Assignment
+from json import dumps, loads
 from BeautifulSoup import BeautifulSoup
 from urllib2 import urlopen, HTTPError
 import re
+import csv
+
+from django.core.management.base import BaseCommand
+
+from heroes.models import Hero, HeroDossier
+from heroes.models import HeroDossier, Hero, Role, Assignment
 
 
 class Command(BaseCommand):
@@ -145,51 +149,29 @@ class Command(BaseCommand):
                             assignment.save()
                 except AttributeError:
                     pass
-                    #This means roles are not defined.  Sometimes happens with heroes in the prerelease phase.
+                    #This means roles are not defined.  Sometimes happens with heroes in the prerelease phase/Abaddon.
+
         # Backswings
         # Sometimes the wiki does not purge old heroes (skeleton king)
-        banned_list = ['Skeleton King']
-        cast_url = "http://dota2.gamepedia.com/Backswing"
         try:
-            html = urlopen(cast_url).read()
-            bs = BeautifulSoup(html)
-            table = bs.findAll(
-                attrs={'class': re.compile(r".*\bwikitable\b.*")}
-            )[0]
-            children = table.findChildren()
-            for row in children:
-                cells = row.findAll('td')
-                if len(cells) != 4:
-                    continue
-                hero_name = cells[1].getText()
-                if hero_name not in banned_list:
-                    dos = HeroDossier.objects.get(hero__name=hero_name)
-                    dos.cast_point = cells[2].getText()
-                    dos.cast_backswing = cells[3].getText()
-                    # @todo: get rid of print debugging. --kit 2014-02-16
-                    print hero_name, dos.cast_point, dos.cast_backswing
-                    dos.save()
-        except HTTPError, err:
-            print "No Cast animations pulled!  Error %s" % (err)
+            print "Trying animations.  You remembered to format it correctly, right?."
+            with open('animations.csv', 'r') as f:
 
-        attack_url = "http://dota2.gamepedia.com/Attack_animation"
-        try:
-            html = urlopen(attack_url).read()
-            bs = BeautifulSoup(html)
-            table = bs.findAll(
-                attrs={'class': re.compile(r".*\bwikitable\b.*")}
-            )[0]
-            children = table.findChildren()
-            for row in children:
-                cells = row.findAll('td')
-                if len(cells) != 6:
-                    continue
-                hero_name = cells[1].getText()
-                if hero_name not in banned_list:
-                    dos = HeroDossier.objects.get(hero__name=hero_name)
-                    dos.atk_backswing = float(cells[4].getText())
-                    # @todo: get rid of print debugging. --kit 2014-02-16
-                    print hero_name, dos.atk_backswing
-                    dos.save()
-        except HTTPError, err:
-            print "No Attack animations pulled!  Error %s" % (err)
+                reader = csv.reader(
+                    f, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL
+                    )
+                reader.next()
+                for row in reader:
+                    try:
+                        doss = HeroDossier.objects.get(hero__name=row[0])
+                        doss.atk_point = row[1]
+                        doss.atk_backswing = row[2]
+                        doss.cast_point = row[3]
+                        doss.cast_backswing = row[4]
+                        doss.save()
+                    except Hero.DoesNotExist:
+                        print row
+                        print "FREAK OUT"
+        except Exception as err:
+            print err.strerror
+            print "Animations not imported."

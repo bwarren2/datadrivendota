@@ -1,0 +1,108 @@
+Hero_name,AtkPt,AtkBackswing,CastPoint,CastBackswing
+Abaddon,0.56,0.41,0.452,1.008
+Alchemist,0.35,0.65,0.4,0.5
+Ancient Apparition,0.45,0.3,0.01,0.75
+Anti-Mage,0.3,0.6,0.3,0.47
+Axe,0.5,0.5,0.3,0.51
+Bane,0.3,0.7,0.5,0.51
+Batrider,0.3,0.54,0.2,0.7
+Beastmaster,0.3,0.7,0.5,0.5
+Bloodseeker,0.43,0.74,0.4,1.4
+Bounty Hunter,0.6,0.59,0.3,0.51
+Brewmaster,0.35,0.65,0.4,0.5
+Bristleback,0.3,0.3,0.4,0.51
+Broodmother,0.4,0.5,0.2,0.51
+Centaur Warrunner,0.3,0.3,0.5,0.51
+Chaos Knight,0.5,0.5,0.4,0.2
+Chen,0.5,0.5,0.3,0.51
+Clinkz,0.7,0.3,0.5,0.51
+Clockwerk,0.33,0.64,0.3,0.51
+Crystal Maiden,0.55,0,0.3,2.4
+Dark Seer,0.59,0.58,0.4,0.67
+Dazzle,0.3,0.3,0.3,0.5
+Death Prophet,0.56,0.51,0.5,0.83
+Disruptor,0.4,0.5,0.05,1
+Doom,0.5,0.7,0.3,0.51
+Dragon Knight,0.5,0.5,0,0.51
+Drow Ranger,0.7,0.3,0.4,0.5
+Earth Spirit,0.35,0.65,0.01,0
+Earthshaker,0.467,0.863,0.65,0.5
+Elder Titan,0.35,0.97,0.4,0.8
+Ember Spirit,0.4,0.3,0,0.51
+Enchantress,0.3,0.7,0.3,0.51
+Enigma,0.4,0.77,0.3,0.51
+Faceless Void,0.5,0.56,0.35,0.51
+Gyrocopter,0.2,0.97,0.3,0.5
+Huskar,0.4,0.5,0.3,2.4
+Invoker,0.4,0.7,0,0
+Io,0.15,0.4,0.001,0
+Jakiro,0.4,0.5,0.65,0.3
+Juggernaut,0.33,0.84,0.3,0.51
+Keeper of the Light,0.3,0.85,0.3,2.4
+Kunkka,0.4,0.3,0.4,0.51
+Legion Commander,0.46,0.64,0.3,0.6
+Leshrac,0.4,0.77,0.7,0.8
+Lich,0.46,0.54,0.4,1.1
+Lifestealer,0.39,0.44,0.01,0.01
+Lina,0.75,0.78,0.45,1.08
+Lion,0.43,0.74,0.3,0.51
+Lone Druid,0.33,0.53,0.5,1.17
+Luna,0.46,0.54,0.6,0.4
+Lycan,0.55,0.55,0.3,0.51
+Magnus,0.5,0.84,0.3,0.6
+Medusa,0.5,0.6,0.4,0.5
+Meepo,0.38,0.6,0.5,0.5
+Mirana,0.3,0.7,0.5,0.83
+Morphling,0.5,0.5,0.25,0.51
+Naga Siren,0.5,0.5,0.65,0.7
+Nature's Prophet,0.4,0.77,0.5,1.17
+Necrophos,0.4,0.77,0.7,0.8
+Night Stalker,0.55,0.55,0.3,0.3
+Nyx Assassin,0.46,0.54,0.4,1.1
+Ogre Magi,0.3,0.3,0.45,0.51
+Omniknight,0.433,0.567,0.5,1.67
+Outworld Devourer,0.46,0.54,0.25,0.51
+Phantom Assassin,0.3,0.7,0.3,0.5
+Phantom Lancer,0.5,0.5,0.3,0.51
+Phoenix,0.35,0.633,0.2,0.5
+Puck,0.5,0.8,0.1,0.51
+Pudge,0.5,1.17,0.3,0.51
+Pugna,0.5,0.5,0.2,0.51
+Queen of Pain,0.56,0.41,0.452,1.008
+Razor,0.3,0.7,0.5,0.125
+Riki,0.3,0.3,0.4,0.51
+Rubick,0.4,0.77,0.1,1.17
+Sand King,0.53,0.47,0,0.51
+Shadow Demon,0.36,0.5,0.3,0.51
+Shadow Fiend,0.5,0.54,0.67,0.4
+Shadow Shaman,0.3,0.5,0.3,1.07
+Silencer,0.5,0.5,0.3,0.51
+Skywrath Mage,0.4,0.78,0.1,1.08
+Slardar,0.36,0.64,0.35,0.51
+Slark,0.5,0.3,0.001,0.51
+Sniper,0.17,0.7,0.3,0.51
+Spectre,0.3,0.7,0.3,0.51
+Spirit Breaker,0.6,0.3,0.47,0.8
+Storm Spirit,0.5,0.3,0.3,0.51
+Sven,0.4,0.3,0.3,0.51
+Templar Assassin,0.3,0.5,0.3,0.51
+Terrorblade,0.3,0.6,0.5,0.51
+Tidehunter,0.6,0.56,0.3,0.51
+Timbersaw,0.36,0.64,0.3,0.6
+Tinker,0.35,0.65,0.53,0.5
+Tiny,0.49,1,0.001,0
+Treant Protector,0.6,0.4,0.5,0.51
+Troll Warlord,0.3,0.3,0.51,0.3
+Tusk,0.36,0.64,0.1,1
+Undying,0.3,0.3,0.45,0.51
+Ursa,0.3,0.3,0.3,0
+Vengeful Spirit,0.33,0.64,0.3,0.51
+Venomancer,0.3,0.7,0,0.51
+Viper,0.33,1,0.3,0.51
+Visage,0.46,0.54,0.4,1.1
+Warlock,0.3,0.3,0.5,0.5
+Weaver,0.64,0.36,0.3,0.51
+Windranger,0.4,0.3,0.3,0.5
+Witch Doctor,0.4,0.5,0.35,0.52
+Wraith King,0.56,0.44,0.35,0.51
+Zeus,0.633,0.366,0.4,0.5
