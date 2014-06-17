@@ -1,15 +1,19 @@
 {% extends "players/base.html" %}
 
-{% block page_title %}Follow Management! <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>{% endblock page_title %}
+{% block page_title %}Player Management! <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>{% endblock page_title %}
 
 {% block content %}
 <div class='container'>
   <div class="row">
 
+    {% if error %}
+      <h5>{{ error }}</h5>
+    {% endif %}
+
     <div class="col-md-12">
 
       <div>
-        <h6>Players you are importing ({{ track_list|length }}/{{ track_limit }})</h6>
+        <h6>Players you are importing ({{ track_list|length }}/{{ request.user.userprofile.track_limit}})</h6>
         <table class="table table-condensed" id='importTable'>
           <thead>
             <tr>
@@ -70,11 +74,14 @@
       </div>
 
     </div>
+
   </div>
 </div>
 {% endblock content %}
 
-<script type="text/javascript">
+{% block extra_js %}
+<script>
+
 function column_count (identifier) {
   var colCount = 0;
   $(identifier + ' tr:nth-child(1) th').each(function () {
@@ -179,3 +186,61 @@ $('form#steam_id_form').submit(function () {
   return false;
 });
 </script>
+{% endblock extra_js %}
+
+{% block tour %}
+<script type="text/javascript">
+  $(function () {
+    var tour = new Tour({
+      backdrop: true
+    });
+
+    tour.addSteps([
+      {
+        orphan: true,
+        title: "Ahoy!",
+        content: "Welcome to data management!"
+      },
+      {
+        orphan: true,
+        title: "Ahoy!",
+        content: "Here, you can manage what data we import and what you follow."
+      },
+      {
+        element: ".chart-form",
+        title: "Follow players",
+        content: "Pick players from our dataset to follow here.",
+        placement: "right"
+      },
+      {
+        element: "#followTable",
+        title: "Manage follows",
+        content: "Remove people you are already following here.",
+        placement: "right"
+      },
+      {
+        element: "#steam_id_form",
+        title: "Importing other players",
+        content: "If you have a steam ID (from a steamcommunity URL) for a new friend or pro to follow, check it here",
+        placement: "left"
+      },
+      {
+        element: "#importTable",
+        title: "Importing other players, 2",
+        content: "If that player is a novel addition to the data ecosystem, you can add them here",
+        placement: "left"
+      },
+      {
+        orphan: true,
+        title: "Ready to go!",
+        content: "That is how you manage data feeds!"
+      }
+    ]);
+
+    $(".tourglyph").on("click",function(){
+      tour.restart();
+    })
+
+  });
+</script>
+{% endblock tour %}

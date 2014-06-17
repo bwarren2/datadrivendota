@@ -1,11 +1,10 @@
 {% extends "players/base.html" %}
 
-{% block page_title %}Follow Management! <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>{% endblock page_title %}
+{% block page_title %}Player Management! <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>{% endblock page_title %}
 
 {% block content %}
 <div class='container'>
   <div class="row">
-
     <div class="col-md-12">
 
       <div>
@@ -60,7 +59,6 @@
       </div>
 
     </div>
-
   </div>
 </div>
 {% endblock content %}
@@ -87,6 +85,8 @@ $('.purgeButton').click(function(){
     }
   });
 });
+
+</script>
 {% endblock extra_js %}
 
 {% block tour %}
@@ -105,7 +105,7 @@ $('.purgeButton').click(function(){
       {
         orphan: true,
         title: "Ahoy!",
-        content: "Here, you can manage what data we import and what you follow."
+        content: "Here, you can manage whose data you follow."
       },
       {
         element: ".chart-form",
@@ -118,18 +118,6 @@ $('.purgeButton').click(function(){
         title: "Manage follows",
         content: "Remove people you are already following here.",
         placement: "right"
-      },
-      {
-        element: "#steam_id_form",
-        title: "Importing other players",
-        content: "If you have a steam ID (from a steamcommunity URL) for a new friend or pro to follow, check it here",
-        placement: "left"
-      },
-      {
-        element: "#importTable",
-        title: "Importing other players, 2",
-        content: "If that player is a novel addition to the data ecosystem, you can add them here",
-        placement: "left"
       },
       {
         orphan: true,
