@@ -149,7 +149,7 @@ class Command(BaseCommand):
         # Backswings
         # Sometimes the wiki does not purge old heroes (skeleton king)
         banned_list = ['Skeleton King']
-        cast_url = "http://dota2.gamepedia.com/Cast_animation"
+        cast_url = "http://dota2.gamepedia.com/Backswing"
         try:
             html = urlopen(cast_url).read()
             bs = BeautifulSoup(html)
