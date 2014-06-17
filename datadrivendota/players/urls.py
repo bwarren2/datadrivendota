@@ -31,6 +31,16 @@ urlpatterns = patterns(
         name="match_request"
     ),
     url(
+        r'^management/tracking/$',
+        views.TrackingView.as_view(),
+        name="tracking"
+    ),
+    url(
+        r'^management/following/$',
+        views.FollowView.as_view(),
+        name="following"
+    ),
+    url(
         r'^(?P<player_id>[0-9]*)/matches/$',
         views.player_matches,
         name="id_matches"

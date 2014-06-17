@@ -5,9 +5,10 @@ from random import choice
 from celery import chain
 from django.conf import settings
 from django.views.generic.edit import FormView
+from django.views.generic.base import TemplateView
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, render_to_response
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from .models import Player, UserProfile
@@ -437,17 +438,41 @@ def player_management(request):
                 'form': form
             }
         )
-    else:
-        return render(
-            request,
-            'players/management.html',
-            {
-                'error': 'You need to be logged in to edit stuff here.'
-            }
-        )
 
 
-class MatchRequestView(FormView):
+class TrackingView(LoginRequiredView, TemplateView):
+    """Where users can adjust who they follow"""
+    template_name = 'data_management/tracking.html'
+
+    def get_context_data(self, *args, **kwargs):
+        if 'follow_list' not in kwargs:
+            kwargs['track_list'] = [
+            track for track in self.request.user.userprofile.tracking.all()
+        ]
+        return super(TrackingView, self).get_context_data(*args, **kwargs)
+
+
+class FollowView(LoginRequiredView, FormView):
+    """Where users can adjust who they follow"""
+    form_class = PlayerAddFollowForm
+    template_name = 'data_management/follow.html'
+
+    def form_valid(self, form):
+        follow_player_id = form.cleaned_data['player']
+        follow_player = Player.objects.get(steam_id=follow_player_id)
+        self.request.user.userprofile.following.add(follow_player)
+        messages.add_message(self.request, messages.SUCCESS, "Follow added")
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, *args, **kwargs):
+        if 'follow_list' not in kwargs:
+            kwargs['follow_list'] = [
+            follow for follow in self.request.user.userprofile.following.all()
+        ]
+        return super(FollowView, self).get_context_data(*args, **kwargs)
+
+
+class MatchRequestView(LoginRequiredView, FormView):
     form_class = MatchRequestForm
     template_name = 'data_management/match_import_request.html'
     initial = {}
