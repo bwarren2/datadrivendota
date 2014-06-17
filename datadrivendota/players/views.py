@@ -8,7 +8,7 @@ from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound
-from django.shortcuts import get_object_or_404, render, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from .models import Player, UserProfile
@@ -19,6 +19,7 @@ from .forms import (
 )
 
 from utils.pagination import SmarterPaginator
+from utils import binomial_exceedence
 
 from players.models import MatchRequest
 from datadrivendota.forms import MatchRequestForm
@@ -231,6 +232,16 @@ def detail(request, player_id=None):
 
         pms.display_duration = \
             str(datetime.timedelta(seconds=pms.match.duration))
+    wins = len([
+        p for p in pms_list
+        if p.match.validity == Match.LEGIT and p.is_win
+    ])
+    games = len([
+        p for p in pms_list
+        if p.match.validity == Match.LEGIT
+    ])
+    winrate = round(wins/float(games), 2)
+    odds = round(binomial_exceedence(games, wins, .5), 2)
 
     #Compare to dendi and s4 by default
     player_list = [70388657, 41231571, player.steam_id]
@@ -246,7 +257,9 @@ def detail(request, player_id=None):
             'stats': stats,
             'compare_url': compare_url,
             'compare_str': compare_str,
-            'pms_list': pms_list
+            'pms_list': pms_list,
+            'winrate': winrate,
+            'odds': odds,
         }
     )
 

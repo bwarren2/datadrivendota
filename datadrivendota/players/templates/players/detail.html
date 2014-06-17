@@ -52,7 +52,9 @@
   </div>
 
   <div>
-        <h4><a href="{% url 'players:id_matches' player_id=player.steam_id %}">Recent Matches</a>  Score: <span id='show-score' class='nav-toggle'>Show</span> <span id='hide-score' class='nav-toggle'>Hide</span></h4>
+  <h4><a href="{% url 'players:id_matches' player_id=player.steam_id %}">Recent Matches</a>      <span class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="" data-placement="right" data-original-title="Winrate in these matches: {{winrate}}.
+  If each match is a coinflip, odds of getting a winrate better than this one: {{odds}}"></span>
+        Score: <span id='show-score' class='nav-toggle'>Show</span> <span id='hide-score' class='nav-toggle'>Hide</span></h4>
         {% include "players/_player_match_cards.html" %}
   </div>
 {% endblock content %}
