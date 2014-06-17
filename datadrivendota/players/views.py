@@ -240,8 +240,8 @@ def detail(request, player_id=None):
         p for p in pms_list
         if p.match.validity == Match.LEGIT
     ])
-    winrate = round(wins/float(games), 2)
-    odds = round(binomial_exceedence(games, wins, .5), 2)
+    winrate = round(wins/float(games)*100, 2)
+    odds = round(binomial_exceedence(games, wins, .5)*100, 2)
 
     #Compare to dendi and s4 by default
     player_list = [70388657, 41231571, player.steam_id]
