@@ -319,6 +319,9 @@ class HeroDossier(models.Model):
             'projectile_speed',
             'range',
             'base_atk_time',
+            'strength_gain',
+            'agility_gain',
+            'intelligence_gain',
         ]
         if level not in range(1, 26):
             raise AttributeError("That is not a real level")
