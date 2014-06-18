@@ -35,7 +35,7 @@
         <tbody>
           <tr>
             <td>
-              Strength: {{ dossier.strength }} + {{ dossier.strength_gain }}
+            Strength: {{ dossier.strength }} + <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=strength_gain&level=16">{{ dossier.strength_gain }}</a>
             </td>
             <td>
               <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=strength&level=1">
@@ -55,7 +55,7 @@
           </tr>
           <tr>
             <td>
-              Agility: {{ dossier.agility }} + {{ dossier.agility_gain }}
+            Agility: {{ dossier.agility }} + <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=agility_gain&level=16">{{ dossier.agility_gain }}</a>
             </td>
             <td>
               <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=agility&level=1">
@@ -75,7 +75,7 @@
           </tr>
           <tr>
             <td>
-              Intelligence: {{ dossier.intelligence }} + {{ dossier.intelligence_gain }}
+            Intelligence: {{ dossier.intelligence }} + <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=intelligence_gain&level=16">{{ dossier.intelligence_gain }}</a>
             </td>
             <td>
               <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=intelligence&level=1">
@@ -95,8 +95,11 @@
           </tr>
         </tbody>
       </table>
-      <div>Day/Night vision: {{ dossier.day_vision }} / {{ dossier.night_vision }}</div>
+      <div>Day/Night vision: <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=day_vision&level=16">{{ dossier.day_vision }}</a> / <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=night_vision&level=16">{{ dossier.night_vision }}</a></div>
       <div>HP/Mana regen: {{ dossier.hp_regen }} / {{ dossier.mana_regen }}</div>
+      <div>Move speed: <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=movespeed&level=16">{{ dossier.movespeed }}</a></div>
+      <div>Range: <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=range&level=16">{{ dossier.range }}</a></div>
+      <div>Base Atk Time: <a href="{% url 'heroes:lineup' %}?heroes={{hero.name}}&stat=base_atk_time&level=16">{{ dossier.base_atk_time }}</a></div>
     </div>
   </div>
 

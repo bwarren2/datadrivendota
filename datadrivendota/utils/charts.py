@@ -22,7 +22,7 @@ def color_scale_params(params, group_list):
 
 def other_colors():
     n = 0
-    colors = settings.CONTRASTING_10
+    colors = settings.PLAYER_10
     while True:
         color = colors[n % len(colors)]
         n += 1

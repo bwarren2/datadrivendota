@@ -571,6 +571,18 @@ CONTRASTING_10 = [
     '#bcbd22',
     '#17becf',
 ]
+PLAYER_10 = [
+    '#1f77b4',
+    '#7EF6C6',
+    '#9A1D9B',
+    '#ECF14C',
+    '#DB7226',
+    '#E890BA',
+    '#99B15F',
+    '#75D1E1',
+    '#147335',
+    '#906A2B',
+]
 
 #Stripe
 STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
