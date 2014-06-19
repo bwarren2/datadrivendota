@@ -15,5 +15,13 @@ class LeagueDossier(models.Model):
     tournament_url = models.CharField(max_length=300)
     item_def = models.IntegerField()
 
+    @property
+    def display_name(self):
+        return self.name.replace('#DOTA_Item_', '').replace('_', ' ')
+
+    @property
+    def display_description(self):
+        return self.description.replace('#DOTA_Item_', '').replace('_', ' ')
+
     def __unicode__(self):
         return self.name

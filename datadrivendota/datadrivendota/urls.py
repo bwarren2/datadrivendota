@@ -15,6 +15,8 @@ urlpatterns = patterns(
     url(r'^items/', include('items.urls', namespace='items')),
     url(r'^matches/', include('matches.urls', namespace='matches')),
     url(r'^players/', include('players.urls', namespace='players')),
+    url(r'^leagues/', include('leagues.urls', namespace='leagues')),
+    url(r'^teams/', include('teams.urls', namespace='teams')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^djs2/', include('django_select2.urls')),
     url(r'^privacy/$', views.privacy, name='privacy'),

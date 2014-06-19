@@ -459,7 +459,7 @@ function draw_barplot(source, placement_div){
   .attr("y", function(d) { return y(d.y_var); })
   .attr("height", function(d) { return height - y(d.y_var); })
   .style("fill", function(d) { return groups[d.group_var]['color'];})
-  .style('stroke-width',1)
+  .style('stroke-width', 1)
   .style('stroke','#000000')
 
   .on("mouseover", function(d) {

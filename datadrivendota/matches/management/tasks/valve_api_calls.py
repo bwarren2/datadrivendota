@@ -22,7 +22,7 @@ from heroes.models import Ability, Hero
 from items.models import Item
 from leagues.models import League, LeagueDossier
 from guilds.models import Guild
-from teams.models import Team
+from teams.models import Team, TeamDossier
 from settings.base import ADDER_32_BIT
 from celery import Task, chain
 import logging
@@ -64,7 +64,10 @@ class ApiContext(object):
         if mode == 'GetPlayerSummaries':
             valve_URL_vars = ['steamids', 'key']
             return self.dictVars(valve_URL_vars)
-        if mode == 'GetLeagueListing':
+        elif mode == 'GetTeamInfoByTeamID':
+            valve_URL_vars = ['key']
+            return self.dictVars(valve_URL_vars)
+        elif mode == 'GetLeagueListing':
             valve_URL_vars = ['key']
             return self.dictVars(valve_URL_vars)
         elif mode == 'GetMatchDetails':
@@ -703,6 +706,64 @@ class AcquireMatches(Task):
             c.delay()
 
 
+class AcquireTeams(Task):
+
+    def run(self):
+        c = ApiContext()
+        c.refresh_records = True
+        vac = ValveApiCall()
+        ul = UploadTeam()
+        c = chain(vac.s(api_context=c, mode='GetTeamInfoByTeamID'), ul.s())
+        c.delay()
+
+
+class UploadTeam(ApiFollower):
+    def run(self, urldata):
+        for team in self.result['teams']:
+            t, created = Team.objects.get_or_create(
+                steam_id=team['team_id']
+                )
+            try:
+                teamdoss = TeamDossier.objects.get(
+                    team=t,
+                    )
+                if self.api_context.refresh_records:
+                    mapping_dict = {
+                        'name': 'name',
+                        'tag': 'tag',
+                        'created': 'time_created',
+                        'rating': 'rating',
+                        'logo': 'logo',
+                        'logo_sponsor': 'logo_sponsor',
+                        'country_code': 'country_code',
+                        'url': 'url',
+                        'games_played_with_current_roster': 'games_played_with_current_roster',
+                    }
+                    for internal, external in mapping_dict.iteritems():
+                        if external in team.iterkeys():
+                            setattr(teamdoss, internal, team.get(external))
+                    map_team_players(teamdoss, team)
+                    teamdoss.save()
+
+            except TeamDossier.DoesNotExist:
+                teamdoss = TeamDossier.objects.create(
+                    team=t,
+                    name=team['name'],
+                    tag=team['tag'],
+                    created=team['time_created'],
+                    rating=team['rating'],
+                    logo=team['logo'],
+                    logo_sponsor=team['logo_sponsor'],
+                    country_code=team['country_code'],
+                    url=team['url'],
+                    games_played_with_current_roster=team[
+                        'games_played_with_current_roster'
+                    ],
+                    )
+                map_team_players(teamdoss, team)
+                teamdoss.save()
+
+
 class AcquireLeagues(Task):
 
     def run(self):
@@ -849,3 +910,17 @@ def upload_match_summary(players, parent_match, refresh_records):
                     )[0],
                 }
                 AdditionalUnit.objects.get_or_create(**kwargs)
+
+def map_team_players(teamdoss, team):
+    player_field_mapping_dict = {
+        'player_0': 'player_0_account_id',
+        'player_1': 'player_1_account_id',
+        'player_2': 'player_2_account_id',
+        'player_3': 'player_3_account_id',
+        'player_4': 'player_4_account_id',
+        'admin': 'admin_account_id',
+    }
+    for internal, external in player_field_mapping_dict.iteritems():
+        if external in team.iterkeys():
+            p = Player.objects.get_or_create(steam_id=team.get(external))[0]
+            setattr(teamdoss, internal, p)

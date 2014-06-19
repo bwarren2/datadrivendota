@@ -36,3 +36,5 @@ class TeamDossier(models.Model):
         'players.Player', related_name='team_admin', null=True
         )
     leagues = models.ManyToManyField('leagues.League')
+    logo_url = models.CharField(max_length=200, null=True)
+    logo_sponsor_url = models.CharField(max_length=200, null=True)
