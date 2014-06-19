@@ -33,18 +33,32 @@ class Match(models.Model):
             '1 is normal, 2 is high, 3 is very high, 0 is my not-assigned, 4 is Tournament'
         )
     )
-    dire_guild = models.ForeignKey(
-        'guilds.Guild',
-        null=True,
-        related_name='dire_guild'
-    )
     radiant_guild = models.ForeignKey(
         'guilds.Guild',
         null=True,
         related_name='radiant_guild'
     )
+    dire_guild = models.ForeignKey(
+        'guilds.Guild',
+        null=True,
+        related_name='dire_guild'
+    )
 
+    radiant_team = models.ForeignKey(
+        'teams.Team',
+        null=True,
+        related_name='radiant_guild'
+    )
+    radiant_team_complete = models.NullBooleanField()
+    dire_team = models.ForeignKey(
+        'teams.Team',
+        null=True,
+        related_name='dire_team'
+    )
+    dire_team_complete = models.NullBooleanField()
 
+    series_id = models.IntegerField(null=True)
+    series_type = models.IntegerField(null=True)
 
     UNPROCESSED = 0
     LEGIT = 1
