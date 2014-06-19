@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for league in league_list %}
+<div>
+{{league.leaguedossier.display_name}}
+</div>
+{% endfor %}
+{% endblock content %}

@@ -6,6 +6,10 @@ from itertools import chain as meld
 from copy import deepcopy
 from time import time as now
 from urllib import urlencode
+from os.path import splitext
+from uuid import uuid4
+from django.core.files import File
+from django.utils.text import slugify
 from matches.models import (
     Match,
     LobbyType,
@@ -20,7 +24,9 @@ from datadrivendota.settings.base import STEAM_API_KEY
 from players.models import Player, get_tracks
 from heroes.models import Ability, Hero
 from items.models import Item
+from leagues.models import League, LeagueDossier
 from guilds.models import Guild
+from teams.models import Team, TeamDossier
 from settings.base import ADDER_32_BIT
 from celery import Task, chain
 import logging
@@ -58,9 +64,22 @@ class ApiContext(object):
     refresh_records = False
     date_pull = False
 
+    def __init__(self, *args, **kwargs):
+        self.key = STEAM_API_KEY
+        super(ApiContext, self).__init__(*args, **kwargs)
+
     def toUrlDict(self, mode):
         if mode == 'GetPlayerSummaries':
             valve_URL_vars = ['steamids', 'key']
+            return self.dictVars(valve_URL_vars)
+        elif mode == 'GetTeamInfoByTeamID':
+            valve_URL_vars = ['key']
+            return self.dictVars(valve_URL_vars)
+        elif mode == 'GetUGCFileDetails':
+            valve_URL_vars = ['key', 'ugcid']
+            return self.dictVars(valve_URL_vars)
+        elif mode == 'GetLeagueListing':
+            valve_URL_vars = ['key']
             return self.dictVars(valve_URL_vars)
         elif mode == 'GetMatchDetails':
             valve_URL_vars = ['match_id', 'key']
@@ -71,6 +90,7 @@ class ApiContext(object):
                 'hero_id',
                 'matches_requested',
                 'skill',
+                'league_id',
                 'date_max',
                 'date_max',
                 'start_at_match_id',
@@ -189,7 +209,6 @@ class ValveApiCall(BaseTask):
         For lots more docs, see http://dev.dota2.com/showthread.php?t=58317
         """
         # The steam API accepts a limited set of URLs, and requires a key
-        self.api_context.key = STEAM_API_KEY
         modeDict = {
             'GetMatchHistory': (
                 'https://api.steampowered.com'
@@ -235,6 +254,7 @@ class ValveApiCall(BaseTask):
             logger.info("Keyerrors!")
             raise
         URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
+        print URL
         if mode == 'GetMatchHistory':
             logger.info("URL: " + URL)
         # Exception handling for the URL opening.
@@ -358,6 +378,7 @@ class RetrievePlayerRecords(ApiFollower):
 
     def spawnDetailCalls(self):
         for result in self.result['matches']:
+            print self.result['matches']
             vac = ValveApiCall()
             um = UploadMatch()
             self.api_context.match_id = result['match_id']
@@ -446,7 +467,9 @@ class UploadMatch(ApiFollower):
                 steam_id=data['lobby_type']
             )[0],
             'human_players': data['human_players'],
-            'league_id': data['leagueid'],
+            'league': League.objects.get_or_create(
+                steam_id=data['leagueid']
+                )[0],
             'positive_votes': data['positive_votes'],
             'negative_votes': data['negative_votes'],
             'game_mode': GameMode.objects.get_or_create(
@@ -454,7 +477,6 @@ class UploadMatch(ApiFollower):
             )[0],
             'skill': self.api_context.skill,
         }
-
         try:
             match = Match.objects.get(steam_id=data['match_id'])
             if self.api_context.refresh_records:
@@ -466,8 +488,10 @@ class UploadMatch(ApiFollower):
                     parent_match=match,
                     refresh_records=self.api_context.refresh_records
                 )
+                update = True
 
         except Match.DoesNotExist:
+            update = True
             match = Match.objects.create(**kwargs)
             match.save()
             upload_match_summary(
@@ -476,7 +500,7 @@ class UploadMatch(ApiFollower):
                 refresh_records=self.api_context.refresh_records
             )
 
-        if 'picks_bans' in data.keys():
+        if 'picks_bans' in data.keys() and update:
             for pickban in data['picks_bans']:
                 datadict = {
                     'match': match,
@@ -495,27 +519,52 @@ class UploadMatch(ApiFollower):
                 )[0]
                 pb.save()
 
-        if 'dire_guild_id' in data.keys():
-            datadict = {
-                'steam_id': data["dire_guild_id"],
-                'name': data["dire_guild_name"],
-                'logo': data["dire_guild_logo"],
-            }
-            Guild.objects.get_or_create(
-                steam_id=data["dire_guild_id"],
-                defaults=datadict
-            )
+        if 'series_id' in data.keys() and update:
+            match.series_id = data['series_id']
 
-        if 'radiant_guild_id' in data.keys():
+        if 'series_type' in data.keys() and update:
+            match.series_type = data['series_type']
+
+        if 'radiant_guild_id' in data.keys() and update:
             datadict = {
                 'steam_id': data["radiant_guild_id"],
                 'name': data["radiant_guild_name"],
                 'logo': data["radiant_guild_logo"],
             }
-            Guild.objects.get_or_create(
+            g = Guild.objects.get_or_create(
                 steam_id=data["radiant_guild_id"],
                 defaults=datadict
-            )
+            )[0]
+            match.radiant_guild = g
+
+        if 'dire_guild_id' in data.keys() and update:
+            datadict = {
+                'steam_id': data["dire_guild_id"],
+                'name': data["dire_guild_name"],
+                'logo': data["dire_guild_logo"],
+            }
+            g = Guild.objects.get_or_create(
+                steam_id=data["dire_guild_id"],
+                defaults=datadict
+            )[0]
+            match.dire_guild = g
+
+        if 'radiant_team_id' in data.keys() and update:
+            radiant_team = Team.objects.get_or_create(
+                steam_id=data['radiant_team_id']
+                )[0]
+            match.radiant_team = radiant_team
+            match.radiant_team_complete = True \
+                if data['radiant_team_id'] == 1 else False
+
+        if 'dire_team_id' in data.keys() and update:
+            dire_team = Team.objects.get_or_create(
+                steam_id=data['dire_team_id']
+                )[0]
+            match.dire_team = dire_team
+            match.dire_team_complete = True \
+                if data['dire_team_id'] == 1 else False
+        match.save()
 
 
 class RefreshUpdatePlayerPersonas(BaseTask):
@@ -690,6 +739,155 @@ class AcquireMatches(Task):
             c.delay()
 
 
+class AcquireTeams(Task):
+
+    def run(self):
+        c = ApiContext()
+        c.refresh_records = True
+        vac = ValveApiCall()
+        ul = UploadTeam()
+        c = chain(vac.s(api_context=c, mode='GetTeamInfoByTeamID'), ul.s())
+        c.delay()
+
+
+class UploadTeam(ApiFollower):
+    def run(self, urldata):
+        for team in self.result['teams']:
+            t, created = Team.objects.get_or_create(
+                steam_id=team['team_id']
+                )
+            try:
+                teamdoss = TeamDossier.objects.get(
+                    team=t,
+                    )
+                if self.api_context.refresh_records:
+                    mapping_dict = {
+                        'name': 'name',
+                        'tag': 'tag',
+                        'created': 'time_created',
+                        'rating': 'rating',
+                        'logo': 'logo',
+                        'logo_sponsor': 'logo_sponsor',
+                        'country_code': 'country_code',
+                        'url': 'url',
+                        'games_played_with_current_roster': 'games_played_with_current_roster',
+                    }
+                    for internal, external in mapping_dict.iteritems():
+                        if external in team.iterkeys():
+                            setattr(teamdoss, internal, team.get(external))
+                    map_team_players(teamdoss, team)
+                    teamdoss.save()
+
+                    c = ApiContext()
+                    utl = UpdateTeamLogos()
+                    utl.s(api_context=c, team_steam_id=t.steam_id).delay()
+
+            except TeamDossier.DoesNotExist:
+                teamdoss = TeamDossier.objects.create(
+                    team=t,
+                    name=team['name'],
+                    tag=team['tag'],
+                    created=team['time_created'],
+                    rating=team['rating'],
+                    logo=team['logo'],
+                    logo_sponsor=team['logo_sponsor'],
+                    country_code=team['country_code'],
+                    url=team['url'],
+                    games_played_with_current_roster=team[
+                        'games_played_with_current_roster'
+                    ],
+                    )
+                map_team_players(teamdoss, team)
+                teamdoss.save()
+
+                c = ApiContext()
+                utl = UpdateTeamLogos()
+                utl.s(api_context=c, team_steam_id=t.steam_id).delay()
+
+
+class UpdateTeamLogos(BaseTask):
+    def run(self, team_steam_id):
+        team = Team.objects.get(steam_id=team_steam_id)
+        logo = team.teamdossier.logo
+#        logo_sponsor = team.teamdossier.logo_sponsor
+
+        mode = 'GetUGCFileDetails'
+        self.api_context.ugcid = logo
+        URL = 'http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?appid=570&' + urlencode(self.api_context.toUrlDict(mode))
+        print URL
+        try:
+            pageaccess = urllib2.urlopen(URL, timeout=5)
+            data = json.loads(pageaccess.read())['data']
+
+            print data
+            ext = splitext(data['filename'])[1]
+            URL = data['url']+data['filename']
+            if ext != '':
+                URL += ext
+            else:
+                URL += '.png'
+            print URL
+
+            try:
+                imgdata = urllib2.urlopen(URL, timeout=5)
+                with open('%s.png' % str(uuid4()), 'w+') as f:
+                    f.write(imgdata.read())
+                filename = slugify(team.name)+'_logo.png'
+                team.teamdossier.logo_image.save(filename, File(open(f.name)))
+
+            except Exception as err:
+                print Exception, err.strerror
+        except Exception as err:
+            print Exception, err.strerror
+
+
+class AcquireLeagues(Task):
+
+    def run(self):
+        c = ApiContext()
+        c.refresh_records = True
+        vac = ValveApiCall()
+        ul = UploadLeague()
+        c = chain(vac.s(api_context=c, mode='GetLeagueListing'), ul.s())
+        c.delay()
+
+
+class UploadLeague(ApiFollower):
+    def run(self, urldata):
+        for league in self.result['leagues']:
+            l, created = League.objects.get_or_create(
+                steam_id=league['leagueid']
+                )
+            try:
+                ldoss = LeagueDossier.objects.get(
+                    league=l,
+                    )
+            except LeagueDossier.DoesNotExist:
+                ldoss = LeagueDossier.objects.create(
+                    league=l,
+                    name=league['name'],
+                    description=league['description'],
+                    tournament_url=league['tournament_url'],
+                    item_def=league['itemdef']
+                    )
+
+
+class UpdateLeagueGames(Task):
+    """Pulls in all games for all extant leagues"""
+
+    def run(self):
+        for league in League.objects.filter(steam_id=65006):
+            c = ApiContext()
+            c.league_id = league.steam_id
+            c.matches_requested = 500
+            c.matches_desired = 500
+            c.skill = 4
+            vac = ValveApiCall()
+            rpr = RetrievePlayerRecords()
+            c = chain(vac.s(api_context=c, mode='GetMatchHistory'), rpr.s())
+            c.delay()
+
+
 def upload_match_summary(players, parent_match, refresh_records):
     """
     Populates the endgame summary data that is associated with a match
@@ -788,3 +986,18 @@ def upload_match_summary(players, parent_match, refresh_records):
                     )[0],
                 }
                 AdditionalUnit.objects.get_or_create(**kwargs)
+
+
+def map_team_players(teamdoss, team):
+    player_field_mapping_dict = {
+        'player_0': 'player_0_account_id',
+        'player_1': 'player_1_account_id',
+        'player_2': 'player_2_account_id',
+        'player_3': 'player_3_account_id',
+        'player_4': 'player_4_account_id',
+        'admin': 'admin_account_id',
+    }
+    for internal, external in player_field_mapping_dict.iteritems():
+        if external in team.iterkeys():
+            p = Player.objects.get_or_create(steam_id=team.get(external))[0]
+            setattr(teamdoss, internal, p)
