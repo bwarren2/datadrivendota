@@ -18,7 +18,7 @@ class Match(models.Model):
 
     first_blood_time = models.IntegerField()
     human_players = models.IntegerField()
-    league_id = models.IntegerField()
+    league = models.ForeignKey('leagues.League', null=True)
     positive_votes = models.IntegerField()
     negative_votes = models.IntegerField()
     lobby_type = models.ForeignKey(
@@ -30,7 +30,7 @@ class Match(models.Model):
         default=0,
         help_text=(
             'How valve denotes skill bracket.  '
-            '1 is normal, 2 is high, 3 is very high, 0 is my not-assigned'
+            '1 is normal, 2 is high, 3 is very high, 0 is my not-assigned, 4 is Tournament'
         )
     )
     dire_guild = models.ForeignKey(
@@ -43,6 +43,8 @@ class Match(models.Model):
         null=True,
         related_name='radiant_guild'
     )
+
+
 
     UNPROCESSED = 0
     LEGIT = 1
@@ -473,6 +475,8 @@ def skill_name(skill):
         return 'High Skill'
     if skill == 3:
         return 'Very High Skill'
+    if skill == 4:
+        return 'Tournament Game'
     else:
         return skill
 

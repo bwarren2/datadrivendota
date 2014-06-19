@@ -20,7 +20,9 @@ from datadrivendota.settings.base import STEAM_API_KEY
 from players.models import Player, get_tracks
 from heroes.models import Ability, Hero
 from items.models import Item
+from leagues.models import League, LeagueDossier
 from guilds.models import Guild
+from teams.models import Team
 from settings.base import ADDER_32_BIT
 from celery import Task, chain
 import logging
@@ -62,6 +64,9 @@ class ApiContext(object):
         if mode == 'GetPlayerSummaries':
             valve_URL_vars = ['steamids', 'key']
             return self.dictVars(valve_URL_vars)
+        if mode == 'GetLeagueListing':
+            valve_URL_vars = ['key']
+            return self.dictVars(valve_URL_vars)
         elif mode == 'GetMatchDetails':
             valve_URL_vars = ['match_id', 'key']
             return self.dictVars(valve_URL_vars)
@@ -71,6 +76,7 @@ class ApiContext(object):
                 'hero_id',
                 'matches_requested',
                 'skill',
+                'league_id',
                 'date_max',
                 'date_max',
                 'start_at_match_id',
@@ -235,6 +241,7 @@ class ValveApiCall(BaseTask):
             logger.info("Keyerrors!")
             raise
         URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
+        print URL
         if mode == 'GetMatchHistory':
             logger.info("URL: " + URL)
         # Exception handling for the URL opening.
@@ -446,7 +453,9 @@ class UploadMatch(ApiFollower):
                 steam_id=data['lobby_type']
             )[0],
             'human_players': data['human_players'],
-            'league_id': data['leagueid'],
+            'league': League.objects.get_or_create(
+                steam_id=data['leagueid']
+                )[0],
             'positive_votes': data['positive_votes'],
             'negative_votes': data['negative_votes'],
             'game_mode': GameMode.objects.get_or_create(
@@ -454,7 +463,6 @@ class UploadMatch(ApiFollower):
             )[0],
             'skill': self.api_context.skill,
         }
-
         try:
             match = Match.objects.get(steam_id=data['match_id'])
             if self.api_context.refresh_records:
@@ -516,6 +524,11 @@ class UploadMatch(ApiFollower):
                 steam_id=data["radiant_guild_id"],
                 defaults=datadict
             )
+        if 'radiant_team_id' in data.keys():
+            radiant_team = Team.objects.get_or_create(
+                steam_id=data['radiant_team_id']
+                )
+
 
 
 class RefreshUpdatePlayerPersonas(BaseTask):
@@ -687,6 +700,54 @@ class AcquireMatches(Task):
             vac = ValveApiCall()
             um = UploadMatch()
             c = chain(vac.s(api_context=c, mode='GetMatchDetails'), um.s())
+            c.delay()
+
+
+class AcquireLeagues(Task):
+
+    def run(self):
+        c = ApiContext()
+        c.refresh_records = True
+        vac = ValveApiCall()
+        ul = UploadLeague()
+        c = chain(vac.s(api_context=c, mode='GetLeagueListing'), ul.s())
+        c.delay()
+
+
+class UploadLeague(ApiFollower):
+    def run(self, urldata):
+        for league in self.result['leagues']:
+            print league
+            l, created = League.objects.get_or_create(
+                steam_id=league['leagueid']
+                )
+            try:
+                ldoss = LeagueDossier.objects.get(
+                    league=l,
+                    )
+            except LeagueDossier.DoesNotExist:
+                ldoss = LeagueDossier.objects.create(
+                    league=l,
+                    name=league['name'],
+                    description=league['description'],
+                    tournament_url=league['tournament_url'],
+                    item_def=league['itemdef']
+                    )
+
+
+class UpdateLeagueGames(Task):
+    """Pulls in all games for all extant leagues"""
+
+    def run(self):
+        for league in League.objects.all():
+            c = ApiContext()
+            c.league_id = league.steam_id
+            c.matches_requested = 500
+            c.matches_desired = 500
+            c.skill = 4
+            vac = ValveApiCall()
+            rpr = RetrievePlayerRecords()
+            c = chain(vac.s(api_context=c, mode='GetLeagueListing'), rpr.s())
             c.delay()
 
 
