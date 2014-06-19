@@ -33,7 +33,10 @@ class MultiMatchSelect(forms.CharField):
         match_list = match_str.split(',')
         return_match_list = []
         if match_list == ['']:
-            raise ValidationError("Please enter match ids")
+            if self.required:
+                raise ValidationError("Please enter match ids")
+            else:
+                return []
         for match in match_list:
             match_id = match.replace("M#: ", "")
             try:
