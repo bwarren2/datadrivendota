@@ -577,7 +577,14 @@ class RefreshUpdatePlayerPersonas(BaseTask):
         list_send_length = 50
         users = Player.objects.filter(updated=True)
         tracked = get_tracks(users)
-        check_list = meld(users, tracked)
+        teams = TeamDossier.objects.all()
+        pros = [t.player_0 for t in teams if t.player_0 is not None]
+        pros.extend([t.player_1 for t in teams if t.player_1 is not None])
+        pros.extend([t.player_2 for t in teams if t.player_2 is not None])
+        pros.extend([t.player_3 for t in teams if t.player_3 is not None])
+        pros.extend([t.player_4 for t in teams if t.player_4 is not None])
+        pros.extend([t.admin for t in teams if t.admin is not None])
+        check_list = meld(users, tracked, pros)
         check_list = [user for user in check_list]
         querylist = []
 
@@ -809,36 +816,53 @@ class UpdateTeamLogos(BaseTask):
     def run(self, team_steam_id):
         team = Team.objects.get(steam_id=team_steam_id)
         logo = team.teamdossier.logo
-#        logo_sponsor = team.teamdossier.logo_sponsor
+        logo_sponsor = team.teamdossier.logo_sponsor
 
         mode = 'GetUGCFileDetails'
         self.api_context.ugcid = logo
         URL = 'http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?appid=570&' + urlencode(self.api_context.toUrlDict(mode))
-        print URL
         try:
             pageaccess = urllib2.urlopen(URL, timeout=5)
             data = json.loads(pageaccess.read())['data']
 
             print data
-            ext = splitext(data['filename'])[1]
-            URL = data['url']+data['filename']
-            if ext != '':
-                URL += ext
-            else:
-                URL += '.png'
-            print URL
+            URL = data['url']
 
             try:
                 imgdata = urllib2.urlopen(URL, timeout=5)
                 with open('%s.png' % str(uuid4()), 'w+') as f:
                     f.write(imgdata.read())
-                filename = slugify(team.name)+'_logo.png'
+                filename = slugify(team.teamdossier.name)+'_logo.png'
                 team.teamdossier.logo_image.save(filename, File(open(f.name)))
 
             except Exception as err:
-                print Exception, err.strerror
+                print err
         except Exception as err:
-            print Exception, err.strerror
+            print err
+
+        mode = 'GetUGCFileDetails'
+        self.api_context.ugcid = logo_sponsor
+        URL = 'http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?appid=570&' + urlencode(self.api_context.toUrlDict(mode))
+        try:
+            pageaccess = urllib2.urlopen(URL, timeout=5)
+            data = json.loads(pageaccess.read())['data']
+
+            print data
+            URL = data['url']
+
+            try:
+                imgdata = urllib2.urlopen(URL, timeout=5)
+                with open('%s.png' % str(uuid4()), 'w+') as f:
+                    f.write(imgdata.read())
+                filename = slugify(team.teamdossier.name)+'_logo.png'
+                team.teamdossier.logo_sponsor_image.save(
+                    filename, File(open(f.name))
+                    )
+
+            except Exception as err:
+                print err
+        except Exception as err:
+            print err
 
 
 class AcquireLeagues(Task):
@@ -876,7 +900,7 @@ class UpdateLeagueGames(Task):
     """Pulls in all games for all extant leagues"""
 
     def run(self):
-        for league in League.objects.filter(steam_id=65006):
+        for league in League.objects.all():
             c = ApiContext()
             c.league_id = league.steam_id
             c.matches_requested = 500
