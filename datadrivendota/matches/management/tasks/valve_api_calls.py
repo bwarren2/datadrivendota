@@ -255,7 +255,7 @@ class ValveApiCall(BaseTask):
             raise
         URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
         print URL
-        if mode in ['GetMatchHistory','GetTeamInfoByTeamID']:
+        if mode in ['GetMatchHistory', 'GetTeamInfoByTeamID']:
             logger.info("URL: " + URL)
         # Exception handling for the URL opening.
         try:
@@ -578,7 +578,14 @@ class RefreshUpdatePlayerPersonas(BaseTask):
         list_send_length = 50
         users = Player.objects.filter(updated=True)
         tracked = get_tracks(users)
-        check_list = meld(users, tracked)
+        teams = TeamDossier.objects.all()
+        pros = [t.player_0 for t in teams if t.player_0 is not None]
+        pros.extend([t.player_1 for t in teams if t.player_1 is not None])
+        pros.extend([t.player_2 for t in teams if t.player_2 is not None])
+        pros.extend([t.player_3 for t in teams if t.player_3 is not None])
+        pros.extend([t.player_4 for t in teams if t.player_4 is not None])
+        pros.extend([t.admin for t in teams if t.admin is not None])
+        check_list = meld(users, tracked, pros)
         check_list = [user for user in check_list]
         querylist = []
 
@@ -828,14 +835,11 @@ class UpdateTeamLogos(BaseTask):
         self.api_context.ugcid = logo
         URL = 'http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?appid=570&' + \
             urlencode(self.api_context.toUrlDict(mode))
-        # print URL
         try:
             pageaccess = urllib2.urlopen(URL, timeout=5)
             data = json.loads(pageaccess.read())['data']
 
-            print data
             URL = data['url']
-            print URL
             try:
                 imgdata = urllib2.urlopen(URL, timeout=5)
                 with open('%s.png' % str(uuid4()), 'w+') as f:
@@ -863,11 +867,11 @@ class UpdateTeamLogos(BaseTask):
                 print "Failed for {0}, {1}".format(
                     team.teamdossier.name,
                     err)
-           # print Exception, err.strerror
 
         mode = 'GetUGCFileDetails'
         self.api_context.ugcid = logo_sponsor
-        URL = 'http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?appid=570&' + urlencode(self.api_context.toUrlDict(mode))
+        URL = 'http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?appid=570&' \
+            + urlencode(self.api_context.toUrlDict(mode))
         # print URL
         try:
             pageaccess = urllib2.urlopen(URL, timeout=5)
@@ -882,11 +886,14 @@ class UpdateTeamLogos(BaseTask):
                 with open('%s.png' % str(uuid4()), 'w+') as f:
                     f.write(imgdata.read())
                 filename = slugify(team.teamdossier.name)+'_logo_sponsor.png'
-                team.teamdossier.logo_sponsor_image.save(filename, File(open(f.name)))
+                team.teamdossier.logo_sponsor_image.save(
+                    filename, File(open(f.name))
+                    )
 
             except Exception as err:
                 if team.teamdossier.logo_sponsor_image is None:
-                    filename = slugify(team.teamdossier.name)+'_logo_sponsor.png'
+                    filename = slugify(team.teamdossier.name)\
+                        + '_logo_sponsor.png'
                     team.teamdossier.logo_sponsor_image.save(
                         filename, File(open('media/teams/img/blank-logo.png'))
                         )
