@@ -92,6 +92,8 @@
                 <li class="{% active 'players:hero_abilities' %}"><a href="{% url 'players:hero_abilities' %}">Ability Comparison</a></li>
               </ul>
             </li>
+            {% comment %}
+            These are secret for now.
             <li class="dropdown {% active 'teams' main_nav %}">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Teams <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -104,6 +106,7 @@
                 <li class="{% active 'leagues:index' %}"><a href="{% url 'leagues:index' %}">Leagues Index</a></li>
               </ul>
             </li>
+            {% endcomment %}
 
             <li class="{% active 'about' main_nav %}">
               <a href="/blog/1">About</a>
