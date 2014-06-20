@@ -221,8 +221,15 @@ window.jsUtils = {}
 
 function scorebarToggles(){
   $('.scorebar').hide();
-  $('#show-score').click(function(){$('.scorebar').fadeIn('fast');});
-  $('#hide-score').click(function(){$('.scorebar').fadeOut('fast');});
+  $('.win-glyph').hide();
+  $('#show-score').click(function(){
+    $('.win-glyph').fadeIn('fast');
+    $('.scorebar').fadeIn('fast');
+  });
+  $('#hide-score').click(function(){
+    $('.win-glyph').fadeOut('fast');
+    $('.scorebar').fadeOut('fast');
+  });
 }
 
 window.jsUtils.scorebarToggles = scorebarToggles

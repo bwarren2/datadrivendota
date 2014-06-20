@@ -26,6 +26,12 @@ class Command(BaseCommand):
         # .exclude(lobby_type__steam_id=7)
 
         def process_matches(unprocessed):
+            def tournament(unprocessed):
+                matches = unprocessed.filter(
+                    skill=4
+                )
+                matches.update(validity=Match.LEGIT)
+
             def too_short(unprocessed):
                 matches = unprocessed.filter(
                     duration__lte=settings.MIN_MATCH_LENGTH
@@ -62,6 +68,7 @@ class Command(BaseCommand):
             # Things with ten human players, longer than min length, where no
             # one left, in the right lobby types, count
             def legitimize(unprocessed):
+                unprocessed.filter(skill=4).update(validity=Match.LEGIT)
                 ms = unprocessed.exclude(
                     duration__lte=settings.MIN_MATCH_LENGTH
                 )
@@ -76,6 +83,7 @@ class Command(BaseCommand):
                 ms = ms.exclude(pk__in=keys)
                 ms.update(validity=Match.LEGIT)
 
+            tournament(unprocessed)
             too_short(unprocessed)
             player_count(unprocessed)
             human_players(unprocessed)

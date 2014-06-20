@@ -537,6 +537,10 @@ def annotated_matches(pms_list, follow_list):
             match_data[id]['match_data']['Dire']['deaths'] = 0
             match_data[id]['match_data']['Dire']['assists'] = 0
             match_data[id]['match_data']['Dire']['KDA2'] = 0
+            if pms.match.radiant_team is not None:
+                match_data[id]['match_data']['Radiant']['team'] = pms.match.radiant_team
+            if pms.match.dire_team is not None:
+                match_data[id]['match_data']['Dire']['team'] = pms.match.dire_team
 
         match_data[id]['match_data']['display_date'] = \
             datetime.datetime.fromtimestamp(pms.match.start_time)

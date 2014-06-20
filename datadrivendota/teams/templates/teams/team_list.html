@@ -7,15 +7,17 @@
 {% endblock page_title %}
 {% block content %}
     {% for team in team_list %}
-            <div class='col-md-2'>
-        <a href="{% url 'teams:detail' steam_id=team.steam_id %}" class='thumbnail'>
+        <div class='col-md-2'>
+            <a href="{% url 'teams:detail' steam_id=team.steam_id %}" class='thumbnail'>
                 {% if team.teamdossier.logo_image %}
                     <img  src="{{team.teamdossier.logo_image.url}}" alt='{{team.teamdossier.name}}'>
 
                 {% else %}
                     <img class='thumbnail' alt='{{team.teamdossier.name}}'>
                 {% endif %}
-        </a>
-            </div>
+            </a>
+            <p class='overlayer'>{{team.teamdossier.name}}</p>
+
+        </div>
     {% endfor %}
 {% endblock content %}

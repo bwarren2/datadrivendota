@@ -6,9 +6,7 @@
 {% if match_data %}
 <div class="container">
   <div class="row">
-    <div class="col-md-8">
       {% include "matches/_match_list.html" %}
-    </div>
     <div class='col-md-4'>
       <div>
         <h4>Score Toggles</h4>
@@ -91,8 +89,6 @@ function kda2_score() {
 
 
 $(document).ready(function() {
-  $('#hero-anchor').click(heroImage);
-  $('#player-anchor').click(playerImage);
   $('#score-format-raw').click(raw_score);
   $('#score-format-kda2').click(kda2_score);
   window.jsUtils.scorebarToggles();

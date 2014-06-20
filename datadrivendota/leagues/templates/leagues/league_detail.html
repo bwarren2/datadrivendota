@@ -2,66 +2,32 @@
 
 {% load staticfiles player_extras %}
 {% block title %}
-    {{team.teamdossier.name}}
+    {{league.leaguedossier.display_name}}
 {% endblock title %}
 {% block page_title %}
-    {{team.teamdossier.name}}
+    {{league.leaguedossier.display_name}}
 {% endblock page_title %}
 {% block content %}
     <div class='row'>
     <div class='col-md-4'>
-        <h4>Hero Winrate</h4>
+        <h4>bar</h4>
         <span id='winrate_chart'></span>
     </div>
     <div class='col-md-4'>
         <h4>Foo</h4>
         <span id='winrate_chart'></span>
     </div>
-    <div class="team-infobox col-md-4">
+    <div class="league-infobox col-md-4">
         <img class='thumbnail' style='margin-top:10px'
         {% if team.teamdossier.logo_image %}
-            src="{{ team.teamdossier.logo_image.url }}"
+            src="{% static 'images/blank-logo.png' %}"
         {% else %}
             src=""
         {% endif %}
         >
-        <h2>{{ team.teamdossier.name }}
+        <h2>{{ league.leaguedossier.display_name }}
         </h2>
-        <h6>Roster:</h6>
-        <ul>
-                <li>
-                    {% player_link team.teamdossier.player_0 %}
-                </li>
-                <li>
-                    {% player_link team.teamdossier.player_1 %}
-                </li>
-                <li>
-                    {% player_link team.teamdossier.player_2 %}
-                </li>
-                <li>
-                    {% player_link team.teamdossier.player_3 %}
-                </li>
-                <li>
-                    {% player_link team.teamdossier.player_4 %}
-                </li>
-        </ul>
-            {% if team.teamdossier.admin %}
-            <h6>Admin:</h6>
 
-                <ul><li>
-                    {% player_link team.teamdossier.admin %}
-                </li></ul>
-            {% endif %}
-
-
-        {% comment %}
-
-       <h6>Wins: {{stats.wins}}</h6>
-      <h6>Losses: {{stats.losses}}</h6>
-      <h6>Winrate: {{stats.winrate}}%</h6>
-      <h6>Total Games: {{stats.total}}</h6>
-      <h6>Steam ID: {{ player.steam_id }}</h6>
-      {% endcomment %}
     </div>
     </div>
     <div class='row' style='padding-top:15px'>

@@ -1,10 +1,15 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% load staticfiles %}
 
-{% for league in league_list %}
-<div>
-{{league.leaguedossier.display_name}}
-</div>
-{% endfor %}
+{% block content %}
+    {% for league in league_list %}
+        <div class='col-md-2'>
+            <a href="{% url 'leagues:detail' steam_id=league.steam_id %}" class='thumbnail'>
+                <img src="{% static 'images/blank-logo.png' %}" alt="{{league.leaguedossier.name}}"/>
+            </a>
+            <p class='overlayer'>{{league.leaguedossier.display_name}}</p>
+
+        </div>
+    {% endfor %}
 {% endblock content %}
