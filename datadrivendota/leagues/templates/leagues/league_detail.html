@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% load staticfiles player_extras %}
+{% block title %}
+    {{league.leaguedossier.display_name}}
+{% endblock title %}
+{% block page_title %}
+    {{league.leaguedossier.display_name}}
+{% endblock page_title %}
+{% block content %}
+    <div class='row'>
+    <div class='col-md-4'>
+        <h4>bar</h4>
+        <span id='winrate_chart'></span>
+    </div>
+    <div class='col-md-4'>
+        <h4>Foo</h4>
+        <span id='winrate_chart'></span>
+    </div>
+    <div class="league-infobox col-md-4">
+        <img class='thumbnail' style='margin-top:10px'
+        {% if team.teamdossier.logo_image %}
+            src="{% static 'images/blank-logo.png' %}"
+        {% else %}
+            src=""
+        {% endif %}
+        >
+        <h2>{{ league.leaguedossier.display_name }}
+        </h2>
+
+    </div>
+    </div>
+    <div class='row' style='padding-top:15px'>
+        <div class='col-md-8'>
+            {% include "matches/_match_list.html" %}
+        </div>
+
+        <div class='col-md-4'>
+
+            <div class='row'>
+              <div class='col-md-6'>
+                <button id='show-score' type="button" class="btn btn-primary btn-lg btn-block">Show Scores</button>
+              </div>
+              <div class='col-md-6'>
+                <button id='hide-score' type="button" class="btn btn-primary btn-lg btn-block">Hide Scores</button>
+              </div>
+            </div>
+
+            <div class='row'>
+              <div class='col-md-6'>
+                <button id='score-format-raw' type="button" class="btn btn-primary btn-lg btn-block">K/D/A</button>
+              </div>
+              <div class='col-md-6'>
+                <button id='score-format-kda2' type="button" class="btn btn-primary btn-lg btn-block">K-D+A/2</button>
+              </div>
+            </div>
+
+        </div>
+    </div>
+{% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range_with_ellipses %}
+{% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+    function raw_score() {
+  $('div.scorebar').fadeOut('fast', function() {
+    $(this).html($(this).attr('data-raw-score'));
+    $(this).fadeIn('fast');
+  });
+}
+
+function kda2_score() {
+  $('div.scorebar').fadeOut('fast', function() {
+    $(this).html($(this).attr('data-kda2'));
+    $(this).fadeIn('fast');
+  });
+}
+
+
+$(document).ready(function() {
+  $('#score-format-raw').click(raw_score);
+  $('#score-format-kda2').click(kda2_score);
+  window.jsUtils.scorebarToggles();
+});
+</script>
+{% endblock extra_js %}

@@ -8,7 +8,17 @@
 
 {% block page_title %}Match #{{ match.steam_id }}
 <small>  {{ match.game_mode.description }} {{ match.lobby_type.description }},
-    {{ match.hms_duration }} @ {{ match.hms_start_time }}</small>{% endblock page_title %}
+    {{ match.hms_duration }} @ {{ match.hms_start_time }}</small>
+    {% if match.league.leaguedossier %}
+      <br>
+      <small>Tournament:
+      {% if match.league.leaguedossier.tournament_url %}
+        <a href="{{match.league.leaguedossier.tournament_url}}">{{match.league.leaguedossier.display_name}}</a>
+      {% else %}
+        {{match.league.leaguedossier.display_name}}
+      {% endif %}</small>
+    {% endif %}
+    {% endblock page_title %}
 
 {% block content %}
 
@@ -68,35 +78,6 @@
     </div>
 
     <div class="row">
-      <div class="dire-pickban col-md-6">
-        <h3>Dire</h3>
-        <div class="row">
-          <div class="col-md-3">
-            <h4>Ban</h4>
-            <ul class="pickban-list" id="dire-ban">
-              {% for pb in dire_bans %}
-                <li data-pborder="{{ pb.order }}">
-                  <a href="#" class="thumbnail">
-                    <img src="{{ pb.hero.thumbshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
-                  </a>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-          <div class="col-md-9">
-            <h4>Pick</h4>
-            <ul class="pickban-list" id="dire-pick">
-              {% for pb in dire_picks %}
-                <li data-pborder="{{ pb.order }}">
-                  <a href="#" class="thumbnail">
-                    <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
-                  </a>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-      </div>
 
       <div class="radiant-pickban col-md-6">
         <h3>Radiant</h3>
@@ -135,6 +116,37 @@
           </div>
         </div>
       </div>
+
+      <div class="dire-pickban col-md-6">
+        <h3>Dire</h3>
+        <div class="row">
+          <div class="col-md-3">
+            <h4>Ban</h4>
+            <ul class="pickban-list" id="dire-ban">
+              {% for pb in dire_bans %}
+                <li data-pborder="{{ pb.order }}">
+                  <a href="#" class="thumbnail">
+                    <img src="{{ pb.hero.thumbshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="col-md-9">
+            <h4>Pick</h4>
+            <ul class="pickban-list" id="dire-pick">
+              {% for pb in dire_picks %}
+                <li data-pborder="{{ pb.order }}">
+                  <a href="#" class="thumbnail">
+                    <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   {% endif %}

@@ -17,11 +17,15 @@ class LeagueDossier(models.Model):
 
     @property
     def display_name(self):
-        return self.name.replace('#DOTA_Item_', '').replace('_', ' ')
+        str = self.name.replace('#DOTA_Item_League_', '')
+        str = str.replace('#DOTA_Item_', '').replace('_', ' ')
+        return str
 
     @property
     def display_description(self):
-        return self.description.replace('#DOTA_Item_', '').replace('_', ' ')
+        str = self.description.replace('#DOTA_Item_League_', '')
+        str = str.replace('#DOTA_Item_', '').replace('_', ' ')
+        return str
 
     def __unicode__(self):
         return self.name

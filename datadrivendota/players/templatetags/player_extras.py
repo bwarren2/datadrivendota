@@ -6,6 +6,8 @@ register = template.Library()
 
 @register.simple_tag
 def player_link(player):
+    if player is None:
+        return ''
     if player.is_masked():
         return "Anonymous"
 

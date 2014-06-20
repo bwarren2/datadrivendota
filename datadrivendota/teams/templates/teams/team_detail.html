@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% load staticfiles player_extras %}
+{% block title %}
+    {{team.teamdossier.name}}
+{% endblock title %}
+{% block page_title %}
+    {{team.teamdossier.name}}
+{% endblock page_title %}
+{% block content %}
+    <div class='row'>
+    <div class='col-md-4'>
+        <h4>Hero Winrate</h4>
+        <span id='winrate_chart'></span>
+    </div>
+    <div class='col-md-4'>
+        <h4>Foo</h4>
+        <span id='winrate_chart'></span>
+    </div>
+    <div class="team-infobox col-md-4">
+        <img class='thumbnail' style='margin-top:10px'
+        {% if team.teamdossier.logo_image %}
+            src="{{ team.teamdossier.logo_image.url }}"
+        {% else %}
+            src=""
+        {% endif %}
+        >
+        <h2>{{ team.teamdossier.name }}
+        </h2>
+        <h6>Roster:</h6>
+        <ul>
+                <li>
+                    {% player_link team.teamdossier.player_0 %}
+                </li>
+                <li>
+                    {% player_link team.teamdossier.player_1 %}
+                </li>
+                <li>
+                    {% player_link team.teamdossier.player_2 %}
+                </li>
+                <li>
+                    {% player_link team.teamdossier.player_3 %}
+                </li>
+                <li>
+                    {% player_link team.teamdossier.player_4 %}
+                </li>
+        </ul>
+            {% if team.teamdossier.admin %}
+            <h6>Admin:</h6>
+
+                <ul><li>
+                    {% player_link team.teamdossier.admin %}
+                </li></ul>
+            {% endif %}
+
+
+        {% comment %}
+
+       <h6>Wins: {{stats.wins}}</h6>
+      <h6>Losses: {{stats.losses}}</h6>
+      <h6>Winrate: {{stats.winrate}}%</h6>
+      <h6>Total Games: {{stats.total}}</h6>
+      <h6>Steam ID: {{ player.steam_id }}</h6>
+      {% endcomment %}
+    </div>
+    </div>
+    <div class='row' style='padding-top:15px'>
+        <div class='col-md-8'>
+            {% include "matches/_match_list.html" %}
+        </div>
+
+        <div class='col-md-4'>
+
+            <div class='row'>
+              <div class='col-md-6'>
+                <button id='show-score' type="button" class="btn btn-primary btn-lg btn-block">Show Scores</button>
+              </div>
+              <div class='col-md-6'>
+                <button id='hide-score' type="button" class="btn btn-primary btn-lg btn-block">Hide Scores</button>
+              </div>
+            </div>
+
+            <div class='row'>
+              <div class='col-md-6'>
+                <button id='score-format-raw' type="button" class="btn btn-primary btn-lg btn-block">K/D/A</button>
+              </div>
+              <div class='col-md-6'>
+                <button id='score-format-kda2' type="button" class="btn btn-primary btn-lg btn-block">K-D+A/2</button>
+              </div>
+            </div>
+
+        </div>
+    </div>
+{% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range_with_ellipses %}
+{% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+    function raw_score() {
+  $('div.scorebar').fadeOut('fast', function() {
+    $(this).html($(this).attr('data-raw-score'));
+    $(this).fadeIn('fast');
+  });
+}
+
+function kda2_score() {
+  $('div.scorebar').fadeOut('fast', function() {
+    $(this).html($(this).attr('data-kda2'));
+    $(this).fadeIn('fast');
+  });
+}
+
+
+$(document).ready(function() {
+  $('#score-format-raw').click(raw_score);
+  $('#score-format-kda2').click(kda2_score);
+  window.jsUtils.scorebarToggles();
+});
+</script>
+{% endblock extra_js %}
