@@ -5,7 +5,7 @@ from django.db import models
 
 class League(models.Model):
     """Analogous to a tournament, these are game series to which you can buy a ticket in the game client"""
-    steam_id = models.IntegerField()
+    steam_id = models.IntegerField(unique=True)
 
 
 class LeagueDossier(models.Model):

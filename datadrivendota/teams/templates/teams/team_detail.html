@@ -14,8 +14,8 @@
         <span id='winrate_chart'></span>
     </div>
     <div class='col-md-4'>
-        <h4>Foo</h4>
-        <span id='winrate_chart'></span>
+        <h4>Pick/Bans</h4>
+        <span id='pick_ban'></span>
     </div>
     <div class="team-infobox col-md-4">
         <img class='thumbnail' style='margin-top:10px'
@@ -116,5 +116,30 @@ $(document).ready(function() {
   $('#score-format-kda2').click(kda2_score);
   window.jsUtils.scorebarToggles();
 });
+</script>
+
+<script type="text/javascript">
+  window.apiHit(
+    "#winrate_chart",
+    '{% url "teams:api_winrate_chart" %}',
+      $.param({
+        team: '{{team.name}}',
+        group_var: 'alignment',
+        width: 300,
+        height: 300,
+      }, true
+    )
+  );
+  window.apiHit(
+    "#pick_ban",
+    '{% url "teams:api_pick_ban_chart" %}',
+      $.param({
+        team: '{{team.name}}',
+        group_var: 'alignment',
+        width: 300,
+        height: 300,
+      }, true
+    )
+  );
 </script>
 {% endblock extra_js %}
