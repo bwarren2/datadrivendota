@@ -2,22 +2,22 @@
 
 <div class="row" style='padding-top:10px'>
   <div class="cast col-md-1">
-    <img class='side-pip' src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.which_side }}' title='dire'>
-    {% if dire_cast_list.0.is_win %}
+    <img class='side-pip' src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.which_side }}' title='Radiant'>
+    {% if radiant_cast_list.0.is_win %}
       <div class='glyphicon glyphicon-ok-circle win-glyph side-win-pip ' title='Won'></div>
     {% endif %}
   </div>
-  {% for summary in dire_cast_list %}
-    <div class="cast dire col-md-2">
+  {% for summary in radiant_cast_list %}
+    <div class="cast radiant col-md-2">
       {% include "matches/_single_match_card.html" %}
     </div>
   {% endfor %}
-  {% if match.dire_team.teamdossier %}
+  {% if match.radiant_team.teamdossier %}
     <div class="cast col-md-1">
-      {% if match.dire_team.teamdossier.logo_image %}
-      <img class='league-pip' src="{{match.dire_team.teamdossier.logo_image.url}}" alt='{{ match.dire_team.teamdossier.name }}' title='{{match.dire_team.teamdossier.name}}'>
+      {% if match.radiant_team.teamdossier.logo_image %}
+      <img class='league-pip' src="{{match.radiant_team.teamdossier.logo_image.url}}" alt='{{ match.radiant_team.teamdossier.name }}' title='{{match.radiant_team.teamdossier.name}}'>
       {% else %}
-      <p>{{match.dire_team.teamdossier.name}}</p>
+      <p>{{match.radiant_team.teamdossier.name}}</p>
       {% endif %}
     </div>
   {% endif %}
