@@ -378,7 +378,6 @@ class RetrievePlayerRecords(ApiFollower):
 
     def spawnDetailCalls(self):
         for result in self.result['matches']:
-            print self.result['matches']
             vac = ValveApiCall()
             um = UploadMatch()
             self.api_context.match_id = result['match_id']
@@ -772,7 +771,6 @@ class AcquireTeams(Task):
 class UploadTeam(ApiFollower):
     def run(self, urldata):
         for team in self.result['teams']:
-            print self.api_context.refresh_records, team
             t, created = Team.objects.get_or_create(
                 steam_id=team['team_id']
                 )
@@ -877,9 +875,7 @@ class UpdateTeamLogos(BaseTask):
             pageaccess = urllib2.urlopen(URL, timeout=5)
             data = json.loads(pageaccess.read())['data']
 
-            print data
             URL = data['url']
-            print URL
 
             try:
                 imgdata = urllib2.urlopen(URL, timeout=5)

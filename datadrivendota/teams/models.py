@@ -3,7 +3,7 @@ from django.db import models
 
 class Team(models.Model):
     """Pro team data"""
-    steam_id = models.IntegerField()
+    steam_id = models.IntegerField(unique=True)
 
 
 class TeamDossier(models.Model):
