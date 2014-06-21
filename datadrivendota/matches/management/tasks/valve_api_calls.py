@@ -816,8 +816,6 @@ class UploadTeam(ApiFollower):
                     for internal, external in mapping_dict.iteritems():
                         if external in team.iterkeys():
                             setattr(teamdoss, internal, team.get(external))
-                    if 'rating' in team.iterkeys():
-                            setattr(teamdoss, 'rating', team.get('rating'))
 
                     map_team_players(teamdoss, team)
                     teamdoss.save()
@@ -833,7 +831,6 @@ class UploadTeam(ApiFollower):
                     tag=team['tag'],
                     created=team['time_created'],
                     rating=team['rating'],
-                    logo=team['logo'],
                     logo_sponsor=team['logo_sponsor'],
                     country_code=team['country_code'],
                     url=team['url'],
@@ -842,6 +839,9 @@ class UploadTeam(ApiFollower):
                     ],
                     )
                 map_team_players(teamdoss, team)
+                if 'rating' in team.iterkeys():
+                        setattr(teamdoss, 'rating', team.get('rating'))
+
                 teamdoss.save()
 
                 c = ApiContext()
