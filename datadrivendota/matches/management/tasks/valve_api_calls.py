@@ -761,8 +761,8 @@ class AcquireTeams(Task):
             .select_related('radiant_team__steam_id')
         teams = [m.radiant_team.steam_id for m in matches]
 
-        matches = Match.objects.filter(skill=4).exclude(radiant_team=None)\
-            .select_related('radiant_team__steam_id')
+        matches = Match.objects.filter(skill=4).exclude(dire_team=None)\
+            .select_related('dire_team__steam_id')
         teams.extend([m.dire_team.steam_id for m in matches])
         teams = list(set(teams))
         for t in teams:
@@ -770,6 +770,21 @@ class AcquireTeams(Task):
             c = ApiContext()
             c.refresh_records = True
             c.start_at_team_id = t
+            c.teams_requested = 1
+            vac = ValveApiCall()
+            ul = UploadTeam()
+            c = chain(vac.s(api_context=c, mode='GetTeamInfoByTeamID'), ul.s())
+            c.delay()
+
+
+class AcquireTeamDossiers(Task):
+
+    def run(self):
+        teams = Team.objects.filter(teamdossier=None)
+        for t in teams:
+            c = ApiContext()
+            c.refresh_records = True
+            c.start_at_team_id = t.steam_id
             c.teams_requested = 1
             vac = ValveApiCall()
             ul = UploadTeam()
