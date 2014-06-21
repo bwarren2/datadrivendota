@@ -854,7 +854,7 @@ class UpdateTeamLogos(BaseTask):
         logo_sponsor = team.teamdossier.logo_sponsor
 
         try:
-            filename, f = get_logo_image(logo, team)
+            filename, f = get_logo_image(logo, team, '_logo.png')
             team.teamdossier.logo_image.save(filename, File(open(f.name)))
         except Exception as err:
             if team.teamdossier.logo_image is None:
@@ -865,7 +865,9 @@ class UpdateTeamLogos(BaseTask):
             print "Failed for {0}, {1}".format(team.teamdossier.name, err)
 
         try:
-            filename, f = get_logo_image(logo_sponsor, team)
+            filename, f = get_logo_image(
+                logo_sponsor, team, '_logo_sponsor.png'
+                )
             team.teamdossier.logo_sponsor_image.save(
                 filename, File(open(f.name))
                 )
@@ -1040,7 +1042,7 @@ def map_team_players(teamdoss, team):
             setattr(teamdoss, internal, p)
 
 
-def get_logo_image(logo, team):
+def get_logo_image(logo, team, suffix):
         mode = 'GetUGCFileDetails'
         c = ApiContext()
         c.ugcid = logo
@@ -1053,5 +1055,5 @@ def get_logo_image(logo, team):
         imgdata = urllib2.urlopen(URL, timeout=5)
         with open('%s.png' % str(uuid4()), 'w+') as f:
             f.write(imgdata.read())
-        filename = slugify(team.teamdossier.name)+'_logo.png'
+        filename = slugify(team.teamdossier.name)+suffix
         return filename, f
