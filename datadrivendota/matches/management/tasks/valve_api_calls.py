@@ -450,6 +450,16 @@ class UploadMatch(ApiFollower):
         overall match data.
         """
         data = self.result
+        """ This is a really stupid hack.  I have no idea how a get_or_create on a unique field can return two things, but this is what celery is freaking about."""
+        try:
+            league = League.objects.filter(
+                steam_id=data['leagueid']
+                )[0]
+        except League.DoesNotExist:
+            league = League.objects.create(
+                steam_id=data['leagueid']
+                )
+
         kwargs = {
             'radiant_win': data['radiant_win'],
             'duration': data['duration'],
@@ -466,9 +476,7 @@ class UploadMatch(ApiFollower):
                 steam_id=data['lobby_type']
             )[0],
             'human_players': data['human_players'],
-            'league': League.objects.get_or_create(
-                steam_id=data['leagueid']
-                )[0],
+            'league': league,
             'positive_votes': data['positive_votes'],
             'negative_votes': data['negative_votes'],
             'game_mode': GameMode.objects.get_or_create(
