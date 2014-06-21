@@ -47,7 +47,7 @@ class Match(models.Model):
     radiant_team = models.ForeignKey(
         'teams.Team',
         null=True,
-        related_name='radiant_guild'
+        related_name='radiant_team'
     )
     radiant_team_complete = models.NullBooleanField()
     dire_team = models.ForeignKey(

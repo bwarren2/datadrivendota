@@ -18,10 +18,22 @@ from datadrivendota.views import ChartFormView, ApiView
 class TeamList(ListView):
     """The index of imported leagues"""
     model = Team
+    paginate_by = 30
+    template_name = 'teams/team_list.html'
 
     def get_queryset(self):
-        qs = self.model.objects.all().select_related()
+        qs = self.model.sorted.all()
         return qs
+
+    def paginate_queryset(self, queryset, page_size):
+        page = self.request.GET.get('page')
+        paginator = SmarterPaginator(
+            object_list=queryset,
+            per_page=page_size,
+            current_page=page
+        )
+        objs = paginator.current_page
+        return (paginator, page, objs, True)
 
 
 class TeamDetail(DetailView):

@@ -1,9 +1,12 @@
 from django.db import models
+from .managers import SortedTeamManager
 
 
 class Team(models.Model):
     """Pro team data"""
     steam_id = models.IntegerField(unique=True)
+    objects = models.Manager()
+    sorted = SortedTeamManager()
 
 
 class TeamDossier(models.Model):
