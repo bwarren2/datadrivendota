@@ -854,31 +854,33 @@ class UpdateTeamLogos(BaseTask):
         logo = team.teamdossier.logo
         logo_sponsor = team.teamdossier.logo_sponsor
 
-        try:
-            filename, f = get_logo_image(logo, team, '_logo.png')
-            team.teamdossier.logo_image.save(filename, File(open(f.name)))
-        except Exception as err:
-            if team.teamdossier.logo_image is None:
-                filename = slugify(team.teamdossier.name)+'_logo.png'
-                team.teamdossier.logo_image.save(
-                    filename, File(open('https://s3.amazonaws.com/datadrivendota/images/blank-logo.png'))
-                    )
-            print "Failed for {0}, {1}".format(team.teamdossier.name, err)
+        if logo != 0:
+            try:
+                filename, f = get_logo_image(logo, team, '_logo.png')
+                team.teamdossier.logo_image.save(filename, File(open(f.name)))
+            except Exception as err:
+                if team.teamdossier.logo_image is None:
+                    filename = slugify(team.teamdossier.name)+'_logo.png'
+                    team.teamdossier.logo_image.save(
+                        filename, File(open('https://s3.amazonaws.com/datadrivendota/images/blank-logo.png'))
+                        )
+                print "Failed for {0}, {1}".format(team.teamdossier.name, err)
 
-        try:
-            filename, f = get_logo_image(
-                logo_sponsor, team, '_logo_sponsor.png'
-                )
-            team.teamdossier.logo_sponsor_image.save(
-                filename, File(open(f.name))
-                )
-        except Exception as err:
-            if team.teamdossier.logo_sponsor_image is None:
-                filename = slugify(team.teamdossier.name)+'_logo_sponsor.png'
-                team.teamdossier.logo_sponsor_image.save(
-                    filename, File(open('https://s3.amazonaws.com/datadrivendota/images/blank-logo.png'))
+        if logo_sponsor != 0:
+            try:
+                filename, f = get_logo_image(
+                    logo_sponsor, team, '_logo_sponsor.png'
                     )
-            print "Failed for {0}, {1}".format(team.teamdossier.name, err)
+                team.teamdossier.logo_sponsor_image.save(
+                    filename, File(open(f.name))
+                    )
+            except Exception as err:
+                if team.teamdossier.logo_sponsor_image is None:
+                    filename = slugify(team.teamdossier.name)+'_logo_sponsor.png'
+                    team.teamdossier.logo_sponsor_image.save(
+                        filename, File(open('https://s3.amazonaws.com/datadrivendota/images/blank-logo.png'))
+                        )
+                print "Failed for {0}, {1}".format(team.teamdossier.name, err)
 
 
 class AcquireLeagues(Task):
@@ -1049,12 +1051,18 @@ def get_logo_image(logo, team, suffix):
         c.ugcid = logo
         URL = 'http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?appid=570&' + \
             urlencode(c.toUrlDict(mode))
-        pageaccess = urllib2.urlopen(URL, timeout=5)
-        data = json.loads(pageaccess.read())['data']
+        try:
+            pageaccess = urllib2.urlopen(URL, timeout=5)
+            data = json.loads(pageaccess.read())['data']
+            URL = data['url']
+        except urllib2.HTTPError as err:
+            print "{0} for {1}".format(err.code, URL)
 
-        URL = data['url']
-        imgdata = urllib2.urlopen(URL, timeout=5)
-        with open('%s.png' % str(uuid4()), 'w+') as f:
-            f.write(imgdata.read())
-        filename = slugify(team.teamdossier.name)+suffix
-        return filename, f
+        try:
+            imgdata = urllib2.urlopen(URL, timeout=5)
+            with open('%s.png' % str(uuid4()), 'w+') as f:
+                f.write(imgdata.read())
+            filename = slugify(team.teamdossier.name)+suffix
+            return filename, f
+        except urllib2.HTTPError as err:
+            print "{0} for {1}".format(err.code, URL)
