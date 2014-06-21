@@ -807,7 +807,6 @@ class UploadTeam(ApiFollower):
                         'name': 'name',
                         'tag': 'tag',
                         'created': 'time_created',
-                        'rating': 'rating',
                         'logo': 'logo',
                         'logo_sponsor': 'logo_sponsor',
                         'country_code': 'country_code',
@@ -817,6 +816,9 @@ class UploadTeam(ApiFollower):
                     for internal, external in mapping_dict.iteritems():
                         if external in team.iterkeys():
                             setattr(teamdoss, internal, team.get(external))
+                    if 'rating' in team.iterkeys():
+                            setattr(teamdoss, 'rating', team.get('rating'))
+
                     map_team_players(teamdoss, team)
                     teamdoss.save()
 
