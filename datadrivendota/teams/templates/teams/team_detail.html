@@ -10,11 +10,11 @@
 {% block content %}
     <div class='row'>
     <div class='col-md-4'>
-        <h4>Hero Winrate</h4>
+        <h4>90 Day Hero Winrate</h4>
         <span id='winrate_chart'></span>
     </div>
     <div class='col-md-4'>
-        <h4>Pick/Bans</h4>
+        <h4>90 Day Pick/Bans</h4>
         <span id='pick_ban'></span>
     </div>
     <div class="team-infobox col-md-4">
@@ -25,8 +25,8 @@
             src=""
         {% endif %}
         >
-        <h2>{{ team.teamdossier.name }}
-        </h2>
+
+        <h2>{{ team.teamdossier.name }}</h2>
         <h6>Roster:</h6>
         <ul>
                 <li>
@@ -119,12 +119,14 @@ $(document).ready(function() {
 </script>
 
 <script type="text/javascript">
+
   window.apiHit(
     "#winrate_chart",
     '{% url "teams:api_winrate_chart" %}',
       $.param({
-        team: '{{team.name}}',
+        team: '{{team.teamdossier.name}}',
         group_var: 'alignment',
+        min_date: '{{min_date}}',
         width: 300,
         height: 300,
       }, true
@@ -134,8 +136,9 @@ $(document).ready(function() {
     "#pick_ban",
     '{% url "teams:api_pick_ban_chart" %}',
       $.param({
-        team: '{{team.name}}',
+        team: '{{team.teamdossier.name}}',
         group_var: 'alignment',
+        min_date: '{{min_date}}',
         width: 300,
         height: 300,
       }, true

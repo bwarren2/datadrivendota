@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
@@ -43,7 +44,6 @@ class TeamDetail(DetailView):
         return Team.objects.get(steam_id=self.kwargs.get('steam_id'))
 
     def get_context_data(self, **kwargs):
-        print self.object.steam_id
         match_list = Match.objects.filter(
             skill=4
             )
@@ -67,10 +67,12 @@ class TeamDetail(DetailView):
             objects.filter(match__in=match_list)\
             .select_related().order_by('-match__start_time')[:500]
         match_data = annotated_matches(pms_list, [])
+        min_date = datetime.date.today() - datetime.timedelta(days=90)
 
         context = {
             'match_list': match_list,
             'match_data': match_data,
+            'min_date': min_date.isoformat(),
         }
         return super(TeamDetail, self).get_context_data(**context)
 

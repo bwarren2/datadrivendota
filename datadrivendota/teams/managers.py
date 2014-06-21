@@ -6,6 +6,7 @@ class SortedTeamManager(models.Manager):
 
     def get_queryset(self):
         qs = super(SortedTeamManager, self).get_queryset()\
+            .exclude(teamdossier=None)\
             .select_related('teamdossier')\
             .annotate(Count('radiant_team')).order_by('-radiant_team__count')
         return qs

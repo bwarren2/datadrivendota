@@ -21,6 +21,11 @@ urlpatterns = patterns(
     ),
     url(r'^api/getteams/$', views.team_list, name='team_list'),
     url(
+        r'^api/winrate/$',
+        views.ApiWinrateChart.as_view(),
+        name='api_winrate_chart'
+        ),
+    url(
         r'^api/pick-ban/$',
         views.ApiPickBanChart.as_view(),
         name='api_pick_ban_chart'
