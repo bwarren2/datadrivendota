@@ -749,12 +749,13 @@ class AcquireMatches(Task):
 class AcquireTeams(Task):
 
     def run(self):
-        matches = Match.objects.filter(skill=4)
-        print matches
-        teams = [m.radiant_team.steam_id for m in matches if m.radiant_team is not None != 0 and m.radiant_team.steam_id is not None]
-        teams.extend(
-            [m.dire_team.steam_id for m in matches if m.dire_team is not None and m.dire_team.steam_id is not None]
-        )
+        matches = Match.objects.filter(skill=4).exclude(radiant_team=None)\
+            .select_related('radiant_team__steam_id')
+        teams = [m.radiant_team.steam_id for m in matches]
+
+        matches = Match.objects.filter(skill=4).exclude(radiant_team=None)\
+            .select_related('radiant_team__steam_id')
+        teams.extend([m.dire_team.steam_id for m in matches])
         teams = list(set(teams))
         for t in teams:
             print t
