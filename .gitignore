@@ -52,3 +52,6 @@ heroku_static_pages/
 #Sublime project
 ddd.sublime-project
 ddd.sublime-workspace
+
+#Temp pngs
+*-*-*-*-*.png
