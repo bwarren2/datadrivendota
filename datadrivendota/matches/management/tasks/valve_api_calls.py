@@ -830,7 +830,6 @@ class UploadTeam(ApiFollower):
                     name=team['name'],
                     tag=team['tag'],
                     created=team['time_created'],
-                    rating=team['rating'],
                     logo_sponsor=team['logo_sponsor'],
                     country_code=team['country_code'],
                     url=team['url'],
