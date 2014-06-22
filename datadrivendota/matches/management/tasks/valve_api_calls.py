@@ -6,7 +6,6 @@ from itertools import chain as meld
 from copy import deepcopy
 from time import time as now
 from urllib import urlencode
-from os.path import splitext
 from uuid import uuid4
 from django.core.files import File
 from django.utils.text import slugify
