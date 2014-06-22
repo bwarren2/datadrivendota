@@ -2,11 +2,14 @@ import urllib2
 import json
 import socket
 import ssl
+from smtplib import SMTP
 from itertools import chain as meld
 from copy import deepcopy
 from time import time as now
 from urllib import urlencode
 from uuid import uuid4
+from celery.exceptions import SoftTimeLimitExceeded
+
 from django.core.files import File
 from django.utils.text import slugify
 from matches.models import (
@@ -19,6 +22,7 @@ from matches.models import (
     AdditionalUnit,
     PickBan
 )
+from django.conf import settings
 from datadrivendota.settings.base import STEAM_API_KEY
 from players.models import Player, get_tracks
 from heroes.models import Ability, Hero
@@ -107,19 +111,31 @@ class ApiContext(object):
         return return_dict
 
     def __str__(self):
-        strng = "Acct id: " + str(self.account_id) + "\n"
-        strng += "matches requested: "+str(self.matches_requested)+"\n"
-        strng += "Skill: "+str(self.skill)+"\n"
-        strng += "date max: "+str(self.date_max)+"\n"
-        strng += "start_at_match_id: "+str(self.start_at_match_id)+"\n"
-        strng += "key: "+str(self.key)+"\n"
 
-        # Things we care about internally
-        strng += "start scrape time: "+str(self.start_scrape_time)+"\n"
-        strng += "matches desired: "+str(self.matches_desired)+"\n"
-        strng += "skill_levels: "+str(self.skill_levels)+"\n"
-        strng += "deepcopy: "+str(self.deepcopy)+"\n"
-        strng += "last scrape time: "+str(self.last_scrape_time)+"\n"
+        strng = ''
+        for field in [
+            'account_id',
+            'matches_requested',
+            'skill',
+            'date_max',
+            'start_at_match_id',
+            'key',
+            'match_id',
+            'hero_id',
+            'start_scrape_time',
+            'matches_desired'
+            'skill_levels',
+            'deepcopy',
+            'last_scrape_time',
+            'steamids',
+            'processed',
+            'refresh_records',
+            'date_pull',
+        ]:
+            if hasattr(self, field):
+                if self.get(field) is not None:
+                    strng = "{0}, {1} \n".format(field, self.get(field))
+
         return strng
 
 
@@ -207,134 +223,138 @@ class ValveApiCall(BaseTask):
         per valve specifications.  There should be a monthly one too.
         For lots more docs, see http://dev.dota2.com/showthread.php?t=58317
         """
-        # The steam API accepts a limited set of URLs, and requires a key
-        modeDict = {
-            'GetMatchHistory': (
-                'https://api.steampowered.com'
-                '/IDOTA2Match_570/GetMatchHistory/v001/'
-            ),
-            'GetMatchDetails': (
-                'https://api.steampowered.com'
-                '/IDOTA2Match_570/GetMatchDetails/v001/'
-            ),
-            'GetHeroes': (
-                'https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/'
-            ),
-            'GetPlayerSummaries': (
-                'https://api.steampowered.com'
-                '/ISteamUser/GetPlayerSummaries/v0002/'
-            ),
-            'EconomySchema': (
-                'https://api.steampowered.com/IEconItems_570/GetSchema/v0001/'
-            ),
-            'GetLeagueListing': (
-                'https://api.steampowered.com'
-                '/IDOTA2Match_570/GetLeagueListing/v0001/'
-            ),
-            'GetLiveLeagueGames': (
-                'https://api.steampowered.com'
-                '/IDOTA2Match_570/GetLiveLeagueGames/v0001/'
-            ),
-            'GetMatchHistoryBySequenceNum': (
-                'https://api.steampowered.com'
-                '/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v0001/'
-            ),
-            'GetTeamInfoByTeamID': (
-                'https://api.steampowered.com'
-                '/IDOTA2Match_570/GetTeamInfoByTeamID/v001/'
-            ),
-        }
-
-        # If you attempt to access a URL I do not think valve supports, I
-        # complain.
         try:
-            url = modeDict[mode]
-        except KeyError:
-            logger.info("Keyerrors!")
-            raise
-        URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
-        print URL
-        if mode in ['GetMatchHistory', 'GetTeamInfoByTeamID']:
-            logger.info("URL: " + URL)
-        # Exception handling for the URL opening.
-        try:
-            pageaccess = urllib2.urlopen(URL, timeout=5)
-        except urllib2.HTTPError, err:
-            if err.code == 104:
-                logger.error(
-                    "Got error 104 (connection reset by peer) for mode "
-                    + str(mode)
-                    + self.api_context.toUrlDict()
-                    + ".  Retrying."
-                )
-                self.retry(mode=mode)
-            elif err.code == 111:
-                logger.error(
-                    "Connection Refused! "
-                    + URL
-                    + ".  Retrying."
-                )
-                self.retry(mode=mode)
-            elif err.code == 404:
-                logger.error("Page not found! " + URL + ".  Retrying.")
-                self.retry(mode=mode)
-            elif err.code == 403:
-                logger.error(
-                    "Your access was denied. "
-                    + URL
-                    + ".  Retrying."
-                )
-                self.retry(mode=mode)
-            elif err.code == 401:
-                logger.error(
-                    "Unauth'd! "
-                    + URL
-                    + ".  Retrying."
-                )
-                self.retry(mode=mode)
-            elif err.code == 500:
-                logger.error("Server Error! " + URL + ".  Retrying.")
-                self.retry(mode=mode)
-            elif err.code == 503:
-                logger.error(
-                    "Server busy or limit exceeded "
-                    + URL
-                    + ".  Retrying."
-                )
-                self.retry(mode=mode)
-            else:
-                logger.error(
-                    "Got error "
-                    + str(err)
-                    + " with URL "
-                    + URL
-                    + ".  Retrying."
-                )
-                self.retry(mode=mode)
-        except BadStatusLine:
-            logger.error(
-                "Bad status line for url %s" % URL
-                + ".  Retrying."
-            )
-            self.retry(mode=mode)
-        except urllib2.URLError as err:
-            self.retry(mode=mode)
-        except (ssl.SSLError, socket.timeout) as err:
-            logger.error(
-                "Connection timeout for {url}. Error: {e}  Retrying.".format(
-                    url=URL,
-                    e=err
-                )
-            )
-            self.retry(mode=mode)
 
-        # If everything is kosher, import the result and return it.
-        data = json.loads(pageaccess.read())
-        # Append the options given so we can tell what the invocation was. For
-        # example, it is not straightforward to deduce the calling account_id
-        # unless you do this.
-        data['api_context'] = self.api_context
-        return data
+            # The steam API accepts a limited set of URLs, and requires a key
+            modeDict = {
+                'GetMatchHistory': (
+                    'https://api.steampowered.com'
+                    '/IDOTA2Match_570/GetMatchHistory/v001/'
+                ),
+                'GetMatchDetails': (
+                    'https://api.steampowered.com'
+                    '/IDOTA2Match_570/GetMatchDetails/v001/'
+                ),
+                'GetHeroes': (
+                    'https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/'
+                ),
+                'GetPlayerSummaries': (
+                    'https://api.steampowered.com'
+                    '/ISteamUser/GetPlayerSummaries/v0002/'
+                ),
+                'EconomySchema': (
+                    'https://api.steampowered.com/IEconItems_570/GetSchema/v0001/'
+                ),
+                'GetLeagueListing': (
+                    'https://api.steampowered.com'
+                    '/IDOTA2Match_570/GetLeagueListing/v0001/'
+                ),
+                'GetLiveLeagueGames': (
+                    'https://api.steampowered.com'
+                    '/IDOTA2Match_570/GetLiveLeagueGames/v0001/'
+                ),
+                'GetMatchHistoryBySequenceNum': (
+                    'https://api.steampowered.com'
+                    '/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v0001/'
+                ),
+                'GetTeamInfoByTeamID': (
+                    'https://api.steampowered.com'
+                    '/IDOTA2Match_570/GetTeamInfoByTeamID/v001/'
+                ),
+            }
+
+            # If you attempt to access a URL I do not think valve supports, I
+            # complain.
+            try:
+                url = modeDict[mode]
+            except KeyError:
+                logger.info("Keyerrors!")
+                raise
+            URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
+            print URL
+            if mode in ['GetMatchHistory', 'GetTeamInfoByTeamID']:
+                logger.info("URL: " + URL)
+            # Exception handling for the URL opening.
+            try:
+                pageaccess = urllib2.urlopen(URL, timeout=5)
+            except urllib2.HTTPError, err:
+                if err.code == 104:
+                    logger.error(
+                        "Got error 104 (connection reset by peer) for mode "
+                        + str(mode)
+                        + self.api_context.toUrlDict()
+                        + ".  Retrying."
+                    )
+                    self.retry(mode=mode)
+                elif err.code == 111:
+                    logger.error(
+                        "Connection Refused! "
+                        + URL
+                        + ".  Retrying."
+                    )
+                    self.retry(mode=mode)
+                elif err.code == 404:
+                    logger.error("Page not found! " + URL + ".  Retrying.")
+                    self.retry(mode=mode)
+                elif err.code == 403:
+                    logger.error(
+                        "Your access was denied. "
+                        + URL
+                        + ".  Retrying."
+                    )
+                    self.retry(mode=mode)
+                elif err.code == 401:
+                    logger.error(
+                        "Unauth'd! "
+                        + URL
+                        + ".  Retrying."
+                    )
+                    self.retry(mode=mode)
+                elif err.code == 500:
+                    logger.error("Server Error! " + URL + ".  Retrying.")
+                    self.retry(mode=mode)
+                elif err.code == 503:
+                    logger.error(
+                        "Server busy or limit exceeded "
+                        + URL
+                        + ".  Retrying."
+                    )
+                    self.retry(mode=mode)
+                else:
+                    logger.error(
+                        "Got error "
+                        + str(err)
+                        + " with URL "
+                        + URL
+                        + ".  Retrying."
+                    )
+                    self.retry(mode=mode)
+            except BadStatusLine:
+                logger.error(
+                    "Bad status line for url %s" % URL
+                    + ".  Retrying."
+                )
+                self.retry(mode=mode)
+            except urllib2.URLError as err:
+                self.retry(mode=mode)
+            except (ssl.SSLError, socket.timeout) as err:
+                logger.error(
+                    "Connection timeout for {url}. Error: {e}  Retrying.".format(
+                        url=URL,
+                        e=err
+                    )
+                )
+                self.retry(mode=mode)
+
+            # If everything is kosher, import the result and return it.
+            data = json.loads(pageaccess.read())
+            # Append the options given so we can tell what the invocation was. For
+            # example, it is not straightforward to deduce the calling account_id
+            # unless you do this.
+            data['api_context'] = self.api_context
+            return data
+        except SoftTimeLimitExceeded:
+            send_error_email(self.api_context.__str__())
 
 
 class RetrievePlayerRecords(ApiFollower):
@@ -1064,3 +1084,10 @@ def get_logo_image(logo, team, suffix):
             return filename, f
         except urllib2.HTTPError as err:
             print "{0} for {1}".format(err.code, URL)
+
+
+def send_error_email(body):
+    smtp = SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
+    smtp.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+    smtp.sendmail("erroremail@datadrivendota", "ben@datadrivendota.com", body)
+    smtp.quit()
