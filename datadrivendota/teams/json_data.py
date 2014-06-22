@@ -97,7 +97,9 @@ def team_winrate_json(
     if len(annotations) == 0:
         raise NoDataFound
 
-    heroes = list(set([row['hero__name'] for row in annotations]))
+    heroes = list(set([
+        row['hero__name'] for row in annotations if row['hero__name'] != ''
+        ]))
     wins = defaultdict(int)
     losses = defaultdict(int)
 

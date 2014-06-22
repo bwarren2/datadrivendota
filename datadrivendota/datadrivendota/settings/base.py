@@ -51,6 +51,13 @@ ADMINS = (
 # Email address used as sender (From field).
 SERVER_EMAIL = "celery@datadrivendota.com"
 
+EMAIL_USE_TLS = True
+EMAIL_PORT = getenv('MAILGUN_SMTP_PORT')
+EMAIL_TIMEOUT = 10
+EMAIL_HOST = getenv['MAILGUN_SMTP_SERVER']
+EMAIL_HOST_USER = getenv('MAILGUN_SMTP_LOGIN')
+EMAIL_HOST_PASSWORD = getenv('MAILGUN_SMTP_PASSWORD')
+
 
 CELERY_QUEUES = (
     Queue('management', Exchange('management'), routing_key='management'),
