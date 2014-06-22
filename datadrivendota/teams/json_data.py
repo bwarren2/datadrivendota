@@ -10,7 +10,7 @@ from utils.charts import (
     XYPlot,
     DataPoint,
 )
-from heroes.models import Hero, Role
+from heroes.models import Hero
 from collections import defaultdict
 from time import mktime
 

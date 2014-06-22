@@ -27,13 +27,6 @@ INSTALLED_APPS += ('gunicorn',)
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-
-EMAIL_PORT = getenv('MAILGUN_SMTP_PORT')
-EMAIL_TIMEOUT = 10
-EMAIL_HOST = getenv('MAILGUN_SMTP_SERVER')
-EMAIL_HOST_USER = getenv('MAILGUN_SMTP_LOGIN')
-EMAIL_HOST_PASSWORD = getenv('MAILGUN_SMTP_PASSWORD')
-
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host
 # EMAIL_HOST = environ.get('EMAIL_HOST', 'smtp.gmail.com')
 

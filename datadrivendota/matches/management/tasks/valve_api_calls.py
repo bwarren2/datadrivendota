@@ -455,7 +455,7 @@ class UploadMatch(ApiFollower):
             league = League.objects.filter(
                 steam_id=data['leagueid']
                 )[0]
-        except League.DoesNotExist:
+        except (League.DoesNotExist, IndexError):
             league = League.objects.create(
                 steam_id=data['leagueid']
                 )
@@ -766,7 +766,6 @@ class AcquireTeams(Task):
         teams.extend([m.dire_team.steam_id for m in matches])
         teams = list(set(teams))
         for t in teams:
-            print t
             c = ApiContext()
             c.refresh_records = True
             c.start_at_team_id = t

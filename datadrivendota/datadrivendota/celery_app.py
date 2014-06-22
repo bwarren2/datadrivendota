@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from os import getenv
 from kombu import Exchange, Queue
-
+from django.conf import settings
 
 from celery import Celery
 
@@ -39,8 +39,16 @@ class Config(object):
     # Valve's rate limiting.
     VALVE_RATE = getenv('VALVE_RATE')
 
-    CELERY_SEND_TASK_ERROR_EMAILS = True
+    ADMINS = settings.ADMINS
 
+    CELERY_SEND_TASK_ERROR_EMAILS = True
+    EMAIL_PORT = settings.EMAIL_PORT
+    EMAIL_TIMEOUT = settings.EMAIL_TIMEOUT
+    EMAIL_HOST = settings.EMAIL_HOST
+    EMAIL_HOST_USER = settings.EMAIL_HOST_USER
+    EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
+
+    #Where celery emails from.
     SERVER_EMAIL = "celery@datadrivendota.com"
 
     CELERY_QUEUES = (
@@ -85,7 +93,8 @@ class Config(object):
             'exchange': 'db',
             'routing_key': 'db'
         },
-        'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {
+        'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas':
+        {
             'exchange': 'management',
             'routing_key': 'management'
         },
@@ -127,7 +136,8 @@ class Config(object):
             'acks_late': True,
             'max_retries': 5,
         },
-        'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas': {
+        'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas':
+        {
             'acks_late': True,
             'max_retries': 5,
         },
