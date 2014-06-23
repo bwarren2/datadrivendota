@@ -354,7 +354,7 @@ class ValveApiCall(BaseTask):
             data['api_context'] = self.api_context
             return data
 
-        except SoftTimeLimitExceeded:
+        except SoftTimeLimitExceeded():
             send_error_email(self.api_context.__str__())
 
 
@@ -1090,5 +1090,5 @@ def get_logo_image(logo, team, suffix):
 def send_error_email(body):
     smtp = SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
     smtp.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-    smtp.sendmail("erroremail@datadrivendota", "ben@datadrivendota.com", body)
+    smtp.sendmail("celery@datadrivendota", "ben@datadrivendota.com", body)
     smtp.quit()
