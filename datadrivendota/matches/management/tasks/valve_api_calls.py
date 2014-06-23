@@ -353,6 +353,7 @@ class ValveApiCall(BaseTask):
             # unless you do this.
             data['api_context'] = self.api_context
             return data
+
         except SoftTimeLimitExceeded:
             send_error_email(self.api_context.__str__())
 
