@@ -8,7 +8,7 @@ from copy import deepcopy
 from time import time as now
 from urllib import urlencode
 from uuid import uuid4
-from celery.exceptions import SoftTimeLimitExceeded
+from celery.exceptions import SoftTimeLimitExceeded, MaxRetriesExceededError
 
 from django.core.files import File
 from django.utils.text import slugify
@@ -133,8 +133,8 @@ class ApiContext(object):
             'date_pull',
         ]:
             if hasattr(self, field):
-                if self.get(field) is not None:
-                    strng = "{0}, {1} \n".format(field, self.get(field))
+                if getattr(self, field) is not None:
+                    strng += "{0}, {1} \n".format(field, getattr(self, field))
 
         return strng
 
@@ -354,8 +354,13 @@ class ValveApiCall(BaseTask):
             data['api_context'] = self.api_context
             return data
 
-        except SoftTimeLimitExceeded():
-            send_error_email(self.api_context.__str__())
+        except SoftTimeLimitExceeded as exc:
+            try:
+                self.retry(countdown=180)
+
+            except MaxRetriesExceededError as exc:
+                send_error_email(self.api_context.__str__())
+                raise
 
 
 class RetrievePlayerRecords(ApiFollower):
@@ -1088,7 +1093,19 @@ def get_logo_image(logo, team, suffix):
 
 
 def send_error_email(body):
-    smtp = SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
+    smtp = SMTP()
+    debuglevel = 0
+    smtp.set_debuglevel(debuglevel)
+    smtp.connect(settings.EMAIL_HOST, settings.EMAIL_PORT)
+
     smtp.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-    smtp.sendmail("celery@datadrivendota", "ben@datadrivendota.com", body)
+    message_text = "Error! Failed with context:\n{0}\n\nBye\n".format(body)
+    from_addr = "celery@datadrivendota.com"
+    to_addr = "ben@datadrivendota.com"
+    subj = 'Error!'
+    msg = "From: {0}\nTo: {1}\nSubject: {2}\n\n{3}".format(
+        from_addr, to_addr, subj, message_text
+    )
+
+    smtp.sendmail(from_addr, to_addr, msg)
     smtp.quit()
