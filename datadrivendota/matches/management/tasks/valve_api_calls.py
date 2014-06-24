@@ -8,8 +8,12 @@ from copy import deepcopy
 from time import time as now
 from urllib import urlencode
 from uuid import uuid4
-from celery.exceptions import SoftTimeLimitExceeded, MaxRetriesExceededError
-
+from celery.exceptions import (
+    SoftTimeLimitExceeded,
+    MaxRetriesExceededError,
+    TimeLimitExceeded,
+    WorkerLostError,
+    )
 from django.core.files import File
 from django.utils.text import slugify
 from matches.models import (
@@ -354,11 +358,18 @@ class ValveApiCall(BaseTask):
             data['api_context'] = self.api_context
             return data
 
-        except SoftTimeLimitExceeded as exc:
+        except (
+            SoftTimeLimitExceeded,
+            WorkerLostError,
+            TimeLimitExceeded,
+        ) as exc:
             try:
-                self.retry(countdown=180)
+                self.retry(exc=exc, countdown=180)
 
-            except MaxRetriesExceededError as exc:
+            except MaxRetriesExceededError:
+                send_error_email(self.api_context.__str__())
+                raise
+        except ValueError:
                 send_error_email(self.api_context.__str__())
                 raise
 
