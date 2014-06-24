@@ -982,7 +982,6 @@ def upload_match_summary(players, parent_match, refresh_records):
             'player_slot': player['player_slot'],
             'hero': Hero.objects.get_or_create(
                 steam_id=player['hero_id'],
-                name=player['hero_id'],
                 )[0],
             'item_0': Item.objects.get_or_create(steam_id=player['item_0'])[0],
             'item_1': Item.objects.get_or_create(steam_id=player['item_1'])[0],
