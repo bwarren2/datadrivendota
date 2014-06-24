@@ -29,18 +29,18 @@ class Command(BaseCommand):
             def tournament(unprocessed):
 
                 #Mainly 1v1 practices
-                matches.filter(human_players__lt=10).update(
+                unprocessed.filter(human_players__lt=10).update(
                     validity=Match.UNCOUNTED
                 )
 
                 #Failure to load
-                matches.filter(
+                unprocessed.filter(
                     playermatchsummary__hero__name=''
                 ).update(
                     validity=Match.UNCOUNTED
                 )
 
-                matches.filter(
+                unprocessed.filter(
                     human_players=10,
                 ).exclude(
                     playermatchsummary__hero__name=''
