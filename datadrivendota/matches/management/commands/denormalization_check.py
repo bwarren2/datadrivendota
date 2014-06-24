@@ -30,7 +30,22 @@ class Command(BaseCommand):
                 matches = unprocessed.filter(
                     skill=4
                 )
-                matches.update(validity=Match.LEGIT)
+                #Mainly 1v1 practices
+                matches.filter(human_players__lt=10).update(
+                    validity=Match.UNCOUNTED
+                )
+                #Failure to load
+                matches.filter(
+                    playermatchsummary__hero__name=''
+                ).distinct().update(
+                    validity=Match.UNCOUNTED
+                )
+
+                matches.filter(
+                    human_players=10,
+                ).exclude(
+                    playermatchsummary__hero__name=''
+                ).update(validity=Match.LEGIT)
 
             def too_short(unprocessed):
                 matches = unprocessed.filter(
@@ -68,7 +83,7 @@ class Command(BaseCommand):
             # Things with ten human players, longer than min length, where no
             # one left, in the right lobby types, count
             def legitimize(unprocessed):
-                unprocessed.filter(skill=4).update(validity=Match.LEGIT)
+                unprocessed = unprocessed.exclude(skill=4)
                 ms = unprocessed.exclude(
                     duration__lte=settings.MIN_MATCH_LENGTH
                 )
