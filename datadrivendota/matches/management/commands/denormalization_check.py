@@ -37,7 +37,7 @@ class Command(BaseCommand):
                 #Failure to load
                 matches.filter(
                     playermatchsummary__hero__name=''
-                ).distinct().update(
+                ).update(
                     validity=Match.UNCOUNTED
                 )
 
@@ -83,7 +83,6 @@ class Command(BaseCommand):
             # Things with ten human players, longer than min length, where no
             # one left, in the right lobby types, count
             def legitimize(unprocessed):
-                unprocessed = unprocessed.exclude(skill=4)
                 ms = unprocessed.exclude(
                     duration__lte=settings.MIN_MATCH_LENGTH
                 )
@@ -99,6 +98,7 @@ class Command(BaseCommand):
                 ms.update(validity=Match.LEGIT)
 
             tournament(unprocessed)
+            unprocessed = unprocessed.exclude(skill=4)
             too_short(unprocessed)
             player_count(unprocessed)
             human_players(unprocessed)
