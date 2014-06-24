@@ -27,13 +27,25 @@ class Command(BaseCommand):
 
         def process_matches(unprocessed):
             def tournament(unprocessed):
+                from matches.models import Match
+                unprocessed = Match.objects.filter(steam_id=729330419)
+                print unprocessed[0].validity
+
                 matches = unprocessed.filter(
                     skill=4
                 )
+
+                unprocessed = Match.objects.filter(steam_id=729330419)
+                print unprocessed[0].validity
+
                 #Mainly 1v1 practices
                 matches.filter(human_players__lt=10).update(
                     validity=Match.UNCOUNTED
                 )
+
+                unprocessed = Match.objects.filter(steam_id=729330419)
+                print unprocessed[0].validity
+
                 #Failure to load
                 matches.filter(
                     playermatchsummary__hero__name=''
@@ -41,11 +53,18 @@ class Command(BaseCommand):
                     validity=Match.UNCOUNTED
                 )
 
+                unprocessed = Match.objects.filter(steam_id=729330419)
+                print unprocessed[0].validity
+
                 matches.filter(
                     human_players=10,
                 ).exclude(
                     playermatchsummary__hero__name=''
                 ).update(validity=Match.LEGIT)
+
+
+                unprocessed = Match.objects.filter(steam_id=729330419)
+                print unprocessed[0].validity
 
             def too_short(unprocessed):
                 matches = unprocessed.filter(
@@ -99,11 +118,13 @@ class Command(BaseCommand):
 
             tournament(unprocessed)
             unprocessed = unprocessed.exclude(skill=4)
+
             too_short(unprocessed)
             player_count(unprocessed)
             human_players(unprocessed)
             leavers(unprocessed)
             game_mode_check(unprocessed)
+
             legitimize(unprocessed)
 
         if full_check is not None:
