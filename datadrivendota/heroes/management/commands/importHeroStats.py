@@ -69,7 +69,9 @@ class Command(BaseCommand):
             # --kit 2014-02-16
             if machine_name != 'npc_dota_hero_base':
                 print machine_name, data_dict['HeroID']
-                hero = Hero.objects.get_or_create(steam_id=data_dict['HeroID'])
+                hero = Hero.objects.get_or_create(
+                    steam_id=data_dict['HeroID']
+                    )[0]
                 default_dict = {}
                 for valve_name, my_name in mapping_dict.iteritems():
                     trait = data_dict.get(
