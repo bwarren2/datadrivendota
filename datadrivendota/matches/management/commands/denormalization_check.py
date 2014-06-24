@@ -72,7 +72,7 @@ class Command(BaseCommand):
                 )
                 ms.update(validity=Match.UNCOUNTED)
 
-            # Games with leavers do not count.
+            # Only traditional game modes count.
             def game_mode_check(unprocessed):
                 ms = unprocessed.exclude(
                     lobby_type__steam_id__in=[0, 2, 6, 7]

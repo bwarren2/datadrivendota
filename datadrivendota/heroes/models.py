@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from .managers import VisibleHeroManager
 # For the name, internal_name, and valve_id, see:
 # https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/
 #       ?key=<YOURKEY>&language=en_us
@@ -73,6 +74,9 @@ class Hero(models.Model):
     thumbshot = models.ImageField(null=True, upload_to='heroes/img/')
     visible = models.BooleanField(default=False)
     roles = models.ManyToManyField(Role, through='Assignment')
+
+    objects = models.Manager()
+    public = VisibleHeroManager()
 
     class Meta:
         verbose_name_plural = 'heroes'
