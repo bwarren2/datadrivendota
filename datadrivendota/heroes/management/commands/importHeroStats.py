@@ -77,6 +77,8 @@ class Command(BaseCommand):
                     hero = Hero.objects.create(
                         steam_id=data_dict['HeroID'],
                         machine_name=machine_name,
+                        name=machine_name[len('npc_dota_hero_'):].replace(
+                            "_", " ").title(),
                         )
 
                 default_dict = {}
