@@ -352,9 +352,6 @@ class ValveApiCall(BaseTask):
 
             # If everything is kosher, import the result and return it.
             data = json.loads(pageaccess.read())
-            # Append the options given so we can tell what the invocation was. For
-            # example, it is not straightforward to deduce the calling account_id
-            # unless you do this.
             data['api_context'] = self.api_context
             return data
 
@@ -364,7 +361,7 @@ class ValveApiCall(BaseTask):
             TimeLimitExceeded,
         ) as exc:
             try:
-                self.retry(exc=exc, countdown=180)
+                self.retry(mode=mode, exc=exc, countdown=180)
 
             except MaxRetriesExceededError:
                 send_error_email(self.api_context.__str__())
