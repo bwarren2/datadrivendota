@@ -57,7 +57,8 @@ class Hero(models.Model):
     machine_name = models.SlugField(
         max_length=200,
         help_text="What goes in URLs.  See slugify()",
-        unique=True
+        unique=True,
+        null=True
     )
     internal_name = models.CharField(
         max_length=200,
