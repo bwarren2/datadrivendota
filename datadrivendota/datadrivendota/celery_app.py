@@ -32,7 +32,7 @@ class Config(object):
     CELERY_ACKS_LATE = True
 
     #Experimenting
-    CELERYD_TASK_SOFT_TIME_LIMIT = 59
+    CELERYD_TASK_SOFT_TIME_LIMIT = int(getenv('CELERYD_TASK_SOFT_TIME_LIMIT'))
 
     CELERY_REDIS_MAX_CONNECTIONS = int(getenv('CELERY_REDIS_MAX_CONNECTIONS'))
 
