@@ -860,6 +860,7 @@ class UploadTeam(ApiFollower):
                     tag=team['tag'],
                     created=team['time_created'],
                     logo_sponsor=team['logo_sponsor'],
+                    logo=team['logo'],
                     country_code=team['country_code'],
                     url=team['url'],
                     games_played_with_current_roster=team[
