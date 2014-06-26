@@ -39,6 +39,7 @@ class Command(BaseCommand):
                 ).update(
                     validity=Match.UNCOUNTED
                 )
+
                 unprocessed.filter(
                     playermatchsummary__hero__name='Blank'
                 ).update(
