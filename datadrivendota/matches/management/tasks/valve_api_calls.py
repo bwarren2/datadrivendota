@@ -880,7 +880,7 @@ class UpdateTeamLogos(BaseTask):
         logo = team.teamdossier.logo
         logo_sponsor = team.teamdossier.logo_sponsor
 
-        if logo != 0:
+        if logo != 0 and logo is not None:
             try:
                 filename, f = get_logo_image(logo, team, '_logo.png')
                 team.teamdossier.logo_image.save(filename, File(open(f.name)))
@@ -892,7 +892,7 @@ class UpdateTeamLogos(BaseTask):
                         )
                 print "Failed for {0}, {1}".format(team.teamdossier.name, err)
 
-        if logo_sponsor != 0:
+        if logo_sponsor != 0 and logo_sponsor is not None:
             try:
                 filename, f = get_logo_image(
                     logo_sponsor, team, '_logo_sponsor.png'
