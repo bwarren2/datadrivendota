@@ -57,7 +57,7 @@ def standard_color_map(group):
 
 
 def hero_classes_dict():
-    hero_data = Hero.objects.all().values(
+    hero_data = Hero.public.values(
         'steam_id',
         'herodossier__alignment',
         'assignment__role__name',

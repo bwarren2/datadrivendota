@@ -119,7 +119,7 @@ def player_winrate_json(
     games = {hero: wins.get(hero, 0) + losses.get(hero, 0) for hero in heroes}
 
     hero_classes = hero_classes_dict()
-    all_heroes = Hero.objects.filter(visible=True).values(
+    all_heroes = Hero.public.values(
         'machine_name',
         'name',
         'herodossier__alignment',
@@ -193,7 +193,7 @@ def player_hero_abilities_json(
         ):
 
     p1 = Player.objects.get(steam_id=player_1)
-    h1 = Hero.objects.get(steam_id=hero_1)
+    h1 = Hero.public.get(steam_id=hero_1)
     sb1 = SkillBuild.objects.filter(
         player_match_summary__hero=h1,
         player_match_summary__player=p1,
@@ -208,7 +208,7 @@ def player_hero_abilities_json(
     ).order_by('player_match_summary', 'level')
     if player_2 is not None and hero_2 is not None:
         p2 = Player.objects.get(steam_id=player_2)
-        h2 = Hero.objects.get(steam_id=hero_2)
+        h2 = Hero.public.get(steam_id=hero_2)
 
         sb2 = SkillBuild.objects.filter(
             player_match_summary__hero=h2,
@@ -354,7 +354,7 @@ def player_versus_winrate_json(
         else:
             pairings[hero][player_2]['winrate'] = 0
 
-    all_heroes = Hero.objects.filter(visible=True).values(
+    all_heroes = Hero.public.values(
         'machine_name',
         'name',
         'herodossier__alignment',
@@ -448,7 +448,7 @@ def player_hero_side_json(
     if min_date_utc > max_date_utc:
         raise NoDataFound
 
-    all_heroes = Hero.objects.all()
+    all_heroes = Hero.public.all()
     hero_names = {h.name: h for h in all_heroes}
 
     if game_modes is None:

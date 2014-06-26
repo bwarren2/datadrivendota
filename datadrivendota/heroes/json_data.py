@@ -113,7 +113,7 @@ def hero_lineup_json(heroes, stat, level):
         hero__visible=True
     ).select_related()
 
-    selected_names = [h.name for h in Hero.objects.filter(steam_id__in=heroes)]
+    selected_names = [h.name for h in Hero.public.filter(steam_id__in=heroes)]
     if len(hero_dossiers) == 0:
         raise NoDataFound
 
@@ -551,7 +551,7 @@ def update_player_winrate(
     game_modes,
 ):
 
-    hero_obj = Hero.objects.get(steam_id=hero)
+    hero_obj = Hero.public.get(steam_id=hero)
     p_games = Player.objects.filter(
         updated=True,
         playermatchsummary__hero__steam_id=hero,
@@ -622,7 +622,7 @@ def hero_performance_lineup(
     else:
         min_date_utc = mktime(min_date.timetuple())
 
-    selected_names = [h.name for h in Hero.objects.filter(steam_id__in=heroes)]
+    selected_names = [h.name for h in Hero.public.filter(steam_id__in=heroes)]
 
     annotations = PlayerMatchSummary.objects.filter(
         match__validity=Match.LEGIT,
@@ -661,7 +661,7 @@ def hero_performance_lineup(
     hero_classes = hero_classes_dict()
     heroes = {
         h.name: h.herodossier.alignment.title()
-        for h in Hero.objects.filter(visible=True).select_related()
+        for h in Hero.public.select_related()
         }
     c = BarPlot()
     xs = []
@@ -729,10 +729,10 @@ def hero_pick_rate_lineup(var, skill_level, player, heroes):
 
     match_total = match_pool.count()
     hero_classes = hero_classes_dict()
-    selected_names = [h.name for h in Hero.objects.filter(steam_id__in=heroes)]
+    selected_names = [h.name for h in Hero.public.filter(steam_id__in=heroes)]
     heroes = {
         h.name: h.herodossier.alignment.title()
-        for h in Hero.objects.filter(visible=True).select_related()
+        for h in Hero.public.select_related()
         }
 
     annotations = {}

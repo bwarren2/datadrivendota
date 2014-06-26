@@ -149,6 +149,7 @@ def followed_index(request):
         }
     )
 
+
 @do_profile()
 def pro_index(request):
     player_list = Player.objects.exclude(pro_name=None)
