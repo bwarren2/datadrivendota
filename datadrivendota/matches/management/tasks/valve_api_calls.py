@@ -8,6 +8,7 @@ from copy import deepcopy
 from time import time as now
 from urllib import urlencode
 from uuid import uuid4
+from celery import Task, chain
 from celery.exceptions import (
     SoftTimeLimitExceeded,
     MaxRetriesExceededError,
@@ -35,7 +36,6 @@ from leagues.models import League, LeagueDossier
 from guilds.models import Guild
 from teams.models import Team, TeamDossier
 from settings.base import ADDER_32_BIT
-from celery import Task, chain
 import logging
 
 ### Patch for <urlopen error [Errno -2] Name or service not known in urllib2
@@ -138,9 +138,12 @@ class ApiContext(object):
         ]:
             if hasattr(self, field):
                 if getattr(self, field) is not None:
-                    strng += "{0}, {1} \n".format(field, getattr(self, field))
+                    strng += "{0}: {1} \n".format(field, getattr(self, field))
 
         return strng
+
+    def __repr__(self):
+        return self.__str__()
 
 
 # Parents
@@ -1082,6 +1085,7 @@ def get_logo_image(logo, team, suffix):
         c.ugcid = logo
         URL = 'http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?appid=570&' + \
             urlencode(c.toUrlDict(mode))
+        print "URL: {0}".format(URL)
         try:
             pageaccess = urllib2.urlopen(URL, timeout=5)
             data = json.loads(pageaccess.read())['data']
