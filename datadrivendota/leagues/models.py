@@ -1,11 +1,14 @@
 from django.db import models
-
+from .managers import SortedLeagueManager
 # Create your models here.
 
 
 class League(models.Model):
     """Analogous to a tournament, these are game series to which you can buy a ticket in the game client"""
     steam_id = models.IntegerField(unique=True)
+
+    objects = models.Manager()
+    recency = SortedLeagueManager()
 
 
 class LeagueDossier(models.Model):
