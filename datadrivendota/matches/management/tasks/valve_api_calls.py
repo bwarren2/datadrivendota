@@ -884,7 +884,7 @@ class UpdateTeamLogos(BaseTask):
             try:
                 filename, f = get_logo_image(logo, team, '_logo.png')
                 team.teamdossier.logo_image.save(filename, File(open(f.name)))
-            except (ssl.SSLError, socket.timeout) as err:
+            except (urllib2.URLError, ssl.SSLError, socket.timeout) as err:
                 self.retry(team_steam_id=team_steam_id)
             except Exception as err:
                 if team.teamdossier.logo_image is None:
@@ -902,7 +902,7 @@ class UpdateTeamLogos(BaseTask):
                 team.teamdossier.logo_sponsor_image.save(
                     filename, File(open(f.name))
                     )
-            except (ssl.SSLError, socket.timeout) as err:
+            except (urllib2.URLError, ssl.SSLError, socket.timeout) as err:
                 self.retry(team_steam_id=team_steam_id)
             except Exception as err:
                 if team.teamdossier.logo_sponsor_image is None:
