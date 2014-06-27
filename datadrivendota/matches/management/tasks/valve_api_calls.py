@@ -125,6 +125,7 @@ class ApiContext(object):
             'start_at_match_id',
             'key',
             'match_id',
+            'league_id',
             'hero_id',
             'start_scrape_time',
             'matches_desired'
@@ -278,7 +279,7 @@ class ValveApiCall(BaseTask):
                 logger.info("Keyerrors!")
                 raise
             URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
-            print URL
+            logger.info("URL: " + URL)
             if mode in ['GetMatchHistory', 'GetTeamInfoByTeamID']:
                 logger.info("URL: " + URL)
             # Exception handling for the URL opening.
@@ -653,7 +654,7 @@ class UpdatePlayerPersonas(ApiFollower):
         response = urldata['response']
 
         for pulled_player in response['players']:
-            print (
+            logger.info(
                 "Updating "
                 + pulled_player['personaname']
                 + ","
@@ -700,6 +701,7 @@ class RefreshPlayerMatchDetail(BaseTask):
             context.deepcopy = True
             context.start_scrape_time = now()
             context.last_scrape_time = user.last_scrape_time
+            logger.info(context)
             vac = ValveApiCall()
             rpr = RetrievePlayerRecords()
             chain(vac.s(
@@ -771,7 +773,7 @@ class AcquireMatches(Task):
 
     def run(self, matches=[]):
         for match in matches:
-            print "Requesting match {0}".format(match)
+            logger.info("Requesting match {0}".format(match))
             c = ApiContext()
             c.matches_requested = 1
             c.matches_desired = 1
@@ -896,7 +898,7 @@ class UpdateTeamLogos(BaseTask):
                     team.teamdossier.logo_image.save(
                         filename, File(open('https://s3.amazonaws.com/datadrivendota/images/blank-logo.png'))
                         )
-                print "Failed for {0}, {1}".format(team.teamdossier.name, err)
+                logger.error("Failed for {0}, {1}".format(team.teamdossier.name, err))
 
         if logo_sponsor != 0 and logo_sponsor is not None:
             try:
@@ -914,7 +916,7 @@ class UpdateTeamLogos(BaseTask):
                     team.teamdossier.logo_sponsor_image.save(
                         filename, File(open('https://s3.amazonaws.com/datadrivendota/images/blank-logo.png'))
                         )
-                print "Failed for {0}, {1}".format(team.teamdossier.name, err)
+                logger.error("Failed for {0}, {1}".format(team.teamdossier.name, err))
 
 
 class AcquireLeagues(Task):
@@ -1086,13 +1088,13 @@ def get_logo_image(logo, team, suffix):
         c.ugcid = logo
         URL = 'http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?appid=570&' + \
             urlencode(c.toUrlDict(mode))
-        print "URL: {0}".format(URL)
+        logger.info("URL: {0}".format(URL))
         try:
             pageaccess = urllib2.urlopen(URL, timeout=5)
             data = json.loads(pageaccess.read())['data']
             URL = data['url']
         except urllib2.HTTPError as err:
-            print "{0} for {1}".format(err.code, URL)
+            logger.error("{0} for {1}".format(err.code, URL))
 
         try:
             imgdata = urllib2.urlopen(URL, timeout=5)
@@ -1101,7 +1103,7 @@ def get_logo_image(logo, team, suffix):
             filename = slugify(team.teamdossier.name)+suffix
             return filename, f
         except urllib2.HTTPError as err:
-            print "{0} for {1}".format(err.code, URL)
+            logger.error("{0} for {1}".format(err.code, URL))
 
 
 def send_error_email(body):
