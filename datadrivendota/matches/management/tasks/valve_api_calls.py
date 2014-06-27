@@ -487,9 +487,6 @@ class UploadMatch(ApiFollower):
         overall match data.
         """
         data = self.result
-        league = League.objects.get_or_create(
-            steam_id=data['leagueid']
-            )[0]
 
         kwargs = {
             'radiant_win': data['radiant_win'],
@@ -507,7 +504,6 @@ class UploadMatch(ApiFollower):
                 steam_id=data['lobby_type']
             )[0],
             'human_players': data['human_players'],
-            'league': league,
             'positive_votes': data['positive_votes'],
             'negative_votes': data['negative_votes'],
             'game_mode': GameMode.objects.get_or_create(
@@ -515,6 +511,15 @@ class UploadMatch(ApiFollower):
             )[0],
             'skill': self.api_context.skill,
         }
+        try:
+
+            league = League.objects.get_or_create(
+                steam_id=data['leagueid']
+                )[0]
+            kwargs.update({'league': league})
+        except KeyError:
+            pass
+
         update = False
         try:
             match = Match.objects.get(steam_id=data['match_id'])
@@ -721,7 +726,7 @@ class AcquirePlayerData(BaseTask):
         player.updated = True
         player.save()
         if self.api_context.matches_requested is None:
-            self.api_context.matches_requested = 100
+            self.api_context.matches_requested = 500
         self.api_context.start_scrape_time = now()
         self.api_context.last_scrape_time = player.last_scrape_time
         self.api_context.deepycopy = True
