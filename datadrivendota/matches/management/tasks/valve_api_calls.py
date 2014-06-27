@@ -426,24 +426,29 @@ class RetrievePlayerRecords(ApiFollower):
             ), um.s()).delay()
 
     def moreResultsLeft(self):
-        return False
+        return not self.result['results_remaining'] == 0
         #Until the date_max problem is fixed, rebounding cannot work.
 
     def rebound(self):
         logger.info("Rebounding")
-        if self.api_context.date_pull is False:
-            self.api_context.start_at_match_id = self.result[
-                'matches'
-            ][-1]['match_id']
-            self.api_context.date_max = None
-        else:
-            # If we want to poll more than 500 results deep, we reset the
-            # valve api's date bounding
-            self.api_context.date_max = self.result[
-                'matches'
-                ][-1]['start_time']
-            self.api_context.start_at_match_id = None
-            self.api_context.date_pull = False
+        self.api_context.start_at_match_id = self.result[
+            'matches'
+        ][-1]['match_id']
+        self.api_context.date_max = None
+
+        # if self.api_context.date_pull is False:
+            # self.api_context.start_at_match_id = self.result[
+            #     'matches'
+            # ][-1]['match_id']
+            # self.api_context.date_max = None
+        # else:
+        #     # If we want to poll more than 500 results deep, we reset the
+        #     # valve api's date bounding
+        #     self.api_context.date_max = self.result[
+        #         'matches'
+        #         ][-1]['start_time']
+        #     self.api_context.start_at_match_id = None
+        #     self.api_context.date_pull = False
 
         vac = ValveApiCall()
         rpr = RetrievePlayerRecords()
