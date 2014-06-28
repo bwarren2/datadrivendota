@@ -17,6 +17,7 @@ class LeagueDossier(models.Model):
     description = models.CharField(max_length=300)  # Made up constant
     tournament_url = models.CharField(max_length=300)
     item_def = models.IntegerField()
+    logo_image = models.ImageField(upload_to='leagues/img/', null=True)
 
     @property
     def display_name(self):

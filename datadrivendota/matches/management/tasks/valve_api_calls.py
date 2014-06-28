@@ -88,6 +88,9 @@ class ApiContext(object):
         elif mode == 'GetLeagueListing':
             valve_URL_vars = ['key']
             return self.dictVars(valve_URL_vars)
+        elif mode == 'GetSchema':
+            valve_URL_vars = ['key']
+            return self.dictVars(valve_URL_vars)
         elif mode == 'GetMatchDetails':
             valve_URL_vars = ['match_id', 'key']
             return self.dictVars(valve_URL_vars)
@@ -268,6 +271,10 @@ class ValveApiCall(BaseTask):
                 'GetTeamInfoByTeamID': (
                     'https://api.steampowered.com'
                     '/IDOTA2Match_570/GetTeamInfoByTeamID/v001/'
+                ),
+                'GetSchema': (
+                    'https://api.steampowered.com'
+                    '/IEconItems_570/GetSchema/v0001/'
                 ),
             }
 
@@ -905,10 +912,18 @@ class UpdateTeamLogos(BaseTask):
             except Exception as err:
                 if team.teamdossier.logo_image is None:
                     filename = slugify(team.teamdossier.name)+'_logo.png'
+                    URL = ('https://s3.amazonaws.com/datadrivendota'
+                           '/images/blank-logo.png')
+                    imgdata = urllib2.urlopen(URL, timeout=5)
+                    with open('%s.png' % str(uuid4()), 'w+') as f:
+                        f.write(imgdata.read())
+
                     team.teamdossier.logo_image.save(
-                        filename, File(open('https://s3.amazonaws.com/datadrivendota/images/blank-logo.png'))
+                        filename, File(open(f))
                         )
-                logger.error("Failed for {0}, {1}".format(team.teamdossier.name, err))
+                logger.error("Failed for {0}, {1}".format(
+                    team.teamdossier.name, err)
+                )
 
         if logo_sponsor != 0 and logo_sponsor is not None:
             try:
@@ -922,11 +937,22 @@ class UpdateTeamLogos(BaseTask):
                 self.retry(team_steam_id=team_steam_id)
             except Exception as err:
                 if team.teamdossier.logo_sponsor_image is None:
-                    filename = slugify(team.teamdossier.name)+'_logo_sponsor.png'
+                    filename = slugify(team.teamdossier.name)\
+                        + '_logo_sponsor.png'
+                    URL = ('https://s3.amazonaws.com/datadrivendota'
+                           '/images/blank-logo.png')
+                    imgdata = urllib2.urlopen(URL, timeout=5)
+                    with open('%s.png' % str(uuid4()), 'w+') as f:
+                        f.write(imgdata.read())
+
                     team.teamdossier.logo_sponsor_image.save(
-                        filename, File(open('https://s3.amazonaws.com/datadrivendota/images/blank-logo.png'))
+                        filename, File(open(f))
                         )
-                logger.error("Failed for {0}, {1}".format(team.teamdossier.name, err))
+                logger.error(
+                    "Failed for {0}, {1}".format(
+                        team.teamdossier.name, err
+                        )
+                    )
 
 
 class AcquireLeagues(Task):
@@ -974,6 +1000,50 @@ class UpdateLeagueGames(Task):
             rpr = RetrievePlayerRecords()
             c = chain(vac.s(api_context=c, mode='GetMatchHistory'), rpr.s())
             c.delay()
+
+
+class MirrorLeagueGames(Task):
+    """Pulls in all games for all extant leagues"""
+
+    def run(self):
+        c = ApiContext()
+        vac = ValveApiCall()
+        ull = UpdateLeagueLogos()
+        c = chain(vac.s(api_context=c, mode='GetSchema'), ull.s())
+        c.delay()
+
+
+class UpdateLeagueLogos(ApiFollower):
+    """ Takes a given schema result and annexes logo urls."""
+
+    def run(self, urldata):
+        leagues = LeagueDossier.objects.all()
+        data = self.result['items']
+        mapping = {d['defindex']: d['image_url'] for d in data}
+        for leaguedossier in leagues:
+            try:
+                url = mapping[leaguedossier.league.steam_id]
+                imgdata = urllib2.urlopen(url, timeout=5)
+                with open('%s.png' % str(uuid4()), 'w+') as f:
+                    f.write(imgdata.read())
+                filename = slugify(leaguedossier.name)+'.png'
+                leaguedossier.logo_image.save(
+                    filename, File(open(f.name))
+                )
+            except (urllib2.URLError, ssl.SSLError, socket.timeout):
+                self.retry()
+            except (KeyError, Exception):
+                if leaguedossier.logo_image is None:
+                    filename = slugify(leaguedossier.name)+'_logo.png'
+                    URL = ('https://s3.amazonaws.com/datadrivendota'
+                           '/images/blank-logo.png')
+                    imgdata = urllib2.urlopen(URL, timeout=5)
+                    with open('%s.png' % str(uuid4()), 'w+') as f:
+                        f.write(imgdata.read())
+
+                    leaguedossier.logo_image.save(
+                        filename, File(open(f))
+                        )
 
 
 def upload_match_summary(players, parent_match, refresh_records):
@@ -1096,7 +1166,8 @@ def get_logo_image(logo, team, suffix):
         mode = 'GetUGCFileDetails'
         c = ApiContext()
         c.ugcid = logo
-        URL = 'http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?appid=570&' + \
+        URL = ('http://api.steampowered.com/ISteamRemoteStorage/'
+               'GetUGCFileDetails/v1/?appid=570&') + \
             urlencode(c.toUrlDict(mode))
         logger.info("URL: {0}".format(URL))
         try:
