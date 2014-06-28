@@ -11,7 +11,7 @@ class LeagueList(ListView):
     model = League
 
     def get_queryset(self):
-        qs = self.model.objects.all().select_related()
+        qs = self.model.recency.all().select_related()
         return qs
 
 

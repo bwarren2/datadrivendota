@@ -7,7 +7,7 @@
         {% if league.leaguedossier.logo_image %}
         <div class='col-md-2'>
             <a href="{% url 'leagues:detail' steam_id=league.steam_id %}" class='thumbnail'>
-                <img src="{% static league.leaguedossier.logo_image.url %}" alt="{{league.leaguedossier.name}}"/>
+                <img src="{{ league.leaguedossier.logo_image.url }}" alt="{{league.leaguedossier.name}}"/>
             </a>
             <p class='overlayer'>{{league.leaguedossier.display_name}}</p>
 
