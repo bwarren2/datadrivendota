@@ -4,6 +4,15 @@
 
 {% block content %}
     {% for league in league_list %}
+        {% if league.leaguedossier.logo_image %}
+        <div class='col-md-2'>
+            <a href="{% url 'leagues:detail' steam_id=league.steam_id %}" class='thumbnail'>
+                <img src="{% static league.leaguedossier.logo_image.url %}" alt="{{league.leaguedossier.name}}"/>
+            </a>
+            <p class='overlayer'>{{league.leaguedossier.display_name}}</p>
+
+        </div>
+        {% else %}
         <div class='col-md-2'>
             <a href="{% url 'leagues:detail' steam_id=league.steam_id %}" class='thumbnail'>
                 <img src="{% static 'images/blank-logo.png' %}" alt="{{league.leaguedossier.name}}"/>
@@ -11,5 +20,6 @@
             <p class='overlayer'>{{league.leaguedossier.display_name}}</p>
 
         </div>
+        {% endif %}
     {% endfor %}
 {% endblock content %}

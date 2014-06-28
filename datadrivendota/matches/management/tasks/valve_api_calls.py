@@ -919,7 +919,7 @@ class UpdateTeamLogos(BaseTask):
                         f.write(imgdata.read())
 
                     team.teamdossier.logo_image.save(
-                        filename, File(open(f))
+                        filename, File(open(f.name))
                         )
                 logger.error("Failed for {0}, {1}".format(
                     team.teamdossier.name, err)
@@ -946,7 +946,7 @@ class UpdateTeamLogos(BaseTask):
                         f.write(imgdata.read())
 
                     team.teamdossier.logo_sponsor_image.save(
-                        filename, File(open(f))
+                        filename, File(open(f.name))
                         )
                 logger.error(
                     "Failed for {0}, {1}".format(
@@ -1020,30 +1020,43 @@ class UpdateLeagueLogos(ApiFollower):
         leagues = LeagueDossier.objects.all()
         data = self.result['items']
         mapping = {d['defindex']: d['image_url'] for d in data}
+        blank_URL = 'http://s3.amazonaws.com/datadrivendota/images/blank-logo.png'
         for leaguedossier in leagues:
+            filename = slugify(leaguedossier.name)+'.png'
             try:
-                url = mapping[leaguedossier.league.steam_id]
-                imgdata = urllib2.urlopen(url, timeout=5)
-                with open('%s.png' % str(uuid4()), 'w+') as f:
-                    f.write(imgdata.read())
-                filename = slugify(leaguedossier.name)+'.png'
-                leaguedossier.logo_image.save(
-                    filename, File(open(f.name))
-                )
-            except (urllib2.URLError, ssl.SSLError, socket.timeout):
-                self.retry()
-            except (KeyError, Exception):
-                if leaguedossier.logo_image is None:
-                    filename = slugify(leaguedossier.name)+'_logo.png'
-                    URL = ('https://s3.amazonaws.com/datadrivendota'
-                           '/images/blank-logo.png')
-                    imgdata = urllib2.urlopen(URL, timeout=5)
+                url = mapping[leaguedossier.item_def]
+                if url != '':
+                    imgdata = urllib2.urlopen(url, timeout=5)
+                    with open('%s.png' % str(uuid4()), 'w+') as f:
+                        f.write(imgdata.read())
+                    leaguedossier.logo_image.save(
+                        filename, File(open(f.name))
+                    )
+                else:
+                    imgdata = urllib2.urlopen(blank_URL, timeout=5)
                     with open('%s.png' % str(uuid4()), 'w+') as f:
                         f.write(imgdata.read())
 
                     leaguedossier.logo_image.save(
-                        filename, File(open(f))
+                        filename, File(open(f.name))
                         )
+
+            except (urllib2.URLError, ssl.SSLError, socket.timeout):
+                self.retry()
+            except (KeyError):
+                if leaguedossier.logo_image is None:
+                    imgdata = urllib2.urlopen(blank_URL, timeout=5)
+                    with open('%s.png' % str(uuid4()), 'w+') as f:
+                        f.write(imgdata.read())
+
+                    leaguedossier.logo_image.save(
+                        filename, File(open(f.name))
+                        )
+            except Exception:
+                import sys, traceback
+                type, name, tb = sys.exc_info()
+
+                print type, name, traceback.print_tb(tb), leaguedossier.league.steam_id
 
 
 def upload_match_summary(players, parent_match, refresh_records):
