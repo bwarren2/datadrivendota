@@ -5,21 +5,15 @@
 {% block content %}
     {% for league in league_list %}
         {% if league.leaguedossier.logo_image %}
-        <div class='col-md-2'>
+        <div class='col-md-3'>
             <a href="{% url 'leagues:detail' steam_id=league.steam_id %}" class='thumbnail'>
                 <img src="{{ league.leaguedossier.logo_image.url }}" alt="{{league.leaguedossier.name}}"/>
             </a>
             <p class='overlayer'>{{league.leaguedossier.display_name}}</p>
 
         </div>
-        {% else %}
-        <div class='col-md-2'>
-            <a href="{% url 'leagues:detail' steam_id=league.steam_id %}" class='thumbnail'>
-                <img src="{% static 'images/blank-logo.png' %}" alt="{{league.leaguedossier.name}}"/>
-            </a>
-            <p class='overlayer'>{{league.leaguedossier.display_name}}</p>
-
-        </div>
         {% endif %}
     {% endfor %}
+    {% include "_pagination.html" with pages_list=league_list page_links_to_display=league_list.paginator.page_range_with_ellipses %}
+
 {% endblock content %}

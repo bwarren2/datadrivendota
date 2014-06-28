@@ -79,9 +79,10 @@ $(function () {
   ajax_select2ify('.multi-player-tags', true, "One or more Players", "/players/api/getplayers");
   ajax_select2ify('.single-hero-tags', false, "One Hero", "/heroes/api/getheroes");
   ajax_select2ify('.multi-hero-tags', true, "One or more Heroes", "/heroes/api/getheroes");
-  ajax_select2ify('.single-match-tags', true, "One Match", "/matches/api/getmatches");
+  ajax_select2ify('.single-match-tags', false, "One Match", "/matches/api/getmatches");
   ajax_select2ify('.multi-match-tags', true, "One or more Matches", "/matches/api/getmatches");
-  ajax_select2ify('.single-team-tags', true, "One Team", "/teams/api/getteams");
+  ajax_select2ify('.single-team-tags', false, "One Team", "/teams/api/getteams");
+  ajax_select2ify('.single-league-tags', false, "One Team", "/teams/api/getleagues");
   ajax_select2ify('.combobox-tags', false, "One Selector", "/matches/api/gettags");
 
   /* gettext library */

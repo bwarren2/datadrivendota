@@ -1,6 +1,5 @@
 from django.db import models
 from .managers import SortedLeagueManager
-# Create your models here.
 
 
 class League(models.Model):
@@ -28,6 +27,7 @@ class LeagueDossier(models.Model):
     @property
     def display_description(self):
         str = self.description.replace('#DOTA_Item_League_', '')
+        str = str.replace('#DOTA_Item_Desc_', '').replace('_', ' ')
         str = str.replace('#DOTA_Item_', '').replace('_', ' ')
         return str
 
