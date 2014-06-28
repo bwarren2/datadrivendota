@@ -1002,8 +1002,8 @@ class UpdateLeagueGames(Task):
             c.delay()
 
 
-class MirrorLeagueGames(Task):
-    """Pulls in all games for all extant leagues"""
+class MirrorLeagueLogos(Task):
+    """Annexes the url data for league logos from the item schema and updates the leaguedossier objects"""
 
     def run(self):
         c = ApiContext()
