@@ -31,7 +31,7 @@
         "#slark-chart",
         '{% url "heroes:api_hero_performance_chart" %}',
           $.param({
-            hero: 'Slark',
+            hero: '{{chart_hero.steam_id}',
             player: '{{chart_player.steam_id}}',
             game_modes: [1, 2, 3, 4, 5],
             division: 'Skill',
