@@ -252,14 +252,14 @@ def detail(request, player_id=None):
     #Compare to dendi and s4 by default
     player_list = [70388657, 41231571, player.steam_id]
     endgame_players = Player.objects.filter(steam_id__in=player_list)
-    player_names = ",".join([p.persona_name for p in endgame_players])
+    player_ids = ",".join([str(p.steam_id) for p in endgame_players])
 
     return render(
         request,
         'players/detail.html',
         {
             'player': player,
-            'endgame_chart_names': player_names,
+            'endgame_chart_ids': player_ids,
             'stats': stats,
             'compare_url': compare_url,
             'compare_str': compare_str,
@@ -551,14 +551,14 @@ def player_list(request):
             player_json = {}
             player_json['id'] = player.steam_id
             player_json['label'] = player.persona_name
-            player_json['value'] = player.persona_name
+            player_json['value'] = player.steam_id
             results.append(player_json)
 
         for player in pros:
             player_json = {}
             player_json['id'] = player.steam_id
             player_json['label'] = player.pro_name
-            player_json['value'] = player.pro_name
+            player_json['value'] = player.steam_id
             results.append(player_json)
         data = json.dumps(results)
     else:

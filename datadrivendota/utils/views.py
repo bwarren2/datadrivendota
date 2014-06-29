@@ -7,6 +7,7 @@ def cast_dict(summary):
             'hero_mugshot': summary.hero.mugshot,
             'hero_mugshot_url': summary.hero.mugshot.url,
             'hero_name': summary.hero.name,
+            'hero_id': summary.hero.steam_id,
             'is_win': summary.is_win,
             'is_radiant': summary.which_side() == 'Radiant',
         }

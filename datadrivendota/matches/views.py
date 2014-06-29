@@ -82,12 +82,7 @@ def match(request, match_id):
     summaries = PlayerMatchSummary.objects.filter(
         match=match
     ).select_related().order_by('player_slot')
-    radiant_slots = sorted(
-        [s.player_slot for s in summaries if s.which_side() == 'Radiant']
-    )
-    dire_slots = sorted(
-        [s.player_slot for s in summaries if s.which_side() == 'Radiant']
-    )
+
     for summary in summaries:
         summary.kda = summary.kills - summary.deaths + .5*summary.assists
         if summary.which_side() == 'Radiant':
