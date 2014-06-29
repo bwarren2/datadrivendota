@@ -177,7 +177,7 @@
       "#player_winrate",
       '{% url "heroes:api_update_player_winrate_chart" %}',
         $.param({
-          hero: "{{ hero.name|safe }}",
+          hero: "{{ hero.steam_id }}",
           game_modes: [1,2,3,4,5],
           width: 300,
           height: 300,
@@ -188,7 +188,7 @@
     "#high_skill_item_winrate",
     '{% url "items:api_item_endgame_chart" %}',
       $.param({
-        hero: "{{hero.name|safe}}",
+        hero: "{{hero.steam_id}}",
         skill_level: '3',
         game_modes: [1, 2, 3, 4, 5],
         no_legend: true,
@@ -202,7 +202,7 @@
       "#chart3",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero.name|safe }}",
+          hero: "{{ hero.steam_id }}",
           x_var: 'duration',
           y_var: 'gold_total',
           group_var: 'skill_name',
@@ -219,7 +219,7 @@
       "#chart1",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero.name|safe }}",
+          hero: "{{ hero.steam_id }}",
           x_var: 'duration',
           y_var: 'kills',
           group_var: 'skill_name',
@@ -236,7 +236,7 @@
       "#chart2",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero.name|safe }}",
+          hero: "{{ hero.steam_id }}",
           x_var: 'duration',
           y_var: 'K-D+.5*A',
           group_var: 'skill_name',

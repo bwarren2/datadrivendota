@@ -60,8 +60,8 @@
         "#usage_chart",
         '{% url "players:api_versus_winrate_chart" %}',
         $.param({
-          player_1: "{{player1.persona_name}}",
-          player_2: "{{player2.persona_name}}",
+          player_1: "{{player1.steam_id}}",
+          player_2: "{{player2.steam_id}}",
           game_modes: [1, 2, 3, 4, 5],
           group_var: 'alignment',
           plot_var: 'usage',
@@ -77,8 +77,8 @@
         "#winrate_chart",
         '{% url "players:api_versus_winrate_chart" %}',
         $.param({
-          player_1: "{{player1.persona_name}}",
-          player_2: "{{player2.persona_name}}",
+          player_1: "{{player1.steam_id}}",
+          player_2: "{{player2.steam_id}}",
           game_modes: [1, 2, 3, 4, 5],
           group_var: 'alignment',
           plot_var: 'winrate',
@@ -93,7 +93,7 @@
         "#kda_chart",
         '{% url "matches:api_endgame_chart" %}',
         $.param({
-          players: "{{player1.persona_name}},{{player2.persona_name}}",
+          players: "{{player1.steam_id}},{{player2.steam_id}}",
           game_modes: [1, 2, 3, 4, 5],
           x_var: 'duration',
           y_var: 'K-D+.5*A',
@@ -112,7 +112,7 @@
         "#team_kda_chart",
         '{% url "matches:api_own_team_endgame_chart" %}',
         $.param({
-          players: "{{player1.persona_name}},{{player2.persona_name}}",
+          players: "{{player1.steam_id}},{{player2.steam_id}}",
           game_modes: [1, 2, 3, 4, 5],
           x_var: 'duration',
           y_var: 'K-D+.5*A',
@@ -131,8 +131,8 @@
         "#role_chart",
         '{% url "players:api_role_chart" %}',
         $.param({
-          player_1: "{{player1.persona_name}}",
-          player_2: "{{player2.persona_name}}",
+          player_1: "{{player1.steam_id}}",
+          player_2: "{{player2.steam_id}}",
           plot_var: 'games',
           width: 300,
           height: 300,

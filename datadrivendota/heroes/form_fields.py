@@ -10,7 +10,7 @@ class SingleHeroSelect(forms.CharField):
         if ',' in hero:
             raise ValidationError("Only one hero at a time.")
         try:
-            hero = Hero.objects.get(name=hero)
+            hero = Hero.objects.get(steam_id=hero)
         except Hero.DoesNotExist:
             raise ValidationError("No hero by that name.")
 
@@ -25,7 +25,7 @@ class MultiHeroSelect(forms.CharField):
         return_hero_list = []
         for hero in hero_list:
             try:
-                hero = Hero.objects.get(name=hero)
+                hero = Hero.objects.get(steam_id=hero)
             except Hero.DoesNotExist:
                 raise ValidationError("%s is not a valid hero name" % hero)
             return_hero_list.append(hero.steam_id)

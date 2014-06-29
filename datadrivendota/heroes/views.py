@@ -296,7 +296,7 @@ def hero_list(request):
             hero_json = {}
             hero_json['id'] = hero.steam_id
             hero_json['label'] = hero.name
-            hero_json['value'] = hero.name
+            hero_json['value'] = hero.steam_id
             results.append(hero_json)
         data = json.dumps(results)
     else:

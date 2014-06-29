@@ -38,11 +38,10 @@ class MultiMatchSelect(forms.CharField):
             else:
                 return []
         for match in match_list:
-            match_id = match.replace("M#: ", "")
             try:
-                found_match = Match.objects.get(steam_id=match_id)
+                found_match = Match.objects.get(steam_id=match)
             except Match.DoesNotExist:
-                raise ValidationError("%s is not a valid match ID" % match_id)
+                raise ValidationError("%s is not a valid match ID" % match)
             return_match_list.append(found_match.steam_id)
 
         return return_match_list

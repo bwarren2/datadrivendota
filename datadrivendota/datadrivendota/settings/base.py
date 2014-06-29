@@ -447,8 +447,8 @@ SKILL2_COLOR = '#CCAF00'
 SKILL3_COLOR = '#3ACC00'
 SKILLPLAYER_COLOR = '#00CC75'
 CONTRASTING_10 = [
-    '#FFFFFF',
-    '#111111',
+    '#1f77b4',
+    '#7EF6C6',
     '#2ca02c',
     '#d62728',
     '#9467bd',

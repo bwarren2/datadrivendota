@@ -36,7 +36,7 @@ urlpatterns = patterns(
         name="progession_list"),
 
     url(
-        r'^(?P<matches>[0-9\,]*)_(?P<hero_name>[a-zA-Z0-9 \-\_\']*)_(?P<win>[a-z]*)/$',
+        r'^(?P<matches>[0-9\,]*)_(?P<hero_id>[0-9]*)_(?P<win>[a-z]*)/$',
         views.MatchHeroContext.as_view(),
         name="match_hero_context"),
     # url(r'^overview/$', views.overview, name="overview"),

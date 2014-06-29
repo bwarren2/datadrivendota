@@ -51,7 +51,7 @@
     "#hero_progression_chart",
     '{% url "heroes:api_skill_progression_chart" %}',
       $.param({
-        hero: "{{hero_name}}",
+        hero: "{{hero_id}}",
         matches: "{{matches}}",
         outcome: "{{win}}",
         game_modes: [1, 2, 3, 4, 5],
@@ -66,7 +66,7 @@
       "#tower_damage",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero_name|safe }}",
+          hero: "{{ hero_id }}",
           matches: "{{matches}}",
           outcome: "{{win}}",
           x_var: 'duration',
@@ -85,7 +85,7 @@
       "#gold_xp",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero_name|safe }}",
+          hero: "{{ hero_id }}",
           matches: "{{matches}}",
           outcome: "{{win}}",
           x_var: 'gold_per_min',
@@ -104,7 +104,7 @@
       "#hit_deny",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero_name|safe }}",
+          hero: "{{ hero_id }}",
           matches: "{{matches}}",
           outcome: "{{win}}",
           x_var: 'last_hits',
@@ -124,7 +124,7 @@
       "#hero_kda2_chart",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero_name|safe }}",
+          hero: "{{ hero_id }}",
           matches: "{{matches}}",
           outcome: "{{win}}",
           x_var: 'duration',
@@ -143,7 +143,7 @@
       "#roi_chart",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero_name|safe }}",
+          hero: "{{ hero_id }}",
           matches: "{{matches}}",
           outcome: "{{win}}",
           x_var: 'gold_total',
@@ -160,23 +160,3 @@
     );
 </script>
 {% endblock extra_js %}
-
-{# {% block tour %}
-<script type="text/javascript">
-  $(function () {
-    var tour = new Tour({
-      backdrop: true
-    });
-
-    tour.addSteps(
-      {{tour|safe}}
-    );
-
-    $(".tourglyph").on("click",function(){
-      tour.restart();
-    })
-
-  });
-</script>
-{% endblock tour %}
- #}

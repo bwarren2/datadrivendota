@@ -66,7 +66,7 @@
     "#winrate_chart",
     '{% url "players:api_winrate_chart" %}',
       $.param({
-        player: '{{player.persona_name}}',
+        player: {{player.steam_id}},
         game_modes: [1, 2, 3, 4, 5],
         group_var: 'alignment',
         width: 300,
@@ -80,7 +80,7 @@
     '{% url "matches:api_endgame_chart" %}',
       $.param({
 
-        players: '{{endgame_chart_names}}',
+        players: '{{endgame_chart_ids}}',
         game_modes: [1, 2, 3, 4, 5],
         x_var: 'duration',
         y_var: 'K-D+.5*A',

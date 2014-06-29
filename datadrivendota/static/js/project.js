@@ -41,7 +41,7 @@ $(function () {
         },
         results: function (data, page) {
           return {
-            results: data.map(function (elt) { return {id: elt.label, text: elt.label}; })
+            results: data.map(function (elt) { return {id: elt.value, text: elt.label}; })
           };
         },
         formatResult: format,

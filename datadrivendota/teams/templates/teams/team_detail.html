@@ -124,7 +124,7 @@ $(document).ready(function() {
     "#winrate_chart",
     '{% url "teams:api_winrate_chart" %}',
       $.param({
-        team: '{{team.teamdossier.name}}',
+        team: '{{team.steam_id}}',
         group_var: 'alignment',
         min_date: '{{min_date}}',
         width: 300,
@@ -136,7 +136,7 @@ $(document).ready(function() {
     "#pick_ban",
     '{% url "teams:api_pick_ban_chart" %}',
       $.param({
-        team: '{{team.teamdossier.name}}',
+        team: '{{team.steam_id}}',
         group_var: 'alignment',
         min_date: '{{min_date}}',
         width: 300,

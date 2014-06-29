@@ -92,7 +92,7 @@ $(document).ready(function() {
     "#winrate_chart",
     '{% url "leagues:api_winrate_chart" %}',
       $.param({
-        league: '{{league.leaguedossier.name}}',
+        league: '{{league.steam_id}}',
         group_var: 'alignment',
         min_date: '{{min_date}}',
         width: 300,
@@ -104,7 +104,7 @@ $(document).ready(function() {
     "#pick_ban",
     '{% url "leagues:api_pick_ban_chart" %}',
       $.param({
-        league: '{{league.leaguedossier.name}}',
+        league: '{{league.steam_id}}',
         group_var: 'alignment',
         min_date: '{{min_date}}',
         width: 300,
