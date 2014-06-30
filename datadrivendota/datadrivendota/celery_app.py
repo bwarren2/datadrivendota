@@ -74,12 +74,6 @@ class Config(object):
         ),
     )
 
-    # @todo: This looks not-DRY; I think this same data exists in settings? If
-    # so:
-    #     from django.conf import settings
-    #     CELERY_ROUTS = settings.CELERY_ROUTES
-    # etc.
-    # --kit 2014-02-16
     CELERY_ROUTES = {
         'matches.management.tasks.valve_api_calls.ValveApiCall': {
             'exchange': 'valve_api',
@@ -114,6 +108,50 @@ class Config(object):
             'exchange': 'management',
             'routing_key': 'management'
         },
+        'matches.management.tasks.valve_api_calls.AcquireMatches': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
+        'matches.management.tasks.valve_api_calls.AcquireTeams': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
+        'matches.management.tasks.valve_api_calls.AcquireTeamDossiers': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
+        'matches.management.tasks.valve_api_calls.UpdateTeamLogos': {
+            'exchange': 'valve_api',
+            'routing_key': 'valve_api_call'
+        },
+        'matches.management.tasks.valve_api_calls.AcquireLeagues': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
+        'matches.management.tasks.valve_api_calls.UploadLeague': {
+            'exchange': 'db',
+            'routing_key': 'db'
+        },
+        'matches.management.tasks.valve_api_calls.UpdateLeagueGames': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
+        'matches.management.tasks.valve_api_calls.MirrorLeagueLogos': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
+        'matches.management.tasks.valve_api_calls.UpdateLeagueLogos': {
+            'exchange': 'valve_api',
+            'routing_key': 'valve_api_call'
+        },
+        'matches.management.tasks.valve_api_calls.MirrorProNames': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
+        'matches.management.tasks.valve_api_calls.UpdateProNames': {
+            'exchange': 'db',
+            'routing_key': 'db'
+        },
 
     }
 
@@ -122,40 +160,112 @@ class Config(object):
     CELERY_DEFAULT_ROUTING_KEY = 'default'
     CELERY_DEFAULT_QUEUE = 'default'
 
+    TASK_MAX_RETRIES = 6  # Note: This is a custom var.
+
     CELERY_ANNOTATIONS = {
         "matches.management.tasks.valve_api_calls.ValveApiCall": {
             "rate_limit": VALVE_RATE,
             'acks_late': True,
-            'max_retries': 5,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
         },
         'matches.management.tasks.valve_api_calls.RetrievePlayerRecords': {
             'acks_late': True,
-            'max_retries': 5,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
         },
         'matches.management.tasks.valve_api_calls.UploadMatch': {
             'acks_late': True,
-            'max_retries': 5,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
         },
         'matches.management.tasks.valve_api_calls.RefreshUpdatePlayerPersonas':
         {
             'acks_late': True,
-            'max_retries': 5,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
         },
         'matches.management.tasks.valve_api_calls.UpdatePlayerPersonas': {
             'acks_late': True,
-            'max_retries': 5,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
         },
         'matches.management.tasks.valve_api_calls.RefreshPlayerMatchDetail': {
             'acks_late': True,
-            'max_retries': 5,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
         },
         'matches.management.tasks.valve_api_calls.AcquirePlayerData': {
             'acks_late': True,
-            'max_retries': 5,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
         },
         'matches.management.tasks.valve_api_calls.AcquireHeroSkillData': {
             'acks_late': True,
-            'max_retries': 5,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.AcquireMatches': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.AcquireTeams': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.AcquireTeamDossiers': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.UploadTeam': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.UpdateTeamLogos': {
+            "rate_limit": VALVE_RATE,
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.AcquireLeagues': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.UploadLeague': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.UpdateLeagueGames': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.MirrorLeagueLogos': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.UpdateLeagueLogos': {
+            "rate_limit": VALVE_RATE,
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.MirrorProNames': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.UpdateProNames': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
         },
 
     }
