@@ -910,6 +910,7 @@ class UpdateTeamLogos(BaseTask):
             try:
                 filename, f = get_logo_image(logo, team, '_logo.png')
                 team.teamdossier.logo_image.save(filename, File(open(f.name)))
+                os.remove(f.name)
             except (urllib2.URLError, ssl.SSLError, socket.timeout) as err:
                 self.retry(team_steam_id=team_steam_id)
             except Exception as err:
@@ -924,6 +925,8 @@ class UpdateTeamLogos(BaseTask):
                     team.teamdossier.logo_image.save(
                         filename, File(open(f.name))
                         )
+                    os.remove(f.name)
+
                 logger.error("Failed for {0}, {1}".format(
                     team.teamdossier.name, err)
                 )
@@ -936,6 +939,8 @@ class UpdateTeamLogos(BaseTask):
                 team.teamdossier.logo_sponsor_image.save(
                     filename, File(open(f.name))
                     )
+                os.remove(f.name)
+
             except (urllib2.URLError, ssl.SSLError, socket.timeout) as err:
                 self.retry(team_steam_id=team_steam_id)
             except Exception as err:
@@ -951,6 +956,8 @@ class UpdateTeamLogos(BaseTask):
                     team.teamdossier.logo_sponsor_image.save(
                         filename, File(open(f.name))
                         )
+                    os.remove(f.name)
+
                 logger.error(
                     "Failed for {0}, {1}".format(
                         team.teamdossier.name, err
@@ -1035,6 +1042,7 @@ class UpdateLeagueLogos(ApiFollower):
                     leaguedossier.logo_image.save(
                         filename, File(open(f.name))
                     )
+                    os.remove(f.name)
                 else:
                     imgdata = urllib2.urlopen(blank_URL, timeout=5)
                     with open('%s.png' % str(uuid4()), 'w+') as f:
@@ -1043,6 +1051,7 @@ class UpdateLeagueLogos(ApiFollower):
                     leaguedossier.logo_image.save(
                         filename, File(open(f.name))
                         )
+                    os.remove(f.name)
 
             except (urllib2.URLError, ssl.SSLError, socket.timeout):
                 self.retry()
@@ -1055,6 +1064,7 @@ class UpdateLeagueLogos(ApiFollower):
                     leaguedossier.logo_image.save(
                         filename, File(open(f.name))
                         )
+                    os.remove(f.name)
 
 
 class MirrorProNames(Task):
