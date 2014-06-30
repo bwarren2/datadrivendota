@@ -483,6 +483,8 @@ def calc_left_margin(max_num, min_num):
         int_length(max_num),
         int_length(avg),
     ) + k_ness) + 12
+    if max_num < 3:
+        margin+=12
     return margin
 
 
