@@ -51,6 +51,7 @@ class HeroLineupMultiSelect(forms.Form):
         'strength',
         'intelligence',
         'agility',
+        'damage',
         'strength_gain',
         'intelligence_gain',
         'agility_gain',
