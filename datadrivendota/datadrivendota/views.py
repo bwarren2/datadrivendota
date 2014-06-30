@@ -15,7 +15,7 @@ from utils.exceptions import NoDataFound
 
 from datadrivendota.forms import KeyForm
 from players.models import PermissionCode, Player
-
+from heroes.models import Hero
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -34,11 +34,15 @@ except ImportError:
 
 def base(request):
     p = Player.objects.get(steam_id=70388657)
+    h = Hero.objects.get(name='Slark')
     if (
         request.user.is_anonymous()
         or request.user.social_auth.filter(provider='steam').count() == 0
     ):
-        extra_dict = {'chart_player': p}
+        extra_dict = {
+            'chart_player': p,
+            'chart_hero': h,
+        }
     else:
         extra_dict = request.user.social_auth.filter(
             provider='steam'
