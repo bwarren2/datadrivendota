@@ -92,8 +92,7 @@ class ApiContext(object):
             valve_URL_vars = ['key']
             return self.dictVars(valve_URL_vars)
         elif mode == 'GetPlayerOfficialInfo':
-            valve_URL_vars = ['key']
-            valve_URL_vars = ['AccountID']
+            valve_URL_vars = ['key', 'AccountID']
             return self.dictVars(valve_URL_vars)
         elif mode == 'GetMatchDetails':
             valve_URL_vars = ['match_id', 'key']
@@ -643,7 +642,7 @@ class RefreshUpdatePlayerPersonas(BaseTask):
         users = Player.objects.filter(updated=True)
         tracked = get_tracks(users)
         teams = TeamDossier.objects.all()
-        pros = assemble_pros()
+        pros = assemble_pros(teams)
         check_list = meld(users, tracked, pros)
         check_list = [user for user in check_list]
         querylist = []
@@ -1056,11 +1055,6 @@ class UpdateLeagueLogos(ApiFollower):
                     leaguedossier.logo_image.save(
                         filename, File(open(f.name))
                         )
-            except Exception:
-                import sys, traceback
-                type, name, tb = sys.exc_info()
-
-                print type, name, traceback.print_tb(tb), leaguedossier.league.steam_id
 
 
 class MirrorProNames(Task):
@@ -1069,15 +1063,33 @@ class MirrorProNames(Task):
     def run(self):
         c = ApiContext()
         vac = ValveApiCall()
-
-        upn = UpdateProNames()
-        c = chain(vac.s(api_context=c, mode='GetPlayerOfficialInfo'), upn.s())
-        c.delay()
+        teams = TeamDossier.objects.all()
+        pros = assemble_pros(teams)
+        for p in pros:
+            c.AccountID = p.steam_id
+            upn = UpdateProNames()
+            t = chain(
+                vac.s(api_context=c, mode='GetPlayerOfficialInfo'), upn.s()
+            )
+            t.delay()
 
 
 class UpdateProNames(ApiFollower):
     """Takes a ping to the official player database and updates that player's pro name"""
-    def run(self, urldata)
+    def run(self, urldata):
+        player = Player.objects.get_or_create(
+            steam_id=self.api_context.AccountID
+            )[0]
+        if self.result['Name'] == '':
+            player.pro_name = None
+            player.save()
+        else:
+            tag = self.result['TeamTag']
+            name = self.result['Name']
+            player.pro_name = tag + ' ' + name
+            player.save()
+
+
 
 def upload_match_summary(players, parent_match, refresh_records):
     """
@@ -1237,3 +1249,14 @@ def send_error_email(body):
 
     smtp.sendmail(from_addr, to_addr, msg)
     smtp.quit()
+
+
+def assemble_pros(teams):
+    lst = []
+    lst.extend([t.player_0 for t in teams if t.player_0 is not None])
+    lst.extend([t.player_1 for t in teams if t.player_1 is not None])
+    lst.extend([t.player_2 for t in teams if t.player_2 is not None])
+    lst.extend([t.player_3 for t in teams if t.player_3 is not None])
+    lst.extend([t.player_4 for t in teams if t.player_4 is not None])
+    lst.extend([t.admin for t in teams if t.admin is not None])
+    return lst
