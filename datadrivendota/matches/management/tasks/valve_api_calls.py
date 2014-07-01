@@ -35,7 +35,7 @@ from heroes.models import Ability, Hero
 from items.models import Item
 from leagues.models import League, LeagueDossier
 from guilds.models import Guild
-from teams.models import Team, TeamDossier
+from teams.models import Team, TeamDossier, assemble_pros
 from settings.base import ADDER_32_BIT
 import logging
 
@@ -1240,34 +1240,6 @@ def send_error_email(body):
 
     smtp.sendmail(from_addr, to_addr, msg)
     smtp.quit()
-
-
-def assemble_pros(teams):
-    lst = []
-    subset = teams.exclude(player_0=None).values('player_0__steam_id')
-    addition = [t['player_0__steam_id'] for t in subset]
-    lst.extend(addition)
-
-    subset = teams.exclude(player_1=None).values('player_1__steam_id')
-    addition = [t['player_1__steam_id'] for t in subset]
-    lst.extend(addition)
-
-    subset = teams.exclude(player_2=None).values('player_2__steam_id')
-    addition = [t['player_2__steam_id'] for t in subset]
-    lst.extend(addition)
-
-    subset = teams.exclude(player_3=None).values('player_3__steam_id')
-    addition = [t['player_3__steam_id'] for t in subset]
-    lst.extend(addition)
-
-    subset = teams.exclude(player_4=None).values('player_4__steam_id')
-    addition = [t['player_4__steam_id'] for t in subset]
-    lst.extend(addition)
-
-    subset = teams.exclude(admin=None).values('admin__steam_id')
-    addition = [t['admin__steam_id'] for t in subset]
-    lst.extend(addition)
-    return lst
 
 
 def update_team_logos(team):

@@ -24,6 +24,7 @@ from utils import binomial_exceedence
 from players.models import MatchRequest
 from datadrivendota.forms import MatchRequestForm
 from matches.models import PlayerMatchSummary, Match
+from teams.models import Team
 from matches.management.tasks.valve_api_calls import (
     ApiContext,
     ValveApiCall,
@@ -152,7 +153,7 @@ def followed_index(request):
 
 @do_profile()
 def pro_index(request):
-    player_list = Player.objects.exclude(pro_name=None)
+    player_list = Player.TI4.all()
     return render(
         request,
         'players/index.html',

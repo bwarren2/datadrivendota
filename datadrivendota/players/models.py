@@ -10,6 +10,8 @@ from django.core.urlresolvers import reverse
 from uuid import uuid4
 from utils.exceptions import DataCapReached, ValidationException
 
+from .managers import TI4Manager
+
 
 def get_code():
     return str(uuid4())
@@ -38,6 +40,9 @@ class Player(models.Model):
         help_text='Unix time of last match scrape start',
         default=0
     )
+
+    objects = models.Manager()
+    TI4 = TI4Manager()
 
     @property
     def display_name(self):

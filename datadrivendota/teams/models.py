@@ -1,5 +1,5 @@
 from django.db import models
-from .managers import SortedTeamManager
+from .managers import SortedTeamManager, TI4TeamManager, TI4DossManager
 
 
 class Team(models.Model):
@@ -7,6 +7,7 @@ class Team(models.Model):
     steam_id = models.IntegerField(unique=True)
     objects = models.Manager()
     sorted = SortedTeamManager()
+    TI4 = TI4TeamManager()
 
 
 class TeamDossier(models.Model):
@@ -41,3 +42,34 @@ class TeamDossier(models.Model):
     leagues = models.ManyToManyField('leagues.League')
     logo_image = models.ImageField(null=True, upload_to='teams/img/')
     logo_sponsor_image = models.ImageField(null=True, upload_to='teams/img/')
+
+    objects = models.Manager()
+    TI4 = TI4DossManager()
+
+
+def assemble_pros(teams):
+    lst = []
+    subset = teams.exclude(player_0=None).values('player_0__steam_id')
+    addition = [t['player_0__steam_id'] for t in subset]
+    lst.extend(addition)
+
+    subset = teams.exclude(player_1=None).values('player_1__steam_id')
+    addition = [t['player_1__steam_id'] for t in subset]
+    lst.extend(addition)
+
+    subset = teams.exclude(player_2=None).values('player_2__steam_id')
+    addition = [t['player_2__steam_id'] for t in subset]
+    lst.extend(addition)
+
+    subset = teams.exclude(player_3=None).values('player_3__steam_id')
+    addition = [t['player_3__steam_id'] for t in subset]
+    lst.extend(addition)
+
+    subset = teams.exclude(player_4=None).values('player_4__steam_id')
+    addition = [t['player_4__steam_id'] for t in subset]
+    lst.extend(addition)
+
+    subset = teams.exclude(admin=None).values('admin__steam_id')
+    addition = [t['admin__steam_id'] for t in subset]
+    lst.extend(addition)
+    return lst

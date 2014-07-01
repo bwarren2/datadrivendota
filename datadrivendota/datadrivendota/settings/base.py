@@ -502,3 +502,21 @@ SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = [
 SUBSCRIPTION_REQUIRED_REDIRECT = 'payments:payments_subscribe'
 
 VERBOSE_PROFILING = getenv('VERBOSE_PROFILING') == 'True'
+
+TI4_TEAMS = [
+    1333179,
+    999689,
+    15,
+    26,
+    5,
+    7,
+    726228,
+    39,
+    111474,
+    36,
+    350190,
+    46,
+    26,
+    1375614,
+    1642908,
+]
