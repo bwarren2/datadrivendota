@@ -70,6 +70,7 @@ class ApiContext(object):
     processed = 0
     refresh_records = False
     date_pull = False
+    appid = 570  # Only matters for ugc acquisition
 
     def __init__(self, *args, **kwargs):
         self.key = STEAM_API_KEY
@@ -83,7 +84,7 @@ class ApiContext(object):
             valve_URL_vars = ['key', 'start_at_team_id', 'teams_requested']
             return self.dictVars(valve_URL_vars)
         elif mode == 'GetUGCFileDetails':
-            valve_URL_vars = ['key', 'ugcid']
+            valve_URL_vars = ['key', 'ugcid', 'appid']
             return self.dictVars(valve_URL_vars)
         elif mode == 'GetLeagueListing':
             valve_URL_vars = ['key']
@@ -283,7 +284,10 @@ class ValveApiCall(BaseTask):
                     'https://api.steampowered.com/IDOTA2Fantasy_570/'
                     'GetPlayerOfficialInfo/v1/'
                 ),
-
+                'GetUGCFileDetails': (
+                    'http://api.steampowered.com/ISteamRemoteStorage/'
+                    'GetUGCFileDetails/v1/'
+                ),
             }
 
             # If you attempt to access a URL I do not think valve supports, I
@@ -871,9 +875,11 @@ class UploadTeam(ApiFollower):
                     map_team_players(teamdoss, team)
                     teamdoss.save()
 
-                    c = ApiContext()
-                    utl = UpdateTeamLogos()
-                    utl.s(api_context=c, team_steam_id=t.steam_id).delay()
+                    update_team_logos(t)
+
+                    # c = ApiContext()
+                    # utl = UpdateTeamLogos()
+                    # utl.s(api_context=c, team_steam_id=t.steam_id).delay()
 
             except TeamDossier.DoesNotExist:
                 teamdoss = TeamDossier.objects.create(
@@ -894,75 +900,48 @@ class UploadTeam(ApiFollower):
                         setattr(teamdoss, 'rating', team.get('rating'))
 
                 teamdoss.save()
-
-                c = ApiContext()
-                utl = UpdateTeamLogos()
-                utl.s(api_context=c, team_steam_id=t.steam_id).delay()
+                update_team_logos(t)
 
 
-class UpdateTeamLogos(BaseTask):
-    def run(self, team_steam_id):
-        team = Team.objects.get(steam_id=team_steam_id)
-        logo = team.teamdossier.logo
-        logo_sponsor = team.teamdossier.logo_sponsor
+class UpdateTeamLogo(ApiFollower):
+    def run(self, urldata):
+        team = Team.objects.get(steam_id=self.api_context.team_id)
+        print self.result, urldata
+        URL = urldata['data']['url']
+        try:
+            imgdata = urllib2.urlopen(URL, timeout=5)
+            with open('%s.png' % str(uuid4()), 'w+') as f:
+                f.write(imgdata.read())
+            filename = slugify(team.teamdossier.name) + '.png'
+            if self.api_context.logo_type == 'team':
+                team.teamdossier.logo_image.save(
+                    filename, File(open(f.name))
+                    )
+            else:
+                team.teamdossier.logo_sponsor_image.save(
+                    filename, File(open(f.name))
+                )
+            os.remove(f.name)
 
-        if logo != 0 and logo is not None:
-            try:
-                filename, f = get_logo_image(logo, team, '_logo.png')
-                team.teamdossier.logo_image.save(filename, File(open(f.name)))
-                os.remove(f.name)
-            except (urllib2.URLError, ssl.SSLError, socket.timeout) as err:
-                self.retry(team_steam_id=team_steam_id)
-            except Exception as err:
-                if team.teamdossier.logo_image is None:
-                    filename = slugify(team.teamdossier.name)+'_logo.png'
-                    URL = ('https://s3.amazonaws.com/datadrivendota'
-                           '/images/blank-logo.png')
-                    imgdata = urllib2.urlopen(URL, timeout=5)
-                    with open('%s.png' % str(uuid4()), 'w+') as f:
-                        f.write(imgdata.read())
+        # If we fail, put in a placeholder and freak.
+        except Exception:
+                filename = slugify(team.teamdossier.name)+'_logo.png'
+                URL = ('https://s3.amazonaws.com/datadrivendota'
+                       '/images/blank-logo.png')
+                imgdata = urllib2.urlopen(URL, timeout=5)
+                with open('%s.png' % str(uuid4()), 'w+') as f:
+                    f.write(imgdata.read())
 
+                if self.api_context.logo_type == 'team':
                     team.teamdossier.logo_image.save(
                         filename, File(open(f.name))
                         )
-                    os.remove(f.name)
-
-                logger.error("Failed for {0}, {1}".format(
-                    team.teamdossier.name, err)
-                )
-
-        if logo_sponsor != 0 and logo_sponsor is not None:
-            try:
-                filename, f = get_logo_image(
-                    logo_sponsor, team, '_logo_sponsor.png'
-                    )
-                team.teamdossier.logo_sponsor_image.save(
-                    filename, File(open(f.name))
-                    )
-                os.remove(f.name)
-
-            except (urllib2.URLError, ssl.SSLError, socket.timeout) as err:
-                self.retry(team_steam_id=team_steam_id)
-            except Exception as err:
-                if team.teamdossier.logo_sponsor_image is None:
-                    filename = slugify(team.teamdossier.name)\
-                        + '_logo_sponsor.png'
-                    URL = ('https://s3.amazonaws.com/datadrivendota'
-                           '/images/blank-logo.png')
-                    imgdata = urllib2.urlopen(URL, timeout=5)
-                    with open('%s.png' % str(uuid4()), 'w+') as f:
-                        f.write(imgdata.read())
-
+                else:
                     team.teamdossier.logo_sponsor_image.save(
                         filename, File(open(f.name))
-                        )
-                    os.remove(f.name)
-
-                logger.error(
-                    "Failed for {0}, {1}".format(
-                        team.teamdossier.name, err
-                        )
                     )
+                os.remove(f.name)
+                raise
 
 
 class AcquireLeagues(Task):
@@ -1100,7 +1079,6 @@ class UpdateProNames(ApiFollower):
             player.save()
 
 
-
 def upload_match_summary(players, parent_match, refresh_records):
     """
     Populates the endgame summary data that is associated with a match
@@ -1217,29 +1195,29 @@ def map_team_players(teamdoss, team):
             setattr(teamdoss, internal, p)
 
 
-def get_logo_image(logo, team, suffix):
-        mode = 'GetUGCFileDetails'
-        c = ApiContext()
-        c.ugcid = logo
-        URL = ('http://api.steampowered.com/ISteamRemoteStorage/'
-               'GetUGCFileDetails/v1/?appid=570&') + \
-            urlencode(c.toUrlDict(mode))
-        logger.info("URL: {0}".format(URL))
-        try:
-            pageaccess = urllib2.urlopen(URL, timeout=5)
-            data = json.loads(pageaccess.read())['data']
-            URL = data['url']
-        except urllib2.HTTPError as err:
-            logger.error("{0} for {1}".format(err.code, URL))
+# def get_logo_image(logo, team, suffix):
+#         mode = 'GetUGCFileDetails'
+#         c = ApiContext()
+#         c.ugcid = logo
+#         URL = ('http://api.steampowered.com/ISteamRemoteStorage/'
+#                'GetUGCFileDetails/v1/?appid=570&') + \
+#             urlencode(c.toUrlDict(mode))
+#         logger.info("URL: {0}".format(URL))
+#         try:
+#             pageaccess = urllib2.urlopen(URL, timeout=5)
+#             data = json.loads(pageaccess.read())['data']
+#             URL = data['url']
+#         except urllib2.HTTPError as err:
+#             logger.error("{0} for {1}".format(err.code, URL))
 
-        try:
-            imgdata = urllib2.urlopen(URL, timeout=5)
-            with open('%s.png' % str(uuid4()), 'w+') as f:
-                f.write(imgdata.read())
-            filename = slugify(team.teamdossier.name)+suffix
-            return filename, f
-        except urllib2.HTTPError as err:
-            logger.error("{0} for {1}".format(err.code, URL))
+#         try:
+#             imgdata = urllib2.urlopen(URL, timeout=5)
+#             with open('%s.png' % str(uuid4()), 'w+') as f:
+#                 f.write(imgdata.read())
+#             filename = slugify(team.teamdossier.name)+suffix
+#             return filename, f
+#         except urllib2.HTTPError as err:
+#             logger.error("{0} for {1}".format(err.code, URL))
 
 
 def send_error_email(body):
@@ -1270,3 +1248,37 @@ def assemble_pros(teams):
     lst.extend([t.player_4 for t in teams if t.player_4 is not None])
     lst.extend([t.admin for t in teams if t.admin is not None])
     return lst
+
+
+def update_team_logos(team):
+    #Refresh the logo
+    logo = team.teamdossier.logo
+    teamdoss = team.teamdossier
+    if logo != 0 and logo is not None:
+        c = ApiContext()
+        vac = ValveApiCall()
+        c.ugcid = teamdoss.logo
+        c.team_id = teamdoss.team.steam_id
+        c.logo_type = 'team'
+
+        utl = UpdateTeamLogo()
+
+        c = chain(
+            vac.s(api_context=c, mode='GetUGCFileDetails'), utl.s()
+        )
+        c.delay()
+
+    logo = team.teamdossier.logo_sponsor
+    if logo != 0 and logo is not None:
+        c = ApiContext()
+        vac = ValveApiCall()
+        c.ugcid = teamdoss.logo
+        c.team_id = teamdoss.team.steam_id
+        c.logo_type = 'sponsor'
+
+        utl = UpdateTeamLogo()
+
+        c = chain(
+            vac.s(api_context=c, mode='GetUGCFileDetails'), utl.s()
+        )
+        c.delay()

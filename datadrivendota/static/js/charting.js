@@ -61,7 +61,7 @@ function inner_chart(params, svg){
   var width = get_width(params);
   var height = get_height(params);
   var margin = get_margin(params);
-  var inner = d3.select('svg').append("g");
+  var inner = svg.append("g");
   inner.attr("class", 'inner-chart')
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
   return inner;
