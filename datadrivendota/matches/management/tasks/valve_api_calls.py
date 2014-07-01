@@ -1,3 +1,4 @@
+import gc
 import urllib2
 import json
 import socket
@@ -165,7 +166,7 @@ class BaseTask(Task):
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
 #        logger.info("Ending {task_id}".format(task_id=task_id))
-        pass
+        gc.collect()
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         # logger.error(
@@ -906,7 +907,6 @@ class UploadTeam(ApiFollower):
 class UpdateTeamLogo(ApiFollower):
     def run(self, urldata):
         team = Team.objects.get(steam_id=self.api_context.team_id)
-        print self.result, urldata
         URL = urldata['data']['url']
         try:
             imgdata = urllib2.urlopen(URL, timeout=5)
