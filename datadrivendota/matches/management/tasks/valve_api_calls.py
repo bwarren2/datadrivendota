@@ -1075,7 +1075,7 @@ class UpdateProNames(ApiFollower):
         else:
             tag = self.result['TeamTag']
             name = self.result['Name']
-            player.pro_name = tag + ' ' + name
+            player.pro_name = '[' + tag + '] ' + name
             player.save()
 
 
