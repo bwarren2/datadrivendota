@@ -646,14 +646,17 @@ class RefreshUpdatePlayerPersonas(BaseTask):
         list_send_length = 50
         users = Player.objects.filter(updated=True)
         tracked = get_tracks(users)
+
         teams = TeamDossier.objects.all()
         pros = assemble_pros(teams)
-        check_list = meld(users, tracked, pros)
-        check_list = [user for user in check_list]
+
+        track_list = meld(users, tracked)
+
+        check_list = [user.steam_id for user in track_list].extend(pros)
         querylist = []
 
         for counter, user in enumerate(check_list, start=1):
-            id_64_bit = str(user.get_64_bit_id())
+            id_64_bit = str(user + ADDER_32_BIT)
             querylist.append(id_64_bit)
 
             # if our list is list_send_length long or we have reached the end
@@ -1050,12 +1053,12 @@ class MirrorProNames(Task):
     """Gets the pro name for each person in the current roster set"""
 
     def run(self):
-        c = ApiContext()
-        vac = ValveApiCall()
         teams = TeamDossier.objects.all()
         pros = assemble_pros(teams)
         for p in pros:
-            c.AccountID = p.steam_id
+            c = ApiContext()
+            vac = ValveApiCall()
+            c.AccountID = p
             upn = UpdateProNames()
             t = chain(
                 vac.s(api_context=c, mode='GetPlayerOfficialInfo'), upn.s()
@@ -1241,12 +1244,29 @@ def send_error_email(body):
 
 def assemble_pros(teams):
     lst = []
-    lst.extend([t.player_0 for t in teams if t.player_0 is not None])
-    lst.extend([t.player_1 for t in teams if t.player_1 is not None])
-    lst.extend([t.player_2 for t in teams if t.player_2 is not None])
-    lst.extend([t.player_3 for t in teams if t.player_3 is not None])
-    lst.extend([t.player_4 for t in teams if t.player_4 is not None])
-    lst.extend([t.admin for t in teams if t.admin is not None])
+    subset = teams.exclude(player_0=None).values('player_0__steam_id')
+    addition = [t['player_0__steam_id'] for t in subset]
+    lst.extend(addition)
+
+    subset = teams.exclude(player_1=None).values('player_1__steam_id')
+    addition = [t['player_1__steam_id'] for t in subset]
+    lst.extend(addition)
+
+    subset = teams.exclude(player_2=None).values('player_2__steam_id')
+    addition = [t['player_2__steam_id'] for t in subset]
+    lst.extend(addition)
+
+    subset = teams.exclude(player_3=None).values('player_3__steam_id')
+    addition = [t['player_3__steam_id'] for t in subset]
+    lst.extend(addition)
+
+    subset = teams.exclude(player_4=None).values('player_4__steam_id')
+    addition = [t['player_4__steam_id'] for t in subset]
+    lst.extend(addition)
+
+    subset = teams.exclude(admin=None).values('admin__steam_id')
+    addition = [t['admin__steam_id'] for t in subset]
+    lst.extend(addition)
     return lst
 
 
