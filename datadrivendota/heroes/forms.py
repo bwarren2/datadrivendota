@@ -59,6 +59,8 @@ class HeroLineupMultiSelect(forms.Form):
         'effective_hp',
         'hp',
         'mana',
+        'hp_regen',
+        'mana_regen',
         'day_vision',
         'night_vision',
         'atk_point',
