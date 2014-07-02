@@ -20,6 +20,7 @@ class TI4TeamManager(models.Manager):
             .filter(steam_id__in=settings.TI4_TEAMS)
         return qs
 
+
 class TI4DossManager(models.Manager):
 
     def get_queryset(self):
