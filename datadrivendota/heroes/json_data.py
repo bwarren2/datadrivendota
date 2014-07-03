@@ -195,11 +195,10 @@ def hero_performance_chart_json(
         hero__steam_id=hero,
         match__validity=Match.LEGIT
     )
-
     if outcome == 'win':
-        superset_pmses.filter(is_win=True)
+        superset_pmses = superset_pmses.filter(is_win=True)
     elif outcome == 'loss':
-        superset_pmses.filter(is_win=False)
+        superset_pmses = superset_pmses.filter(is_win=False)
 
     skill1 = superset_pmses.filter(match__skill=1)\
         .order_by('-match__start_time').select_related()[:100]
@@ -316,7 +315,7 @@ def hero_progression_json(
         pmses = pmses.filter(
             is_win=False
         )
-    print outcome, "!@!@!"
+
     pmses = pmses.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
     skill1 = pmses.filter(match__skill=1)\
         .order_by('-match__start_time')[:100]
@@ -340,7 +339,6 @@ def hero_progression_json(
         )
         pmses_pool.extend(list(requested_pmses))
         requested_ids = [pms.match.steam_id for pms in requested_pmses]
-        print requested_ids
     else:
         requested_ids = []
 
