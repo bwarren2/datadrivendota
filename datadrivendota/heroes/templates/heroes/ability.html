@@ -42,7 +42,7 @@
     <li>Behavior:
       <ul>
         {% for b in ability.behavior.all %}
-          <li>{{forloop.counter}}: {{ b.display_name }}</li>
+          <li>{{ b.display_name }}</li>
         {% endfor %}
       </ul>
     </li>
