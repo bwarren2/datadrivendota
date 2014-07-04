@@ -80,7 +80,7 @@
     <li>Special Values:
       <ul>
         {% for b in ability.abilityspecialvalues_set.all %}
-          <li>{{ b.value }}</li>
+          <li>{{ b.display_key }}: {{ b.value }}</li>
         {% endfor %}
       </ul>
     </li>
