@@ -9,6 +9,7 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from uuid import uuid4
 from utils.exceptions import DataCapReached, ValidationException
+from django.utils.encoding import smart_str
 
 from .managers import TI4Manager
 
@@ -48,9 +49,9 @@ class Player(models.Model):
     def display_name(self):
 
         if self.pro_name is not None:
-            return self.pro_name
+            return smart_str(self.pro_name)
         else:
-            return self.persona_name
+            return smart_str(self.persona_name)
 
     def save(self, *args, **kwargs):
         # That magic number is the valve 32bit -64bit adder.
