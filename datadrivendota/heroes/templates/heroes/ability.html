@@ -25,7 +25,7 @@
       <li>Channel time: {{ ability.channel_time }}</li>
     {% endif %}
     {% if ability.damage_type %}
-      <li>Damage Type: {{ ability.damage_type }}</li>
+      <li>Damage Type: {{ ability.display_damage_type }}</li>
     {% endif %}
     {% if ability.damage %}
       <li>Damage: {{ ability.damage }}</li>
@@ -42,38 +42,45 @@
     <li>Behavior:
       <ul>
         {% for b in ability.behavior.all %}
-          <li>{{forloop.counter}}: {{ b.internal_name }}</li>
+          <li>{{forloop.counter}}: {{ b.display_name }}</li>
         {% endfor %}
       </ul>
     </li>
 
+    {% if ability.target_flags.all %}
     <li>Target flags:
       <ul>
         {% for b in ability.target_flags.all %}
-          <li>{{forloop.counter}}: {{ b.internal_name }}</li>
+          <li>{{ b.display_name }}</li>
         {% endfor %}
       </ul>
     </li>
+    {% endif %}
 
+
+    {% if ability.target_type.all %}
     <li>Target type:
       <ul>
         {% for b in ability.target_type.all %}
-          <li>{{forloop.counter}}: {{ b.internal_name }}</li>
+          <li>{{ b.display_name }}</li>
         {% endfor %}
       </ul>
     </li>
+    {% endif %}
 
+    {% if ability.target_team.all %}
     <li>Target team:
       <ul>
         {% for b in ability.target_team.all %}
-          <li>{{forloop.counter}}: {{ b.internal_name }}</li>
+          <li>{{ b.display_name }}</li>
         {% endfor %}
       </ul>
     </li>
+    {% endif %}
     <li>Special Values:
       <ul>
         {% for b in ability.abilityspecialvalues_set.all %}
-          <li>{{b.key}}: {{ b.value }}</li>
+          <li>{{ b.value }}</li>
         {% endfor %}
       </ul>
     </li>

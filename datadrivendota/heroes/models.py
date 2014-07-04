@@ -184,6 +184,9 @@ class Ability(models.Model):
         self.machine_name = slugify(self.internal_name)
         super(Ability, self).save(*args, **kwargs)
 
+    def display_damage_type(self):
+        return self.damage_type.replace('DAMAGE_TYPE_', '').title()
+
 
 class AbilitySpecialValues(models.Model):
     ability = models.ForeignKey('Ability')
@@ -195,6 +198,9 @@ class AbilitySpecialValues(models.Model):
         help_text="Valve's underscore name",
         max_length=150
     )
+
+    def display_key(self):
+        return self.key.replace('_', ' ').title()
 
     def __unicode__(self):
         return ' ('+str(self.key)+': '+self.value+')'
@@ -209,12 +215,23 @@ class AbilityBehavior(models.Model):
     def __unicode__(self):
         return human_name(self.internal_name)
 
+    def display_name(self):
+        return self.internal_name.replace(
+            'DOTA_ABILITY_BEHAVIOR_', ''
+            ).replace('_', ' ').title()
+
 
 class AbilityUnitTargetFlags(models.Model):
     internal_name = models.CharField(
         help_text="Valve's all-caps underscore name",
         max_length=150
     )
+
+    def display_name(self):
+        return self.internal_name.replace(
+            'DOTA_UNIT_TARGET_FLAG_', ''
+            ).replace('_', ' ').title()
+
 
     def __unicode__(self):
         return human_name(self.internal_name)
@@ -226,6 +243,11 @@ class AbilityUnitTargetType(models.Model):
         max_length=150
     )
 
+    def display_name(self):
+        return self.internal_name.replace(
+            'DOTA_UNIT_TARGET_', ''
+            ).replace('_', ' ').title()
+
     def __unicode__(self):
         return human_name(self.internal_name)
 
@@ -235,6 +257,11 @@ class AbilityUnitTargetTeam(models.Model):
         help_text="Valve's all-caps underscore name",
         max_length=150
     )
+
+    def display_name(self):
+        return self.internal_name.replace(
+            'DOTA_UNIT_TARGET_TEAM_', ''
+            ).replace('_', ' ').title()
 
     def __unicode__(self):
         return human_name(self.internal_name)
