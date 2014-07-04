@@ -351,41 +351,37 @@ class HeroAbilities(HeroAbilitiesMixin, ChartFormView):
 def player_matches(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
     total_results = 500
-    if request.method == 'POST':
-        form = PlayerMatchesFilterForm(request.POST)
-        if form.is_valid():
-            print form.cleaned_data
-            pms_list = PlayerMatchSummary.objects.select_related()
+    form = PlayerMatchesFilterForm(request.GET)
+    if form.is_valid():
+        print form.cleaned_data
+        pms_list = PlayerMatchSummary.objects.select_related()
+        pms_list = pms_list.filter(
+            player=player
+        )
+        if form.cleaned_data['hero'] is not None:
             pms_list = pms_list.filter(
-                player=player
+                hero__steam_id=form.cleaned_data['hero']
             )
-            if form.cleaned_data['hero'] is not None:
-                pms_list = pms_list.filter(
-                    hero__steam_id=form.cleaned_data['hero']
+        if form.cleaned_data['min_date'] is not None:
+            min_date_utc = mktime(
+                form.cleaned_data['min_date'].timetuple()
                 )
-            if form.cleaned_data['min_date'] is not None:
-                min_date_utc = mktime(
-                    form.cleaned_data['min_date'].timetuple()
-                    )
-                pms_list = pms_list.filter(
-                    match__start_time__gte=min_date_utc,
-                )
-            if form.cleaned_data['max_date'] is not None:
-                max_date_utc = mktime(
-                    form.cleaned_data['max_date'].timetuple()
-                    )
-                pms_list = pms_list.filter(
-                    match__start_time__lte=max_date_utc,
-                )
-            pms_list = pms_list.order_by('-match__start_time')[0:total_results]
-            pms_list = date_notate_pms_list(pms_list)
-        else:
-            pms_list = get_playermatchsummaries_for_player(
-                player, total_results
+            pms_list = pms_list.filter(
+                match__start_time__gte=min_date_utc,
             )
+        if form.cleaned_data['max_date'] is not None:
+            max_date_utc = mktime(
+                form.cleaned_data['max_date'].timetuple()
+                )
+            pms_list = pms_list.filter(
+                match__start_time__lte=max_date_utc,
+            )
+        pms_list = pms_list.order_by('-match__start_time')[0:total_results]
+        pms_list = date_notate_pms_list(pms_list)
     else:
-        form = PlayerMatchesFilterForm()
-        pms_list = get_playermatchsummaries_for_player(player, total_results)
+        pms_list = get_playermatchsummaries_for_player(
+            player, total_results
+        )
 
     page = request.GET.get('page')
     paginator = SmarterPaginator(
