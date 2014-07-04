@@ -7,6 +7,11 @@ class SingleHeroSelect(forms.CharField):
     widget = forms.HiddenInput(attrs={'class': 'single-hero-tags'})
 
     def clean(self, hero):
+        if self.required and not hero:
+            raise forms.ValidationError("That is not a real hero name")
+        if not self.required and not hero:
+            return None
+
         if ',' in hero:
             raise ValidationError("Only one hero at a time.")
         try:
