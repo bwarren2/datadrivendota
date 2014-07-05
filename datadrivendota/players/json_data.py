@@ -11,7 +11,8 @@ from utils.charts import (
     hero_classes_dict,
     XYPlot,
     DataPoint,
-    TasselPlot
+    TasselPlot,
+    TasselDataPoint
 )
 from heroes.models import Hero, Role, HeroDossier
 from matches.models import SkillBuild
@@ -236,7 +237,7 @@ def player_hero_abilities_json(
         display_name = pro_name if pro_name is not None else name
         if build['level'] == 1:
             subtractor = build['time']/60.0
-        d = DataPoint()
+        d = TasselDataPoint()
         d.x_var = round(build['time']/60.0-subtractor, 3)
         d.y_var = build['level']
         winningness = 'Win' if \
