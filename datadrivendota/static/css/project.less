@@ -23,21 +23,25 @@
 
 /* Rules */
 
-.brand-release-mark {
+.release-mark(){
   font-family: "Roboto", sans-serif;
   color: red;
   position: absolute;
-  left: 130px;
   top: 5px;
   .rotate;
 }
+
+.brand-release-mark {
+  .release-mark;
+  left: 130px;
+}
 .section-release-mark {
-  font-family: "Roboto", sans-serif;
-  color: red;
-  position: absolute;
+  .release-mark;
   left: 60px;
-  top: 5px;
-  .rotate;
+}
+.item-section-release-mark {
+  .release-mark;
+  left: 30px;
 }
 
 .adbar{
