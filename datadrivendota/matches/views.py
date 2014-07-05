@@ -25,6 +25,7 @@ from .mixins import (
     MatchParameterMixin,
     SingleMatchParameterMixin,
     RoleMixin,
+    SetProgressionMixin,
 )
 from datadrivendota.views import ChartFormView, ApiView
 from datadrivendota.forms import FollowMatchForm
@@ -528,6 +529,20 @@ class ProgressionList(ProgressionListMixin, ChartFormView):
     def amend_params(self, params):
         return params
 
+class ProgressionSet(SetProgressionMixin, ChartFormView):
+    tour = [
+        {
+            'orphan': True,
+            'title': "Welcome!",
+            'content': "This page charts level progression data for a specific hero in specific matches."
+        }
+    ]
+    title = "Match Set Hero Progression"
+    html = "matches/form.html"
+
+    def amend_params(self, params):
+        return params
+
 
 class AbilityBuild(AbilityBuildMixin, ChartFormView):
     tour = [
@@ -714,4 +729,7 @@ class ApiMatchBarChart(SingleMatchParameterMixin, ApiView):
 
 
 class ApiRoleChart(RoleMixin, ApiView):
+    pass
+
+class ApiSetProgressionChart(SetProgressionMixin, ApiView):
     pass

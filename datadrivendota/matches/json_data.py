@@ -1,7 +1,7 @@
 from math import floor
 from django.conf import settings
 from django.utils.text import slugify
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.core.urlresolvers import reverse
 from itertools import chain
 from matches.models import (
@@ -17,7 +17,7 @@ from utils.exceptions import NoDataFound
 from utils.charts import (
     hero_classes_dict,
     XYPlot, DataPoint, BarPlot, TasselPlot,
-    valid_var
+    TasselDataPoint, valid_var
 )
 from players.models import Player
 from utils import db_arg_map, match_url
@@ -669,7 +669,7 @@ def match_list_json(matches, players):
         if build['level'] == 1:
             subtractor = build['time']/60.0
 
-        d = DataPoint()
+        d = TasselDataPoint()
         d.x_var = round(build['time']/60.0-subtractor, 3)
         d.y_var = build['level']
 
@@ -692,5 +692,64 @@ def match_list_json(matches, players):
     c.params.path_stroke_width = 3
     c.params.x_label = 'Time (m)'
     c.params.y_label = 'Level'
+
+    return c
+
+
+def match_set_progression_json(hero, match_set_1, match_set_2, match_set_3):
+    sbs = SkillBuild.objects.filter(
+        player_match_summary__hero__steam_id=hero
+    ).filter(
+        Q(player_match_summary__match__steam_id__in=match_set_1) |
+        Q(player_match_summary__match__steam_id__in=match_set_2) |
+        Q(player_match_summary__match__steam_id__in=match_set_3)
+    ).values(
+        'time',
+        'level',
+        'player_match_summary__is_win',
+        'player_match_summary__match__steam_id',
+        'player_match_summary__hero__steam_id',
+        'player_match_summary__player__persona_name',
+        'player_match_summary__player__pro_name',
+    ).order_by('player_match_summary', 'level')
+
+    hero_classes = hero_classes_dict()
+
+    c = TasselPlot()
+    for build in sbs:
+
+        if build['level'] == 1:
+            subtractor = build['time']/60.0
+
+        d = TasselDataPoint()
+        d.x_var = round(build['time']/60.0-subtractor, 3)
+        d.y_var = build['level']
+
+        if build['player_match_summary__match__steam_id'] in match_set_1:
+            group = "Set 1"
+        elif build['player_match_summary__match__steam_id'] in match_set_2:
+            group = "Set 2"
+        elif build['player_match_summary__match__steam_id'] in match_set_3:
+            group = "Set 3"
+
+        d.group_var = group
+
+        d.series_var = build['player_match_summary__match__steam_id']
+
+        d.label = group
+
+        d.panel_var = 'Skill Progression'
+
+        hero_id = build['player_match_summary__hero__steam_id']
+
+        if hero_classes[hero_id] is not None:
+            d.classes.extend(hero_classes[hero_id])
+
+        c.datalist.append(d)
+
+    c.params.x_min = 0
+    c.params.x_label = 'Time (m)'
+    c.params.y_label = 'Level'
+    c.params.path_stroke_width = 2
 
     return c

@@ -6,6 +6,7 @@ from .forms import (
     MatchParameterSelect,
     SingleMatchParameterSelect,
     RoleSelect,
+    MatchSetSelect,
 )
 from .json_data import (
     player_endgame_json,
@@ -15,7 +16,8 @@ from .json_data import (
     player_team_endgame_json,
     match_parameter_json,
     single_match_parameter_json,
-    match_role_json
+    match_role_json,
+    match_set_progression_json,
 )
 
 
@@ -102,3 +104,14 @@ class RoleMixin(object):
         'match',
     ]
     json_function = staticmethod(match_role_json)
+
+
+class SetProgressionMixin(object):
+    form = MatchSetSelect
+    attrs = [
+        'hero',
+        'match_set_1',
+        'match_set_2',
+        'match_set_3',
+    ]
+    json_function = staticmethod(match_set_progression_json)

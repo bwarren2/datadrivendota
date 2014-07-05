@@ -34,6 +34,9 @@ urlpatterns = patterns(
     url(r'^progression-list/$',
         views.ProgressionList.as_view(),
         name="progession_list"),
+    url(r'^progression-sets/$',
+        views.ProgressionSet.as_view(),
+        name="progession_sets"),
 
     url(
         r'^context/$',
@@ -65,6 +68,11 @@ urlpatterns = patterns(
         r'^api/ability-build/$',
         views.ApiAbilityBuildChart.as_view(),
         name='api_ability_build_chart'
+        ),
+    url(
+        r'^api/set-progression/$',
+        views.ApiSetProgressionChart.as_view(),
+        name='api_progession_sets_chart'
         ),
     url(
         r'^api/match-scatter/$',

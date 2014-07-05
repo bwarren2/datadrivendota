@@ -230,3 +230,22 @@ class ContextSelect(forms.Form):
         required=False,
         help_text='Pick one or more matches'
     )
+
+
+class MatchSetSelect(forms.Form):
+    hero = SingleHeroSelect(
+        required=True,
+        help_text='Pick one hero'
+    )
+    match_set_1 = MultiMatchSelect(
+        required=True,
+        help_text='Pick one or more matches'
+    )
+    match_set_2 = MultiMatchSelect(
+        required=False,
+        help_text='Pick one or more matches'
+    )
+    match_set_3 = MultiMatchSelect(
+        required=False,
+        help_text='Pick one or more matches'
+    )
