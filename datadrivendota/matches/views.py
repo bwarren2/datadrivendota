@@ -340,15 +340,59 @@ class MatchHeroContext(FormView):
     template_name = 'matches/match_hero_context.html'
     form_class = ContextSelect
 
+    def get(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+
+        if form.is_valid():
+            return self.form_valid(form)
+
+        else:
+            return self.form_invalid(form)
+            return render(
+                self.request,
+                self.template_name,
+                {'form': form_class()},
+            )
+
+    def get_form_kwargs(self):
+        """
+        Returns the keyword arguments for instantiating the form.
+        """
+        kwargs = {
+            'initial': self.get_initial(),
+            'prefix': self.get_prefix(),
+        }
+        if self.request.method in ('POST', 'PUT'):
+            kwargs.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
+
+        if self.request.method in ('GET'):
+            kwargs.update({
+                'data': self.request.GET,
+                'files': self.request.FILES,
+            })
+
+        return kwargs
+
     def form_valid(self, form):
-        hero_id = form.cleaned_data['hero']
+        hero = form.cleaned_data['hero']
+
+        hero_obj = Hero.objects.get(steam_id=hero)
+
+        hero_name = hero_obj.name
+        machine_name = hero_obj.machine_name
         matches = ",".join(str(x) for x in form.cleaned_data['matches'])
-        win = form.cleaned_data['outcome']
+        outcome = form.cleaned_data['outcome']
         amendments = {
             'form': form,
-            'hero_id': hero_id,
+            'hero': hero,
             'matches': matches,
-            'win': win,
+            'outcome': outcome,
+            'hero_name': hero_name,
+            'machine_name': machine_name,
         }
         return render(
             self.request,

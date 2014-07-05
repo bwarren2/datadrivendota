@@ -223,10 +223,10 @@ class ContextSelect(forms.Form):
         required=True,
         help_text='Pick one hero'
     )
-    matches = MultiMatchSelect(
-        required=True,
-        help_text='Pick one or more matches'
-    )
     outcome = OutcomeField(
         required=True,
         help_text='What outcome would you like to compare against?')
+    matches = MultiMatchSelect(
+        required=False,
+        help_text='Pick one or more matches'
+    )

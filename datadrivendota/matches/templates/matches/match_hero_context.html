@@ -2,7 +2,7 @@
 
 {% block title %}Contextualizer{% endblock title %}
 
-{% block page_title %}Contextualizer
+{% block page_title %}Contextualizer - <a href="{% url 'heroes:detail' hero_name=machine_name%}">{{hero_name}}</a>
   {# <div class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></div> #}
 {% endblock page_title %}
 
@@ -62,16 +62,16 @@
 {% endblock content %}
 
 {% block extra_js %}
-{% if hero_id %}
+{% if hero %}
 
 <script type="text/javascript">
   window.apiHit(
     "#hero_progression_chart",
     '{% url "heroes:api_skill_progression_chart" %}',
       $.param({
-        hero: "{{hero_id}}",
+        hero: "{{hero}}",
         matches: "{{matches}}",
-        outcome: "{{win}}",
+        outcome: "{{outcome}}",
         game_modes: [1, 2, 3, 4, 5],
         division: 'Skill',
         width: 300,
@@ -84,9 +84,9 @@
       "#tower_damage",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero_id }}",
+          hero: "{{ hero }}",
           matches: "{{matches}}",
-          outcome: "{{win}}",
+          outcome: "{{outcome}}",
           x_var: 'duration',
           y_var: 'tower_damage',
           group_var: 'skill_name',
@@ -103,9 +103,9 @@
       "#gold_xp",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero_id }}",
+          hero: "{{ hero }}",
           matches: "{{matches}}",
-          outcome: "{{win}}",
+          outcome: "{{outcome}}",
           x_var: 'gold_per_min',
           y_var: 'xp_per_min',
           group_var: 'skill_name',
@@ -122,9 +122,9 @@
       "#hit_deny",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero_id }}",
+          hero: "{{ hero }}",
           matches: "{{matches}}",
-          outcome: "{{win}}",
+          outcome: "{{outcome}}",
           x_var: 'last_hits',
           y_var: 'denies',
           group_var: 'skill_name',
@@ -142,9 +142,9 @@
       "#hero_kda2_chart",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero_id }}",
+          hero: "{{ hero }}",
           matches: "{{matches}}",
-          outcome: "{{win}}",
+          outcome: "{{outcome}}",
           x_var: 'duration',
           y_var: 'K-D+.5*A',
           group_var: 'skill_name',
@@ -161,9 +161,9 @@
       "#roi_chart",
       '{% url "heroes:api_hero_performance_chart" %}',
         $.param({
-          hero: "{{ hero_id }}",
+          hero: "{{ hero }}",
           matches: "{{matches}}",
-          outcome: "{{win}}",
+          outcome: "{{outcome}}",
           x_var: 'gold_total',
           y_var: 'hero_damage',
           group_var: 'skill_name',
