@@ -8,7 +8,23 @@
 
 {% block content %}
 
-  <h4>{{hero_name}} in {{matches}} against game outcome: {{win}}</h4>
+
+<div>
+  <div class='form-container col-md-12'>
+    <form class='form-inline' action="" method='POST'>
+      {% include "_form.html" %}
+      {% csrf_token %}
+
+      <div class="control-group">
+        <div class="controls pull-right">
+          <button type="submit" class="btn btn-small btn-primary">Submit</button>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </form>
+  </div>
+
+</div>
   <div class="row">
     <div class="player-charts col-md-4">
     <h4>KDA2</h4>
@@ -46,6 +62,8 @@
 {% endblock content %}
 
 {% block extra_js %}
+{% if hero_id %}
+
 <script type="text/javascript">
   window.apiHit(
     "#hero_progression_chart",
@@ -159,4 +177,6 @@
       )
     );
 </script>
+{% endif %}
+
 {% endblock extra_js %}

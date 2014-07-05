@@ -9,12 +9,13 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404
 from django.shortcuts import render
 from django.conf import settings
-from django.views.generic.base import TemplateView
+from django.views.generic.edit import FormView
 
 from utils.views import cast_dict, ability_infodict
 from utils.pagination import SmarterPaginator
 from heroes.models import Hero, Role
 from .models import Match, PlayerMatchSummary, PickBan
+from .forms import ContextSelect
 from .mixins import (
     EndgameMixin,
     OwnTeamEndgameMixin,
@@ -335,8 +336,25 @@ def follow_match_feed(request):
             )
 
 
-class MatchHeroContext(TemplateView):
+class MatchHeroContext(FormView):
     template_name = 'matches/match_hero_context.html'
+    form_class = ContextSelect
+
+    def form_valid(self, form):
+        hero_id = form.cleaned_data['hero']
+        matches = ",".join(str(x) for x in form.cleaned_data['matches'])
+        win = form.cleaned_data['outcome']
+        amendments = {
+            'form': form,
+            'hero_id': hero_id,
+            'matches': matches,
+            'win': win,
+        }
+        return render(
+            self.request,
+            self.template_name,
+            self.get_context_data(**amendments),
+            )
 
 
 class MatchParameterChart(MatchParameterMixin, ChartFormView):

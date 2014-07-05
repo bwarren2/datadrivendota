@@ -5,6 +5,8 @@ from .form_fields import (
     MultiMatchSelect,
     SingleMatchSelect,
     )
+from heroes.form_fields import SingleHeroSelect
+from datadrivendota.form_fields import OutcomeField
 
 
 class EndgameSelect(forms.Form):
@@ -214,3 +216,17 @@ class RoleSelect(forms.Form):
         required=True,
         help_text='Pick one match by ID'
     )
+
+
+class ContextSelect(forms.Form):
+    hero = SingleHeroSelect(
+        required=True,
+        help_text='Pick one hero'
+    )
+    matches = MultiMatchSelect(
+        required=True,
+        help_text='Pick one or more matches'
+    )
+    outcome = OutcomeField(
+        required=True,
+        help_text='What outcome would you like to compare against?')
