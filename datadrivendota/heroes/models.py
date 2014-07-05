@@ -383,7 +383,9 @@ class HeroDossier(models.Model):
         elif stat == "hp_regen":
             return self.hp_regen + ((level-1)*self.strength_gain)*0.03
         elif stat == "mana_regen":
-            return self.mana_regen + ((level-1)*self.intelligence_gain)*0.04
+            return self.mana_regen + self.fetch_value(
+                'intelligence', level
+                )*0.04
         elif stat == "damage":
             base_dmg = (self.max_dmg + self.min_dmg) / 2
             if self.alignment == 'intelligence':
