@@ -66,8 +66,6 @@
               </ul>
             </li>
 
-            <li class="{% active 'items' main_nav %}"><a href="{% url 'items:index' %}">Items</a><span class="item-section-release-mark">alpha</span></li>
-
             <li class="dropdown {% active 'matches' main_nav %}">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Matches <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -92,6 +90,9 @@
                 <li class="{% active 'players:hero_abilities' %}"><a href="{% url 'players:hero_abilities' %}">Ability Comparison</a></li>
               </ul>
             </li>
+
+            <li class="{% active 'items' main_nav %}"><a href="{% url 'items:index' %}">Items</a><span class="item-section-release-mark">alpha</span></li>
+
             <li class="dropdown {% active 'teams' main_nav %}">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Teams <span class="section-release-mark">alpha</span><b class="caret"></b></a>
               <ul class="dropdown-menu">
