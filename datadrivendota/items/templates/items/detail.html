@@ -5,9 +5,14 @@
 {% block page_title %}{{ item.name }}{% endblock page_title %}
 
 {% block content %}
-  <a class="item thumbnail">
-    <img class="item" src="{{ item.mugshot.url }}" alt="{{ item.name }}">
-  </a>
+
+<div class="ability-card thumbnail">
+  <div class="aligner">
+    <a class="item thumbnail">
+      <img class="item" src="{{ item.mugshot.url }}" alt="{{ item.name }}">
+    </a>
+  </div>
+
   {% if item.description %}
     <p>{{ item.description }}</p>
   {% endif %}
@@ -18,3 +23,4 @@
     <blockquote class="lore">{{ item.lore }}</blockquote>
   {% endif %}
 {% endblock content %}
+</div>
