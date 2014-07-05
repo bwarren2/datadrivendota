@@ -1,4 +1,3 @@
-from os.path import basename
 import json
 from functools import wraps
 
@@ -8,12 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
 
 from datadrivendota.views import ChartFormView, ApiView
-from utils.file_management import moveJson
 
-from matches.models import GameMode
-from .json_data import (
-    update_player_winrate,
-)
 from .models import Hero, Ability, HeroDossier, Role, Assignment
 from .mixins import (
     VitalsMixin,

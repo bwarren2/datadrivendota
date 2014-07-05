@@ -352,6 +352,7 @@ def player_matches(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
     total_results = 500
     form = PlayerMatchesFilterForm(request.GET)
+
     if form.is_valid():
         print form.cleaned_data
         pms_list = PlayerMatchSummary.objects.select_related()
