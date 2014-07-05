@@ -355,12 +355,18 @@ def hero_progression_json(
         'player_match_summary__match__skill',
         'player_match_summary__match__steam_id',
         'player_match_summary__player__persona_name',
+        'player_match_summary__player__pro_name',
         'player_match_summary__hero__steam_id',
     ).order_by('player_match_summary', 'level')
     hero_classes = hero_classes_dict()
 
     c = TasselPlot()
     for build in sbs:
+
+        name = build['player_match_summary__player__persona_name']
+        pro_name = build['player_match_summary__player__pro_name']
+        display_name = pro_name if pro_name is not None else name
+
         if build['level'] == 1:
             subtractor = build['time']/60.0
 
@@ -399,18 +405,16 @@ def hero_progression_json(
 
         d.group_var = group
 
-        d.series_var = build[
-            'player_match_summary__match__steam_id'
-        ]
-        d.label = build[
-            'player_match_summary__player__persona_name'
-        ]
+        d.series_var = build['player_match_summary__match__steam_id']
+
+        d.label = display_name
+
         d.panel_var = 'Skill Progression'
+
         hero_id = build['player_match_summary__hero__steam_id']
+
         if hero_classes[hero_id] is not None:
-            d.classes.extend(
-                hero_classes[hero_id]
-            )
+            d.classes.extend(hero_classes[hero_id])
 
         c.datalist.append(d)
 

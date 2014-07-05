@@ -222,41 +222,54 @@ def player_hero_abilities_json(
             'player_match_summary__hero__steam_id',
             'player_match_summary__player__persona_name',
             'player_match_summary__player__pro_name',
-        ).order_by('player_match_summary', 'level')
+        ).distinct().order_by('player_match_summary', 'level')
         sbs = chain(sb1, sb2)
     elif player_2 is None and hero_2 is None:
         sbs = sb1
     else:
         raise NoDataFound
 
-    c = TasselPlot()
     hero_classes = hero_classes_dict()
+
+    c = TasselPlot()
     for build in sbs:
+
         name = build['player_match_summary__player__persona_name']
         pro_name = build['player_match_summary__player__pro_name']
         display_name = pro_name if pro_name is not None else name
+
         if build['level'] == 1:
             subtractor = build['time']/60.0
+
         d = TasselDataPoint()
         d.x_var = round(build['time']/60.0-subtractor, 3)
         d.y_var = build['level']
+
         winningness = 'Win' if \
             build['player_match_summary__is_win'] \
             else 'Loss'
+
         if division == 'Player win/loss':
-            d.group_var = "{p}, ({win})".format(
+            group = "{p}, ({win})".format(
                 p=display_name,
                 win=winningness)
         elif division == 'Players':
-            d.group_var = "{p}".format(
+            group = "{p}".format(
                 p=display_name)
         elif division == 'Win/loss':
-            d.group_var = "{win}".format(
+            group = "{win}".format(
                 win=winningness)
+
+        d.group_var = group
+
         d.series_var = build['player_match_summary__match__steam_id']
+
         d.label = display_name
+
         d.panel_var = 'Skill Progression'
+
         hero_id = build['player_match_summary__hero__steam_id']
+
         if hero_classes[hero_id] is not None:
             d.classes.extend(hero_classes[hero_id])
 
