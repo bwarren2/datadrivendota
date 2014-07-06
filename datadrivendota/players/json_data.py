@@ -222,7 +222,7 @@ def player_hero_abilities_json(
             'player_match_summary__hero__steam_id',
             'player_match_summary__player__persona_name',
             'player_match_summary__player__pro_name',
-        ).distinct().order_by('player_match_summary', 'level')
+        ).order_by('player_match_summary', 'level')
         sbs = chain(sb1, sb2)
     elif player_2 is None and hero_2 is None:
         sbs = sb1
