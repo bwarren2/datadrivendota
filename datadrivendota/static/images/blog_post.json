@@ -5490,7 +5490,7 @@
       "label": 432852610,
       "y_var": 2.0
     },
-       {
+           {
       "point_size": 1,
       "tooltip": 670603857,
       "panel_var": 0,
@@ -5580,7 +5580,6 @@
       "label": 432852610,
       "y_var": 2.0
     }
-
   ],
   "parameters": {
     "pointSizeMin": 5,
@@ -5645,7 +5644,7 @@
       "index": 3,
       "color": "#1f77b4",
       "class_selector": "informed-play"
-    }
+    },
     {
       "display_name": "Pre Calibration",
       "index": 4,
