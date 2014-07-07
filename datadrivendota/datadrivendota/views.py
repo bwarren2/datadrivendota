@@ -319,6 +319,7 @@ class ApiView(View):
         ]
         for var in flagVars:
             reqvar = request.GET.get(var, None)
+            print var, reqvar
             if reqvar is not None:
                 if var == 'no_legend':
                     chart.params.draw_legend = False
