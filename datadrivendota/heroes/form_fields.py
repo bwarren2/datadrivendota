@@ -26,6 +26,11 @@ class MultiHeroSelect(forms.CharField):
     widget = forms.HiddenInput(attrs={'class': 'multi-hero-tags'})
 
     def clean(self, hero_str):
+        if self.required and not hero_str:
+            raise forms.ValidationError("That is not a real hero name")
+        if not self.required and not hero_str:
+            return None
+
         hero_list = hero_str.split(',')
         return_hero_list = []
         for hero in hero_list:
