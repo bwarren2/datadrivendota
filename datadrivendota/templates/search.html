@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Search
+{% endblock title %}
+{% block page_title %}
+    Search
+{% endblock page_title %}
+
+{% block content %}
+
+    <div class='row'>
+      <div class="col-md-4">
+        <h4>General Lookup</h4>
+        <h5>(Heroes, Teams, Players, etc)</h5>
+        <div class='form-container'>
+            <form class='chart-form' action="" method='POST'>
+              {% include "_form.html" %}
+              {% csrf_token %}
+              <div class="control-group">
+                <div class="controls pull-left">
+                  <button type="submit" class="btn btn-small btn-primary">Submit</button>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </form>
+        </div>
+      </div>
+      <div class="col-md-8">
+
+        {% if heroes %}
+            <div class='row'>
+                <h4>Heroes</h4>
+                {% for hero in heroes %}
+                    {% include "heroes/_hero_card.html" %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if players %}
+            <div class='row'>
+                <h4>Players by Name</h4>
+                {% for player in players %}
+                    {% include "players/_player_card.html" %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+
+        {% if pros %}
+            <div class='row'>
+                <h4>Players by Pro Name</h4>
+                {% for player in pros %}
+                    {% include "players/_player_card.html" %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if teamdossiers %}
+            <div class='row'>
+                <h4>Teams</h4>
+                {% for teamdoss in teamdossiers %}
+                    {% include "teams/_teamdossier_card.html" %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if leaguedossiers %}
+            <div class='row'>
+                <h4>Leagues</h4>
+                {% for leaguedoss in leaguedossiers %}
+                    {% include "leagues/_leaguedossier_card.html" %}
+                {% endfor %}
+            </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+{% endblock content %}

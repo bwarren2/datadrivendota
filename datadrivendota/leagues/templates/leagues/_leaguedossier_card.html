@@ -1,0 +1,9 @@
+{% if leaguedoss.logo_image %}
+
+<div class="col-md-3">
+  <a href="{% url 'leagues:detail' steam_id=leaguedoss.league.steam_id %}" class="thumbnail">
+    <img src="{{ leaguedoss.logo_image.url }}" alt="{{ leaguedoss.name }}" class="league-portrait">
+    <p class='overlayer'>{{ leaguedoss.display_name }}</p>
+  </a>
+</div>
+{% endif %}

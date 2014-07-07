@@ -6,16 +6,21 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
+from django.views.generic.edit import FormView as DjangoFormView
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
+from django.db.models import Q
 
 from utils.file_management import outsourceJson, moveJson
 from utils.exceptions import NoDataFound
 
-from datadrivendota.forms import KeyForm
+from .forms import KeyForm, SearchForm
 from players.models import PermissionCode, Player
 from heroes.models import Hero
+from items.models import Item
+from leagues.models import LeagueDossier
+from teams.models import TeamDossier
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -325,3 +330,36 @@ class ApiView(View):
         data = 'fail'
         mimetype = 'application/json'
         return HttpResponse(data, mimetype)
+
+
+class SearchView(DjangoFormView):
+    form_class = SearchForm
+    template_name = 'search.html'
+
+    def form_valid(self, form):
+        search_str = form.cleaned_data['search_string']
+
+        context = {
+            'heroes': Hero.public.filter(
+                name__icontains=(search_str)
+                )[:10],
+            'players': Player.objects.filter(
+                persona_name__icontains=(search_str)
+                )[:10],
+            'pros': Player.objects.filter(
+                pro_name__icontains=(search_str)
+                )[:10],
+            'teamdossiers': TeamDossier.objects.filter(
+                Q(name__icontains=(search_str)) |
+                Q(tag__icontains=(search_str))
+                )[:10],
+            'items': Item.objects.filter(
+                name__icontains=(search_str)
+                )[:10],
+            'leaguedossiers': LeagueDossier.objects.filter(
+                name__icontains=(search_str)
+                )[:10],
+            'form': form
+        }
+
+        return render(self.request, self.template_name, context)

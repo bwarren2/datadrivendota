@@ -113,7 +113,9 @@ def hero_lineup_json(heroes, stat, level):
         hero__visible=True
     ).select_related()
 
-    selected_names = [h.name for h in Hero.public.filter(steam_id__in=heroes)]
+    selected_heroes = [
+        h.steam_id for h in Hero.public.filter(steam_id__in=heroes)
+        ]
     if len(hero_dossiers) == 0:
         raise NoDataFound
 
@@ -138,7 +140,7 @@ def hero_lineup_json(heroes, stat, level):
 
         d = DataPoint()
         group = key.hero.safe_name() \
-            if key.hero.safe_name() in selected_names \
+            if key.hero.steam_id in selected_heroes \
             else key.alignment.title()
         xs.append(key.hero.safe_name())
         d.x_var = key.hero.safe_name()
