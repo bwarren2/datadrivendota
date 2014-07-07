@@ -32,7 +32,12 @@
             <div class='row'>
                 <h4>Heroes</h4>
                 {% for hero in heroes %}
-                    {% include "heroes/_hero_card.html" %}
+                    <div class="{{hero.classes}} col-md-3">
+                      <a href="{% url 'heroes:detail' hero_name=hero.machine_name %}" class="thumbnail">
+                        <img src="{{ hero.mugshot.url }}" alt="{{ hero.name }}" class="hero-portrait">
+                        <p class='overlayer'>{{ hero.name }}</p>
+                      </a>
+                    </div>
                 {% endfor %}
             </div>
         {% endif %}
