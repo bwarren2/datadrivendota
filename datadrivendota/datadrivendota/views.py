@@ -307,38 +307,37 @@ class ApiView(View):
                 setattr(chart.params, adjust, reqvar)
 
         flagVars = [
-            'no_legend'
-            'padding_bottom'
-            'padding_top'
-            'padding_left'
-            'padding_right'
-            'margin_bottom'
-            'margin_top'
-            'margin_left'
-            'margin_right'
+            'no_legend',
+            'padding_bottom',
+            'padding_top',
+            'padding_left',
+            'padding_right',
+            'margin_bottom',
+            'margin_top',
+            'margin_left',
+            'margin_right',
         ]
         for var in flagVars:
             reqvar = request.GET.get(var, None)
-            print var, reqvar
             if reqvar is not None:
                 if var == 'no_legend':
                     chart.params.draw_legend = False
                 if var == 'padding_bottom':
-                    chart.params.padding['bottom'] = reqvar
+                    chart.params.padding['bottom'] = int(reqvar)
                 if var == 'padding_top':
-                    chart.params.padding['top'] = reqvar
+                    chart.params.padding['top'] = int(reqvar)
                 if var == 'padding_left':
-                    chart.params.padding['left'] = reqvar
+                    chart.params.padding['left'] = int(reqvar)
                 if var == 'padding_right':
-                    chart.params.padding['right'] = reqvar
+                    chart.params.padding['right'] = int(reqvar)
                 if var == 'margin_bottom':
-                    chart.params.margin['bottom'] = reqvar
+                    chart.params.margin['bottom'] = int(reqvar)
                 if var == 'margin_top':
-                    chart.params.margin['top'] = reqvar
+                    chart.params.margin['top'] = int(reqvar)
                 if var == 'margin_left':
-                    chart.params.margin['left'] = reqvar
+                    chart.params.margin['left'] = int(reqvar)
                 if var == 'margin_right':
-                    chart.params.margin['right'] = reqvar
+                    chart.params.margin['right'] = int(reqvar)
 
     def succeed(self, json_data):
         response_data = {}
