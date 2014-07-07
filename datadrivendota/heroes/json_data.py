@@ -113,9 +113,12 @@ def hero_lineup_json(heroes, stat, level):
         hero__visible=True
     ).select_related()
 
-    selected_heroes = [
-        h.steam_id for h in Hero.public.filter(steam_id__in=heroes)
-        ]
+    if heroes is not None:
+        selected_heroes = [
+            h.steam_id for h in Hero.public.filter(steam_id__in=heroes)
+            ]
+    else:
+        selected_heroes = []
     if len(hero_dossiers) == 0:
         raise NoDataFound
 

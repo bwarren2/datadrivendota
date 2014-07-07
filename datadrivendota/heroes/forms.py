@@ -76,7 +76,7 @@ class HeroLineupMultiSelect(forms.Form):
 
     LINEUP_STATS = list_to_choice_list(VITAL_STAT_POOL)
     heroes = MultiHeroSelect(
-        required=True,
+        required=False,
         help_text='Pick one or more heroes'
     )
     stat = forms.ChoiceField(
