@@ -285,7 +285,6 @@ class ApiView(View):
                     return self.succeed(json_data)
 
                 else:
-                    print bound_form.errors
                     return self.fail()
 
             except NoDataFound:
@@ -309,12 +308,36 @@ class ApiView(View):
 
         flagVars = [
             'no_legend'
+            'padding_bottom'
+            'padding_top'
+            'padding_left'
+            'padding_right'
+            'margin_bottom'
+            'margin_top'
+            'margin_left'
+            'margin_right'
         ]
         for var in flagVars:
             reqvar = request.GET.get(var, None)
             if reqvar is not None:
                 if var == 'no_legend':
                     chart.params.draw_legend = False
+                if var == 'padding_bottom':
+                    chart.params.padding['bottom'] = reqvar
+                if var == 'padding_top':
+                    chart.params.padding['top'] = reqvar
+                if var == 'padding_left':
+                    chart.params.padding['left'] = reqvar
+                if var == 'padding_right':
+                    chart.params.padding['right'] = reqvar
+                if var == 'margin_bottom':
+                    chart.params.margin['bottom'] = reqvar
+                if var == 'margin_top':
+                    chart.params.margin['top'] = reqvar
+                if var == 'margin_left':
+                    chart.params.margin['left'] = reqvar
+                if var == 'margin_right':
+                    chart.params.margin['right'] = reqvar
 
     def succeed(self, json_data):
         response_data = {}
