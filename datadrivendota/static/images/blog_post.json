@@ -1,0 +1,5662 @@
+{
+  "data": [
+    {
+      "point_size": 1,
+      "tooltip": 763680160,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 23.433333333333334,
+      "group_var": 0,
+      "url": "/matches/763680160",
+      "label": 763680160,
+      "y_var": -4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763674937,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.816666666666666,
+      "group_var": 0,
+      "url": "/matches/763674937",
+      "label": 763674937,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763674357,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.5,
+      "group_var": 0,
+      "url": "/matches/763674357",
+      "label": 763674357,
+      "y_var": 15.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763669866,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.033333333333335,
+      "group_var": 0,
+      "url": "/matches/763669866",
+      "label": 763669866,
+      "y_var": -3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763669503,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.3,
+      "group_var": 0,
+      "url": "/matches/763669503",
+      "label": 763669503,
+      "y_var": 3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763658665,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.316666666666666,
+      "group_var": 0,
+      "url": "/matches/763658665",
+      "label": 763658665,
+      "y_var": -8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763656949,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.05,
+      "group_var": 0,
+      "url": "/matches/763656949",
+      "label": 763656949,
+      "y_var": 14.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763657851,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.53333333333333,
+      "group_var": 0,
+      "url": "/matches/763657851",
+      "label": 763657851,
+      "y_var": 9.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763656929,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 37.95,
+      "group_var": 0,
+      "url": "/matches/763656929",
+      "label": 763656929,
+      "y_var": 6.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761815456,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.3,
+      "group_var": 0,
+      "url": "/matches/761815456",
+      "label": 761815456,
+      "y_var": -1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761808994,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.7,
+      "group_var": 0,
+      "url": "/matches/761808994",
+      "label": 761808994,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761815535,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.766666666666666,
+      "group_var": 0,
+      "url": "/matches/761815535",
+      "label": 761815535,
+      "y_var": 2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761809004,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 27.583333333333332,
+      "group_var": 0,
+      "url": "/matches/761809004",
+      "label": 761809004,
+      "y_var": 5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761805107,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.53333333333333,
+      "group_var": 0,
+      "url": "/matches/761805107",
+      "label": 761805107,
+      "y_var": 2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761800290,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 33.35,
+      "group_var": 0,
+      "url": "/matches/761800290",
+      "label": 761800290,
+      "y_var": 14.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761804539,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.25,
+      "group_var": 0,
+      "url": "/matches/761804539",
+      "label": 761804539,
+      "y_var": 3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761800333,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.05,
+      "group_var": 0,
+      "url": "/matches/761800333",
+      "label": 761800333,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761793620,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 16.666666666666668,
+      "group_var": 0,
+      "url": "/matches/761793620",
+      "label": 761793620,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 759841798,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 20.583333333333332,
+      "group_var": 0,
+      "url": "/matches/759841798",
+      "label": 759841798,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 759840953,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 19.816666666666666,
+      "group_var": 0,
+      "url": "/matches/759840953",
+      "label": 759840953,
+      "y_var": -5.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 759836014,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 23.383333333333333,
+      "group_var": 0,
+      "url": "/matches/759836014",
+      "label": 759836014,
+      "y_var": 17.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 757929588,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.983333333333334,
+      "group_var": 0,
+      "url": "/matches/757929588",
+      "label": 757929588,
+      "y_var": -3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 757925359,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.666666666666668,
+      "group_var": 0,
+      "url": "/matches/757925359",
+      "label": 757925359,
+      "y_var": -4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 757918110,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 16.183333333333334,
+      "group_var": 0,
+      "url": "/matches/757918110",
+      "label": 757918110,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 757899061,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 43.71666666666667,
+      "group_var": 0,
+      "url": "/matches/757899061",
+      "label": 757899061,
+      "y_var": -6.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 757913759,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 33.13333333333333,
+      "group_var": 0,
+      "url": "/matches/757913759",
+      "label": 757913759,
+      "y_var": -9.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 757898525,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 45.85,
+      "group_var": 0,
+      "url": "/matches/757898525",
+      "label": 757898525,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 757932302,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.46666666666667,
+      "group_var": 0,
+      "url": "/matches/757932302",
+      "label": 757932302,
+      "y_var": 3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 756151157,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 21.883333333333333,
+      "group_var": 0,
+      "url": "/matches/756151157",
+      "label": 756151157,
+      "y_var": 7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 756148155,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 22.7,
+      "group_var": 0,
+      "url": "/matches/756148155",
+      "label": 756148155,
+      "y_var": 13.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754367392,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.033333333333335,
+      "group_var": 0,
+      "url": "/matches/754367392",
+      "label": 754367392,
+      "y_var": -13.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754365397,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.583333333333332,
+      "group_var": 0,
+      "url": "/matches/754365397",
+      "label": 754365397,
+      "y_var": -4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754365873,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 22.65,
+      "group_var": 0,
+      "url": "/matches/754365873",
+      "label": 754365873,
+      "y_var": -1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754364914,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 27.0,
+      "group_var": 0,
+      "url": "/matches/754364914",
+      "label": 754364914,
+      "y_var": 5.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754361742,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 27.533333333333335,
+      "group_var": 0,
+      "url": "/matches/754361742",
+      "label": 754361742,
+      "y_var": -3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754357384,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.8,
+      "group_var": 0,
+      "url": "/matches/754357384",
+      "label": 754357384,
+      "y_var": 7.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754362127,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.75,
+      "group_var": 0,
+      "url": "/matches/754362127",
+      "label": 754362127,
+      "y_var": 15.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754359377,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.866666666666667,
+      "group_var": 0,
+      "url": "/matches/754359377",
+      "label": 754359377,
+      "y_var": 10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754357308,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.483333333333334,
+      "group_var": 0,
+      "url": "/matches/754357308",
+      "label": 754357308,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754357225,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 24.3,
+      "group_var": 0,
+      "url": "/matches/754357225",
+      "label": 754357225,
+      "y_var": -6.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754358079,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 20.1,
+      "group_var": 0,
+      "url": "/matches/754358079",
+      "label": 754358079,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754344068,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.95,
+      "group_var": 0,
+      "url": "/matches/754344068",
+      "label": 754344068,
+      "y_var": -5.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754356551,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 24.033333333333335,
+      "group_var": 0,
+      "url": "/matches/754356551",
+      "label": 754356551,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754355323,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 23.366666666666667,
+      "group_var": 0,
+      "url": "/matches/754355323",
+      "label": 754355323,
+      "y_var": -6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754353219,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 25.816666666666666,
+      "group_var": 0,
+      "url": "/matches/754353219",
+      "label": 754353219,
+      "y_var": 10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754351977,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.583333333333336,
+      "group_var": 0,
+      "url": "/matches/754351977",
+      "label": 754351977,
+      "y_var": 20.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754352939,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 37.45,
+      "group_var": 0,
+      "url": "/matches/754352939",
+      "label": 754352939,
+      "y_var": 22.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754350755,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.61666666666667,
+      "group_var": 0,
+      "url": "/matches/754350755",
+      "label": 754350755,
+      "y_var": 9.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754348981,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 33.65,
+      "group_var": 0,
+      "url": "/matches/754348981",
+      "label": 754348981,
+      "y_var": 17.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754349627,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.55,
+      "group_var": 0,
+      "url": "/matches/754349627",
+      "label": 754349627,
+      "y_var": 15.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754349633,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 51.96666666666667,
+      "group_var": 0,
+      "url": "/matches/754349633",
+      "label": 754349633,
+      "y_var": 4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754349906,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.05,
+      "group_var": 0,
+      "url": "/matches/754349906",
+      "label": 754349906,
+      "y_var": 2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754329814,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 37.766666666666666,
+      "group_var": 0,
+      "url": "/matches/754329814",
+      "label": 754329814,
+      "y_var": 2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 754329821,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 23.4,
+      "group_var": 0,
+      "url": "/matches/754329821",
+      "label": 754329821,
+      "y_var": 10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745345916,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.666666666666664,
+      "group_var": 0,
+      "url": "/matches/745345916",
+      "label": 745345916,
+      "y_var": 0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745347475,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.116666666666667,
+      "group_var": 0,
+      "url": "/matches/745347475",
+      "label": 745347475,
+      "y_var": 1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745346447,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.5,
+      "group_var": 0,
+      "url": "/matches/745346447",
+      "label": 745346447,
+      "y_var": -2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745344402,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.416666666666664,
+      "group_var": 0,
+      "url": "/matches/745344402",
+      "label": 745344402,
+      "y_var": -3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745344581,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.516666666666666,
+      "group_var": 0,
+      "url": "/matches/745344581",
+      "label": 745344581,
+      "y_var": 11.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745345004,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.4,
+      "group_var": 0,
+      "url": "/matches/745345004",
+      "label": 745345004,
+      "y_var": 5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745343882,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 33.56666666666667,
+      "group_var": 0,
+      "url": "/matches/745343882",
+      "label": 745343882,
+      "y_var": -1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745343886,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.95,
+      "group_var": 0,
+      "url": "/matches/745343886",
+      "label": 745343886,
+      "y_var": 19.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745343915,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.96666666666667,
+      "group_var": 0,
+      "url": "/matches/745343915",
+      "label": 745343915,
+      "y_var": -10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745341487,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.633333333333333,
+      "group_var": 0,
+      "url": "/matches/745341487",
+      "label": 745341487,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745341745,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.18333333333333,
+      "group_var": 0,
+      "url": "/matches/745341745",
+      "label": 745341745,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745343656,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.6,
+      "group_var": 0,
+      "url": "/matches/745343656",
+      "label": 745343656,
+      "y_var": -7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745339661,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.9,
+      "group_var": 0,
+      "url": "/matches/745339661",
+      "label": 745339661,
+      "y_var": -1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745334107,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.6,
+      "group_var": 0,
+      "url": "/matches/745334107",
+      "label": 745334107,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 745344401,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.96666666666667,
+      "group_var": 0,
+      "url": "/matches/745344401",
+      "label": 745344401,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740074258,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 23.433333333333334,
+      "group_var": 0,
+      "url": "/matches/740074258",
+      "label": 740074258,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740073009,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 18.5,
+      "group_var": 0,
+      "url": "/matches/740073009",
+      "label": 740073009,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740070567,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 25.7,
+      "group_var": 0,
+      "url": "/matches/740070567",
+      "label": 740070567,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740070688,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 27.0,
+      "group_var": 0,
+      "url": "/matches/740070688",
+      "label": 740070688,
+      "y_var": -6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740069920,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.183333333333334,
+      "group_var": 0,
+      "url": "/matches/740069920",
+      "label": 740069920,
+      "y_var": -10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740068159,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 22.066666666666666,
+      "group_var": 0,
+      "url": "/matches/740068159",
+      "label": 740068159,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740067912,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.783333333333335,
+      "group_var": 0,
+      "url": "/matches/740067912",
+      "label": 740067912,
+      "y_var": 14.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740067772,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 20.633333333333333,
+      "group_var": 0,
+      "url": "/matches/740067772",
+      "label": 740067772,
+      "y_var": 10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740067733,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.0,
+      "group_var": 0,
+      "url": "/matches/740067733",
+      "label": 740067733,
+      "y_var": 2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740067719,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.783333333333335,
+      "group_var": 0,
+      "url": "/matches/740067719",
+      "label": 740067719,
+      "y_var": 1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740067303,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 27.783333333333335,
+      "group_var": 0,
+      "url": "/matches/740067303",
+      "label": 740067303,
+      "y_var": -6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740066921,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.366666666666667,
+      "group_var": 0,
+      "url": "/matches/740066921",
+      "label": 740066921,
+      "y_var": 0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740066741,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.816666666666666,
+      "group_var": 0,
+      "url": "/matches/740066741",
+      "label": 740066741,
+      "y_var": -4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740066940,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.116666666666667,
+      "group_var": 0,
+      "url": "/matches/740066940",
+      "label": 740066940,
+      "y_var": 2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740066216,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.483333333333334,
+      "group_var": 0,
+      "url": "/matches/740066216",
+      "label": 740066216,
+      "y_var": 18.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740065363,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.4,
+      "group_var": 0,
+      "url": "/matches/740065363",
+      "label": 740065363,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740065853,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.033333333333335,
+      "group_var": 0,
+      "url": "/matches/740065853",
+      "label": 740065853,
+      "y_var": -3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740065299,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.2,
+      "group_var": 0,
+      "url": "/matches/740065299",
+      "label": 740065299,
+      "y_var": 15.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740066049,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.8,
+      "group_var": 0,
+      "url": "/matches/740066049",
+      "label": 740066049,
+      "y_var": 1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740066018,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 21.133333333333333,
+      "group_var": 0,
+      "url": "/matches/740066018",
+      "label": 740066018,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740064645,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 24.633333333333333,
+      "group_var": 0,
+      "url": "/matches/740064645",
+      "label": 740064645,
+      "y_var": 17.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740064494,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.633333333333333,
+      "group_var": 0,
+      "url": "/matches/740064494",
+      "label": 740064494,
+      "y_var": 3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740063724,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 19.45,
+      "group_var": 0,
+      "url": "/matches/740063724",
+      "label": 740063724,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740064093,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.966666666666665,
+      "group_var": 0,
+      "url": "/matches/740064093",
+      "label": 740064093,
+      "y_var": -10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740063219,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.46666666666667,
+      "group_var": 0,
+      "url": "/matches/740063219",
+      "label": 740063219,
+      "y_var": 8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740064142,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.21666666666667,
+      "group_var": 0,
+      "url": "/matches/740064142",
+      "label": 740064142,
+      "y_var": 6.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740063316,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.516666666666666,
+      "group_var": 0,
+      "url": "/matches/740063316",
+      "label": 740063316,
+      "y_var": 4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740062573,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.666666666666668,
+      "group_var": 0,
+      "url": "/matches/740062573",
+      "label": 740062573,
+      "y_var": 16.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740062896,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 24.166666666666668,
+      "group_var": 0,
+      "url": "/matches/740062896",
+      "label": 740062896,
+      "y_var": -7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740062430,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.366666666666667,
+      "group_var": 0,
+      "url": "/matches/740062430",
+      "label": 740062430,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 740062485,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "normal-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.1,
+      "group_var": 0,
+      "url": "/matches/740062485",
+      "label": 740062485,
+      "y_var": 23.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763675046,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.816666666666666,
+      "group_var": 1,
+      "url": "/matches/763675046",
+      "label": 763675046,
+      "y_var": 0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763667906,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 41.8,
+      "group_var": 1,
+      "url": "/matches/763667906",
+      "label": 763667906,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763666332,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.716666666666665,
+      "group_var": 1,
+      "url": "/matches/763666332",
+      "label": 763666332,
+      "y_var": 9.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763664612,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 50.5,
+      "group_var": 1,
+      "url": "/matches/763664612",
+      "label": 763664612,
+      "y_var": 11.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763666608,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.45,
+      "group_var": 1,
+      "url": "/matches/763666608",
+      "label": 763666608,
+      "y_var": 14.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763650846,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 45.983333333333334,
+      "group_var": 1,
+      "url": "/matches/763650846",
+      "label": 763650846,
+      "y_var": 12.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763665610,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 45.166666666666664,
+      "group_var": 1,
+      "url": "/matches/763665610",
+      "label": 763665610,
+      "y_var": 10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763662024,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 54.766666666666666,
+      "group_var": 1,
+      "url": "/matches/763662024",
+      "label": 763662024,
+      "y_var": 8.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763660930,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.78333333333333,
+      "group_var": 1,
+      "url": "/matches/763660930",
+      "label": 763660930,
+      "y_var": 7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763659575,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.93333333333333,
+      "group_var": 1,
+      "url": "/matches/763659575",
+      "label": 763659575,
+      "y_var": 1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763659398,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.183333333333334,
+      "group_var": 1,
+      "url": "/matches/763659398",
+      "label": 763659398,
+      "y_var": -4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763653838,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 33.483333333333334,
+      "group_var": 1,
+      "url": "/matches/763653838",
+      "label": 763653838,
+      "y_var": 7.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763658635,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.93333333333333,
+      "group_var": 1,
+      "url": "/matches/763658635",
+      "label": 763658635,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763657901,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.85,
+      "group_var": 1,
+      "url": "/matches/763657901",
+      "label": 763657901,
+      "y_var": 13.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763657381,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.666666666666664,
+      "group_var": 1,
+      "url": "/matches/763657381",
+      "label": 763657381,
+      "y_var": 2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763656396,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.983333333333334,
+      "group_var": 1,
+      "url": "/matches/763656396",
+      "label": 763656396,
+      "y_var": 13.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763656338,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 43.916666666666664,
+      "group_var": 1,
+      "url": "/matches/763656338",
+      "label": 763656338,
+      "y_var": 3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763654343,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.55,
+      "group_var": 1,
+      "url": "/matches/763654343",
+      "label": 763654343,
+      "y_var": 4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763660006,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 53.81666666666667,
+      "group_var": 1,
+      "url": "/matches/763660006",
+      "label": 763660006,
+      "y_var": 2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763654592,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.8,
+      "group_var": 1,
+      "url": "/matches/763654592",
+      "label": 763654592,
+      "y_var": -6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763654797,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.78333333333333,
+      "group_var": 1,
+      "url": "/matches/763654797",
+      "label": 763654797,
+      "y_var": -10.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763662053,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.05,
+      "group_var": 1,
+      "url": "/matches/763662053",
+      "label": 763662053,
+      "y_var": 12.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763653602,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.03333333333333,
+      "group_var": 1,
+      "url": "/matches/763653602",
+      "label": 763653602,
+      "y_var": 8.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763653662,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.416666666666668,
+      "group_var": 1,
+      "url": "/matches/763653662",
+      "label": 763653662,
+      "y_var": -3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763650872,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 21.8,
+      "group_var": 1,
+      "url": "/matches/763650872",
+      "label": 763650872,
+      "y_var": -7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763653913,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.1,
+      "group_var": 1,
+      "url": "/matches/763653913",
+      "label": 763653913,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763649338,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 37.983333333333334,
+      "group_var": 1,
+      "url": "/matches/763649338",
+      "label": 763649338,
+      "y_var": -3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763653333,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.333333333333336,
+      "group_var": 1,
+      "url": "/matches/763653333",
+      "label": 763653333,
+      "y_var": -3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763652642,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.63333333333333,
+      "group_var": 1,
+      "url": "/matches/763652642",
+      "label": 763652642,
+      "y_var": -3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763652366,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 49.88333333333333,
+      "group_var": 1,
+      "url": "/matches/763652366",
+      "label": 763652366,
+      "y_var": 8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763650411,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 47.333333333333336,
+      "group_var": 1,
+      "url": "/matches/763650411",
+      "label": 763650411,
+      "y_var": 11.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763652349,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.0,
+      "group_var": 1,
+      "url": "/matches/763652349",
+      "label": 763652349,
+      "y_var": 6.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763649056,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.2,
+      "group_var": 1,
+      "url": "/matches/763649056",
+      "label": 763649056,
+      "y_var": 6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763645653,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.5,
+      "group_var": 1,
+      "url": "/matches/763645653",
+      "label": 763645653,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763649282,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.416666666666664,
+      "group_var": 1,
+      "url": "/matches/763649282",
+      "label": 763649282,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763649480,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 53.78333333333333,
+      "group_var": 1,
+      "url": "/matches/763649480",
+      "label": 763649480,
+      "y_var": 17.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763650935,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.883333333333333,
+      "group_var": 1,
+      "url": "/matches/763650935",
+      "label": 763650935,
+      "y_var": -6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763648349,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.516666666666666,
+      "group_var": 1,
+      "url": "/matches/763648349",
+      "label": 763648349,
+      "y_var": -1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763649629,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 42.916666666666664,
+      "group_var": 1,
+      "url": "/matches/763649629",
+      "label": 763649629,
+      "y_var": 3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763647998,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.7,
+      "group_var": 1,
+      "url": "/matches/763647998",
+      "label": 763647998,
+      "y_var": 4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763648632,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.71666666666667,
+      "group_var": 1,
+      "url": "/matches/763648632",
+      "label": 763648632,
+      "y_var": -1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763647417,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 43.36666666666667,
+      "group_var": 1,
+      "url": "/matches/763647417",
+      "label": 763647417,
+      "y_var": 7.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763646922,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.11666666666667,
+      "group_var": 1,
+      "url": "/matches/763646922",
+      "label": 763646922,
+      "y_var": 9.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763647094,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.6,
+      "group_var": 1,
+      "url": "/matches/763647094",
+      "label": 763647094,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763646633,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.13333333333333,
+      "group_var": 1,
+      "url": "/matches/763646633",
+      "label": 763646633,
+      "y_var": 8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763645160,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.6,
+      "group_var": 1,
+      "url": "/matches/763645160",
+      "label": 763645160,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763645025,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 43.28333333333333,
+      "group_var": 1,
+      "url": "/matches/763645025",
+      "label": 763645025,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763650172,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 51.416666666666664,
+      "group_var": 1,
+      "url": "/matches/763650172",
+      "label": 763650172,
+      "y_var": 10.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763644069,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 43.583333333333336,
+      "group_var": 1,
+      "url": "/matches/763644069",
+      "label": 763644069,
+      "y_var": 4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763643426,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.15,
+      "group_var": 1,
+      "url": "/matches/763643426",
+      "label": 763643426,
+      "y_var": -1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763641938,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 21.483333333333334,
+      "group_var": 1,
+      "url": "/matches/763641938",
+      "label": 763641938,
+      "y_var": 4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763641758,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.483333333333334,
+      "group_var": 1,
+      "url": "/matches/763641758",
+      "label": 763641758,
+      "y_var": 10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763639896,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.18333333333333,
+      "group_var": 1,
+      "url": "/matches/763639896",
+      "label": 763639896,
+      "y_var": 26.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763642121,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 20.616666666666667,
+      "group_var": 1,
+      "url": "/matches/763642121",
+      "label": 763642121,
+      "y_var": -3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763641079,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 20.0,
+      "group_var": 1,
+      "url": "/matches/763641079",
+      "label": 763641079,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763640785,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 24.066666666666666,
+      "group_var": 1,
+      "url": "/matches/763640785",
+      "label": 763640785,
+      "y_var": -7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763640377,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.85,
+      "group_var": 1,
+      "url": "/matches/763640377",
+      "label": 763640377,
+      "y_var": 33.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763640002,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.016666666666666,
+      "group_var": 1,
+      "url": "/matches/763640002",
+      "label": 763640002,
+      "y_var": 15.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763639293,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.366666666666667,
+      "group_var": 1,
+      "url": "/matches/763639293",
+      "label": 763639293,
+      "y_var": 6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763638975,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 37.2,
+      "group_var": 1,
+      "url": "/matches/763638975",
+      "label": 763638975,
+      "y_var": 7.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763640394,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 46.5,
+      "group_var": 1,
+      "url": "/matches/763640394",
+      "label": 763640394,
+      "y_var": 6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763635631,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.25,
+      "group_var": 1,
+      "url": "/matches/763635631",
+      "label": 763635631,
+      "y_var": 5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763636960,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.43333333333333,
+      "group_var": 1,
+      "url": "/matches/763636960",
+      "label": 763636960,
+      "y_var": -1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763632638,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.333333333333332,
+      "group_var": 1,
+      "url": "/matches/763632638",
+      "label": 763632638,
+      "y_var": 10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763635017,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.43333333333333,
+      "group_var": 1,
+      "url": "/matches/763635017",
+      "label": 763635017,
+      "y_var": 5.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763638550,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.483333333333334,
+      "group_var": 1,
+      "url": "/matches/763638550",
+      "label": 763638550,
+      "y_var": 2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763628349,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.35,
+      "group_var": 1,
+      "url": "/matches/763628349",
+      "label": 763628349,
+      "y_var": 10.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763626822,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.53333333333333,
+      "group_var": 1,
+      "url": "/matches/763626822",
+      "label": 763626822,
+      "y_var": 16.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763628065,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.7,
+      "group_var": 1,
+      "url": "/matches/763628065",
+      "label": 763628065,
+      "y_var": 7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763628141,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 46.55,
+      "group_var": 1,
+      "url": "/matches/763628141",
+      "label": 763628141,
+      "y_var": 13.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763633918,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.95,
+      "group_var": 1,
+      "url": "/matches/763633918",
+      "label": 763633918,
+      "y_var": -2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763610158,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 42.1,
+      "group_var": 1,
+      "url": "/matches/763610158",
+      "label": 763610158,
+      "y_var": 4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763620711,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.383333333333333,
+      "group_var": 1,
+      "url": "/matches/763620711",
+      "label": 763620711,
+      "y_var": -3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763617548,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 25.433333333333334,
+      "group_var": 1,
+      "url": "/matches/763617548",
+      "label": 763617548,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763608974,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.366666666666667,
+      "group_var": 1,
+      "url": "/matches/763608974",
+      "label": 763608974,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763603708,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 27.05,
+      "group_var": 1,
+      "url": "/matches/763603708",
+      "label": 763603708,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763600295,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.53333333333333,
+      "group_var": 1,
+      "url": "/matches/763600295",
+      "label": 763600295,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763599827,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.93333333333333,
+      "group_var": 1,
+      "url": "/matches/763599827",
+      "label": 763599827,
+      "y_var": 0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763594598,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.28333333333333,
+      "group_var": 1,
+      "url": "/matches/763594598",
+      "label": 763594598,
+      "y_var": 5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761812504,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.216666666666665,
+      "group_var": 1,
+      "url": "/matches/761812504",
+      "label": 761812504,
+      "y_var": 18.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761810602,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.866666666666667,
+      "group_var": 1,
+      "url": "/matches/761810602",
+      "label": 761810602,
+      "y_var": -3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761810636,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 14.383333333333333,
+      "group_var": 1,
+      "url": "/matches/761810636",
+      "label": 761810636,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761807776,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.116666666666667,
+      "group_var": 1,
+      "url": "/matches/761807776",
+      "label": 761807776,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761804626,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 12.2,
+      "group_var": 1,
+      "url": "/matches/761804626",
+      "label": 761804626,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761808456,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 12.316666666666666,
+      "group_var": 1,
+      "url": "/matches/761808456",
+      "label": 761808456,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761802279,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 23.05,
+      "group_var": 1,
+      "url": "/matches/761802279",
+      "label": 761802279,
+      "y_var": 1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761801879,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.233333333333334,
+      "group_var": 1,
+      "url": "/matches/761801879",
+      "label": 761801879,
+      "y_var": 0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761805615,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.616666666666667,
+      "group_var": 1,
+      "url": "/matches/761805615",
+      "label": 761805615,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761804585,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 12.833333333333334,
+      "group_var": 1,
+      "url": "/matches/761804585",
+      "label": 761804585,
+      "y_var": -1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761801945,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 42.28333333333333,
+      "group_var": 1,
+      "url": "/matches/761801945",
+      "label": 761801945,
+      "y_var": -2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761804720,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.916666666666668,
+      "group_var": 1,
+      "url": "/matches/761804720",
+      "label": 761804720,
+      "y_var": 9.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761802957,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 23.516666666666666,
+      "group_var": 1,
+      "url": "/matches/761802957",
+      "label": 761802957,
+      "y_var": 12.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761802416,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 23.45,
+      "group_var": 1,
+      "url": "/matches/761802416",
+      "label": 761802416,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761793141,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 37.71666666666667,
+      "group_var": 1,
+      "url": "/matches/761793141",
+      "label": 761793141,
+      "y_var": 11.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761802955,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.5,
+      "group_var": 1,
+      "url": "/matches/761802955",
+      "label": 761802955,
+      "y_var": -5.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761803176,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.883333333333333,
+      "group_var": 1,
+      "url": "/matches/761803176",
+      "label": 761803176,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761802029,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 23.733333333333334,
+      "group_var": 1,
+      "url": "/matches/761802029",
+      "label": 761802029,
+      "y_var": 14.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761802186,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 48.46666666666667,
+      "group_var": 1,
+      "url": "/matches/761802186",
+      "label": 761802186,
+      "y_var": 2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761802002,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 37.43333333333333,
+      "group_var": 1,
+      "url": "/matches/761802002",
+      "label": 761802002,
+      "y_var": 5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 761801875,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 37.31666666666667,
+      "group_var": 1,
+      "url": "/matches/761801875",
+      "label": 761801875,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763671508,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.93333333333333,
+      "group_var": 2,
+      "url": "/matches/763671508",
+      "label": 763671508,
+      "y_var": 8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763668933,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.933333333333334,
+      "group_var": 2,
+      "url": "/matches/763668933",
+      "label": 763668933,
+      "y_var": -8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763671520,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.1,
+      "group_var": 2,
+      "url": "/matches/763671520",
+      "label": 763671520,
+      "y_var": 12.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763664510,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.4,
+      "group_var": 2,
+      "url": "/matches/763664510",
+      "label": 763664510,
+      "y_var": 1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763663598,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.03333333333333,
+      "group_var": 2,
+      "url": "/matches/763663598",
+      "label": 763663598,
+      "y_var": 9.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763667373,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 21.916666666666668,
+      "group_var": 2,
+      "url": "/matches/763667373",
+      "label": 763667373,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763658339,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 46.85,
+      "group_var": 2,
+      "url": "/matches/763658339",
+      "label": 763658339,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763659538,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 25.483333333333334,
+      "group_var": 2,
+      "url": "/matches/763659538",
+      "label": 763659538,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763657213,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.21666666666667,
+      "group_var": 2,
+      "url": "/matches/763657213",
+      "label": 763657213,
+      "y_var": -5.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763652792,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.7,
+      "group_var": 2,
+      "url": "/matches/763652792",
+      "label": 763652792,
+      "y_var": 1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763648241,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.88333333333333,
+      "group_var": 2,
+      "url": "/matches/763648241",
+      "label": 763648241,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763656264,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.53333333333333,
+      "group_var": 2,
+      "url": "/matches/763656264",
+      "label": 763656264,
+      "y_var": -1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763655454,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.583333333333332,
+      "group_var": 2,
+      "url": "/matches/763655454",
+      "label": 763655454,
+      "y_var": 11.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763654923,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 45.25,
+      "group_var": 2,
+      "url": "/matches/763654923",
+      "label": 763654923,
+      "y_var": 6.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763659548,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 27.516666666666666,
+      "group_var": 2,
+      "url": "/matches/763659548",
+      "label": 763659548,
+      "y_var": 14.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763654459,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 42.833333333333336,
+      "group_var": 2,
+      "url": "/matches/763654459",
+      "label": 763654459,
+      "y_var": 14.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763652896,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.21666666666667,
+      "group_var": 2,
+      "url": "/matches/763652896",
+      "label": 763652896,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763645155,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 44.416666666666664,
+      "group_var": 2,
+      "url": "/matches/763645155",
+      "label": 763645155,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763652482,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 44.733333333333334,
+      "group_var": 2,
+      "url": "/matches/763652482",
+      "label": 763652482,
+      "y_var": 9.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763652500,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 41.86666666666667,
+      "group_var": 2,
+      "url": "/matches/763652500",
+      "label": 763652500,
+      "y_var": 1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763652019,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 25.55,
+      "group_var": 2,
+      "url": "/matches/763652019",
+      "label": 763652019,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763652117,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 42.81666666666667,
+      "group_var": 2,
+      "url": "/matches/763652117",
+      "label": 763652117,
+      "y_var": -7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763652007,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 51.6,
+      "group_var": 2,
+      "url": "/matches/763652007",
+      "label": 763652007,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763658185,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 19.05,
+      "group_var": 2,
+      "url": "/matches/763658185",
+      "label": 763658185,
+      "y_var": 3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763651243,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.95,
+      "group_var": 2,
+      "url": "/matches/763651243",
+      "label": 763651243,
+      "y_var": 1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763651151,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 43.21666666666667,
+      "group_var": 2,
+      "url": "/matches/763651151",
+      "label": 763651151,
+      "y_var": -3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763651306,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.93333333333333,
+      "group_var": 2,
+      "url": "/matches/763651306",
+      "label": 763651306,
+      "y_var": 7.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763651283,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 48.333333333333336,
+      "group_var": 2,
+      "url": "/matches/763651283",
+      "label": 763651283,
+      "y_var": 8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763651521,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 55.06666666666667,
+      "group_var": 2,
+      "url": "/matches/763651521",
+      "label": 763651521,
+      "y_var": 8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763650124,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 44.1,
+      "group_var": 2,
+      "url": "/matches/763650124",
+      "label": 763650124,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763650297,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.4,
+      "group_var": 2,
+      "url": "/matches/763650297",
+      "label": 763650297,
+      "y_var": -6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763648315,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 48.916666666666664,
+      "group_var": 2,
+      "url": "/matches/763648315",
+      "label": 763648315,
+      "y_var": 14.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763648969,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 25.35,
+      "group_var": 2,
+      "url": "/matches/763648969",
+      "label": 763648969,
+      "y_var": 11.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763653313,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 27.65,
+      "group_var": 2,
+      "url": "/matches/763653313",
+      "label": 763653313,
+      "y_var": 6.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763649769,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.333333333333332,
+      "group_var": 2,
+      "url": "/matches/763649769",
+      "label": 763649769,
+      "y_var": -7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763648646,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 22.983333333333334,
+      "group_var": 2,
+      "url": "/matches/763648646",
+      "label": 763648646,
+      "y_var": 14.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763649129,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 41.2,
+      "group_var": 2,
+      "url": "/matches/763649129",
+      "label": 763649129,
+      "y_var": 6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763648927,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.333333333333336,
+      "group_var": 2,
+      "url": "/matches/763648927",
+      "label": 763648927,
+      "y_var": 10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763648411,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 43.53333333333333,
+      "group_var": 2,
+      "url": "/matches/763648411",
+      "label": 763648411,
+      "y_var": 2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763648202,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.8,
+      "group_var": 2,
+      "url": "/matches/763648202",
+      "label": 763648202,
+      "y_var": 8.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763647562,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 53.05,
+      "group_var": 2,
+      "url": "/matches/763647562",
+      "label": 763647562,
+      "y_var": 8.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763646266,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.683333333333334,
+      "group_var": 2,
+      "url": "/matches/763646266",
+      "label": 763646266,
+      "y_var": 4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763647444,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.21666666666667,
+      "group_var": 2,
+      "url": "/matches/763647444",
+      "label": 763647444,
+      "y_var": -2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763646882,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.71666666666667,
+      "group_var": 2,
+      "url": "/matches/763646882",
+      "label": 763646882,
+      "y_var": -1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763644500,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 55.63333333333333,
+      "group_var": 2,
+      "url": "/matches/763644500",
+      "label": 763644500,
+      "y_var": 7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763643899,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.016666666666666,
+      "group_var": 2,
+      "url": "/matches/763643899",
+      "label": 763643899,
+      "y_var": -3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763643470,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.68333333333333,
+      "group_var": 2,
+      "url": "/matches/763643470",
+      "label": 763643470,
+      "y_var": 6.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763643460,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.46666666666667,
+      "group_var": 2,
+      "url": "/matches/763643460",
+      "label": 763643460,
+      "y_var": -1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763639175,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.466666666666665,
+      "group_var": 2,
+      "url": "/matches/763639175",
+      "label": 763639175,
+      "y_var": 4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763643525,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.116666666666667,
+      "group_var": 2,
+      "url": "/matches/763643525",
+      "label": 763643525,
+      "y_var": 6.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763644804,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.2,
+      "group_var": 2,
+      "url": "/matches/763644804",
+      "label": 763644804,
+      "y_var": 8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763642813,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.483333333333334,
+      "group_var": 2,
+      "url": "/matches/763642813",
+      "label": 763642813,
+      "y_var": -7.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763641895,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 21.533333333333335,
+      "group_var": 2,
+      "url": "/matches/763641895",
+      "label": 763641895,
+      "y_var": -2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763642294,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.05,
+      "group_var": 2,
+      "url": "/matches/763642294",
+      "label": 763642294,
+      "y_var": 0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763642755,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 35.75,
+      "group_var": 2,
+      "url": "/matches/763642755",
+      "label": 763642755,
+      "y_var": 4.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763632121,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 40.03333333333333,
+      "group_var": 2,
+      "url": "/matches/763632121",
+      "label": 763632121,
+      "y_var": 2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763641693,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 42.666666666666664,
+      "group_var": 2,
+      "url": "/matches/763641693",
+      "label": 763641693,
+      "y_var": 9.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763640777,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.28333333333333,
+      "group_var": 2,
+      "url": "/matches/763640777",
+      "label": 763640777,
+      "y_var": 2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763639001,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 27.55,
+      "group_var": 2,
+      "url": "/matches/763639001",
+      "label": 763639001,
+      "y_var": 8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763640613,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 43.18333333333333,
+      "group_var": 2,
+      "url": "/matches/763640613",
+      "label": 763640613,
+      "y_var": 22.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763629392,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 49.43333333333333,
+      "group_var": 2,
+      "url": "/matches/763629392",
+      "label": 763629392,
+      "y_var": -10.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763638466,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.1,
+      "group_var": 2,
+      "url": "/matches/763638466",
+      "label": 763638466,
+      "y_var": 20.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763637969,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 50.733333333333334,
+      "group_var": 2,
+      "url": "/matches/763637969",
+      "label": 763637969,
+      "y_var": 3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763639535,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 43.8,
+      "group_var": 2,
+      "url": "/matches/763639535",
+      "label": 763639535,
+      "y_var": -5.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763639763,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 42.28333333333333,
+      "group_var": 2,
+      "url": "/matches/763639763",
+      "label": 763639763,
+      "y_var": 1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763638746,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.93333333333333,
+      "group_var": 2,
+      "url": "/matches/763638746",
+      "label": 763638746,
+      "y_var": -2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763638783,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 32.13333333333333,
+      "group_var": 2,
+      "url": "/matches/763638783",
+      "label": 763638783,
+      "y_var": 16.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763638633,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.8,
+      "group_var": 2,
+      "url": "/matches/763638633",
+      "label": 763638633,
+      "y_var": 8.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763637842,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.833333333333336,
+      "group_var": 2,
+      "url": "/matches/763637842",
+      "label": 763637842,
+      "y_var": 14.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763637719,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 23.533333333333335,
+      "group_var": 2,
+      "url": "/matches/763637719",
+      "label": 763637719,
+      "y_var": -3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763637672,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 33.016666666666666,
+      "group_var": 2,
+      "url": "/matches/763637672",
+      "label": 763637672,
+      "y_var": 17.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763632690,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 19.15,
+      "group_var": 2,
+      "url": "/matches/763632690",
+      "label": 763632690,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763635500,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 37.61666666666667,
+      "group_var": 2,
+      "url": "/matches/763635500",
+      "label": 763635500,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763635544,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.666666666666664,
+      "group_var": 2,
+      "url": "/matches/763635544",
+      "label": 763635544,
+      "y_var": -3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763631719,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 55.43333333333333,
+      "group_var": 2,
+      "url": "/matches/763631719",
+      "label": 763631719,
+      "y_var": 13.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763634066,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.11666666666667,
+      "group_var": 2,
+      "url": "/matches/763634066",
+      "label": 763634066,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763639901,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 48.583333333333336,
+      "group_var": 2,
+      "url": "/matches/763639901",
+      "label": 763639901,
+      "y_var": -4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763637702,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.7,
+      "group_var": 2,
+      "url": "/matches/763637702",
+      "label": 763637702,
+      "y_var": 17.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763634394,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 43.833333333333336,
+      "group_var": 2,
+      "url": "/matches/763634394",
+      "label": 763634394,
+      "y_var": 0.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763637903,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 58.333333333333336,
+      "group_var": 2,
+      "url": "/matches/763637903",
+      "label": 763637903,
+      "y_var": 5.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763634056,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.03333333333333,
+      "group_var": 2,
+      "url": "/matches/763634056",
+      "label": 763634056,
+      "y_var": 1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763633036,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.18333333333333,
+      "group_var": 2,
+      "url": "/matches/763633036",
+      "label": 763633036,
+      "y_var": -1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763633549,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 27.533333333333335,
+      "group_var": 2,
+      "url": "/matches/763633549",
+      "label": 763633549,
+      "y_var": -0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763633562,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 31.65,
+      "group_var": 2,
+      "url": "/matches/763633562",
+      "label": 763633562,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763632255,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.25,
+      "group_var": 2,
+      "url": "/matches/763632255",
+      "label": 763632255,
+      "y_var": -5.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763631307,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 28.333333333333332,
+      "group_var": 2,
+      "url": "/matches/763631307",
+      "label": 763631307,
+      "y_var": -1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763631780,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.4,
+      "group_var": 2,
+      "url": "/matches/763631780",
+      "label": 763631780,
+      "y_var": -2.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763628958,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 20.216666666666665,
+      "group_var": 2,
+      "url": "/matches/763628958",
+      "label": 763628958,
+      "y_var": 16.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763631245,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.733333333333334,
+      "group_var": 2,
+      "url": "/matches/763631245",
+      "label": 763631245,
+      "y_var": -1.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763630793,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 34.75,
+      "group_var": 2,
+      "url": "/matches/763630793",
+      "label": 763630793,
+      "y_var": 8.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763631834,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.933333333333334,
+      "group_var": 2,
+      "url": "/matches/763631834",
+      "label": 763631834,
+      "y_var": 4.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763639516,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 30.6,
+      "group_var": 2,
+      "url": "/matches/763639516",
+      "label": 763639516,
+      "y_var": 6.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763629422,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.05,
+      "group_var": 2,
+      "url": "/matches/763629422",
+      "label": 763629422,
+      "y_var": -7.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763633362,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 37.083333333333336,
+      "group_var": 2,
+      "url": "/matches/763633362",
+      "label": 763633362,
+      "y_var": 13.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763629013,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.666666666666664,
+      "group_var": 2,
+      "url": "/matches/763629013",
+      "label": 763629013,
+      "y_var": -2.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763634812,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 53.483333333333334,
+      "group_var": 2,
+      "url": "/matches/763634812",
+      "label": 763634812,
+      "y_var": 6.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763627694,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 36.666666666666664,
+      "group_var": 2,
+      "url": "/matches/763627694",
+      "label": 763627694,
+      "y_var": -3.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763627659,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 42.9,
+      "group_var": 2,
+      "url": "/matches/763627659",
+      "label": 763627659,
+      "y_var": 13.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763628205,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 29.85,
+      "group_var": 2,
+      "url": "/matches/763628205",
+      "label": 763628205,
+      "y_var": 0.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 763627184,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "very-high-skill"
+      ],
+      "stroke_width": 1,
+      "x_var": 47.233333333333334,
+      "group_var": 2,
+      "url": "/matches/763627184",
+      "label": 763627184,
+      "y_var": 3.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 670603857,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "specified"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.7,
+      "group_var": 3,
+      "url": "/matches/670603857",
+      "label": 670603857,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 576601654,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "specified"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.55,
+      "group_var": 3,
+      "url": "/matches/576601654",
+      "label": 576601654,
+      "y_var": 15.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 562738906,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "specified"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.733333333333334,
+      "group_var": 3,
+      "url": "/matches/562738906",
+      "label": 562738906,
+      "y_var": -7.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 437749955,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "specified"
+      ],
+      "stroke_width": 1,
+      "x_var": 51.9,
+      "group_var": 3,
+      "url": "/matches/437749955",
+      "label": 437749955,
+      "y_var": 1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 432852610,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "specified"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.0,
+      "group_var": 3,
+      "url": "/matches/432852610",
+      "label": 432852610,
+      "y_var": 2.0
+    },
+       {
+      "point_size": 1,
+      "tooltip": 670603857,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "specified"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.7,
+      "group_var": 4,
+      "url": "/matches/670603857",
+      "label": 670603857,
+      "y_var": -5.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 576601654,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "specified"
+      ],
+      "stroke_width": 1,
+      "x_var": 38.55,
+      "group_var": 4,
+      "url": "/matches/576601654",
+      "label": 576601654,
+      "y_var": 15.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 562738906,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "specified"
+      ],
+      "stroke_width": 1,
+      "x_var": 39.733333333333334,
+      "group_var": 4,
+      "url": "/matches/562738906",
+      "label": 562738906,
+      "y_var": -7.5
+    },
+    {
+      "point_size": 1,
+      "tooltip": 437749955,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "specified"
+      ],
+      "stroke_width": 1,
+      "x_var": 51.9,
+      "group_var": 4,
+      "url": "/matches/437749955",
+      "label": 437749955,
+      "y_var": 1.0
+    },
+    {
+      "point_size": 1,
+      "tooltip": 432852610,
+      "panel_var": 0,
+      "classes": [
+        "legion-commander",
+        "carry",
+        "strength",
+        "durable",
+        "specified"
+      ],
+      "stroke_width": 1,
+      "x_var": 26.0,
+      "group_var": 4,
+      "url": "/matches/432852610",
+      "label": 432852610,
+      "y_var": 2.0
+    }
+
+  ],
+  "parameters": {
+    "pointSizeMin": 5,
+    "strokeSizeMax": 1,
+    "draw_path": false,
+    "legendHeightPercent": 0.1,
+    "outerWidth": "300",
+    "pointSizeMax": 5,
+    "path_stroke_width": 3,
+    "x_ticks": "6",
+    "y_max": 33.5,
+    "fadeOpacity": 0.1,
+    "outerHeight": "300",
+    "pointDomainMax": 1,
+    "y_min": -13.5,
+    "padding": {
+      "bottom": 0,
+      "left": 0,
+      "right": 0,
+      "top": 0
+    },
+    "draw_legend": true,
+    "legendWidthPercent": 0.25,
+    "y_ticks": null,
+    "strokeSizeMin": 1,
+    "chart": "xyplot",
+    "margin": {
+      "bottom": 20,
+      "left": 36,
+      "right": 20,
+      "top": 25
+    },
+    "x_min": 12.2,
+    "pointDomainMin": 1,
+    "x_max": 58.333333333333336,
+    "strokeDomainMin": 0,
+    "strokeDomainMax": 0,
+    "y_label": "Kills-Death+.5*Assists",
+    "x_label": "GameLength(m)"
+  },
+  "groups": [
+    {
+      "display_name": "Normal Skill",
+      "index": 0,
+      "color": "#CC0000",
+      "class_selector": "normal-skill"
+    },
+    {
+      "display_name": "High Skill",
+      "index": 1,
+      "color": "#CCAF00",
+      "class_selector": "high-skill"
+    },
+    {
+      "display_name": "Very High Skill",
+      "index": 2,
+      "color": "#3ACC00",
+      "class_selector": "very-high-skill"
+    },
+    {
+      "display_name": "Informed Play",
+      "index": 3,
+      "color": "#1f77b4",
+      "class_selector": "informed-play"
+    }
+    {
+      "display_name": "Pre Calibration",
+      "index": 4,
+      "color": "#1f77b4",
+      "class_selector": "pre-calibration"
+    }
+  ],
+  "panels": [
+    {
+      "display_name": "Kills-Death+.5*Assists vs GameLength(m)",
+      "index": 0
+    }
+  ]
+}
