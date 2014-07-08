@@ -222,7 +222,7 @@ def detail(request, player_id=None):
     stats['losses'] = losses
     stats['total'] = total
     stats['winrate'] = round(
-        float(wins) / (wins + losses) if wins + losses > 0 else 0,
+        float(wins) / (wins + losses)*100 if wins + losses > 0 else 0,
         2
     )
 
