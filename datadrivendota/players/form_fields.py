@@ -32,6 +32,10 @@ class MultiPlayerField(forms.CharField):
     widget = forms.HiddenInput(attrs={'class': 'multi-player-tags'})
 
     def clean(self, player):
+        if self.required and not player:
+            raise forms.ValidationError("That is not a real player name")
+        if not self.required and not player:
+            return None
         player_list = player.split(',')
         return_player_list = []
         for player in player_list:
