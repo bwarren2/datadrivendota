@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 from datadrivendota import views
-
+from players.views import data_applicant
 admin.autodiscover()
 
 urlpatterns = patterns(
@@ -22,6 +22,11 @@ urlpatterns = patterns(
     url(r'^djs2/', include('django_select2.urls')),
     url(r'^privacy/$', views.privacy, name='privacy'),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
+    url(
+        r'^data-request/$',
+        data_applicant,
+        name="data_applicant"
+    ),
     url(
         r'^logout/$',
         'django.contrib.auth.views.logout',

@@ -2,6 +2,7 @@ import datetime
 from django import forms
 from players.form_fields import SinglePlayerField
 from heroes.form_fields import SingleHeroSelect
+from players.models import Applicant
 
 
 def beta_start():
@@ -45,3 +46,9 @@ class MatchRequestForm(forms.Form):
 
 class SearchForm(forms.Form):
     search_string = forms.CharField(required=True, max_length=50)
+
+
+class ApplicantForm(forms.ModelForm):
+    class Meta:
+        model = Applicant
+        fields = ['email', 'steam_id', 'interested_in_premium']

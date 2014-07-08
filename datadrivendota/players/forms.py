@@ -273,9 +273,3 @@ class PlayerMatchesFilterForm(forms.Form):
         help_text='Start times for included dates must be on or before this'
     )
     max_date.widget = forms.TextInput(attrs={'class': 'datepicker'})
-
-
-class ApplicantForm(forms.ModelForm):
-    class Meta:
-        model = Applicant
-        fields = ['email', 'steam_id']

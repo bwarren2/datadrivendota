@@ -130,6 +130,7 @@ class Applicant(models.Model):
         # help_text="Valve's internal map",
     )
     email = models.EmailField()
+    interested_in_premium = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         # That magic number is the valve 32bit -64bit adder.

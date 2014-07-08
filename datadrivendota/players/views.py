@@ -14,9 +14,9 @@ from django.contrib.auth.decorators import permission_required
 from .models import Player, UserProfile
 from .forms import (
     PlayerAddFollowForm,
-    ApplicantForm,
     PlayerMatchesFilterForm
 )
+from datadrivendota.forms import ApplicantForm
 
 from utils.pagination import SmarterPaginator
 from utils import binomial_exceedence
