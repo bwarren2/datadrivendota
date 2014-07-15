@@ -55,7 +55,7 @@ class Command(BaseCommand):
             # slow things down for the API call regs
             time.sleep(1)
             data = json.loads(urllib2.urlopen(url).read())['result']
-            print url, data['results_remaining']
+            # print url, data['results_remaining']
 
             if data['status'] != 1:
                 raise Exception("No Data for that call")
