@@ -10,7 +10,7 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     url(r'^$', views.base, name='base'),
-    url(r'^about/$', views.about, name='about'),
+    url(r'^blank/$', views.blank, name='blank'),
     url(r'^search/$', views.SearchView.as_view(), name='search'),
     url(r'^heroes/', include('heroes.urls', namespace='heroes')),
     url(r'^items/', include('items.urls', namespace='items')),
