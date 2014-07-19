@@ -91,6 +91,7 @@ class Command(BaseCommand):
                 ms = unprocessed.exclude(
                     duration__lte=settings.MIN_MATCH_LENGTH
                 )
+                ms = ms.exclude(validity=Match.LEGIT)
                 ms = ms.exclude(human_players__lt=10)
                 ms = ms.exclude(playermatchsummary__leaver__steam_id__gt=1)
                 ms = ms.filter(lobby_type__steam_id__in=[0, 2, 6, 7])
