@@ -101,18 +101,28 @@ class Command(BaseCommand):
                 keys = sub_selection.values_list('pk', flat=True)
                 ms = ms.exclude(pk__in=keys)
                 ms.update(validity=Match.LEGIT)
-
+            print "Defs done"
             tournament_matches = unprocessed.filter(skill=4)
+            print "Select done"
             tournament(tournament_matches)
+            print "Tourney handled"
             unprocessed = unprocessed.exclude(skill=4)
+            print "Moving to everything else"
 
+            print "Too short"
             too_short(unprocessed)
+            print "Player Count"
             player_count(unprocessed)
+            print "Humans"
             human_players(unprocessed)
+            print "Leaves"
             leavers(unprocessed)
+            print "Modes"
             game_mode_check(unprocessed)
 
+            print "Legitimize"
             legitimize(unprocessed)
+            print "Done"
 
         if full_check is not None:
             print "Doing all"
