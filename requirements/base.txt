@@ -54,6 +54,6 @@ sqlparse==0.1.11
 stripe==1.12.0
 wsgiref==0.1.2
 Cython==0.20.2
--e git+git://github.com/bumptech/palm
--e git+git://github.com/andrix/python-snappy
--e git+git://github.com/bwarren2/smoke
+-e git+git://github.com/bumptech/palm#egg=palm
+-e git+git://github.com/andrix/python-snappy#egg=python-snappy
+-e git+git://github.com/bwarren2/smoke#egg=smoke
