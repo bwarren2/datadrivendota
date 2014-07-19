@@ -99,6 +99,9 @@ class ApiContext(object):
         elif mode == 'GetMatchDetails':
             valve_URL_vars = ['match_id', 'key']
             return self.dictVars(valve_URL_vars)
+        elif mode == 'GetTournamentPlayerStats':
+            valve_URL_vars = ['league_id', 'account_id', 'key']
+            return self.dictVars(valve_URL_vars)
         elif mode == 'GetMatchHistory':
             valve_URL_vars = [
                 'account_id',
@@ -288,6 +291,10 @@ class ValveApiCall(BaseTask):
                 'GetUGCFileDetails': (
                     'http://api.steampowered.com/ISteamRemoteStorage/'
                     'GetUGCFileDetails/v1/'
+                ),
+                'GetTournamentPlayerStats': (
+                    'http://api.steampowered.com/IDOTA2Match_570/'
+                    'GetTournamentPlayerStats/v1/'
                 ),
             }
 
@@ -1080,6 +1087,52 @@ class UpdateProNames(ApiFollower):
             name = self.result['Name']
             player.pro_name = '[' + tag + '] ' + name
             player.save()
+
+
+class AcquireHiddenLeagueGames(Task):
+    """Gets the pro name for each person in the current roster set"""
+
+    def run(self, league_id):
+        lst = [
+            '101495620',  # Alliance
+            '94362277',  # Titan
+            '87276347',  # EG
+            '100317750',  # Fnatic
+            '100883708',  # Newbee
+            '91698091',  # Vici
+            '70388657',  # Na'Vi
+            '90892734',  # DK
+            '88553213',  # iG
+            '19757254',  # Cloud 9
+            '89269794',  # Empire
+            '1185644',  # Na'Vi US
+            '131380551',  # Arrow
+            '123854991',  # LGD
+            '87285329',  # mouz
+            '86738694',  # Liquid
+            '88933594',  # MVP
+            '21289303',  # CIS
+            '36547811',  # VP
+        ]
+        for acct in lst:
+            c = ApiContext()
+            vac = ValveApiCall()
+            c.account_id = acct
+            c.league_id = league_id
+            rhgr = RetrieveHiddenGameResults()
+            t = chain(
+                vac.s(api_context=c, mode='GetTournamentPlayerStats'), rhgr.s()
+            )
+            t.delay()
+
+
+class RetrieveHiddenGameResults(ApiFollower):
+    """"""
+    def run(self, urldata):
+        matches = [match['match_id'] for match in urldata['result']['matches']]
+        print matches
+        am = AcquireMatches()
+        am.delay(matches=matches)
 
 
 def upload_match_summary(players, parent_match, refresh_records):
