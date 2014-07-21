@@ -27,10 +27,11 @@
         <div class='row' id='header'></div>
         <div class='row' id='side-charts'>
             <div class='col-md-offset-2 col-md-4' id='kills'>
-                <h4>Hero Kills</h4>
+                <h4>Hero Kills</h4><span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Kills by team, from combat log.  Times are replay time, so the flat stretch is drafting." data-placement="right"></span>
+
             </div>
             <div class='col-md-4' id='tower-dmg'>
-                <h4>Tower Kills</h4>
+                <h4>Tower Kills</h4><span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Cumulative building damage by side.  Times are replay time, so the flat stretch is drafting." data-placement="right"></span>
 
             </div>
             {% comment %}
@@ -50,13 +51,16 @@
             </div>
             {% endcomment %}
             <div class='col-md-offset-2 col-md-4' id='dealt_dmg-kill'>
-                <h4>Hero Damage vs Kills</h4>
+                <h4>Hero Damage vs Kills</h4><span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Kills vs hero damage dealing by player, from the combat log.  Mason goes nuts in the midgame!  (Due to weird underlying data, this damage is different from endgame damage; reductions etc make the numbers slightly different.)" data-placement="right"></span>
             </div>
             <div class='col-md-4' id='taken_dmg-deaths'>
-                <h4>Damage Taken vs Deaths</h4>
+                <h4>Damage Taken vs Deaths</h4><span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Deaths vs damage taken from heroes, from combat log.  Void held DK and Doom down while Mason pounded face." data-placement="right"></span>
 
             </div>
         </div>
+        <a href="http://www.datadrivendota.com/blog/2014/07/21/ti4-and-replay-parsing/">
+        <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Related Blog Post</button>
+        </a>
     </div>
 {% endblock content %}
 
