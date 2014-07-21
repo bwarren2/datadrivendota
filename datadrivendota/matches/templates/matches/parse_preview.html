@@ -190,6 +190,39 @@ $(function(){
         .style("stroke", function(d) {
           return(d['color']);
         })
+
+    inner_svg.append('g')
+        .append("rect")
+        .attr("x", x(0))
+        .attr("y", y(y_max))
+        .attr("width", 5)
+        .attr("height", height+2)
+        .attr("class", "dmg-slider")
+        // .style("stroke-width", 2)
+        // .style("stroke", function(d) {
+        //   return(d['color']);
+        // })
+
+    var idx = 1
+    var duration = 100
+    // var max_len = chart_json[0]['data'].length
+    var max_len = 357
+
+    $('#start-animation').on('click', function(){
+    var myhandle = setInterval(function() {
+        if(idx>=max_len){
+            idx = 1;
+            clearInterval(myhandle)
+        }
+         d3.selectAll('.dmg-slider')
+        .transition()
+        .duration(duration)
+        .attr('x', function(){return x(idx*10)});
+        idx +=1
+    }, duration)
+});
+
+
     }
 
     var data = '{% static '787900748kills.json' %}';
@@ -336,6 +369,7 @@ $(function(){
         .attr("y", y(y_max))
         .attr("width", 5)
         .attr("height", height+2)
+        .attr("class", "tower-slider")
         // .style("stroke-width", 2)
         // .style("stroke", function(d) {
         //   return(d['color']);
@@ -347,19 +381,17 @@ $(function(){
     var max_len = 357
 
     $('#start-animation').on('click', function(){
-    // var myhandle = setInterval(function() {
-    //     if(idx>max_len){
-    //         idx = 1;
-    //         clearInterval(myhandle)
-    //     }
-        alert('foo')
-        alert(placement_div+' rect')
-         d3.selectAll(placement_div+' rect').remove();
-        // .transition()
-        // .duration(duration)
-        // .attr('x', function(){return x(idx*10)});
+    var myhandle = setInterval(function() {
+        if(idx>=max_len){
+            idx = 1;
+            clearInterval(myhandle)
+        }
+         d3.selectAll('.tower-slider')
+        .transition()
+        .duration(duration)
+        .attr('x', function(){return x(idx*10)});
         idx +=1
-    // }, duration)
+    }, duration)
 });
 
     }
@@ -521,9 +553,9 @@ $(function(){
 
         $('#start-animation').on('click', function(){
             var myhandle = setInterval(function() {
-                if(idx>max_len){
-                    idx = 1;
+                if(idx>=max_len){
                     clearInterval(myhandle);
+                    idx = 1;
                 }
                  d3.selectAll(placement_div+' circle')
                 .transition()
@@ -536,6 +568,7 @@ $(function(){
                     return(y(d['data'][idx]['dmg_dealt']));
                 })
                 idx +=1
+                console.log(idx, max_len, idx>max_len)
         }, duration)});
     }
 
@@ -683,8 +716,8 @@ $(function(){
         var max_len = chart_json[0]['data'].length
         $('#start-animation').on('click', function(){
         var myhandle = setInterval(function() {
-            if(idx>max_len){
-                idx = 0;
+            if(idx>=max_len){
+                idx = 1;
                 clearInterval(myhandle)
             }
              d3.selectAll(placement_div+' circle')
