@@ -5,13 +5,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from datadrivendota import views
 from players.views import data_applicant
+from matches.views import parse_preview
 admin.autodiscover()
 
 urlpatterns = patterns(
     '',
     url(r'^$', views.base, name='base'),
     url(r'^blank/$', views.blank, name='blank'),
-    url(r'^test/$', views.test, name='test'),
+    url(r'^special/$', parse_preview, name='special'),
     url(r'^search/$', views.SearchView.as_view(), name='search'),
     url(r'^heroes/', include('heroes.urls', namespace='heroes')),
     url(r'^items/', include('items.urls', namespace='items')),

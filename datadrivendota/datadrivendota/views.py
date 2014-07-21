@@ -60,10 +60,6 @@ def blank(request):
     return render(request, 'base.html')
 
 
-def test(request):
-    return render(request, 'test.html')
-
-
 def privacy(request):
     return render(request, 'privacy.html')
 

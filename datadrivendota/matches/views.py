@@ -199,6 +199,56 @@ def match(request, match_id):
         )
 
 
+@devserver_profile()
+def parse_preview(request):
+    match_id = 787900748
+    match = Match.objects.get(steam_id=match_id)
+    summaries = PlayerMatchSummary.objects.filter(
+        match=match
+    ).select_related().order_by('player_slot')
+
+    for summary in summaries:
+        summary.kda = summary.kills - summary.deaths + .5*summary.assists
+        if summary.which_side() == 'Radiant':
+            summary.is_radiant = True
+        else:
+            summary.is_dire = True
+        if summary.leaver.steam_id != 0:
+            summary.improper_player = True
+        if summary.is_win:
+            summary.won = True
+
+    match.hms_duration = datetime.timedelta(seconds=match.duration)
+    match.hms_start_time = datetime.datetime.fromtimestamp(
+        match.start_time
+    ).strftime('%H:%M:%S %Y-%m-%d')
+
+    radiant_summaries = [
+        summary for summary in summaries if summary.which_side() == 'Radiant'
+    ]
+    radiant_cast_list = []
+    for summary in radiant_summaries:
+        radiant_cast_list.append(cast_dict(summary))
+
+    dire_summaries = [
+        summary for summary in summaries if summary.which_side() == 'Dire'
+    ]
+    dire_cast_list = []
+    for summary in dire_summaries:
+        dire_cast_list.append(cast_dict(summary))
+
+    return render(
+        request,
+        'matches/parse_preview.html',
+        {
+            'match': match,
+            'summaries': summaries,
+            'radiant_cast_list': radiant_cast_list,
+            'dire_cast_list': dire_cast_list,
+        }
+    )
+
+
 @devserver_profile(follow=[])
 def follow_match_feed(request):
     results_per_page = 20
