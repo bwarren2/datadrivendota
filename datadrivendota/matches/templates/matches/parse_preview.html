@@ -186,7 +186,7 @@ $(function(){
         })
     }
 
-    var data = '/assets/787900748kills.json';
+    var data = '{{STATIC_URL}}787900748kills.json';
     var foo = $.getJSON(data, function(data){
         chart_json = foo['responseJSON'];
         plot(chart_json)
@@ -358,7 +358,7 @@ $(function(){
 
 
 
-    var data = '/assets/787900748towers.json';
+    var data = '{{STATIC_URL}}787900748towers.json';
     var foo = $.getJSON(data, function(data){
         chart_json = foo['responseJSON'];
         plot(chart_json)
@@ -528,7 +528,7 @@ $(function(){
         }, duration)});
     }
 
-    var data = '/assets/787900748kill_dmg.json';
+    var data = '{{STATIC_URL}}787900748kill_dmg.json';
     var foo = $.getJSON(data, function(data){
         var chart_json = foo['responseJSON'];
         plot(chart_json);
@@ -690,7 +690,7 @@ $(function(){
         var idx = 1
     }
 
-    var data = '/assets/787900748death_dmg.json';
+    var data = '{{STATIC_URL}}787900748death_dmg.json';
     var foo = $.getJSON(data, function(data){
         var chart_json = foo['responseJSON'];
         plot(chart_json);
