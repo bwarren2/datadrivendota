@@ -26,24 +26,30 @@
         <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Start Animation</button>
         <div class='row' id='header'></div>
         <div class='row' id='side-charts'>
-
-            <div class='col-md-4' id='kills'>
+            <div class='col-md-offset-2 col-md-4' id='kills'>
                 <h4>Hero Kills</h4>
             </div>
             <div class='col-md-4' id='tower-dmg'>
                 <h4>Tower Kills</h4>
 
             </div>
-            <div class='col-md-4' id='life'>
+            {% comment %}
+
+             <div class='col-md-4' id='life'>
                 <h4>Hero Health</h4>
 
             </div>
+            {% endcomment %}
+
         </div>
         <div class='row' id='hero-charts'>
+            {% comment %}
+
             <div class='col-md-4' id='lasthits-lvls'>
                 <h4>Last Hits vs Levels</h4>
             </div>
-            <div class='col-md-4' id='dealt_dmg-kill'>
+            {% endcomment %}
+            <div class='col-md-offset-2 col-md-4' id='dealt_dmg-kill'>
                 <h4>Hero Damage vs Kills</h4>
             </div>
             <div class='col-md-4' id='taken_dmg-deaths'>
@@ -324,35 +330,37 @@ $(function(){
           return(d['color']);
         })
 
-    // inner_svg.append('g')
-    //     .append("rect")
-    //     .attr("x", x(0))
-    //     .attr("y", y(y_max))
-    //     .attr("width", 5)
-    //     .attr("height", height+2)
-    //     // .style("stroke-width", 2)
-    //     // .style("stroke", function(d) {
-    //     //   return(d['color']);
-    //     // })
+    inner_svg.append('g')
+        .append("rect")
+        .attr("x", x(0))
+        .attr("y", y(y_max))
+        .attr("width", 5)
+        .attr("height", height+2)
+        // .style("stroke-width", 2)
+        // .style("stroke", function(d) {
+        //   return(d['color']);
+        // })
 
-    // var idx = 1
-    // var duration = 100
-    // // var max_len = chart_json[0]['data'].length
-    // var max_len = 357
-    // console.log(placement_div+' rect')
-    // $('#start-animation').on('click', function(){
+    var idx = 1
+    var duration = 100
+    // var max_len = chart_json[0]['data'].length
+    var max_len = 357
+
+    $('#start-animation').on('click', function(){
     // var myhandle = setInterval(function() {
     //     if(idx>max_len){
     //         idx = 1;
     //         clearInterval(myhandle)
     //     }
-    //      d3.selectAll(placement_div+' rect')
-    //     .transition()
-    //     .duration(duration)
-    //     .attr('x', function(){return x(idx*10)});
-    //     console.log(x(idx*10))
-    //     idx +=1
-    // }, duration)});
+        alert('foo')
+        alert(placement_div+' rect')
+         d3.selectAll(placement_div+' rect').remove();
+        // .transition()
+        // .duration(duration)
+        // .attr('x', function(){return x(idx*10)});
+        idx +=1
+    // }, duration)
+});
 
     }
 
@@ -401,6 +409,13 @@ $(function(){
                     return(p['dmg_dealt'])
                 }))
             });
+
+    function toTitleCase(str)
+    {
+        temp = str.replace('npc_dota_hero_', ' ')
+        temp = temp.replace('_', ' ')
+        return temp.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    }
 
     var x = d3.scale.linear()
         .range([0, width])
@@ -483,18 +498,14 @@ $(function(){
         .attr('r', function(d){
             return(5);
         })
+        .style("stroke", function(d) {return('#000000');})
         .attr("class", function(d){return(d['name'])})
-        .attr('stroke-width', function(d){
-            return(1);
-        })
-        .style("stroke", function(d) {
-            return('#000000')
-        })
         .on("mouseover", function(d) {
         div.transition()
             .duration(200)
             .style("opacity", 0.9);
-            div.html(d.name)
+
+            div.html(toTitleCase(d.name))
             .style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY - 28) + "px");
         })
@@ -554,6 +565,13 @@ $(function(){
     y_label = 'Damage Taken'
     placement_div = "div#taken_dmg-deaths"
     transitionDelay = 500
+
+    function toTitleCase(str)
+    {
+        temp = str.replace('npc_dota_hero_', ' ')
+        temp = temp.replace('_', ' ')
+        return temp.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    }
 
     var x_min = 0,
         y_min = 0,
@@ -644,18 +662,13 @@ $(function(){
         .attr('r', function(d){
             return(5);
         })
-        .attr('stroke-width', function(d){
-            return(1);
-        })
         .attr("class", function(d){return(d['name'])})
-        .style("stroke", function(d) {
-            return('#000000')
-        })
+        .style("stroke", function(d) {return('#000000');})
         .on("mouseover", function(d) {
         div.transition()
             .duration(200)
             .style("opacity", 0.9);
-            div.html(d.name)
+            div.html(toTitleCase(d.name))
             .style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY - 28) + "px");
         })
