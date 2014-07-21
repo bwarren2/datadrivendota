@@ -11,6 +11,7 @@ urlpatterns = patterns(
     '',
     url(r'^$', views.base, name='base'),
     url(r'^blank/$', views.blank, name='blank'),
+    url(r'^test/$', views.test, name='test'),
     url(r'^search/$', views.SearchView.as_view(), name='search'),
     url(r'^heroes/', include('heroes.urls', namespace='heroes')),
     url(r'^items/', include('items.urls', namespace='items')),
