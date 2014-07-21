@@ -21,7 +21,9 @@
 {% block content %}
 
   {% include "matches/_match_cards.html" %}
+
     <div class='container'>
+        <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Start Animation</button>
         <div class='row' id='header'></div>
         <div class='row' id='side-charts'>
 
@@ -54,126 +56,9 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-    // kills=[
-    //     {
-    //         'data': [[1,1], [2.5,1.5]],
-    //         'color': '#FF3100'
-    //     },
-    //     {
-    //         'data': [[2,2], [2.5,1.85]],
-    //         'color': '#0400FF'
-    //     },
-    //     {
-    //         'data': [[3,3], [2.75, 1.15]],
-    //         'color': '#00FF20'
-    //     }
-    // ]
-    // var margin = {top: 20, right: 20, bottom: 20, left: 30},
-    //     padding = {top: 0, right: 0, bottom: 0, left: 0},
-    //     outerWidth = 300,
-    //     outerHeight = 300,
-    //     innerWidth = outerWidth - margin.left - margin.right,
-    //     innerHeight = outerHeight - margin.top - margin.bottom,
-    //     width = innerWidth - padding.left - padding.right,
-    //     height = innerHeight - padding.top - padding.bottom;
-
-    // x_label = 'Hi'
-    // y_label = 'Bye'
-    // var x_min = d3.min(kills, function(d){ return(d['data'][0][0])}),
-    //     y_min = d3.min(kills, function(d){ return(d['data'][0][1])}),
-    //     x_max = d3.max(kills, function(d){ return(d['data'][0][0])}),
-    //     y_max = d3.max(kills, function(d){ return(d['data'][0][1])});
-
-    // var x = d3.scale.linear()
-    //     .range([0, width])
-    //     .domain([x_min, x_max]);
-
-    // var y = d3.scale.linear()
-    //     .range([height, 0])
-    //     .domain([y_min, y_max]);
-
-    // var xAxis = d3.svg.axis()
-    //     .scale(x)
-    //     .orient("bottom");
-
-    // var yAxis = d3.svg.axis()
-    //     .scale(y)
-    //     .orient("left");
-
-    // $(function(){
-
-    // inner_svg = d3.select("div#kills").append("svg")
-    //     .attr("width", width + margin.left + margin.right)
-    //     .attr("height", height + margin.top + margin.bottom)
-    //     .attr("class", 'kills-outer-chart')
-    //     .append("g")
-    //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    //     .attr("class", 'kills-inner-chart')
-
-    // //Draw X
-    // inner_svg.append("g")
-    //     .attr("class", "x-axis")
-    //     .attr("transform", "translate(0," + height + ")")
-    //     .call(xAxis)
-    //     .append("text")
-    //     .attr("class", "x-axis-label")
-    //     .attr("y", -16)
-    //     .attr("x", width)
-    //     .attr("dy", ".71em")
-    //     .style("text-anchor", "end")
-    //     .text(x_label);
-
-    // //Draw Y
-    // inner_svg.append("g")
-    //     .attr("class", "y-axis")
-    //     .attr("transform", "translate(0,0)")
-    //     .call(yAxis)
-    //     .append("text")
-    //     .attr("class", "y-axis-label")
-    //     .attr("transform", "rotate(-90)")
-    //     .attr("y", 6)
-    //     .attr("dy", ".71em")
-    //     .style("text-anchor", "end")
-    //     .text(y_label);
-
-    // inner_svg.selectAll('.series')
-    //     .data(kills)
-    //     .enter()
-    //     .append('circle')
-    //     .attr('cx',function(d){
-    //         return(x(d['data'][0][0]));
-    //     })
-    //     .attr('cy',function(d){
-    //         return(y(d['data'][0][1]));
-    //     })
-    //     // .attr("class", function(d){
-    //     //     for(var key in d.classes){
-    //     //         d.classes[key]=convertToSlug(d.classes[key]);
-    //     //     }
-    //     //     return 'data-toggleable dataset points '+d.classes.join(' ');
-    //     // })
-    //     .attr('r', function(d){
-    //         return(5);
-    //     })
-    //     .attr('stroke-width', function(d){
-    //         return(1);
-    //     })
-    //     .style("fill", function(d) { return(d['color'])})
-    //     .style("stroke", function(d) {
-    //         return('#000000')
-    //     })
-    //     .transition()
-    //     .ease('linear')
-    //     .delay(1000)
-    //     .duration(1000)
-    //     .attr('cx',function(d){
-    //         return(x(d['data'][1][0]));
-    //     })
-    //     .attr('cy',function(d){
-    //         return(y(d['data'][1][1]));
-    //     })
-
-    // })
+var div = d3.select("body").append("div")
+.attr("class", "tooltip")
+.style("opacity", 0);
 </script>
 <script type="text/javascript">
 // Side Kill Progression
@@ -221,7 +106,7 @@ $(function(){
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom")
-        .ticks(6)
+        .ticks(4)
         .tickFormat(function (d) {
             strng = String((d-d%60)/60)+':'+String(d%60)
             return strng;
@@ -299,39 +184,6 @@ $(function(){
         .style("stroke", function(d) {
           return(d['color']);
         })
-        // .call(transition)
-        // .attr('cx',function(d){
-        //     return(x(d['data'][0][0]));
-        // })
-        // .attr('cy',function(d){
-        //     return(y(d['data'][0][1]));
-        // })
-        // // .attr("class", function(d){
-        // //     for(var key in d.classes){
-        // //         d.classes[key]=convertToSlug(d.classes[key]);
-        // //     }
-        // //     return 'data-toggleable dataset points '+d.classes.join(' ');
-        // // })
-        // .attr('r', function(d){
-        //     return(5);
-        // })
-        // .attr('stroke-width', function(d){
-        //     return(1);
-        // })
-        // .style("fill", function(d) { return(d['color'])})
-        // .style("stroke", function(d) {
-        //     return('#000000')
-        // })
-        // .transition()
-        // .ease('linear')
-        // .delay(1000)
-        // .duration(1000)
-        // .attr('cx',function(d){
-        //     return(x(d['data'][1][0]));
-        // })
-        // .attr('cy',function(d){
-        //     return(y(d['data'][1][1]));
-        // })
     }
 
     var data = '/assets/787900748kills.json';
@@ -388,7 +240,7 @@ $(function(){
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom")
-        .ticks(6)
+        .ticks(4)
         .tickFormat(function (d) {
             strng = String((d-d%60)/60)+':'+String(d%60)
             return strng;
@@ -396,7 +248,12 @@ $(function(){
 
     var yAxis = d3.svg.axis()
         .scale(y)
-        .orient("left");
+        .orient("left")
+        .tickFormat(function (d) {
+            strng = String(d/1000)+'K'
+            return strng;
+        });
+
 
     var line = d3.svg.line()
         .x(function(d){
@@ -407,19 +264,19 @@ $(function(){
         });
 
 
-    function transition(path) {
-      path.transition()
-          .duration(7500)
-          .attrTween("stroke-dasharray", tweenDash)
-          .each("end", function() { d3.select(this).call(transition); });
-    }
+    // function transition(path) {
+    //   path.transition()
+    //       .duration(7500)
+    //       .attrTween("stroke-dasharray", tweenDash)
+    //       .each("end", function() { d3.select(this).call(transition); });
+    // }
 
-    function tweenDash() {
-      var l = this.getTotalLength(),
-        l = 510
-          i = d3.interpolateString("0," + l, l + "," + l);
-      return function(t) { return i(t); };
-    }
+    // function tweenDash() {
+    //   var l = this.getTotalLength(),
+    //     l = 510
+    //       i = d3.interpolateString("0," + l, l + "," + l);
+    //   return function(t) { return i(t); };
+    // }
 
     inner_svg = d3.select(placement_div).append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -466,40 +323,40 @@ $(function(){
         .style("stroke", function(d) {
           return(d['color']);
         })
-        // .call(transition)
-        // .attr('cx',function(d){
-        //     return(x(d['data'][0][0]));
-        // })
-        // .attr('cy',function(d){
-        //     return(y(d['data'][0][1]));
-        // })
-        // // .attr("class", function(d){
-        // //     for(var key in d.classes){
-        // //         d.classes[key]=convertToSlug(d.classes[key]);
-        // //     }
-        // //     return 'data-toggleable dataset points '+d.classes.join(' ');
-        // // })
-        // .attr('r', function(d){
-        //     return(5);
-        // })
-        // .attr('stroke-width', function(d){
-        //     return(1);
-        // })
-        // .style("fill", function(d) { return(d['color'])})
-        // .style("stroke", function(d) {
-        //     return('#000000')
-        // })
-        // .transition()
-        // .ease('linear')
-        // .delay(1000)
-        // .duration(1000)
-        // .attr('cx',function(d){
-        //     return(x(d['data'][1][0]));
-        // })
-        // .attr('cy',function(d){
-        //     return(y(d['data'][1][1]));
-        // })
+
+    // inner_svg.append('g')
+    //     .append("rect")
+    //     .attr("x", x(0))
+    //     .attr("y", y(y_max))
+    //     .attr("width", 5)
+    //     .attr("height", height+2)
+    //     // .style("stroke-width", 2)
+    //     // .style("stroke", function(d) {
+    //     //   return(d['color']);
+    //     // })
+
+    // var idx = 1
+    // var duration = 100
+    // // var max_len = chart_json[0]['data'].length
+    // var max_len = 357
+    // console.log(placement_div+' rect')
+    // $('#start-animation').on('click', function(){
+    // var myhandle = setInterval(function() {
+    //     if(idx>max_len){
+    //         idx = 1;
+    //         clearInterval(myhandle)
+    //     }
+    //      d3.selectAll(placement_div+' rect')
+    //     .transition()
+    //     .duration(duration)
+    //     .attr('x', function(){return x(idx*10)});
+    //     console.log(x(idx*10))
+    //     idx +=1
+    // }, duration)});
+
     }
+
+
 
     var data = '/assets/787900748towers.json';
     var foo = $.getJSON(data, function(data){
@@ -560,7 +417,11 @@ $(function(){
 
     var yAxis = d3.svg.axis()
         .scale(y)
-        .orient("left");
+        .orient("left")
+        .tickFormat(function (d) {
+            strng = String(d/1000)+'K'
+            return strng;
+        });
 
     var line = d3.svg.line()
         .x(function(d){
@@ -570,6 +431,9 @@ $(function(){
             return y(d['dmg'])
         });
 
+    var div = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
 
     inner_svg = d3.select(placement_div).append("svg")
@@ -619,31 +483,49 @@ $(function(){
         .attr('r', function(d){
             return(5);
         })
+        .attr("class", function(d){return(d['name'])})
         .attr('stroke-width', function(d){
             return(1);
         })
-        .style("fill", function(d) { return('#FFFFFF')})
         .style("stroke", function(d) {
             return('#000000')
         })
+        .on("mouseover", function(d) {
+        div.transition()
+            .duration(200)
+            .style("opacity", 0.9);
+            div.html(d.name)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+            .duration(500)
+            .style("opacity", 0);
+        });
 
         var idx = 1
         var duration = 100
-        var max_len = console.log(chart_json[0]['data'].length)
-        var myhandle = setInterval(function() {
-            if(idx>max_len){clearInterval(myhandle)}
-             d3.selectAll(placement_div+' circle')
-            .transition()
-            .ease('linear')
-            .duration(duration)
-            .attr('cx',function(d){
-                return(x(d['data'][idx]['kills']));
-            })
-            .attr('cy',function(d){
-                return(y(d['data'][idx]['dmg_dealt']));
-            })
-            idx +=1
-        }, duration);
+        var max_len = chart_json[0]['data'].length
+
+        $('#start-animation').on('click', function(){
+            var myhandle = setInterval(function() {
+                if(idx>max_len){
+                    idx = 1;
+                    clearInterval(myhandle);
+                }
+                 d3.selectAll(placement_div+' circle')
+                .transition()
+                .ease('linear')
+                .duration(duration)
+                .attr('cx',function(d){
+                    return(x(d['data'][idx]['kills']));
+                })
+                .attr('cy',function(d){
+                    return(y(d['data'][idx]['dmg_dealt']));
+                })
+                idx +=1
+        }, duration)});
     }
 
     var data = '/assets/787900748kill_dmg.json';
@@ -656,6 +538,7 @@ $(function(){
 </script>
 <script type="text/javascript">
 // Death Taken Scatter
+
 $(function(){
     function plot(chart_json){
     var margin = {top: 20, right: 20, bottom: 20, left: 50},
@@ -671,6 +554,7 @@ $(function(){
     y_label = 'Damage Taken'
     placement_div = "div#taken_dmg-deaths"
     transitionDelay = 500
+
     var x_min = 0,
         y_min = 0,
         x_max = d3.max(
@@ -703,8 +587,15 @@ $(function(){
 
     var yAxis = d3.svg.axis()
         .scale(y)
-        .orient("left");
+        .orient("left")
+        .tickFormat(function (d) {
+            strng = String(d/1000)+'K'
+            return strng;
+        });
 
+    var div = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
     inner_svg = d3.select(placement_div).append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -756,15 +647,33 @@ $(function(){
         .attr('stroke-width', function(d){
             return(1);
         })
-        .style("fill", function(d) { return('#FFFFFF')})
+        .attr("class", function(d){return(d['name'])})
         .style("stroke", function(d) {
             return('#000000')
         })
+        .on("mouseover", function(d) {
+        div.transition()
+            .duration(200)
+            .style("opacity", 0.9);
+            div.html(d.name)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+            .duration(500)
+            .style("opacity", 0);
+        });
+
 
         var duration = 100
-        var max_len = console.log(chart_json[0]['data'].length)
-        var myhandle =  setInterval(function() {
-            if(idx>=max_len){clearInterval(myhandle)}
+        var max_len = chart_json[0]['data'].length
+        $('#start-animation').on('click', function(){
+        var myhandle = setInterval(function() {
+            if(idx>max_len){
+                idx = 0;
+                clearInterval(myhandle)
+            }
              d3.selectAll(placement_div+' circle')
             .transition()
             .ease('linear')
@@ -776,7 +685,7 @@ $(function(){
                 return(y(d['data'][idx]['dmg_taken']));
             })
             idx +=1
-        }, duration);
+        }, duration)});
 
         var idx = 1
     }
@@ -793,6 +702,16 @@ $(function(){
 
 {% block extra_css %}
     <style type="text/css">
+    {% for key, value in css_color_dict.iteritems %}
+        .{{key}} {
+            fill: {{value}};
+        }
+    {% endfor %}
+    {% for key, value in slot_dict.iteritems %}
+        .player-slot-{{key}} {
+             box-shadow: 0 0 25.5px {{value}};
+        }
+    {% endfor %}
     path{
         fill: none;
     }

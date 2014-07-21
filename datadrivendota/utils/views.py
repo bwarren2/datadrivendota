@@ -10,6 +10,7 @@ def cast_dict(summary):
             'hero_id': summary.hero.steam_id,
             'is_win': summary.is_win,
             'is_radiant': summary.which_side() == 'Radiant',
+            'slot': summary.player_slot,
         }
     except ValueError:
         datadict = {
@@ -18,6 +19,7 @@ def cast_dict(summary):
             'hero_name': summary.hero.name,
             'is_win': summary.is_win,
             'is_radiant': summary.which_side() == 'Radiant',
+            'slot': summary.player_slot,
         }
     if summary.player.avatar is not None:
         datadict.update({'player_image': summary.player.avatar})

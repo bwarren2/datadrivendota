@@ -1,6 +1,6 @@
 {% if summary.hero_mugshot %}
   <div>
-    <img src="{{ summary.hero_mugshot_url }}" alt="{{ summary.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail">
+    <img src="{{ summary.hero_mugshot_url }}" alt="{{ summary.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail player-slot-{{summary.slot}}">
   </div>
 
   {% if summary.improper_player %}

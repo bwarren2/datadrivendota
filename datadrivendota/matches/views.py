@@ -207,6 +207,20 @@ def parse_preview(request):
         match=match
     ).select_related().order_by('player_slot')
 
+    slot_dict = {
+        0: '#1f77b4',
+        1: '#7EF6C6',
+        2: '#9A1D9B',
+        3: '#ECF14C',
+        4: '#DB7226',
+        128: '#E890BA',
+        129: '#99B15F',
+        130: '#75D1E1',
+        131: '#147335',
+        132: '#906A2B',
+    }
+
+    css_color_dict = {}
     for summary in summaries:
         summary.kda = summary.kills - summary.deaths + .5*summary.assists
         if summary.which_side() == 'Radiant':
@@ -217,7 +231,7 @@ def parse_preview(request):
             summary.improper_player = True
         if summary.is_win:
             summary.won = True
-
+        css_color_dict[summary.hero.internal_name] = slot_dict[summary.player_slot]
     match.hms_duration = datetime.timedelta(seconds=match.duration)
     match.hms_start_time = datetime.datetime.fromtimestamp(
         match.start_time
@@ -245,6 +259,8 @@ def parse_preview(request):
             'summaries': summaries,
             'radiant_cast_list': radiant_cast_list,
             'dire_cast_list': dire_cast_list,
+            'css_color_dict': css_color_dict,
+            'slot_dict': slot_dict,
         }
     )
 
