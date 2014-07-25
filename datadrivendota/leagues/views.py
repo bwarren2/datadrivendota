@@ -132,7 +132,7 @@ def league_list(request):
         for league in leagues:
             league_json = {}
             league_json['id'] = league.steam_id
-            league_json['label'] = league.leaguedossier.name
+            league_json['label'] = league.leaguedossier.display_name
             league_json['value'] = league.steam_id
             results.append(league_json)
 

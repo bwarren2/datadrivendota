@@ -142,7 +142,7 @@ def team_list(request):
             team_json = {}
             team_json['id'] = team.steam_id
             team_json['label'] = team.teamdossier.name
-            team_json['value'] = team.teamdossier.name
+            team_json['value'] = team.steam_id
             results.append(team_json)
 
         data = json.dumps(results)

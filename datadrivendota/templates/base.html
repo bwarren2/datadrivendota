@@ -91,18 +91,24 @@
               </ul>
             </li>
 
-            <li class="{% active 'items' main_nav %}"><a href="{% url 'items:index' %}">Items</a><span class="item-section-release-mark">alpha</span></li>
 
+          {% comment %}
+            <li class="{% active 'items' main_nav %}"><a href="{% url 'items:index' %}">Items</a><span class="item-section-release-mark">alpha</span></li>
+          {% endcomment %}
             <li class="dropdown {% active 'teams' main_nav %}">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Teams <span class="section-release-mark">alpha</span><b class="caret"></b></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Teams <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li class="{% active 'teams:index' %}"><a href="{% url 'teams:index' %}">Team Index</a></li>
+                <li class="{% active 'teams:winrate' %}"><a href="{% url 'teams:winrate' %}">Winrate</a></li>
+                <li class="{% active 'teams:pick_ban' %}"><a href="{% url 'teams:pick_ban' %}">Pick-Ban</a></li>
               </ul>
             </li>
             <li class="dropdown {% active 'leagues' main_nav %}">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Leagues <span class="section-release-mark">alpha</span><b class="caret"></b></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Leagues<b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li class="{% active 'leagues:index' %}"><a href="{% url 'leagues:index' %}">Leagues Index</a></li>
+                <li class="{% active 'leagues:winrate' %}"><a href="{% url 'leagues:winrate' %}">Winrate</a></li>
+                <li class="{% active 'leagues:pick_ban' %}"><a href="{% url 'leagues:pick_ban' %}">Pick-Ban</a></li>
               </ul>
             </li>
 

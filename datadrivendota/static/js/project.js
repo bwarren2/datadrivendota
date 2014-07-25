@@ -82,7 +82,7 @@ $(function () {
   ajax_select2ify('.single-match-tags', false, "One Match", "/matches/api/getmatches");
   ajax_select2ify('.multi-match-tags', true, "One or more Matches", "/matches/api/getmatches");
   ajax_select2ify('.single-team-tags', false, "One Team", "/teams/api/getteams");
-  ajax_select2ify('.single-league-tags', false, "One Team", "/teams/api/getleagues");
+  ajax_select2ify('.single-league-tags', false, "One League", "/leagues/api/getleagues");
   ajax_select2ify('.combobox-tags', false, "One Selector", "/matches/api/gettags");
 
   /* gettext library */

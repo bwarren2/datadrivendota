@@ -12,7 +12,7 @@ urlpatterns = patterns(
     url(
         r'^winrate/$',
         views.Winrate.as_view(),
-        name='team_winrate'
+        name='winrate'
     ),
     url(
         r'^pick-ban/$',

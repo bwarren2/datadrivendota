@@ -69,6 +69,7 @@ def league_winrate_json(
     if min_date_utc > max_date_utc:
         raise NoDataFound
 
+    print league
     try:
         league = League.objects.get(steam_id=league)
     except League.DoesNotExist:
@@ -83,6 +84,7 @@ def league_winrate_json(
     annotations = annotations.filter(
         match__league=league
         )
+    print league, annotations, min_date_utc, max_date_utc
     annotations = annotations.values('hero__name', 'is_win')\
         .annotate(Count('is_win'))
 
