@@ -12,6 +12,7 @@ from utils.charts import (
 from heroes.models import Hero
 from collections import defaultdict
 from time import mktime
+from utils import utcize
 
 if settings.VERBOSE_PROFILING:
     try:
@@ -57,19 +58,9 @@ def league_winrate_json(
         max_date=None,
         group_var='alignment',
         ):
-    if max_date is None:
-        max_date_utc = mktime(datetime.datetime.now().timetuple())
-    else:
-        max_date_utc = mktime(max_date.timetuple())
-    if min_date is None:
-        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
-    else:
-        min_date_utc = mktime(min_date.timetuple())
 
-    if min_date_utc > max_date_utc:
-        raise NoDataFound
+    min_date_utc, max_date_utc = utcize(min_date, max_date)
 
-    print league
     try:
         league = League.objects.get(steam_id=league)
     except League.DoesNotExist:
@@ -84,7 +75,7 @@ def league_winrate_json(
     annotations = annotations.filter(
         match__league=league
         )
-    print league, annotations, min_date_utc, max_date_utc
+
     annotations = annotations.values('hero__name', 'is_win')\
         .annotate(Count('is_win'))
 
@@ -174,17 +165,8 @@ def league_pick_ban_json(
         max_date=None,
         group_var='alignment',
         ):
-    if max_date is None:
-        max_date_utc = mktime(datetime.datetime.now().timetuple())
-    else:
-        max_date_utc = mktime(max_date.timetuple())
-    if min_date is None:
-        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
-    else:
-        min_date_utc = mktime(min_date.timetuple())
 
-    if min_date_utc > max_date_utc:
-        raise NoDataFound
+    min_date_utc, max_date_utc = utcize(min_date, max_date)
 
     try:
         league = League.objects.get(steam_id=league)

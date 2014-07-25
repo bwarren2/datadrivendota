@@ -17,7 +17,7 @@ from utils.charts import (
 from heroes.models import Hero, Role, HeroDossier
 from matches.models import SkillBuild
 from collections import defaultdict
-from time import mktime
+from utils import utcize
 
 if settings.VERBOSE_PROFILING:
     try:
@@ -65,17 +65,9 @@ def player_winrate_json(
         max_date=None,
         group_var='alignment',
         ):
-    if max_date is None:
-        max_date_utc = mktime(datetime.datetime.now().timetuple())
-    else:
-        max_date_utc = mktime(max_date.timetuple())
-    if min_date is None:
-        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
-    else:
-        min_date_utc = mktime(min_date.timetuple())
 
-    if min_date_utc > max_date_utc:
-        raise NoDataFound
+    min_date_utc, max_date_utc = utcize(min_date, max_date)
+
     if game_modes is None:
         game_modes = [
             gm.steam_id
@@ -292,19 +284,11 @@ def player_versus_winrate_json(
         group_var='alignment',
         plot_var='winrate',
         ):
-    if max_date is None:
-        max_date_utc = mktime(datetime.datetime.now().timetuple())
-    else:
-        max_date_utc = mktime(max_date.timetuple())
-    if min_date is None:
-        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
-    else:
-        min_date_utc = mktime(min_date.timetuple())
+
+    min_date_utc, max_date_utc = utcize(min_date, max_date)
 
     hero_classes = hero_classes_dict()
 
-    if min_date_utc > max_date_utc:
-        raise NoDataFound
     if game_modes is None:
         game_modes = [
             gm.steam_id
@@ -450,17 +434,7 @@ def player_hero_side_json(
         plot_var='winrate',
 ):
 
-    if max_date is None:
-        max_date_utc = mktime(datetime.datetime.now().timetuple())
-    else:
-        max_date_utc = mktime(max_date.timetuple())
-    if min_date is None:
-        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
-    else:
-        min_date_utc = mktime(min_date.timetuple())
-
-    if min_date_utc > max_date_utc:
-        raise NoDataFound
+    min_date_utc, max_date_utc = utcize(min_date, max_date)
 
     all_heroes = Hero.public.all()
     hero_names = {h.name: h for h in all_heroes}

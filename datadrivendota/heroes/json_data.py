@@ -1,7 +1,5 @@
 import operator
 from itertools import chain
-from time import mktime
-import datetime
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -29,6 +27,7 @@ from utils.charts import (
     XYPlot, BarPlot, TasselPlot, TasselDataPoint,
     valid_var,
     )
+from utils import utcize
 
 if settings.VERBOSE_PROFILING:
     try:
@@ -620,14 +619,7 @@ def hero_performance_lineup(
     max_date=None,
 ):
 
-    if max_date is None:
-        max_date_utc = mktime(datetime.datetime.now().timetuple())
-    else:
-        max_date_utc = mktime(max_date.timetuple())
-    if min_date is None:
-        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
-    else:
-        min_date_utc = mktime(min_date.timetuple())
+    min_date_utc, max_date_utc = utcize(min_date, max_date)
 
     selected_names = [h.name for h in Hero.public.filter(steam_id__in=heroes)]
 
