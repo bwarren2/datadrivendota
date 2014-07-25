@@ -263,7 +263,7 @@ function get_fade_opacity(params){
   return params.fadeOpacity;
 }
 
-function draw_scatterplot(source, placement_div){
+function draw_scatterplot(source, placement_div, callback){
     var raw_data = source['data'];
     var params = source['parameters'];
     var groups = source['groups'];
@@ -374,8 +374,12 @@ function draw_scatterplot(source, placement_div){
     if(params['draw_legend']){
       draw_legend(params, groups, svg, color);
     }
+    if (typeof callback === 'function'){
+      callback();
+    }
+
 }
-function draw_barplot(source, placement_div){
+function draw_barplot(source, placement_div, callback){
   var raw_data = source['data'];
   var params = source['parameters'];
   var groups = source['groups'];
@@ -480,10 +484,14 @@ function draw_barplot(source, placement_div){
   if(params['draw_legend']){
     draw_legend(params, groups, svg, color);
   }
+  if (typeof callback === 'function'){
+    callback();
+  }
+
 }
 
 
-function draw_scatterseries(source, placement_div){
+function draw_scatterseries(source, placement_div, callback){
   var raw_data = source['data'];
   var params = source['parameters'];
   var groups = source['groups'];
@@ -591,21 +599,22 @@ function draw_scatterseries(source, placement_div){
   if(params['draw_legend']){
     draw_legend(params, groups, svg, color);
   }
+  if (typeof callback === 'function'){
+    callback();
+  }
+
 }
 
 
 function plot(source, div, callback){
     if(source.parameters['chart']=='xyplot'){
-        draw_scatterplot(source, div);
+        draw_scatterplot(source, div, callback);
     }
     else if(source.parameters['chart']=='barplot'){
-        draw_barplot(source, div);
+        draw_barplot(source, div, callback);
     }
     else if(source.parameters['chart']=='scatterseries'){
-        draw_scatterseries(source, div);
-    }
-    if (typeof callback === 'function'){
-      callback();
+        draw_scatterseries(source, div, callback);
     }
 
 }
