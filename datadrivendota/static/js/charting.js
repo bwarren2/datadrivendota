@@ -497,7 +497,6 @@ function draw_scatterseries(source, placement_div, callback){
   var groups = source['groups'];
   var panels = source['panels'];
   params['draw_path'] = 'True';
-  params['draw_legend'] = 'True';
 
   data = d3.nest()
   .key(function(d){return d.panel_var;})
