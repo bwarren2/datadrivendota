@@ -25,7 +25,7 @@
   {% include "matches/_match_cards.html" %}
 
   <div class="row">
-    <div class="charts col-md-6">
+    <div id='level-row' class="charts col-md-6">
     <h4>Level Progression</h4>
           <span id='abilities'></span>
     </div>
@@ -37,7 +37,7 @@
   </div>
 
   <div class="row">
-    <div class="charts col-md-6">
+    <div id='matchup-data' class="charts col-md-6">
     <h4>Matchup Data</h4>
         <span id='kill_dmg'></span>
         <span id='xp_gold'></span>
@@ -51,7 +51,7 @@
   </div>
 
   <div class="row">
-    <div class="charts col-md-6">
+    <div id='last-hit-chart' class="charts col-md-6">
     <h4>Last Hits</h4>
         <span id='last_hits'></span>
     </div>
@@ -63,7 +63,7 @@
   </div>
 
   {% if dire_bans or radiant_bans %}
-    <h4>Picks and Bans</h4>
+    <h4 id='pickban-tool'>Picks and Bans</h4>
     <div class="row controls-button">
       <div class="col-sm-12 text-center">
         <div>
