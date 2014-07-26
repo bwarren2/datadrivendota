@@ -690,7 +690,7 @@ def match_list_json(matches, players):
     c.groups = groups
     c.params.x_min = 0
     c.params.path_stroke_width = 3
-    c.params.x_label = 'Time (m)'
+    c.params.x_label = 'Replay Time (m)'
     c.params.y_label = 'Level'
 
     return c
