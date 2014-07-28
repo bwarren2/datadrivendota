@@ -200,24 +200,23 @@ def match(request, match_id):
 
 
 @devserver_profile()
-def parse_preview(request):
-    match_id = 787900748
+def parse_preview(request, match_id=787900748):
     match = Match.objects.get(steam_id=match_id)
     summaries = PlayerMatchSummary.objects.filter(
         match=match
     ).select_related().order_by('player_slot')
 
     slot_dict = {
-        0: '#7CD51B', #1f77b4', #Radiant #7CD51B
-        1: '#7CD51B',#7EF6C6',
-        2: '#7CD51B',#9A1D9B',
-        3: '#7CD51B',#ECF14C',
-        4: '#7CD51B',#DB7226',
-        128: '#BA3B15', #E890BA',
-        129: '#BA3B15', #99B15F',
-        130: '#BA3B15', #75D1E1',
-        131: '#BA3B15', #147335',
-        132: '#BA3B15', #906A2B', #Dire  #BA3B15
+        0: '#7CD51B',  # 1f77b4', #Radiant #7CD51B
+        1: '#7CD51B',  # 7EF6C6',
+        2: '#7CD51B',  # 9A1D9B',
+        3: '#7CD51B',  # ECF14C',
+        4: '#7CD51B',  # DB7226',
+        128: '#BA3B15',  # E890BA',
+        129: '#BA3B15',  # 99B15F',
+        130: '#BA3B15',  # 75D1E1',
+        131: '#BA3B15',  # 147335',
+        132: '#BA3B15',  # 906A2B', #Dire  #BA3B15
     }
 
     css_color_dict = {}
@@ -231,7 +230,9 @@ def parse_preview(request):
             summary.improper_player = True
         if summary.is_win:
             summary.won = True
-        css_color_dict[summary.hero.internal_name] = slot_dict[summary.player_slot]
+        css_color_dict[
+            summary.hero.internal_name
+        ] = slot_dict[summary.player_slot]
     match.hms_duration = datetime.timedelta(seconds=match.duration)
     match.hms_start_time = datetime.datetime.fromtimestamp(
         match.start_time
@@ -251,6 +252,7 @@ def parse_preview(request):
     for summary in dire_summaries:
         dire_cast_list.append(cast_dict(summary))
 
+
     return render(
         request,
         'matches/parse_preview.html',
@@ -261,6 +263,7 @@ def parse_preview(request):
             'dire_cast_list': dire_cast_list,
             'css_color_dict': css_color_dict,
             'slot_dict': slot_dict,
+            'side_kills': 'replay_parse_json/'+str(match.steam_id)+'_kills.json'
         }
     )
 

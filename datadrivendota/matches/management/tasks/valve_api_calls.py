@@ -1251,31 +1251,6 @@ def map_team_players(teamdoss, team):
             setattr(teamdoss, internal, p)
 
 
-# def get_logo_image(logo, team, suffix):
-#         mode = 'GetUGCFileDetails'
-#         c = ApiContext()
-#         c.ugcid = logo
-#         URL = ('http://api.steampowered.com/ISteamRemoteStorage/'
-#                'GetUGCFileDetails/v1/?appid=570&') + \
-#             urlencode(c.toUrlDict(mode))
-#         logger.info("URL: {0}".format(URL))
-#         try:
-#             pageaccess = urllib2.urlopen(URL, timeout=5)
-#             data = json.loads(pageaccess.read())['data']
-#             URL = data['url']
-#         except urllib2.HTTPError as err:
-#             logger.error("{0} for {1}".format(err.code, URL))
-
-#         try:
-#             imgdata = urllib2.urlopen(URL, timeout=5)
-#             with open('%s.png' % str(uuid4()), 'w+') as f:
-#                 f.write(imgdata.read())
-#             filename = slugify(team.teamdossier.name)+suffix
-#             return filename, f
-#         except urllib2.HTTPError as err:
-#             logger.error("{0} for {1}".format(err.code, URL))
-
-
 def send_error_email(body):
     smtp = SMTP()
     debuglevel = 0
