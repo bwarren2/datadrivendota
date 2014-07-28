@@ -35,7 +35,7 @@
 
             </div>
 
-             <div class='col-md-4' id='life'>
+             <div class='col-md-4' id='side-last-hits'>
                 <h4>Last Hits <span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Last hits on the neutrals list or opposing side creeps.  Not a perfect map to the reported last hits number yet." data-placement="right"></span></h4>
             </div>
 
@@ -212,414 +212,272 @@ $(function(){
         });
     }
 
+    function hero_dot_plot(
+        chart_json,
+        margin,
+        x_var,
+        x_label,
+        y_var,
+        y_label,
+        placement_div
+        ){
+
+        var padding = {top: 0, right: 0, bottom: 0, left: 0},
+            outerWidth = 300,
+            outerHeight = 300,
+            innerWidth = outerWidth - margin.left - margin.right,
+            innerHeight = outerHeight - margin.top - margin.bottom;
+            width = innerWidth - padding.left - padding.right,
+            height = innerHeight - padding.top - padding.bottom;
+
+        var transitionDelay = 500
+        var x_min = 0,
+            y_min = 0,
+            x_max = d3.max(
+                chart_json,
+                function(d){
+                    return(d3.max(d['data'], function(p){
+                        return(p[x_var])
+                    }))
+                });
+            y_max = d3.max(
+                chart_json,
+                function(d){
+                    return(d3.max(d['data'], function(p){
+                        return(p[y_var])
+                    }))
+                });
+
+        function toTitleCase(str)
+        {
+            temp = str.replace('npc_dota_hero_', ' ')
+            temp = temp.replace('_', ' ')
+            return temp.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+        }
+
+        var x = d3.scale.linear()
+            .range([0, width])
+            .domain([x_min, x_max]);
+
+        var y = d3.scale.linear()
+            .range([height, 0])
+            .domain([y_min, y_max]);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .ticks(6)
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+        if (y_max >= 1000){
+            yAxis.tickFormat(function (d) {
+                strng = String(d/1000)+'K'
+                return strng;
+            });
+        }
+
+        var line = d3.svg.line()
+            .x(function(d){
+                return x(d[x_var])
+            })
+            .y(function(d){
+                return y(d[y_var])
+            });
+
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+
+        inner_svg = d3.select(placement_div).append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("class", 'outer-chart')
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .attr("class", 'inner-chart')
+
+        //Draw X
+        inner_svg.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+            .append("text")
+            .attr("class", "x-axis-label")
+            .attr("y", -16)
+            .attr("x", width)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text(x_label);
+
+        //Draw Y
+        inner_svg.append("g")
+            .attr("class", "y-axis")
+            .attr("transform", "translate(0,0)")
+            .call(yAxis)
+            .append("text")
+            .attr("class", "y-axis-label")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text(y_label);
+
+        inner_svg.selectAll('.series')
+            .data(chart_json)
+            .enter()
+            .append('circle')
+            .attr('cx',function(d){
+                return(x(d['data'][0][x_var]));
+            })
+            .attr('cy',function(d){
+                return(y(d['data'][0][y_var]));
+            })
+            .attr('r', function(d){
+                return(5);
+            })
+            .style("stroke", function(d) {return('#000000');})
+            .attr("class", function(d){return(d['name'])})
+            .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", 0.9);
+
+                div.html(toTitleCase(d.name))
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+            .on("mouseout", function(d) {
+                div.transition()
+                .duration(500)
+                .style("opacity", 0);
+            });
+
+            var idx = 1
+            var duration = 100
+            var max_len = chart_json[0]['data'].length
+
+            $('#start-animation').on('click', function(){
+                var myhandle = setInterval(function() {
+                     d3.selectAll(placement_div+' circle')
+                    .transition()
+                    .ease('linear')
+                    .duration(duration)
+                    .attr('cx',function(d){
+                        return(x(d['data'][idx][x_var]));
+                    })
+                    .attr('cy',function(d){
+                        return(y(d['data'][idx][y_var]));
+                    })
+                    idx +=1
+                    if(idx>=max_len){
+                        clearInterval(myhandle);
+                        idx = 1;
+                    }
+            }, duration)});
+        }
+
+
     // Side Towers
-    var data = '{% static '787900748towers.json' %}';
-    var sides = $.getJSON(data, function(data){
-        margin = {top: 20, right: 20, bottom: 20, left: 50}
-        x_label = 'Time'
-        y_label = 'Tower Damage'
-        placement_div = "div#tower-dmg"
-        x_var = 'time'
-        y_var = 'dmg'
-        slider_name = 'tower-slider'
-        chart_json = sides['responseJSON'];
+    var data = '{% static side_towers %}';
+    var side_towers = $.getJSON(data, function(data){
+        chart_json = side_towers['responseJSON'];
         side_plot(
             chart_json,
-            x_var,
-            x_label,
-            y_var,
-            y_label,
-            placement_div,
-            margin,
-            slider_name
+            x_var='time',
+            x_label='Time',
+            y_var='dmg',
+            y_label='Tower Damage',
+            placement_div="div#tower-dmg",
+            margin={top: 20, right: 20, bottom: 20, left: 50},
+            slider_name='tower-slider'
         )
     });
 
     // Side Kills
-    var data = '{% static '787900748kills.json' %}';
-    var kills = $.getJSON(data, function(data){
-        margin = {top: 20, right: 20, bottom: 20, left: 30}
-        x_label = 'Time'
-        y_label = 'Kills'
-        placement_div = "div#kills"
-        x_var = 'time'
-        y_var = 'kills'
-        slider_name = 'dmg-slider'
-        chart_json = kills['responseJSON'];
-        side_plot(
-            chart_json,
-            x_var,
-            x_label,
-            y_var,
-            y_label,
-            placement_div,
-            margin,
-            slider_name
-        )
-    });
-
     var data = '{% static side_kills %}';
-    console.log(data)
-    var kills = $.getJSON(data, function(data){
-        margin = {top: 20, right: 20, bottom: 20, left: 30}
-        x_label = 'Time'
-        y_label = 'Kills'
-        placement_div = "div#kills"
-        x_var = 'time'
-        y_var = 'kills'
-        slider_name = 'dmg-slider'
-        chart_json = kills['responseJSON'];
+    var side_kills = $.getJSON(data, function(data){
+        chart_json = side_kills['responseJSON'];
         side_plot(
             chart_json,
-            x_var,
-            x_label,
-            y_var,
-            y_label,
-            placement_div,
-            margin,
-            slider_name
+            x_var='time',
+            x_label='Time',
+            y_var='kills',
+            y_label='Kills',
+            placement_div="div#kills",
+            margin={top: 20, right: 20, bottom: 20, left: 30},
+            slider_name='dmg-slider'
         )
     });
 
-})
-</script>
-<script type="text/javascript">
-// Kill Dmg Scatter
-var chart_json
-$(function(){
-
-    function plot(chart_json){
-    var margin = {top: 20, right: 20, bottom: 20, left: 50},
-        padding = {top: 0, right: 0, bottom: 0, left: 0},
-        outerWidth = 300,
-        outerHeight = 300,
-        innerWidth = outerWidth - margin.left - margin.right,
-        innerHeight = outerHeight - margin.top - margin.bottom;
-        width = innerWidth - padding.left - padding.right,
-        height = innerHeight - padding.top - padding.bottom;
-
-    var x_label = 'Kills'
-    var y_label = 'Hero Damage'
-    var placement_div = "div#dealt_dmg-kill"
-    var transitionDelay = 500
-    var x_min = 0,
-        y_min = 0,
-        x_max = d3.max(
+    //Side Creeps
+    var data = '{% static side_creeps %}';
+    var side_creeps = $.getJSON(data, function(data){
+        chart_json = side_creeps['responseJSON'];
+        side_plot(
             chart_json,
-            function(d){
-                return(d3.max(d['data'], function(p){
-                    return(p['kills'])
-                }))
-            });
-        y_max = d3.max(
-            chart_json,
-            function(d){
-                return(d3.max(d['data'], function(p){
-                    return(p['dmg_dealt'])
-                }))
-            });
-
-    function toTitleCase(str)
-    {
-        temp = str.replace('npc_dota_hero_', ' ')
-        temp = temp.replace('_', ' ')
-        return temp.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-    }
-
-    var x = d3.scale.linear()
-        .range([0, width])
-        .domain([x_min, x_max]);
-
-    var y = d3.scale.linear()
-        .range([height, 0])
-        .domain([y_min, y_max]);
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .ticks(6)
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .tickFormat(function (d) {
-            strng = String(d/1000)+'K'
-            return strng;
-        });
-
-    var line = d3.svg.line()
-        .x(function(d){
-            return x(d['time'])
-        })
-        .y(function(d){
-            return y(d['dmg'])
-        });
-
-    var div = d3.select("body").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
-
-
-    inner_svg = d3.select(placement_div).append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .attr("class", 'outer-chart')
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .attr("class", 'inner-chart')
-
-    //Draw X
-    inner_svg.append("g")
-        .attr("class", "x-axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        .append("text")
-        .attr("class", "x-axis-label")
-        .attr("y", -16)
-        .attr("x", width)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text(x_label);
-
-    //Draw Y
-    inner_svg.append("g")
-        .attr("class", "y-axis")
-        .attr("transform", "translate(0,0)")
-        .call(yAxis)
-        .append("text")
-        .attr("class", "y-axis-label")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text(y_label);
-
-    inner_svg.selectAll('.series')
-        .data(chart_json)
-        .enter()
-        .append('circle')
-        .attr('cx',function(d){
-            return(x(d['data'][0]['kills']));
-        })
-        .attr('cy',function(d){
-            return(y(d['data'][0]['dmg_dealt']));
-        })
-        .attr('r', function(d){
-            return(5);
-        })
-        .style("stroke", function(d) {return('#000000');})
-        .attr("class", function(d){return(d['name'])})
-        .on("mouseover", function(d) {
-        div.transition()
-            .duration(200)
-            .style("opacity", 0.9);
-
-            div.html(toTitleCase(d.name))
-            .style("left", (d3.event.pageX) + "px")
-            .style("top", (d3.event.pageY - 28) + "px");
-        })
-        .on("mouseout", function(d) {
-            div.transition()
-            .duration(500)
-            .style("opacity", 0);
-        });
-
-        var idx = 1
-        var duration = 100
-        var max_len = chart_json[0]['data'].length
-
-        $('#start-animation').on('click', function(){
-            var myhandle = setInterval(function() {
-                if(idx>=max_len){
-                    clearInterval(myhandle);
-                    idx = 1;
-                }
-                 d3.selectAll(placement_div+' circle')
-                .transition()
-                .ease('linear')
-                .duration(duration)
-                .attr('cx',function(d){
-                    return(x(d['data'][idx]['kills']));
-                })
-                .attr('cy',function(d){
-                    return(y(d['data'][idx]['dmg_dealt']));
-                })
-                idx +=1
-        }, duration)});
-    }
-
-    var data = '{% static '787900748kill_dmg.json' %}';
-    var foo = $.getJSON(data, function(data){
-        var chart_json = foo['responseJSON'];
-        plot(chart_json);
+            x_var='time',
+            x_label='Time',
+            y_var='creep_kills',
+            y_label='Creep Kills',
+            placement_div="div#side-last-hits",
+            margin={top: 20, right: 20, bottom: 20, left: 40},
+            slider_name='creep-slider'
+        )
     });
 
-})
-</script>
-<script type="text/javascript">
-// Death Taken Scatter
-
-$(function(){
-    function plot(chart_json){
-    var margin = {top: 20, right: 20, bottom: 20, left: 50},
-        padding = {top: 0, right: 0, bottom: 0, left: 0},
-        outerWidth = 300,
-        outerHeight = 300,
-        innerWidth = outerWidth - margin.left - margin.right,
-        innerHeight = outerHeight - margin.top - margin.bottom;
-        width = innerWidth - padding.left - padding.right,
-        height = innerHeight - padding.top - padding.bottom;
-
-    x_label = 'Deaths'
-    y_label = 'Damage Taken'
-    placement_div = "div#taken_dmg-deaths"
-    transitionDelay = 500
-
-    function toTitleCase(str)
-    {
-        temp = str.replace('npc_dota_hero_', ' ')
-        temp = temp.replace('_', ' ')
-        return temp.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-    }
-
-    var x_min = 0,
-        y_min = 0,
-        x_max = d3.max(
+    //Hero Kills
+    var data = '{% static hero_kills %}';
+    var hero_kills = $.getJSON(data, function(data){
+        chart_json = hero_kills['responseJSON'];
+        hero_dot_plot(
             chart_json,
-            function(d){
-                return(d3.max(d['data'], function(p){
-                    return(p['deaths'])
-                }))
-            });
-        y_max = d3.max(
-            chart_json,
-            function(d){
-                return(d3.max(d['data'], function(p){
-                    return(p['dmg_taken'])
-                }))
-            });
-
-    var x = d3.scale.linear()
-        .range([0, width])
-        .domain([x_min, x_max]);
-
-    var y = d3.scale.linear()
-        .range([height, 0])
-        .domain([y_min, y_max]);
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .ticks(6)
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .tickFormat(function (d) {
-            strng = String(d/1000)+'K'
-            return strng;
-        });
-
-    var div = d3.select("body").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
-
-    inner_svg = d3.select(placement_div).append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .attr("class", 'outer-chart')
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .attr("class", 'inner-chart')
-
-    //Draw X
-    inner_svg.append("g")
-        .attr("class", "x-axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        .append("text")
-        .attr("class", "x-axis-label")
-        .attr("y", -16)
-        .attr("x", width)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text(x_label);
-
-    //Draw Y
-    inner_svg.append("g")
-        .attr("class", "y-axis")
-        .attr("transform", "translate(0,0)")
-        .call(yAxis)
-        .append("text")
-        .attr("class", "y-axis-label")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text(y_label);
-
-    inner_svg.selectAll('.series')
-        .data(chart_json)
-        .enter()
-        .append('circle')
-        .attr('cx',function(d){
-            return(x(d['data'][0]['deaths']));
-        })
-        .attr('cy',function(d){
-            return(y(d['data'][0]['dmg_taken']));
-        })
-        .attr('r', function(d){
-            return(5);
-        })
-        .attr("class", function(d){return(d['name'])})
-        .style("stroke", function(d) {return('#000000');})
-        .on("mouseover", function(d) {
-        div.transition()
-            .duration(200)
-            .style("opacity", 0.9);
-            div.html(toTitleCase(d.name))
-            .style("left", (d3.event.pageX) + "px")
-            .style("top", (d3.event.pageY - 28) + "px");
-        })
-        .on("mouseout", function(d) {
-            div.transition()
-            .duration(500)
-            .style("opacity", 0);
-        });
-
-
-        var duration = 100
-        var max_len = chart_json[0]['data'].length
-        $('#start-animation').on('click', function(){
-        var myhandle = setInterval(function() {
-            if(idx>=max_len){
-                idx = 1;
-                clearInterval(myhandle)
-            }
-             d3.selectAll(placement_div+' circle')
-            .transition()
-            .ease('linear')
-            .duration(duration)
-            .attr('cx',function(d){
-                return(x(d['data'][idx]['deaths']));
-            })
-            .attr('cy',function(d){
-                return(y(d['data'][idx]['dmg_taken']));
-            })
-            idx +=1
-        }, duration)});
-
-        var idx = 1
-    }
-
-    var data = '{% static '787900748death_dmg.json' %}';
-    var foo = $.getJSON(data, function(data){
-        var chart_json = foo['responseJSON'];
-        plot(chart_json);
+            margin={top: 20, right: 20, bottom: 20, left: 50},
+            x_var='kills',
+            x_label='Kills',
+            y_var='dmg_dealt',
+            y_label='Hero Damage',
+            placement_div="div#dealt_dmg-kill"
+        )
     });
 
+    //Hero Deaths
+    var data = '{% static hero_deaths %}';
+    var hero_deaths = $.getJSON(data, function(data){
+        chart_json = hero_deaths['responseJSON'];
+        hero_dot_plot(
+            chart_json,
+            margin={top: 20, right: 20, bottom: 20, left: 50},
+            x_var='deaths',
+            x_label='Deaths',
+            y_var='dmg_taken',
+            y_label='Damage Taken',
+            placement_div="div#taken_dmg-deaths"
+        )
+    });
+
+    //Hero Deaths
+    var data = '{% static hero_creeps %}';
+    var hero_creeps = $.getJSON(data, function(data){
+        chart_json = hero_creeps['responseJSON'];
+        hero_dot_plot(
+            chart_json,
+            margin={top: 20, right: 20, bottom: 20, left: 50},
+            x_var='creep_kills',
+            x_label='Creep Kills',
+            y_var='level',
+            y_label='Level',
+            placement_div="div#lasthits-lvls"
+        )
+    });
+
+
+
 })
 </script>
+
 {% endblock extra_js %}
 
 {% block extra_css %}

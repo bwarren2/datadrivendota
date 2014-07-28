@@ -201,7 +201,6 @@ def match(request, match_id):
 
 @devserver_profile()
 def parse_preview(request, match_id=787900748):
-    match = Match.objects.get(steam_id=match_id)
     summaries = PlayerMatchSummary.objects.filter(
         match=match
     ).select_related().order_by('player_slot')
@@ -263,7 +262,12 @@ def parse_preview(request, match_id=787900748):
             'dire_cast_list': dire_cast_list,
             'css_color_dict': css_color_dict,
             'slot_dict': slot_dict,
-            'side_kills': 'replay_parse_json/'+str(match.steam_id)+'_kills.json'
+            'side_kills': 'replay_parse_json/'+str(match.steam_id)+'_kills.json',
+            'side_creeps': 'replay_parse_json/'+str(match.steam_id)+'_creeps.json',
+            'side_towers': 'replay_parse_json/'+str(match.steam_id)+'_towers.json',
+            'hero_kills': 'replay_parse_json/'+str(match.steam_id)+'_kill_dmg.json',
+            'hero_deaths': 'replay_parse_json/'+str(match.steam_id)+'_death_dmg.json',
+            'hero_creeps': 'replay_parse_json/'+str(match.steam_id)+'_hero_creeps.json',
         }
     )
 
