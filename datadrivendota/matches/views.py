@@ -201,6 +201,10 @@ def match(request, match_id):
 
 @devserver_profile()
 def parse_preview(request, match_id=787900748):
+    try:
+        match = Match.objects.get(steam_id=match_id)
+    except Match.DoesNotExist:
+        raise Http404
     summaries = PlayerMatchSummary.objects.filter(
         match=match
     ).select_related().order_by('player_slot')
