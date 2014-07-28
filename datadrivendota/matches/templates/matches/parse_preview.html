@@ -23,8 +23,14 @@
   {% include "matches/_match_cards.html" %}
 
     <div class='container'>
-        <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Start Animation</button>
-        <div class='row' id='header'></div>
+        <div class='col-md-4 col-md-offset-2' id='header'>
+            <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Start Animation</button>
+
+        </div>
+        <div class='col-md-4' id='header'>
+            <a href="{%url 'matches:match_detail' match_id=match.steam_id%}"><button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Match Summary</button></a>
+
+        </div>
         <div class='row' id='side-charts'>
             <div class='col-md-4' id='kills'>
                 <h4>Hero Kills <span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Kills by team, from combat log.  Times are replay time, so the flat stretch is drafting." data-placement="right"></span></h4>
@@ -53,9 +59,6 @@
             </div>
 
         </div>
-        <a href="http://www.datadrivendota.com/blog/2014/07/21/ti4-and-replay-parsing/">
-        <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Related Blog Post</button>
-        </a>
     </div>{% endblock content %}
 
 {% block extra_js %}
