@@ -25,6 +25,11 @@ urlpatterns = patterns(
         views.MatchParameterChart.as_view(),
         name='match_parameter_scatter'
     ),
+    url(
+        r'^(?P<match_id>[0-9\-]*)/parse$',
+        views.parse_preview,
+        name="match_parse"
+    ),
     url(r'^(?P<match_id>[0-9\-]*)/$', views.match, name="match_detail"),
     url(
         r'^ability-build/$',

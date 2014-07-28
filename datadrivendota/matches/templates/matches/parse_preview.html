@@ -173,13 +173,16 @@ $(function(){
             .style("text-anchor", "end")
             .text(y_label);
 
+        var max_len;
         inner_svg.selectAll('.series')
             .data(chart_json)
             .enter()
             .append('g')
             .append("svg:path")
             .attr("d", function(d){
-                return(line(d['data']));})
+                max_len = d['data'].length
+                return(line(d['data']));
+            })
             .style("stroke-width", 2)
             .style("stroke", function(d) {
               return(d['color']);
@@ -195,7 +198,7 @@ $(function(){
 
         var idx = 1
         var duration = 100
-        var max_len = chart_json[0][data].length
+        // var max_len = chart_json[0][data].length
 
         $('#start-animation').on('click', function(){
             var myhandle = setInterval(function() {
