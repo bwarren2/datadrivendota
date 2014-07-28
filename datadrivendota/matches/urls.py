@@ -28,7 +28,7 @@ urlpatterns = patterns(
     url(
         r'^(?P<match_id>[0-9\-]*)/parse$',
         views.parse_preview,
-        name="match_parse"
+        name="parse"
     ),
     url(r'^(?P<match_id>[0-9\-]*)/$', views.match, name="match_detail"),
     url(
