@@ -240,6 +240,11 @@ $(function(){
                 stop()
                 idx=1
             }
+            if(idx<=0){
+                stop()
+                idx=max_len
+            }
+
              d3.selectAll('.'+slider_name)
             .transition()
             .duration(duration)
@@ -439,6 +444,11 @@ $(function(){
                     stop()
                     idx=1
                 }
+                if(idx<=0){
+                    stop()
+                    idx=max_len
+                }
+
                 d3.selectAll(placement_div+' circle')
                     .transition()
                     .ease('linear')
