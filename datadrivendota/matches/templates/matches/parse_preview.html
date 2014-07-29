@@ -24,15 +24,28 @@
 
     <div class='container'>
         <div class='row' id='buttons'>
-            <div class='col-md-3'>
-                <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Start Animation</button>
-                <button id='stop-animation' type="button" class="btn btn-primary btn-lg btn-block">Stop Animation</button>
+            <h2>Animation:</h2>
+            <div class='col-md-1'>
+                <button id='stop-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Stop</button>
+            </div>
+            <div class='col-md-1'>
+                <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Start</button>
+            </div>
+            <div class='col-md-1'>
+                <button id='back-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+                    <span  class="info glyphicon glyphicon-backward">
+                </button>
+            </div>
+            <div class='col-md-1'>
+                <button id='forward-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+                    <span  class="info glyphicon glyphicon-forward">
+                </button>
             </div>
             <div class='col-md-2'>
                 <input style='margin-top:5px' id='time-display' class='form-control' type='text' placeholder='Replay Time' readonly>
             </div>
 
-            <div class='col-md-4 col-md-offset-3' id='related-match'>
+            <div class='col-md-4 col-md-offset-1' id='related-match'>
                 <a href="{%url 'matches:match_detail' match_id=match.steam_id%}"><button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Match Summary</button></a>
 
             </div>
@@ -67,7 +80,7 @@
         </div>
         <div class='row'>
             <div class='col-md-6 col-md-offset-3' id='note'>
-                <p>Note: This is alpha tech.  There are some known issues (the way kills are counted cannot detect resurrections, the last hit set is not quite right) but the gist is here.</p>
+                <p>Note: This is alpha tech.  There are some known issues (the way kills are counted cannot detect resurrections, the last hit set is not quite right, the charts desync after a while) but the gist is here.</p>
             </div>
         </div>
 
@@ -251,13 +264,25 @@ $(function(){
         $('#start-animation').bind("click", function(){
             $('#start-animation').toggle();
             $('#stop-animation').toggle();
+            $('#back-animation').toggle();
+            $('#forward-animation').toggle();
             start();
         }); // use .on in jQuery 1.7+
 
         $('#stop-animation').bind("click", function(){
             $('#start-animation').toggle();
             $('#stop-animation').toggle();
+            $('#back-animation').toggle();
+            $('#forward-animation').toggle();
             stop();
+        });
+        $('#back-animation').bind("click", function(){
+            --idx
+            update();
+        });
+        $('#forward-animation').bind("click", function(){
+            ++idx
+            update();
         });
 
     }
@@ -452,6 +477,15 @@ $(function(){
                 // $('#stop-animation').toggle();
                 stop();
             });
+            $('#back-animation').bind("click", function(){
+                --idx
+                update();
+            });
+            $('#forward-animation').bind("click", function(){
+                ++idx
+                update();
+            });
+
         }
 
 
@@ -569,6 +603,9 @@ $(function(){
     {% endfor %}
     path{
         fill: none;
+    }
+    .animation-button{
+        height:45px;
     }
     </style>
 {% endblock extra_css %}
