@@ -219,14 +219,12 @@ $(function(){
             .style("text-anchor", "end")
             .text(y_label);
 
-        var max_len;
         inner_svg.selectAll('.series')
             .data(chart_json)
             .enter()
             .append('g')
             .append("svg:path")
             .attr("d", function(d){
-                max_len = d['data'].length
                 return(line(d['data']));
             })
             .style("stroke-width", 2)
@@ -236,7 +234,7 @@ $(function(){
 
         inner_svg.append('g')
             .append("rect")
-            .attr("x", x(0))
+            .attr("x", x(x_min))
             .attr("y", y(y_max))
             .attr("width", 3)
             .attr("height", height+2)
@@ -244,27 +242,33 @@ $(function(){
 
         var idx = 0
         var duration = 100
-        // var max_len = chart_json[0][data].length
+        var max_len = chart_json[0]['data'].length
 
         var update = function () {
-            updateTimer(idx*10)
             if(idx>=max_len){
                 stop()
-                idx=1
+                idx=0
             }
-            if(idx<=0){
+            if(idx<0){
                 stop()
-                idx=max_len
+                idx=max_len-1
             }
+            // alert(idx)
+            // alert(max_len)
+            // alert(chart_json[0]['data'][idx])
+            // alert(chart_json[0]['data'].length)
+            updateTimer(chart_json[0]['data'][idx]['time'])
 
              d3.selectAll('.'+slider_name)
             .transition()
             .duration(duration)
-            .attr('x', function(){return x(idx*10)});
+            .attr('x', function(){
+                return x(chart_json[0]['data'][idx]['time'])
+            });
         }
 
         var tick = function(){
-            ++idx
+            ++idx;
             start()
         }
 
@@ -278,27 +282,27 @@ $(function(){
             clearTimeout(myhandle)
         }
 
-        $('#start-animation').bind("click", function(){
+        $('#start-animation').on("click", function(){
             $('#start-animation').toggle();
             $('#stop-animation').toggle();
             $('#back-animation').toggle();
             $('#forward-animation').toggle();
             start();
-        }); // use .on in jQuery 1.7+
+        });
 
-        $('#stop-animation').bind("click", function(){
+        $('#stop-animation').on("click", function(){
             $('#start-animation').toggle();
             $('#stop-animation').toggle();
             $('#back-animation').toggle();
             $('#forward-animation').toggle();
             stop();
         });
-        $('#back-animation').bind("click", function(){
-            --idx
+        $('#back-animation').on("click", function(){
+            --idx;
             update();
         });
-        $('#forward-animation').bind("click", function(){
-            ++idx
+        $('#forward-animation').on("click", function(){
+            ++idx;
             update();
         });
 
@@ -464,14 +468,13 @@ $(function(){
             var duration = 100
             var max_len = chart_json[0]['data'].length
             var update = function () {
-                updateTimer(idx*10)
                 if(idx>=max_len){
                     stop()
-                    idx=1
+                    idx=0
                 }
                 if(idx<0){
                     stop()
-                    idx=max_len
+                    idx=max_len-1
                 }
 
                 d3.selectAll(placement_div+' circle')
@@ -501,22 +504,18 @@ $(function(){
                 clearTimeout(myhandle)
             }
 
-            $('#start-animation').bind("click", function(){
-                // $('#start-animation').toggle();
-                // $('#stop-animation').toggle();
+            $('#start-animation').on("click", function(){
                 start();
-            }); // use .on in jQuery 1.7+
+            });
 
-            $('#stop-animation').bind("click", function(){
-                // $('#start-animation').toggle();
-                // $('#stop-animation').toggle();
+            $('#stop-animation').on("click", function(){
                 stop();
             });
-            $('#back-animation').bind("click", function(){
+            $('#back-animation').on("click", function(){
                 --idx
                 update();
             });
-            $('#forward-animation').bind("click", function(){
+            $('#forward-animation').on("click", function(){
                 ++idx
                 update();
             });
