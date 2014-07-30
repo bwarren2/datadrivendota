@@ -604,6 +604,431 @@ function draw_scatterseries(source, placement_div, callback){
 
 }
 
+function hero_dot_plot(
+  chart_json,
+  margin,
+  x_var,
+  x_label,
+  y_var,
+  y_label,
+  placement_div
+  ){
+
+  var padding = {top: 0, right: 0, bottom: 0, left: 0},
+      outerWidth = 300,
+      outerHeight = 300,
+      innerWidth = outerWidth - margin.left - margin.right,
+      innerHeight = outerHeight - margin.top - margin.bottom;
+      width = innerWidth - padding.left - padding.right,
+      height = innerHeight - padding.top - padding.bottom;
+
+  var transitionDelay = 500
+  var x_min = d3.min(
+          chart_json,
+          function(d){
+              return(d3.min(d['data'], function(p){
+                  return(p[x_var])
+              }))
+          });
+  var y_min = d3.min(
+          chart_json,
+          function(d){
+              return(d3.min(d['data'], function(p){
+                  return(p[y_var])
+              }))
+          });
+  var x_max = d3.max(
+          chart_json,
+          function(d){
+              return(d3.max(d['data'], function(p){
+                  return(p[x_var])
+              }))
+          });
+  var y_max = d3.max(
+          chart_json,
+          function(d){
+              return(d3.max(d['data'], function(p){
+                  return(p[y_var])
+              }))
+          });
+
+  function toTitleCase(str)
+  {
+      temp = str.replace('npc_dota_hero_', ' ')
+      temp = temp.replace('_', ' ')
+      return temp.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+  }
+
+  var x = d3.scale.linear()
+      .range([0, width])
+      .domain([x_min, x_max]);
+
+  var y = d3.scale.linear()
+      .range([height, 0])
+      .domain([y_min, y_max]);
+
+  var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom")
+      .ticks(6)
+
+  var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left")
+  if (y_max >= 1000){
+      yAxis.tickFormat(function (d) {
+          strng = String(d/1000)+'K'
+          return strng;
+      });
+  }
+
+  var line = d3.svg.line()
+      .x(function(d){
+          return x(d[x_var])
+      })
+      .y(function(d){
+          return y(d[y_var])
+      });
+
+  var div = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+
+  inner_svg = d3.select(placement_div).append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .attr("class", 'outer-chart')
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .attr("class", 'inner-chart')
+
+  //Draw X
+  inner_svg.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .append("text")
+      .attr("class", "x-axis-label")
+      .attr("y", -16)
+      .attr("x", width)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text(x_label);
+
+  //Draw Y
+  inner_svg.append("g")
+      .attr("class", "y-axis")
+      .attr("transform", "translate(0,0)")
+      .call(yAxis)
+      .append("text")
+      .attr("class", "y-axis-label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text(y_label);
+
+  inner_svg.selectAll('.series')
+      .data(chart_json)
+      .enter()
+      .append('circle')
+      .attr('cx',function(d){
+          return(x(d['data'][0][x_var]));
+      })
+      .attr('cy',function(d){
+          return(y(d['data'][0][y_var]));
+      })
+      .attr('r', function(d){
+          return(5);
+      })
+      .style("stroke", function(d) {return('#000000');})
+      .attr("class", function(d){return(d['name'])})
+      .on("mouseover", function(d) {
+      div.transition()
+          .duration(200)
+          .style("opacity", 0.9);
+
+          div.html(toTitleCase(d.name))
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+          div.transition()
+          .duration(500)
+          .style("opacity", 0);
+      });
+
+
+      var idx = 0
+      var duration = 100
+      var max_len = chart_json[0]['data'].length
+      var update = function () {
+          if(idx>=max_len){
+              stop()
+              idx=0
+          }
+          if(idx<0){
+              stop()
+              idx=max_len-1
+          }
+
+          d3.selectAll(placement_div+' circle')
+              .transition()
+              .ease('linear')
+              .duration(duration)
+              .attr('cx',function(d){
+                  return(x(d['data'][idx][x_var]));
+              })
+              .attr('cy',function(d){
+                  return(y(d['data'][idx][y_var]));
+              })
+      }
+
+      var tick = function(){
+          ++idx
+          start()
+      }
+
+      var myhandle
+      var start = function(){
+          update()
+          myhandle = setTimeout(tick, duration)
+      }
+
+      var stop = function (){
+          clearTimeout(myhandle)
+      }
+
+      $('#start-animation').on("click", function(){
+          start();
+      });
+
+      $('#stop-animation').on("click", function(){
+          stop();
+      });
+      $('#back-animation').on("click", function(){
+          --idx
+          update();
+      });
+      $('#forward-animation').on("click", function(){
+          ++idx
+          update();
+      });
+
+}
+
+function side_progess_plot(
+    chart_json,
+    x_var,
+    x_label,
+    y_var,
+    y_label,
+    placement_div,
+    margin,
+    slider_name){
+
+    var padding = {top: 0, right: 0, bottom: 0, left: 0},
+        outerWidth = 300,
+        outerHeight = 300,
+        innerWidth = outerWidth - margin.left - margin.right,
+        innerHeight = outerHeight - margin.top - margin.bottom,
+        width = innerWidth - padding.left - padding.right,
+        height = innerHeight - padding.top - padding.bottom;
+
+    var x_min = d3.min(
+            chart_json,
+            function(d){
+                return(d3.min(d['data'], function(p){
+                    return(p[x_var])
+                }))
+            });
+    var y_min = d3.min(
+            chart_json,
+            function(d){
+                return(d3.min(d['data'], function(p){
+                    return(p[y_var])
+                }))
+            });
+    var x_max = d3.max(
+            chart_json,
+            function(d){
+                return(d3.max(d['data'], function(p){
+                    return(p[x_var])
+                }))
+            });
+    var y_max = d3.max(
+            chart_json,
+            function(d){
+                return(d3.max(d['data'], function(p){
+                    return(p[y_var])
+                }))
+            });
+
+    var x = d3.scale.linear()
+        .range([0, width])
+        .domain([x_min, x_max]);
+
+    var y = d3.scale.linear()
+        .range([height, 0])
+        .domain([y_min, y_max]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .ticks(4)
+        .tickFormat(function (d) {
+            strng = String((d-d%60)/60)+':'+String(d%60)
+            return strng;
+        });
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+    if (y_max >= 1000){
+        yAxis.tickFormat(function (d) {
+            strng = String(d/1000)+'K'
+            return strng;
+        });
+    }
+
+    var line = d3.svg.line()
+        .x(function(d){
+            return x(d[x_var])
+        })
+        .y(function(d){
+            return y(d[y_var])
+        });
+
+    inner_svg = d3.select(placement_div).append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .attr("class", 'outer-chart')
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("class", 'inner-chart')
+
+    //Draw X
+    inner_svg.append("g")
+        .attr("class", "x-axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .append("text")
+        .attr("class", "x-axis-label")
+        .attr("y", -16)
+        .attr("x", width)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(x_label);
+
+    //Draw Y
+    inner_svg.append("g")
+        .attr("class", "y-axis")
+        .attr("transform", "translate(0,0)")
+        .call(yAxis)
+        .append("text")
+        .attr("class", "y-axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(y_label);
+
+    inner_svg.selectAll('.series')
+        .data(chart_json)
+        .enter()
+        .append('g')
+        .append("svg:path")
+        .attr("d", function(d){
+            return(line(d['data']));
+        })
+        .style("stroke-width", 2)
+        .style("stroke", function(d) {
+          return(d['color']);
+        })
+
+    inner_svg.append('g')
+        .append("rect")
+        .attr("x", x(x_min))
+        .attr("y", y(y_max))
+        .attr("width", 3)
+        .attr("height", height+2)
+        .attr("class", slider_name)
+
+    var idx = 0
+    var duration = 100
+    var max_len = chart_json[0]['data'].length
+
+    var update = function () {
+        if(idx>=max_len){
+            stop()
+            idx=0
+        }
+        if(idx<0){
+            stop()
+            idx=max_len-1
+        }
+        // alert(idx)
+        // alert(max_len)
+        // alert(chart_json[0]['data'][idx])
+        // alert(chart_json[0]['data'].length)
+        updateTimer(chart_json[0]['data'][idx]['time'])
+
+         d3.selectAll('.'+slider_name)
+        .transition()
+        .duration(duration)
+        .attr('x', function(){
+            return x(chart_json[0]['data'][idx]['time'])
+        });
+    }
+
+    var tick = function(){
+        ++idx;
+        start()
+    }
+
+    var myhandle
+    var start = function(){
+        update()
+        myhandle = setTimeout(tick, duration)
+    }
+
+    var stop = function (){
+        clearTimeout(myhandle)
+    }
+
+    $('#start-animation').on("click", function(){
+        $('#start-animation').toggle();
+        $('#stop-animation').toggle();
+        $('#back-animation').toggle();
+        $('#forward-animation').toggle();
+        start();
+    });
+
+    $('#stop-animation').on("click", function(){
+        $('#start-animation').toggle();
+        $('#stop-animation').toggle();
+        $('#back-animation').toggle();
+        $('#forward-animation').toggle();
+        stop();
+    });
+    $('#back-animation').on("click", function(){
+        --idx;
+        update();
+    });
+    $('#forward-animation').on("click", function(){
+        ++idx;
+        update();
+    });
+
+}
+
+
+function updateTimer(d){
+    $('#time-display').val(String((d-d%60)/60)+':'+String(d%60))
+}
+
+
 
 function plot(source, div, callback){
     if(source.parameters['chart']=='xyplot'){
@@ -619,6 +1044,8 @@ function plot(source, div, callback){
 }
 window.d3ening = {};
 window.d3ening.plot = plot;
+window.d3ening.hero_dot_plot = hero_dot_plot;
+window.d3ening.side_progess_plot = side_progess_plot;
 
 window.chartUtils = {}
 window.chartUtils.convertToSlug = convertToSlug
