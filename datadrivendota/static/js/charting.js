@@ -611,7 +611,8 @@ function hero_dot_plot(
   x_label,
   y_var,
   y_label,
-  placement_div
+  placement_div,
+  autostart
   ){
 
   var padding = {top: 0, right: 0, bottom: 0, left: 0},
@@ -815,6 +816,9 @@ function hero_dot_plot(
           ++idx
           update();
       });
+      if(autostart){
+        start();
+      }
 
 }
 
