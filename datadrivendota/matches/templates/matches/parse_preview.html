@@ -98,9 +98,6 @@ $(function(){
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-    function updateTimer(d){
-        $('#time-display').val(String((d-d%60)/60)+':'+String(d%60))
-    }
 
     // Side Towers
     var data = '{% static side_towers %}';
