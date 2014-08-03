@@ -354,7 +354,6 @@ def player_matches(request, player_id=None):
     form = PlayerMatchesFilterForm(request.GET)
 
     if form.is_valid():
-        print form.cleaned_data
         pms_list = PlayerMatchSummary.objects.select_related()
         pms_list = pms_list.filter(
             player=player
