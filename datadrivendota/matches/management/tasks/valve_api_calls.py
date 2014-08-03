@@ -806,10 +806,12 @@ class AcquireHeroSkillData(BaseTask):
 
 class AcquireMatches(Task):
 
-    def run(self, matches=[]):
+    def run(self, matches=[], skill=None):
         for match in matches:
             logger.info("Requesting match {0}".format(match))
             c = ApiContext()
+            if skill is not None:
+                c.skill = skill
             c.matches_requested = 1
             c.matches_desired = 1
             c.refresh_records = True
@@ -1130,9 +1132,8 @@ class RetrieveHiddenGameResults(ApiFollower):
     """"""
     def run(self, urldata):
         matches = [match['match_id'] for match in urldata['result']['matches']]
-        print matches
         am = AcquireMatches()
-        am.delay(matches=matches)
+        am.delay(matches=matches, skill=4)
 
 
 def upload_match_summary(players, parent_match, refresh_records):
