@@ -82,8 +82,8 @@ def team_winrate_json(
     )
 
     annotations = annotations.filter(
-        Q(match__radiant_team=team) |
-        Q(match__dire_team=team)
+        Q(match__radiant_team=team, player_slot__lte=5) |
+        Q(match__dire_team=team, player_slot__gte=6)
         )
     annotations = annotations.values('hero__name', 'is_win')\
         .annotate(Count('is_win'))
