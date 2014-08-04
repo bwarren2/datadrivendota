@@ -612,7 +612,8 @@ function hero_dot_plot(
   y_var,
   y_label,
   placement_div,
-  autostart
+  autostart=false,
+  button_controller=false
   ){
 
   var padding = {top: 0, right: 0, bottom: 0, left: 0},
@@ -802,10 +803,23 @@ function hero_dot_plot(
       }
 
       $('#start-animation').on("click", function(){
+        if(button_controller){
+          $('#start-animation').toggle();
+          $('#stop-animation').toggle();
+          $('#back-animation').toggle();
+          $('#forward-animation').toggle();
+        }
+
           start();
       });
 
       $('#stop-animation').on("click", function(){
+        if(button_controller){
+          $('#start-animation').toggle();
+          $('#stop-animation').toggle();
+          $('#back-animation').toggle();
+          $('#forward-animation').toggle();
+        }
           stop();
       });
       $('#back-animation').on("click", function(){
@@ -830,7 +844,8 @@ function side_progess_plot(
     y_label,
     placement_div,
     margin,
-    slider_name){
+    slider_name,
+    button_controller=false){
 
     var padding = {top: 0, right: 0, bottom: 0, left: 0},
         outerWidth = 300,
@@ -972,10 +987,6 @@ function side_progess_plot(
             stop()
             idx=max_len-1
         }
-        // alert(idx)
-        // alert(max_len)
-        // alert(chart_json[0]['data'][idx])
-        // alert(chart_json[0]['data'].length)
         updateTimer(chart_json[0]['data'][idx]['time'])
 
          d3.selectAll('.'+slider_name)
@@ -1002,18 +1013,22 @@ function side_progess_plot(
     }
 
     $('#start-animation').on("click", function(){
-        $('#start-animation').toggle();
-        $('#stop-animation').toggle();
-        $('#back-animation').toggle();
-        $('#forward-animation').toggle();
+        if(button_controller){
+          $('#start-animation').toggle();
+          $('#stop-animation').toggle();
+          $('#back-animation').toggle();
+          $('#forward-animation').toggle();
+        }
         start();
     });
 
     $('#stop-animation').on("click", function(){
-        $('#start-animation').toggle();
-        $('#stop-animation').toggle();
-        $('#back-animation').toggle();
-        $('#forward-animation').toggle();
+        if(button_controller){
+          $('#start-animation').toggle();
+          $('#stop-animation').toggle();
+          $('#back-animation').toggle();
+          $('#forward-animation').toggle();
+        }
         stop();
     });
     $('#back-animation').on("click", function(){

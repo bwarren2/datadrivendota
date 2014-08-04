@@ -115,7 +115,7 @@ class PickBan(PickBanMixin, ChartFormView):
         {
             'orphan': True,
             'title': "Ready to go!",
-            'content': "Try it out!?"
+            'content': "Try it out!"
         }
     ]
     title = "Pick/Bans"

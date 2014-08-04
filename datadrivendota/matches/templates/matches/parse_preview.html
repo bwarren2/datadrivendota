@@ -111,7 +111,9 @@ $(function(){
             y_label='Tower Damage',
             placement_div="div#tower-dmg",
             margin={top: 20, right: 20, bottom: 20, left: 50},
-            slider_name='tower-slider'
+            slider_name='tower-slider',
+            autostart=false,
+            button_controller=true
         )
     });
 
@@ -174,6 +176,7 @@ $(function(){
             y_var='dmg_taken',
             y_label='Damage Taken',
             placement_div="div#taken_dmg-deaths"
+
         )
     });
 
