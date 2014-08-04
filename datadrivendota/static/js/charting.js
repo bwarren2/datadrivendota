@@ -778,6 +778,8 @@ function hero_dot_plot(
               idx=max_len-1
           }
 
+          updateTimer(chart_json[0]['data'][idx]['time'])
+
           d3.selectAll(placement_div+' circle')
               .transition()
               .ease('linear')
@@ -994,6 +996,7 @@ function side_progess_plot(
             stop()
             idx=max_len-1
         }
+
         updateTimer(chart_json[0]['data'][idx]['time'])
 
          d3.selectAll('.'+slider_name)
