@@ -612,9 +612,12 @@ function hero_dot_plot(
   y_var,
   y_label,
   placement_div,
-  autostart=false,
-  button_controller=false
+  autostart,
+  button_controller
   ){
+
+   if(typeof(autostart)==='undefined') autostart = false;
+   if(typeof(button_controller)==='undefined') button_controller = false;
 
   var padding = {top: 0, right: 0, bottom: 0, left: 0},
       outerWidth = 300,
@@ -845,7 +848,11 @@ function side_progess_plot(
     placement_div,
     margin,
     slider_name,
-    button_controller=false){
+    button_controller
+    ){
+
+
+    if(typeof(button_controller)==='undefined') button_controller = false;
 
     var padding = {top: 0, right: 0, bottom: 0, left: 0},
         outerWidth = 300,
