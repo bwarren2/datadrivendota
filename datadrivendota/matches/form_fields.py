@@ -51,6 +51,9 @@ class SingleMatchSelect(forms.CharField):
     widget = forms.HiddenInput(attrs={'class': 'single-match-tags'})
 
     def clean(self, match):
+        if match is None:
+            return []
+
         if ',' in match:
             raise ValidationError("Only one match at a time.")
         try:
