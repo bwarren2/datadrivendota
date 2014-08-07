@@ -175,27 +175,8 @@ class Command(BaseCommand):
                 'We have roles without thumbshots: {0}'.format(roles)
             )
 
-        print "Specific match badness"
-        matches = Match.objects.filter(duration__gte=settings.MIN_MATCH_LENGTH)
-        matches = matches.annotate(Count('playermatchsummary'))
 
-        # pmses =PlayerMatchSummary.objects.filter(
-        #     match__validity=Match.LEGIT,
-        #     ).exclude(skill_build__level=1)
-        bad_matches = []
-        for match in matches:
-            if match.playermatchsummary__count < 10:
-                bad_matches.append(match)
-            if match.playermatchsummary__count > 10:
-                bad_matches.append(match)
-
-        m = Match.objects.filter(steam_id=0)
-        if len(m) != 0:
-            error_email(
-                'Database alert!',
-                'We have a match with steam_id 0'
-            )
-
+        print "Hero thumbshot integrity"
         # Hero Integrity checks
         h = Hero.objects.filter(thumbshot='').exclude(visible=False)
         if len(h) != 0:
@@ -204,6 +185,7 @@ class Command(BaseCommand):
                 'We have a hero without a thumbshot url'
             )
 
+        print "Hero name integrity"
         h = Hero.objects.filter(name='').exclude(visible=False)
         if len(h) != 0:
             error_email(
@@ -211,6 +193,7 @@ class Command(BaseCommand):
                 'We have a hero without a name'
             )
 
+        print "Hero dossier integrity"
         heroes = Hero.objects.all().exclude(visible=False)
         error_msg = ''
         for hero in heroes:
