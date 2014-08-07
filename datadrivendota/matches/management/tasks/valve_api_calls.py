@@ -739,6 +739,7 @@ class RefreshPlayerMatchDetail(BaseTask):
             else:
                 context.matches_desired = self.api_context.matches_desired
 
+            print context.matches_requested, context.matches_desired
             context.deepcopy = True
             context.start_scrape_time = now()
             context.last_scrape_time = user.last_scrape_time
