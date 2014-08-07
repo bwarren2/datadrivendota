@@ -99,7 +99,6 @@ class Command(BaseCommand):
                 )
                 ms = ms.filter(validity=Match.UNPROCESSED)
                 print ms.query
-                print ms.update(validity=Match.LEGIT).query
                 ms.update(validity=Match.LEGIT)
 
             print "Defs done"
