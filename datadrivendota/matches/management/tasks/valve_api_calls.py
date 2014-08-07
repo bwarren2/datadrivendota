@@ -420,6 +420,7 @@ class RetrievePlayerRecords(ApiFollower):
             p.updated = False
             p.save()
             return True
+
         elif self.result['status'] == 1:
             # Spawn a bunch of match detail queries
 
@@ -444,6 +445,17 @@ class RetrievePlayerRecords(ApiFollower):
         for result in self.result['matches']:
             self.api_context.processed += 1
             if self.api_context.processed <= self.api_context.matches_desired:
+
+                logger.info(
+                    "{0}: {1} done, {2} wanted, doing: {3}".format(
+                        self.api_context.account_id,
+                        self.api_context.processed,
+                        self.api_context.matches_desired,
+                        self.api_context.processed <=
+                        self.api_context.matches_desired
+                    )
+                )
+
                 vac = ValveApiCall()
                 um = UploadMatch()
                 self.api_context.match_id = result['match_id']
@@ -454,29 +466,50 @@ class RetrievePlayerRecords(ApiFollower):
                 ), um.s()).delay()
 
     def moreResultsLeft(self):
-        return not self.result['results_remaining'] == 0
-        #Until the date_max problem is fixed, rebounding cannot work.
+        if not (self.result['results_remaining'] == 0) \
+                and self.api_context.processed <= \
+                self.api_context.matches_desired:
 
+            logger.info(
+                (
+                    "Did {0} of {1} for {2}. {3} left.  \n "
+                    "Logic: remaining: {4}, "
+                    "needing: {5}, in sum: {6}.  Going back"
+                ).format(
+                    self.api_context.processed,
+                    self.api_context.matches_desired,
+                    self.api_context.account_id,
+                    self.result['results_remaining'],
+                    not (self.result['results_remaining'] == 0),
+                    self.api_context.processed <=
+                        self.api_context.matches_desired,
+                    not (self.result['results_remaining'] == 0)
+                        and self.api_context.processed <=
+                        self.api_context.matches_desired,
+                )
+            )
+            return True
+
+        else:
+
+            logger.error(
+                "Did {0} of {1} for {2}. {3} left.  Done.".format(
+                    self.api_context.processed,
+                    self.api_context.matches_desired,
+                    self.api_context.account_id,
+                    self.result['results_remaining']
+                )
+            )
+
+            return False
+
+    #Until the date_max problem is fixed, date_max cannot work.
     def rebound(self):
         logger.info("Rebounding")
         self.api_context.start_at_match_id = self.result[
             'matches'
         ][-1]['match_id']
         self.api_context.date_max = None
-
-        # if self.api_context.date_pull is False:
-            # self.api_context.start_at_match_id = self.result[
-            #     'matches'
-            # ][-1]['match_id']
-            # self.api_context.date_max = None
-        # else:
-        #     # If we want to poll more than 500 results deep, we reset the
-        #     # valve api's date bounding
-        #     self.api_context.date_max = self.result[
-        #         'matches'
-        #         ][-1]['start_time']
-        #     self.api_context.start_at_match_id = None
-        #     self.api_context.date_pull = False
 
         vac = ValveApiCall()
         rpr = RetrievePlayerRecords()
@@ -723,8 +756,6 @@ class RefreshPlayerMatchDetail(BaseTask):
         check_list = meld(users, tracked)
         check_list = [user for user in check_list]
 
-        print "{0} to be checked".format(len(check_list))
-
         for counter, user in enumerate(check_list, start=1):
             context = ApiContext()
             context.account_id = user.steam_id
@@ -739,7 +770,6 @@ class RefreshPlayerMatchDetail(BaseTask):
             else:
                 context.matches_desired = self.api_context.matches_desired
 
-            print context.matches_requested, context.matches_desired
             context.deepcopy = True
             context.start_scrape_time = now()
             context.last_scrape_time = user.last_scrape_time
