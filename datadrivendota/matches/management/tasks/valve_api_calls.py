@@ -722,6 +722,9 @@ class RefreshPlayerMatchDetail(BaseTask):
         tracked = get_tracks(users)
         check_list = meld(users, tracked)
         check_list = [user for user in check_list]
+
+        print "{0} to be checked".format(len(check_list))
+
         for counter, user in enumerate(check_list, start=1):
             context = ApiContext()
             context.account_id = user.steam_id
