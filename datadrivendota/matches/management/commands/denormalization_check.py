@@ -2,7 +2,7 @@ import datetime
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
-from django.db.models import Count
+from django.db.models import Count, Max
 from datadrivendota.utilities import error_email
 from matches.models import PlayerMatchSummary, Match
 from heroes.models import Hero, Role
@@ -26,6 +26,9 @@ class Command(BaseCommand):
         # .exclude(lobby_type__steam_id=7)
 
         def process_matches(unprocessed):
+
+            max_id = unprocessed.aggregate(Max('id'))['id__max']
+            print max_id
             def tournament(unprocessed):
 
                 #Mainly 1v1 practices
@@ -85,23 +88,14 @@ class Command(BaseCommand):
                 )
                 ms.update(validity=Match.UNCOUNTED)
 
-            # Things with ten human players, longer than min length, where no
-            # one left, in the right lobby types, count
-            def legitimize(unprocessed):
+            # Everything we did not just exclude is valid.
+            def legitimize(unprocessed, max_id):
                 ms = unprocessed.exclude(
-                    duration__lte=settings.MIN_MATCH_LENGTH
+                    id__gt=max_id
                 )
-                ms = ms.exclude(validity=Match.LEGIT)
-                ms = ms.exclude(human_players__lt=10)
-                ms = ms.exclude(playermatchsummary__leaver__steam_id__gt=1)
-                ms = ms.filter(lobby_type__steam_id__in=[0, 2, 6, 7])
-                sub_selection = ms.annotate(Count('playermatchsummary'))
-                sub_selection = sub_selection.filter(
-                    playermatchsummary__count__lt=10
-                )
-                keys = sub_selection.values_list('pk', flat=True)
-                ms = ms.exclude(pk__in=keys)
+                ms = ms.filter(validity=Match.UNPROCESSED)
                 ms.update(validity=Match.LEGIT)
+
             print "Defs done"
             tournament_matches = unprocessed.filter(skill=4)
             print "Select done"
@@ -122,7 +116,7 @@ class Command(BaseCommand):
             game_mode_check(unprocessed)
 
             print "Legitimize"
-            legitimize(unprocessed)
+            legitimize(unprocessed, max_id)
             print "Done"
 
         if full_check is not None:
@@ -139,7 +133,6 @@ class Command(BaseCommand):
                 start_time__gte=a.strftime('%s')
             )
             process_matches(unprocessed)
-
 
         # Match Integrity Checks
         radiant_badness = PlayerMatchSummary.objects.filter(
