@@ -19,6 +19,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         match_count = options['match_count']
+        match_count = int(match_count)
         if match_count <= 0:
             raise Exception("How many matches per hero? (Use --match-count)")
         heroes = Hero.objects.all()
