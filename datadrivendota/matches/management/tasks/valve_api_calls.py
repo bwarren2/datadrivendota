@@ -659,10 +659,8 @@ class RefreshUpdatePlayerPersonas(BaseTask):
 
         track_list = meld(users, tracked)
 
-        print track_list
         check_list = [user.steam_id for user in track_list]
-        check_list = check_list.extend(pros)
-        print check_list
+        check_list.extend(pros)
 
         querylist = []
 
