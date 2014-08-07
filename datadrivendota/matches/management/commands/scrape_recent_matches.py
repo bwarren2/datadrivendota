@@ -19,6 +19,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         match_count = options['match_count']
+        match_count = int(match_count)
         c = ApiContext()
         if match_count > 0:
             c.matches_desired = match_count
