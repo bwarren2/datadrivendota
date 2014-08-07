@@ -92,7 +92,7 @@ class Command(BaseCommand):
                 ms.update(validity=Match.UNCOUNTED)
 
             # Everything we did not just exclude is valid.
-            def legitimize(unprocessed, max_id):
+            def legitimize(unprocessed, max_id, min_id):
                 ms = Match.objects.exclude(
                     id__gt=max_id,
                     id__lt=min_id
@@ -121,7 +121,7 @@ class Command(BaseCommand):
             game_mode_check(unprocessed)
 
             print "Legitimize"
-            legitimize(unprocessed, max_id)
+            legitimize(unprocessed, max_id, min_id)
             print "Done"
 
         if full_check is not None:
