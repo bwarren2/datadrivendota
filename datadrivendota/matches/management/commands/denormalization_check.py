@@ -93,7 +93,7 @@ class Command(BaseCommand):
 
             # Everything we did not just exclude is valid.
             def legitimize(unprocessed, max_id):
-                ms = Match.objects.filter.exclude(
+                ms = Match.objects.exclude(
                     id__gt=max_id,
                     id__lt=min_id
                 )
