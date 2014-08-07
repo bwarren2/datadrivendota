@@ -99,7 +99,6 @@ class Command(BaseCommand):
                         id__lt=min_id
                     )
                     ms = ms.filter(validity=Match.UNPROCESSED)
-                    print ms.query
                     ms.update(validity=Match.LEGIT)
 
                 print "Defs done"
@@ -141,6 +140,7 @@ class Command(BaseCommand):
             process_matches(unprocessed)
 
         # Match Integrity Checks
+        print "Check Radiant Badness"
         radiant_badness = PlayerMatchSummary.objects.filter(
             match__radiant_win=True,
             player_slot__lte=5,
@@ -152,6 +152,7 @@ class Command(BaseCommand):
                 'We have denormalization for radiant players and iswin=False'
             )
 
+        print "Check Dire Badness"
         dire_badness = PlayerMatchSummary.objects.filter(
             match__radiant_win=True,
             player_slot__gte=5,
@@ -163,6 +164,7 @@ class Command(BaseCommand):
                 'We have denormalization for dire players and iswin=True'
             )
 
+        print "Check Thumbshot Badness"
         thumbshot_badness = Role.objects.filter(
             thumbshot=''
         )
@@ -173,6 +175,7 @@ class Command(BaseCommand):
                 'We have roles without thumbshots: {0}'.format(roles)
             )
 
+        print "Specific match badness"
         matches = Match.objects.filter(duration__gte=settings.MIN_MATCH_LENGTH)
         matches = matches.annotate(Count('playermatchsummary'))
 
