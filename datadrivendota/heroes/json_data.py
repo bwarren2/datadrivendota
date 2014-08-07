@@ -150,7 +150,7 @@ def hero_lineup_json(heroes, stat, level):
         d.label = key.hero.safe_name()
         d.tooltip = "{name} ({val})".format(
             name=key.hero.safe_name(),
-            val=val,
+            val=round(val, 2),
         )
         d.group_var = group
         d.classes = []
