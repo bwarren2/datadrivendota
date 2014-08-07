@@ -26,103 +26,104 @@ class Command(BaseCommand):
         # .exclude(lobby_type__steam_id=7)
 
         def process_matches(unprocessed):
+            print unprocessed.exists(), unprocessed
+            if unprocessed.exists():
+                max_id = unprocessed.aggregate(Max('id'))['id__max']
+                min_id = unprocessed.aggregate(Min('id'))['id__min']
+                print max_id
+                print min_id
 
-            max_id = unprocessed.aggregate(Max('id'))['id__max']
-            min_id = unprocessed.aggregate(Min('id'))['id__min']
-            print max_id
-            print min_id
+                def tournament(unprocessed):
 
-            def tournament(unprocessed):
+                    #Mainly 1v1 practices
+                    unprocessed.filter(human_players__lt=10).update(
+                        validity=Match.UNCOUNTED
+                    )
 
-                #Mainly 1v1 practices
-                unprocessed.filter(human_players__lt=10).update(
-                    validity=Match.UNCOUNTED
-                )
+                    #Failure to load
+                    unprocessed.filter(
+                        playermatchsummary__hero__name=''
+                    ).update(
+                        validity=Match.UNCOUNTED
+                    )
 
-                #Failure to load
-                unprocessed.filter(
-                    playermatchsummary__hero__name=''
-                ).update(
-                    validity=Match.UNCOUNTED
-                )
+                    unprocessed.filter(
+                        playermatchsummary__hero__name='Blank'
+                    ).update(
+                        validity=Match.UNCOUNTED
+                    )
 
-                unprocessed.filter(
-                    playermatchsummary__hero__name='Blank'
-                ).update(
-                    validity=Match.UNCOUNTED
-                )
+                    unprocessed.filter(
+                        human_players=10,
+                    ).exclude(
+                        playermatchsummary__hero__name=''
+                    ).update(validity=Match.LEGIT)
 
-                unprocessed.filter(
-                    human_players=10,
-                ).exclude(
-                    playermatchsummary__hero__name=''
-                ).update(validity=Match.LEGIT)
+                def too_short(unprocessed):
+                    matches = unprocessed.filter(
+                        duration__lte=settings.MIN_MATCH_LENGTH
+                    )
+                    matches.update(validity=Match.UNCOUNTED)
 
-            def too_short(unprocessed):
-                matches = unprocessed.filter(
-                    duration__lte=settings.MIN_MATCH_LENGTH
-                )
-                matches.update(validity=Match.UNCOUNTED)
+                # Games that do not have ten match summaries are uncounted.
+                def player_count(unprocessed):
+                    ms = unprocessed.annotate(Count('playermatchsummary'))
+                    ms = ms.filter(playermatchsummary__count__lt=10)
+                    keys = ms.values_list('pk', flat=True)
+                    ms = unprocessed.filter(pk__in=keys)
+                    ms.update(validity=Match.UNCOUNTED)
 
-            # Games that do not have ten match summaries are uncounted.
-            def player_count(unprocessed):
-                ms = unprocessed.annotate(Count('playermatchsummary'))
-                ms = ms.filter(playermatchsummary__count__lt=10)
-                keys = ms.values_list('pk', flat=True)
-                ms = unprocessed.filter(pk__in=keys)
-                ms.update(validity=Match.UNCOUNTED)
+                # Games against bots do not count.
+                def human_players(unprocessed):
+                    ms = unprocessed.filter(human_players__lt=10)
+                    ms.update(validity=Match.UNCOUNTED)
 
-            # Games against bots do not count.
-            def human_players(unprocessed):
-                ms = unprocessed.filter(human_players__lt=10)
-                ms.update(validity=Match.UNCOUNTED)
+                # Games with leavers do not count.
+                def leavers(unprocessed):
+                    ms = unprocessed.filter(
+                        playermatchsummary__leaver__steam_id__gt=1
+                    )
+                    ms.update(validity=Match.UNCOUNTED)
 
-            # Games with leavers do not count.
-            def leavers(unprocessed):
-                ms = unprocessed.filter(
-                    playermatchsummary__leaver__steam_id__gt=1
-                )
-                ms.update(validity=Match.UNCOUNTED)
+                # Only traditional game modes count.
+                def game_mode_check(unprocessed):
+                    ms = unprocessed.exclude(
+                        lobby_type__steam_id__in=[0, 2, 6, 7]
+                    )
+                    ms.update(validity=Match.UNCOUNTED)
 
-            # Only traditional game modes count.
-            def game_mode_check(unprocessed):
-                ms = unprocessed.exclude(
-                    lobby_type__steam_id__in=[0, 2, 6, 7]
-                )
-                ms.update(validity=Match.UNCOUNTED)
+                # Everything we did not just exclude is valid.
+                def legitimize(unprocessed, max_id, min_id):
+                    ms = Match.objects.exclude(
+                        id__gt=max_id,
+                        id__lt=min_id
+                    )
+                    ms = ms.filter(validity=Match.UNPROCESSED)
+                    print ms.query
+                    ms.update(validity=Match.LEGIT)
 
-            # Everything we did not just exclude is valid.
-            def legitimize(unprocessed, max_id, min_id):
-                ms = Match.objects.exclude(
-                    id__gt=max_id,
-                    id__lt=min_id
-                )
-                ms = ms.filter(validity=Match.UNPROCESSED)
-                print ms.query
-                ms.update(validity=Match.LEGIT)
+                print "Defs done"
+                tournament_matches = unprocessed.filter(skill=4)
+                print "Select done"
+                tournament(tournament_matches)
+                print "Tourney handled"
+                unprocessed = unprocessed.exclude(skill=4)
+                print "Moving to everything else"
 
-            print "Defs done"
-            tournament_matches = unprocessed.filter(skill=4)
-            print "Select done"
-            tournament(tournament_matches)
-            print "Tourney handled"
-            unprocessed = unprocessed.exclude(skill=4)
-            print "Moving to everything else"
+                print "Too short"
+                too_short(unprocessed)
+                print "Player Count"
+                player_count(unprocessed)
+                print "Humans"
+                human_players(unprocessed)
+                print "Leaves"
+                leavers(unprocessed)
+                print "Modes"
+                game_mode_check(unprocessed)
 
-            print "Too short"
-            too_short(unprocessed)
-            print "Player Count"
-            player_count(unprocessed)
-            print "Humans"
-            human_players(unprocessed)
-            print "Leaves"
-            leavers(unprocessed)
-            print "Modes"
-            game_mode_check(unprocessed)
-
-            print "Legitimize"
-            legitimize(unprocessed, max_id, min_id)
-            print "Done"
+                print "Legitimize"
+                legitimize(unprocessed, max_id, min_id)
+                print "Done"
 
         if full_check is not None:
             print "Doing all"
