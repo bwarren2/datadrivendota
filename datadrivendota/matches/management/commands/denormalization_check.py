@@ -2,7 +2,7 @@ import datetime
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
-from django.db.models import Count, Max
+from django.db.models import Count, Max, Min
 from datadrivendota.utilities import error_email
 from matches.models import PlayerMatchSummary, Match
 from heroes.models import Hero, Role
@@ -28,7 +28,10 @@ class Command(BaseCommand):
         def process_matches(unprocessed):
 
             max_id = unprocessed.aggregate(Max('id'))['id__max']
+            min_id = unprocessed.aggregate(Min('id'))['id__min']
             print max_id
+            print min_id
+
             def tournament(unprocessed):
 
                 #Mainly 1v1 practices
@@ -90,10 +93,13 @@ class Command(BaseCommand):
 
             # Everything we did not just exclude is valid.
             def legitimize(unprocessed, max_id):
-                ms = unprocessed.exclude(
-                    id__gt=max_id
+                ms = Match.objects.filter.exclude(
+                    id__gt=max_id,
+                    id__lt=min_id
                 )
                 ms = ms.filter(validity=Match.UNPROCESSED)
+                print ms.query
+                print ms.update(validity=Match.LEGIT).query
                 ms.update(validity=Match.LEGIT)
 
             print "Defs done"
