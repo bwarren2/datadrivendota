@@ -442,15 +442,16 @@ class RetrievePlayerRecords(ApiFollower):
 
     def spawnDetailCalls(self):
         for result in self.result['matches']:
-            vac = ValveApiCall()
-            um = UploadMatch()
-            self.api_context.match_id = result['match_id']
             self.api_context.processed += 1
-            pass_context = deepcopy(self.api_context)
-            chain(vac.s(
-                mode='GetMatchDetails',
-                api_context=pass_context
-            ), um.s()).delay()
+            if self.api_context.processed <= self.api_context.matches_desired:
+                vac = ValveApiCall()
+                um = UploadMatch()
+                self.api_context.match_id = result['match_id']
+                pass_context = deepcopy(self.api_context)
+                chain(vac.s(
+                    mode='GetMatchDetails',
+                    api_context=pass_context
+                ), um.s()).delay()
 
     def moreResultsLeft(self):
         return not self.result['results_remaining'] == 0
