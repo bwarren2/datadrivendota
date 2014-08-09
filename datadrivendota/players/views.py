@@ -179,9 +179,8 @@ def detail(request, player_id=None):
             pro_name=None,
         ).exclude(
             steam_id=player.steam_id,
-        ).filter(
-            updated=True,
         )
+
         p2 = choice([p for p in p2])
         compare_url = reverse(
             'players:comparison',
