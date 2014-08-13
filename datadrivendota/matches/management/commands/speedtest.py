@@ -241,3 +241,16 @@ import datetime""".format(fn)
             )
             """, setup=setup).repeat(1, 1)
             output_print(s, fn)
+
+        fn = 'item_endgame'
+        if test_fn == fn or test_fn is None:
+            setup = """from items.json_data import {0}
+import datetime""".format(fn)
+            s = timeit.Timer("""item_endgame(
+                hero=5,
+                player=85045426,
+                skill_level=None,
+                game_modes=[],
+            )
+            """, setup=setup).repeat(1, 1)
+            output_print(s, fn)

@@ -11,7 +11,6 @@ def item_endgame(
     player=None,
     skill_level=None,
     game_modes=[],
-    *args, **kwargs
 ):
     if game_modes == []:
         game_modes = [
