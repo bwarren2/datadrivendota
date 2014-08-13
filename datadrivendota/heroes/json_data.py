@@ -110,7 +110,7 @@ def hero_lineup_json(heroes, stat, level):
 
     hero_dossiers = HeroDossier.objects.filter(
         hero__visible=True
-    ).select_related()
+    )
 
     if heroes is not None:
         selected_heroes = [
@@ -205,23 +205,35 @@ def hero_performance_chart_json(
         superset_pmses = superset_pmses.filter(is_win=False)
 
     skill1 = superset_pmses.filter(match__skill=1)\
-        .order_by('-match__start_time').select_related()[:100]
+        .order_by('-match__start_time')\
+        .select_related(
+            'match', 'player', 'hero__name', 'hero__steam_id'
+            )[:100]
     skill2 = superset_pmses.filter(match__skill=2)\
-        .order_by('-match__start_time').select_related()[:100]
+        .order_by('-match__start_time')\
+        .select_related(
+            'match', 'player', 'hero__name', 'hero__steam_id'
+        )[:100]
     skill3 = superset_pmses.filter(match__skill=3)\
-        .order_by('-match__start_time').select_related()[:100]
+        .order_by('-match__start_time')\
+        .select_related(
+            'match', 'player', 'hero__name', 'hero__steam_id'
+        )[:100]
 
     if player is not None:
         player_games = superset_pmses.filter(
             player__steam_id=player
-        ).select_related()
+        ).select_related(
+            'match', 'player', 'hero__name', 'hero__steam_id'
+        )
         pms_pool = list(chain(skill1, skill2, skill3, player_games))
         player_game_ids = fetch_match_attributes(player_games, 'match_id')[0]
     else:
         pms_pool = list(chain(skill1, skill2, skill3))
         player_game_ids = []
 
-    """If you are explicitly telling me you want certain information, there is minimal filtration occurring."""
+    # If you are explicitly telling me you want certain information,
+    # there is minimal filtration occurring.
     if matches is not None:
         requested_pmses = PlayerMatchSummary.objects.filter(
             hero__steam_id=hero,

@@ -32,7 +32,9 @@ def item_endgame(
         pmses = pmses.filter(match__skill=skill_level)
 
     itemDict = {}
-    pmses = pmses.select_related()[:500]
+    pmses = pmses.select_related(
+        'item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5', 'match'
+        )[:500]
     for p in pmses:
         for attr in [
             'item_0',

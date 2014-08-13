@@ -143,20 +143,23 @@ def match(request, match_id):
             match=match,
             team=dire_flag,
             is_pick=True
-        ).select_related()
+        ).select_related('hero')
+
         dire_bans = PickBan.objects.filter(
             match=match,
             team=dire_flag,
             is_pick=False
-        ).select_related()
+        ).select_related('hero')
+
         radiant_picks = PickBan.objects.filter(
             match=match,
             is_pick=True
-        ).exclude(team=dire_flag).select_related()
+        ).exclude(team=dire_flag).select_related('hero')
+
         radiant_bans = PickBan.objects.filter(
             match=match,
             is_pick=False
-        ).exclude(team=dire_flag).select_related()
+        ).exclude(team=dire_flag).select_related('hero')
 
         pickban_length = (
             dire_picks.count() +
