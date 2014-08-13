@@ -367,9 +367,13 @@ def hero_progression_json(
         requested_pmses = PlayerMatchSummary.objects.filter(
             match__steam_id__in=matches,
             hero__steam_id=hero
-        ).select_related('match__steam_id')[:100]
+        ).values('match__steam_id')[:100]
 
-        pmses_pool.extend(list(requested_pmses))
+        pmses_pool.extend(
+            list(
+                [x['match__steam_id'] for x in requested_pmses]
+            )
+        )
         requested_ids = [pms.match.steam_id for pms in requested_pmses]
     else:
         requested_ids = []
