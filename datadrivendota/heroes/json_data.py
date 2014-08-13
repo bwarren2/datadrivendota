@@ -336,15 +336,15 @@ def hero_progression_json(
 
     pmses = pmses.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
     skill1 = pmses.filter(match__skill=1)\
-        .values('match__steam_id')\
+        .values('id')\
         .order_by('-match__start_time')[:100]
 
     skill2 = pmses.filter(match__skill=2)\
-        .values('match__steam_id')\
+        .values('id')\
         .order_by('-match__start_time')[:100]
 
     skill3 = pmses.filter(match__skill=3)\
-        .values('match__steam_id')\
+        .values('id')\
         .order_by('-match__start_time')[:100]
 
     if player is not None:
@@ -352,14 +352,19 @@ def hero_progression_json(
             .values('match__steam_id')\
 
         player_game_ids = [pg['match__steam_id'] for pg in player_games]
+
+        player_games = pmses.filter(player__steam_id=player)\
+            .values('id')\
+
+
         pmses_pool = [
-            x['match__steam_id']
+            x['id']
             for x in chain(skill1, skill2, skill3, player_games)
         ]
     else:
         player_game_ids = []
         pmses_pool = [
-            x['match__steam_id']
+            x['id']
             for x in chain(skill1, skill2, skill3)
         ]
 
@@ -367,14 +372,20 @@ def hero_progression_json(
         requested_pmses = PlayerMatchSummary.objects.filter(
             match__steam_id__in=matches,
             hero__steam_id=hero
-        ).values('match__steam_id')[:100]
+        ).values('id')[:100]
 
         pmses_pool.extend(
             list(
-                [x['match__steam_id'] for x in requested_pmses]
+                [x['id'] for x in requested_pmses]
             )
         )
-        requested_ids = [pms.match.steam_id for pms in requested_pmses]
+
+        requested_pmses = PlayerMatchSummary.objects.filter(
+            match__steam_id__in=matches,
+            hero__steam_id=hero
+        ).values('match__steam_id')[:100]
+
+        requested_ids = [x['match__steam_id'] for x in requested_pmses]
     else:
         requested_ids = []
 
@@ -382,7 +393,7 @@ def hero_progression_json(
         raise NoDataFound
 
     sbs = SkillBuild.objects.filter(
-        player_match_summary__in=pmses_pool,
+        player_match_summary__id__in=pmses_pool,
     ).values(
         'level',
         'time',
