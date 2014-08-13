@@ -336,23 +336,32 @@ def hero_progression_json(
 
     pmses = pmses.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
     skill1 = pmses.filter(match__skill=1)\
+        .values('match__steam_id')\
         .order_by('-match__start_time')[:100]
 
     skill2 = pmses.filter(match__skill=2)\
+        .values('match__steam_id')\
         .order_by('-match__start_time')[:100]
 
     skill3 = pmses.filter(match__skill=3)\
+        .values('match__steam_id')\
         .order_by('-match__start_time')[:100]
 
     if player is not None:
         player_games = pmses.filter(player__steam_id=player)\
-            .select_related('match__steam_id')
+            .values('match__steam_id')\
 
-        player_game_ids = [pg.id for pg in player_games]
-        pmses_pool = list(chain(skill1, skill2, skill3, player_games))
+        player_game_ids = [pg['match__steam_id'] for pg in player_games]
+        pmses_pool = [
+            x['match__steam_id']
+            for x in chain(skill1, skill2, skill3, player_games)
+        ]
     else:
         player_game_ids = []
-        pmses_pool = list(chain(skill1, skill2, skill3))
+        pmses_pool = [
+            x['match__steam_id']
+            for x in chain(skill1, skill2, skill3)
+        ]
 
     if matches is not None:
         requested_pmses = PlayerMatchSummary.objects.filter(
