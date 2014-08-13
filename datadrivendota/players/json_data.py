@@ -245,7 +245,7 @@ def player_hero_abilities_json(
             group = "{p}, ({win})".format(
                 p=display_name,
                 win=winningness)
-        elif division == 'Players':
+        elif division == 'Players' or division is None:
             group = "{p}".format(
                 p=display_name)
         elif division == 'Win/loss':

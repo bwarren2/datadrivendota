@@ -13,10 +13,12 @@ class Command(BaseCommand):
             help='A specific function to test.'
         ),
     )
+
     def handle(self, *args, **options):
 
         def output_print(s, fn):
-            print fn, round(min(s),2), round(max(s),2), round(sum(s)/len(s),2)
+            print fn,
+            print round(min(s), 2), round(max(s), 2), round(sum(s)/len(s), 2)
         test_fn = options['test_fn']
 
         fn = "hero_vitals_json"

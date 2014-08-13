@@ -231,6 +231,8 @@ def hero_performance_chart_json(
         requested_game_ids = fetch_match_attributes(
             requested_pmses, 'match_id'
         )[0]
+    else:
+        requested_game_ids = []
 
     if len(pms_pool) == 0:
         raise NoDataFound
