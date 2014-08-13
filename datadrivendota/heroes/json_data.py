@@ -206,30 +206,28 @@ def hero_performance_chart_json(
 
     skill1 = superset_pmses.filter(match__skill=1)\
         .order_by('-match__start_time')\
-        .select_related(
-            'match', 'player', 'hero__name', 'hero__steam_id'
-            )[:100]
+        .values('match__steam_id')[:100]
     skill2 = superset_pmses.filter(match__skill=2)\
         .order_by('-match__start_time')\
-        .select_related(
-            'match', 'player', 'hero__name', 'hero__steam_id'
-        )[:100]
+        .values('match__steam_id')[:100]
     skill3 = superset_pmses.filter(match__skill=3)\
         .order_by('-match__start_time')\
-        .select_related(
-            'match', 'player', 'hero__name', 'hero__steam_id'
-        )[:100]
+        .values('match__steam_id')[:100]
 
     if player is not None:
-        player_games = superset_pmses.filter(
-            player__steam_id=player
-        ).select_related(
-            'match', 'player', 'hero__name', 'hero__steam_id'
-        )
-        pms_pool = list(chain(skill1, skill2, skill3, player_games))
+        player_games = superset_pmses.filter(player__steam_id=player)\
+            .values('match__steam_id')[:100]
+
+        pms_pool = [
+            x['match__steam_id']
+            for x in chain(skill1, skill2, skill3, player_games)
+        ]
         player_game_ids = fetch_match_attributes(player_games, 'match_id')[0]
     else:
-        pms_pool = list(chain(skill1, skill2, skill3))
+        pms_pool = [
+            x['match__steam_id']
+            for x in chain(skill1, skill2, skill3)
+        ]
         player_game_ids = []
 
     # If you are explicitly telling me you want certain information,
