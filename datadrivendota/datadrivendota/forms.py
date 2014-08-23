@@ -2,7 +2,7 @@ import datetime
 from django import forms
 from players.form_fields import SinglePlayerField
 from heroes.form_fields import SingleHeroSelect
-from players.models import Applicant
+from accounts.models import Applicant
 
 
 def beta_start():

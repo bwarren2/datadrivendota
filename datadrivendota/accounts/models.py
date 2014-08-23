@@ -7,14 +7,16 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from utils.exceptions import DataCapReached, ValidationException
 
-# Create your models here.
+
+def get_code():
+    return str(uuid4())
 
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
-    player = models.OneToOneField('Player')
-    following = models.ManyToManyField('Player', related_name='quarry')
-    tracking = models.ManyToManyField('Player', related_name='feed')
+    player = models.OneToOneField('players.Player')
+    following = models.ManyToManyField('players.Player', related_name='quarry')
+    tracking = models.ManyToManyField('players.Player', related_name='feed')
     track_limit = models.IntegerField(default=7)
     requested = models.ManyToManyField('MatchRequest', null=True)
     request_limit = models.IntegerField(default=10)

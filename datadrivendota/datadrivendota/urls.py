@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 from datadrivendota import views
-from players.views import data_applicant
+from accounts.views import data_applicant
 from matches.views import parse_preview
 admin.autodiscover()
 

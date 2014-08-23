@@ -5,7 +5,6 @@ from matches.form_fields import MultiGameModeSelect
 from .form_fields import SinglePlayerField
 from heroes.models import Role
 from heroes.form_fields import SingleHeroSelect
-from .models import Applicant
 
 
 def thirty_days_ago():

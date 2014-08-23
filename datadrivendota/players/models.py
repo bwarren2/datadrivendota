@@ -7,10 +7,6 @@ from django.utils.encoding import smart_str
 from .managers import TI4Manager
 
 
-def get_code():
-    return str(uuid4())
-
-
 class Player(models.Model):
     steam_id = models.BigIntegerField(
         help_text="Valve's internal map",

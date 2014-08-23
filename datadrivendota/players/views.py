@@ -19,7 +19,6 @@ from datadrivendota.forms import ApplicantForm
 from utils.pagination import SmarterPaginator
 from utils import binomial_exceedence
 
-from players.models import MatchRequest
 from datadrivendota.forms import MatchRequestForm
 from matches.models import PlayerMatchSummary, Match
 from matches.management.tasks.valve_api_calls import (
@@ -29,7 +28,7 @@ from matches.management.tasks.valve_api_calls import (
     AcquirePlayerData,
     AcquireMatches
 )
-from .models import request_to_player, Applicant
+from accounts.models import request_to_player, Applicant
 
 from .mixins import (
     WinrateMixin,
@@ -89,50 +88,6 @@ def index(request):
             'player_list': player_list
         }
     )
-
-
-def data_applicant(request):
-    if request.method == 'POST':
-        form = ApplicantForm(request.POST)
-        if form.is_valid():
-
-            """This is some stupid hacky stuff.  What we really want to do is have a uniqueness criterion on the model, a 32bit validator on the field, and a clean() method on the field that takes % 32bit.  We'll do it later."""
-            try:
-                modulo_id = form.cleaned_data['steam_id'] \
-                    % settings.ADDER_32_BIT
-                test = Applicant.objects.get(
-                    steam_id=modulo_id
-                )
-                status = 'preexisting'
-            except Applicant.DoesNotExist:
-                form.save()
-                status = 'success'
-
-            return render(
-                request,
-                'players/data_applicant.html',
-                {
-                    'form': form,
-                    status: status
-                }
-            )
-        else:
-            status = 'error'
-            return render(
-                request,
-                'players/data_applicant.html',
-                {
-                    'form': form,
-                    status: status
-                }
-            )
-    else:
-        form = ApplicantForm()
-        return render(
-            request,
-            'players/data_applicant.html',
-            {'form': form}
-        )
 
 
 @permission_required('players.can_touch')

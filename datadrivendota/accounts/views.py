@@ -1,53 +1,68 @@
-from django.shortcuts import render
-import datetime
-import json
-from time import mktime
-from random import choice
-from celery import chain
-from django.conf import settings
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseNotFound
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-from .models import Player
+
+from players.models import Player
 from accounts.models import UserProfile
-from .forms import (
-    PlayerAddFollowForm,
-    PlayerMatchesFilterForm
-)
+from players.forms import PlayerAddFollowForm
 from datadrivendota.forms import ApplicantForm
 
-from utils.pagination import SmarterPaginator
-from utils import binomial_exceedence
-
-from players.models import MatchRequest
+from accounts.models import MatchRequest
 from datadrivendota.forms import MatchRequestForm
-from matches.models import PlayerMatchSummary, Match
-from matches.management.tasks.valve_api_calls import (
-    ApiContext,
-    ValveApiCall,
-    UpdatePlayerPersonas,
-    AcquirePlayerData,
-    AcquireMatches
-)
+from matches.management.tasks.valve_api_calls import AcquireMatches
+
 from .models import request_to_player, Applicant
 
-from .mixins import (
-    WinrateMixin,
-    HeroAdversaryMixin,
-    HeroAbilitiesMixin,
-    VersusWinrateMixin,
-    RoleMixin,
-    )
-
-from heroes.models import Hero
-from datadrivendota.views import ChartFormView, ApiView, LoginRequiredView
+from datadrivendota.views import LoginRequiredView
 from utils.exceptions import DataCapReached, ValidationException
 
-# Create your views here.
+
+def data_applicant(request):
+    if request.method == 'POST':
+        form = ApplicantForm(request.POST)
+        if form.is_valid():
+
+            """This is some stupid hacky stuff.  What we really want to do is have a uniqueness criterion on the model, a 32bit validator on the field, and a clean() method on the field that takes % 32bit.  We'll do it later."""
+            try:
+                modulo_id = form.cleaned_data['steam_id'] \
+                    % settings.ADDER_32_BIT
+                test = Applicant.objects.get(
+                    steam_id=modulo_id
+                )
+                status = 'preexisting'
+            except Applicant.DoesNotExist:
+                form.save()
+                status = 'success'
+
+            return render(
+                request,
+                'players/data_applicant.html',
+                {
+                    'form': form,
+                    status: status
+                }
+            )
+        else:
+            status = 'error'
+            return render(
+                request,
+                'players/data_applicant.html',
+                {
+                    'form': form,
+                    status: status
+                }
+            )
+    else:
+        form = ApplicantForm()
+        return render(
+            request,
+            'players/data_applicant.html',
+            {'form': form}
+        )
+
 
 @permission_required('players.can_touch')
 def player_management(request):
