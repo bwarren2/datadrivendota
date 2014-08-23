@@ -1,4 +1,5 @@
-from players.models import Player, UserProfile
+from .models import Player
+from accounts.models import UserProfile
 from django.conf import settings
 from django.contrib.auth.models import User
 
