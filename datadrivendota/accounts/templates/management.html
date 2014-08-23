@@ -1,0 +1,12 @@
+{% extends "players/base.html" %}
+
+{% block page_title %}Player Management! <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>{% endblock page_title %}
+
+{% block content %}
+<div class='container'>
+  <div><h3><a href="{% url 'players:match_request' %}">Request a particular match</a></h3></div>
+  <div><h3><a href="{% url 'players:following' %}">Change who you follow here</a></h3></div>
+  <div><h3><a href="{% url 'players:tracking' %}">Add people to import here</a></h3></div>
+</div>
+{% endblock content %}
+
