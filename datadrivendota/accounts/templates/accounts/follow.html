@@ -1,0 +1,135 @@
+{% extends "players/base.html" %}
+
+{% block page_title %}Player Management! <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>{% endblock page_title %}
+
+{% block content %}
+<div class='container'>
+  <div class="row">
+    <div class="col-md-12">
+
+      <div>
+        <h6>People you are following</h6>
+        <table class="table table-condensed" id='followTable'>
+          <thead>
+            <tr>
+              <th>Steam ID</th>
+              <th>Name</th>
+              <th>Avatar</th>
+              <th>Purge Button</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for player in follow_list %}
+              <tr id={{ player.steam_id }}>
+                <td>
+                  <a href="{% url 'players:id_detail' player_id=player.steam_id %}">
+                    {{ player.steam_id }}
+                  </a>
+                </td>
+                <td>
+                  <a href="{% url 'players:id_detail' player_id=player.steam_id %}">
+                    {{ player.persona_name }}
+                  </a>
+                </td>
+                <td>
+                  <img src="{{ player.avatar }}">
+                </td>
+                <td>
+                  <input type="button" class="btn btn-danger purgeButton" name="{{ player.steam_id }}" value="Purge" />
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <div class='form-container'>
+          <form class='chart-form' action="" method='POST'>
+           {% csrf_token %}
+            {% include "_form.html" %}
+            <div class="control-group">
+              <div class="controls pull-right">
+                <button type="submit" class="btn btn-small btn-primary">Submit</button>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+$('.purgeButton').click(function(){
+  $.ajax({
+    type: "POST",
+    url: "{% url 'accounts:drop_follow' %}",
+    data: {
+      'slug': $(this).attr('name'),
+      'csrfmiddlewaretoken': '{{ csrf_token }}'
+    },
+    dataType: "text",
+    success: function(response) {
+      $("tr#" + response).remove();
+    },
+    error: function(rs, e) {
+      Messenger().post({
+        message: rs.responseText,
+        type: 'error'
+      });
+    }
+  });
+});
+
+</script>
+{% endblock extra_js %}
+
+{% block tour %}
+<script type="text/javascript">
+  $(function () {
+    var tour = new Tour({
+      backdrop: true
+    });
+
+    tour.addSteps([
+      {
+        orphan: true,
+        title: "Ahoy!",
+        content: "Welcome to data management!"
+      },
+      {
+        orphan: true,
+        title: "Ahoy!",
+        content: "Here, you can manage whose data you follow."
+      },
+      {
+        element: ".chart-form",
+        title: "Follow players",
+        content: "Pick players from our dataset to follow here.",
+        placement: "right"
+      },
+      {
+        element: "#followTable",
+        title: "Manage follows",
+        content: "Remove people you are already following here.",
+        placement: "right"
+      },
+      {
+        orphan: true,
+        title: "Ready to go!",
+        content: "That is how you manage data feeds!"
+      }
+    ]);
+
+    $(".tourglyph").on("click",function(){
+      tour.restart();
+    })
+
+  });
+</script>
+{% endblock tour %}

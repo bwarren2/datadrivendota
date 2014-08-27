@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from optparse import make_option
-from players.models import PermissionCode
+from accounts.models import PermissionCode
 
 
 class Command(BaseCommand):

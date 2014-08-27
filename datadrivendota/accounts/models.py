@@ -27,7 +27,6 @@ class UserProfile(models.Model):
             return False
         else:
             self.tracking.add(player)
-            self.track_limit += 1
             self.save()
             return True
 

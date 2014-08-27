@@ -1,3 +1,5 @@
+import json
+
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from django.core.urlresolvers import reverse
@@ -18,6 +20,19 @@ from .models import request_to_player, Applicant
 
 from datadrivendota.views import LoginRequiredView
 from utils.exceptions import DataCapReached, ValidationException
+
+
+from celery import chain
+from django.conf import settings
+from django.http import HttpResponse, HttpResponseNotFound
+
+
+from matches.management.tasks.valve_api_calls import (
+    ApiContext,
+    ValveApiCall,
+    UpdatePlayerPersonas,
+    AcquirePlayerData,
+)
 
 
 def data_applicant(request):
@@ -79,7 +94,7 @@ def player_management(request):
         track_list = [track for track in player.userprofile.tracking.all()]
         return render(
             request,
-            'data_management/management.html',
+            'accounts/management.html',
             {
                 'follow_list': follow_list,
                 'track_list': track_list,
@@ -91,20 +106,20 @@ def player_management(request):
 
 class TrackingView(LoginRequiredView, TemplateView):
     """Where users can adjust who they follow"""
-    template_name = 'data_management/tracking.html'
+    template_name = 'accounts/tracking.html'
 
     def get_context_data(self, *args, **kwargs):
         if 'follow_list' not in kwargs:
             kwargs['track_list'] = [
-            track for track in self.request.user.userprofile.tracking.all()
-        ]
+                track for track in self.request.user.userprofile.tracking.all()
+            ]
         return super(TrackingView, self).get_context_data(*args, **kwargs)
 
 
 class FollowView(LoginRequiredView, FormView):
     """Where users can adjust who they follow"""
     form_class = PlayerAddFollowForm
-    template_name = 'data_management/follow.html'
+    template_name = 'accounts/follow.html'
 
     def form_valid(self, form):
         follow_player_id = form.cleaned_data['player']
@@ -116,14 +131,15 @@ class FollowView(LoginRequiredView, FormView):
     def get_context_data(self, *args, **kwargs):
         if 'follow_list' not in kwargs:
             kwargs['follow_list'] = [
-            follow for follow in self.request.user.userprofile.following.all()
-        ]
+                follow for follow in
+                self.request.user.userprofile.following.all()
+            ]
         return super(FollowView, self).get_context_data(*args, **kwargs)
 
 
 class MatchRequestView(LoginRequiredView, FormView):
     form_class = MatchRequestForm
-    template_name = 'data_management/match_import_request.html'
+    template_name = 'accounts/match_import_request.html'
     initial = {}
 
     def form_invalid(self, form):
@@ -163,3 +179,167 @@ class MatchRequestView(LoginRequiredView, FormView):
 
     def get_success_url(self):
         return reverse('players:management')
+
+
+def drop_follow(request):
+    if request.is_ajax():
+        drop = Player.objects.get(steam_id=request.POST['slug'])
+        request.user.userprofile.following.remove(drop)
+        data = request.POST['slug']
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
+
+
+def check_id(request):
+    if request.is_ajax() and request.POST['steam_id']:
+        steam_id = request.POST['steam_id']
+        try:
+            int(steam_id)
+        except ValueError:
+            data = 'We need an integer id'
+            mimetype = 'application/json'
+            return HttpResponseNotFound(data, mimetype)
+
+        c = ApiContext()
+        c.steamids = "{base},{check}".format(
+            base=steam_id,
+            check=int(steam_id) + settings.ADDER_32_BIT
+        )
+        vac = ValveApiCall()
+        t = vac.delay(
+            api_context=c,
+            mode='GetPlayerSummaries'
+        )
+        steam_response = t.get()
+
+        if steam_response['response']['players'] == []:
+            params = {
+                'player_exists': False,
+                'steam_id': None,
+                'name': None,
+                'avatar_url': None,
+                'public': False,
+                'tracked': False
+            }
+            data = json.dumps(params)
+        else:
+            c = ApiContext()
+            c.account_id = steam_id
+            c.matches_requested = 1
+            c.matches_desired = 1
+            vac = ValveApiCall()
+            t = vac.delay(api_context=c, mode='GetMatchHistory')
+            dota_response = t.get()
+
+            tracking = (
+                len(
+                    UserProfile.objects.filter(tracking__steam_id=steam_id)
+                ) != 0
+                or len(
+                    Player.objects.filter(steam_id=steam_id, updated=True)
+                ) != 0
+            )
+            if dota_response['result']['status'] != 1:
+                params = {
+                    'player_exists': True,
+                    'steam_id': steam_response[
+                        'response'
+                    ]['players'][0]['steamid'],
+                    'name': steam_response[
+                        'response'
+                    ]['players'][0]['personaname'].encode('utf-8'),
+                    'avatar_url': steam_response[
+                        'response'
+                    ]['players'][0]['avatarmedium'],
+                    'public': False,
+                    'tracked': tracking
+                }
+                data = json.dumps(params)
+            else:
+                params = {
+                    'player_exists': True,
+                    'steam_id': steam_response[
+                        'response'
+                    ]['players'][0]['steamid'],
+                    'name': steam_response[
+                        'response'
+                    ]['players'][0]['personaname'].encode('utf-8'),
+                    'avatar_url': steam_response[
+                        'response'
+                    ]['players'][0]['avatarmedium'],
+                    'public': True,
+                    'tracked': tracking
+                }
+                data = json.dumps(params)
+        if (
+                params['player_exists']
+                and params['public']
+                and not params['tracked']
+                ):
+            data = json.dumps({
+                'exists': params['player_exists'],
+                'id': params['steam_id'],
+                'name': params['name'],
+                'public': params['public'],
+                'image': params['avatar_url'],
+                'tracked': params['tracked'],
+                'cleared': True,
+            })
+        else:
+            data = json.dumps({
+                'exists': params['player_exists'],
+                'id': params['steam_id'],
+                'name': params['name'],
+                'public': params['public'],
+                'image': params['avatar_url'],
+                'tracked': params['tracked'],
+                'cleared': False,
+            })
+
+    else:
+        data = 'fail'
+        mimetype = 'application/json'
+        return HttpResponseNotFound(data, mimetype)
+
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
+
+
+def add_track(request):
+    if request.is_ajax():
+        steam_id = int(request.POST['steam_id']) % settings.ADDER_32_BIT
+        try:
+            track = Player.objects.get(steam_id=steam_id)
+        except Player.DoesNotExist:
+            track = Player.objects.create(steam_id=steam_id)
+
+        if request.user.userprofile.add_tracking(track):
+            data = request.POST['steam_id']
+
+            # Refresh all the names
+            c = ApiContext()
+            vac = ValveApiCall()
+            upp = UpdatePlayerPersonas()
+            c.steamids = steam_id + settings.ADDER_32_BIT
+            chain(vac.s(
+                mode='GetPlayerSummaries',
+                api_context=c
+            ), upp.s()).delay()
+
+            # Pull in the new guy.
+            apd = AcquirePlayerData()
+            c = ApiContext()
+            c.account_id = steam_id
+            apd.delay(api_context=c)
+
+        else:
+            data = 'fail'
+        mimetype = 'application/json'
+        return HttpResponse(data, mimetype)
+
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
