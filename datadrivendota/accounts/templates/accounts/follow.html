@@ -68,7 +68,7 @@
 $('.purgeButton').click(function(){
   $.ajax({
     type: "POST",
-    url: "{% url 'players:drop_follow' %}",
+    url: "{% url 'accounts:drop_follow' %}",
     data: {
       'slug': $(this).attr('name'),
       'csrfmiddlewaretoken': '{{ csrf_token }}'

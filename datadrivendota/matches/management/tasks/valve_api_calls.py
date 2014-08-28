@@ -30,7 +30,8 @@ from matches.models import (
 )
 from django.conf import settings
 from datadrivendota.settings.base import STEAM_API_KEY
-from players.models import Player, get_tracks
+from players.models import Player
+from accounts.models import get_tracks
 from heroes.models import Ability, Hero
 from items.models import Item
 from leagues.models import League, LeagueDossier
