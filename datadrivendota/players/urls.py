@@ -21,26 +21,6 @@ urlpatterns = patterns(
         name='hero_abilities'
     ),
     url(
-        r'^management/$',
-        views.player_management,
-        name="management"
-    ),
-    url(
-        r'^management/match-request/$',
-        views.MatchRequestView.as_view(),
-        name="match_request"
-    ),
-    url(
-        r'^management/tracking/$',
-        views.TrackingView.as_view(),
-        name="tracking"
-    ),
-    url(
-        r'^management/following/$',
-        views.FollowView.as_view(),
-        name="following"
-    ),
-    url(
         r'^(?P<player_id>[0-9]*)/matches/$',
         views.player_matches,
         name="id_matches"
@@ -61,9 +41,6 @@ urlpatterns = patterns(
         name="comparison"
     ),
     url(r'^api/getplayers/$', views.player_list, name='player_list'),
-    url(r'^api/dropfollow/$', views.drop_follow, name='drop_follow'),
-    url(r'^api/checkid/$', views.check_id, name='check_id'),
-    url(r'^api/addtrack/$', views.add_track, name='add_track'),
     url(
         r'^api/winrate/$',
         views.ApiWinrateChart.as_view(),

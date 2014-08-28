@@ -82,6 +82,18 @@
 {% block extra_js %}
 <script>
 
+if (!String.prototype.format) {
+  String.prototype.format = function() {
+    var args = arguments;
+    return this.replace(/{(\d+)}/g, function(match, number) {
+      return typeof args[number] != 'undefined'
+        ? args[number]
+        : match
+      ;
+    });
+  };
+}
+
 function column_count (identifier) {
   var colCount = 0;
   $(identifier + ' tr:nth-child(1) th').each(function () {
@@ -128,44 +140,100 @@ function hide_progress_bar () {
 }
 
 function do_steam_id_import_form () {
+  $("#checkTable").find("tr:gt(0)").remove();
   show_progress_bar('#checkTable');
 
   $.ajax({
     type: "POST",
-    url: "{% url 'players:check_id' %}",
+    url: "{% url 'accounts:check_id' %}",
     data: {
       'steam_id': $('#steam_id_input').val(),
       'csrfmiddlewaretoken': '{{ csrf_token }}'
     },
     dataType: "text",
     success: function(response) {
-      $('#checkTable > tbody:last').append(response);
-      $("#add_track").click(function(){
-        $.ajax({
-          type:'POST',
-          url:'{% url "players:add_track" %}',
-          data:{
-            "steam_id": $("#add_track").attr('name'),
-            'csrfmiddlewaretoken': '{{ csrf_token }}',
-          },
-          dataType: "text",
-          success: function(response) {
-            Messenger().post({
-              message: "Success!",
-              type: 'success'
-            });
-            hide_progress_bar();
-          },
-          error: function(rs, e) {
-            Messenger().post({
-              message: rs.responseText,
-              type: 'error'
-            });
-            hide_progress_bar();
-          }
+      response = $.parseJSON(response)
+      $("#checkTable").find("tr:gt(0)").remove();
+
+      if (response.cleared){
+        $('#checkTable > tbody:last').after(
+            "<tr> \
+            <td>{0}</td>\
+            <td>{1}</td>\
+            <td>{2}</td>\
+            <td><img src='{3}'></td>\
+            <td>{4}</td>\
+            <td>{5}</td>\
+            <td><input type='button' id='add_track' name='{6}''\ value='Import!'' /></td>\
+            </tr>".format(
+              response.exists,
+              response.id,
+              response.name,
+              response.image,
+              response.public,
+              response.tracked,
+              response.id
+            )
+        );
+        $("#add_track").click(function(){
+          $.ajax({
+            type:'POST',
+            url:'{% url "accounts:add_track" %}',
+            data:{
+              "steam_id": $("#add_track").attr('name'),
+              'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            dataType: "text",
+            success: function(response) {
+              $('#importTable > tbody:last').append(
+
+                );
+              Messenger().post({
+                message: "Success!",
+                type: 'success'
+              });
+              hide_progress_bar();
+            },
+            error: function(rs, e) {
+              Messenger().post({
+                message: rs.responseText,
+                type: 'error'
+              });
+              hide_progress_bar();
+            }
+          });
         });
-      });
-      hide_progress_bar();
+        hide_progress_bar();
+      }
+      else{
+        if (response.tracked){
+          reason = 'Already imported!'
+        }
+        else if(!response.public){
+          reason = 'Not Available :('
+        }
+        $('#checkTable > tbody:last').after(
+            "<tr> \
+            <td>{0}</td>\
+            <td>{1}</td>\
+            <td>{2}</td>\
+            <td><img src='{3}'></td>\
+            <td>{4}</td>\
+            <td>{5}</td>\
+            <td>{6}</td>\
+            </tr>".format(
+              response.exists,
+              response.id,
+              response.name,
+              response.image,
+              response.public,
+              response.tracked,
+              reason
+            )
+        );
+        hide_progress_bar();
+      }
+
     },
     error: function(rs, e) {
       Messenger().post({

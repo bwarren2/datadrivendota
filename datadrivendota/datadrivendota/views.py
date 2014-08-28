@@ -16,7 +16,8 @@ from utils.file_management import outsourceJson, moveJson
 from utils.exceptions import NoDataFound
 
 from .forms import KeyForm, SearchForm
-from players.models import PermissionCode, Player
+from players.models import Player
+from accounts.models import PermissionCode
 from heroes.models import Hero
 from items.models import Item
 from leagues.models import LeagueDossier

@@ -29,7 +29,8 @@ from .mixins import (
 )
 from datadrivendota.views import ChartFormView, ApiView
 from datadrivendota.forms import FollowMatchForm
-from players.models import request_to_player, Player
+from players.models import Player
+from accounts.models import request_to_player
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:

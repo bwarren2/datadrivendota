@@ -271,6 +271,7 @@ LOCAL_APPS = (
     'guilds',
     'leagues',
     'teams',
+    'accounts',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -409,6 +410,7 @@ PIPELINE_JS = {
             'js/bootstrap-tour.js',
             'select2-3.4.5/select2.js',
             'js/d3/d3.min.js',
+            'js/eldarion-ajax.min.js',
             'js/charting.js',
             'js/project.js',
         ),
