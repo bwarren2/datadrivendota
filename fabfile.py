@@ -13,6 +13,10 @@ def test(suite="all"):
             )
         )
 
+def push():
+    local('git push origin master')
+    local('git push heroku master')
+
 
 def hp():
     local('git push heroku master')
