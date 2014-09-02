@@ -473,7 +473,7 @@ def hero_progression_json(
         c.datalist.append(d)
 
     for pnt in c.datalist:
-        if pnt.group not in c.groups:
+        if pnt.group_var not in c.groups:
             c.groups.append(pnt.group)
 
     if matches is not None:
