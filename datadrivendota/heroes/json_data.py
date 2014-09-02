@@ -474,7 +474,7 @@ def hero_progression_json(
 
     for pnt in c.datalist:
         if pnt.group_var not in c.groups:
-            c.groups.append(pnt.group)
+            c.groups.append(pnt.group_var)
 
     if matches is not None:
         c.groups.append('Specified')
