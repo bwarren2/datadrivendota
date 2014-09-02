@@ -1,5 +1,7 @@
 import operator
 from itertools import chain
+from time import mktime
+import datetime
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -600,9 +602,14 @@ def update_player_winrate(
     game_modes,
 ):
 
+    #default: past 180 days
+
+    min_date = mktime(datetime.datetime.now().timetuple()) - 180*60*60
+
     hero_obj = Hero.public.get(steam_id=hero)
     p_games = Player.TI4.filter(
         playermatchsummary__hero__steam_id=hero,
+        playermatchsummary__match__start_time__gte=min_date,
         ).annotate(Count('playermatchsummary__id'))
 
     dict_games = {p: {'games': p.playermatchsummary__id__count}
@@ -610,6 +617,7 @@ def update_player_winrate(
 
     p_wins = Player.TI4.filter(
         playermatchsummary__hero__steam_id=hero,
+        playermatchsummary__match__start_time__gte=min_date,
         playermatchsummary__is_win=True,
         ).annotate(Count('playermatchsummary__id'))
 
