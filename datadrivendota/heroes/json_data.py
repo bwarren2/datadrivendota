@@ -601,16 +601,14 @@ def update_player_winrate(
 ):
 
     hero_obj = Hero.public.get(steam_id=hero)
-    p_games = Player.objects.filter(
-        updated=True,
+    p_games = Player.TI4.filter(
         playermatchsummary__hero__steam_id=hero,
         ).annotate(Count('playermatchsummary__id'))
 
     dict_games = {p: {'games': p.playermatchsummary__id__count}
                   for p in p_games}
 
-    p_wins = Player.objects.filter(
-        updated=True,
+    p_wins = Player.TI4.filter(
         playermatchsummary__hero__steam_id=hero,
         playermatchsummary__is_win=True,
         ).annotate(Count('playermatchsummary__id'))
