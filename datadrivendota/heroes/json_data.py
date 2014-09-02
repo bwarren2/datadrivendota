@@ -448,7 +448,7 @@ def hero_progression_json(
                     'Normal Skill',
                     'High Skill',
                     'Very High Skill',
-                    'Tournament Game'
+                    'Tournament Game',
                 ]
                 if player is not None and c.groups is not None:
                     c.groups.append('Player')
