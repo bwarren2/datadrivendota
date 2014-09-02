@@ -604,7 +604,7 @@ def update_player_winrate(
 
     #default: past 180 days
 
-    min_date = mktime(datetime.datetime.now().timetuple()) - 180*60*60
+    min_date = mktime(datetime.datetime.now().timetuple()) - 180*24*60*60
 
     hero_obj = Hero.public.get(steam_id=hero)
     p_games = Player.TI4.filter(
