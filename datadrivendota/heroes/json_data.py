@@ -444,7 +444,12 @@ def hero_progression_json(
                     s=skill_value)
                 #Contextual ordering
 
-                c.groups = ['Normal Skill', 'High Skill', 'Very High Skill']
+                c.groups = [
+                    'Normal Skill',
+                    'High Skill',
+                    'Very High Skill',
+                    'Tournament Game'
+                ]
                 if player is not None and c.groups is not None:
                     c.groups.append('Player')
 

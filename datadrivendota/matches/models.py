@@ -493,4 +493,3 @@ def skill_name(skill):
         return 'Tournament Game'
     else:
         return skill
-
