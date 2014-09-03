@@ -35,7 +35,6 @@ logutils==0.3.3
 oauth2==1.5.211
 oauthlib==0.6.0
 paramiko==1.10.1
-PIL==1.1.7
 psycopg2==2.4.6
 pycrypto==2.6
 Pygments==1.6
