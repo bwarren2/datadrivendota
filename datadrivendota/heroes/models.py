@@ -232,7 +232,6 @@ class AbilityUnitTargetFlags(models.Model):
             'DOTA_UNIT_TARGET_FLAG_', ''
             ).replace('_', ' ').title()
 
-
     def __unicode__(self):
         return human_name(self.internal_name)
 
