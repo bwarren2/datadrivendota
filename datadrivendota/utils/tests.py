@@ -42,7 +42,7 @@ class SmarterPaginatorTestCase(TestCase):
 
         return tuple(page_range.__getslice__(*s) for s in slices)
 
-    def test_for(self, rng, current, expected):
+    def validate(self, rng, current, expected):
         error = "Saw {}, expected {}".format(
             self.page_range_with_ellipses(rng, current),
             expected
@@ -54,79 +54,79 @@ class SmarterPaginatorTestCase(TestCase):
         )
 
     def test_permutations(self):
-        self.test_for(
+        self.validate(
             [0],
             0,
             ([0],)
         )
 
-        self.test_for(
+        self.validate(
             [0, 1],
             0,
             ([0, 1],)
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4],
             0,
             ([0, 1, 2, 3, 4],)
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4],
             1,
             ([0, 1, 2, 3, 4],)
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4],
             2,
             ([0, 1, 2, 3, 4],)
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4],
             3,
             ([0, 1, 2, 3, 4],)
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4],
             4,
             ([0, 1, 2, 3, 4],)
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4, 5, 6, 7],
             1,
             ([0, 1, 2, 3], [5, 6, 7])
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4, 5, 6, 7],
             2,
             ([0, 1, 2, 3, 4, 5, 6, 7],)
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4, 5, 6, 7],
             5,
             ([0, 1, 2, 3, 4, 5, 6, 7],)
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4, 5, 6, 7],
             6,
             ([0, 1, 2], [4, 5, 6, 7])
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             5,
             ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],)
         )
 
-        self.test_for(
+        self.validate(
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
             6,
             ([0, 1, 2], [4, 5, 6, 7, 8], [10, 11, 12])

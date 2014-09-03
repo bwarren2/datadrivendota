@@ -431,9 +431,11 @@ PIPELINE_COMPILERS = (
 ########## END PIPELINE CONFIGURATION
 
 # Tests
-# Thorny!
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = ['--with-yanc', '--stop']
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=accounts,guilds,heroes,items,leagues,matches,players,teams,utils',
+]
 
 
 #Magic Colors
