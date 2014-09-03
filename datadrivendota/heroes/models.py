@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from .managers import VisibleHeroManager
+from utils import safen
 # For the name, internal_name, and valve_id, see:
 # https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/
 #       ?key=<YOURKEY>&language=en_us
@@ -213,7 +214,7 @@ class AbilityBehavior(models.Model):
     )
 
     def __unicode__(self):
-        return human_name(self.internal_name)
+        return safen(self.internal_name)
 
     def display_name(self):
         return self.internal_name.replace(
@@ -233,7 +234,7 @@ class AbilityUnitTargetFlags(models.Model):
             ).replace('_', ' ').title()
 
     def __unicode__(self):
-        return human_name(self.internal_name)
+        return safen(self.internal_name)
 
 
 class AbilityUnitTargetType(models.Model):
@@ -248,7 +249,7 @@ class AbilityUnitTargetType(models.Model):
             ).replace('_', ' ').title()
 
     def __unicode__(self):
-        return human_name(self.internal_name)
+        return safen(self.internal_name)
 
 
 class AbilityUnitTargetTeam(models.Model):
@@ -263,7 +264,7 @@ class AbilityUnitTargetTeam(models.Model):
             ).replace('_', ' ').title()
 
     def __unicode__(self):
-        return human_name(self.internal_name)
+        return safen(self.internal_name)
 
 
 class HeroDossier(models.Model):
@@ -397,28 +398,3 @@ class HeroDossier(models.Model):
 
         else:
             raise AttributeError("What is %s" % stat)
-
-
-def invalid_option(stats_list):
-    valid_stat_set = set([
-        'level',
-        'strength',
-        'agility',
-        'intelligence',
-        'armor',
-        'hp',
-        'effective_hp',
-        'mana',
-    ])
-    for stat in stats_list:
-        if stat not in valid_stat_set:
-            return True
-    return False
-
-
-def safen(str):
-    return str.replace('-', ' ').replace('_', ' ').title()
-
-
-def human_name(str):
-    return str.replace("_", " ").title()
