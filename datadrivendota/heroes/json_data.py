@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models import Avg
 
-from heroes.models import HeroDossier, Hero, invalid_option, Ability
+from heroes.models import HeroDossier, Hero, Ability
 from matches.models import (
     PlayerMatchSummary,
     Match,
@@ -870,3 +870,20 @@ def hero_pick_rate_lineup(var, skill_level, player, heroes):
     c.params.padding['bottom'] = 120
     c.params.tick_values = [x for ind, x in enumerate(xs) if ind % 2 == 0]
     return c
+
+
+def invalid_option(stats_list):
+    valid_stat_set = set([
+        'level',
+        'strength',
+        'agility',
+        'intelligence',
+        'armor',
+        'hp',
+        'effective_hp',
+        'mana',
+    ])
+    for stat in stats_list:
+        if stat not in valid_stat_set:
+            return True
+    return False
