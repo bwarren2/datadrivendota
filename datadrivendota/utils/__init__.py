@@ -49,6 +49,7 @@ def match_url(match_id):
     """Yes, I know.  This is a dumb hack because calling reverse() a million times starts taking up a meaningful fraction of the load time.  At least this way the hack is centralized, and this function can be gutted if needed."""
     return '/matches/'+str(match_id)
 
+
 def binomial_likelihood(n, k, p):
     choosing = factorial(n)/(factorial(k)*factorial(n-k))
     branching = p**k*(1-p)**(n-k)
