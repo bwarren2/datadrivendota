@@ -1,5 +1,5 @@
 from django.db import models
-from datadrivendota.utilities import safen
+from utils import safen
 
 
 class Match(models.Model):
