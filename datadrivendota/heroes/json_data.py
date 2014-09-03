@@ -351,13 +351,9 @@ def hero_progression_json(
 
     if player is not None:
         player_games = pmses.filter(player__steam_id=player)\
-            .values('match__steam_id')\
+            .values('match__steam_id', 'id')\
 
-        player_game_ids = [pg['match__steam_id'] for pg in player_games]
-
-        player_games = pmses.filter(player__steam_id=player)\
-            .values('id')\
-
+        player_game_ids = [pg['id'] for pg in player_games]
 
         pmses_pool = [
             x['id']
