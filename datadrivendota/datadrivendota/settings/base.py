@@ -434,7 +434,6 @@ PIPELINE_COMPILERS = (
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--with-coverage',
-    '--cover-package=accounts,guilds,heroes,items,leagues,matches,players,teams,utils',
 ]
 
 

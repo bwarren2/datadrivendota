@@ -50,6 +50,7 @@ class Command(BaseCommand):
                 keep_going = False
             if keep_going:
                 continue
+            try
             ab = Ability.objects.get_or_create(
                 steam_id=data_dict['ID'],
                 #is_ultimate=False,
@@ -62,7 +63,7 @@ class Command(BaseCommand):
                         setattr(ab, value, trait)
                         ab.internal_name = ability
                     if (
-                            data_dict.get('AbilityType', '')
+                        data_dict.get('AbilityType', '')
                             == 'DOTA_ABILITY_TYPE_ULTIMATE'
                             ):
                         ab.is_ultimate = True
