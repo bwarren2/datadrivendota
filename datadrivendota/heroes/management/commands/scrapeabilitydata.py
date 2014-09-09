@@ -16,6 +16,8 @@ from heroes.models import (
     Hero
 )
 
+# Hint: change the blank ability internal name to something else before running this if there are new abilities coming in.
+
 
 class Command(BaseCommand):
 
