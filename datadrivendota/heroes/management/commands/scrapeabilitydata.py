@@ -50,7 +50,6 @@ class Command(BaseCommand):
                 keep_going = False
             if keep_going:
                 continue
-            try
             ab = Ability.objects.get_or_create(
                 steam_id=data_dict['ID'],
                 #is_ultimate=False,
