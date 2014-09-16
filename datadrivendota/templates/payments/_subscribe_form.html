@@ -2,8 +2,25 @@
 {% load bootstrap_tags %}
 
 <div class="subscribe-form">
-    <h2>Purchase a Subscription</h2>
-    <p class="lead">Provide your payment details to start your subscription today.</p>
+    <h2>Subscriptions</h2>
+    <p class="lead">We let users subscribe and get extra features through a small monthly payment.  Benefits include:</p>
+    <ul>
+    <li>
+        No ads
+    </li>
+    <li>
+        Importing your own data and that of up to 7 other people
+    </li>
+    <li>
+        Requesting particular matches for import
+    </li>
+    <li>
+        Helping the devs cover costs
+    </li>
+    </ul>
+    <p class="lead">
+        Pick a plan below and get started today!
+    </p>
     {% if error %}
         <div class="alert alert-error">{{ error }}</div>
     {% endif %}
