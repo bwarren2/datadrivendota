@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from .managers import VisibleHeroManager
 from utils import safen
+from utils.exceptions import NoDataFound
 # For the name, internal_name, and valve_id, see:
 # https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/
 #       ?key=<YOURKEY>&language=en_us
@@ -356,15 +357,15 @@ class HeroDossier(models.Model):
             'intelligence_gain',
         ]
         if level not in range(1, 26):
-            raise AttributeError("That is not a real level")
+            raise NoDataFound("That is not a real level")
         if hasattr(self, stat) and stat in easy_list:
             return getattr(self, stat)
         elif stat == "strength":
-            return self.strength+(level-1)*self.strength_gain
+            return scale_stat(self.strength, level, self.strength_gain)
         elif stat == "intelligence":
-            return self.intelligence+(level-1)*self.intelligence_gain
+            return scale_stat(self.intelligence, level, self.intelligence_gain)
         elif stat == "agility":
-            return self.agility+(level-1)*self.agility_gain
+            return scale_stat(self.agility, level, self.agility_gain)
         elif stat == "modified_armor":
             return self.armor + ((level-1)*self.agility_gain)/7.0
         elif stat == "effective_hp":
@@ -397,4 +398,8 @@ class HeroDossier(models.Model):
             return base_dmg + add_dmg
 
         else:
-            raise AttributeError("What is %s" % stat)
+            raise NoDataFound("What is %s" % stat)
+
+
+def scale_stat(base, addon, level):
+    return base+(level-1)*addon

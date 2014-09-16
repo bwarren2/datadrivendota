@@ -15,14 +15,17 @@ class SingleHeroSelect(forms.CharField):
         if ',' in hero:
             raise ValidationError("Only one hero at a time.")
         try:
-            hero = Hero.objects.get(steam_id=hero)
+            num_id = int(hero)
+            hero = Hero.objects.get(steam_id=num_id)
         except Hero.DoesNotExist:
-            raise ValidationError("No hero by that name.")
+            raise ValidationError("No hero by that ID.")
 
         return hero.steam_id
 
 
 class MultiHeroSelect(forms.CharField):
+    """ Takes a comma-delimited string and returns a list of all the instances with names in that list."""
+
     widget = forms.HiddenInput(attrs={'class': 'multi-hero-tags'})
 
     def clean(self, hero_str):

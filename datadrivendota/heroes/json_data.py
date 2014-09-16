@@ -29,7 +29,7 @@ from utils.charts import (
     XYPlot, BarPlot, TasselPlot, TasselDataPoint,
     valid_var,
     )
-from utils import utcize
+from utils import utcize, match_url
 
 if settings.VERBOSE_PROFILING:
     try:
@@ -70,13 +70,17 @@ else:
 
 @do_profile()
 def hero_vitals_json(heroes, stats):
+    """ Takes a list of ids, gets valid heroes from that list, then makes a chart of all the valid stats given. """
+
+    # # Validate
     selected_hero_dossiers = HeroDossier.objects.filter(
         hero__steam_id__in=heroes
     )
-
+    # If we cannot find any heroes or the stats are invalid
     if len(selected_hero_dossiers) == 0 or invalid_option(stats):
         raise NoDataFound
 
+    # Everything is kosher
     hero_classes = hero_classes_dict()
     c = XYPlot()
     for hero_dossier in selected_hero_dossiers:
@@ -123,13 +127,10 @@ def hero_lineup_json(heroes, stat, level):
     if len(hero_dossiers) == 0:
         raise NoDataFound
 
-    try:
-        hero_value = dict(
-            (dossier, dossier.fetch_value(stat, level))
-            for dossier in hero_dossiers
-        )
-    except AttributeError:
-        raise NoDataFound
+    hero_value = dict(
+        (dossier, dossier.fetch_value(stat, level))
+        for dossier in hero_dossiers
+    )
 
     hero_value = sorted(
         hero_value.iteritems(),
@@ -267,7 +268,7 @@ def hero_performance_chart_json(
             d.y_var = fetch_pms_attribute(pms, y_var)
             d.label = match_dict[pms.id]
             d.tooltip = match_dict[pms.id]
-            d.url = '/matches/'+str(match_dict[pms.id])
+            d.url = match_url(match_dict[pms.id])
             if hero_classes[pms.hero.steam_id] is not None:
                 d.classes.extend(
                     hero_classes[pms.hero.steam_id]

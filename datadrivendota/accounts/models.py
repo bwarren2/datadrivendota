@@ -74,7 +74,7 @@ class Applicant(models.Model):
     def save(self, *args, **kwargs):
         # That magic number is the valve 32bit -64bit adder.
         # Steam ids are 32 bit by convention.
-        self.steam_id = self.steam_id % ADDER_32_BIT
+        self.steam_id = self.steam_id % settings.ADDER_32_BIT
         super(Applicant, self).save(*args, **kwargs)
 
     def __unicode__(self):

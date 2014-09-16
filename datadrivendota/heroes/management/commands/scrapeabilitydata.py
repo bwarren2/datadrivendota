@@ -16,6 +16,8 @@ from heroes.models import (
     Hero
 )
 
+# Hint: change the blank ability internal name to something else before running this if there are new abilities coming in.
+
 
 class Command(BaseCommand):
 
@@ -62,7 +64,7 @@ class Command(BaseCommand):
                         setattr(ab, value, trait)
                         ab.internal_name = ability
                     if (
-                            data_dict.get('AbilityType', '')
+                        data_dict.get('AbilityType', '')
                             == 'DOTA_ABILITY_TYPE_ULTIMATE'
                             ):
                         ab.is_ultimate = True
