@@ -52,6 +52,8 @@ def standard_color_map(group):
             return settings.SKILL3_COLOR
     elif group == 'Player':
             return settings.SKILLPLAYER_COLOR
+    elif group == 'Tournament game':
+            return settings.SKILLTOURNAMENT_COLOR
     else:
         return None
 

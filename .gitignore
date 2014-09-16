@@ -55,3 +55,6 @@ ddd.sublime-workspace
 
 #Temp pngs
 *-*-*-*-*.png
+
+#Nose Coverage
+.coverage

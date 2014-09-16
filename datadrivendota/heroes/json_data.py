@@ -1,11 +1,13 @@
 import operator
 from itertools import chain
+from time import mktime
+import datetime
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models import Avg
 
-from heroes.models import HeroDossier, Hero, invalid_option, Ability
+from heroes.models import HeroDossier, Hero, Ability
 from matches.models import (
     PlayerMatchSummary,
     Match,
@@ -27,7 +29,7 @@ from utils.charts import (
     XYPlot, BarPlot, TasselPlot, TasselDataPoint,
     valid_var,
     )
-from utils import utcize
+from utils import utcize, match_url
 
 if settings.VERBOSE_PROFILING:
     try:
@@ -68,13 +70,17 @@ else:
 
 @do_profile()
 def hero_vitals_json(heroes, stats):
+    """ Takes a list of ids, gets valid heroes from that list, then makes a chart of all the valid stats given. """
+
+    # # Validate
     selected_hero_dossiers = HeroDossier.objects.filter(
         hero__steam_id__in=heroes
     )
-
+    # If we cannot find any heroes or the stats are invalid
     if len(selected_hero_dossiers) == 0 or invalid_option(stats):
         raise NoDataFound
 
+    # Everything is kosher
     hero_classes = hero_classes_dict()
     c = XYPlot()
     for hero_dossier in selected_hero_dossiers:
@@ -121,13 +127,10 @@ def hero_lineup_json(heroes, stat, level):
     if len(hero_dossiers) == 0:
         raise NoDataFound
 
-    try:
-        hero_value = dict(
-            (dossier, dossier.fetch_value(stat, level))
-            for dossier in hero_dossiers
-        )
-    except AttributeError:
-        raise NoDataFound
+    hero_value = dict(
+        (dossier, dossier.fetch_value(stat, level))
+        for dossier in hero_dossiers
+    )
 
     hero_value = sorted(
         hero_value.iteritems(),
@@ -265,7 +268,7 @@ def hero_performance_chart_json(
             d.y_var = fetch_pms_attribute(pms, y_var)
             d.label = match_dict[pms.id]
             d.tooltip = match_dict[pms.id]
-            d.url = '/matches/'+str(match_dict[pms.id])
+            d.url = match_url(match_dict[pms.id])
             if hero_classes[pms.hero.steam_id] is not None:
                 d.classes.extend(
                     hero_classes[pms.hero.steam_id]
@@ -349,13 +352,9 @@ def hero_progression_json(
 
     if player is not None:
         player_games = pmses.filter(player__steam_id=player)\
-            .values('match__steam_id')\
+            .values('match__steam_id', 'id')\
 
-        player_game_ids = [pg['match__steam_id'] for pg in player_games]
-
-        player_games = pmses.filter(player__steam_id=player)\
-            .values('id')\
-
+        player_game_ids = [pg['id'] for pg in player_games]
 
         pmses_pool = [
             x['id']
@@ -442,7 +441,12 @@ def hero_progression_json(
                     s=skill_value)
                 #Contextual ordering
 
-                c.groups = ['Normal Skill', 'High Skill', 'Very High Skill']
+                c.groups = [
+                    'Normal Skill',
+                    'High Skill',
+                    'Very High Skill',
+                    'Tournament Game',
+                ]
                 if player is not None and c.groups is not None:
                     c.groups.append('Player')
 
@@ -464,6 +468,10 @@ def hero_progression_json(
             d.classes.extend(hero_classes[hero_id])
 
         c.datalist.append(d)
+
+    for pnt in c.datalist:
+        if pnt.group_var not in c.groups:
+            c.groups.append(pnt.group_var)
 
     if matches is not None:
         c.groups.append('Specified')
@@ -600,18 +608,22 @@ def update_player_winrate(
     game_modes,
 ):
 
+    #default: past 180 days
+
+    min_date = mktime(datetime.datetime.now().timetuple()) - 180*24*60*60
+
     hero_obj = Hero.public.get(steam_id=hero)
-    p_games = Player.objects.filter(
-        updated=True,
+    p_games = Player.TI4.filter(
         playermatchsummary__hero__steam_id=hero,
+        playermatchsummary__match__start_time__gte=min_date,
         ).annotate(Count('playermatchsummary__id'))
 
     dict_games = {p: {'games': p.playermatchsummary__id__count}
                   for p in p_games}
 
-    p_wins = Player.objects.filter(
-        updated=True,
+    p_wins = Player.TI4.filter(
         playermatchsummary__hero__steam_id=hero,
+        playermatchsummary__match__start_time__gte=min_date,
         playermatchsummary__is_win=True,
         ).annotate(Count('playermatchsummary__id'))
 
@@ -859,3 +871,20 @@ def hero_pick_rate_lineup(var, skill_level, player, heroes):
     c.params.padding['bottom'] = 120
     c.params.tick_values = [x for ind, x in enumerate(xs) if ind % 2 == 0]
     return c
+
+
+def invalid_option(stats_list):
+    valid_stat_set = set([
+        'level',
+        'strength',
+        'agility',
+        'intelligence',
+        'armor',
+        'hp',
+        'effective_hp',
+        'mana',
+    ])
+    for stat in stats_list:
+        if stat not in valid_stat_set:
+            return True
+    return False

@@ -4,14 +4,22 @@ from fabric.api import local
 def test(suite="all"):
     if suite == 'all':
         local(
-            'python -W ignore datadrivendota/manage.py test integration_tests'
+            'python -W ignore datadrivendota/manage.py  test integration_tests'
         )
-    else:
+    elif suite == 'apps':
         local(
-            'python -W ignore datadrivendota/manage.py test {suite}'.format(
+            'python datadrivendota/manage.py test accounts guilds heroes items leagues matches players teams utils --settings=datadrivendota.settings.test'.format(
                 suite=suite
             )
         )
+
+    else:
+        local(
+            'python datadrivendota/manage.py test {suite} --cover-package={suite} --settings=datadrivendota.settings.test'.format(
+                suite=suite
+            )
+        )
+
 
 def push():
     local('git push origin master')

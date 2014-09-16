@@ -25,7 +25,7 @@ class Command(BaseCommand):
         # smaller methods. Try to keep linecount under a dozen.
         # --kit 2014-02-16
 
-        with open('npc_heroes.json') as f:
+        with open('json_files/npc_heroes.json') as f:
             stats = loads(f.read())['DOTAHeroes']
         try:
             del stats['Version']  # Purge a junk field

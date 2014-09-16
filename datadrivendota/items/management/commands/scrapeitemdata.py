@@ -16,7 +16,7 @@ class Command(BaseCommand):
         edited_json = {}
 
         # Get the item IDs from the local file.
-        with open('items.json') as f:
+        with open('json_files/items.json') as f:
             internal_json = loads(f.read())
 
         try:

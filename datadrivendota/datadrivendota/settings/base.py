@@ -431,9 +431,10 @@ PIPELINE_COMPILERS = (
 ########## END PIPELINE CONFIGURATION
 
 # Tests
-# Thorny!
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = ['--with-yanc', '--stop']
+NOSE_ARGS = [
+    '--with-coverage',
+]
 
 
 #Magic Colors
@@ -448,6 +449,7 @@ SKILL1_COLOR = '#CC0000'
 SKILL2_COLOR = '#CCAF00'
 SKILL3_COLOR = '#3ACC00'
 SKILLPLAYER_COLOR = '#00CC75'
+SKILLTOURNAMENT_COLOR = '#AA37CA'
 CONTRASTING_10 = [
     '#1f77b4',
     '#7EF6C6',

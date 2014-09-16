@@ -9,7 +9,6 @@ from django.template.loader import render_to_string
 from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
 
 import stripe
 

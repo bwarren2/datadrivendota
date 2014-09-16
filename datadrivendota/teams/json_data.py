@@ -1,7 +1,6 @@
 import datetime
 from django.conf import settings
 from django.db.models import Count, Q
-from django.core.urlresolvers import reverse
 from matches.models import PlayerMatchSummary, GameMode, Match, PickBan
 from .models import Team
 from utils.exceptions import NoDataFound

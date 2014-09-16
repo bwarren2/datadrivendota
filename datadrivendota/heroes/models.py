@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
 from .managers import VisibleHeroManager
+from utils import safen
+from utils.exceptions import NoDataFound
 # For the name, internal_name, and valve_id, see:
 # https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/
 #       ?key=<YOURKEY>&language=en_us
@@ -213,7 +215,7 @@ class AbilityBehavior(models.Model):
     )
 
     def __unicode__(self):
-        return human_name(self.internal_name)
+        return safen(self.internal_name)
 
     def display_name(self):
         return self.internal_name.replace(
@@ -232,9 +234,8 @@ class AbilityUnitTargetFlags(models.Model):
             'DOTA_UNIT_TARGET_FLAG_', ''
             ).replace('_', ' ').title()
 
-
     def __unicode__(self):
-        return human_name(self.internal_name)
+        return safen(self.internal_name)
 
 
 class AbilityUnitTargetType(models.Model):
@@ -249,7 +250,7 @@ class AbilityUnitTargetType(models.Model):
             ).replace('_', ' ').title()
 
     def __unicode__(self):
-        return human_name(self.internal_name)
+        return safen(self.internal_name)
 
 
 class AbilityUnitTargetTeam(models.Model):
@@ -264,7 +265,7 @@ class AbilityUnitTargetTeam(models.Model):
             ).replace('_', ' ').title()
 
     def __unicode__(self):
-        return human_name(self.internal_name)
+        return safen(self.internal_name)
 
 
 class HeroDossier(models.Model):
@@ -356,15 +357,15 @@ class HeroDossier(models.Model):
             'intelligence_gain',
         ]
         if level not in range(1, 26):
-            raise AttributeError("That is not a real level")
+            raise NoDataFound("That is not a real level")
         if hasattr(self, stat) and stat in easy_list:
             return getattr(self, stat)
         elif stat == "strength":
-            return self.strength+(level-1)*self.strength_gain
+            return scale_stat(self.strength, level, self.strength_gain)
         elif stat == "intelligence":
-            return self.intelligence+(level-1)*self.intelligence_gain
+            return scale_stat(self.intelligence, level, self.intelligence_gain)
         elif stat == "agility":
-            return self.agility+(level-1)*self.agility_gain
+            return scale_stat(self.agility, level, self.agility_gain)
         elif stat == "modified_armor":
             return self.armor + ((level-1)*self.agility_gain)/7.0
         elif stat == "effective_hp":
@@ -397,29 +398,8 @@ class HeroDossier(models.Model):
             return base_dmg + add_dmg
 
         else:
-            raise AttributeError("What is %s" % stat)
+            raise NoDataFound("What is %s" % stat)
 
 
-def invalid_option(stats_list):
-    valid_stat_set = set([
-        'level',
-        'strength',
-        'agility',
-        'intelligence',
-        'armor',
-        'hp',
-        'effective_hp',
-        'mana',
-    ])
-    for stat in stats_list:
-        if stat not in valid_stat_set:
-            return True
-    return False
-
-
-def safen(str):
-    return str.replace('-', ' ').replace('_', ' ').title()
-
-
-def human_name(str):
-    return str.replace("_", " ").title()
+def scale_stat(base, addon, level):
+    return base+(level-1)*addon
