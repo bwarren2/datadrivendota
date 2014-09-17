@@ -2,6 +2,8 @@
 
 {% load navigation_extras %}
 
+{% block page_title %}{% endblock page_title %}
+
 {% block extra_nav %}
   <ul class='nav nav-tabs'>
     <li class="{% active 'payments:payments_subscribe' %}"><a href="{% url 'payments:payments_subscribe' %}">Subscribe</a></li>
