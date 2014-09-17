@@ -493,7 +493,7 @@ class RetrievePlayerRecords(ApiFollower):
 
         else:
 
-            logger.error(
+            logger.info(
                 "Did {0} of {1} for {2}. {3} left.  Done.".format(
                     self.api_context.processed,
                     self.api_context.matches_desired,
