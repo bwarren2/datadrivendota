@@ -5,8 +5,8 @@
 {% block content %}
     {% include "payments/_subscription_status.html" %}
     <h2>Payment History</h2>
-    <p class="lead">Your transaction history</p>
     {% if request.user.customer.invoices.all %}
+        <p class="lead">Your transaction history</p>
         <table class="table">
             <thead>
                 <tr>
@@ -21,15 +21,11 @@
                     <td>{{ invoice.date|date:"M d" }}</td>
                     <td>
                         {% if invoice.paid and invoice.total > 0 %}
-                            <p>
-                                <span class="label label-success">Paid</span> ${{ invoice.total|floatformat:"2" }}
-                            </p>
+                            ${{ invoice.total|floatformat:"2" }} <span class="label label-success">Paid</span>
                         {% endif %}
 
                         {% if invoice.paid and invoice.total < 0 %}
-                            <p>
-                                <span class="label label-success">Credit</span> ${{ invoice.total|floatformat:"2" }}
-                            </p>
+                            ${{ invoice.total|floatformat:"2" }} <span class="label label-success">Credit</span>
                         {% endif %}
                     </td>
                 </tr>
