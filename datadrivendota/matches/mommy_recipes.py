@@ -103,26 +103,26 @@ def make_matchset():
     # Make a hero
     h = make_hero()
 
-    # Make 4 abilities
-    mommy.make('heroes.ability', hero=h, steam_id=1)
-    mommy.make('heroes.ability', hero=h, steam_id=2)
-    mommy.make('heroes.ability', hero=h, steam_id=3)
-    mommy.make('heroes.ability', hero=h, steam_id=4)
-
     i = mommy.make('items.item', thumbshot=None, mugshot=None)
-    p = mommy.make_recipe('players.player', pro_name='ProGuy')
+    p = mommy.make(
+        'players.player',
+        pro_name='ProGuy')
     ls = mommy.make('matches.leaverstatus')
     lt = mommy.make('matches.lobbytype')
     gm = mommy.make_recipe('matches.game_mode')
 
-    t = mommy.make('teams.team', steam_id=1333179)
-    mommy.make(
-        'teams.teamdossier',
-        team=t,
-        name='FakeTI4 team',
-        player_0=p
-    )
-
+    from teams.models import Team
+    try:
+        t = Team.objects.get(steam_id=1333179)
+    except Team.DoesNotExist:
+        t = mommy.make('teams.team', steam_id=1333179)
+        mommy.make(
+            'teams.teamdossier',
+            team=t,
+            name='FakeTI4 team',
+            player_0=p
+        )
+    l = mommy.make('leagues.league')
     abilities = Ability.objects.filter(hero=h)
 
     sb = mommy.make('matches.skillbuild', level=1, ability=abilities[0])
@@ -144,6 +144,8 @@ def make_matchset():
             item_5=i,
             leaver=ls,
             level=3,
+            match__radiant_team=t,
+            match__league=l,
             match__game_mode=gm,
             match__start_time=start_time,
             match__lobby_type=lt,

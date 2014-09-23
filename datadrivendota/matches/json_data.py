@@ -193,7 +193,7 @@ def player_team_endgame_json(
                 )
 
             if not valid_var(panel_var):
-                pass
+                split_param = None
             elif panel_var == 'game_mode':
                 split_param = annotation.game_mode.description
             elif panel_var == 'player':
@@ -696,7 +696,16 @@ def match_list_json(matches, players):
     return c
 
 
-def match_set_progression_json(hero, match_set_1, match_set_2, match_set_3):
+def match_set_progression_json(
+        hero,
+        match_set_1,
+        match_set_2=None,
+        match_set_3=None
+        ):
+    if match_set_2 is None:
+        match_set_2 = []
+    if match_set_3 is None:
+        match_set_3 = []
     sbs = SkillBuild.objects.filter(
         player_match_summary__hero__steam_id=hero
     ).filter(

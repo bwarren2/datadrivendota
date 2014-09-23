@@ -22,6 +22,8 @@ from utils.exceptions import NoDataFound
 
 JSON_TIME = .2
 
+# update_player_winrate uses 1.5s cap, needs optimization
+
 
 class TestHeroes(TestCase):
 
@@ -31,6 +33,16 @@ class TestHeroes(TestCase):
     def test_names(self):
         self.assertEqual(self.hero.__unicode__(), self.hero.name)
         self.assertEqual(self.hero.safe_name(), safen(self.hero.machine_name))
+
+
+class TestMommyRecipes(TestCase):
+
+    def setUp(self):
+        pass
+
+    def test_fake(self):
+        mommy.make_recipe('heroes.hero', name=u'Axe')
+        make_hero()
 
 
 class TestHeroManagers(TestCase):
@@ -192,7 +204,7 @@ class TestWorkingJson(TestCase):
         )
         self.assertGreater(len(chart.datalist), 1)
 
-    @timed(1)
+    @timed(1.5)
     def test_winrate_json(self):
         chart = update_player_winrate(
             self.hero.steam_id,

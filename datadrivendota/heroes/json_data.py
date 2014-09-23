@@ -11,7 +11,6 @@ from heroes.models import HeroDossier, Hero, Ability
 from matches.models import (
     PlayerMatchSummary,
     Match,
-    fetch_match_attributes,
     SkillBuild,
     skill_name,
     fetch_pms_attribute,
@@ -230,7 +229,7 @@ def hero_performance_chart_json(
             'match', 'player', 'hero__name', 'hero__steam_id'
         )
         pms_pool = list(chain(skill1, skill2, skill3, player_games))
-        player_game_ids = fetch_match_attributes(player_games, 'match_id')[0]
+        player_game_ids = [x.match.steam_id for x in player_games]
     else:
         pms_pool = list(chain(skill1, skill2, skill3))
         player_game_ids = []
@@ -243,9 +242,7 @@ def hero_performance_chart_json(
             match__steam_id__in=matches,
         )
         pms_pool.extend(list(requested_pmses))
-        requested_game_ids = fetch_match_attributes(
-            requested_pmses, 'match_id'
-        )[0]
+        requested_game_ids = [x.match.steam_id for x in requested_pmses]
     else:
         requested_game_ids = []
 

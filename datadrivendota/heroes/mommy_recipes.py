@@ -28,7 +28,7 @@ role = Recipe(
 ability = Recipe(
     Ability,
     name=seq('Ability'),
-    id=seq(1)
+    steam_id=seq(1)
     )
 
 
@@ -55,13 +55,15 @@ herodossier = Recipe(
 
 def make_hero(steam_id=None):
     if steam_id is not None:
-
-        a1 = mommy.make_recipe(
-            'heroes.assignment',
-            hero__steam_id=steam_id)
+        hero = mommy.make_recipe('heroes.hero', steam_id=steam_id)
     else:
-        a1 = mommy.make_recipe('heroes.assignment')
+        hero = mommy.make_recipe('heroes.hero')
+
+    a1 = mommy.make_recipe(
+        'heroes.assignment',
+        hero=hero)
 
     h1 = a1.hero
     mommy.make_recipe('heroes.herodossier', hero=h1)
+    mommy.make_recipe('heroes.ability', hero=h1, _quantity=4)
     return h1
