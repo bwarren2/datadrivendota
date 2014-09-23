@@ -164,10 +164,7 @@ class PlayerMatchSummary(models.Model):
         return False
 
     def __unicode__(self):
-        # @todo: This doesn't currently return a unicode object, but a string
-        # object. Bad news bears!
-        # --kit 2014-02-16
-        return (
+        return unicode(
             "Match "
             + str(self.match.steam_id)
             + ", User "

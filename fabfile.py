@@ -15,7 +15,7 @@ def test(suite="all"):
 
     else:
         local(
-            'python datadrivendota/manage.py test {suite} --cover-package={suite} --settings=datadrivendota.settings.test'.format(
+            'python datadrivendota/manage.py test {suite} --nologcapture --cover-package={suite} --settings=datadrivendota.settings.test'.format(
                 suite=suite
             )
         )
