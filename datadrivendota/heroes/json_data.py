@@ -11,7 +11,6 @@ from heroes.models import HeroDossier, Hero, Ability
 from matches.models import (
     PlayerMatchSummary,
     Match,
-    fetch_match_attributes,
     SkillBuild,
     skill_name,
     fetch_pms_attribute,
@@ -230,7 +229,7 @@ def hero_performance_chart_json(
             'match', 'player', 'hero__name', 'hero__steam_id'
         )
         pms_pool = list(chain(skill1, skill2, skill3, player_games))
-        player_game_ids = fetch_match_attributes(player_games, 'match_id')[0]
+        player_game_ids = [x.match.steam_id for x in player_games]
     else:
         pms_pool = list(chain(skill1, skill2, skill3))
         player_game_ids = []
@@ -243,9 +242,7 @@ def hero_performance_chart_json(
             match__steam_id__in=matches,
         )
         pms_pool.extend(list(requested_pmses))
-        requested_game_ids = fetch_match_attributes(
-            requested_pmses, 'match_id'
-        )[0]
+        requested_game_ids = [x.match.steam_id for x in requested_pmses]
     else:
         requested_game_ids = []
 
@@ -325,7 +322,7 @@ def hero_progression_json(
         ]
 
     pmses = PlayerMatchSummary.objects.filter(
-        match__game_mode__in=game_modes
+        match__game_mode__steam_id__in=game_modes
     )
 
     if outcome == 'win':
@@ -338,6 +335,7 @@ def hero_progression_json(
         )
 
     pmses = pmses.filter(hero__steam_id=hero, match__validity=Match.LEGIT)
+
     skill1 = pmses.filter(match__skill=1)\
         .values('id')\
         .order_by('-match__start_time')[:100]
@@ -491,6 +489,12 @@ def hero_skillbuild_winrate_json(
     level_list = levels
     hero_id = hero
     player_id = player
+    if game_modes == [] or game_modes is None:
+        game_modes = [
+            mode.steam_id
+            for mode in GameMode.objects.filter(is_competitive=True)
+        ]
+
     game_mode_list = game_modes
 
     def group_format(lvl):
@@ -508,10 +512,11 @@ def hero_skillbuild_winrate_json(
                 ct=len([x for x in choice_lst if x == choice]),
                 )
         return label
+
     c = XYPlot()
     for level in level_list:
         sbs = SkillBuild.objects.filter(
-            player_match_summary__match__game_mode__in=game_mode_list,
+            player_match_summary__match__game_mode__steam_id__in=game_mode_list,
             player_match_summary__hero__steam_id=hero_id,
             player_match_summary__player__steam_id=player_id,
             player_match_summary__level__gte=level,
@@ -523,6 +528,13 @@ def hero_skillbuild_winrate_json(
             'player_match_summary__match__steam_id',
             'ability__steam_id',
         )
+        print SkillBuild.objects.all(), sbs
+        for s in SkillBuild.objects.all():
+            print s.player_match_summary.match.game_mode.steam_id, game_mode_list
+            print s.player_match_summary.hero.steam_id, hero_id
+            print s.player_match_summary.player.steam_id, player_id
+            print s.player_match_summary.level, level
+            print s.player_match_summary.match.validity, Match.LEGIT
 
         match_wins = list(set([
             sb['player_match_summary__match__steam_id']
@@ -555,6 +567,7 @@ def hero_skillbuild_winrate_json(
         dimensions = set(mygen)
 
         for id_str in dimensions:
+            print id_str
             if id_str not in build_dict:
                 build_dict[id_str] = {}
             build_dict[id_str]['games'] = len(
@@ -607,6 +620,12 @@ def update_player_winrate(
     hero,
     game_modes,
 ):
+
+    if game_modes == [] or game_modes is None:
+        game_modes = [
+            mode.steam_id
+            for mode in GameMode.objects.filter(is_competitive=True)
+        ]
 
     #default: past 180 days
 

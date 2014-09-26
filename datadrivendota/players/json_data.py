@@ -181,15 +181,22 @@ def player_hero_abilities_json(
         hero_1,
         player_2,
         hero_2,
-        game_modes,
+        game_modes=None,
         division=None
         ):
+
+    if game_modes is None:
+        game_modes = [
+            gm.steam_id
+            for gm in GameMode.objects.filter(is_competitive=True)
+        ]
 
     p1 = Player.objects.get(steam_id=player_1)
     h1 = Hero.public.get(steam_id=hero_1)
     sb1 = SkillBuild.objects.filter(
         player_match_summary__hero=h1,
         player_match_summary__player=p1,
+        player_match_summary__match__game_mode__steam_id__in=game_modes,
     ).values(
         'time',
         'level',
@@ -206,6 +213,7 @@ def player_hero_abilities_json(
         sb2 = SkillBuild.objects.filter(
             player_match_summary__hero=h2,
             player_match_summary__player=p2,
+            player_match_summary__match__game_mode__steam_id__in=game_modes,
         ).values(
             'time',
             'level',

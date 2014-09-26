@@ -164,10 +164,7 @@ class PlayerMatchSummary(models.Model):
         return False
 
     def __unicode__(self):
-        # @todo: This doesn't currently return a unicode object, but a string
-        # object. Bad news bears!
-        # --kit 2014-02-16
-        return (
+        return unicode(
             "Match "
             + str(self.match.steam_id)
             + ", User "
@@ -180,50 +177,6 @@ class PlayerMatchSummary(models.Model):
             return 'Radiant'
         else:
             return 'Dire'
-
-    def derive_attribute(summaries, attribute):
-        if attribute == 'duration':
-            vector_list = [
-                summary.match.duration / 60.0
-                for summary in summaries
-            ]
-        elif attribute == 'K-D+.5*A':
-            vector_list = [
-                summary.kills - summary.deaths + summary.assists*.5
-                for summary in summaries
-            ]
-        elif attribute == 'player':
-            vector_list = [
-                summary.player.persona_name
-                for summary in summaries
-            ]
-        elif attribute == 'is_win':
-            vector_list = [
-                'Won' if summary.is_win else 'Lost'
-                for summary in summaries
-            ]
-        elif attribute == 'game_mode':
-            vector_list = [
-                summary.match.game_mode.description
-                for summary in summaries
-            ]
-        elif attribute == 'skill':
-            vector_list = [summary.match.skill for summary in summaries]
-        elif attribute == 'hero_name':
-            vector_list = [safen(summary.hero.name) for summary in summaries]
-        elif attribute == 'first_blood_time':
-            vector_list = [
-                summary.match.first_blood_time / 60.0
-                for summary in summaries
-            ]
-        else:
-            vector_list = [
-                getattr(summary, attribute)
-                for summary in summaries
-            ]
-
-        label = fetch_attribute_label(attribute)
-        return vector_list, label
 
 
 class AdditionalUnit(models.Model):
@@ -273,21 +226,6 @@ class SkillBuild(models.Model):
     def __unicode__(self):
         return str(self.player_match_summary.id)+', '+str(self.level)
         pass
-
-
-def fetch_match_attributes(summaries, attribute):
-
-    if attribute == 'No Split':
-        vector_list = ['No split' for summary in summaries]
-        label = 'No Split'
-    else:
-        vector_list = [
-            fetch_pms_attribute(summary, attribute)
-            for summary in summaries
-        ]
-
-        label = fetch_attribute_label(attribute)
-    return vector_list, label
 
 
 def fetch_pms_attribute(summary, attribute):

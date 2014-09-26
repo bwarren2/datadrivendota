@@ -58,3 +58,6 @@ ddd.sublime-workspace
 
 #Nose Coverage
 .coverage
+
+#Profiling
+kernprof*
