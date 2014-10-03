@@ -2,6 +2,7 @@ Hero_name,AtkPt,AtkBackswing,CastPoint,CastBackswing
 Abaddon,0.56,0.41,0.452,1.008
 Alchemist,0.35,0.65,0.2,0.5
 Ancient Apparition,0.45,0.3,0.01,0.75
+Ancient Apparition,0.45,0.3,0.01,0.75
 Anti-Mage,0.3,0.6,0.3,0.47
 Axe,0.5,0.5,0.3,0.51
 Bane,0.3,0.7,0.5,0.51
@@ -35,7 +36,7 @@ Faceless Void,0.5,0.56,0.35,0.51
 Gyrocopter,0.2,0.97,0.3,0.5
 Huskar,0.4,0.5,0.3,2.4
 Invoker,0.4,0.7,0,0
-Io,0.15,0.4,0.001,0
+Io,0.15,0.4,1.00E-003,0
 Jakiro,0.4,0.5,0.65,0.3
 Juggernaut,0.33,0.84,0.3,0.51
 Keeper of the Light,0.3,0.85,0.3,2.4
@@ -79,7 +80,7 @@ Shadow Shaman,0.3,0.5,0.3,1.07
 Silencer,0.5,0.5,0.3,0.51
 Skywrath Mage,0.4,0.78,0.1,1.08
 Slardar,0.36,0.64,0.35,0.51
-Slark,0.5,0.3,0.001,0.51
+Slark,0.5,0.3,1.00E-003,0.51
 Sniper,0.17,0.7,0.3,0.51
 Spectre,0.3,0.7,0.3,0.51
 Spirit Breaker,0.6,0.3,0.47,0.8
@@ -91,7 +92,7 @@ Terrorblade,0.3,0.6,0.5,0.51
 Tidehunter,0.6,0.56,0.3,0.51
 Timbersaw,0.36,0.64,0.3,0.6
 Tinker,0.35,0.65,0.53,0.5
-Tiny,0.49,1,0.001,0
+Tiny,0.49,1,1.00E-003,0
 Treant Protector,0.6,0.4,0.5,0.51
 Troll Warlord,0.3,0.3,0.2,0.3
 Tusk,0.36,0.64,0.1,1

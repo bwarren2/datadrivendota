@@ -54,9 +54,7 @@ class Command(BaseCommand):
                 continue
             ab = Ability.objects.get_or_create(
                 steam_id=data_dict['ID'],
-                #is_ultimate=False,
                 )[0]
-                #I am not sure why the is_ultimate flag is needed.  The field looks optional to me.  Ask Kit.
             for key, value in mapping_dict.iteritems():
                 try:
                     trait = data_dict.get(key)
