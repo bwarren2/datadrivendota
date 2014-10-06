@@ -116,6 +116,10 @@ class Config(object):
             'exchange': 'management',
             'routing_key': 'management'
         },
+        'matches.management.tasks.valve_api_calls.UploadTeam': {
+            'exchange': 'db',
+            'routing_key': 'db'
+        },
         'matches.management.tasks.valve_api_calls.AcquireTeamDossiers': {
             'exchange': 'management',
             'routing_key': 'management'

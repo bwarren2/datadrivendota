@@ -1100,6 +1100,15 @@ class MirrorProNames(Task):
     """Gets the pro name for each person in the current roster set"""
 
     def run(self):
+        #Purge out the people that have pro names but are not on teams.
+        ps = Player.objects.filter(player_0=None).filter(player_1=None)
+        ps = ps.filter(player_2=None).filter(player_3=None)
+        ps = ps.filter(player_4=None).filter(team_admin=None)
+        ps = ps.exclude(pro_name=None).exclude(pro_name='')
+
+        ps.update(pro_name=None)
+
+        # Get the new names for people on teams.
         teams = TeamDossier.objects.all()
         pros = assemble_pros(teams)
         for p in pros:
