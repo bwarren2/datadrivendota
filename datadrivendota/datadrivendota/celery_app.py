@@ -132,6 +132,10 @@ class Config(object):
             'exchange': 'management',
             'routing_key': 'management'
         },
+        'matches.management.tasks.valve_api_calls.AcquireLeagueGames': {
+            'exchange': 'management',
+            'routing_key': 'management'
+        },
         'matches.management.tasks.valve_api_calls.UploadLeague': {
             'exchange': 'db',
             'routing_key': 'db'
@@ -236,6 +240,11 @@ class Config(object):
             'trail': False,
         },
         'matches.management.tasks.valve_api_calls.AcquireLeagues': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.valve_api_calls.AcquireLeagueGames': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,

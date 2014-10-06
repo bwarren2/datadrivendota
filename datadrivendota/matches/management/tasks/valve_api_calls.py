@@ -1,5 +1,7 @@
 import gc
 import urllib2
+import datetime
+from time import mktime
 import json
 import socket
 import ssl
@@ -60,6 +62,7 @@ class ApiContext(object):
     key = None
     match_id = None
     hero_id = None
+    tournament_games_only = None
     # There are magic lists of teh above in the URL constructor.
 
     # Things we care about internally
@@ -103,6 +106,9 @@ class ApiContext(object):
         elif mode == 'GetTournamentPlayerStats':
             valve_URL_vars = ['league_id', 'account_id', 'key']
             return self.dictVars(valve_URL_vars)
+        elif mode == 'GetScheduledLeagueGames':
+            valve_URL_vars = ['date_min', 'date_max', 'key']
+            return self.dictVars(valve_URL_vars)
         elif mode == 'GetMatchHistory':
             valve_URL_vars = [
                 'account_id',
@@ -110,10 +116,10 @@ class ApiContext(object):
                 'matches_requested',
                 'skill',
                 'league_id',
-                'date_max',
+                'date_min',
                 'date_max',
                 'start_at_match_id',
-                'key'
+                'key',
             ]
             return self.dictVars(valve_URL_vars)
         else:
@@ -134,6 +140,7 @@ class ApiContext(object):
             'matches_requested',
             'skill',
             'date_max',
+            'date_min',
             'start_at_match_id',
             'key',
             'match_id',
@@ -148,6 +155,7 @@ class ApiContext(object):
             'processed',
             'refresh_records',
             'date_pull',
+            'tournament_games_only',
         ]:
             if hasattr(self, field):
                 if getattr(self, field) is not None:
@@ -297,6 +305,11 @@ class ValveApiCall(BaseTask):
                     'http://api.steampowered.com/IDOTA2Match_570/'
                     'GetTournamentPlayerStats/v1/'
                 ),
+                'GetScheduledLeagueGames': (
+                    'http://api.steampowered.com/IDOTA2Match_570/'
+                    'GetScheduledLeagueGames/V001/'
+                ),
+
             }
 
             # If you attempt to access a URL I do not think valve supports, I
@@ -1012,32 +1025,81 @@ class UploadLeague(ApiFollower):
                 steam_id=league['leagueid']
                 )
             try:
-                ldoss = LeagueDossier.objects.get(
+                LeagueDossier.objects.get(
                     league=l,
-                    )
+                )
             except LeagueDossier.DoesNotExist:
-                ldoss = LeagueDossier.objects.create(
+                LeagueDossier.objects.create(
                     league=l,
                     name=league['name'],
                     description=league['description'],
                     tournament_url=league['tournament_url'],
                     item_def=league['itemdef']
-                    )
+                )
 
 
 class UpdateLeagueGames(Task):
     """Pulls in all games for all extant leagues"""
 
-    def run(self):
-        for league in League.objects.all():
+    def run(self, min_date=None):
+
+        if min_date is None:
+            min_date = int(
+                mktime(
+                    datetime.datetime.now().timetuple()
+                ) - 7*24*60*60
+            )
+
+        if min_date != 'all':
             c = ApiContext()
-            c.league_id = league.steam_id
+            c.matches_requested = 500
+            c.matches_desired = 500
+            c.date_min = min_date
+            c.skill = 4
+            vac = ValveApiCall()
+            alg = AcquireLeagueGames()
+            c = chain(
+                vac.s(api_context=c, mode='GetScheduledLeagueGames'),
+                alg.s()
+            )
+            c.delay()
+
+        elif min_date == 'all':
+            for league in League.objects.all():
+                c = ApiContext()
+                c.league_id = league.steam_id
+                c.matches_requested = 500
+                c.matches_desired = 500
+                c.skill = 4
+                vac = ValveApiCall()
+                rpr = RetrievePlayerRecords()
+                ch = chain(
+                    vac.s(api_context=c, mode='GetMatchHistory'),
+                    rpr.s()
+                )
+                ch.delay()
+        else:
+            raise Exception("What is this min_date?: {0}".format(min_date))
+
+
+class AcquireLeagueGames(ApiFollower):
+
+    def run(self, urldata):
+        data = self.result['games']
+        leagues = [game['league_id'] for game in data]
+        for league_id in leagues:
+            c = ApiContext()
+            c.league_id = league_id
+            c.date_min = self.api_context.date_min
             c.matches_requested = 500
             c.matches_desired = 500
             c.skill = 4
             vac = ValveApiCall()
             rpr = RetrievePlayerRecords()
-            c = chain(vac.s(api_context=c, mode='GetMatchHistory'), rpr.s())
+            c = chain(
+                vac.s(api_context=c, mode='GetMatchHistory'),
+                rpr.s()
+            )
             c.delay()
 
 
