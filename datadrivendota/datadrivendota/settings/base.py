@@ -102,7 +102,7 @@ AWS_QUERYSTRING_AUTH = False
 S3_URL = 'http://%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 STATIC_DIRECTORY = '/assets/'
 MEDIA_DIRECTORY = '/media/'
-
+AWS_S3_SECURE_URLS = True
 
 ########## MEDIA CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
