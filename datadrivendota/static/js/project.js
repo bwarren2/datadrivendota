@@ -430,11 +430,13 @@ var side_progress_line = function(dataset, target_selector, bind_button, callbac
       .data([data_slice])
       .attr("class", "difference-line progress-line")
 
-  idx = initial_count
+  idx = initial_count;
 
 
-  function tick(dataset, idx) {
+  ;(function(idx, diff_path, dire_path, radiant_path, yaxis, xaxis, svg, diffline, direline, radiantline, x, y, margin, width, height, data_slice){
+  function tick(dataset, idx, target_selector) {
     idx = new_index(dataset, idx)
+    console.log(idx)
     if(idx<dataset.length){
       data_slice.push(dataset[idx])
     }else{
@@ -488,17 +490,18 @@ var side_progress_line = function(dataset, target_selector, bind_button, callbac
         .duration(duration)
         .ease("linear")
         .call(y.axis)
-        .each("end", tick(dataset, idx));
+        .each("end", function(){tick(dataset, idx, target_selector)});
 
 
     // // pop the old data point off the front
     data_slice.shift();
   }
-
-
   $(bind_button).click(function(){
-    tick(dataset, idx);
-  }
+    tick(dataset, idx, target_selector);
+  })
+
+}(idx, diff_path, dire_path, radiant_path, yaxis, xaxis, svg, diffline, direline, radiantline, x, y, margin, width, height, data_slice))
+
   // if(typeof callback === 'undefined'){
   //   callback()
   // }
