@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.conf import settings
 from heroes.models import Hero
 from django.utils.text import slugify
@@ -66,7 +67,7 @@ def hero_classes_dict():
         'name'
     )
 
-    hero_classes = {}
+    hero_classes = defaultdict(lambda: '')
     for dct in hero_data:
         idx = dct['steam_id']
         if idx not in hero_classes:
