@@ -436,7 +436,6 @@ var side_progress_line = function(dataset, target_selector, bind_button, callbac
   ;(function(idx, diff_path, dire_path, radiant_path, yaxis, xaxis, svg, diffline, direline, radiantline, x, y, margin, width, height, data_slice){
   function tick(dataset, idx, target_selector) {
     idx = new_index(dataset, idx)
-    console.log(idx)
     if(idx<dataset.length){
       data_slice.push(dataset[idx])
     }else{
