@@ -1080,3 +1080,226 @@ window.chartUtils = {}
 window.chartUtils.convertToSlug = convertToSlug
 window.chartUtils.toTitleCase = toTitleCase
 window.chartUtils.make_tooltip = make_tooltip
+
+
+var new_index = function(dataset, i){
+  if(i==dataset.length){
+    return(0);
+  }
+  else{
+    return(i+1)
+  }
+}
+
+var side_progress_line = function(dataset, target_selector, bind_button, params, callback){
+
+  initial_fract = 3
+  var initial_count = Math.round(dataset.length/initial_fract);
+
+  var margin = {top: 15, right: 15, bottom: 25, left: 60},
+      width = params.width - margin.right,
+      height = params.height - margin.top - margin.bottom;
+
+  data_slice = dataset.slice(0, initial_count)
+
+  var x = d3.scale.linear()
+      .domain([
+        d3.min(data_slice, function(d){return(d['times'])}),
+        d3.max(data_slice, function(d){return(d['times'])}),
+      ])
+      .range([0, width]);
+
+  var y = d3.scale.linear()
+      .domain([
+        d3.min(data_slice, function(d){return(
+          Math.min(
+            d['radiant'],
+            d['dire'],
+            d['difference']
+            )
+          )
+        }),
+        d3.max(data_slice, function(d){return(
+          Math.max(
+            d['radiant'],
+            d['dire'],
+            d['difference']
+            )
+          )
+        })
+      ])
+      .range([height, 0]);
+
+  var radiantline = d3.svg.line()
+      .interpolate("basis")
+      .x(function(d, i) { return x(d['times']); })
+      .y(function(d, i) { return y(d['radiant']); });
+  var direline = d3.svg.line()
+      .interpolate("basis")
+      .x(function(d, i) { return x(d['times']); })
+      .y(function(d, i) { return y(d['dire']); });
+  var diffline = d3.svg.line()
+      .interpolate("basis")
+      .x(function(d, i) { return x(d['times']); })
+      .y(function(d, i) { return y(d['difference']); });
+
+  var svg = d3.select(target_selector).append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .style("margin-left", -margin.left + "px")
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  svg.append("defs").append("clipPath")
+      .attr("id", "clip")
+      .append("rect")
+      .attr("width", width)
+      .attr("height", height);
+
+
+
+  var xaxis = svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(
+        x.axis = d3.svg.axis().scale(x).orient("bottom").tickFormat(
+          function(d,i){
+            return(secondstotime(d))
+          }
+        )
+      );
+
+      xaxis.append("text")
+        .attr("class", "x-axis-label")
+        .attr("y", -16)
+        .attr("x", width)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(params.x_lab);
+
+
+  var yaxis = svg.append("g")
+      .attr("class", "y axis")
+      .attr("transform", "translate(0,0)")
+      .call(y.axis = d3.svg.axis().scale(y).orient("left"));
+
+      yaxis.append("text")
+      .attr("class", "y-axis-label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text(params.y_lab);
+
+
+  var radiant_path = svg.append("g")
+      .attr("clip-path", "url(#clip)")
+      .append("svg:path")
+      .data([data_slice])
+      .attr("class", "radiant-line progress-line")
+
+  var dire_path = svg.append("g")
+      .attr("clip-path", "url(#clip)")
+      .append("svg:path")
+      .data([data_slice])
+      .attr("class", "dire-line progress-line")
+
+  var diff_path = svg.append("g")
+      .attr("clip-path", "url(#clip)")
+      .append("svg:path")
+      .data([data_slice])
+      .attr("class", "difference-line progress-line")
+
+  idx = initial_count;
+
+
+  ;(function(idx, diff_path, dire_path, radiant_path, yaxis, xaxis, svg, diffline, direline, radiantline, x, y, margin, width, height, data_slice){
+  function tick(dataset, idx, target_selector) {
+    idx = new_index(dataset, idx)
+    if(idx<dataset.length){
+      data_slice.push(dataset[idx])
+    }else{
+      return
+    }
+
+    // update the domains
+    x.domain([
+      d3.min(data_slice, function(d){return(d['times'])}),
+      d3.max(data_slice, function(d){return(d['times'])}),
+    ]);
+    y.domain([
+        d3.min(data_slice, function(d){return(
+          Math.min(
+            d['radiant'],
+            d['dire'],
+            d['difference']
+            )
+          )
+        }),
+        d3.max(data_slice, function(d){return(
+          Math.max(
+            d['radiant'],
+            d['dire'],
+            d['difference']
+            )
+          )
+        })
+    ])
+
+
+    // redraw the line
+    svg.select(target_selector+" .radiant-line")
+        .attr("d", radiantline)
+        .attr("transform", null);
+    svg.select(target_selector+" .dire-line")
+        .attr("d", direline)
+        .attr("transform", null);
+    svg.select(target_selector+" .difference-line")
+        .attr("d", diffline)
+        .attr("transform", null);
+
+    // // slide the x-axis left
+    xaxis.transition()
+        .duration(duration)
+        .ease("linear")
+        .call(x.axis);
+
+    // // move the y axis
+    yaxis.transition()
+        .duration(duration)
+        .ease("linear")
+        .call(y.axis)
+        .each("end", function(){tick(dataset, idx, target_selector)});
+
+
+    // // pop the old data point off the front
+    data_slice.shift();
+  }
+  $(bind_button).click(function(){
+    tick(dataset, idx, target_selector);
+  })
+
+}(idx, diff_path, dire_path, radiant_path, yaxis, xaxis, svg, diffline, direline, radiantline, x, y, margin, width, height, data_slice))
+
+  // if(typeof callback === 'undefined'){
+  //   callback()
+  // }
+}
+window.side_progress_line = side_progress_line
+
+var side_progress_plot = function(url, params){
+  $.getJSON(url, function(data){
+    duration = params.duration;
+    dataset = [];
+    keys = Object.keys(data);
+    for(i=0; i<data['times'].length;i++){
+        data_obj = {}
+        for(var key_idx in keys){
+            data_obj[keys[key_idx]] = data[keys[key_idx]][i]
+        }
+        dataset.push(data_obj)
+    }
+    side_progress_line(dataset, 'div#body', '.magicbutton', params)
+  })
+}
+window.side_progress_plot = side_progress_plot
