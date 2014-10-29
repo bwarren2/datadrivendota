@@ -620,8 +620,16 @@ def match_role_json(match):
             d.classes = [slugify(role)]
             c.datalist.append(d)
 
-    xmax = max(max([d.x_var for d in c.datalist]), 0)
-    ymax = max(max([d.y_var for d in c.datalist]), 0)
+    if len([d.x_var for d in c.datalist]) == 0:
+        xmax = 0
+    else:
+        xmax = max([d.x_var for d in c.datalist])
+
+    if len([d.y_var for d in c.datalist]) == 0:
+        ymax = 0
+    else:
+        ymax = max([d.y_var for d in c.datalist])
+
     absmax = max(xmax, ymax)
     c.params.x_min = 0
     c.params.x_max = absmax
