@@ -259,7 +259,6 @@ def parse_preview(request, match_id=787900748):
     for summary in dire_summaries:
         dire_cast_list.append(cast_dict(summary))
 
-
     return render(
         request,
         'matches/parse_preview.html',
@@ -276,6 +275,78 @@ def parse_preview(request, match_id=787900748):
             'hero_kills': 'replay_parse_json/'+str(match.steam_id)+'_kill_dmg.json',
             'hero_deaths': 'replay_parse_json/'+str(match.steam_id)+'_death_dmg.json',
             'hero_creeps': 'replay_parse_json/'+str(match.steam_id)+'_hero_creeps.json',
+        }
+    )
+
+
+@devserver_profile()
+def parse_match(request, match_id=787900748):
+    try:
+        match = Match.objects.get(steam_id=match_id)
+    except Match.DoesNotExist:
+        raise Http404
+    summaries = PlayerMatchSummary.objects.filter(
+        match=match
+    ).select_related().order_by('player_slot')
+
+    slot_dict = {
+        0: '#7CD51B',  # 1f77b4', #Radiant #7CD51B
+        1: '#7CD51B',  # 7EF6C6',
+        2: '#7CD51B',  # 9A1D9B',
+        3: '#7CD51B',  # ECF14C',
+        4: '#7CD51B',  # DB7226',
+        128: '#BA3B15',  # E890BA',
+        129: '#BA3B15',  # 99B15F',
+        130: '#BA3B15',  # 75D1E1',
+        131: '#BA3B15',  # 147335',
+        132: '#BA3B15',  # 906A2B', #Dire  #BA3B15
+    }
+
+    css_color_dict = {}
+    for summary in summaries:
+        summary.kda = summary.kills - summary.deaths + .5*summary.assists
+        if summary.which_side() == 'Radiant':
+            summary.is_radiant = True
+        else:
+            summary.is_dire = True
+        if summary.leaver.steam_id != 0:
+            summary.improper_player = True
+        if summary.is_win:
+            summary.won = True
+        css_color_dict[
+            summary.hero.internal_name
+        ] = slot_dict[summary.player_slot]
+    match.hms_duration = datetime.timedelta(seconds=match.duration)
+    match.hms_start_time = datetime.datetime.fromtimestamp(
+        match.start_time
+    ).strftime('%H:%M:%S %Y-%m-%d')
+
+    radiant_summaries = [
+        summary for summary in summaries if summary.which_side() == 'Radiant'
+    ]
+    radiant_cast_list = []
+    for summary in radiant_summaries:
+        radiant_cast_list.append(cast_dict(summary))
+
+    dire_summaries = [
+        summary for summary in summaries if summary.which_side() == 'Dire'
+    ]
+    dire_cast_list = []
+    for summary in dire_summaries:
+        dire_cast_list.append(cast_dict(summary))
+
+    return render(
+        request,
+        'matches/parse_match.html',
+        {
+            'match': match,
+            'summaries': summaries,
+            'radiant_cast_list': radiant_cast_list,
+            'dire_cast_list': dire_cast_list,
+            'css_color_dict': css_color_dict,
+            'slot_dict': slot_dict,
+            'timeline':
+            'replay_parse_json/'+str(match.steam_id)+'_timeline.json',
         }
     )
 
