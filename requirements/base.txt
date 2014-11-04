@@ -28,7 +28,6 @@ ecdsa==0.10
 Fabric==1.6.0
 flower==0.5.2
 futures==2.2.0
-gunicorn==0.17.4
 httplib2==0.8
 Jinja2==2.6
 kombu==3.0.19
