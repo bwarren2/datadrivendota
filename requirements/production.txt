@@ -2,5 +2,4 @@
 #	production that isn't in development.
 -r base.txt
 newrelic
-gevent==1.0.1
-gunicorn==19.1.1
+waitress==0.8.9
