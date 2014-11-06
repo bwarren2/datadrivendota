@@ -85,19 +85,86 @@
 {% block extra_js %}
 <script type="text/javascript">
 
+var timeline
+var heroes
 $(function(){
 
+    // Config
+    var timeline_idx = 0;
+    var interval_duration = 500;
+    var hero_json = {{hero_json|safe}}
+
+    // Cosmetics
+    $('.chart-pip').remove()
+    $('.cast-player-image').remove()
+    var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+    //Utility
     function updateTimer(d){
         $('#time-display').val(String((d-d%60)/60)+':'+String(d%60))
     }
+    function loggingu(txt){
+        console.log(txt)
+    }
+    function sortNumber(a,b) {
+        return a - b;
+    }
 
-    function healthBars(){
-        console.log('In health bars.')
+
+    // Charting!
+    function healthBars(heroes, timeline){
+        var health_bar_height = 5
+        loggingu('In health bars.')
+
+        $.each(heroes, function(idx, val){
+
+            var selector = '.'+val['hero_name']+'_slot'
+            var width = $(selector).width()
+
+            svg = d3.select(selector).insert("svg", 'img')
+            .attr("width", width)
+            .attr("height", 2*health_bar_height)
+            .attr("class", 'lifebar')
+
+            var mbar = svg.append("rect")
+            .attr("x", 0)
+            .attr("y", health_bar_height)
+            .attr("width", width)
+            .attr("height", health_bar_height)
+            .attr("class", val['hero_name']+' mana-bar');
+
+            var hbar = svg.append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", width)
+            .attr("height", health_bar_height)
+            .attr("class", val['hero_name']+' health-bar');
+
+            // Listen for the update
+            $(document).on('update', function(e, snapshot){
+                health_width = width*snapshot[idx]['health']/snapshot[idx]['max_health']
+                hbar.transition()
+                    .duration(interval_duration)
+                    .attr('width', health_width)
+                if(health_width === 0){}
+                mbar.attr(
+                    'width',
+                    width*snapshot[idx]['mana']/snapshot[idx]['max_mana']
+                )
+            })
+
+        })
+
     }
+
+
     function setUp(heroes, timeline){
-        console.log('Setting up.')
-        healthBars()
+        loggingu('Setting up.')
+        healthBars(heroes, timeline)
     }
+
 
     // Animation Controls
     $('#stop-animation').toggle()
@@ -114,44 +181,80 @@ $(function(){
         $('#forward-animation').toggle();
     });
 
-    var div = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
 
 
     var url = '{% static timeline %}';
-    var timeline;
-    var heroes;
     var chats;
     var hero_creeps = $.getJSON(url, function(result){
+
+        // Wir mussen sie data machen
         timeline = result['timeline']
         heroes = result['heroes']
         chats = result['chats']
-        console.log(heroes);
-        setUp();
-        // bindHandlers();
+        $.each(heroes, function(i, v){
+            heroes[i]['hero_name'] = hero_json[String(heroes[i]['id'])]
+        })
+        ints = Object.keys(timeline)
+        var numArray = []
+        $.each(ints, function(i, v){
+            numArray.push(parseInt(v))
+        })
+        numArray.sort(sortNumber);
+
+        // Prep the ticker
+        var make_metronome = function(numArray, timeline){
+            function new_index(adder){
+                timeline_idx = (timeline_idx+adder)%numArray.length
+            }
+            var myfun = function(){
+
+                new_index(1)
+                slice = timeline[numArray[timeline_idx]]
+                $(document).trigger('update', [slice])
+                $('#time-display').val(slice['time'])
+            }
+            return myfun;
+        }
+        metronome = make_metronome(numArray, timeline)
+        bindHandlers(metronome)
+
+        // Set up graphics!
+        setUp(heroes, timeline);
     });
 
     // Handling Handlers
-    // var myhandle
-    // var start = function(){
-    //     update()
-    //     myhandle = setTimeout(tick, duration)
-    // }
+    function bindHandlers(broadcast){
+        var myhandle
+        var play = function(){
+            new_index(1)
+            broadcast()
+        }
+        var start = function(){
+            myhandle = setInterval(play, interval_duration)
+        }
 
-    // var stop = function (){
-    //     clearTimeout(myhandle)
-    // }
+        var stop = function (){
+            clearInterval(myhandle)
+        }
 
-    // $('#back-animation').click(function(){
-    //     --idx;
-    //     update();
-    // });
-    // $('#forward-animation').click(function(){
-    //     ++idx;
-    //     update();
-    // });
+        $('#start-animation').click(function(){
+            start();
+        })
 
+        $('#stop-animation').click(function(){
+            stop();
+        })
+
+
+        $('#back-animation').click(function(){
+            new_index(-1);
+            broadcast();
+        });
+        $('#forward-animation').click(function(){
+            new_index(1);
+            broadcast();
+        });
+    }
 })
 </script>
 
@@ -174,6 +277,15 @@ $(function(){
     }
     .animation-button{
         height:45px;
+    }
+    .health-bar{
+        fill: #84F721;
+    }
+    .mana-bar{
+        fill: #507AEF;
+    }
+    img.desaturate{
+        filter: grayscale(100%);
     }
     </style>
 {% endblock extra_css %}

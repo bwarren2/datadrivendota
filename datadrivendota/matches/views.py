@@ -335,6 +335,11 @@ def parse_match(request, match_id=787900748):
     for summary in dire_summaries:
         dire_cast_list.append(cast_dict(summary))
 
+    hero_id_names = {
+        pms.hero.steam_id: pms.hero.internal_name
+        for pms in summaries
+    }
+
     return render(
         request,
         'matches/parse_match.html',
@@ -347,6 +352,7 @@ def parse_match(request, match_id=787900748):
             'slot_dict': slot_dict,
             'timeline':
             'replay_parse_json/'+str(match.steam_id)+'_timeline.json',
+            'hero_json': json.dumps(hero_id_names),
         }
     )
 
