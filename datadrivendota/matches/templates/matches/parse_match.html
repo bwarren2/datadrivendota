@@ -51,7 +51,7 @@
             </div>
         </div>
         <div class='row' >
-            <div class='col-md-4'>
+            <div class='col-md-4' id='kill_dmg'>
                 {% comment %}
                 <h4>Hero Kills <span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="" data-placement="right"></span></h4>
                 {% endcomment %}
@@ -159,10 +159,90 @@ $(function(){
 
     }
 
+    function killDmg(heroes, timeline, minmax){
+        loggingu('In Kill Dmg.')
+        selector = 'div#kill_dmg'
+        var width = $(selector).width()
+        var height = width // Mmm, squares
+        var params = {'width': width, 'height': height}
+        var margin = {top: 15, right: 15, bottom: 25, left: 60},
+            width = params.width - margin.right - margin.left,
+            height = params.height - margin.top - margin.bottom;
+
+        hero_ary = $.map(heroes, function(value, index) {
+            return [value];
+        })
+
+        x = d3.scale.linear()
+            .domain([0, Math.min(minmax['kills']['max'], 200)])
+            .range(
+                [0, width]
+            )
+        y = d3.scale.linear()
+            .domain([
+                    minmax['hero_damage_dealt']['min'],
+                    minmax['hero_damage_dealt']['max']
+                ])
+            .range(
+                [height, 0]
+            )
+
+        svg = d3.select(selector).insert('svg')
+            .attr('class', 'kill_dmg')
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .style("margin-left", -margin.left + "px")
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+        xAxis = svg.append('g').attr('class', 'x axis')
+            .attr('transform', 'translate(0,'+height+')')
+            .call(d3.svg.axis().scale(x).orient("bottom"))
+
+        yAxis = svg.append('g').attr('class', 'y axis')
+            .attr('transform', 'translate(0,0)')
+            .call(y.axis = d3.svg.axis().scale(y).orient('left'))
+
+        data = []
+        $.each(Object.keys(timeline), function(idx, val){
+            data.push(parseInt(val));
+        })
+        tick = Math.min.apply(null, data)
+
+        timeline_ary = $.map(timeline[tick], function(value, index) {
+            return [value];
+        })
+
+        svg.selectAll('circle').data(timeline_ary)
+            .enter().append("circle")
+            .attr("cx", function(d) {
+                 return x(d.kills);
+            })
+            .attr("cy", function(d) {
+                 return y(d.hero_damage_dealt);
+            })
+            .attr("r", 5);
+
+            // // Listen for the update
+            // $(document).on('update', function(e, snapshot){
+            //     health_width = width*snapshot[idx]['health']/snapshot[idx]['max_health']
+            //     hbar.transition()
+            //         .duration(interval_duration)
+            //         .attr('width', health_width)
+            //     if(health_width === 0){}
+            //     mbar.attr(
+            //         'width',
+            //         width*snapshot[idx]['mana']/snapshot[idx]['max_mana']
+            //     )
+            // })
+    }
+
 
     function setUp(heroes, timeline){
         loggingu('Setting up.')
         healthBars(heroes, timeline)
+        killDmg(heroes, timeline, minmax)
     }
 
 
@@ -191,10 +271,12 @@ $(function(){
         timeline = result['timeline']
         heroes = result['heroes']
         chats = result['chats']
+        minmax = result['minmax']
         $.each(heroes, function(i, v){
             heroes[i]['hero_name'] = hero_json[String(heroes[i]['id'])]
         })
         ints = Object.keys(timeline)
+
         var numArray = []
         $.each(ints, function(i, v){
             numArray.push(parseInt(v))
@@ -219,7 +301,7 @@ $(function(){
         bindHandlers(metronome)
 
         // Set up graphics!
-        setUp(heroes, timeline);
+        setUp(heroes, timeline, minmax);
     });
 
     // Handling Handlers
@@ -265,6 +347,9 @@ $(function(){
     {% for key, value in css_color_dict.iteritems %}
         .{{key}} {
             fill: {{value}};
+            stroke: 1;
+            stroke-width: 1;
+            r: 2;
         }
     {% endfor %}
     {% for key, value in slot_dict.iteritems %}
