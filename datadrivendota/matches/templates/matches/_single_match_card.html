@@ -1,5 +1,5 @@
 {% if summary.hero_mugshot %}
-  <div>
+  <div class="{{summary.hero_safe_name}}_slot {{summary.internal_hero_name}}_slot">
     <img src="{{ summary.hero_mugshot_url }}" alt="{{ summary.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail player-slot-{{summary.slot}}">
   </div>
 
