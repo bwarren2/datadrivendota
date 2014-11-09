@@ -367,6 +367,7 @@ PIPELINE_CSS = {
     'all': {
         'source_filenames': (
             'css/custom_bootstrap_compilation.less',
+            'css/dota2minimapheroes.css',
             'css/bootstrap-tour.less',
             'jquery-ui-bootstrap/jquery-ui-1.10.0.custom.css',
             'select2-3.4.5/select2.css',
