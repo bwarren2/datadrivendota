@@ -51,22 +51,23 @@
             </div>
         </div>
         <div class='row' >
-            <div class='col-md-4' id='minimap'>
-                {% comment %}
-                <h4>Hero Kills <span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="" data-placement="right"></span></h4>
-                {% endcomment %}
+            <div class='goofyspacer'>
+                <div class='col-md-4' id='lh_level'>
+                    {% comment %}
+                    <h4>Hero Kills <span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="" data-placement="right"></span></h4>
+                    {% endcomment %}
 
-            </div>
-            <div class='col-md-4' id='kill_dmg'>
-            </div>
+                </div>
+                <div class='col-md-4' id='kill_dmg'>
+                </div>
 
-             <div class='col-md-4'>
+                <div class='col-md-4' id='death_dmg'>
+                </div>
             </div>
-
         </div>
         <div class='row' id='hero-charts'>
 
-            <div class='col-md-4'>
+            <div class='col-md-4' id='minimap'>
             </div>
             <div class='col-md-4'>
             </div>
@@ -134,7 +135,7 @@ $(function(){
             var selector = '.'+val['hero_name']+'_slot'
             var width = $(selector).width()
 
-            svg = d3.select(selector).insert("svg", 'img')
+            var svg = d3.select(selector).insert("svg", 'img')
             .attr("width", width)
             .attr("height", 2*health_bar_height)
             .attr("class", 'lifebar')
@@ -155,7 +156,7 @@ $(function(){
 
             // Listen for the update
             $(document).on('update', function(e, snapshot){
-                health_width = width*snapshot[idx]['health']/snapshot[idx]['max_health']
+                var health_width = width*snapshot[idx]['health']/snapshot[idx]['max_health']
                 hbar.transition()
                     .duration(interval_duration)
                     .attr('width', health_width)
@@ -208,7 +209,7 @@ $(function(){
         $.each(timeslice, function(idx, val){
 
             var icon_class = 'd2mh '+ heroes[idx]['hero_name']
-            hero_icon = d3.select(selector).insert("i")
+            var hero_icon = d3.select(selector).insert("i")
                .attr('class', icon_class)
                .style('position', 'absolute')
                .attr('width', 32)
@@ -219,8 +220,8 @@ $(function(){
             // Listen for the update
             $(document).on('update', function(e, snapshot){
                 icon_class = '.d2mh.'+ heroes[idx]['hero_name']
-                toppx = (snapshot[idx].y/minmax['y']['max'])*height+'px'
-                leftpx = (width*(snapshot[idx].x/minmax['x']['max']))+'px'
+                toppx = (300-(snapshot[idx].y/minmax['y']['max'])*300)+'px'
+                leftpx = (300*(snapshot[idx].x/minmax['x']['max']))+'px'
                 d3.select(icon_class).transition()
                     .style('top', toppx)
                     .style('left', leftpx)
@@ -244,7 +245,7 @@ $(function(){
 
 
         x = d3.scale.linear()
-            .domain([0, Math.min(minmax['kills']['max'], 200)])
+            .domain([0, Math.min(minmax['calc_kills']['max'], 200)])
             .range(
                 [0, width]
             )
@@ -277,13 +278,13 @@ $(function(){
         svg.selectAll('circle').data(timeslice)
             .enter().append("circle")
             .attr("cx", function(d) {
-                 return x(d.kills);
+                 return x(d.calc_kills);
             })
             .attr("cy", function(d) {
                  return y(d.hero_damage_dealt);
             })
             .attr("class", function(d) {
-                 return y(d.hero_damage_dealt);
+                 return heroes[d.hero_idx]['name'];
             })
             .attr("r", 5);
 
@@ -293,10 +294,82 @@ $(function(){
                 .transition()
                 .duration(interval_duration)
                 .attr("cx", function(d) {
-                   return x(d.kills);
+                   return x(d.calc_kills);
                 })
                 .attr("cy", function(d) {
-                     return y(d.hero_damage_dealt);
+                     return y(d[hero_damage_dealt]);
+                })
+            })
+    }
+
+    function updatingScatter(heroes, timeslice, minmax, x_var, y_var, target){
+        loggingu('Updating '+target)
+        var selector = target
+        var width = $(selector).width()
+        var height = width // Mmm, squares
+        var params = {'width': width, 'height': height}
+        var margin = {top: 15, right: 15, bottom: 25, left: 60},
+            width = params.width - margin.right - margin.left,
+            height = params.height - margin.top - margin.bottom;
+
+
+        var x = d3.scale.linear()
+            .domain([
+                    minmax[x_var]['min'],
+                    minmax[x_var]['max']
+                ])
+            .range(
+                [0, width]
+            )
+        var y = d3.scale.linear()
+            .domain([
+                    minmax[y_var]['min'],
+                    minmax[y_var]['max']
+                ])
+            .range(
+                [height, 0]
+            )
+
+        var svg = d3.select(selector).insert('svg')
+            // .attr('class', 'kill_dmg')
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            // .style("margin-left", -margin.left + "px")
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+        var xAxis = svg.append('g').attr('class', 'x axis')
+            .attr('transform', 'translate(0,'+height+')')
+            .call(d3.svg.axis().scale(x).orient("bottom"))
+
+        var yAxis = svg.append('g').attr('class', 'y axis')
+            .attr('transform', 'translate(0,0)')
+            .call(y.axis = d3.svg.axis().scale(y).orient('left'))
+
+        svg.selectAll(selector +' circle').data(timeslice)
+            .enter().append("circle")
+            .attr("cx", function(d) {
+                 return x(d[x_var]);
+            })
+            .attr("cy", function(d) {
+                 return y(d[y_var]);
+            })
+            .attr("class", function(d) {
+                 return heroes[d.hero_idx]['name'];
+            })
+            .attr("r", 5);
+
+            // Listen for the update
+            $(document).on('update', function(e, timeslice){
+                d3.selectAll(selector+' circle').data(timeslice)
+                .transition()
+                .duration(interval_duration)
+                .attr("cx", function(d) {
+                   return x(d[x_var]);
+                })
+                .attr("cy", function(d) {
+                     return y(d[y_var]);
                 })
             })
     }
@@ -305,8 +378,20 @@ $(function(){
     function setUp(heroes, timeline){
         loggingu('Setting up.')
         healthBars(heroes, timeline)
-        killDmg(heroes, timeline, minmax)
+        // killDmg(heroes, timeline, minmax)
         miniMap(heroes, timeline)
+        updatingScatter(
+            heroes, timeline, minmax,
+            'calc_kills', 'hero_damage_dealt', 'div#kill_dmg'
+        )
+        updatingScatter(
+            heroes, timeline, minmax,
+            'deaths', 'hero_damage_taken', 'div#death_dmg'
+        )
+        updatingScatter(
+            heroes, timeline, minmax,
+            'level', 'lh', 'div#lh_level'
+        )
     }
 
 
@@ -352,10 +437,16 @@ $(function(){
         // Prep the ticker
         var make_metronome = function(numArray, timeline){
             function new_index(adder){
-                tick_idx = (tick_idx+adder)%numArray.length
+
+                // GFD, javascript.  You're drunk.
+                fakemod = function(n, modulus) {
+                    return ((n%modulus)+modulus)%modulus;
+                }
+                tick_idx = fakemod((tick_idx+adder),numArray.length)
             }
-            var myfun = function(){
-                new_index(1)
+            var myfun = function(change){
+                new_index(change)
+
                 // Take the hero data for that tick
                 slice = slice_timeline(timeline[numArray[tick_idx]])
                 $(document).trigger('update', [slice])
@@ -384,8 +475,7 @@ $(function(){
     function bindHandlers(broadcast){
         var myhandle
         var play = function(){
-            new_index(1)
-            broadcast()
+            broadcast(1)
         }
         var start = function(){
             myhandle = setInterval(play, interval_duration)
@@ -405,12 +495,10 @@ $(function(){
 
 
         $('#back-animation').click(function(){
-            new_index(-1);
-            broadcast();
+            broadcast(-1);
         });
         $('#forward-animation').click(function(){
-            new_index(1);
-            broadcast();
+            broadcast(1);
         });
     }
 })
@@ -423,9 +511,6 @@ $(function(){
     {% for key, value in css_color_dict.iteritems %}
         .{{key}} {
             fill: {{value}};
-            stroke: 1;
-            stroke-width: 1;
-            r: 2;
         }
     {% endfor %}
     {% for key, value in slot_dict.iteritems %}
@@ -439,6 +524,12 @@ $(function(){
     .animation-button{
         height:45px;
     }
+    circle{
+        stroke-width:2;
+        /*stroke-fill:#000000;*/
+        stroke: #000000;
+        r: 2;
+    }
     .health-bar{
         fill: #84F721;
     }
@@ -447,6 +538,9 @@ $(function(){
     }
     img.desaturate{
         filter: grayscale(100%);
+    }
+    div.goofyspacer{
+        margin-top:10px
     }
     </style>
 {% endblock extra_css %}
