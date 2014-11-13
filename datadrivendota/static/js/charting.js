@@ -1,3 +1,13 @@
+function smartTicks(d) {
+    if ((d / 1000000) >= 1) {
+        return d / 1000000 + "M";
+    }
+    if ((d / 1000) >= 1) {
+        return d / 1000 + "K";
+    }
+    return d;
+}
+
 function convertToSlug(Text)
 {
     return Text
@@ -1303,3 +1313,599 @@ var side_progress_plot = function(url, params){
   })
 }
 window.side_progress_plot = side_progress_plot
+
+var miniMap = function(heroes, timeslice, params){
+
+    var selector = 'div#minimap'
+    var width = $(selector).width()
+    var height = width
+    d3.select(selector).style('position', 'relative')
+    var svg = d3.select(selector)
+        .append('svg')
+        .attr('class', 'testchart')
+        .attr('width', width)
+        .attr('height', height)
+
+    var defs = svg.append('svg:defs');
+
+    defs.append('svg:pattern')
+        .attr('id', 'tile-ww')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', width)
+        .attr('height', height)
+        .append('svg:image')
+        .attr('xlink:href', '/assets/images/minimap.png')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', width)
+        .attr('height', height)
+
+    svg.append("rect")
+       .attr("fill", "url(#tile-ww)")
+       .attr('width', width)
+       .attr('height', height)
+       .attr('x', 0)
+       .attr('y', 0)
+
+    function transX(xVal){
+        presumed_min = 71
+        scalar = minmax['x']['max'] - presumed_min
+        xVal = xVal - 71
+        return  20+(260*(xVal/scalar))+'px'
+    }
+    function transY(yVal){
+        presumed_min = 71
+        scalar = minmax['y']['max'] - presumed_min
+        yVal = yVal - 71
+        return  20+(yVal/scalar*240)+'px'
+    }
+
+    $.each(timeslice, function(idx, val){
+
+        var icon_class = 'd2mh '+ heroes[idx]['name']
+        var hero_icon = d3.select(selector).insert("i")
+           .attr('class', icon_class)
+           .style('position', 'absolute')
+           .attr('width', 32)
+           .attr('height', 32)
+           .style('bottom', transY(val.y))
+           .style('left', transX(val.x))
+
+        // Listen for the update
+        $(document).on('update', function(e, snapshot){
+            icon_class = selector+' .d2mh.'+ heroes[idx]['name']
+            d3.select(icon_class).transition().duration(params.interval_duration)
+                .style('bottom', transY(snapshot[idx].y))
+                .style('left', transX(snapshot[idx].x))
+        })
+
+    })
+
+}
+ window.miniMap = miniMap
+
+var statBars = function(heroes, timeslice, minmax, target, params){
+    var selector = target
+    var width = $(selector).width()
+    var height = $(selector).height()
+    params['width'] = width
+    params['height'] = 292
+    var margin = {top: 15, right: 15, bottom: 25, left: 60},
+        width = params.width - margin.right - margin.left,
+        height = params.height - margin.top - margin.bottom;
+
+
+    var num_series = 3
+    var num_heroes = 10
+
+    bar_domain = []
+    $.each(heroes, function(i,v){
+        bar_domain.push(v['hero_name'])
+    })
+
+    var x0 = d3.scale.ordinal()
+        .domain(bar_domain)
+        .rangeBands([0, width], .2)
+
+    var x1 = d3.scale.ordinal()
+        .domain(['str', 'int', 'agi'])
+        .rangeBands([0, x0.rangeBand()]);
+
+    var ymax = d3.max(timeslice, function(d){
+        return Math.max(
+            d['str_total'],
+            d['int_total'],
+            d['agi_total']
+        )
+    });
+    y_domain = [0, ymax];
+    var y = d3.scale.linear()
+        .domain(y_domain)
+        .range(
+            [height, 0]
+        );
+
+    var svg = d3.select(selector).insert('svg')
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+    var xAxis = svg.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', 'translate(0,'+height+')')
+        .call(d3.svg.axis().scale(x0).orient('bottom'))
+
+    xAxis.selectAll('text')
+            .style('text-anchor', 'end')
+            .attr('dx', '-1em')
+            .attr('dy', '-0.3em')
+            .attr('transform', function(d){
+                return 'rotate(90)';
+            })
+        .append('text')
+            .attr('y', -16)
+            .attr('x', width)
+            .attr('dy', '.71em')
+            .style('text-anchor', 'end')
+            .text(params['x_label'])
+
+    var yAxis = svg.append('g').attr('class', 'y axis')
+        .attr('transform', 'translate(0,0)')
+        .call(
+            y.axis = d3.svg.axis().scale(y)
+            .orient('left').tickFormat(smartTicks)
+        )
+
+    yAxis.append("text")
+        .attr("class", "y-axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(params['y_label']);
+
+    // Put minimap hero icons on bars
+    d3.select(selector).style('position', 'relative')
+    $.each(timeslice, function(idx, val){
+        d3.select(selector)
+            .append('i')
+            .attr('class', 'd2mh '+heroes[val.hero_idx]['name'])
+            .style('position', 'absolute')
+            .style("left", x0.rangeBand()/2+margin.left+x0(heroes[val.hero_idx]['hero_name'])+'px')
+            .style("bottom", (height-y(0))+'px')
+    })
+
+    // Put bars in for each series
+    $.each(['str', 'int', 'agi'], function(idx, val){
+        stat = val+'_total'
+        rect_select = selector+' rect.'+stat
+
+        svg.selectAll(rect_select)
+            .data(timeslice)
+            .enter()
+            .append('rect')
+            .attr('x', function(d){
+                name = heroes[d.hero_idx]['hero_name']
+                return x1(val)+x0(name)
+            })
+            .attr('y', function(d){
+                return height-y(d[stat])
+            })
+            .attr('width', function(d){
+               return x1.rangeBand()
+            })
+            .attr('height', function(d){
+               return y(d[stat])
+            })
+            .attr('class', function(d){
+                name = heroes[d.hero_idx]['hero_name']
+
+                return stat+' '+name
+            })
+    })
+
+        // Listen for the update
+        $(document).on('update', function(e, timeslice){
+
+            ymax = Math.max(d3.max(timeslice, function(d){
+                return Math.max(
+                    d['str_total'],
+                    d['int_total'],
+                    d['agi_total']
+                )
+            }), ymax)
+            y_domain = [0, ymax+5]
+            y.domain(y_domain)
+
+            yAxis.transition()
+                .duration(params.interval_duration)
+                .ease('linear')
+                .call(y.axis)
+
+            $.each(['str', 'int', 'agi'], function(idx, val){
+                stat = val+'_total'
+                rect_select = selector+' rect.'+stat
+
+                svg.selectAll(rect_select)
+                    .data(timeslice)
+                    .attr('x', function(d){
+                        name = heroes[d.hero_idx]['hero_name']
+                        return x1(val)+x0(name)
+                    })
+                    .attr('y', function(d){
+                        return y(d[stat])
+                    })
+                    .attr('width', function(d){
+                       return x1.rangeBand()
+                    })
+                    .attr('height', function(d){
+                       return height-y(d[stat])
+                    })
+            })
+        })
+}
+
+window.statBars = statBars
+
+
+var goldBars = function(heroes, timeslice, minmax, x_var, y_var, target, params){
+    var selector = target
+    var width = $(selector).width()
+    var height = $(selector).height()
+    params['width'] = width
+    params['height'] = 292
+    var margin = {top: 15, right: 15, bottom: 25, left: 60},
+        width = params.width - margin.right - margin.left,
+        height = params.height - margin.top - margin.bottom;
+
+
+    bar_domain = []
+    $.each(heroes, function(i,v){
+        bar_domain.push(v['hero_name'])
+    })
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], 0.1).domain(bar_domain)
+
+    var ymax = d3.max(timeslice, function(d){
+        return d['reliable_gold']+d['unreliable_gold']
+    })
+    y_domain = [0, ymax]
+    var y = d3.scale.linear()
+        .domain(y_domain)
+        .range(
+            [height, 0]
+        )
+
+    var svg = d3.select(selector).insert('svg')
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+    var xAxis = svg.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', 'translate(0,'+height+')')
+        .call(d3.svg.axis().scale(x).orient('bottom'))
+
+    xAxis.selectAll('text')
+            .style('text-anchor', 'end')
+            .attr('dx', '-1em')
+            .attr('dy', '-0.3em')
+            .attr('transform', function(d){
+                return 'rotate(90)';
+            })
+        .append('text')
+            .attr('y', -16)
+            .attr('x', width)
+            .attr('dy', '.71em')
+            .style('text-anchor', 'end')
+            .text(params['x_label'])
+
+
+
+    var yAxis = svg.append('g').attr('class', 'y axis')
+        .attr('transform', 'translate(0,0)')
+        .call(
+            y.axis = d3.svg.axis().scale(y)
+            .orient('left').tickFormat(smartTicks)
+        )
+
+    yAxis.append("text")
+        .attr("class", "y-axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(params['y_label']);
+
+    // Put minimap hero icons on bars
+    d3.select(selector).style('position', 'relative')
+    $.each(timeslice, function(idx, val){
+        d3.select(selector)
+            .append('i')
+            .attr('class', 'd2mh '+heroes[val.hero_idx]['name'])
+            .style('position', 'absolute')
+            .style("left", x.rangeBand()/2+margin.left+x(heroes[val.hero_idx]['hero_name'])+'px')
+            .style("bottom", (height-y(0))+'px')
+    })
+
+    svg.selectAll(selector +' rect.reliable').data(timeslice)
+        .enter().append("rect")
+        .attr("x", function(d) {
+            return x(heroes[d.hero_idx]['hero_name']);
+        })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) { return y(d['reliable_gold']); })
+        .attr("height", function(d) {
+            return height - y(d['reliable_gold']);
+        })
+        .attr("class", function(d) {
+             return heroes[d.hero_idx]['name']+' reliable';
+        })
+        .on("mouseover", function(d) {
+            params.tooltip_div.transition()
+              .duration(200)
+              .style("opacity", 0.9);
+            params.tooltip_div.html(heroes[d.hero_idx]['hero_name'] + ' Reliable Gold')
+              .style("left", (d3.event.pageX) + "px")
+              .style("top", (d3.event.pageY - 28) + "px");
+            }
+        )
+        .on("mouseout", function(d) {
+            params.tooltip_div.transition()
+            .duration(500)
+            .style("opacity", 0);
+        });
+
+    svg.selectAll(selector +' rect.unreliable').data(timeslice)
+        .enter().append("rect")
+        .attr("x", function(d) {
+            return x(heroes[d.hero_idx]['hero_name']);
+        })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) {
+            return y(d['reliable_gold']+d['unreliable_gold']);
+        })
+        .attr("height", function(d) {
+            return height - y(d['unreliable_gold']);
+        })
+        .attr("class", function(d) {
+             return heroes[d.hero_idx]['name']+' unreliable';
+        })
+        .on("mouseover", function(d) {
+            params.tooltip_div.transition()
+              .duration(200)
+              .style("opacity", 0.9);
+            params.tooltip_div.html(heroes[d.hero_idx]['hero_name'] + ' Unreliable Gold')
+              .style("left", (d3.event.pageX) + "px")
+              .style("top", (d3.event.pageY - 28) + "px");
+            }
+        )
+        .on("mouseout", function(d) {
+            params.tooltip_div.transition()
+            .duration(500)
+            .style("opacity", 0);
+        });
+
+        // Listen for the update
+        $(document).on('update', function(e, timeslice){
+
+            ymax = Math.max(d3.max(timeslice, function(d){
+                return d['reliable_gold']+d['unreliable_gold']
+            }), ymax)
+            y_domain = [0, ymax]
+            y.domain(y_domain)
+
+            yAxis.transition()
+                .duration(params.interval_duration)
+                .ease('linear')
+                .call(y.axis)
+
+            svg.selectAll(selector +' rect.unreliable').data(timeslice)
+                .transition()
+                .duration(params.interval_duration)
+                .attr("x", function(d) {
+                    return x(heroes[d.hero_idx]['hero_name']);
+                })
+                .attr("width", x.rangeBand())
+                .attr("y", function(d) {
+                    return y(d['reliable_gold']+d['unreliable_gold']);
+                })
+                .attr("height", function(d) {
+                    return height - y(d['unreliable_gold']);
+                })
+            svg.selectAll(selector +' rect.reliable').data(timeslice)
+                .transition()
+                .duration(params.interval_duration)
+                .attr("x", function(d) {
+                    return x(heroes[d.hero_idx]['hero_name']);
+                })
+                .attr("width", x.rangeBand())
+                .attr("y", function(d) { return y(d['reliable_gold']); })
+                .attr("height", function(d) {
+                    return height - y(d['reliable_gold']);
+                })
+
+        })
+}
+window.goldBars = goldBars
+
+var updatingScatter = function(heroes, timeslice, minmax, x_var, y_var, target,params){
+    var selector = target
+    var width = $(selector).width()
+    var height = width // Mmm, squares
+    params['width'] = width
+    params['height'] = height
+    var margin = {top: 15, right: 15, bottom: 25, left: 35},
+        width = params.width - margin.right - margin.left,
+        height = params.height - margin.top - margin.bottom;
+
+
+    var x = d3.scale.linear()
+        .domain([
+                minmax[x_var]['min'],
+                minmax[x_var]['max']
+            ])
+        .range(
+            [0, width]
+        )
+    var y = d3.scale.linear()
+        .domain([
+                minmax[y_var]['min'],
+                minmax[y_var]['max']
+            ])
+        .range(
+            [height, 0]
+        )
+
+    var svg = d3.select(selector).insert('svg')
+        // .attr('class', 'kill_dmg')
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        // .style("margin-left", -margin.left + "px")
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+    var xAxis = svg.append('g').attr('class', 'x axis')
+        .attr('transform', 'translate(0,'+height+')')
+        .call(
+            d3.svg.axis().scale(x).orient("bottom")
+            .tickFormat(smartTicks).ticks(5)
+        )
+
+    xAxis.append("text")
+        .attr("class", "x-axis-label")
+        .attr("y", -16)
+        .attr("x", width)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(params['x_label'])
+
+    var yAxis = svg.append('g').attr('class', 'y axis')
+        .attr('transform', 'translate(0,0)')
+        .call(
+            y.axis = d3.svg.axis().scale(y)
+            .orient('left').tickFormat(smartTicks).ticks(5)
+        )
+
+    yAxis.append("text")
+        .attr("class", "y-axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(params['y_label']);
+
+    // Put hero icons on dots
+    d3.select(selector).style('position', 'relative')
+    $.each(timeslice, function(idx, val){
+        d3.select(selector)
+            .append('i')
+            .attr('class', 'toggleface d2mh '+heroes[val.hero_idx]['name'])
+            .style('position', 'absolute')
+            .style("left", margin.left+x(val[x_var])+'px')
+            .style("top", margin.top+y(val[y_var])+'px')
+    })
+
+    svg.selectAll(selector +' circle').data(timeslice)
+        .enter().append("circle")
+        .attr("cx", function(d) {
+             return x(d[x_var]);
+        })
+        .attr("cy", function(d) {
+             return y(d[y_var]);
+        })
+        .attr("class", function(d) {
+             return heroes[d.hero_idx]['name'];
+        })
+        .attr("r", 3)
+        .on("mouseover", function(d) {
+            params.tooltip_div.transition()
+              .duration(200)
+              .style("opacity", 0.9);
+            params.tooltip_div.html(heroes[d.hero_idx]['hero_name'])
+              .style("left", (d3.event.pageX) + "px")
+              .style("top", (d3.event.pageY - 28) + "px");
+            }
+        )
+        .on("mouseout", function(d) {
+            params.tooltip_div.transition()
+            .duration(500)
+            .style("opacity", 0);
+        });
+
+        // Listen for the update
+        $(document).on('update', function(e, timeslice){
+            d3.selectAll(selector+' circle').data(timeslice)
+            .transition()
+            .duration(params.interval_duration)
+            .attr("cx", function(d) {
+               return x(d[x_var]);
+            })
+            .attr("cy", function(d) {
+                 return y(d[y_var]);
+            })
+
+            //Move heroes on the dots
+            $.each(timeslice, function(idx, val){
+                hero_icon = selector+' i.toggleface.d2mh.'+heroes[val.hero_idx]['name']
+                d3.select(hero_icon)
+                    .transition()
+                    .duration(params.interval_duration)
+                    .style("left", margin.left+x(val[x_var])+'px')
+                    .style("top", margin.top+y(val[y_var])+'px')
+            })
+
+        })
+}
+
+window.updatingScatter = updatingScatter
+
+
+var healthBars = function(heroes, timeslice, params){
+    var health_bar_height = 5
+
+    $.each(heroes, function(idx, val){
+        var selector = '.'+val['name']+'_slot'
+        var width = $(selector).width()
+
+        var svg = d3.select(selector).insert("svg", 'img')
+        .attr("width", width)
+        .attr("height", 2*health_bar_height)
+        .attr("class", 'lifebar')
+
+        var mbar = svg.append("rect")
+        .attr("x", 0)
+        .attr("y", health_bar_height)
+        .attr("width", width)
+        .attr("height", health_bar_height)
+        .attr("class", val['name']+' mana-bar');
+
+        var hbar = svg.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", width)
+        .attr("height", health_bar_height)
+        .attr("class", val['name']+' health-bar');
+
+        // Listen for the update
+        $(document).on('update', function(e, snapshot){
+            var health_width = width*snapshot[idx]['health']/snapshot[idx]['max_health']
+            hbar.transition()
+                .duration(params.interval_duration)
+                .attr('width', health_width)
+            if(health_width === 0){}
+            mbar.attr(
+                'width',
+                width*snapshot[idx]['mana']/snapshot[idx]['max_mana']
+            )
+        })
+
+    })
+
+}
+window.healthBars = healthBars

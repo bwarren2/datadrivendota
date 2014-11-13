@@ -30,6 +30,11 @@ urlpatterns = patterns(
         views.parse_preview,
         name="parse"
     ),
+    url(
+        r'^(?P<match_id>[0-9\-]*)/parse_match$',
+        views.parse_match,
+        name="parse_match"
+    ),
     url(r'^(?P<match_id>[0-9\-]*)/$', views.match, name="match_detail"),
     url(
         r'^ability-build/$',

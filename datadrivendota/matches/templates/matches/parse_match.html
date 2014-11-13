@@ -1,0 +1,359 @@
+{% extends "matches/base.html" %}
+
+{% load staticfiles player_extras %}
+
+{% block title %}Match #{{ match.steam_id }}{% endblock title %}
+
+{% block page_title %}Match #{{ match.steam_id }}
+<small>  {{ match.game_mode.description }} {{ match.lobby_type.description }},
+    {{ match.hms_duration }} @ {{ match.hms_start_time }}</small>
+    {% if match.league.leaguedossier %}
+      <br>
+      <small>Tournament:
+      {% if match.league.leaguedossier.tournament_url %}
+        <a href="{{match.league.leaguedossier.tournament_url}}">{{match.league.leaguedossier.display_name}}</a>
+      {% else %}
+        {{match.league.leaguedossier.display_name}}
+      {% endif %}</small>
+    {% endif %}
+    {% endblock page_title %}
+
+{% block content %}
+
+    <div class='container'>
+        <div class='row' id='buttons'>
+        <div class='goofyspacer'>
+            <h2>Animation (times approximate):</h2>
+            <div class='col-md-1'>
+                <button id='stop-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Stop</button>
+            </div>
+            <div class='col-md-1'>
+                <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Start</button>
+            </div>
+            <div class='col-md-1'>
+                <button id='back-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+                    <span  class="info glyphicon glyphicon-backward">
+                </button>
+            </div>
+            <div class='col-md-1'>
+                <button id='forward-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+                    <span  class="info glyphicon glyphicon-forward">
+                </button>
+            </div>
+            <div class='col-md-2'>
+                <input style='margin-top:5px' id='time-display' class='form-control' type='text' placeholder='Replay Time' readonly>
+            </div>
+
+            <div class='col-md-2 col-md-offset-1' id='related-match'>
+                <a href="{%url 'matches:match_detail' match_id=match.steam_id%}"><button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Match Summary</button></a>
+            </div>
+            <div class='col-md-2 col-md-offset-1'>
+                <button id='face-toggle' type="button" class="btn btn-primary btn-lg btn-block">Toggle Faces</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+  {% include "matches/_match_cards.html" %}
+
+    <div class='container'>
+        <div class='row' >
+            <div class='goofyspacer'>
+                <h4>Scatterplots</h4>
+                <div class='col-md-3' id='lh_level'></div>
+                    {% comment %}
+                    <h4>Hero Kills <span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="" data-placement="right"></span></h4>
+                    {% endcomment %}
+                <div class='col-md-3' id='kill_dmg'></div>
+                <div class='col-md-3' id='death_dmg'></div>
+                <div class='col-md-3' id='gold_exp'></div>
+            </div>
+        </div>
+        <div class='row'>
+            <h4>Minimap and Gold</h4>
+            <div class='goofyspacer'>
+                <div class='col-md-4' id='minimap'></div>
+                <div class='col-md-8' id='gold_bars'></div>
+            </div>
+
+        </div>
+        <div class='row'>
+            <h4>Stat Bars</h4>
+            <div class='goofyspacer'>
+                <div class='col-md-4' id='minimap'></div>
+                <div class='col-md-8' id='stat_bars'></div>
+            </div>
+
+        </div>
+        <div class='row'>
+            <div class='col-md-6 col-md-offset-3' id='note'>
+                <p>Note: This is alpha tech.  There are some known issues: data in the first few minutes can have broken values, and killing an aeigs holder counts as a kill, but the gist is here.</p>
+            </div>
+        </div>
+
+    </div>{% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+
+var timeline
+var heroes
+$(function(){
+
+    // Config
+    var tick_idx = 0;
+    var interval_duration = 250;
+    var hero_json = {{hero_json|safe}}
+    var tooltip_div = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    // Cosmetics
+    $('.chart-pip').remove()
+    $('.cast-player-image').remove()
+    var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+    $('#face-toggle').click(function(){
+        $('.toggleface').toggle()
+    })
+
+    //Utility
+    function updateTimer(d){
+        $('#time-display').val(String((d-d%60)/60)+':'+String(d%60))
+    }
+    function sortNumber(a,b) {
+        return a - b;
+    }
+    function between(x, min, max) {
+        return x >= min && x <= max;
+    }
+    function slice_timeline(timeline_segment){
+        return_ary = $.map(
+            timeline_segment,
+            function(value, index) {
+                if(between(index,0,10)){
+                    return [value];
+                }
+            })
+        return return_ary
+    }
+
+
+    function setUp(heroes, timeline){
+        window.healthBars(heroes, timeline, {'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
+        // killDmg(heroes, timeline, minmax)
+        window.miniMap(heroes, timeline, {'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
+        window.updatingScatter(
+            heroes, timeline, minmax,
+            'calc_kills', 'hero_damage_dealt', 'div#kill_dmg',
+            {'x_label': 'Kills', 'y_label': 'Hero Damage Dealt', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
+
+        )
+        window.updatingScatter(
+            heroes, timeline, minmax,
+            'deaths', 'hero_damage_taken', 'div#death_dmg',
+            {'x_label': 'Deaths', 'y_label': 'Hero Damage Taken', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
+        )
+        window.updatingScatter(
+            heroes, timeline, minmax,
+            'level', 'lh', 'div#lh_level',
+            {'x_label': 'Level', 'y_label': 'Last Hits', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
+        )
+        window.updatingScatter(
+            heroes, timeline, minmax,
+            'gold', 'xp', 'div#gold_exp',
+            {'x_label': 'Gold Total', 'y_label': 'XP Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
+        )
+        window.goldBars(
+            heroes, timeline, minmax,
+            'gold', 'xp', 'div#gold_bars',
+            {'x_label': 'Heroes', 'y_label': 'Gold Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
+        )
+        window.statBars(heroes, timeline, minmax, 'div#stat_bars',
+            {'x_label': 'Heroes', 'y_label': 'Stat Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
+    }
+
+
+    // Animation Controls
+    $('#stop-animation').toggle()
+    $('#start-animation').click(function(){
+        $('#start-animation').toggle();
+        $('#stop-animation').toggle();
+        $('#back-animation').toggle();
+        $('#forward-animation').toggle();
+    });
+    $('#stop-animation').click(function(){
+        $('#start-animation').toggle();
+        $('#stop-animation').toggle();
+        $('#back-animation').toggle();
+        $('#forward-animation').toggle();
+    });
+
+    var url = '{% static timeline %}';
+    var chats;
+    var hero_creeps = $.getJSON(url, function(result){
+
+        // Wir mussen sie data machen
+        timeline = result['timeline']
+        heroes = result['heroes']
+        chats = result['chats']
+        minmax = result['minmax']
+        $.each(heroes, function(i, v){
+            name = heroes[i]['name']
+            name = name.replace('npc_dota_hero_', '')
+            name = name.replace('_', ' ')
+            heroes[i]['hero_name'] = name
+        })
+        ints = Object.keys(timeline)
+
+        var numArray = []
+        $.each(ints, function(i, v){
+            numArray.push(parseInt(v))
+        })
+        numArray.sort(sortNumber);
+
+        function updateTimer(state){
+            $('#time-display').val(state['time'])
+        }
+
+        // Prep the ticker
+        var make_metronome = function(numArray, timeline){
+            function new_index(adder){
+
+                // GFD, javascript.  You're drunk.
+                fakemod = function(n, modulus) {
+                    return ((n%modulus)+modulus)%modulus;
+                }
+                tick_idx = fakemod((tick_idx+adder),numArray.length)
+            }
+            var myfun = function(change){
+                new_index(change)
+
+                // Take the hero data for that tick
+                slice = slice_timeline(timeline[numArray[tick_idx]])
+                $(document).trigger('update', [slice])
+                updateTimer(timeline[numArray[tick_idx]])
+
+            }
+            return myfun;
+        }
+        metronome = make_metronome(numArray, timeline)
+        bindHandlers(metronome)
+
+        // Get the min tick
+        data = []
+        $.each(Object.keys(timeline), function(idx, val){
+            data.push(parseInt(val));
+        })
+        tick = Math.min.apply(null, data)
+
+        slice = slice_timeline(timeline[tick])
+        // Set up graphics!
+        updateTimer(timeline[tick])
+        setUp(heroes, slice, minmax);
+    });
+
+    // Handling Handlers
+    function bindHandlers(broadcast){
+        var myhandle
+        var play = function(){
+            broadcast(1)
+        }
+        var start = function(){
+            myhandle = setInterval(play, interval_duration)
+        }
+
+        var stop = function (){
+            clearInterval(myhandle)
+        }
+
+        $('#start-animation').click(function(){
+            start();
+        })
+
+        $('#stop-animation').click(function(){
+            stop();
+        })
+
+
+        $('#back-animation').click(function(){
+            broadcast(-1);
+        });
+        $('#forward-animation').click(function(){
+            broadcast(1);
+        });
+    }
+})
+</script>
+
+{% endblock extra_js %}
+
+{% block extra_css %}
+    <style type="text/css">
+    {% for key, value in css_color_dict.iteritems %}
+        .{{key}} {
+            fill: {{value}};
+        }
+    {% endfor %}
+    {% for key, value in slot_dict.iteritems %}
+        .player-slot-{{key}} {
+             box-shadow: 0 0 25.5px {{value}};
+        }
+    {% endfor %}
+    path{
+        fill: none;
+    }
+    .animation-button{
+        height:45px;
+    }
+    circle{
+        stroke-width:1;
+        /*stroke-fill:#000000;*/
+        stroke: #000000;
+        r: 2;
+    }
+    .health-bar{
+        fill: #84F721;
+    }
+    .mana-bar{
+        fill: #507AEF;
+    }
+    rect.unreliable{
+        fill: #F6E800;
+        stroke: #000000;
+        stroke-width: 1;
+    }
+    rect.reliable{
+        fill: #C4B900;
+        stroke: #000000;
+        stroke-width: 1;
+    }
+    rect.str_total{
+        fill: #D90000;
+        stroke: #000000;
+        stroke-width: 1;
+    }
+    rect.int_total{
+        fill: #0000D9;
+        stroke: #000000;
+        stroke-width: 1;
+    }
+    rect.agi_total{
+        fill: #00D900;
+        stroke: #000000;
+        stroke-width: 1;
+    }
+    .mana-bar{
+        fill: #507AEF;
+    }
+    img.desaturate{
+        filter: grayscale(100%);
+    }
+    div.goofyspacer{
+        margin-top:10px;
+        margin-bottom:10px;
+    }
+    </style>
+{% endblock extra_css %}
+
