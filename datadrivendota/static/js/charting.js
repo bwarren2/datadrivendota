@@ -1334,7 +1334,7 @@ var miniMap = function(heroes, timeslice, params){
         .attr('width', width)
         .attr('height', height)
         .append('svg:image')
-        .attr('xlink:href', '/assets/images/minimap.png')
+        .attr('xlink:href', 'https://s3.amazonaws.com/datadrivendota/images/minimap.png')
         .attr('x', 0)
         .attr('y', 0)
         .attr('width', width)
