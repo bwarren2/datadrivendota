@@ -1320,41 +1320,42 @@ var miniMap = function(heroes, state, timeslice, params){
     var width = $(selector).width()
     var height = width
     var building_initials = [
-      {'y': 87, 'x': 78, 'name': 'npc_dota_goodguys_fort'},
-      {'y': 78, 'x': 96, 'name': 'npc_dota_goodguys_melee_rax_bot'},
-      {'y': 96, 'x': 90, 'name': 'npc_dota_goodguys_melee_rax_mid'},
-      {'y': 105, 'x': 78, 'name': 'npc_dota_goodguys_melee_rax_top'},
-      {'y': 81, 'x': 96, 'name': 'npc_dota_goodguys_range_rax_bot'},
-      {'y': 99, 'x': 87, 'name': 'npc_dota_goodguys_range_rax_mid'},
-      {'y': 105, 'x': 72, 'name': 'npc_dota_goodguys_range_rax_top'},
-      {'y': 84, 'x': 168, 'name': 'npc_dota_goodguys_tower1_bot'},
-      {'y': 123, 'x': 117, 'name': 'npc_dota_goodguys_tower1_mid'},
-      {'y': 153, 'x': 75, 'name': 'npc_dota_goodguys_tower1_top'},
-      {'y': 78, 'x': 123, 'name': 'npc_dota_goodguys_tower2_bot'},
-      {'y': 108, 'x': 99, 'name': 'npc_dota_goodguys_tower2_mid'},
-      {'y': 122, 'x': 75, 'name': 'npc_dota_goodguys_tower2_top'},
-      {'y': 80, 'x': 98, 'name': 'npc_dota_goodguys_tower3_bot'},
-      {'y': 99, 'x': 91, 'name': 'npc_dota_goodguys_tower3_mid'},
-      {'y': 108, 'x': 75, 'name': 'npc_dota_goodguys_tower3_top'},
-      {'y': 90, 'x': 81, 'name': 'npc_dota_goodguys_tower4'},
-      {'y': 174, 'x': 171, 'name': 'npc_dota_badguys_fort'},
-      {'y': 162, 'x': 180, 'name': 'npc_dota_badguys_melee_rax_bot'},
-      {'y': 167, 'x': 162, 'name': 'npc_dota_badguys_melee_rax_mid'},
-      {'y': 185, 'x': 158, 'name': 'npc_dota_badguys_melee_rax_top'},
-      {'y': 162, 'x': 177, 'name': 'npc_dota_badguys_range_rax_bot'},
-      {'y': 168, 'x': 160, 'name': 'npc_dota_badguys_range_rax_mid'},
-      {'y': 187, 'x': 158, 'name': 'npc_dota_badguys_range_rax_top'},
-      {'y': 114, 'x': 178, 'name': 'npc_dota_badguys_tower1_bot'},
-      {'y': 138, 'x': 136, 'name': 'npc_dota_badguys_tower1_mid'},
-      {'y': 186, 'x': 84, 'name': 'npc_dota_badguys_tower1_top'},
-      {'y': 141, 'x': 178, 'name': 'npc_dota_badguys_tower2_bot'},
-      {'y': 156, 'x': 150, 'name': 'npc_dota_badguys_tower2_mid'},
-      {'y': 186, 'x': 132, 'name': 'npc_dota_badguys_tower2_top'},
-      {'y': 159, 'x': 178, 'name': 'npc_dota_badguys_tower3_bot'},
-      {'y': 166, 'x': 160, 'name': 'npc_dota_badguys_tower3_mid'},
-      {'y': 186, 'x': 155, 'name': 'npc_dota_badguys_tower3_top'},
-      {'y': 172, 'x': 169, 'name': 'npc_dota_badguys_tower4'}
+      {'y': 87, 'x': 78, 'id': 'npc_dota_goodguys_fort'},
+      {'y': 78, 'x': 96, 'id': 'npc_dota_goodguys_melee_rax_bot'},
+      {'y': 96, 'x': 90, 'id': 'npc_dota_goodguys_melee_rax_mid'},
+      {'y': 105, 'x': 78, 'id': 'npc_dota_goodguys_melee_rax_top'},
+      {'y': 81, 'x': 96, 'id': 'npc_dota_goodguys_range_rax_bot'},
+      {'y': 99, 'x': 87, 'id': 'npc_dota_goodguys_range_rax_mid'},
+      {'y': 105, 'x': 72, 'id': 'npc_dota_goodguys_range_rax_top'},
+      {'y': 84, 'x': 168, 'id': 'npc_dota_goodguys_tower1_bot'},
+      {'y': 123, 'x': 117, 'id': 'npc_dota_goodguys_tower1_mid'},
+      {'y': 153, 'x': 75, 'id': 'npc_dota_goodguys_tower1_top'},
+      {'y': 78, 'x': 123, 'id': 'npc_dota_goodguys_tower2_bot'},
+      {'y': 108, 'x': 99, 'id': 'npc_dota_goodguys_tower2_mid'},
+      {'y': 122, 'x': 75, 'id': 'npc_dota_goodguys_tower2_top'},
+      {'y': 80, 'x': 98, 'id': 'npc_dota_goodguys_tower3_bot'},
+      {'y': 99, 'x': 91, 'id': 'npc_dota_goodguys_tower3_mid'},
+      {'y': 108, 'x': 75, 'id': 'npc_dota_goodguys_tower3_top'},
+      {'y': 90, 'x': 81, 'id': 'npc_dota_goodguys_tower4'},
+      {'y': 174, 'x': 171, 'id': 'npc_dota_badguys_fort'},
+      {'y': 162, 'x': 180, 'id': 'npc_dota_badguys_melee_rax_bot'},
+      {'y': 167, 'x': 162, 'id': 'npc_dota_badguys_melee_rax_mid'},
+      {'y': 185, 'x': 158, 'id': 'npc_dota_badguys_melee_rax_top'},
+      {'y': 162, 'x': 177, 'id': 'npc_dota_badguys_range_rax_bot'},
+      {'y': 168, 'x': 160, 'id': 'npc_dota_badguys_range_rax_mid'},
+      {'y': 187, 'x': 158, 'id': 'npc_dota_badguys_range_rax_top'},
+      {'y': 114, 'x': 178, 'id': 'npc_dota_badguys_tower1_bot'},
+      {'y': 138, 'x': 136, 'id': 'npc_dota_badguys_tower1_mid'},
+      {'y': 186, 'x': 84, 'id': 'npc_dota_badguys_tower1_top'},
+      {'y': 141, 'x': 178, 'id': 'npc_dota_badguys_tower2_bot'},
+      {'y': 156, 'x': 150, 'id': 'npc_dota_badguys_tower2_mid'},
+      {'y': 186, 'x': 132, 'id': 'npc_dota_badguys_tower2_top'},
+      {'y': 159, 'x': 178, 'id': 'npc_dota_badguys_tower3_bot'},
+      {'y': 166, 'x': 160, 'id': 'npc_dota_badguys_tower3_mid'},
+      {'y': 186, 'x': 155, 'id': 'npc_dota_badguys_tower3_top'},
+      {'y': 172, 'x': 169, 'id': 'npc_dota_badguys_tower4'}
     ]
+
     d3.select(selector).style('position', 'relative')
     var svg = d3.select(selector)
         .append('svg')
@@ -1419,8 +1420,7 @@ var miniMap = function(heroes, state, timeslice, params){
         .data(building_initials)
         .enter()
         .append("rect")
-        .attr('class', function(d){return 'buildings '+d.name})
-        .attr('id', function(d){return d.name})
+        .attr('class', function(d){return 'buildings '+d.id})
         .attr('width', 4)
         .attr('height', 4)
         .attr('data-coord',  function(d){return d.y})
@@ -1487,18 +1487,22 @@ var miniMap = function(heroes, state, timeslice, params){
 
         squares.exit().remove();
 
-        // var buildings = svg.selectAll('rect.buildings')
-        // .data(state['buildings'], function(d){retrun d});
+        var building_temp = building_initials.filter(function(v){
+          return $.inArray(v['id'], state['Buildings'])>=0;
+        })
 
-        // buildings.enter()
-        // .append("rect")
-        // .attr('class', function(d){return 'buildings '+d.name})
-        // .attr('width', 4)
-        // .attr('height', 4)
-        // .attr('y', function(d){return height-transY(d.y)+'px'})
-        // .attr('x', function(d){return transX(d.x)+'px'})
+        var buildings = svg.selectAll('rect.buildings')
+        .data(building_temp, function(d){return d.id});
 
-        // buildings.exit().remove()
+        buildings.enter()
+        .append("rect")
+        .attr('class', function(d){return 'buildings '+d.id})
+        .attr('width', 4)
+        .attr('height', 4)
+        .attr('y', function(d){return height-transY(d.y)+'px'})
+        .attr('x', function(d){return transX(d.x)+'px'})
+
+        buildings.exit().remove()
 
 
     })
