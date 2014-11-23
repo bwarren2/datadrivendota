@@ -195,11 +195,11 @@ $(function(){
             'gold', 'xp', 'div#gold_exp',
             {'x_label': 'Gold Total', 'y_label': 'XP Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
         )
-        // window.goldBars(
-        //     heroes, timeline, minmax,
-        //     'gold', 'xp', 'div#gold_bars',
-        //     {'x_label': 'Heroes', 'y_label': 'Gold Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
-        // )
+        window.goldBars(
+            heroes, timeline, minmax,
+            'gold', 'xp', 'div#gold_bars',
+            {'x_label': 'Heroes', 'y_label': 'Gold Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
+        )
         window.statBars(heroes, timeline, minmax, 'div#stat_bars',
             {'x_label': 'Heroes', 'y_label': 'Stat Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
         $(document).on('update', function(e, snapshot){
