@@ -105,6 +105,7 @@
 
 var timeline
 var heroes
+var state
 $(function(){
 
 
@@ -139,6 +140,15 @@ $(function(){
     })
 
     //Utility
+    function updateState(snapshot){
+        state = {}
+        $.map(
+        ['Observers', 'Sentries', 'Buildings'],
+        function(value, index) {
+            state[value] = (snapshot[value])
+        })
+        return state
+    }
     function updateTimer(d){
         $('#time-display').val(String((d-d%60)/60)+':'+String(d%60))
     }
@@ -160,10 +170,10 @@ $(function(){
     }
 
 
-    function setUp(heroes, timeline){
+    function setUp(heroes, timeline, state, minmax){
         window.healthBars(heroes, timeline, {'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
         // killDmg(heroes, timeline, minmax)
-        window.miniMap(heroes, timeline, {'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
+        window.miniMap(heroes, state, timeline, {'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
         window.updatingScatter(
             heroes, timeline, minmax,
             'calc_kills', 'hero_damage_dealt', 'div#kill_dmg',
@@ -185,11 +195,11 @@ $(function(){
             'gold', 'xp', 'div#gold_exp',
             {'x_label': 'Gold Total', 'y_label': 'XP Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
         )
-        window.goldBars(
-            heroes, timeline, minmax,
-            'gold', 'xp', 'div#gold_bars',
-            {'x_label': 'Heroes', 'y_label': 'Gold Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
-        )
+        // window.goldBars(
+        //     heroes, timeline, minmax,
+        //     'gold', 'xp', 'div#gold_bars',
+        //     {'x_label': 'Heroes', 'y_label': 'Gold Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
+        // )
         window.statBars(heroes, timeline, minmax, 'div#stat_bars',
             {'x_label': 'Heroes', 'y_label': 'Stat Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
         $(document).on('update', function(e, snapshot){
@@ -271,7 +281,8 @@ $(function(){
 
                 // Take the hero data for that tick
                 slice = slice_timeline(timeline[numArray[tick_idx]])
-                $(document).trigger('update', [slice])
+                state = updateState(timeline[numArray[tick_idx]])
+                $(document).trigger('update', [slice, state])
                 updateTimer(timeline[numArray[tick_idx]])
 
             }
@@ -288,9 +299,11 @@ $(function(){
         tick = Math.min.apply(null, data)
 
         slice = slice_timeline(timeline[tick])
+        state = updateState(timeline[tick])
+
         // Set up graphics!
         updateTimer(timeline[tick])
-        setUp(heroes, slice, minmax);
+        setUp(heroes, slice, state, minmax);
     });
 
     // Handling Handlers
@@ -397,6 +410,22 @@ $(function(){
         -webkit-filter: grayscale(100%);
         -moz-filter: grayscale(100%);
         filter: grayscale(100%);
+    }
+    circle.observers{
+        stroke: #000000;
+        fill: #C5C300;
+    }
+    rect.sentries{
+        stroke: #000000;
+        fill: #2C2B85;
+    }
+    rect.spacers{
+        stroke: #000000;
+        fill: #282BFF;
+    }
+    rect.buildings{
+        stroke: #000000;
+        fill: #00F11B;
     }
     </style>
 <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />

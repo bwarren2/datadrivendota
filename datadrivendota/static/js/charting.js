@@ -1314,11 +1314,47 @@ var side_progress_plot = function(url, params){
 }
 window.side_progress_plot = side_progress_plot
 
-var miniMap = function(heroes, timeslice, params){
+var miniMap = function(heroes, state, timeslice, params){
 
     var selector = 'div#minimap'
     var width = $(selector).width()
     var height = width
+    var building_initials = [
+      {'y': 87, 'x': 78, 'name': 'npc_dota_goodguys_fort'},
+      {'y': 78, 'x': 96, 'name': 'npc_dota_goodguys_melee_rax_bot'},
+      {'y': 96, 'x': 90, 'name': 'npc_dota_goodguys_melee_rax_mid'},
+      {'y': 105, 'x': 78, 'name': 'npc_dota_goodguys_melee_rax_top'},
+      {'y': 81, 'x': 96, 'name': 'npc_dota_goodguys_range_rax_bot'},
+      {'y': 99, 'x': 87, 'name': 'npc_dota_goodguys_range_rax_mid'},
+      {'y': 105, 'x': 72, 'name': 'npc_dota_goodguys_range_rax_top'},
+      {'y': 84, 'x': 168, 'name': 'npc_dota_goodguys_tower1_bot'},
+      {'y': 123, 'x': 117, 'name': 'npc_dota_goodguys_tower1_mid'},
+      {'y': 153, 'x': 75, 'name': 'npc_dota_goodguys_tower1_top'},
+      {'y': 78, 'x': 123, 'name': 'npc_dota_goodguys_tower2_bot'},
+      {'y': 108, 'x': 99, 'name': 'npc_dota_goodguys_tower2_mid'},
+      {'y': 122, 'x': 75, 'name': 'npc_dota_goodguys_tower2_top'},
+      {'y': 80, 'x': 98, 'name': 'npc_dota_goodguys_tower3_bot'},
+      {'y': 99, 'x': 91, 'name': 'npc_dota_goodguys_tower3_mid'},
+      {'y': 108, 'x': 75, 'name': 'npc_dota_goodguys_tower3_top'},
+      {'y': 90, 'x': 81, 'name': 'npc_dota_goodguys_tower4'},
+      {'y': 174, 'x': 171, 'name': 'npc_dota_badguys_fort'},
+      {'y': 162, 'x': 180, 'name': 'npc_dota_badguys_melee_rax_bot'},
+      {'y': 167, 'x': 162, 'name': 'npc_dota_badguys_melee_rax_mid'},
+      {'y': 185, 'x': 158, 'name': 'npc_dota_badguys_melee_rax_top'},
+      {'y': 162, 'x': 177, 'name': 'npc_dota_badguys_range_rax_bot'},
+      {'y': 168, 'x': 160, 'name': 'npc_dota_badguys_range_rax_mid'},
+      {'y': 187, 'x': 158, 'name': 'npc_dota_badguys_range_rax_top'},
+      {'y': 114, 'x': 178, 'name': 'npc_dota_badguys_tower1_bot'},
+      {'y': 138, 'x': 136, 'name': 'npc_dota_badguys_tower1_mid'},
+      {'y': 186, 'x': 84, 'name': 'npc_dota_badguys_tower1_top'},
+      {'y': 141, 'x': 178, 'name': 'npc_dota_badguys_tower2_bot'},
+      {'y': 156, 'x': 150, 'name': 'npc_dota_badguys_tower2_mid'},
+      {'y': 186, 'x': 132, 'name': 'npc_dota_badguys_tower2_top'},
+      {'y': 159, 'x': 178, 'name': 'npc_dota_badguys_tower3_bot'},
+      {'y': 166, 'x': 160, 'name': 'npc_dota_badguys_tower3_mid'},
+      {'y': 186, 'x': 155, 'name': 'npc_dota_badguys_tower3_top'},
+      {'y': 172, 'x': 169, 'name': 'npc_dota_badguys_tower4'}
+    ]
     d3.select(selector).style('position', 'relative')
     var svg = d3.select(selector)
         .append('svg')
@@ -1351,14 +1387,45 @@ var miniMap = function(heroes, timeslice, params){
         presumed_min = 71
         scalar = minmax['x']['max'] - presumed_min
         xVal = xVal - 71
-        return  20+(260*(xVal/scalar))+'px'
+        return  20+(260*(xVal/scalar))
     }
     function transY(yVal){
         presumed_min = 71
         scalar = minmax['y']['max'] - presumed_min
         yVal = yVal - 71
-        return  20+(yVal/scalar*240)+'px'
+        return  20+(yVal/scalar*240)
     }
+
+    svg.selectAll('circle.observers')
+      .data(state['Observers'])
+      .enter()
+      .append("circle")
+      .attr('class', 'observers')
+      .attr('r', 3)
+      .attr('cy', function(d){return height-transY(d.y)+'px'})
+      .attr('cx', function(d){return transX(d.x)+'px'})
+
+    svg.selectAll('rect.sentries')
+        .data(state['Sentries'])
+        .enter()
+        .append("rect")
+        .attr('class', 'sentries')
+        .attr('width', 4)
+        .attr('height', 4)
+        .attr('y', function(d){return height-transY(d.y)+'px'})
+        .attr('x', function(d){return transX(d.x)+'px'})
+
+    svg.selectAll('rect.buildings')
+        .data(building_initials)
+        .enter()
+        .append("rect")
+        .attr('class', function(d){return 'buildings '+d.name})
+        .attr('id', function(d){return d.name})
+        .attr('width', 4)
+        .attr('height', 4)
+        .attr('data-coord',  function(d){return d.y})
+        .attr('y', function(d){return height-transY(d.y)+'px'})
+        .attr('x', function(d){return transX(d.x)+'px'})
 
     $.each(timeslice, function(idx, val){
 
@@ -1368,19 +1435,73 @@ var miniMap = function(heroes, timeslice, params){
            .style('position', 'absolute')
            .attr('width', 32)
            .attr('height', 32)
-           .style('bottom', transY(val.y))
-           .style('left', transX(val.x))
+           .style('bottom', transY(val.y)+'px')
+           .style('left', transX(val.x)+'px')
 
         // Listen for the update
         $(document).on('update', function(e, snapshot){
             icon_class = selector+' .d2mh.'+ heroes[idx]['name']
             d3.select(icon_class).transition().duration(params.interval_duration)
-                .style('bottom', transY(snapshot[idx].y))
-                .style('left', transX(snapshot[idx].x))
+                .style('bottom', transY(snapshot[idx].y)+'px')
+                .style('left', transX(snapshot[idx].x)+'px')
         })
 
     })
 
+    $(document).on('update', function(e, snapshot, state){
+        var circles = svg.selectAll('circle.observers')
+        .data(state['Observers']);
+
+        circles
+        .transition()
+        .duration(0)
+        .attr('cy', function(d){return height-transY(d.y)+'px'})
+        .attr('cx', function(d){return transX(d.x)+'px'});
+
+        circles.enter()
+        .append("circle")
+        .attr('class', 'observers')
+        .attr('r', 3)
+        .attr('cy', function(d){return height-transY(d.y)+'px'})
+        .attr('cx', function(d){return transX(d.x)+'px'})
+
+        circles.exit().remove();
+
+
+        var squares = svg.selectAll('rect.sentries')
+        .data(state['Sentries']);
+
+        squares
+        .transition()
+        .duration(0)
+        .attr('y', function(d){return height-transY(d.y)+'px'})
+        .attr('x', function(d){return transX(d.x)+'px'});
+
+        squares.enter()
+        .append("rect")
+        .attr('class', 'sentries')
+        .attr('width', 4)
+        .attr('height', 4)
+        .attr('y', function(d){return height-transY(d.y)+'px'})
+        .attr('x', function(d){return transX(d.x)+'px'})
+
+        squares.exit().remove();
+
+        // var buildings = svg.selectAll('rect.buildings')
+        // .data(state['buildings'], function(d){retrun d});
+
+        // buildings.enter()
+        // .append("rect")
+        // .attr('class', function(d){return 'buildings '+d.name})
+        // .attr('width', 4)
+        // .attr('height', 4)
+        // .attr('y', function(d){return height-transY(d.y)+'px'})
+        // .attr('x', function(d){return transX(d.x)+'px'})
+
+        // buildings.exit().remove()
+
+
+    })
 }
  window.miniMap = miniMap
 
