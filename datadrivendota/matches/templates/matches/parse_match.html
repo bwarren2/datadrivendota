@@ -19,33 +19,40 @@
     {% endblock page_title %}
 
 {% block content %}
-
     <div class='container'>
         <div class='row' id='buttons'>
         <div class='goofyspacer'>
             <h2>Animation (times approximate):</h2>
-            <div class='col-md-1'>
-                <button id='stop-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Stop</button>
-            </div>
-            <div class='col-md-1'>
-                <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Start</button>
-            </div>
-            <div class='col-md-1'>
-                <button id='back-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
-                    <span  class="info glyphicon glyphicon-backward">
-                </button>
-            </div>
-            <div class='col-md-1'>
-                <button id='forward-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
-                    <span  class="info glyphicon glyphicon-forward">
-                </button>
+            <div class='col-md-4'>
+                <div class='container'>
+                    <div class='row'>
+                        <div class='col-md-1'>
+                            <button id='stop-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Stop</button>
+                        </div>
+                        <div class='col-md-1'>
+                            <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Start</button>
+                        </div>
+                        <div class='col-md-1'>
+                            <button id='back-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+                                <span  class="info glyphicon glyphicon-backward">
+                            </button>
+                        </div>
+                        <div class='col-md-1'>
+                            <button id='forward-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+                                <span  class="info glyphicon glyphicon-forward">
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
             </div>
             <div class='col-md-2'>
                 <input style='margin-top:5px' id='time-display' class='form-control' type='text' placeholder='Replay Time' readonly>
             </div>
 
-            <div class='col-md-2 col-md-offset-1' id='related-match'>
-                <a href="{%url 'matches:match_detail' match_id=match.steam_id%}"><button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block">Match Summary</button></a>
+            <div class='col-md-2'>
+                <label>Speed: <span id='duration_label'></span></label>
+                <div id='duration_slider'></div>
             </div>
             <div class='col-md-2 col-md-offset-1'>
                 <button id='face-toggle' type="button" class="btn btn-primary btn-lg btn-block">Toggle Faces</button>
@@ -98,7 +105,9 @@
 
 var timeline
 var heroes
+var state
 $(function(){
+
 
     // Config
     var tick_idx = 0;
@@ -107,6 +116,18 @@ $(function(){
     var tooltip_div = d3.select("body").append("div")
       .attr("class", "tooltip")
       .style("opacity", 0);
+    $('#duration_slider').slider({
+        'value': interval_duration,
+        'min': 50,
+        'max': 400,
+        'step': 50,
+        slide: function(event, ui){
+            $('#duration_label').html(ui.value+'ms')
+            interval_duration = ui.value
+        }
+
+    })
+    $('#duration_label').html($('#duration_slider').slider('value')+'ms')
 
     // Cosmetics
     $('.chart-pip').remove()
@@ -119,6 +140,15 @@ $(function(){
     })
 
     //Utility
+    function updateState(snapshot){
+        state = {}
+        $.map(
+        ['Observers', 'Sentries', 'Buildings'],
+        function(value, index) {
+            state[value] = (snapshot[value])
+        })
+        return state
+    }
     function updateTimer(d){
         $('#time-display').val(String((d-d%60)/60)+':'+String(d%60))
     }
@@ -140,10 +170,10 @@ $(function(){
     }
 
 
-    function setUp(heroes, timeline){
+    function setUp(heroes, timeline, state, minmax){
         window.healthBars(heroes, timeline, {'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
         // killDmg(heroes, timeline, minmax)
-        window.miniMap(heroes, timeline, {'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
+        window.miniMap(heroes, state, timeline, {'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
         window.updatingScatter(
             heroes, timeline, minmax,
             'calc_kills', 'hero_damage_dealt', 'div#kill_dmg',
@@ -165,13 +195,30 @@ $(function(){
             'gold', 'xp', 'div#gold_exp',
             {'x_label': 'Gold Total', 'y_label': 'XP Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
         )
-        window.goldBars(
-            heroes, timeline, minmax,
-            'gold', 'xp', 'div#gold_bars',
-            {'x_label': 'Heroes', 'y_label': 'Gold Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
-        )
+        // window.goldBars(
+        //     heroes, timeline, minmax,
+        //     'gold', 'xp', 'div#gold_bars',
+        //     {'x_label': 'Heroes', 'y_label': 'Gold Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div}
+        // )
         window.statBars(heroes, timeline, minmax, 'div#stat_bars',
             {'x_label': 'Heroes', 'y_label': 'Stat Total', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
+        $(document).on('update', function(e, snapshot){
+            $.each(snapshot, function(i, v){
+                function kill_images(selection){
+                    if(v['health']===0 & !$(selector).hasClass('dead')){
+                        $(selector).addClass('dead')
+                    }
+                    if(v['health']!==0 &$(selector).hasClass('dead')){
+                        $(selector).removeClass('dead')
+                    }
+                }
+                selector = "."+heroes[v.hero_idx]['name']
+                kill_images(selector)
+
+                selector = "div."+heroes[v.hero_idx]['name']+"_slot img"
+                kill_images(selector)
+            })
+        })
     }
 
 
@@ -182,12 +229,14 @@ $(function(){
         $('#stop-animation').toggle();
         $('#back-animation').toggle();
         $('#forward-animation').toggle();
+        $('#duration_slider').toggle();
     });
     $('#stop-animation').click(function(){
         $('#start-animation').toggle();
         $('#stop-animation').toggle();
         $('#back-animation').toggle();
         $('#forward-animation').toggle();
+        $('#duration_slider').toggle();
     });
 
     var url = '{% static timeline %}';
@@ -232,7 +281,8 @@ $(function(){
 
                 // Take the hero data for that tick
                 slice = slice_timeline(timeline[numArray[tick_idx]])
-                $(document).trigger('update', [slice])
+                state = updateState(timeline[numArray[tick_idx]])
+                $(document).trigger('update', [slice, state])
                 updateTimer(timeline[numArray[tick_idx]])
 
             }
@@ -249,9 +299,11 @@ $(function(){
         tick = Math.min.apply(null, data)
 
         slice = slice_timeline(timeline[tick])
+        state = updateState(timeline[tick])
+
         // Set up graphics!
         updateTimer(timeline[tick])
-        setUp(heroes, slice, minmax);
+        setUp(heroes, slice, state, minmax);
     });
 
     // Handling Handlers
@@ -354,6 +406,29 @@ $(function(){
         margin-top:10px;
         margin-bottom:10px;
     }
+    .dead {
+        -webkit-filter: grayscale(100%);
+        -moz-filter: grayscale(100%);
+        filter: grayscale(100%);
+    }
+    circle.observers{
+        stroke: #000000;
+        fill: #C5C300;
+    }
+    rect.sentries{
+        stroke: #000000;
+        fill: #2C2B85;
+    }
+    rect.spacers{
+        stroke: #000000;
+        fill: #282BFF;
+    }
+    rect.buildings{
+        stroke: #000000;
+        fill: #00F11B;
+    }
     </style>
+<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
 {% endblock extra_css %}
 
