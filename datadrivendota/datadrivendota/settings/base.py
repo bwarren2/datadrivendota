@@ -103,7 +103,7 @@ S3_URL = '//%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 STATIC_DIRECTORY = '/assets/'
 MEDIA_DIRECTORY = '/media/'
 AWS_S3_SECURE_URLS = True
-AWS_IS_GZIPPED = True
+# AWS_IS_GZIPPED = True
 
 ########## MEDIA CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
