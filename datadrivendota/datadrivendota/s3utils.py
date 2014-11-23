@@ -1,5 +1,5 @@
 from storages.backends.s3boto import S3BotoStorage
-from pipeline.storage import GZIPMixin
+# from pipeline.storage import GZIPMixin
 
 StaticRootS3BotoStorage = lambda: S3BotoStorage(location='static')
 MediaRootS3BotoStorage = lambda: S3BotoStorage(location='media')
@@ -27,6 +27,6 @@ class PatchedCachedFilesMixin(CachedFilesMixin):
 
 
 class S3PipelineStorage(
-    GZIPMixin, PipelineMixin, PatchedCachedFilesMixin, S3BotoStorage
+    PipelineMixin, PatchedCachedFilesMixin, S3BotoStorage
 ):
     pass
