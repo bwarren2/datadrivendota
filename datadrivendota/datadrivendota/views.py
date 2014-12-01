@@ -268,7 +268,7 @@ class ChartFormView(View):
 class ApiView(View):
 
     def get(self, request):
-        if (request.is_ajax() and request.GET) or True:
+        if (request.is_ajax() and request.GET):
             try:
                 bound_form = self.form(request.GET)
                 if bound_form.is_valid():
