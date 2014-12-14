@@ -42,11 +42,10 @@ urlpatterns = patterns(
     url(r'^payments/', include("payments.urls", namespace='payments')),
     url(r'^comments/', include('django.contrib.comments.urls')),
     url(r'^blog/', include('zinnia.urls')),
-     url(r'^robots.txt$', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
+    url(r'^robots\.txt$', TemplateView.as_view(template_name='robots.txt',
+        content_type='text/plain')),
     url(
         '',
         include('social.apps.django_app.urls', namespace='social')
     ),  # Wat? Why are we including this at root? Seems risky. --kit 2014-02-16
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
