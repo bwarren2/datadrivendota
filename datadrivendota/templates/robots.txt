@@ -1,10 +1,10 @@
 # robots.txt for http://www.datadrivendota.com/
 
 User-agent: *
-Disallow: /api
-Disallow: heroes/api
-Disallow: matches/api
-Disallow: players/api
-Disallow: teams/api
-Disallow: items/api
-Disallow: guilds/api
+Disallow: /api/
+Disallow: /heroes/api/
+Disallow: /matches/api/
+Disallow: /players/api/
+Disallow: /teams/api/
+Disallow: /items/api/
+Disallow: /guilds/api/
