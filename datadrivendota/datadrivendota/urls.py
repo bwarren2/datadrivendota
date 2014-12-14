@@ -42,7 +42,7 @@ urlpatterns = patterns(
     url(r'^payments/', include("payments.urls", namespace='payments')),
     url(r'^comments/', include('django.contrib.comments.urls')),
     url(r'^blog/', include('zinnia.urls')),
-    url(r'^robots\.txt$', TemplateView.as_view(template_name='robots.txt',
+    url(r'^robots\.txt/$', TemplateView.as_view(template_name='robots.txt',
         content_type='text/plain')),
     url(
         '',
