@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
 # Uncomment the next two lines to enable the admin:
@@ -42,10 +42,11 @@ urlpatterns = patterns(
     url(r'^payments/', include("payments.urls", namespace='payments')),
     url(r'^comments/', include('django.contrib.comments.urls')),
     url(r'^blog/', include('zinnia.urls')),
-    (r'^robots\.txt$', direct_to_template,
-        {'template': 'robots.txt', 'mimetype': 'text/plain'}),
+     url(r'^robots\.txt$', TemplateView.as_view(template_name='robots\.txt', content_type='text/plain')),
     url(
         '',
         include('social.apps.django_app.urls', namespace='social')
     ),  # Wat? Why are we including this at root? Seems risky. --kit 2014-02-16
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
