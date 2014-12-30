@@ -60,6 +60,8 @@ class Match(models.Model):
     series_id = models.IntegerField(null=True)
     series_type = models.IntegerField(null=True)
 
+    replay = models.FileField(upload_to='matches/replays/', null=True)
+
     UNPROCESSED = 0
     LEGIT = 1
     UNCOUNTED = 2
