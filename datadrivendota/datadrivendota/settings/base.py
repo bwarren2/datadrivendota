@@ -416,6 +416,7 @@ PIPELINE_JS = {
             'js/d3/d3.min.js',
             'js/eldarion-ajax.min.js',
             'js/charting.js',
+            'js/gunzip.min.js',
             'js/project.js',
         ),
         'output_filename': 'js/all.js',

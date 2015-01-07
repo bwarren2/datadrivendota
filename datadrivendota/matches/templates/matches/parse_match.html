@@ -54,9 +54,6 @@
                 <label>Speed: <span id='duration_label'></span></label>
                 <div id='duration_slider'></div>
             </div>
-            <div class='col-md-2 col-md-offset-1'>
-                <button id='face-toggle' type="button" class="btn btn-primary btn-lg btn-block">Toggle Faces</button>
-            </div>
         </div>
         </div>
     </div>
@@ -64,9 +61,13 @@
   {% include "matches/_match_cards.html" %}
 
     <div class='container'>
-        <div class='row' >
             <div class='goofyspacer'>
-                <h4>Scatterplots</h4>
+                <h4>Scatterplots
+                <span class='btn-group'>
+                <button id='face-toggle' type="button" class="btn btn-primary btn-lg btn-block">Toggle Faces</button>
+                </span>
+                </h4>
+            <div class='row' >
                 <div class='col-md-3' id='lh_level'></div>
                     {% comment %}
                     <h4>Hero Kills <span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="" data-placement="right"></span></h4>
@@ -101,13 +102,12 @@
     </div>{% endblock content %}
 
 {% block extra_js %}
-<script type="text/javascript">
 
+<script type="text/javascript">
 var timeline
 var heroes
 var state
 $(function(){
-
 
     // Config
     var tick_idx = 0;
@@ -241,70 +241,87 @@ $(function(){
 
     var url = '{% static timeline %}';
     var chats;
-    var hero_creeps = $.getJSON(url, function(result){
+    console.log("{{match.replay.url}}")
+    $.ajax({
+        type: 'GET',
+        dataType: 'text',
+        url: '{{match.replay.url}}',
+        headers: {
+            'content-type': 'text/plain',
+            'content-encoding': 'gzip'
+        },
+        success: function(result) {
+            result = $.parseJSON(result)
+            console.log(typeof(result))
+            // Wir mussen sie data machen
+            timeline = result['timeline']
+            heroes = result['heroes']
+            chats = result['chats']
+            minmax = result['minmax']
+            $.each(heroes, function(i, v){
+                name = heroes[i]['name']
+                name = name.replace('npc_dota_hero_', '')
+                name = name.replace('_', ' ')
+                heroes[i]['hero_name'] = name
+            })
+            ints = Object.keys(timeline)
 
-        // Wir mussen sie data machen
-        timeline = result['timeline']
-        heroes = result['heroes']
-        chats = result['chats']
-        minmax = result['minmax']
-        $.each(heroes, function(i, v){
-            name = heroes[i]['name']
-            name = name.replace('npc_dota_hero_', '')
-            name = name.replace('_', ' ')
-            heroes[i]['hero_name'] = name
-        })
-        ints = Object.keys(timeline)
+            var numArray = []
+            $.each(ints, function(i, v){
+                numArray.push(parseInt(v))
+            })
+            numArray.sort(sortNumber);
 
-        var numArray = []
-        $.each(ints, function(i, v){
-            numArray.push(parseInt(v))
-        })
-        numArray.sort(sortNumber);
+            function updateTimer(state){
+                $('#time-display').val(state['time'])
+            }
 
-        function updateTimer(state){
-            $('#time-display').val(state['time'])
-        }
+            // Prep the ticker
+            var make_metronome = function(numArray, timeline){
+                function new_index(adder){
 
-        // Prep the ticker
-        var make_metronome = function(numArray, timeline){
-            function new_index(adder){
-
-                // GFD, javascript.  You're drunk.
-                fakemod = function(n, modulus) {
-                    return ((n%modulus)+modulus)%modulus;
+                    // GFD, javascript.  You're drunk.
+                    fakemod = function(n, modulus) {
+                        return ((n%modulus)+modulus)%modulus;
+                    }
+                    tick_idx = fakemod((tick_idx+adder),numArray.length)
                 }
-                tick_idx = fakemod((tick_idx+adder),numArray.length)
-            }
-            var myfun = function(change){
-                new_index(change)
+                var myfun = function(change){
+                    new_index(change)
 
-                // Take the hero data for that tick
-                slice = slice_timeline(timeline[numArray[tick_idx]])
-                state = updateState(timeline[numArray[tick_idx]])
-                $(document).trigger('update', [slice, state])
-                updateTimer(timeline[numArray[tick_idx]])
+                    // Take the hero data for that tick
+                    slice = slice_timeline(timeline[numArray[tick_idx]])
+                    state = updateState(timeline[numArray[tick_idx]])
+                    $(document).trigger('update', [slice, state])
+                    updateTimer(timeline[numArray[tick_idx]])
 
+                }
+                return myfun;
             }
-            return myfun;
+            metronome = make_metronome(numArray, timeline)
+            bindHandlers(metronome)
+
+            // Get the min tick
+            data = []
+            $.each(Object.keys(timeline), function(idx, val){
+                data.push(parseInt(val));
+            })
+            tick = Math.min.apply(null, data)
+
+            slice = slice_timeline(timeline[tick])
+            state = updateState(timeline[tick])
+
+            // Set up graphics!
+            updateTimer(timeline[tick])
+            setUp(heroes, slice, state, minmax);
+
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert("Issue: "
+                + textStatus + " "
+                + errorThrown + " !");
         }
-        metronome = make_metronome(numArray, timeline)
-        bindHandlers(metronome)
-
-        // Get the min tick
-        data = []
-        $.each(Object.keys(timeline), function(idx, val){
-            data.push(parseInt(val));
-        })
-        tick = Math.min.apply(null, data)
-
-        slice = slice_timeline(timeline[tick])
-        state = updateState(timeline[tick])
-
-        // Set up graphics!
-        updateTimer(timeline[tick])
-        setUp(heroes, slice, state, minmax);
-    });
+    })
 
     // Handling Handlers
     function bindHandlers(broadcast){
