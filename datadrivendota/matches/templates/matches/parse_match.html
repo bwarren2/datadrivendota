@@ -251,6 +251,7 @@ $(function(){
             'content-encoding': 'gzip'
         },
         success: function(result) {
+            console.log('Success!')
             result = $.parseJSON(result)
             console.log(typeof(result))
             // Wir mussen sie data machen
