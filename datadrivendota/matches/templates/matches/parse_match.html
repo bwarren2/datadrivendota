@@ -251,10 +251,8 @@ $(function(){
         },
         success: function(result) {
             console.log('Success!')
-            console.log(result)
             console.log(typeof(result))
             result = $.parseJSON(result)
-            console.log(result)
             console.log(typeof(result))
             // Wir mussen sie data machen
             timeline = result['timeline']
