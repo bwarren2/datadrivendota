@@ -250,10 +250,8 @@ $(function(){
             'content-encoding': 'gzip'
         },
         success: function(result) {
-            console.log('Success!')
-            console.log(typeof(result))
             result = $.parseJSON(result)
-            console.log(typeof(result))
+
             // Wir mussen sie data machen
             timeline = result['timeline']
             heroes = result['heroes']
