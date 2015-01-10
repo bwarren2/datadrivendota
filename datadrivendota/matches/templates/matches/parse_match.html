@@ -51,7 +51,8 @@
             </div>
 
             <div class='col-md-2'>
-                <label>Speed (Smaller = Faster): <span id='duration_label'></span></label>
+                <label>Faster</label>
+                <label style='float:right'>Slower</label>
                 <div id='duration_slider'></div>
             </div>
         </div>
@@ -122,12 +123,12 @@ $(function(){
         'max': 400,
         'step': 50,
         slide: function(event, ui){
-            $('#duration_label').html(ui.value+'ms')
+            // $('#duration_label').html(ui.value+'ms')
             interval_duration = ui.value
         }
 
     })
-    $('#duration_label').html($('#duration_slider').slider('value')+'ms')
+    // $('#duration_label').html($('#duration_slider').slider('value')+'ms')
 
     // Cosmetics
     $('.chart-pip').remove()
