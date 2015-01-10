@@ -1798,13 +1798,13 @@ var goldBars = function(heroes, timeslice, minmax, x_var, y_var, target, params)
             return height - y(d['unreliable_gold']);
         })
         .attr("class", function(d) {
-             return heroes[d.hero_idx]['name']+' unreliable';
+             return toTitleCase(heroes[d.hero_idx]['name'])+' unreliable';
         })
         .on("mouseover", function(d) {
             params.tooltip_div.transition()
               .duration(200)
               .style("opacity", 0.9);
-            params.tooltip_div.html(heroes[d.hero_idx]['hero_name'] + ' Unreliable Gold')
+            params.tooltip_div.html(toTitleCase(heroes[d.hero_idx]['hero_name']) + ' Unreliable Gold')
               .style("left", (d3.event.pageX) + "px")
               .style("top", (d3.event.pageY - 28) + "px");
             }
@@ -1952,7 +1952,7 @@ var updatingScatter = function(heroes, timeslice, minmax, x_var, y_var, target,p
             params.tooltip_div.transition()
               .duration(200)
               .style("opacity", 0.9);
-            params.tooltip_div.html(heroes[d.hero_idx]['hero_name'])
+            params.tooltip_div.html(toTitleCase(heroes[d.hero_idx]['hero_name'])
               .style("left", (d3.event.pageX) + "px")
               .style("top", (d3.event.pageY - 28) + "px");
             }
