@@ -1774,7 +1774,7 @@ var goldBars = function(heroes, timeslice, minmax, x_var, y_var, target, params)
             params.tooltip_div.transition()
               .duration(200)
               .style("opacity", 0.9);
-            params.tooltip_div.html(heroes[d.hero_idx]['hero_name'] + ' Reliable Gold')
+            params.tooltip_div.html(toTitleCase(heroes[d.hero_idx]['hero_name']) + ' Reliable Gold')
               .style("left", (d3.event.pageX) + "px")
               .style("top", (d3.event.pageY - 28) + "px");
             }
