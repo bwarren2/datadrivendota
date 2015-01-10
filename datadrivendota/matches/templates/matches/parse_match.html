@@ -254,10 +254,10 @@ $(function(){
             result = $.parseJSON(result)
 
             // Wir mussen sie data machen
-            timeline = result['timeline']
-            heroes = result['heroes']
-            chats = result['chats']
-            minmax = result['minmax']
+            timeline = result['timeline'];
+            heroes = result['heroes'];
+            chats = result['chats'];
+            minmax = result['minmax'];
             $.each(heroes, function(i, v){
                 name = heroes[i]['name']
                 name = name.replace('npc_dota_hero_', '')
