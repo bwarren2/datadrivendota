@@ -33,6 +33,8 @@ class LeagueList(ListView):
             current_page=page
         )
         objs = paginator.current_page
+        for x in range(0, 5):
+            print objs[x].leaguedossier.name, objs[x].steam_id
         return (paginator, page, objs, True)
 
 
