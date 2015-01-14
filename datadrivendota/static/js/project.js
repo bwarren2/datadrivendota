@@ -10,7 +10,7 @@ $(function () {
       return state.label;
   }
 
-  function singleInitSeelction(element, callback) {
+  function singleInitSelection(element, callback) {
     var data = {id: element.val(), text: element.val()};
     callback(data);
   }
@@ -27,7 +27,7 @@ $(function () {
     if (multiple) {
       var initSelectionFunction = multpleInitSelection;
     } else {
-      var initSelectionFunction = singleInitSeelction;
+      var initSelectionFunction = singleInitSelection;
     }
 
     $(selector).select2({
