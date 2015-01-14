@@ -27,19 +27,12 @@ class LeagueList(ListView):
 
     def paginate_queryset(self, queryset, page_size):
         page = self.request.GET.get('page')
-        print "QSs:"
-        for x in queryset:
-            print x.leaguedossier.name
         paginator = SmarterPaginator(
             object_list=queryset,
             per_page=page_size,
             current_page=page
         )
         objs = paginator.current_page
-        print "Objs:"
-        for x in objs:
-            print x.leaguedossier.name
-        print page_size, len(objs)
         return (paginator, page, objs, True)
 
 
