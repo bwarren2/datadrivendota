@@ -19,6 +19,7 @@
         </div>
         {% endif %}
     {% endfor %}
+    </div>
     {% include "_pagination.html" with pages_list=league_list page_links_to_display=league_list.paginator.page_range_with_ellipses %}
 
 {% endblock content %}
