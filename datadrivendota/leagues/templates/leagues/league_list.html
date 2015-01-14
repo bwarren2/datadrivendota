@@ -20,6 +20,9 @@
         {% endif %}
     {% endfor %}
     </div>
+    {% comment %}
+        Move pagination outside main block.  We should probably refactor.
+    {% endcomment %}
     {% include "_pagination.html" with pages_list=league_list page_links_to_display=league_list.paginator.page_range_with_ellipses %}
 
 {% endblock content %}

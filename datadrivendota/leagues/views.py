@@ -25,6 +25,7 @@ class LeagueList(ListView):
 
     def paginate_queryset(self, queryset, page_size):
         page = self.request.GET.get('page')
+        print queryset, queryset[0]
         paginator = SmarterPaginator(
             object_list=queryset,
             per_page=page_size,
