@@ -29,7 +29,7 @@ $(function () {
     } else {
       var initSelectionFunction = singleInitSelection;
     }
-
+    console.log(selector, multiple, placeholder, api_endpoint)
     $(selector).select2({
       multiple: multiple,
       placeholder: placeholder,
