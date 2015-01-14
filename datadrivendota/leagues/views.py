@@ -25,7 +25,8 @@ class LeagueList(ListView):
 
     def paginate_queryset(self, queryset, page_size):
         page = self.request.GET.get('page')
-        print queryset, queryset[0]
+        for x in range(0, 5):
+            print queryset[x].leaguedossier.name
         paginator = SmarterPaginator(
             object_list=queryset,
             per_page=page_size,
@@ -42,7 +43,6 @@ class LeagueDetail(DetailView):
         return League.objects.get(steam_id=self.kwargs.get('steam_id'))
 
     def get_context_data(self, **kwargs):
-        print self.object.steam_id
         match_list = Match.objects.filter(
             league=self.object
             )
