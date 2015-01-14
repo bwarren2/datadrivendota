@@ -20,21 +20,26 @@ class LeagueList(ListView):
     paginate_by = 32
 
     def get_queryset(self):
-        qs = self.model.recency.all().select_related()
+        qs = self.model.recency.all().select_related().exclude(
+            leaguedossier__logo_image=None
+            )
         return qs
 
     def paginate_queryset(self, queryset, page_size):
         page = self.request.GET.get('page')
-        for x in range(0, 5):
-            print queryset[x].leaguedossier.name
+        print "QSs:"
+        for x in queryset:
+            print x.leaguedossier.name
         paginator = SmarterPaginator(
             object_list=queryset,
             per_page=page_size,
             current_page=page
         )
         objs = paginator.current_page
-        for x in range(0, 5):
-            print objs[x].leaguedossier.name, objs[x].steam_id
+        print "Objs:"
+        for x in objs:
+            print x.leaguedossier.name
+        print page_size, len(objs)
         return (paginator, page, objs, True)
 
 
