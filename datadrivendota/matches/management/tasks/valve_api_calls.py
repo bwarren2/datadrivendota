@@ -1122,6 +1122,7 @@ class UpdateLeagueLogos(ApiFollower):
         data = self.result['items']
         mapping = {d['defindex']: d['image_url'] for d in data}
         blank_URL = 'http://s3.amazonaws.com/datadrivendota/images/blank-logo.png'
+        logger.info('Forming league URLs for {0} leagues'.format(len(leagues)))
         for leaguedossier in leagues:
             filename = slugify(leaguedossier.name)+'.png'
             try:
@@ -1156,7 +1157,8 @@ class UpdateLeagueLogos(ApiFollower):
                         filename, File(open(f.name))
                         )
                     os.remove(f.name)
-
+            imgdata = None
+            gc.collect()
 
 class MirrorProNames(Task):
     """Gets the pro name for each person in the current roster set"""
