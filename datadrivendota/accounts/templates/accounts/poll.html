@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}
+    Polling Question!
+{% endblock title %}
+{% block page_title %}
+
+{% endblock page_title %}
+
+{% block topbar %}
+    {% comment %}
+        Clear the adbar
+    {% endcomment %}
+{% endblock topbar %}
+
+{% block content %}
+    <div class='jumbotron'>
+        <div class='pull-right'>
+            <img class='thumbnail' src="https://s3.amazonaws.com/datadrivendota/images/Treasure_of_the_Frosted_Flame.png">
+        </div>
+        <h1>Answer this poll, enter to win a box</h1>
+        <p>We have questions.  To make it worth your time, we are raffling off chests.</p>
+        <button class='btn btn-primary btn-large' id='goto-poll'>Interested?</button>
+    </div>
+    <div>
+        <h1>Rules</h1>
+        <h2>Eligibility</h2>
+        <p>If you answer both questions and provide an account id, you are automatically entered into the raffle.  </p>
+        <h2>Timeline</h2>
+        <p>The poll closes on Monday, January 16 2015.  We will update this page with the date, time, and URL of winner selection later that week.  We want to be done with trades by Monday, January 30.  Prizes still unclaimed by then will be sold. </p>
+        <h2>Picking Winners</h2>
+        <p>Winners will be chosen randomly on video, and this page will be updated with the winning account numbers.  Each winner gets a chest of our choosing, and trade requests will go out the next day.</p>
+    </div>
+    <div id='poll'>
+        <h1>Poll</h1>
+        <p>Our big new feature is replay parsing, like <a href="https://www.datadrivendota.com/matches/787453665/parse_match">this</a>.</p>
+        <div class='form-container'>
+          <form class='chart-form' action="" method='POST'>
+           {% csrf_token %}
+            {% include "_form.html" %}
+            <div class="control-group">
+              <div class="controls pull-right">
+                <button id='request-button' type="submit" class="btn btn-small btn-primary">Submit!</button>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </form>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block extra_css %}
+<style type="text/css">
+.chart-form{
+    width:auto;
+}
+.jumbotron{
+    background-color:#444;
+}
+h2{
+    font-size: 20px;
+}
+</style>
+{% endblock extra_css %}
+
+{% block extra_js %}
+<script type="text/javascript">
+    $(function(){
+        $('button#goto-poll').click(function(){
+            $('html,body').animate({
+                scrollTop: $('#poll').offset().top
+            }, 100)
+        })
+    })
+</script>
+{% endblock extra_js %}

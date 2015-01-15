@@ -17,6 +17,7 @@ from datadrivendota.forms import MatchRequestForm
 from matches.management.tasks.valve_api_calls import AcquireMatches
 
 from .models import request_to_player, Applicant
+from .forms import PollForm
 
 from datadrivendota.views import LoginRequiredView
 from utils.exceptions import DataCapReached, ValidationException
@@ -179,6 +180,16 @@ class MatchRequestView(LoginRequiredView, FormView):
 
     def get_success_url(self):
         return reverse('players:management')
+
+
+class PollView(FormView):
+    """Where users can adjust who they follow"""
+    form_class = PollForm
+    template_name = 'accounts/poll.html'
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS, "Follow added")
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 def drop_follow(request):
