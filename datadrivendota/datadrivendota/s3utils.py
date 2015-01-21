@@ -17,6 +17,7 @@ import urlparse
 #    signaturedoesnotmatch-amazon-s3-with-django-pipeline-s3boto-and-st)
 class PatchedCachedFilesMixin(CachedFilesMixin):
     def url(self, *a, **kw):
+        print a, kw
         s = super(PatchedCachedFilesMixin, self).url(*a, **kw)
         if isinstance(s, unicode):
             s = s.encode('utf-8', 'ignore')
