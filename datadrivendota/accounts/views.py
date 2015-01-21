@@ -19,7 +19,7 @@ from accounts.models import MatchRequest
 from datadrivendota.forms import MatchRequestForm
 from matches.management.tasks.valve_api_calls import AcquireMatches
 
-from .models import request_to_player, Applicant
+from .models import request_to_player, Applicant, PollResponse
 from .forms import PollForm
 
 from datadrivendota.views import LoginRequiredView
@@ -191,8 +191,26 @@ class PollView(FormView):
     template_name = 'accounts/poll.html'
 
     def form_valid(self, form):
-        messages.add_message(self.request, messages.SUCCESS, "Follow added")
-        return self.render_to_response(self.get_context_data(form=form))
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            "Answer Submitted!"
+        )
+
+        if form.cleaned_data['steam_id'] == 'yes':
+            premium = True
+        else:
+            premium = False
+
+        PollResponse.objects.create(
+            steam_id=int(form.cleaned_data['steam_id']),
+            interested_in_premium=premium
+        )
+        return self.response_class(
+            request=self.request,
+            template='poll_response.html',
+            context=self.get_context_data(form=form),
+        )
 
     def get_context_data(self, **kwargs):
         context = super(PollView, self).get_context_data(**kwargs)
@@ -202,7 +220,6 @@ class PollView(FormView):
         }
         m = Match.objects.get(steam_id=787453665)
         context['match_replay_url'] = 'http://127.0.0.1:8000'+m.replay.url
-        print context['match_replay_url']
         context['hero_json'] = json.dumps(hero_id_names)
         return context
 
