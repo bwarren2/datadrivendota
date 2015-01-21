@@ -6,11 +6,14 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
+from django.conf import settings
 
 from players.models import Player
 from accounts.models import UserProfile
 from players.forms import PlayerAddFollowForm
 from datadrivendota.forms import ApplicantForm
+from heroes.models import Hero
+from matches.models import Match
 
 from accounts.models import MatchRequest
 from datadrivendota.forms import MatchRequestForm
@@ -190,6 +193,18 @@ class PollView(FormView):
     def form_valid(self, form):
         messages.add_message(self.request, messages.SUCCESS, "Follow added")
         return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, **kwargs):
+        context = super(PollView, self).get_context_data(**kwargs)
+        hero_id_names = {
+            hero.steam_id: hero.internal_name
+            for hero in Hero.public.all()
+        }
+        m = Match.objects.get(steam_id=787453665)
+        context['match_replay_url'] = 'http://127.0.0.1:8000'+m.replay.url
+        print context['match_replay_url']
+        context['hero_json'] = json.dumps(hero_id_names)
+        return context
 
 
 def drop_follow(request):

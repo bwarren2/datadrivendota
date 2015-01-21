@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load staticfiles player_extras %}
+
 {% block title %}
     Polling Question!
 {% endblock title %}
@@ -19,20 +21,65 @@
         </div>
         <h1>Answer this poll, enter to win a box</h1>
         <p>We have questions.  To make it worth your time, we are raffling off chests.</p>
-        <button class='btn btn-primary btn-large' id='goto-poll'>Interested?</button>
     </div>
-    <div>
-        <h1>Rules</h1>
-        <h2>Eligibility</h2>
-        <p>If you answer both questions and provide an account id, you are automatically entered into the raffle.  </p>
-        <h2>Timeline</h2>
-        <p>The poll closes on Monday, January 16 2015.  We will update this page with the date, time, and URL of winner selection later that week.  We want to be done with trades by Monday, January 30.  Prizes still unclaimed by then will be sold. </p>
-        <h2>Picking Winners</h2>
-        <p>Winners will be chosen randomly on video, and this page will be updated with the winning account numbers.  Each winner gets a chest of our choosing, and trade requests will go out the next day.</p>
+    <div class='col-md-11' id='poll'>
+        <h1>Our big feature: Replay Parsing
+                <button class='btn btn-primary btn-lg'>See it in action</button>
+            </h1>
+        We can look at the game state every tick, extract any data we want, and render it for accessibility.  In a small example:</p>
+        <div class='container'>
+            <div class='row' id='buttons'>
+            <div class='goofyspacer'>
+                <div class='col-md-4 col-md-offset-1'>
+                    <div class='container'>
+                        <div class='row'>
+
+
+                            <div class='col-md-1'>
+                                <button id='stop-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Stop</button>
+                            </div>
+                            <div class='col-md-1'>
+                                <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Start</button>
+                            </div>
+                            <div class='col-md-1'>
+                                <button id='back-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+                                    <span class="info glyphicon glyphicon-backward"></span>
+                                </button>
+                            </div>
+                            <div class='col-md-1'>
+                                <button id='forward-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+                                    <span  class="info glyphicon glyphicon-forward"></span>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class='col-md-2'>
+                    <input style='margin-top:5px' id='time-display' class='form-control' type='text' placeholder='Replay Time' readonly>
+                </div>
+
+                <div class='col-md-2'>
+                    <span class='btn-group'>
+                    <button id='face-toggle' type="button" class="btn btn-primary btn-lg btn-block">Toggle Faces</button>
+                    </span>
+            </div>
+            </div>
+            </div>
+        </div>
+        <div class='container'>
+            <div class='row'>
+                <div class='col-md-4 col-md-offset-2'>
+                    <div id='minimap'></div>
+                </div>
+                <div class='col-md-4'>
+                    <div id='kill_dmg'></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id='poll'>
-        <h1>Poll</h1>
-        <p>Our big new feature is replay parsing, like <a href="https://www.datadrivendota.com/matches/787453665/parse_match">this</a>.</p>
+    <div class='col-md-11' id='poll'>
+        <h1>Question</h1>
         <div class='form-container'>
           <form class='chart-form' action="" method='POST'>
            {% csrf_token %}
@@ -47,19 +94,116 @@
         </div>
     </div>
 
+    <div class='col-md-11' >
+        <h1>Rules</h1>
+        <h2>Prizes</h2>
+        <p>We will raffle off 1 box per 100 respondents that provide an account id, up to 20 boxes.</p>
+        <h2>Eligibility</h2>
+        <p>If you answer both questions and provide an account id, you are automatically entered into the raffle.</p>
+        <h2>Picking Winners</h2>
+        <p>Winners will be chosen randomly on video, and this page will be updated with the winning account numbers.  Each winner gets a chest of our choosing, and trade requests will go out the next day.</p>
+        <h2>Timeline</h2>
+        <p>The poll closes on Monday, January 16 2015.  We will update this page with the date, time, and URL of winner selection later that week.  We want to be done with trades by Monday, January 30.  Prizes still unclaimed by then will be sold. </p>
+    </div>
+
 {% endblock content %}
 
 {% block extra_css %}
 <style type="text/css">
+circle{
+    fill:blue;
+}
 .chart-form{
     width:auto;
 }
-.jumbotron{
+#minimap{
+    width:293px;
+}
+#kill_dmg{
+    width:293px;
+}
+}
+.lead-jumbotron{
     background-color:#444;
 }
 h2{
     font-size: 20px;
 }
+path{
+    fill: none;
+}
+.animation-button{
+    height:45px;
+}
+circle{
+    stroke-width:1;
+    /*stroke-fill:#000000;*/
+    stroke: #000000;
+    r: 2;
+}
+.health-bar{
+    fill: #84F721;
+}
+.mana-bar{
+    fill: #507AEF;
+}
+rect.unreliable{
+    fill: #F6E800;
+    stroke: #000000;
+    stroke-width: 1;
+}
+rect.reliable{
+    fill: #C4B900;
+    stroke: #000000;
+    stroke-width: 1;
+}
+rect.str_total{
+    fill: #D90000;
+    stroke: #000000;
+    stroke-width: 1;
+}
+rect.int_total{
+    fill: #0000D9;
+    stroke: #000000;
+    stroke-width: 1;
+}
+rect.agi_total{
+    fill: #00D900;
+    stroke: #000000;
+    stroke-width: 1;
+}
+.mana-bar{
+    fill: #507AEF;
+}
+img.desaturate{
+    filter: grayscale(100%);
+}
+div.goofyspacer{
+    margin-top:10px;
+    margin-bottom:10px;
+}
+.dead {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    filter: grayscale(100%);
+}
+circle.observers{
+    stroke: #000000;
+    fill: #C5C300;
+}
+rect.sentries{
+    stroke: #000000;
+    fill: #2C2B85;
+}
+rect.spacers{
+    stroke: #000000;
+    fill: #282BFF;
+}
+rect.buildings{
+    stroke: #000000;
+    fill: #00F11B;
+}
+
 </style>
 {% endblock extra_css %}
 
@@ -71,6 +215,197 @@ h2{
                 scrollTop: $('#poll').offset().top
             }, 100)
         })
+
+    // Config
+    var tick_idx = 0;
+    var interval_duration = 250;
+    var hero_json = {{hero_json|safe}}
+    var tooltip_div = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    // Cosmetics
+    $('.chart-pip').remove()
+    $('.cast-player-image').remove()
+    var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+    $('#face-toggle').click(function(){
+        $('.toggleface').toggle()
     })
+
+    //Utility
+    function updateState(snapshot){
+        state = {}
+        $.map(
+        ['Observers', 'Sentries', 'Buildings'],
+        function(value, index) {
+            state[value] = (snapshot[value])
+        })
+        return state
+    }
+    function updateTimer(d){
+        $('#time-display').val(String((d-d%60)/60)+':'+String(d%60))
+    }
+    function sortNumber(a,b) {
+        return a - b;
+    }
+    function between(x, min, max) {
+        return x >= min && x <= max;
+    }
+    function slice_timeline(timeline_segment){
+        return_ary = $.map(
+            timeline_segment,
+            function(value, index) {
+                if(between(index,0,10)){
+                    return [value];
+                }
+            })
+        return return_ary
+    }
+
+
+    function setUp(heroes, timeline, state, minmax){
+        window.miniMap(heroes, state, timeline, {'interval_duration': interval_duration, 'tooltip_div': tooltip_div})
+        window.updatingScatter(
+            heroes, timeline, minmax,
+            'calc_kills', 'hero_damage_dealt', 'div#kill_dmg',
+            {'x_label': 'Kills', 'y_label': 'Hero Damage Dealt', 'interval_duration': interval_duration, 'tooltip_div': tooltip_div, 'pip_left_offset': 19}
+
+        )
+    }
+
+
+    // Animation Controls
+    $('#stop-animation').toggle()
+    $('#start-animation').click(function(){
+        $('#start-animation').toggle();
+        $('#stop-animation').toggle();
+        $('#back-animation').toggle();
+        $('#forward-animation').toggle();
+        $('#duration_slider').toggle();
+    });
+    $('#stop-animation').click(function(){
+        $('#start-animation').toggle();
+        $('#stop-animation').toggle();
+        $('#back-animation').toggle();
+        $('#forward-animation').toggle();
+        $('#duration_slider').toggle();
+    });
+
+    var url = '{% static timeline %}';
+    var chats;
+    $.ajax({
+        type: 'GET',
+        dataType: 'text',
+        url: "{{match_replay_url}}",
+        headers: {
+            'content-encoding': 'gzip'
+        },
+        success: function(result) {
+            result = $.parseJSON(result)
+
+            // Wir mussen sie data machen
+            timeline = result['timeline'];
+            heroes = result['heroes'];
+            chats = result['chats'];
+            minmax = result['minmax'];
+            $.each(heroes, function(i, v){
+                name = heroes[i]['name']
+                name = name.replace('npc_dota_hero_', '')
+                name = name.replace('_', ' ')
+                heroes[i]['hero_name'] = name
+            })
+            ints = Object.keys(timeline)
+
+            var numArray = []
+            $.each(ints, function(i, v){
+                numArray.push(parseInt(v))
+            })
+            numArray.sort(sortNumber);
+
+            function updateTimer(state){
+                $('#time-display').val(state['time'])
+            }
+
+            // Prep the ticker
+            var make_metronome = function(numArray, timeline){
+                function new_index(adder){
+
+                    // GFD, javascript.  You're drunk.
+                    fakemod = function(n, modulus) {
+                        return ((n%modulus)+modulus)%modulus;
+                    }
+                    tick_idx = fakemod((tick_idx+adder),numArray.length)
+                }
+                var myfun = function(change){
+                    new_index(change)
+
+                    // Take the hero data for that tick
+                    slice = slice_timeline(timeline[numArray[tick_idx]])
+                    state = updateState(timeline[numArray[tick_idx]])
+                    $(document).trigger('update', [slice, state])
+                    updateTimer(timeline[numArray[tick_idx]])
+
+                }
+                return myfun;
+            }
+            metronome = make_metronome(numArray, timeline)
+            bindHandlers(metronome)
+
+            // Get the min tick
+            data = []
+            $.each(Object.keys(timeline), function(idx, val){
+                data.push(parseInt(val));
+            })
+            tick = Math.min.apply(null, data)
+
+            slice = slice_timeline(timeline[tick])
+            state = updateState(timeline[tick])
+
+            // Set up graphics!
+            updateTimer(timeline[tick])
+            setUp(heroes, slice, state, minmax);
+
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert("Issue: "
+                + textStatus + " "
+                + errorThrown + " !");
+        }
+    })
+
+    // Handling Handlers
+    function bindHandlers(broadcast){
+        var myhandle
+        var play = function(){
+            broadcast(1)
+        }
+        var start = function(){
+            myhandle = setInterval(play, interval_duration)
+        }
+
+        var stop = function (){
+            clearInterval(myhandle)
+        }
+
+        $('#start-animation').click(function(){
+            start();
+        })
+
+        $('#stop-animation').click(function(){
+            stop();
+        })
+
+
+        $('#back-animation').click(function(){
+            broadcast(-1);
+        });
+        $('#forward-animation').click(function(){
+            broadcast(1);
+        });
+    }
+})
 </script>
+
 {% endblock extra_js %}

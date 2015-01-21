@@ -1864,10 +1864,32 @@ var updatingScatter = function(heroes, timeslice, minmax, x_var, y_var, target,p
     var height = width // Mmm, squares
     params['width'] = width
     params['height'] = height
-    var margin = {top: 15, right: 15, bottom: 25, left: 35},
-        width = params.width - margin.right - margin.left,
-        height = params.height - margin.top - margin.bottom;
+    if(params.margin !== undefined){
+      var margin = {
+        top: params.margin.top ? params.margin.top : 15,
+        right: params.margin.right ? params.margin.right : 15,
+        bottom: params.margin.bottom ? params.margin.bottom : 25,
+        left: params.margin.left ? params.margin.left : 35}
 
+    } else {
+    var margin = {
+        top: 15,
+        right: 15,
+        bottom: 25,
+        left: 35}
+    }
+    if(params.pip_left_offset !== undefined){
+      console.log('Offset')
+      pip_left_offset = params.pip_left_offset
+    }else{
+      console.log('No offset')
+      pip_left_offset = margin.left
+    }
+    console.log(pip_left_offset)
+
+    var width = params.width - margin.right - margin.left,
+        height = params.height - margin.top - margin.bottom;
+    console.log(margin)
 
     var x = d3.scale.linear()
         .domain([
@@ -1887,10 +1909,8 @@ var updatingScatter = function(heroes, timeslice, minmax, x_var, y_var, target,p
         )
 
     var svg = d3.select(selector).insert('svg')
-        // .attr('class', 'kill_dmg')
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        // .style("margin-left", -margin.left + "px")
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -1932,8 +1952,12 @@ var updatingScatter = function(heroes, timeslice, minmax, x_var, y_var, target,p
             .append('i')
             .attr('class', 'toggleface d2mh '+heroes[val.hero_idx]['name'])
             .style('position', 'absolute')
-            .style("left", margin.left+x(val[x_var])+'px')
-            .style("top", margin.top+y(val[y_var])+'px')
+            .style("left", pip_left_offset+x(val[x_var])+'px')
+            .style("top", margin.top+y(val[y_var])+'px');
+        console.log(heroes[val.hero_idx]['name'],
+          margin.left+x(val[x_var]),
+          x(val[x_var]),
+          val[x_var])
     })
 
     svg.selectAll(selector +' circle').data(timeslice)
@@ -1981,9 +2005,10 @@ var updatingScatter = function(heroes, timeslice, minmax, x_var, y_var, target,p
                 d3.select(hero_icon)
                     .transition()
                     .duration(params.interval_duration)
-                    .style("left", margin.left+x(val[x_var])+'px')
+                    .style("left", pip_left_offset+x(val[x_var])+'px')
                     .style("top", margin.top+y(val[y_var])+'px')
             })
+
 
         })
 }
