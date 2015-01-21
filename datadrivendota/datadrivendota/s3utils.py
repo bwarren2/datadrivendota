@@ -18,6 +18,9 @@ import urlparse
 class PatchedCachedFilesMixin(CachedFilesMixin):
     def url(self, *a, **kw):
         print a, kw
+        if a == ('',):
+            return 'myfakeurl'
+
         s = super(PatchedCachedFilesMixin, self).url(*a, **kw)
         if isinstance(s, unicode):
             s = s.encode('utf-8', 'ignore')
