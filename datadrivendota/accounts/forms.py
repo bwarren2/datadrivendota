@@ -12,7 +12,7 @@ class PollForm(forms.Form):
         widget=forms.RadioSelect
     )
     steam_id = forms.CharField(
-        label="Your steam ID (Optional)",
+        label="Your steam ID (Optional, For Prizes)",
         required=False,
         # help_text="For claiming a prize if you win one"
     )

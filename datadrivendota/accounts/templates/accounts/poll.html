@@ -69,11 +69,13 @@
         </div>
         <div class='container'>
             <div class='row'>
-                <div class='col-md-4 col-md-offset-2'>
-                    <div id='minimap'></div>
-                </div>
-                <div class='col-md-4'>
-                    <div id='kill_dmg'></div>
+                <div id='replay_charts'>
+                    <div class='col-md-4 col-md-offset-2'>
+                        <div id='minimap'></div>
+                    </div>
+                    <div class='col-md-4'>
+                        <div id='kill_dmg'></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -97,19 +99,22 @@
     <div class='col-md-11' >
         <h1>Rules</h1>
         <h2>Prizes</h2>
-        <p>We will raffle off 1 box per 100 respondents that provide an account id, up to 20 boxes.</p>
+        <p>We will raffle off 1 box per 50 respondents that provide an account id, up to 20 boxes.</p>
         <h2>Eligibility</h2>
-        <p>If you answer both questions and provide an account id, you are automatically entered into the raffle.</p>
+        <p>If you answer both questions and provide an account id, you are automatically entered into the raffle.  Account ID is required for prize eligibility, but not required for the poll.</p>
         <h2>Picking Winners</h2>
         <p>Winners will be chosen randomly on video, and this page will be updated with the winning account numbers.  Each winner gets a chest of our choosing, and trade requests will go out the next day.</p>
         <h2>Timeline</h2>
-        <p>The poll closes on Monday, January 16 2015.  We will update this page with the date, time, and URL of winner selection later that week.  We want to be done with trades by Monday, January 30.  Prizes still unclaimed by then will be sold. </p>
+        <p>The poll closes on Monday, January 23, 2015.  We will update this page with the date, time, and URL of winner selection later that week.  We want to be done with trades by Monday, January 30.  Prizes still unclaimed by then will be sold. </p>
     </div>
 
 {% endblock content %}
 
 {% block extra_css %}
 <style type="text/css">
+#replay_charts{
+    margin-top:10px;
+}
 circle{
     fill:blue;
 }
