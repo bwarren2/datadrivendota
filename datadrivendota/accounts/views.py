@@ -1,4 +1,5 @@
 import json
+from os import getenv
 
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
@@ -219,7 +220,13 @@ class PollView(FormView):
             for hero in Hero.public.all()
         }
         m = Match.objects.get(steam_id=787453665)
-        context['match_replay_url'] = 'https://www.datadrivendota.com'+m.replay.url
+
+        # Local storages use relative urls, prod uses absolute.  Annoying.
+        if getenv('DJANGO_SETTINGS_MODULE') == 'datadrivendota.settings.local':
+            context['match_replay_url'] = 'http://127.0.0.1:8000'+m.replay.url
+        else:
+            context['match_replay_url'] = m.replay.url
+
         context['hero_json'] = json.dumps(hero_id_names)
         return context
 
