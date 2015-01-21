@@ -6,17 +6,21 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
+from django.conf import settings
 
 from players.models import Player
 from accounts.models import UserProfile
 from players.forms import PlayerAddFollowForm
 from datadrivendota.forms import ApplicantForm
+from heroes.models import Hero
+from matches.models import Match
 
 from accounts.models import MatchRequest
 from datadrivendota.forms import MatchRequestForm
 from matches.management.tasks.valve_api_calls import AcquireMatches
 
-from .models import request_to_player, Applicant
+from .models import request_to_player, Applicant, PollResponse
+from .forms import PollForm
 
 from datadrivendota.views import LoginRequiredView
 from utils.exceptions import DataCapReached, ValidationException
@@ -179,6 +183,45 @@ class MatchRequestView(LoginRequiredView, FormView):
 
     def get_success_url(self):
         return reverse('players:management')
+
+
+class PollView(FormView):
+    """Where users can adjust who they follow"""
+    form_class = PollForm
+    template_name = 'accounts/poll.html'
+
+    def form_valid(self, form):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            "Answer Submitted!"
+        )
+
+        if form.cleaned_data['steam_id'] == 'yes':
+            premium = True
+        else:
+            premium = False
+
+        PollResponse.objects.create(
+            steam_id=int(form.cleaned_data['steam_id']),
+            interested_in_premium=premium
+        )
+        return self.response_class(
+            request=self.request,
+            template='poll_response.html',
+            context=self.get_context_data(form=form),
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super(PollView, self).get_context_data(**kwargs)
+        hero_id_names = {
+            hero.steam_id: hero.internal_name
+            for hero in Hero.public.all()
+        }
+        m = Match.objects.get(steam_id=787453665)
+        context['match_replay_url'] = 'http://127.0.0.1:8000'+m.replay.url
+        context['hero_json'] = json.dumps(hero_id_names)
+        return context
 
 
 def drop_follow(request):

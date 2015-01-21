@@ -181,6 +181,22 @@ class PermissionCode(models.Model):
         return True
 
 
+class PollResponse(models.Model):
+    steam_id = models.BigIntegerField(
+        # help_text="Valve's internal map",
+    )
+    interested_in_premium = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        # That magic number is the valve 32bit -64bit adder.
+        # Steam ids are 32 bit by convention.
+        self.steam_id = self.steam_id % settings.ADDER_32_BIT
+        super(PollResponse, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return "{0}, {1}".format(self.steam_id, self.interested_in_premium)
+
+
 def request_to_player(request):
     return request.user.userprofile.player
 
