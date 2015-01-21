@@ -219,7 +219,7 @@ class PollView(FormView):
             for hero in Hero.public.all()
         }
         m = Match.objects.get(steam_id=787453665)
-        context['match_replay_url'] = 'http://127.0.0.1:8000'+m.replay.url
+        context['match_replay_url'] = 'https://www.datadrivendota.com'+m.replay.url
         context['hero_json'] = json.dumps(hero_id_names)
         return context
 
