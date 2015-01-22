@@ -45,10 +45,12 @@ def migrate():
 
 
 def collect_static():
-    return local(
-        'python datadrivendota/manage.py '
-        'collectstatic --settings=datadrivendota.settings.production --noinput'
+    command = (
+        'python datadrivendota/manage.py collectstatic'
+        ' -i bootstrap'
+        ' --settings=datadrivendota.settings.production --noinput'
     )
+    local(command)
 
 
 def scrape_valve_heroes():
