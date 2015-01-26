@@ -198,7 +198,7 @@ class PollView(FormView):
             "Answer Submitted!"
         )
 
-        if form.cleaned_data['steam_id'] == 'yes':
+        if form.cleaned_data['premium'] == 'yes':
             premium = True
         else:
             premium = False

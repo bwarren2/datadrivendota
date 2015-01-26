@@ -183,7 +183,8 @@ class PermissionCode(models.Model):
 
 class PollResponse(models.Model):
     steam_id = models.BigIntegerField(
-        # help_text="Valve's internal map",
+        blank=True,
+        null=True,
     )
     interested_in_premium = models.BooleanField(default=False)
 
