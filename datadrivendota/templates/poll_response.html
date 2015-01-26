@@ -4,6 +4,12 @@ Thanks!
 {% endblock title %}
 {% block page_title %}
 {% endblock page_title %}
+{% block topbar %}
+    {% comment %}
+        Clear the adbar
+    {% endcomment %}
+{% endblock topbar %}
+
 {% block content %}
 
     <div class='jumbotron'>
@@ -11,6 +17,6 @@ Thanks!
             <img class='thumbnail' src="https://s3.amazonaws.com/datadrivendota/images/Treasure_of_the_Frosted_Flame.png">
         </div>
         <h1>Thanks!</h1>
-        <p>Your response has been submitted.  We'll post the results of the raffle in a few days!.</p>
+        <p>Your response has been submitted.  We'll post the results of the raffle in a few days!</p>
     </div>
 {% endblock content %}
