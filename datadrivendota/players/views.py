@@ -118,7 +118,8 @@ def pro_index(request):
 def detail(request, player_id=None):
     player = get_object_or_404(Player, steam_id=player_id)
 
-    if request.user.is_authenticated() and request.user.userprofile is not None:
+    # Tech debt: Ignore personalization
+    if request.user.is_authenticated() and False:
         compare_url = reverse(
             'players:comparison',
             kwargs={
