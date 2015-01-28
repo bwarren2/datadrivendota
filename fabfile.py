@@ -8,9 +8,7 @@ def test(suite="all"):
         )
     elif suite == 'apps':
         local(
-            'python datadrivendota/manage.py test accounts guilds heroes items leagues matches players teams utils --settings=datadrivendota.settings.test'.format(
-                suite=suite
-            )
+            'python datadrivendota/manage.py test accounts guilds heroes items leagues matches players teams utils --settings=datadrivendota.settings.test'
         )
 
     else:

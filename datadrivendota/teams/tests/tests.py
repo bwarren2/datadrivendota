@@ -14,7 +14,6 @@ class TestWorkingJson(TestCase):
         pass
 
     def test_team_winrate_json(self):
-        print self.team
         chart = team_winrate_json(
             team=self.team.steam_id,
             game_modes=None,

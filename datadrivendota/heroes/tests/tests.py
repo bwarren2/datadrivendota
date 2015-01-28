@@ -20,7 +20,7 @@ from matches.mommy_recipes import make_matchset
 from heroes.mommy_recipes import make_hero
 from utils.exceptions import NoDataFound
 
-JSON_TIME = .2
+JSON_TIME = .5
 
 # update_player_winrate uses 1.5s cap, needs optimization
 
