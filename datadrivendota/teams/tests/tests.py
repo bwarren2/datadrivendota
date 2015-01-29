@@ -1,14 +1,15 @@
 from django.test import TestCase
-from teams.models import Team
 from teams.json_data import team_winrate_json
 from matches.mommy_recipes import make_matchset
+# from model_mommy import mommy
+from teams.models import Team
 
 
 class TestWorkingJson(TestCase):
 
     def setUp(self):
         self.hero, self.player = make_matchset()
-        self.team = Team.objects.get(teamdossier__player_0=self.player)
+        self.team = Team.objects.get(steam_id=1333179)
 
     def tearDown(self):
         pass
