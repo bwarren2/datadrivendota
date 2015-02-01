@@ -2,33 +2,19 @@ import datetime
 import json
 from time import mktime
 from random import choice
-from celery import chain
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import permission_required
 from .models import Player
-from accounts.models import UserProfile
 from .forms import (
-    PlayerAddFollowForm,
     PlayerMatchesFilterForm
 )
-from datadrivendota.forms import ApplicantForm
 
 from utils.pagination import SmarterPaginator
 from utils import binomial_exceedence
 
-from datadrivendota.forms import MatchRequestForm
 from matches.models import PlayerMatchSummary, Match
-from matches.management.tasks.valve_api_calls import (
-    ApiContext,
-    ValveApiCall,
-    UpdatePlayerPersonas,
-    AcquirePlayerData,
-    AcquireMatches
-)
-from accounts.models import request_to_player, Applicant
 
 from .mixins import (
     WinrateMixin,
@@ -39,8 +25,7 @@ from .mixins import (
     )
 
 from heroes.models import Hero
-from datadrivendota.views import ChartFormView, ApiView, LoginRequiredView
-from utils.exceptions import DataCapReached, ValidationException
+from datadrivendota.views import ChartFormView, ApiView
 
 if settings.VERBOSE_PROFILING:
     try:

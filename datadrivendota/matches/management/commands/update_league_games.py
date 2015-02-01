@@ -1,7 +1,5 @@
 from django.core.management.base import BaseCommand
-from matches.management.tasks.valve_api_calls import (
-    UpdateLeagueGames,
-)
+from leagues.management.tasks import UpdateLeagueGames
 
 
 class Command(BaseCommand):
