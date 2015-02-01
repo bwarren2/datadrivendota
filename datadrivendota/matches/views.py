@@ -350,8 +350,6 @@ def parse_match(request, match_id=787900748):
             'dire_cast_list': dire_cast_list,
             'css_color_dict': css_color_dict,
             'slot_dict': slot_dict,
-            'timeline':
-            'replay_parse_json/'+str(match.steam_id)+'_timeline.json',
             'hero_json': json.dumps(hero_id_names),
         }
     )
