@@ -36,7 +36,7 @@ from datadrivendota.management.tasks import (
     ValveApiCall,
 )
 from players.management.tasks import MirrorClientPersonas
-from players.management.tesks import MirrorPlayerData
+from players.management.tasks import MirrorPlayerData
 
 
 def data_applicant(request):
