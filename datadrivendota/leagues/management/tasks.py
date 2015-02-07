@@ -16,7 +16,7 @@ from datadrivendota.management.tasks import (
     ValveApiCall,
     CycleApiCall
 )
-from matches.management.tasks import AcquireMatches
+from matches.management.tasks import MirrorMatches
 
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os
@@ -228,6 +228,6 @@ class RetrieveHiddenGameResults(ApiFollower):
 
     def run(self, urldata):
         matches = [match['match_id'] for match in urldata['result']['matches']]
-        am = AcquireMatches()
+        am = MirrorMatches()
         am.delay(matches=matches, skill=4)
 
