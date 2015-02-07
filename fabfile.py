@@ -34,6 +34,10 @@ def rabbit_reset():
     return local('sh convenience\ files/rabbit_reset')
 
 
+def rabbit_list():
+    return local('sudo rabbitmqctl list_queues')
+
+
 def heroku_migrate():
     return local("heroku run python datadrivendota/manage.py migrate --no-initial-data")
 

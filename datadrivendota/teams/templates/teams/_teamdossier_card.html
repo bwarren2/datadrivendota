@@ -1,9 +1,9 @@
-{% if teamdoss.logo_image %}
+{% if team.logo_image %}
 
 <div class="col-md-3">
-  <a href="{% url 'teams:detail' steam_id=teamdoss.team.steam_id %}" class="thumbnail">
-    <img src="{{ teamdoss.logo_image.url }}" alt="{{ teamdoss.name }}" class="team-portrait">
-    <p class='overlayer'>{{ teamdoss.name }}</p>
+  <a href="{% url 'teams:detail' steam_id=team.team.steam_id %}" class="thumbnail">
+    <img src="{{ team.logo_image.url }}" alt="{{ team.name }}" class="team-portrait">
+    <p class='overlayer'>{{ team.name }}</p>
   </a>
 </div>
 {% endif %}

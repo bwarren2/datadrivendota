@@ -1,11 +1,13 @@
 import json
 import datetime
 
+from rest_framework import viewsets
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
 from utils.pagination import SmarterPaginator
 
+from .serializers import TeamSerializer
 from .models import Team
 from matches.models import Match, PlayerMatchSummary
 from matches.views import annotated_matches
@@ -130,18 +132,26 @@ class ApiPickBanChart(PickBanMixin, ApiView):
     pass
 
 
+class TeamViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    List and detail for teams.
+    """
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
+    lookup_field = 'steam_id'
+
+
 def team_list(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
         teams = Team.objects.filter(
-            teamdossier__name__icontains=q,
+            name__icontains=q,
         )[:20]
-        print q, teams
         results = []
         for team in teams:
             team_json = {}
             team_json['id'] = team.steam_id
-            team_json['label'] = team.teamdossier.name
+            team_json['label'] = team.name
             team_json['value'] = team.steam_id
             results.append(team_json)
 

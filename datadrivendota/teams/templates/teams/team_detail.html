@@ -2,10 +2,10 @@
 
 {% load staticfiles player_extras %}
 {% block title %}
-    {{team.teamdossier.name}}
+    {{team.name}}
 {% endblock title %}
 {% block page_title %}
-    {{team.teamdossier.name}}
+    {{team.name}}
 {% endblock page_title %}
 {% block content %}
     <div class='row'>
@@ -19,37 +19,37 @@
     </div>
     <div class="team-infobox col-md-4">
         <img class='thumbnail' style='margin-top:10px'
-        {% if team.teamdossier.logo_image %}
-            src="{{ team.teamdossier.logo_image.url }}"
+        {% if team.logo_image %}
+            src="{{ team.logo_image.url }}"
         {% else %}
             src=""
         {% endif %}
         >
 
-        <h2>{{ team.teamdossier.name }}</h2>
+        <h2>{{ team.name }}</h2>
         <h6>Roster:</h6>
         <ul>
                 <li>
-                    {% player_link team.teamdossier.player_0 %}
+                    {% player_link team.player_0 %}
                 </li>
                 <li>
-                    {% player_link team.teamdossier.player_1 %}
+                    {% player_link team.player_1 %}
                 </li>
                 <li>
-                    {% player_link team.teamdossier.player_2 %}
+                    {% player_link team.player_2 %}
                 </li>
                 <li>
-                    {% player_link team.teamdossier.player_3 %}
+                    {% player_link team.player_3 %}
                 </li>
                 <li>
-                    {% player_link team.teamdossier.player_4 %}
+                    {% player_link team.player_4 %}
                 </li>
         </ul>
-            {% if team.teamdossier.admin %}
+            {% if team.admin %}
             <h6>Admin:</h6>
 
                 <ul><li>
-                    {% player_link team.teamdossier.admin %}
+                    {% player_link team.admin %}
                 </li></ul>
             {% endif %}
 

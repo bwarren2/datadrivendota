@@ -6,19 +6,9 @@
 
 {% block title %}Match #{{ match.steam_id }}{% endblock title %}
 
-{% block page_title %}Match #{{ match.steam_id }}
-<small>  {{ match.game_mode.description }} {{ match.lobby_type.description }},
-    {{ match.hms_duration }} @ {{ match.hms_start_time }}</small>
-    {% if match.league.leaguedossier %}
-      <br>
-      <small>Tournament:
-      {% if match.league.leaguedossier.tournament_url %}
-        <a href="{{match.league.leaguedossier.tournament_url}}">{{match.league.leaguedossier.display_name}}</a>
-      {% else %}
-        {{match.league.leaguedossier.display_name}}
-      {% endif %}</small>
-    {% endif %}
-    {% endblock page_title %}
+{% block page_title %}
+    {% include "matches/_match_header_card.html" %}
+{% endblock page_title %}
 
 {% block content %}
 

@@ -1,8 +1,8 @@
-from datetime import datetime
+from django.utils import timezone
 from time import mktime
 from model_mommy.recipe import Recipe, seq, foreign_key
 from model_mommy import mommy
-from matches.models import Match, PlayerMatchSummary, GameMode
+from .models import Match, PlayerMatchSummary, GameMode
 from heroes.mommy_recipes import hero, make_hero
 from players.mommy_recipes import player
 from items.mommy_recipes import item
@@ -115,10 +115,9 @@ def make_matchset():
     try:
         t = Team.objects.get(steam_id=1333179)
     except Team.DoesNotExist:
-        t = mommy.make('teams.team', steam_id=1333179)
-        mommy.make(
-            'teams.teamdossier',
-            team=t,
+        t = mommy.make(
+            'teams.team',
+            steam_id=1333179,
             name='FakeTI4 team',
             player_0=p
         )
@@ -129,8 +128,8 @@ def make_matchset():
     sb2 = mommy.make('matches.skillbuild', level=2, ability=abilities[1])
     sb3 = mommy.make('matches.skillbuild', level=3, ability=abilities[0])
 
-    start_time = mktime(datetime.now().timetuple())
-
+    start_time = mktime(timezone.now().timetuple())
+    print start_time
     for skill in range(0, 5):
         mommy.make(
             'matches.playermatchsummary',
@@ -154,5 +153,53 @@ def make_matchset():
             skillbuild_set=[sb, sb2, sb3],
             _quantity=3,
         )
+    # Ensure there is always 1 win and 1 loss
+    # Tests can be nondeterministic otherwise
+    mommy.make(
+        'matches.playermatchsummary',
+        player=p,
+        hero=h,
+        item_0=i,
+        item_1=i,
+        item_2=i,
+        item_3=i,
+        item_4=i,
+        item_5=i,
+        leaver=ls,
+        level=3,
+        match__radiant_team=t,
+        match__league=l,
+        match__game_mode=gm,
+        match__start_time=start_time,
+        match__lobby_type=lt,
+        match__skill=1,
+        is_win=True,
+        match__validity=Match.LEGIT,
+        skillbuild_set=[sb, sb2, sb3],
+        _quantity=1,
+    )
+    mommy.make(
+        'matches.playermatchsummary',
+        player=p,
+        hero=h,
+        item_0=i,
+        item_1=i,
+        item_2=i,
+        item_3=i,
+        item_4=i,
+        item_5=i,
+        leaver=ls,
+        level=3,
+        match__radiant_team=t,
+        match__league=l,
+        match__game_mode=gm,
+        match__start_time=start_time,
+        match__lobby_type=lt,
+        match__skill=1,
+        is_win=False,
+        match__validity=Match.LEGIT,
+        skillbuild_set=[sb, sb2, sb3],
+        _quantity=1,
+    )
 
     return h, p

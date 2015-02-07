@@ -5,7 +5,7 @@ from functools import wraps
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.generic import View
+from django.views.generic import View, TemplateView
 from django.views.generic.edit import FormView as DjangoFormView
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -20,8 +20,8 @@ from players.models import Player
 from accounts.models import PermissionCode
 from heroes.models import Hero
 from items.models import Item
-from leagues.models import LeagueDossier
-from teams.models import TeamDossier
+from teams.models import Team
+from leagues.models import League
 
 try:
     if 'devserver' not in settings.INSTALLED_APPS:
@@ -360,6 +360,31 @@ class ApiView(View):
         return HttpResponse(data, mimetype)
 
 
+class JsonApiView(TemplateView):
+
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax() or True:
+            kwargs = self.get_context_data(**kwargs)
+            return self.succeed(self.fetch_json(*args, **kwargs))
+        else:
+            raise SuspiciousOperation
+            return self.fail()
+
+    def succeed(self, json_data):
+        response_data = {}
+        response_data['result'] = 'success'
+        response_data['data'] = json_data
+        return HttpResponse(
+            dumps(response_data),
+            content_type="application/json"
+        )
+
+    def fail(self):
+        data = 'fail'
+        mimetype = 'application/json'
+        return HttpResponse(data, mimetype)
+
+
 class SearchView(DjangoFormView):
     form_class = SearchForm
     template_name = 'search.html'
@@ -377,14 +402,14 @@ class SearchView(DjangoFormView):
             'pros': Player.objects.filter(
                 pro_name__icontains=(search_str)
                 )[:10],
-            'teamdossiers': TeamDossier.objects.filter(
+            'teams': Team.objects.filter(
                 Q(name__icontains=(search_str)) |
                 Q(tag__icontains=(search_str))
                 )[:10],
             'items': Item.objects.filter(
                 name__icontains=(search_str)
                 )[:10],
-            'leaguedossiers': LeagueDossier.objects.filter(
+            'leagues': League.objects.filter(
                 name__icontains=(search_str)
                 )[:10],
             'form': form

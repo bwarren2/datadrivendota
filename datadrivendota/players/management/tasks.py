@@ -3,7 +3,7 @@ from copy import deepcopy
 from time import time as now
 from celery import Task, chain
 from players.models import Player
-from teams.models import TeamDossier
+from teams.models import Team
 from accounts.models import get_tracks
 from teams.models import assemble_pros
 from settings.base import ADDER_32_BIT
@@ -12,11 +12,10 @@ import logging
 from datadrivendota.management.tasks import (
     BaseTask,
     ValveApiCall,
-    CycleApiCall,
     ApiFollower,
     ApiContext,
 )
-
+from matches.management.tasks import CycleApiCall
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os
 os.environ['http_proxy'] = ''
@@ -36,7 +35,7 @@ class MirrorClientPersonas(BaseTask):
         users = Player.objects.filter(updated=True)
         tracked = get_tracks(users)
 
-        teams = TeamDossier.objects.all()
+        teams = Team.objects.all()
         pros = assemble_pros(teams)
 
         track_list = meld(users, tracked)
@@ -134,7 +133,7 @@ class MirrorProNames(Task):
         ps.update(pro_name=None)
 
         # Get the new names for people on teams.
-        teams = TeamDossier.objects.all()
+        teams = Team.objects.all()
         pros = assemble_pros(teams)
         for p in pros:
             c = ApiContext()

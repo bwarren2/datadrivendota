@@ -17,6 +17,7 @@ class Config(object):
     # List of modules to import when celery starts.
     CELERY_IMPORTS = (
         "matches.management.tasks",
+        "items.management.tasks",
         "heroes.management.tasks",
         "players.management.tasks",
         "leagues.management.tasks",
@@ -86,7 +87,7 @@ class Config(object):
             'exchange': 'valve_api',
             'routing_key': 'valve_api_call'
         },
-        'datadrivendota.management.tasks.CycleApiCall': {
+        'matches.management.tasks.CycleApiCall': {
             'exchange': 'rpr',
             'routing_key': 'rpr'
         },
@@ -123,11 +124,11 @@ class Config(object):
             'exchange': 'management',
             'routing_key': 'management'
         },
-        'teams.management.tasks.UploadTeam': {
+        'teams.management.tasks.UpdateTeam': {
             'exchange': 'db',
             'routing_key': 'db'
         },
-        'teams.management.tasks.MirrorTeamDossiers': {
+        'teams.management.tasks.MirrorTeamDetails': {
             'exchange': 'management',
             'routing_key': 'management'
         },
@@ -159,6 +160,14 @@ class Config(object):
             'exchange': 'valve_api',
             'routing_key': 'valve_api_call'
         },
+        'leagues.management.tasks.MirrorLeagueSchedule': {
+            'exchange': 'valve_api',
+            'routing_key': 'valve_api_call'
+        },
+        'leagues.management.tasks.UpdateLeagueSchedule': {
+            'exchange': 'valve_api',
+            'routing_key': 'valve_api_call'
+        },
         'players.management.tasks.MirrorProNames': {
             'exchange': 'management',
             'routing_key': 'management'
@@ -184,7 +193,7 @@ class Config(object):
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
-        'datadrivendota.management.tasks.CycleApiCall': {
+        'matches.management.tasks.CycleApiCall': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
@@ -230,12 +239,12 @@ class Config(object):
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
-        'teams.management.tasks.MirrorTeamDossiers': {
+        'teams.management.tasks.MirrorTeamDetails': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
-        'teams.management.tasks.UploadTeam': {
+        'teams.management.tasks.UpdateTeam': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
@@ -272,6 +281,18 @@ class Config(object):
             'trail': False,
         },
         'leagues.management.tasks.UpdateLeagueLogos': {
+            "rate_limit": VALVE_RATE,
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'leagues.management.tasks.UpdateLeagueSchedule': {
+            "rate_limit": VALVE_RATE,
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'leagues.management.tasks.MirrorLeagueSchedule': {
             "rate_limit": VALVE_RATE,
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,

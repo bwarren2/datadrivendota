@@ -260,6 +260,7 @@ THIRD_PARTY_APPS = (
     'tagging',
     'mptt',
     'zinnia',
+    'rest_framework',
 )
 
 # Apps specific for this project go here.
@@ -433,7 +434,16 @@ PIPELINE_JS = {
 PIPELINE_COMPILERS = (
     'pipeline.compilers.less.LessCompiler',
 )
+
 ########## END PIPELINE CONFIGURATION
+
+
+########## START REDIS CONFIGURATION
+LIVE_JSON_KEY = 'live_league_json'
+ITEM_SCHEMA_KEY = 'valve_item_schema_json'
+########## END REDIS CONFIGURATION
+
+
 
 # Tests
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -480,7 +490,7 @@ PLAYER_10 = [
     '#906A2B',
 ]
 
-#Stripe
+########## START STRIPE CONFIGURATION
 STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
 STRIPE_PUBLIC_KEY = getenv('STRIPE_PUBLIC_KEY')
 
@@ -509,6 +519,7 @@ SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = [
     ]
 
 SUBSCRIPTION_REQUIRED_REDIRECT = 'payments:payments_subscribe'
+########## END STRIPE CONFIGURATION
 
 VERBOSE_PROFILING = getenv('VERBOSE_PROFILING') == 'True'
 
@@ -529,3 +540,12 @@ TI4_TEAMS = [
     1375614,
     1642908,
 ]
+
+VALVE_CDN_PATH = 'http://cdn.dota2.com/apps/570/'
+UPDATE_LAG_UTC = 60*60*24*3  # 3 Days
+
+########## START REST CONFIGURATION
+REST_FRAMEWORK = {
+    'PAGINATE_BY': 10
+}
+########## END REST CONFIGURATION

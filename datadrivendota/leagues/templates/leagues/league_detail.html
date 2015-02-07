@@ -2,10 +2,10 @@
 
 {% load staticfiles player_extras %}
 {% block title %}
-    {{league.leaguedossier.display_name}}
+    {{league.display_name}}
 {% endblock title %}
 {% block page_title %}
-    {{league.leaguedossier.display_name}}
+    {{league.display_name}}
 {% endblock page_title %}
 {% block content %}
     <div class='row'>
@@ -19,13 +19,13 @@
     </div>
     <div class="league-infobox col-md-4">
         <img class='thumbnail' style='margin-top:10px'
-        {% if league.leaguedossier.logo_image %}
-            src="{{ league.leaguedossier.logo_image.url }}"
+        {% if league.logo_image %}
+            src="{{ league.logo_image.url }}"
         {% else %}
             src=""
         {% endif %}
         >
-        <h2>{{ league.leaguedossier.display_name }}
+        <h2>{{ league.display_name }}
         </h2>
 
     </div>

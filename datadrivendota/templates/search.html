@@ -61,10 +61,10 @@
             </div>
         {% endif %}
 
-        {% if teamdossiers %}
+        {% if teams %}
             <div class='row'>
                 <h4>Teams</h4>
-                {% for teamdoss in teamdossiers %}
+                {% for team in teams %}
                     {% include "teams/_teamdossier_card.html" %}
                 {% endfor %}
             </div>
@@ -73,7 +73,7 @@
         {% if leaguedossiers %}
             <div class='row'>
                 <h4>Leagues</h4>
-                {% for leaguedoss in leaguedossiers %}
+                {% for league in leagues %}
                     {% include "leagues/_leaguedossier_card.html" %}
                 {% endfor %}
             </div>

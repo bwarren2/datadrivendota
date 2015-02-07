@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class='row' id='games'></div>
+
+
+{% endblock content %}
+
+{% block title %}
+Current Live Games
+{% endblock title %}
+
+{% block pagetitle %}
+Current Live Games
+{% endblock pagetitle %}
+
+{% block extra_js %}
+
+{% comment %}
+    Helperthings!
+{% endcomment %}
+<script type="text/javascript" src='https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js'></script>
+<script src="http://cdn.jsdelivr.net/handlebarsjs/3.0.0/handlebars.js"></script>
+
+
+<script type="text/x-handlebars-template" id='game-template'>
+{% verbatim %}
+    {{#games}}
+    {{!--
+    <div class="{{summary.hero_safe_name}}_slot {{summary.internal_hero_name}}_slot">
+    <img src="{{ summary.hero_mugshot_url }}" alt="{{ summary.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail player-slot-{{summary.slot}}">
+    </div>
+    --}}
+
+        <div id={{league_id}} class='col-md-2'>
+
+            {{!-- <img src="{{image_url}}" class='thumbnail'> --}}
+            <img id="{{dire_team.team_id}}" src="{{dire_team.logo_url}}" class='thumbnail'>
+            <img id="{{radiant_team.team_id}}"src="{{radiant_team.logo_url}}" class='thumbnail'>
+            <p class='overlayer'>{{match_id}}</p>
+        </div>
+    {{/games}}
+{% endverbatim %}
+</script>
+
+
+<script type="text/javascript">
+
+    var source = $('#game-template').html()
+    var template = Handlebars.compile(source);
+    console.log(template)
+
+    $(function(){
+        var p = Promise.resolve(
+            $.get(
+                "{% url 'leagues:api_live_games_list' %}"
+            )
+        ).then(function(result){
+            console.log(result['data'])
+            $('div#games').html(template({'games': result['data']}))
+        })
+
+    })
+</script>
+{% endblock extra_js %}

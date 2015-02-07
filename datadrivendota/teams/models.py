@@ -1,17 +1,11 @@
 from django.db import models
-from .managers import SortedTeamManager, TI4TeamManager, TI4DossManager
+from .managers import SortedTeamManager, TI4TeamManager
+from django.utils import timezone
 
 
 class Team(models.Model):
     """Pro team data"""
     steam_id = models.IntegerField(unique=True)
-    objects = models.Manager()
-    sorted = SortedTeamManager()
-    TI4 = TI4TeamManager()
-
-
-class TeamDossier(models.Model):
-    team = models.OneToOneField('Team')
     name = models.CharField(max_length=200, null=True)
     tag = models.CharField(max_length=200, null=True)
     created = models.IntegerField(null=True)
@@ -20,7 +14,7 @@ class TeamDossier(models.Model):
     logo_sponsor = models.BigIntegerField(null=True)
     country_code = models.CharField(max_length=10, null=True)
     url = models.CharField(max_length=200, null=True)
-    games_played_with_current_roster = models.IntegerField()
+    games_played_with_current_roster = models.IntegerField(null=True)
     player_0 = models.ForeignKey(
         'players.Player', related_name='player_0', null=True
         )
@@ -40,11 +34,25 @@ class TeamDossier(models.Model):
         'players.Player', related_name='team_admin', null=True
         )
     leagues = models.ManyToManyField('leagues.League')
-    logo_image = models.ImageField(null=True, upload_to='teams/img/')
+    logo_image = models.ImageField(
+        null=True, upload_to='teams/img/', default='blank_team.png'
+    )
     logo_sponsor_image = models.ImageField(null=True, upload_to='teams/img/')
+    valve_cdn_image = models.TextField(
+        null=True, help_text='Steam cdn image url'
+    )
+    valve_cdn_sponsor_image = models.TextField(
+        null=True, help_text='Steam cdn sponsor image url'
+    )
+    update_time = models.DateTimeField(default=timezone.now)
 
     objects = models.Manager()
-    TI4 = TI4DossManager()
+    sorted = SortedTeamManager()
+    TI4 = TI4TeamManager()
+
+    def save(self, *args, **kwargs):
+        self.update_time = timezone.now()
+        super(Team, self).save(*args, **kwargs)
 
 
 def assemble_pros(teams):

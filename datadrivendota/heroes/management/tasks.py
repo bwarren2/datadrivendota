@@ -4,8 +4,8 @@ import logging
 from datadrivendota.management.tasks import (
     BaseTask,
     ValveApiCall,
-    CycleApiCall
 )
+from matches.management.tasks import CycleApiCall
 
 logger = logging.getLogger(__name__)
 

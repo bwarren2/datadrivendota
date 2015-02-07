@@ -1,4 +1,5 @@
 import urllib2
+from datetime import datetime
 from uuid import uuid4
 from celery import Task, chain
 from django.core.files import File
@@ -7,7 +8,7 @@ from matches.models import (
     Match,
 )
 from players.models import Player
-from teams.models import Team, TeamDossier
+from teams.models import Team
 import logging
 
 from datadrivendota.management.tasks import (
@@ -42,36 +43,37 @@ class MirrorTeams(Task):
             c.start_at_team_id = t
             c.teams_requested = 1
             vac = ValveApiCall()
-            ul = UploadTeam()
+            ul = UpdateTeam()
             c = chain(vac.s(api_context=c, mode='GetTeamInfoByTeamID'), ul.s())
             c.delay()
 
 
-class MirrorTeamDossiers(Task):
+class MirrorTeamDetails(Task):
 
-    def run(self):
-        teams = Team.objects.filter(teamdossier=None)
+    def run(self, teams=None):
+        if teams is None:
+            teams = [t.steam_id for t in Team.objects.filter(name=None)]
+        else:
+            pass  # presume teams is a list of steam ids
         for t in teams:
             c = ApiContext()
             c.refresh_records = True
-            c.start_at_team_id = t.steam_id
+            c.start_at_team_id = t
             c.teams_requested = 1
             vac = ValveApiCall()
-            ul = UploadTeam()
+            ul = UpdateTeam()
+
             c = chain(vac.s(api_context=c, mode='GetTeamInfoByTeamID'), ul.s())
             c.delay()
 
 
-class UploadTeam(ApiFollower):
+class UpdateTeam(ApiFollower):
     def run(self, urldata):
-        for team in self.result['teams']:
-            t, created = Team.objects.get_or_create(
-                steam_id=team['team_id']
+        for team_data in self.result['teams']:
+            team, created = Team.objects.get_or_create(
+                steam_id=team_data['team_id']
                 )
             try:
-                teamdoss = TeamDossier.objects.get(
-                    team=t,
-                    )
                 if self.api_context.refresh_records:
                     mapping_dict = {
                         'name': 'name',
@@ -85,21 +87,13 @@ class UploadTeam(ApiFollower):
                             'games_played_with_current_roster',
                     }
                     for internal, external in mapping_dict.iteritems():
-                        if external in team.iterkeys():
-                            setattr(teamdoss, internal, team.get(external))
+                        if external in team_data.iterkeys():
+                            setattr(team, internal, team_data.get(external))
 
-                    map_team_players(teamdoss, team)
-                    teamdoss.save()
-
-                    update_team_logos(t)
-
-                    # c = ApiContext()
-                    # utl = UpdateTeamLogos()
-                    # utl.s(api_context=c, team_steam_id=t.steam_id).delay()
-
-            except TeamDossier.DoesNotExist:
-                teamdoss = TeamDossier.objects.create(
-                    team=t,
+                    map_team_players(team, team_data)
+                    team.save()
+            except Team.DoesNotExist:
+                team = Team.objects.create(
                     name=team['name'],
                     tag=team['tag'],
                     created=team['time_created'],
@@ -111,36 +105,85 @@ class UploadTeam(ApiFollower):
                         'games_played_with_current_roster'
                     ],
                     )
-                map_team_players(teamdoss, team)
+                map_team_players(team, team_data)
                 if 'rating' in team.iterkeys():
-                        setattr(teamdoss, 'rating', team.get('rating'))
+                        setattr(team, 'rating', team.get('rating'))
 
-                teamdoss.save()
-                update_team_logos(t)
+                team.save()
+
+            self._update_team_logos(team)
+
+    def _update_team_logos(self, team):
+        logo = team.logo
+        logger.info("Testing!")
+        if self._need_logo_update(logo):
+            logger.info("Passed test!")
+            c = ApiContext()
+            vac = ValveApiCall()
+            c.ugcid = team.logo
+            c.team_id = team.steam_id
+            c.logo_type = 'team'
+
+            utl = UpdateTeamLogo()
+
+            c = chain(
+                vac.s(api_context=c, mode='GetUGCFileDetails'), utl.s()
+            )
+            c.delay()
+
+        logo = team.logo_sponsor
+        if self._need_logo_update(logo):
+            c = ApiContext()
+            vac = ValveApiCall()
+            c.ugcid = team.logo
+            c.team_id = team.steam_id
+            c.logo_type = 'sponsor'
+
+            utl = UpdateTeamLogo()
+
+            c = chain(
+                vac.s(api_context=c, mode='GetUGCFileDetails'), utl.s()
+            )
+            c.delay()
+
+    def _need_logo_update(self, logo):
+        return True
+        return logo != 0 and logo is not None
 
 
 class UpdateTeamLogo(ApiFollower):
     def run(self, urldata):
+        logger.error(urldata)
+        if urldata['status'] == 'FAILURE':
+            logger.error('FAILBOAT')
+            return False
         team = Team.objects.get(steam_id=self.api_context.team_id)
         URL = urldata['data']['url']
         try:
-            imgdata = urllib2.urlopen(URL, timeout=5)
-            with open('%s.png' % str(uuid4()), 'w+') as f:
-                f.write(imgdata.read())
-            filename = slugify(team.teamdossier.name) + '.png'
+            # imgdata = urllib2.urlopen(URL, timeout=5)
+            # with open('%s.png' % str(uuid4()), 'w+') as f:
+            #     foo = imgdata.read()
+            #     print foo
+            #     f.write(foo)
+            # filename = slugify(team.name) + '.png'
             if self.api_context.logo_type == 'team':
-                team.teamdossier.logo_image.save(
-                    filename, File(open(f.name))
-                    )
+                #     team.logo_image.save(
+                #         filename, File(open(f.name))
+                #         )
+                team.valve_cdn_image = URL
+                print URL
             else:
-                team.teamdossier.logo_sponsor_image.save(
-                    filename, File(open(f.name))
-                )
-            os.remove(f.name)
+                # team.logo_sponsor_image.save(
+                #     filename, File(open(f.name))
+                # )
+                team.valve_cdn_sponsor_image = URL
+
+            # os.remove(f.name)
+            team.save()
 
         # If we fail, put in a placeholder and freak.
         except Exception:
-                filename = slugify(team.teamdossier.name)+'_logo.png'
+                filename = slugify(team.name)+'_logo.png'
                 URL = ('https://s3.amazonaws.com/datadrivendota'
                        '/images/blank-logo.png')
                 imgdata = urllib2.urlopen(URL, timeout=5)
@@ -148,26 +191,34 @@ class UpdateTeamLogo(ApiFollower):
                     f.write(imgdata.read())
 
                 if self.api_context.logo_type == 'team':
-                    team.teamdossier.logo_image.save(
+                    team.logo_image.save(
                         filename, File(open(f.name))
                         )
+                    team.valve_cdn_image = URL
                 else:
-                    team.teamdossier.logo_sponsor_image.save(
+                    team.logo_sponsor_image.save(
                         filename, File(open(f.name))
                     )
+                    team.valve_cdn_sponsor_image = URL
                 os.remove(f.name)
                 raise
 
+    def failout(self):
+        logger.error("I failed :( {0}".format(repr(self.api_context)))
+
 
 def update_team_logos(team):
-    # Refresh the logo
-    logo = team.teamdossier.logo
-    teamdoss = team.teamdossier
+    """
+    DEPRECATED
+
+    Refresh the logo
+    """
+    logo = team.logo
     if logo != 0 and logo is not None:
         c = ApiContext()
         vac = ValveApiCall()
-        c.ugcid = teamdoss.logo
-        c.team_id = teamdoss.team.steam_id
+        c.ugcid = team.logo
+        c.team_id = team.steam_id
         c.logo_type = 'team'
 
         utl = UpdateTeamLogo()
@@ -177,12 +228,12 @@ def update_team_logos(team):
         )
         c.delay()
 
-    logo = team.teamdossier.logo_sponsor
+    logo = team.logo_sponsor
     if logo != 0 and logo is not None:
         c = ApiContext()
         vac = ValveApiCall()
-        c.ugcid = teamdoss.logo
-        c.team_id = teamdoss.team.steam_id
+        c.ugcid = team.logo
+        c.team_id = team.steam_id
         c.logo_type = 'sponsor'
 
         utl = UpdateTeamLogo()
@@ -193,7 +244,7 @@ def update_team_logos(team):
         c.delay()
 
 
-def map_team_players(teamdoss, team):
+def map_team_players(team, team_data):
     player_field_mapping_dict = {
         'player_0': 'player_0_account_id',
         'player_1': 'player_1_account_id',
@@ -203,6 +254,8 @@ def map_team_players(teamdoss, team):
         'admin': 'admin_account_id',
     }
     for internal, external in player_field_mapping_dict.iteritems():
-        if external in team.iterkeys():
-            p = Player.objects.get_or_create(steam_id=team.get(external))[0]
-            setattr(teamdoss, internal, p)
+        if external in team_data.iterkeys():
+            p = Player.objects.get_or_create(
+                steam_id=team_data.get(external)
+            )[0]
+            setattr(team, internal, p)

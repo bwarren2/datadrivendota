@@ -7,7 +7,17 @@ from django.contrib import admin
 from datadrivendota import views
 from accounts.views import data_applicant
 from matches.views import parse_preview
+
+from teams.views import TeamViewSet
+from leagues.views import LeagueViewSet
+from rest_framework.routers import DefaultRouter
+
 admin.autodiscover()
+
+# DRF is great
+router = DefaultRouter()
+router.register('teams', TeamViewSet)
+router.register('leagues', LeagueViewSet)
 
 urlpatterns = patterns(
     '',
@@ -42,6 +52,8 @@ urlpatterns = patterns(
     url(r'^payments/', include("payments.urls", namespace='payments')),
     url(r'^comments/', include('django.contrib.comments.urls')),
     url(r'^blog/', include('zinnia.urls')),
+    url(r'^rest-api/', include(router.urls, namespace='rest-api')),
+
     url(r'^robots\.txt/$', TemplateView.as_view(template_name='robots.txt',
         content_type='text/plain')),
     url(

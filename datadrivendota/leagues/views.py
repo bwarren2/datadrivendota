@@ -1,17 +1,37 @@
 import json
 from django.http import HttpResponse
 
-from django.views.generic import ListView, DetailView
+from rest_framework import viewsets
+from django.views.generic import ListView, DetailView, TemplateView
 from utils.pagination import SmarterPaginator
+from django.conf import settings
 
-from .models import League
+from .models import League, ScheduledMatch
+from .serializers import LeagueSerializer
 from matches.models import Match, PlayerMatchSummary
 from matches.views import annotated_matches
 from .mixins import (
     WinrateMixin,
     PickBanMixin,
 )
-from datadrivendota.views import ChartFormView, ApiView
+from datadrivendota.views import ChartFormView, ApiView, JsonApiView
+from datadrivendota.redis_app import redis_app as redis
+
+
+class ScheduledMatchList(ListView):
+    """The index of imported leagues"""
+    model = ScheduledMatch
+    paginate_by = 32
+
+    def paginate_queryset(self, queryset, page_size):
+        page = self.request.GET.get('page')
+        paginator = SmarterPaginator(
+            object_list=queryset,
+            per_page=page_size,
+            current_page=page
+        )
+        objs = paginator.current_page
+        return (paginator, page, objs, True)
 
 
 class LeagueList(ListView):
@@ -21,7 +41,7 @@ class LeagueList(ListView):
 
     def get_queryset(self):
         qs = self.model.recency.all().select_related().exclude(
-            leaguedossier__logo_image=None
+            logo_image=None
             )
         return qs
 
@@ -115,6 +135,22 @@ class PickBan(PickBanMixin, ChartFormView):
     html = "players/form.html"
 
 
+class LiveGameListView(TemplateView):
+    """
+
+    """
+    title = "Live Games!"
+    template_name = "leagues/live_game_list.html"
+
+
+class LiveGameDetailView(TemplateView):
+    """
+
+    """
+    title = "Live Games!"
+    template_name = "leagues/live_game_detail.html"
+
+
 class ApiWinrateChart(WinrateMixin, ApiView):
     pass
 
@@ -127,13 +163,13 @@ def league_list(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
         leagues = League.objects.filter(
-            leaguedossier__name__icontains=q,
+            name__icontains=q,
         )[:20]
         results = []
         for league in leagues:
             league_json = {}
             league_json['id'] = league.steam_id
-            league_json['label'] = league.leaguedossier.display_name
+            league_json['label'] = league.display_name
             league_json['value'] = league.steam_id
             results.append(league_json)
 
@@ -142,3 +178,36 @@ def league_list(request):
         data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
+
+
+class ApiLiveGamesList(JsonApiView):
+
+    def fetch_json(self, *args, **kwargs):
+        data = json.loads(redis.get(settings.LIVE_JSON_KEY))['games']
+        return data
+
+
+class ApiLiveGameDetail(JsonApiView):
+
+    def get_context_data(self, **kwargs):
+        if 'match_id' in kwargs:
+            kwargs['match_id'] = int(kwargs['match_id'])
+        print type(kwargs['match_id'])
+        return kwargs
+
+    def fetch_json(self, *args, **kwargs):
+        data = json.loads(redis.get(settings.LIVE_JSON_KEY))['games']
+        # print data
+        for game in data:
+            print game['match_id'], kwargs['match_id'],
+            if game['match_id'] == kwargs['match_id']:
+                print "harro!"
+                return game
+        print "Frowny face!"
+        self.fail()
+
+
+class LeagueViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = League.objects.all()
+    serializer_class = LeagueSerializer
+    lookup_field = 'steam_id'

@@ -20,7 +20,7 @@ from matches.mommy_recipes import make_matchset
 from heroes.mommy_recipes import make_hero
 from utils.exceptions import NoDataFound
 
-JSON_TIME = .5
+JSON_TIME = 2
 
 # update_player_winrate uses 1.5s cap, needs optimization
 
@@ -204,7 +204,7 @@ class TestWorkingJson(TestCase):
         )
         self.assertGreater(len(chart.datalist), 1)
 
-    @timed(1.5)
+    @timed(JSON_TIME)
     def test_winrate_json(self):
         chart = update_player_winrate(
             self.hero.steam_id,
