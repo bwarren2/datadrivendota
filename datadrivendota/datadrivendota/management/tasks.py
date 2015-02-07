@@ -18,7 +18,7 @@ from datadrivendota.settings.base import STEAM_API_KEY
 import logging
 from utils import send_error_email
 from players.models import Player
-
+from matches.management.tasks import UpdateMatch
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os
 os.environ['http_proxy'] = ''
@@ -417,7 +417,7 @@ class CycleApiCall(ApiFollower):
                 )
 
                 vac = ValveApiCall()
-                um = UploadMatch()
+                um = UpdateMatch()
                 self.api_context.match_id = result['match_id']
                 pass_context = deepcopy(self.api_context)
                 chain(vac.s(
