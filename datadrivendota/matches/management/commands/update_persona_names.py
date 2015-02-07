@@ -1,8 +1,6 @@
 from django.core.management.base import BaseCommand
-from matches.management.tasks.valve_api_calls import (
-    RefreshUpdatePlayerPersonas,
-    ApiContext,
-)
+from datadrivendota.management.tasks import ApiContext
+from players.management.tasks import MirrorClientPersonas,
 
 
 class Command(BaseCommand):
@@ -10,4 +8,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         c = ApiContext()
-        RefreshUpdatePlayerPersonas().delay(api_context=c)
+        MirrorClientPersonas().delay(api_context=c)

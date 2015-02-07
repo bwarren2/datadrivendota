@@ -1,8 +1,6 @@
 from django.core.management.base import BaseCommand
-from matches.management.tasks.valve_api_calls import (
-    ApiContext,
-    AcquireHeroSkillData
-)
+from datadrivendota.management.tasks import ApiContext
+from heroes.management.tasks import MirrorHeroSkillData
 from heroes.models import Hero
 from optparse import make_option
 
@@ -28,5 +26,5 @@ class Command(BaseCommand):
             c.matches_requested = match_count
             c.matches_desired = match_count
             c.hero_id = hero.steam_id
-            ahsd = AcquireHeroSkillData()
+            ahsd = MirrorHeroSkillData()
             ahsd.delay(api_context=c)

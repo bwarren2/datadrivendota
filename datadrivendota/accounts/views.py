@@ -18,7 +18,7 @@ from matches.models import Match
 
 from accounts.models import MatchRequest
 from datadrivendota.forms import MatchRequestForm
-from matches.management.tasks.valve_api_calls import AcquireMatches
+from matches.management.tasks import MirrorMatches
 
 from .models import request_to_player, Applicant, PollResponse
 from .forms import PollForm
@@ -28,16 +28,15 @@ from utils.exceptions import DataCapReached, ValidationException
 
 
 from celery import chain
-from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound
 
 
-from matches.management.tasks.valve_api_calls import (
+from datadrivendota.management.tasks import (
     ApiContext,
     ValveApiCall,
-    UpdatePlayerPersonas,
-    AcquirePlayerData,
 )
+from players.management.tasks import MirrorClientPersonas
+from players.management.tesks import MirrorPlayerData
 
 
 def data_applicant(request):
@@ -45,11 +44,12 @@ def data_applicant(request):
         form = ApplicantForm(request.POST)
         if form.is_valid():
 
-            """This is some stupid hacky stuff.  What we really want to do is have a uniqueness criterion on the model, a 32bit validator on the field, and a clean() method on the field that takes % 32bit.  We'll do it later."""
+            """
+            This is some stupid hacky stuff.  What we really want to do is have a uniqueness criterion on the model, a 32bit validator on the field, and a clean() method on the field that takes % 32bit.  We'll do it later."""
             try:
                 modulo_id = form.cleaned_data['steam_id'] \
                     % settings.ADDER_32_BIT
-                test = Applicant.objects.get(
+                Applicant.objects.get(
                     steam_id=modulo_id
                 )
                 status = 'preexisting'
@@ -163,7 +163,7 @@ class MatchRequestView(LoginRequiredView, FormView):
                     'matches:match_detail',
                     kwargs={'match_id': match_request.match_id}
                 ))
-            task = AcquireMatches()
+            task = MirrorMatches()
             task.delay(matches=[match_request.match_id])
             messages.add_message(self.request, messages.SUCCESS, msg)
 
@@ -371,7 +371,7 @@ def add_track(request):
             # Refresh all the names
             c = ApiContext()
             vac = ValveApiCall()
-            upp = UpdatePlayerPersonas()
+            upp = MirrorClientPersonas()
             c.steamids = steam_id + settings.ADDER_32_BIT
             chain(vac.s(
                 mode='GetPlayerSummaries',
@@ -379,7 +379,7 @@ def add_track(request):
             ), upp.s()).delay()
 
             # Pull in the new guy.
-            apd = AcquirePlayerData()
+            apd = MirrorPlayerData()
             c = ApiContext()
             c.account_id = steam_id
             apd.delay(api_context=c)

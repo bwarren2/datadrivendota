@@ -1,8 +1,10 @@
+from smtplib import SMTP
 from django.core.mail import send_mail
 from math import factorial
 from utils.exceptions import NoDataFound
 from time import mktime
 import datetime
+from django.conf import settings
 
 
 def utcize(min_date, max_date):
@@ -62,3 +64,22 @@ def binomial_exceedence(n, k, p):
     odds = sum(binomial_likelihood(n, i, p) for i in range(k+1))
 
     return 1-odds
+
+
+def send_error_email(body):
+    smtp = SMTP()
+    debuglevel = 0
+    smtp.set_debuglevel(debuglevel)
+    smtp.connect(settings.EMAIL_HOST, settings.EMAIL_PORT)
+
+    smtp.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+    message_text = "Error! Failed with context:\n{0}\n\nBye\n".format(body)
+    from_addr = "celery@datadrivendota.com"
+    to_addr = "ben@datadrivendota.com"
+    subj = 'Error!'
+    msg = "From: {0}\nTo: {1}\nSubject: {2}\n\n{3}".format(
+        from_addr, to_addr, subj, message_text
+    )
+
+    smtp.sendmail(from_addr, to_addr, msg)
+    smtp.quit()
