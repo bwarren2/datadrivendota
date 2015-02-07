@@ -154,5 +154,53 @@ def make_matchset():
             skillbuild_set=[sb, sb2, sb3],
             _quantity=3,
         )
+    # Ensure there is always 1 win and 1 loss
+    # Tests can be nondeterministic otherwise
+    mommy.make(
+        'matches.playermatchsummary',
+        player=p,
+        hero=h,
+        item_0=i,
+        item_1=i,
+        item_2=i,
+        item_3=i,
+        item_4=i,
+        item_5=i,
+        leaver=ls,
+        level=3,
+        match__radiant_team=t,
+        match__league=l,
+        match__game_mode=gm,
+        match__start_time=start_time,
+        match__lobby_type=lt,
+        match__skill=1,
+        is_win=True,
+        match__validity=Match.LEGIT,
+        skillbuild_set=[sb, sb2, sb3],
+        _quantity=3,
+    )
+    mommy.make(
+        'matches.playermatchsummary',
+        player=p,
+        hero=h,
+        item_0=i,
+        item_1=i,
+        item_2=i,
+        item_3=i,
+        item_4=i,
+        item_5=i,
+        leaver=ls,
+        level=3,
+        match__radiant_team=t,
+        match__league=l,
+        match__game_mode=gm,
+        match__start_time=start_time,
+        match__lobby_type=lt,
+        match__skill=1,
+        is_win=False,
+        match__validity=Match.LEGIT,
+        skillbuild_set=[sb, sb2, sb3],
+        _quantity=3,
+    )
 
     return h, p
