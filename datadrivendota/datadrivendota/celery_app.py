@@ -86,7 +86,7 @@ class Config(object):
             'exchange': 'valve_api',
             'routing_key': 'valve_api_call'
         },
-        'datadrivendota.management.tasks.CycleApiCall': {
+        'matches.management.tasks.CycleApiCall': {
             'exchange': 'rpr',
             'routing_key': 'rpr'
         },
@@ -184,7 +184,7 @@ class Config(object):
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
-        'datadrivendota.management.tasks.CycleApiCall': {
+        'matches.management.tasks.CycleApiCall': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,

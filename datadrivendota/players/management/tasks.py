@@ -12,11 +12,10 @@ import logging
 from datadrivendota.management.tasks import (
     BaseTask,
     ValveApiCall,
-    CycleApiCall,
     ApiFollower,
     ApiContext,
 )
-
+from matches.management.tasks import CycleApiCall
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os
 os.environ['http_proxy'] = ''

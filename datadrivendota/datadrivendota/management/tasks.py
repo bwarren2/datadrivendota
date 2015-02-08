@@ -1,5 +1,4 @@
 from httplib import BadStatusLine
-from copy import deepcopy
 import gc
 import urllib2
 import json
@@ -7,7 +6,7 @@ import socket
 import ssl
 from time import time as now
 from urllib import urlencode
-from celery import Task, chain
+from celery import Task
 from celery.exceptions import (
     SoftTimeLimitExceeded,
     MaxRetriesExceededError,
@@ -17,8 +16,7 @@ from celery.exceptions import (
 from datadrivendota.settings.base import STEAM_API_KEY
 import logging
 from utils import send_error_email
-from players.models import Player
-from matches.management.tasks import UpdateMatch
+# from matches.management.tasks import UpdateMatch
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os
 os.environ['http_proxy'] = ''
@@ -357,144 +355,3 @@ class ValveApiCall(BaseTask):
                 raise
 
 
-class CycleApiCall(ApiFollower):
-    """
-    Recycle an API context to dig deeper into match results.
-
-    Only supports get match history right now, but that is the only API that really leans on repeated calls.
-    """
-
-    def run(self, urldata):
-        """
-        Recursively pings the valve API to get match data and spawns new tasks
-        to deal with the downloaded match IDs.
-        """
-        # Validate
-        if self.result['status'] == 15:
-            logger.error(
-                "Could not pull data. "
-                + str(self.api_context.account_id)
-                + " disallowed it. "
-            )
-            p = Player.objects.get(steam_id=self.api_context.account_id)
-            p.updated = False
-            p.save()
-            return True
-
-        elif self.result['status'] == 1:
-            # Spawn a bunch of match detail queries
-
-            logger.info("Spawning")
-
-            self.spawnDetailCalls()
-
-            logger.info("Checking for more results")
-            if self.moreResultsLeft():
-                self.rebound()
-
-            # Successful closeout
-            else:
-                logger.info("Cleaning up")
-                self.cleanup()
-            return True
-        else:
-            logger.error("Unhandled status: "+str(self.result['status']))
-            return True
-
-    def spawnDetailCalls(self):
-        for result in self.result['matches']:
-            self.api_context.processed += 1
-            if self.api_context.processed <= self.api_context.matches_desired:
-
-                logger.info(
-                    "{0}: {1} done, {2} wanted, doing: {3}".format(
-                        self.api_context.account_id,
-                        self.api_context.processed,
-                        self.api_context.matches_desired,
-                        self.api_context.processed <=
-                        self.api_context.matches_desired
-                    )
-                )
-
-                vac = ValveApiCall()
-                um = UpdateMatch()
-                self.api_context.match_id = result['match_id']
-                pass_context = deepcopy(self.api_context)
-                chain(vac.s(
-                    mode='GetMatchDetails',
-                    api_context=pass_context
-                ), um.s()).delay()
-
-    def moreResultsLeft(self):
-        if not (self.result['results_remaining'] == 0) \
-                and self.api_context.processed <= \
-                self.api_context.matches_desired:
-
-            logger.info(
-                (
-                    "Did {0} of {1} for {2}. {3} left.  \n "
-                    "Logic: remaining: {4}, "
-                    "needing: {5}, in sum: {6}.  Going back"
-                ).format(
-                    self.api_context.processed,
-                    self.api_context.matches_desired,
-                    self.api_context.account_id,
-                    self.result['results_remaining'],
-                    not (self.result['results_remaining'] == 0),
-                    self.api_context.processed <=
-                        self.api_context.matches_desired,
-                    not (self.result['results_remaining'] == 0)
-                        and self.api_context.processed <=
-                        self.api_context.matches_desired,
-                )
-            )
-            return True
-
-        else:
-
-            logger.info(
-                "Did {0} of {1} for {2}. {3} left.  Done.".format(
-                    self.api_context.processed,
-                    self.api_context.matches_desired,
-                    self.api_context.account_id,
-                    self.result['results_remaining']
-                )
-            )
-
-            return False
-
-    # Until the date_max problem is fixed, date_max cannot work.
-    def rebound(self):
-        logger.info("Rebounding")
-        self.api_context.start_at_match_id = self.result[
-            'matches'
-        ][-1]['match_id']
-        self.api_context.date_max = None
-
-        vac = ValveApiCall()
-        rpr = CycleApiCall()
-        pass_context = deepcopy(self.api_context)
-        chain(vac.s(
-            mode='GetMatchHistory',
-            api_context=pass_context
-        ), rpr.s()).delay()
-
-    def cleanup(self):
-        # If there is a player we have been focusing on
-        if self.api_context.account_id is not None:
-            try:
-                player = Player.objects.get(
-                    steam_id=self.api_context.account_id
-                )
-                if self.api_context.start_scrape_time:
-                    new_last_scrape = self.api_context.start_scrape_time
-                else:
-                    new_last_scrape = now()
-                player.last_scrape_time = new_last_scrape
-                player.save()
-            except Player.DoesNotExist:
-                logger.error(
-                    "ERROR! Player does not exist {0}".format(
-                        self.api_context.account_id
-                    )
-                )

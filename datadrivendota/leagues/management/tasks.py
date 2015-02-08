@@ -14,9 +14,8 @@ from datadrivendota.management.tasks import (
     ApiFollower,
     ApiContext,
     ValveApiCall,
-    CycleApiCall
 )
-from matches.management.tasks import MirrorMatches
+from matches.management.tasks import MirrorMatches, CycleApiCall
 
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os
