@@ -7,7 +7,7 @@ from heroes.mommy_recipes import hero, make_hero
 from players.mommy_recipes import player
 from items.mommy_recipes import item
 from heroes.models import Ability
-
+from random import randint
 match = Recipe(
     Match,
     steam_id=seq(1),
@@ -136,6 +136,7 @@ def make_matchset():
             'matches.playermatchsummary',
             player=p,
             hero=h,
+            steam_id=randint(0, 100000000),
             item_0=i,
             item_1=i,
             item_2=i,
@@ -160,6 +161,7 @@ def make_matchset():
         'matches.playermatchsummary',
         player=p,
         hero=h,
+        steam_id=randint(0, 100000000),
         item_0=i,
         item_1=i,
         item_2=i,
@@ -177,12 +179,13 @@ def make_matchset():
         is_win=True,
         match__validity=Match.LEGIT,
         skillbuild_set=[sb, sb2, sb3],
-        _quantity=3,
+        _quantity=1,
     )
     mommy.make(
         'matches.playermatchsummary',
         player=p,
         hero=h,
+        steam_id=randint(0, 100000000),
         item_0=i,
         item_1=i,
         item_2=i,
@@ -200,7 +203,7 @@ def make_matchset():
         is_win=False,
         match__validity=Match.LEGIT,
         skillbuild_set=[sb, sb2, sb3],
-        _quantity=3,
+        _quantity=1,
     )
 
     return h, p
