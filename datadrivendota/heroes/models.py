@@ -53,6 +53,10 @@ class Role(models.Model):
 
 
 class Hero(models.Model):
+    steam_id = models.PositiveIntegerField(
+        unique=True,
+        help_text="Valve's int"
+    )
     name = models.CharField(
         max_length=200,
         help_text="In-game name."
@@ -60,21 +64,23 @@ class Hero(models.Model):
     machine_name = models.SlugField(
         max_length=200,
         help_text="What goes in URLs.  See slugify()",
-        unique=True,
-        null=True
+        blank=True,
     )
     internal_name = models.CharField(
         max_length=200,
         help_text="The protobuf string for the hero"
     )
-
-    steam_id = models.PositiveIntegerField(
-        unique=True,
-        help_text="Valve's int"
-    )
     lore = models.TextField(null=True)
-    mugshot = models.ImageField(null=True, upload_to='heroes/img/')
-    thumbshot = models.ImageField(null=True, upload_to='heroes/img/')
+    mugshot = models.ImageField(
+        null=True,
+        upload_to='heroes/img/',
+        default='blanks/blank_hero_mugshot.png'
+    )
+    thumbshot = models.ImageField(
+        null=True,
+        upload_to='heroes/img/',
+        default='blanks/blank_hero_thumb.png'
+    )
     visible = models.BooleanField(default=False)
     roles = models.ManyToManyField(Role, through='Assignment')
 
@@ -103,7 +109,6 @@ class Assignment(models.Model):
 
 
 class Ability(models.Model):
-    #Things that come from VPK files
     steam_id = models.IntegerField(
         help_text="Valve's internal map",
         unique=True

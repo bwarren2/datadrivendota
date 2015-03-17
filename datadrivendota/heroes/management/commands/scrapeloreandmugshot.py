@@ -29,7 +29,6 @@ class Command(BaseCommand):
                 filename = slugify(h.name)+'_full.png'
                 h.mugshot.save(filename, File(open(f.name)))
             except HTTPError, err:
-                h.mugshot = None
                 print "No mugshot for %s!  Error %s" % (h.name, err)
 
             url = (
@@ -43,7 +42,6 @@ class Command(BaseCommand):
                 filename = slugify(h.name)+'_thumb.png'
                 h.thumbshot.save(filename, File(open(f.name)))
             except HTTPError, err:
-                h.thumbshot = None
                 print "No thumbshot for %s!  Error %s" % (h.name, err)
 
             #Lore section

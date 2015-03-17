@@ -1,5 +1,6 @@
 import json
 from functools import wraps
+from rest_framework import viewsets
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -9,6 +10,7 @@ from django.utils.text import slugify
 from datadrivendota.views import ChartFormView, ApiView
 
 from .models import Hero, Ability, HeroDossier, Role, Assignment
+from .serializers import HeroSerializer
 from .mixins import (
     VitalsMixin,
     LineupMixin,
@@ -326,6 +328,13 @@ class ApiUpdatePlayerWinrateChart(UpdatePlayerWinrateMixin, ApiView):
 
 class ApiHeroPerformanceLineupChart(HeroPerformanceLineupMixin, ApiView):
     pass
+
+
+class HeroViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Hero.public.all()
+    paginate_by = None
+    serializer_class = HeroSerializer
+    lookup_field = 'steam_id'
 
 
 def ability_detail(request, ability_name):

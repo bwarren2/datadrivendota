@@ -153,10 +153,6 @@ class UpdateTeam(ApiFollower):
 
 class UpdateTeamLogo(ApiFollower):
     def run(self, urldata):
-        logger.error(urldata)
-        if urldata['status'] == 'FAILURE':
-            logger.error('FAILBOAT')
-            return False
         team = Team.objects.get(steam_id=self.api_context.team_id)
         URL = urldata['data']['url']
         try:

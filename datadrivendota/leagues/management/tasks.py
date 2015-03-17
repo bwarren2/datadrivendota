@@ -1,5 +1,5 @@
 import json
-from StringIO import StringIO
+from collections import defaultdict
 import gc
 import urllib2
 from datetime import timedelta
@@ -11,10 +11,13 @@ from uuid import uuid4
 from celery import Task, chain
 from django.conf import settings
 from datadrivendota.redis_app import redis_app as redis
+from datadrivendota.redis_app import timeline_key, slice_key
 from django.core.files import File
 from django.utils.text import slugify
-from leagues.models import League
 from utils.accessors import get_league_schema
+from leagues.models import League
+from heroes.models import Hero
+from items.models import Item
 from teams.models import Team
 from teams.management.tasks import MirrorTeamDetails
 from leagues.models import ScheduledMatch
@@ -58,83 +61,208 @@ class UpdateLiveGames(ApiFollower):
     """
     def run(self, urldata):
 
-        urldata = self._clean_urldata(urldata)
+        urldata = self._setup(urldata)
 
-        teams = self._find_update_teams(urldata)
-        self._update_teams(teams)
-        leagues = self._find_update_leagues(urldata)
-        self._update_leagues(leagues)
+        # Do this all at once to group leagues and teams in one pass
+        urldata = self._merge_logos(urldata)
 
-        data = self._merge_logos(urldata)
-        self._store_data(data)
+        for game in urldata:
+            formatted_game = {}
+            formatted_game['players'] = self._get_players(game)
+            formatted_game['states'] = self._get_states(game)
+            formatted_game['pickbans'] = self._get_pickbans(game)
+            formatted_game['game'] = self._get_game_data(game)
+
+            for side in ['radiant', 'dire']:
+                formatted_game[side] = self._get_side_data(game, side)
+
+            self._store_data(formatted_game)
+
+        # Update data if needed
+        if not self.update_leagues:
+            self._update_leagues(self.update_leagues)
+        if not self.update_teams:
+            self._update_teams(self.update_teams)
+
+    def _store_data(self, game_snapshot):
+        # Store slice
+        expiry_seconds = 60*60*24*100  # 1 day
+        key = slice_key(game_snapshot['game']['match_id'])
+        redis.set(key, json.dumps(game_snapshot))
+        redis.expire(key, expiry_seconds)
+
+        # Merge timeline
+        key = timeline_key(game_snapshot['game']['match_id'])
+        extant = redis.get(key)
+        if extant is not None:
+            extant = json.loads(extant)
+
+        timeline = self._merge_slice(game_snapshot, extant)
+        extant = redis.set(key, json.dumps(timeline))
+        redis.expire(key, expiry_seconds)
+
+    def _merge_slice(self, game_snapshot, extant):
+        new_timeslice = {
+            'players': game_snapshot['players'],
+            'states': game_snapshot['states'],
+        }
+
+        if extant is None:
+            extant = {}
+            # Don't have an existing concat'd json, make one to start
+            extant['timeline'] = []
+            extant['timeline'].append(new_timeslice)
+            extant['game'] = game_snapshot['game']
+            extant['radiant'] = game_snapshot['radiant']
+            extant['dire'] = game_snapshot['dire']
+            extant['pickbans'] = game_snapshot['pickbans']
+            return extant
+        else:
+            times = [x['states']['duration'] for x in extant['timeline']]
+            if new_timeslice['states']['duration'] not in times:
+                extant['timeline'].append(new_timeslice)
+                extant['timeline'].sort(
+                    key=lambda item: item['states']['duration']
+                )
+                return extant
+            else:
+                return extant
+
+    def _get_side_data(self, game, side):
+        if '{0}_team'.format(side) in game.keys():
+            datadict = game['{0}_team'.format(side)]
+            datadict['wins'] = game['{0}_series_wins'.format(side)]
+        else:
+            datadict = None
+
+        return datadict
+
+    def _get_game_data(self, game):
+        game_dict = {}
+        game_dict['league_id'] = game['league_id']
+        game_dict['league_logo_url'] = game['league_id']
+        game_dict['league_tier'] = game['league_tier']
+        game_dict['lobby_id'] = game['lobby_id']
+        game_dict['match_id'] = game['match_id']
+        game_dict['series_type'] = game['series_type']
+        game_dict['spectators'] = game['spectators']
+        game_dict['stream_delay_s'] = game['stream_delay_s']
+        #  Fix this:  u'league_tier': 1,
+
+        return game_dict
+
+    def _get_states(self, game):
+        state_dict = defaultdict(dict)
+        if 'scoreboard' in game:
+            state_dict['roshan_timer'] = \
+                game['scoreboard']['roshan_respawn_timer']
+            state_dict['duration'] = \
+                game['scoreboard']['duration']
+            for side in ['radiant', 'dire']:
+                state_dict['{0}_barracks'.format(side)] =\
+                     game['scoreboard'][side]['barracks_state']
+                state_dict['{0}_towers'.format(side)] =\
+                    game['scoreboard'][side]['tower_state']
+        else:
+            state_dict['roshan_timer'] = None
+            state_dict['duration'] = 0
+
+        state_dict.default_factory = None  # Django can't iterate on ddicts
+        return state_dict
+
+    def _get_players(self, game):
+        players = []
+        if 'scoreboard' in game.keys():
+            for side in ['radiant', 'dire']:
+                player_list = game['scoreboard'][side]['players']
+                for player in player_list:
+
+                    # Incorporate hero data
+                    player['hero_url'] = self.hero_urls[player['hero_id']]
+
+                    account_id = player['account_id']
+                    player_data = [
+                        x for x in game['players']
+                        if x['account_id'] == account_id
+                    ][0]
+                    player['name'] = player_data['name']
+                    # print player_data
+                    if player_data['team'] == 0:
+                        player['side'] = 'radiant'
+                    else:
+                        player['side'] = 'dire'
+
+                    player['kda2'] = player['kills'] - player['death']\
+                        + player['assists']/2.0
+                    players.append(player)
+            else:
+                pass  # Nothing to see here
+
+        return players
+
+    def _get_heroes(self):
+        self.hero_urls = {
+            x.steam_id: x.mugshot.url for x in Hero.objects.all()
+            }
+
+    def _get_items(self):
+        self.item_names = {
+            x.steam_id: x.internal_name for x in Item.objects.all()
+            }
+
+    def _get_pickbans(self, game):
+        pickbans = defaultdict(dict)
+        for side in ['radiant', 'dire']:
+            for choice in ['picks', 'bans']:
+                if 'scoreboard' in game:
+                    if choice in game['scoreboard'][side]:  # Sometimes rd
+                        pickbans[side][choice] = \
+                            game['scoreboard'][side][choice]
+
+                        for hero in pickbans[side][choice]:
+                            hero['url'] = self.hero_urls[hero['hero_id']]
+                    else:
+                        pickbans[side][choice] = None
+                else:
+                    pickbans[side][choice] = None
+
+        return pickbans
 
     def _merge_logos(self, data):
-        for game in data['games']:
+        update_teams = []
+        update_leagues = []
+        for game in data:
 
             # Do Teams
             for team_type in ['radiant_team', 'dire_team']:
                 if team_type in game.keys():
                     if 'team_id' in game[team_type].keys():
-                        try:
-                            team_id = game[team_type]['team_id']
-                            team = Team.objects.get(
-                                steam_id=team_id
-                                )
-                            if team.logo_image:
-                                logo_url = team.logo_image.url
-                                game[team_type]['logo_url'] = logo_url
-                            else:
-                                game[team_type]['logo_url'] = ''
-                        except Team.DoesNotExist:
-                            game[team_type]['logo_url'] = ''
+                        team_id = game[team_type]['team_id']
+                        team, t_created = Team.objects.get_or_create(
+                            steam_id=team_id
+                            )
+                        game[team_type]['logo_url'] = team.valve_cdn_image
+                        if t_created:
+                            update_teams.append(team_id)
             # Do League
-            try:
-                league_id = game['league_id']
-                league = League.objects.get(
-                    steam_id=league_id
-                    )
-                if league.logo_image:
-                    logo_url = league.logo_image.url
-                    game['league_logo_url'] = logo_url
-                else:
-                    game['league_logo_url'] = ''
-            except League.DoesNotExist:
-                game['league_logo_url'] = ''
+            league_id = game['league_id']
+            league, l_created = League.objects.get_or_create(
+                steam_id=league_id
+                )
+            game['league_logo_url'] = league.valve_cdn_image
+            if l_created:
+                update_leagues.append(league_id)
+
+        self.update_leagues = update_leagues
+        self.update_teams = update_teams
 
         return data
 
-    def _store_data(self, data):
-        # redis.set(settings.LIVE_JSON_KEY, json.dumps(urldata['result']))
-        redis.set(settings.LIVE_JSON_KEY, json.dumps(data))
-
-    def _find_update_teams(self, data):
-        update_teams = []
-        for game in data['games']:
-            # Do Teams
-            for team_type in ['radiant_team', 'dire_team']:
-                if team_type in game.keys():
-                    if 'team_id' in game[team_type].keys():
-                        try:
-                            team_id = game[team_type]['team_id']
-                            Team.objects.get(
-                                steam_id=team_id
-                            )
-                        except Team.DoesNotExist:
-                            update_teams.append(team_id)
-        return update_teams
-
-    def _find_update_leagues(self, data):
-        update_leagues = []
-        for game in data['games']:
-            try:
-                league_id = game['league_id']
-                League.objects.get(
-                    steam_id=league_id
-                )
-            except League.DoesNotExist:
-                game['league_logo_url'] = ''
-                update_leagues.append(league_id)
-        return update_leagues
+    def _setup(self, urldata):
+        urldata = self._clean_urldata(urldata)
+        self._get_heroes()
+        self._get_items()
+        return urldata
 
     def _update_teams(self, update_teams):
         if update_teams is not None:
@@ -152,7 +280,7 @@ class UpdateLiveGames(ApiFollower):
         """
         Strips out request-level response from valve.
         """
-        return urldata['result']
+        return urldata['result']['games']
 
 
 class MirrorLeagueSchedule(Task):
@@ -315,7 +443,6 @@ class UpdateLeagueSchedule(ApiFollower):
             league = League.objects.get(
                 steam_id=game['league_id']
             )
-            print self._object_outdated(league), league
             if self._object_outdated(league):
                 update_leagues.add(league.steam_id)
         logger.info("Leagues that need updating: {0}".format(update_leagues))

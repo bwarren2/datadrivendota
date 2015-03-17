@@ -1,7 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class='row' id='games'></div>
+    <div class='row' id='games'>
+        {% comment %}
+        {% for game in games %}
+
+
+        <a href="{% url 'leagues:live_game_detail' match_id=game.steam_id %}">
+        </a>
+        <div id={{league_id}} class='col-md-2'>
+
+            <img id="{{dire_team.team_id}}" src="{{dire_team.logo_url}}" class='thumbnail'>
+            <img id="{{radiant_team.team_id}}"src="{{radiant_team.logo_url}}" class='thumbnail'>
+            <p class='overlayer'>{{match_id}}</p>
+        </div>
+        {% endfor %}
+        {% endcomment %}
+
+    </div>
 
 
 {% endblock content %}
@@ -10,19 +26,19 @@
 Current Live Games
 {% endblock title %}
 
-{% block pagetitle %}
+{% block page_title %}
 Current Live Games
-{% endblock pagetitle %}
+{% endblock page_title %}
 
 {% block extra_js %}
 
-{% comment %}
-    Helperthings!
-{% endcomment %}
 <script type="text/javascript" src='https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js'></script>
 <script src="http://cdn.jsdelivr.net/handlebarsjs/3.0.0/handlebars.js"></script>
 
 
+{% comment %}
+    Helperthings!
+{% endcomment %}
 <script type="text/x-handlebars-template" id='game-template'>
 {% verbatim %}
     {{#games}}
@@ -32,13 +48,14 @@ Current Live Games
     </div>
     --}}
 
+        <a href="/leagues/live-game-detail/{{match_id}}">
         <div id={{league_id}} class='col-md-2'>
 
-            {{!-- <img src="{{image_url}}" class='thumbnail'> --}}
-            <img id="{{dire_team.team_id}}" src="{{dire_team.logo_url}}" class='thumbnail'>
-            <img id="{{radiant_team.team_id}}"src="{{radiant_team.logo_url}}" class='thumbnail'>
+            <img id="{{league_id}}" src="{{league_logo_url}}" class='thumbnail'>
+            {{!-- <img id="{{radiant_team.team_id}}"src="{{radiant_team.logo_url}}" class='thumbnail'> --}}
             <p class='overlayer'>{{match_id}}</p>
         </div>
+        </a>
     {{/games}}
 {% endverbatim %}
 </script>

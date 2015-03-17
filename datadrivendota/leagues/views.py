@@ -1,11 +1,12 @@
 import json
+from collections import defaultdict
 from django.http import HttpResponse
-
 from rest_framework import viewsets
 from django.views.generic import ListView, DetailView, TemplateView
 from utils.pagination import SmarterPaginator
-from django.conf import settings
 
+from heroes.models import Hero
+from items.models import Item
 from .models import League, ScheduledMatch
 from .serializers import LeagueSerializer
 from matches.models import Match, PlayerMatchSummary
@@ -15,7 +16,7 @@ from .mixins import (
     PickBanMixin,
 )
 from datadrivendota.views import ChartFormView, ApiView, JsonApiView
-from datadrivendota.redis_app import redis_app as redis
+from datadrivendota.redis_app import load_games, timeline_key, redis_app
 
 
 class ScheduledMatchList(ListView):
@@ -139,7 +140,7 @@ class LiveGameListView(TemplateView):
     """
 
     """
-    title = "Live Games!"
+    title = "Particular Game!"
     template_name = "leagues/live_game_list.html"
 
 
@@ -149,6 +150,14 @@ class LiveGameDetailView(TemplateView):
     """
     title = "Live Games!"
     template_name = "leagues/live_game_detail.html"
+
+    def get_context_data(self, **kwargs):
+
+        match_id = int(kwargs['match_id'])
+        context = {
+            'match_id': match_id
+        }
+        return super(LiveGameDetailView, self).get_context_data(**context)
 
 
 class ApiWinrateChart(WinrateMixin, ApiView):
@@ -183,7 +192,7 @@ def league_list(request):
 class ApiLiveGamesList(JsonApiView):
 
     def fetch_json(self, *args, **kwargs):
-        data = json.loads(redis.get(settings.LIVE_JSON_KEY))['games']
+        data = load_games()
         return data
 
 
@@ -192,19 +201,15 @@ class ApiLiveGameDetail(JsonApiView):
     def get_context_data(self, **kwargs):
         if 'match_id' in kwargs:
             kwargs['match_id'] = int(kwargs['match_id'])
-        print type(kwargs['match_id'])
         return kwargs
 
     def fetch_json(self, *args, **kwargs):
-        data = json.loads(redis.get(settings.LIVE_JSON_KEY))['games']
-        # print data
-        for game in data:
-            print game['match_id'], kwargs['match_id'],
-            if game['match_id'] == kwargs['match_id']:
-                print "harro!"
-                return game
-        print "Frowny face!"
-        self.fail()
+        key = timeline_key(kwargs['match_id'])
+        data = redis_app.get(key)
+        if data is not None:
+            return data
+        else:
+            self.fail()
 
 
 class LeagueViewSet(viewsets.ReadOnlyModelViewSet):

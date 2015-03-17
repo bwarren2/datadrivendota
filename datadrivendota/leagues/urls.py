@@ -30,7 +30,7 @@ urlpatterns = patterns(
         name='live_games'
         ),
     url(
-        r'^live-game-detail/$',
+        r'^live-game-detail/(?P<match_id>[0-9\-]*)$',
         views.LiveGameDetailView.as_view(),
         name='live_game_detail'
         ),

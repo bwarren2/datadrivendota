@@ -174,6 +174,7 @@ class Command(BaseCommand):
                 reader.next()
                 for row in reader:
                     try:
+                        print row[0]
                         doss = HeroDossier.objects.get(hero__name=row[0])
                         doss.atk_point = row[1]
                         doss.atk_backswing = row[2]

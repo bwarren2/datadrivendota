@@ -1885,11 +1885,9 @@ var updatingScatter = function(heroes, timeslice, minmax, x_var, y_var, target,p
       console.log('No offset')
       pip_left_offset = margin.left
     }
-    console.log(pip_left_offset)
 
     var width = params.width - margin.right - margin.left,
         height = params.height - margin.top - margin.bottom;
-    console.log(margin)
 
     var x = d3.scale.linear()
         .domain([
@@ -1954,10 +1952,6 @@ var updatingScatter = function(heroes, timeslice, minmax, x_var, y_var, target,p
             .style('position', 'absolute')
             .style("left", pip_left_offset+x(val[x_var])+'px')
             .style("top", margin.top+y(val[y_var])+'px');
-        console.log(heroes[val.hero_idx]['name'],
-          margin.left+x(val[x_var]),
-          x(val[x_var]),
-          val[x_var])
     })
 
     svg.selectAll(selector +' circle').data(timeslice)

@@ -63,3 +63,4 @@ ddd.sublime-workspace
 kernprof*
 
 datadrivendota/static/replay_parse_json
+datadrivendota/celerybeat-schedule

@@ -16,10 +16,9 @@ class Command(BaseCommand):
         # of the stdlib.
         # --kit 2014-02-16
         diction = {'key': STEAM_API_KEY, 'language': 'en_us'}
-        response = urllib2.urlopen(
-            "https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?"
-            + urlencode(diction)
-        )
+        url = "https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?"+ urlencode(diction)
+        print "URL: {0}".format(url)
+        response = urllib2.urlopen(url)
         html = response.read()
         data = json.loads(html)
 

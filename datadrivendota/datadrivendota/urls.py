@@ -10,6 +10,7 @@ from matches.views import parse_preview
 
 from teams.views import TeamViewSet
 from leagues.views import LeagueViewSet
+from heroes.views import HeroViewSet
 from rest_framework.routers import DefaultRouter
 
 admin.autodiscover()
@@ -18,6 +19,7 @@ admin.autodiscover()
 router = DefaultRouter()
 router.register('teams', TeamViewSet)
 router.register('leagues', LeagueViewSet)
+router.register('heroes', HeroViewSet)
 
 urlpatterns = patterns(
     '',
@@ -56,6 +58,11 @@ urlpatterns = patterns(
 
     url(r'^robots\.txt/$', TemplateView.as_view(template_name='robots.txt',
         content_type='text/plain')),
+    url(
+        r'^styles/$',
+        TemplateView.as_view(template_name='bootstrap_test.html'),
+        name='styles'
+    ),
     url(
         '',
         include('social.apps.django_app.urls', namespace='social')

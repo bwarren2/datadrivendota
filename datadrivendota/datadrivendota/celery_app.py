@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from os import getenv
 from kombu import Exchange, Queue
 from django.conf import settings
-
+from datetime import timedelta
 from celery import Celery
 
 app = Celery('datadrivendota')
@@ -311,6 +311,20 @@ class Config(object):
 
     }
 
+    CELERYBEAT_SCHEDULE = {
+        # 'reflect-item-schema-hourly': {
+        #     'task': 'items.management.tasks.MirrorItemSchema',
+        #     'schedule': timedelta(hours=1),
+        # },
+        # 'reflect-league-schedule-hourly': {
+        #     'task': 'leagues.management.tasks.MirrorLeagueSchedule',
+        #     'schedule': timedelta(hours=1),
+        # },
+        'reflect-league-schedule-hourly': {
+            'task': 'leagues.management.tasks.MirrorLiveGames',
+            'schedule': timedelta(seconds=10),
+        },
+    }
 
 app.config_from_object(Config)
 
