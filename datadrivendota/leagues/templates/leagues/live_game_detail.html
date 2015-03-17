@@ -246,8 +246,16 @@ $(function(){
         cells.attr('class', 'update');
 
 
-        cells.text(function(d){
-            return d.value}
+        cells.html(
+            function(d){
+                if(d.key!=='hero_url'){
+                    return d.value
+                }else{
+                    return '<img class="table-face" src='+d.value+'>'
+
+                }
+            }
+
         );
 
         // Cells exit selection
@@ -292,10 +300,8 @@ $(function(){
         .duration(500)
         .style('opacity', 1.0);
 
-        cells_in_new_rows.html(function(d){return d.value});
         cells_in_new_rows.html(
             function(d){
-                console.log(d)
                 if(d.key!=='hero_url'){
                     return d.value
                 }else{
