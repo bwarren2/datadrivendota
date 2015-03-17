@@ -7,6 +7,7 @@ from heroes.mommy_recipes import hero, make_hero
 from players.mommy_recipes import player
 from items.mommy_recipes import item
 from heroes.models import Ability
+from random import randint
 
 match = Recipe(
     Match,
