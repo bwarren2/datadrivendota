@@ -5,7 +5,7 @@ urlpatterns = patterns(
     '',
     url(r'^$', views.LeagueList.as_view(), name='index'),
     url(
-        r'^scheduled_matches$',
+        r'^scheduled-matches$',
         views.ScheduledMatchList.as_view(),
         name='scheduled_matches'
     ),
