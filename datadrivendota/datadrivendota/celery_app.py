@@ -312,18 +312,18 @@ class Config(object):
     }
 
     CELERYBEAT_SCHEDULE = {
-        # 'reflect-item-schema-hourly': {
-        #     'task': 'items.management.tasks.MirrorItemSchema',
-        #     'schedule': timedelta(hours=1),
-        # },
+        'reflect-item-schema-hourly': {
+            'task': 'items.management.tasks.MirrorItemSchema',
+            'schedule': timedelta(hours=1),
+        },
         # 'reflect-league-schedule-hourly': {
         #     'task': 'leagues.management.tasks.MirrorLeagueSchedule',
         #     'schedule': timedelta(hours=1),
         # },
-        'reflect-league-schedule-hourly': {
-            'task': 'leagues.management.tasks.MirrorLiveGames',
-            'schedule': timedelta(seconds=10),
-        },
+        # 'reflect-league-schedule-hourly': {
+        #     'task': 'leagues.management.tasks.MirrorLiveGames',
+        #     'schedule': timedelta(seconds=10),
+        # },
     }
 
 app.config_from_object(Config)
