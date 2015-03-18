@@ -46,15 +46,10 @@ class Command(BaseCommand):
         keep_going = False
         for ability, data_dict in abilities.iteritems():
             print ability
-            # if ability == 'oracle_fortunes_end':
-            #     import pdb;pdb.set_trace()
-            if ability == 'greevil_miniboss_orange_light_strike_array':
-                keep_going = False
-            if keep_going:
-                continue
             ab = Ability.objects.get_or_create(
                 steam_id=data_dict['ID'],
                 )[0]
+            print ab
             for key, value in mapping_dict.iteritems():
                 try:
                     trait = data_dict.get(key)
