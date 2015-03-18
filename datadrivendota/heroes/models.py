@@ -118,7 +118,7 @@ class Ability(models.Model):
         max_length=150
     )
     machine_name = models.CharField(
-        help_text="Valve's underscore name",
+        help_text="Valve's underscore name, slugified",
         max_length=150,
         unique=True
     )
