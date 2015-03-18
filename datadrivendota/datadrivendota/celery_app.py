@@ -91,6 +91,14 @@ class Config(object):
             'exchange': 'rpr',
             'routing_key': 'rpr'
         },
+        'items.management.tasks.MirrorItemSchema': {
+            'exchange': 'db',
+            'routing_key': 'db'
+        },
+        'items.management.tasks.UpdateItemSchema': {
+            'exchange': 'db',
+            'routing_key': 'db'
+        },
         'matches.management.tasks.UpdateMatch': {
             'exchange': 'db',
             'routing_key': 'db'
@@ -189,6 +197,16 @@ class Config(object):
     CELERY_ANNOTATIONS = {
         "datadrivendota.management.tasks.ValveApiCall": {
             "rate_limit": VALVE_RATE,
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'items.management.tasks.UpdateItemSchema': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'items.management.tasks.MirrorItemSchema': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
@@ -316,14 +334,14 @@ class Config(object):
             'task': 'items.management.tasks.MirrorItemSchema',
             'schedule': timedelta(hours=1),
         },
-        # 'reflect-league-schedule-hourly': {
-        #     'task': 'leagues.management.tasks.MirrorLeagueSchedule',
-        #     'schedule': timedelta(hours=1),
-        # },
-        # 'reflect-league-schedule-hourly': {
-        #     'task': 'leagues.management.tasks.MirrorLiveGames',
-        #     'schedule': timedelta(seconds=10),
-        # },
+        'reflect-league-schedule-hourly': {
+            'task': 'leagues.management.tasks.MirrorLeagueSchedule',
+            'schedule': timedelta(hours=1),
+        },
+        'reflect-league-schedule-hourly': {
+            'task': 'leagues.management.tasks.MirrorLiveGames',
+            'schedule': timedelta(seconds=10),
+        },
     }
 
 app.config_from_object(Config)
