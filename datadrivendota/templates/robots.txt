@@ -8,3 +8,4 @@ Disallow: /players/api/
 Disallow: /teams/api/
 Disallow: /items/api/
 Disallow: /guilds/api/
+Disallow: /items/
