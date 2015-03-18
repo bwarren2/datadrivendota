@@ -12,11 +12,11 @@ def get_league_schema():
     data = get_item_schema()
     return_dct = {}
     for key, val in data.iteritems():
-        if (
-            'prefab' in val.keys() and val['prefab'] == 'league'
-            and 'league_id' in val['tool']['usage'].keys()
-        ):
-            league_id = int(val['tool']['usage']['league_id'])
-            return_dct[league_id] = val
-            return_dct[league_id]['itemdef'] = key
+        if 'prefab' in val and 'tool' in val:
+            if val['prefab'] == 'league' and 'usage' in val['tool']:
+                if 'league_id' in val['tool']['usage']:
+                    league_id = int(val['tool']['usage']['league_id'])
+                    return_dct[league_id] = val
+                    return_dct[league_id]['itemdef'] = key
+
     return return_dct
