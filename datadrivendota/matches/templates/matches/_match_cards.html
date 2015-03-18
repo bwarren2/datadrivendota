@@ -20,11 +20,7 @@
   {% if match.radiant_team %}
     <div class="col-md-1">
       <div class='cast'>
-      {% if match.radiant_team.logo_image %}
-      <img class='league-pip' src="{{match.radiant_team.logo_image.url}}" alt='{{ match.radiant_team.name }}' title='{{match.radiant_team.name}}'>
-      {% else %}
-      <p>{{match.radiant_team.name}}</p>
-      {% endif %}
+      <img class='league-pip' src="{{match.radiant_team.image}}" alt='{{ match.radiant_team.name }}' title='{{match.radiant_team.name}}'>
       </div>
     </div>
   {% endif %}
@@ -51,11 +47,7 @@
     <div class="col-md-1">
       <div class='cast'>
 
-      {% if match.dire_team.logo_image %}
-      <img class='league-pip' src="{{match.dire_team.logo_image.url}}" alt='{{ match.dire_team.name }}' title='{{match.dire_team.name}}'>
-      {% else %}
-      <p>{{match.dire_team.name}}</p>
-      {% endif %}
+      <img class='league-pip' src="{{match.dire_team.image}}" alt='{{ match.dire_team.name }}' title='{{match.dire_team.name}}'>
       </div>
     </div>
   {% endif %}

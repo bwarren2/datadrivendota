@@ -241,7 +241,7 @@ class UpdateLiveGames(ApiFollower):
                         team, t_created = Team.objects.get_or_create(
                             steam_id=team_id
                             )
-                        game[team_type]['logo_url'] = team.valve_cdn_image
+                        game[team_type]['logo_url'] = team.image
                         if t_created:
                             update_teams.append(team_id)
             # Do League
@@ -249,7 +249,7 @@ class UpdateLiveGames(ApiFollower):
             league, l_created = League.objects.get_or_create(
                 steam_id=league_id
                 )
-            game['league_logo_url'] = league.valve_cdn_image
+            game['league_logo_url'] = league.image
             if l_created:
                 update_leagues.append(league_id)
 
@@ -467,9 +467,9 @@ class UpdateLeagueSchedule(ApiFollower):
         Works for either team or league.
         """
         if (
-            obj.logo_image.name is None
-            or obj.logo_image.name == None
-            or obj.logo_image.name == ''
+            obj.valve_cdn_image is None
+            or obj.valve_cdn_image == None
+            or obj.valve_cdn_image == ''
             or obj.update_time < (
                 timezone.now() - timedelta(
                     seconds=settings.UPDATE_LAG_UTC
@@ -598,7 +598,6 @@ class UpdateLeagueLogo(ApiFollower):
     """
     def run(self, urldata):
         league = League.objects.get(steam_id=self.api_context.league_id)
-        filename = '{0}.png'.format(self.api_context.iconname)
         url = '{0}{1}'.format(
             settings.VALVE_CDN_PATH,
             urldata['result']['path']
@@ -609,9 +608,6 @@ class UpdateLeagueLogo(ApiFollower):
         with open('%s.png' % str(uuid4()), 'w+') as f:
             f.write(imgdata.read())
 
-        league.logo_image.save(
-            filename, File(open(f.name))
-            )
         league.valve_cdn_image = url
         league.save()
         os.remove(f.name)
@@ -688,75 +684,75 @@ class MirrorLeagueGames(ApiFollower):
             c.delay()
 
 
-class MirrorLeagueLogos(Task):
-    """
-    DEPRECATED
+# class MirrorLeagueLogos(Task):
+#     """
+#     DEPRECATED
 
-    Annexes the url data for league logos from the item schema and updates the logo fields
-    """
+#     Annexes the url data for league logos from the item schema and updates the logo fields
+#     """
 
-    def run(self):
-        c = ApiContext()
-        vac = ValveApiCall()
-        ull = UpdateLeagueLogos()
-        c = chain(vac.s(api_context=c, mode='GetSchema'), ull.s())
-        c.delay()
+#     def run(self):
+#         c = ApiContext()
+#         vac = ValveApiCall()
+#         ull = UpdateLeagueLogos()
+#         c = chain(vac.s(api_context=c, mode='GetSchema'), ull.s())
+#         c.delay()
 
 
-class UpdateLeagueLogos(ApiFollower):
-    """ Takes a given schema result and annexes logo urls."""
+# class UpdateLeagueLogos(ApiFollower):
+#     """ Takes a given schema result and annexes logo urls."""
 
-    def run(self, urldata):
-        raise Exception('Geborked filter, fix.')
-        leagues = League.objects.filter('')
-        data = self.result['items']
-        mapping = {d['defindex']: d['image_url'] for d in data}
-        blank_URL = (
-            'http://s3.amazonaws.com/datadrivendota'
-            '/images/blank-logo.png'
-        )
+#     def run(self, urldata):
+#         raise Exception('Geborked filter, fix.')
+#         leagues = League.objects.filter('')
+#         data = self.result['items']
+#         mapping = {d['defindex']: d['image_url'] for d in data}
+#         blank_URL = (
+#             'http://s3.amazonaws.com/datadrivendota'
+#             '/images/blank-logo.png'
+#         )
 
-        logger.info('Forming league URLs for {0} leagues'.format(len(leagues)))
-        for league in leagues:
-            logger.info('Doing {0} (ID: {1}'.format(
-                league.name,
-                league.league.steam_id
-                ))
-            filename = slugify(league.name)+'.png'
-            try:
-                url = mapping[league.item_def]
-                if url != '':
-                    imgdata = urllib2.urlopen(url, timeout=5)
-                    with open('%s.png' % str(uuid4()), 'w+') as f:
-                        f.write(imgdata.read())
-                    league.logo_image.save(
-                        filename, File(open(f.name))
-                    )
-                    os.remove(f.name)
-                else:
-                    imgdata = urllib2.urlopen(blank_URL, timeout=5)
-                    with open('%s.png' % str(uuid4()), 'w+') as f:
-                        f.write(imgdata.read())
+#         logger.info('Forming league URLs for {0} leagues'.format(len(leagues)))
+#         for league in leagues:
+#             logger.info('Doing {0} (ID: {1}'.format(
+#                 league.name,
+#                 league.league.steam_id
+#                 ))
+#             filename = slugify(league.name)+'.png'
+#             try:
+#                 url = mapping[league.item_def]
+#                 if url != '':
+#                     imgdata = urllib2.urlopen(url, timeout=5)
+#                     with open('%s.png' % str(uuid4()), 'w+') as f:
+#                         f.write(imgdata.read())
+#                     league.logo_image.save(
+#                         filename, File(open(f.name))
+#                     )
+#                     os.remove(f.name)
+#                 else:
+#                     imgdata = urllib2.urlopen(blank_URL, timeout=5)
+#                     with open('%s.png' % str(uuid4()), 'w+') as f:
+#                         f.write(imgdata.read())
 
-                    league.logo_image.save(
-                        filename, File(open(f.name))
-                        )
-                    os.remove(f.name)
+#                     league.logo_image.save(
+#                         filename, File(open(f.name))
+#                         )
+#                     os.remove(f.name)
 
-            except (urllib2.URLError, ssl.SSLError, socket.timeout):
-                self.retry()
-            except (KeyError):
-                if league.logo_image is None:
-                    imgdata = urllib2.urlopen(blank_URL, timeout=5)
-                    with open('%s.png' % str(uuid4()), 'w+') as f:
-                        f.write(imgdata.read())
+#             except (urllib2.URLError, ssl.SSLError, socket.timeout):
+#                 self.retry()
+#             except (KeyError):
+#                 if league.logo_image is None:
+#                     imgdata = urllib2.urlopen(blank_URL, timeout=5)
+#                     with open('%s.png' % str(uuid4()), 'w+') as f:
+#                         f.write(imgdata.read())
 
-                    league.logo_image.save(
-                        filename, File(open(f.name))
-                        )
-                    os.remove(f.name)
-            imgdata = None
-            gc.collect()
+#                     league.logo_image.save(
+#                         filename, File(open(f.name))
+#                         )
+#                     os.remove(f.name)
+#             imgdata = None
+#             gc.collect()
 
 
 class AcquireHiddenLeagueGames(Task):

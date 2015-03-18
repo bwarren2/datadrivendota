@@ -156,48 +156,21 @@ class UpdateTeamLogo(ApiFollower):
         team = Team.objects.get(steam_id=self.api_context.team_id)
         URL = urldata['data']['url']
         try:
-            # imgdata = urllib2.urlopen(URL, timeout=5)
-            # with open('%s.png' % str(uuid4()), 'w+') as f:
-            #     foo = imgdata.read()
-            #     print foo
-            #     f.write(foo)
-            # filename = slugify(team.name) + '.png'
             if self.api_context.logo_type == 'team':
-                #     team.logo_image.save(
-                #         filename, File(open(f.name))
-                #         )
                 team.valve_cdn_image = URL
                 print URL
             else:
-                # team.logo_sponsor_image.save(
-                #     filename, File(open(f.name))
-                # )
                 team.valve_cdn_sponsor_image = URL
-
-            # os.remove(f.name)
             team.save()
 
         # If we fail, put in a placeholder and freak.
         except Exception:
-                filename = slugify(team.name)+'_logo.png'
-                URL = ('https://s3.amazonaws.com/datadrivendota'
-                       '/images/blank-logo.png')
-                imgdata = urllib2.urlopen(URL, timeout=5)
-                with open('%s.png' % str(uuid4()), 'w+') as f:
-                    f.write(imgdata.read())
-
-                if self.api_context.logo_type == 'team':
-                    team.logo_image.save(
-                        filename, File(open(f.name))
-                        )
-                    team.valve_cdn_image = URL
-                else:
-                    team.logo_sponsor_image.save(
-                        filename, File(open(f.name))
-                    )
-                    team.valve_cdn_sponsor_image = URL
-                os.remove(f.name)
-                raise
+            if self.api_context.logo_type == 'team':
+                team.valve_cdn_image = URL
+                print URL
+            else:
+                team.valve_cdn_sponsor_image = URL
+            raise
 
     def failout(self):
         logger.error("I failed :( {0}".format(repr(self.api_context)))

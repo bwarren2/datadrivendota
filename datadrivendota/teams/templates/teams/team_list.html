@@ -9,12 +9,7 @@
     {% for team in team_list %}
         <div class='col-md-2'>
             <a href="{% url 'teams:detail' steam_id=team.steam_id %}" class='thumbnail'>
-                {% if team.logo_image %}
-                    <img  src="{{team.logo_image.url}}" alt='{{team.name}}'>
-
-                {% else %}
-                    <img class='thumbnail' alt='{{team.name}}'>
-                {% endif %}
+                <img  src="{{team.image}}" alt='{{team.name}}'>
             </a>
             <p class='overlayer'>{{team.name}}</p>
 

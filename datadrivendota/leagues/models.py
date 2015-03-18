@@ -4,19 +4,28 @@ from django.utils import timezone
 
 
 class League(models.Model):
-    """Analogous to a tournament, these are game series to which you can buy a ticket in the game client"""
+    """
+    Analogous to a tournament, these are game series to which you can buy a ticket in the game client
+    """
     steam_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=200, null=True)  # Made up constant
-    description = models.CharField(max_length=300, null=True)  # Made up constant
+    description = models.CharField(max_length=300, null=True)
     tournament_url = models.CharField(max_length=300, null=True)
     item_def = models.IntegerField(null=True)
-    logo_image = models.ImageField(
-        upload_to='leagues/img/', null=True, default='blank_team.png'
-    )
     valve_cdn_image = models.TextField(
         null=True, help_text='Steam cdn image url'
     )
     update_time = models.DateTimeField(default=timezone.now)
+
+    @property
+    def image(self):
+        if self.valve_cdn_image is None:
+            return (
+                'https://s3.amazonaws.com/datadrivendota/'
+                'blanks/blank_league.png'
+            )
+        else:
+            return self.valve_cdn_image
 
     @property
     def display_name(self):

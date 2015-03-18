@@ -41,9 +41,7 @@ class LeagueList(ListView):
     paginate_by = 32
 
     def get_queryset(self):
-        qs = self.model.recency.all().select_related().exclude(
-            logo_image=None
-            )
+        qs = self.model.recency.all().select_related()
         return qs
 
     def paginate_queryset(self, queryset, page_size):

@@ -9,15 +9,13 @@
 {% endblock page_title %}
 {% block content %}
     {% for league in league_list %}
-        {% if league.logo_image %}
         <div class='col-md-3'>
             <a href="{% url 'leagues:detail' steam_id=league.steam_id %}" class='thumbnail'>
-                <img src="{{ league.logo_image.url }}" alt="{{league.name}}"/>
+                <img src="{{ league.image }}" alt="{{league.name}}"/>
             </a>
             <p class='overlayer'>{{league.display_name}}</p>
 
         </div>
-        {% endif %}
     {% endfor %}
     </div>
     {% comment %}

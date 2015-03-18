@@ -87,19 +87,24 @@ class TestLeagueScheduleUpdate(TestCase):
         )
 
         for team in Team.objects.all():
-            fake_logo(team)
+            team.valve_cdn_image = None
+            team.save()
 
         test_team = Team.objects.all()[0]
+        test_team.valve_cdn_image = 'http://www.whatever.com/test.png'
+        test_team.save()
         # Has logo image, recent update time
         self.assertEqual(self.task._object_outdated(test_team), False)
 
         # Has logo image, old update time
         test_team.update_time = timezone.now() - timedelta(days=10)
+        test_team.valve_cdn_image = 'http://www.whatever.com/test.png'
         test_team.save()
         self.assertEqual(self.task._object_outdated(test_team), True)
 
         # Has no logo image, old update time
-        test_team.logo_image.delete()
+        test_team.valve_cdn_image = ''
+        test_team.save()
         self.assertEqual(self.task._object_outdated(test_team), True)
 
         # Has no logo image, new update time
@@ -119,16 +124,17 @@ class TestLeagueScheduleUpdate(TestCase):
         for game in data['games']:
 
             t = Team.objects.get(steam_id=game['teams'][0]['team_id'])
-            fake_logo(t)
+            remove_logo(t)
             teams.append(t)
 
             t = Team.objects.get(steam_id=game['teams'][1]['team_id'])
-            fake_logo(t)
+            remove_logo(t)
             teams.append(t)
 
         teams[0].update_time = timezone.now() - timedelta(weeks=20)
         teams[0].save()
-        teams[2].logo_image.delete()
+        teams[2].valve_cdn_image = None
+        teams[2].save()
 
         # print "Expected: {0}".format([teams[0].steam_id, teams[2].steam_id])
         # print "Got: {0}".format(self.task.find_update_teams(data))
@@ -151,7 +157,7 @@ class TestLeagueScheduleUpdate(TestCase):
         for game in data['games']:
 
             l = League.objects.get(steam_id=game['league_id'])
-            fake_logo(l)
+            remove_logo(l)
             leagues.append(l)
 
         # Make a league look very out of date
@@ -254,7 +260,6 @@ class TestLiveGames(FastFixtureTestCase):
         #     f.write(json.dumps(lst))
 
 
-def fake_logo(obj):
-    fakery = StringIO()
-    fakery.write('foo')
-    obj.logo_image.save('binky.jpg', File(fakery))
+def remove_logo(team):
+    team.valve_cdn_image = None
+    team.save()

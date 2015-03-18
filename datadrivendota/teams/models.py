@@ -34,10 +34,6 @@ class Team(models.Model):
         'players.Player', related_name='team_admin', null=True
         )
     leagues = models.ManyToManyField('leagues.League')
-    logo_image = models.ImageField(
-        null=True, upload_to='teams/img/', default='blank_team.png'
-    )
-    logo_sponsor_image = models.ImageField(null=True, upload_to='teams/img/')
     valve_cdn_image = models.TextField(
         null=True, help_text='Steam cdn image url'
     )
@@ -49,6 +45,16 @@ class Team(models.Model):
     objects = models.Manager()
     sorted = SortedTeamManager()
     TI4 = TI4TeamManager()
+
+    @property
+    def image(self):
+        if self.valve_cdn_sponsor_image is not None:
+            return self.valve_cdn_sponsor_image
+        else:
+            return (
+                'https://s3.amazonaws.com/datadrivendota/'
+                'blanks/blank_team.png'
+                )
 
     def save(self, *args, **kwargs):
         self.update_time = timezone.now()

@@ -7,7 +7,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
     def get_logo_url(self, obj):
         try:
-            return obj.logo_image.url
+            return obj.image
         except ValueError:
             return ''
 

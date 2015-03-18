@@ -1,9 +1,6 @@
-{% if league.logo_image %}
-
 <div class="col-md-3">
   <a href="{% url 'leagues:detail' steam_id=league.league.steam_id %}" class="thumbnail">
-    <img src="{{ league.logo_image.url }}" alt="{{ league.name }}" class="league-portrait">
+    <img src="{{ league.image }}" alt="{{ league.name }}" class="league-portrait">
     <p class='overlayer'>{{ league.display_name }}</p>
   </a>
 </div>
-{% endif %}
