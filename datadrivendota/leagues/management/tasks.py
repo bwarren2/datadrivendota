@@ -49,7 +49,7 @@ class MirrorLiveGames(Task):
         vac = ValveApiCall()
         ulg = UpdateLiveGames()
         c = chain(
-            vac.s(api_context=c, mode='GetSchemaURL'),
+            vac.s(api_context=c, mode='GetLiveLeagueGames'),
             ulg.s()
         )
         c.delay()
