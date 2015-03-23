@@ -301,7 +301,7 @@ def hero_list(request):
     return HttpResponse(data, mimetype)
 
 
-#API endpoints
+# API endpoints
 class ApiVitalsChart(VitalsMixin, ApiView):
     pass
 
@@ -331,7 +331,7 @@ class ApiHeroPerformanceLineupChart(HeroPerformanceLineupMixin, ApiView):
 
 
 class HeroViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Hero.public.all()
+    queryset = Hero.objects.all()
     paginate_by = None
     serializer_class = HeroSerializer
     lookup_field = 'steam_id'

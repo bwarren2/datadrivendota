@@ -1,12 +1,9 @@
 import json
-from collections import defaultdict
 from django.http import HttpResponse
 from rest_framework import viewsets
 from django.views.generic import ListView, DetailView, TemplateView
 from utils.pagination import SmarterPaginator
 
-from heroes.models import Hero
-from items.models import Item
 from .models import League, ScheduledMatch
 from .serializers import LeagueSerializer
 from matches.models import Match, PlayerMatchSummary
@@ -16,7 +13,12 @@ from .mixins import (
     PickBanMixin,
 )
 from datadrivendota.views import ChartFormView, ApiView, JsonApiView
-from datadrivendota.redis_app import load_games, timeline_key, redis_app
+from datadrivendota.redis_app import (
+        get_games,
+        timeline_key,
+        redis_app,
+        slice_key
+    )
 
 
 class ScheduledMatchList(ListView):
@@ -141,6 +143,17 @@ class LiveGameListView(TemplateView):
     title = "Particular Game!"
     template_name = "leagues/live_game_list.html"
 
+    def get_context_data(self, **kwargs):
+
+        context = {
+            'games': sorted(
+                get_games(),
+                key=lambda game: (game['scoreboard']['duration'] if 'scoreboard' in game else 0),
+                reverse=True
+            )
+        }
+        return super(LiveGameListView, self).get_context_data(**context)
+
 
 class LiveGameDetailView(TemplateView):
     """
@@ -190,7 +203,7 @@ def league_list(request):
 class ApiLiveGamesList(JsonApiView):
 
     def fetch_json(self, *args, **kwargs):
-        data = load_games()
+        data = get_games()
         return data
 
 
@@ -203,6 +216,22 @@ class ApiLiveGameDetail(JsonApiView):
 
     def fetch_json(self, *args, **kwargs):
         key = timeline_key(kwargs['match_id'])
+        data = redis_app.get(key)
+        if data is not None:
+            return data
+        else:
+            self.fail()
+
+
+class ApiLiveGameSlice(JsonApiView):
+
+    def get_context_data(self, **kwargs):
+        if 'match_id' in kwargs:
+            kwargs['match_id'] = int(kwargs['match_id'])
+        return kwargs
+
+    def fetch_json(self, *args, **kwargs):
+        key = slice_key(kwargs['match_id'])
         data = redis_app.get(key)
         if data is not None:
             return data

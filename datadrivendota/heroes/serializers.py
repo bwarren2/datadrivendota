@@ -13,4 +13,4 @@ class HeroSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Hero
-        fields = ('steam_id', 'internal_name', 'name', 'image_url')
+        fields = ('steam_id', 'internal_name', 'name', 'image_url', 'visible')

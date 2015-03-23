@@ -60,9 +60,6 @@
                 <li role="presentation" class="dropdown-header">Advanced Charts</li>
                 <li class="{% active 'heroes:vitals' %}"><a href="{% url 'heroes:vitals' %}">Vitals</a></li>
                 <li class="{% active 'heroes:lineup' %}"><a href="{% url 'heroes:lineup' %}">Lineups</a></li>
-                <li class="{% active 'heroes:hero_performance' %}"><a href="{% url 'heroes:hero_performance' %}">Performance Scatter</a></li>
-                <li class="{% active 'heroes:hero_performance_lineup' %}"><a href="{% url 'heroes:hero_performance_lineup' %}">Performance Lineup</a></li>
-                <li class="{% active 'heroes:hero_skill_progressions' %}"><a href="{% url 'heroes:hero_skill_progression' %}">Skill Progression</a></li>
               </ul>
             </li>
 
@@ -71,12 +68,6 @@
               <ul class="dropdown-menu">
                 <li class="{% active 'matches:index' %}"><a href="{% url 'matches:index' %}">Index</a></li>
                 <li role="presentation" class="divider"></li>
-                <li role="presentation" class="dropdown-header">Advanced Charts</li>
-                <li class="{% active 'matches:endgame' %}"><a href="{% url 'matches:endgame' %}">Endgame Charts</a></li>
-                <li class="{% active 'matches:team_endgame' %}"><a href="{% url 'matches:team_endgame' %}">Partial Team Endgame Charts</a></li>
-                <li class="{% active 'matches:own-team-endgame' %}"><a href="{% url 'matches:own_team_endgame' %}">Separate Team Endgame Charts</a></li>
-                <li class="{% active 'matches:ability_build' %}"><a href="{% url 'matches:ability_build' %}">Ability Build</a></li>
-                <li class="{% active 'matches:progression_list' %}"><a href="{% url 'matches:progession_list' %}">Match List Hero Progression</a></li>
               </ul>
             </li>
 
@@ -85,9 +76,6 @@
               <ul class="dropdown-menu">
                 <li class="{% active 'players:pro_index' %}"><a href="{% url 'players:pro_index' %}">Pro Index</a></li>
                 <li role="presentation" class="divider"></li>
-                <li role="presentation" class="dropdown-header">Advanced Charts</li>
-                <li class="{% active 'players:player_winrate' %}"><a href="{% url 'players:player_winrate' %}">Winrate</a></li>
-                <li class="{% active 'players:hero_abilities' %}"><a href="{% url 'players:hero_abilities' %}">Ability Comparison</a></li>
               </ul>
             </li>
 
@@ -99,16 +87,17 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Teams <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li class="{% active 'teams:index' %}"><a href="{% url 'teams:index' %}">Team Index</a></li>
-                <li class="{% active 'teams:winrate' %}"><a href="{% url 'teams:winrate' %}">Winrate</a></li>
-                <li class="{% active 'teams:pick_ban' %}"><a href="{% url 'teams:pick_ban' %}">Pick-Ban</a></li>
               </ul>
             </li>
             <li class="dropdown {% active 'leagues' main_nav %}">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Leagues<b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li class="{% active 'leagues:index' %}"><a href="{% url 'leagues:index' %}">Leagues Index</a></li>
-                <li class="{% active 'leagues:winrate' %}"><a href="{% url 'leagues:winrate' %}">Winrate</a></li>
-                <li class="{% active 'leagues:pick_ban' %}"><a href="{% url 'leagues:pick_ban' %}">Pick-Ban</a></li>
+                {% comment %}
+                // Not ready yet; move js out of tempalte.
+                <li class="{% active 'leagues:live_games' %}"><a href="{% url 'leagues:live_games' %}">Live Matches</a></li>
+                <li class="{% active 'leagues:scheduled_matches' %}"><a href="{% url 'leagues:scheduled_matches' %}">Scheduled Matches</a></li>
+                {% endcomment %}
               </ul>
             </li>
 
@@ -204,6 +193,8 @@
 
     {% endcomment %}
     {% compressed_js 'all' %}
+    {% compressed_js 'bluebird' %}
+    {% compressed_js 'handlebars' %}
 
       <script type="text/javascript">
         window.comboBox();

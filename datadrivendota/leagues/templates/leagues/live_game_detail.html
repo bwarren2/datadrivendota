@@ -31,7 +31,12 @@ Match #{{match_id}}
             </div>
             <div id='forward-button'>
                 <button id='forward-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
-                    <span  class="info glyphicon glyphicon-forward">
+                    <span class="info glyphicon glyphicon-forward">
+                </button>
+            </div>
+            <div id='autoplay-button'>
+                <button id='autoplay-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+                    <span class="info glyphicon glyphicon-refresh">
                 </button>
             </div>
             <div id='timer'>
@@ -41,8 +46,24 @@ Match #{{match_id}}
 
     </div>
 
-    <div id='map'>
-        <h2>Minimap</h2>
+    <div id='state'>
+        <div id='matchup'>
+            <h2>Matchup</h2>
+            <div id='logo-lineup'>
+                <div id='radiant-logo'>
+                </div>
+                <div id='dire-logo'>
+                </div>
+                <div id='league-logo'>
+                </div>
+                <div id='game-facts'>
+                </div>
+            </div>
+        </div>
+
+        <div id='map'>
+            <h2>Minimap</h2>
+        </div>
     </div>
 
 
@@ -69,6 +90,13 @@ Match #{{match_id}}
             <table id='scoreboard' class='table table-responsive table-condensed'>
                 <thead>
                     <td>Hero</td>
+                    <td >Name</td>
+                    <td ></td>
+                    <td ></td>
+                    <td ></td>
+                    <td ></td>
+                    <td ></td>
+                    <td ></td>
                     <td><p class='kills'>K</p></td>
                     <td><p class='deaths'>D</p></td>
                     <td><p class='assists'>A</p></td>
@@ -128,9 +156,6 @@ Match #{{match_id}}
 
 {% block extra_js %}
 
-<script type="text/javascript" src='https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js'></script>
-<script src="http://cdn.jsdelivr.net/handlebarsjs/3.0.0/handlebars.js"></script>
-
 
 {% comment %}
     Helperthings!
@@ -158,7 +183,8 @@ Match #{{match_id}}
 
 $(function(){
 
-    var interval_duration = 200;
+    var interval_duration = 1000;
+    var ping_duration = 10000;
     var tick_idx = 0;
     var tooltip_div = d3.select("body").append("div")
       .attr("class", "tooltip")
@@ -194,12 +220,35 @@ $(function(){
         var start = function(){myhandle = setInterval(play, interval_duration)}
         var stop = function (){ clearInterval(myhandle)}
 
-        $('#start-animation').click(function(){ start(); })
-        $('#stop-animation').click(function(){ stop(); })
+        $('#start-animation').click(
+            function(){
+              $('.animation-button').toggle();
+              start();
+            }
+        );
+        $('#stop-animation').click(function(){
+            $('.animation-button').toggle();
+            stop();
+        })
         $('#back-animation').click(function(){update_fn(-1);});
         $('#forward-animation').click(function(){update_fn(1);});
-    }
 
+    }
+    var bind_autoplay = function (update_fn){
+        var myhandle
+        var autoplay = function(){
+            myhandle = setInterval(update_fn, ping_duration)
+        }
+        var stop = function (){ clearInterval(myhandle)}
+
+        $('#stop-animation').click(function(){
+            stop();
+        })
+        $('#autoplay-animation').click(function(){
+            $('.animation-button').toggle();
+            autoplay();
+        });
+    }
     // Prep the ticker
     var make_update_trigger = function(timeline){
         function new_index(adder){
@@ -218,22 +267,30 @@ $(function(){
         }
         return myfun;
     }
+    var make_autoplay_trigger = function(timeline){
+        var myfun = function(){
+            tick_idx = timeline.length-1
+            timeslice = timeline[tick_idx];
+            $(document).trigger('update', [timeline[tick_idx]])
+            updateTimer(timeline[tick_idx]['states']['duration'])
+        }
+        return myfun;
+    }
 
     var update_table = function(players){
-        console.log('players', players)
         var update_data = []
         $.each(players, function(i, v){
             update_data.push(
                 cloneAndPluck(v,
-                    ['hero_url', 'kills', 'death', 'assists', 'kda2',
+                    ['hero_url', 'name', 'item0', 'item1', 'item2', 'item3', 'item4', 'item5', 'kills', 'death', 'assists', 'kda2',
                     'gold_per_min', 'xp_per_min']
                 )
             )
         })
 
+        img_list = ['hero_url', 'item0', 'item1', 'item2', 'item3', 'item4', 'item5'];
         // Select the table element
         var table = d3.select('table#scoreboard tbody');
-        console.log(update_data);
         var rows = table
                     .selectAll('tr')
                     .data(update_data)
@@ -246,24 +303,37 @@ $(function(){
         cells.attr('class', 'update');
 
 
-        cells.html(
-            function(d){
-                if(d.key!=='hero_url'){
-                    return d.value
+        html_from_cell = function(d){
+            console.log(d)
+            if(img_list.indexOf(d.key)>=0){
+                if (d.key==='hero_url'){
+                    return '<img class="table-face toggleface" src='+d.value+'>'
                 }else{
-                    return '<img class="table-face" src='+d.value+'>'
-
+                    if(d.value !== undefined){
+                        return '<img class="thumbnail table-item a"'+d.value+' src='+items[d.value].mugshot_url+'>'
+                    }else{
+                        return '<img class="thumbnail" src="">'
+                    }
                 }
+            }else{
+                return d.value
             }
+        }
 
-        );
+            // function(d){
+            //     if(d.key!=='hero_url'){
+            //         return d.value
+            //     }else{
+            //         return '<img class="table-face" src='+d.value+'>'
+
+            //     }
+            // }
+
+        cells.html(html_from_cell);
 
         // Cells exit selection
         cells.exit()
           .attr('class', 'exit')
-          .transition()
-          .delay(200)
-          .duration(500)
           .style('opacity', 0.0)
           .remove();
 
@@ -271,9 +341,6 @@ $(function(){
         cells.enter().append('td')
           .style('opacity', 0.0)
           .attr('class', 'enter')
-          .transition()
-          .delay(900)
-          .duration(500)
           .style('opacity', 1.0);
 
 
@@ -295,29 +362,14 @@ $(function(){
                 return 'hero_url'
             }
         })
-        .transition()
-        .delay(900)
-        .duration(500)
         .style('opacity', 1.0);
 
-        cells_in_new_rows.html(
-            function(d){
-                if(d.key!=='hero_url'){
-                    return d.value
-                }else{
-                    return '<img class="table-face" src='+d.value+'>'
-
-                }
-            }
-        );
+        cells_in_new_rows.html(html_from_cell);
 
 
         // Exit
         rows.exit()
           .attr('class', 'exit')
-          .transition()
-          .delay(200)
-          .duration(500)
           .style('opacity', 0.0)
           .remove();
 
@@ -383,12 +435,18 @@ $(function(){
         .append("g")
         .attr("transform","translate("+margin.left+","+margin.top+")");
 
-    var xAxis = svg.append('g').attr('class', 'x axis')
+    var xAxis = svg
+        .append('g')
+        .attr('class', 'x axis')
         .attr('transform', 'translate(0,'+height+')')
         .call(
-            d3.svg.axis().scale(x).orient("bottom")
-            .tickFormat(smartTicks).ticks(5)
-        )
+            x.axis = d3.svg
+            .axis()
+            .scale(x)
+            .orient("bottom")
+            .tickFormat(smartTicks)
+            .ticks(5)
+        );
 
     xAxis.append("text")
         .attr("class", "x-axis-label")
@@ -401,8 +459,13 @@ $(function(){
     var yAxis = svg.append('g').attr('class', 'y axis')
         .attr('transform', 'translate(0,0)')
         .call(
-            y.axis = d3.svg.axis().scale(y)
-            .orient('left').tickFormat(smartTicks).ticks(5)
+            y.axis = d3
+                .svg
+                .axis()
+                .scale(y)
+                .orient('left')
+                .tickFormat(smartTicks)
+                .ticks(5)
         )
 
     yAxis.append("text")
@@ -441,7 +504,7 @@ $(function(){
         .attr("r", 3)
         .on("mouseover", function(d) {
             params.tooltip_div.transition()
-              .duration(200)
+              .duration(interval_duration)
               .style("opacity", 0.9);
             params.tooltip_div.html(heroes[d.hero_id]['name'])
               .style("left", (d3.event.pageX) + "px")
@@ -450,22 +513,39 @@ $(function(){
         )
         .on("mouseout", function(d) {
             params.tooltip_div.transition()
-            .duration(500)
+            .duration(interval_duration)
             .style("opacity", 0);
         });
 
 
-    $(document).on('update', function(e, timeslice){
+    var update_fn = function(timeslice){
+
+        var y_max = d3.max(timeslice.players, function(p){
+            return p[y_var]
+        })
+        var y_domain = [0, y_max]
+        y.domain(y_domain);
+        yAxis.transition()
+            .duration(params.interval_duration)
+            .ease('linear')
+            .call(y.axis);
+
+        var x_max = d3.max(timeslice.players, function(p){
+            return p[x_var]
+        })
+        var x_domain = [0, x_max]
+        x.domain(x_domain);
+        xAxis.transition()
+            .duration(params.interval_duration)
+            .ease('linear')
+            .call(x.axis);
+
         d3.selectAll(selector+' circle')
         .data(timeslice.players)
         .transition()
         .duration(params.interval_duration)
-        .attr("cx", function(d) {
-             return x(d[x_var]);
-        })
-        .attr("cy", function(d) {
-             return y(d[y_var]);
-        })
+        .attr("cx", function(d) { return x(d[x_var]); })
+        .attr("cy", function(d) { return y(d[y_var]); })
 
         // Move heroes on the dots
         $.each(timeslice.players, function(idx, val){
@@ -476,12 +556,25 @@ $(function(){
                 .style("left", pip_left_offset+x(val[x_var])+'px')
                 .style("top", margin.top+y(val[y_var])+'px')
         })
+    }
 
-
-    });
-
+    return update_fn;
 
 }
+
+var necromance = function(timeline){
+    $.each(timeline.players, function(i, v){
+        var hero_id = v['hero_id'];
+        var face = '.toggleface.'+heroes[hero_id]['internal_name']
+        if(v['respawn_timer']!=0){
+            $(face).addClass('dead')
+        }
+        else{
+            $(face).removeClass('dead')
+        }
+    })
+}
+
 
 var miniMap = function(timeslice, target, divname, params){
 
@@ -542,15 +635,13 @@ var miniMap = function(timeslice, target, divname, params){
         return ans
     }
 
-
     $.each(timeslice, function(idx, val){
 
         var hero_id = val['hero_id'];
         var ypos = transY(val.position_y)+'px';
         var xpos = transX(val.position_x)+'px';
 
-        var icon_class = 'd2mh '+ heroes[hero_id]['internal_name']+' '+val['side']
-        var icon_select = selector+' i.d2mh.'+heroes[hero_id]['internal_name']
+        var icon_class = 'd2mh toggleface '+ heroes[hero_id]['internal_name']+' '+val['side']
 
         var hero_icon = d3.select(selector).insert("i")
            .attr('class', icon_class)
@@ -559,22 +650,14 @@ var miniMap = function(timeslice, target, divname, params){
            .attr('height', 32)
            .style('bottom', ypos)
            .style('left', xpos)
+    })
 
-        var necromance = function(player){
-            if(player['respawn_timer']!=0){
-                $(icon_select).addClass('dead')
-            }
-            else{
-                $(icon_select).removeClass('dead')
-            }
-
-        }
-        necromance(val)
-        // Listen for the update
-        $(document).on('update', function(e, timeslice){
-            necromance(timeslice['players'][idx])
-            ypos = transY(timeslice['players'][idx]['position_y'])+'px';
-            xpos = transX(timeslice['players'][idx]['position_x'])+'px';
+    var minimap_update_fn = function(timeslice){
+        $.each(timeslice.players, function(idx, val){
+            var hero_id = val['hero_id'];
+            var icon_select = selector+' i.d2mh.'+heroes[hero_id]['internal_name']
+            var ypos = transY(val.position_y)+'px';
+            var xpos = transX(val.position_x)+'px';
 
             d3.select(icon_select)
                 .transition()
@@ -582,9 +665,9 @@ var miniMap = function(timeslice, target, divname, params){
                 .style('bottom', ypos)
                 .style('left', xpos)
         })
+    }
 
-    })
-
+    return minimap_update_fn;
 }
 
 
@@ -600,33 +683,98 @@ var miniMap = function(timeslice, target, divname, params){
                 "{% url 'rest-api:hero-list' %}"
             )
         ),
-        function(match_result, hero_result){
+        Promise.resolve(
+            $.get(
+                "{% url 'rest-api:item-list' %}"
+            )
+        ),
+        function(match_result, hero_result, item_result){
             match_data = $.parseJSON(match_result['data'])
             heroes = {}
             $.each(hero_result, function(i, v){
                 heroes[v['steam_id']] = v
             })
+            items = {}
+            $.each(item_result, function(i, v){
+                items[v['steam_id']] = v
+            })
         }
     )
     .then(function(){
+        $('#stop-animation').toggle();
+
         $(document).on('update', function(e, data){
-            console.log('Updatingu!', data, tick_idx)
+            // console.log('Updatingu!', data, tick_idx)
         })
         timeline = match_data['timeline']
-        idx = match_data['timeline'].length-1
-        data = match_data['timeline'][idx]['players'];
-        xpm_chart('div#gpm-xpm-chart', 'gx-chart',
+        tick_idx = match_data['timeline'].length-1
+
+        updateTimer(timeline[tick_idx]['states']['duration'])
+
+        data = match_data['timeline'][tick_idx]['players'];
+        xp_update = xpm_chart('div#gpm-xpm-chart', 'gx-chart',
             {'x_label': 'GPM', 'y_label': 'XPM', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200},
             data, 'gold_per_min', 'xp_per_min')
-        xpm_chart('div#kill-death-chart', 'kd-chart', {'x_label': 'Kills', 'y_label': 'Deaths', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'kills', 'death')
-        xpm_chart('div#last-hit-levels', 'lhl-chart', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'level', 'last_hits')
-        miniMap(data, 'div#map', 'minimap', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'interval_duration':200})
-        update_fn = make_update_trigger(timeline);
+        kd_update = xpm_chart('div#kill-death-chart', 'kd-chart', {'x_label': 'Kills', 'y_label': 'Deaths', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'kills', 'death')
+        lh_update = xpm_chart('div#last-hit-levels', 'lhl-chart', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'level', 'last_hits')
+        minimap_update = miniMap(data, 'div#map', 'minimap', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'interval_duration':200})
+        var update_fn = make_update_trigger(timeline);
         bind_playback(update_fn);
+
+        bind_autoplay(make_autoplay_trigger(timeline));
+
         update_table(data);
+
         $(document).on('update', function(e, timeslice){
             update_table(timeslice.players);
+            minimap_update(timeslice);
+            necromance(timeslice);
+            lh_update(timeslice);
+            kd_update(timeslice);
+            xp_update(timeslice);
         })
+
+        if('radiant' in match_data){
+            $('div#logo-lineup div#radiant-logo').append('<img class="thumbnail" src='+match_data.radiant.logo_url+'>')
+            $('div#logo-lineup div#radiant-logo').append('<p class="team-tag">'+match_data.radiant.team_name+'</p>')
+        }
+        if('dire' in match_data){
+            $('div#logo-lineup div#dire-logo').append('<img class="thumbnail" src='+match_data.dire.logo_url+'>')
+            $('div#logo-lineup div#dire-logo').append('<p class="team-tag">'+match_data.dire.team_name+'</p>')
+        }
+        // $('div#logo-lineup div#league-logo').append('<img class="thumbnail" src='+match_data.dire.logo_url+'>')
+        $('div#logo-lineup div#game-facts').append(
+            "<table id='Summary' class='table table-responsive table-condensed'> \
+                <tbody> \
+                <tr><td>Match id:</td> <td>"+match_data.game.match_id+"</tr>\
+                    <tr><td>Lobby id:</td> <td>"+match_data.game.lobby_id+"</tr>\
+                    <tr><td>Spectators:</td> <td>"+match_data.game.spectators+"</tr>\
+                    <tr><td>Stream Delay (s):</td> <td>"+match_data.game.stream_delay_s+"</tr>\
+                </tbody> \
+                <tfoot> \
+                </tfoot> \
+            </table>")
+
+    })
+    .then(function(){
+        setInterval(function(){
+            $.get(
+                "{% url 'leagues:api_live_game_slice' match_id=match_id %}",
+                function(resp){
+                    data = $.parseJSON(resp['data'])
+                    var max_slice = d3.max(timeline, function(d){
+                        return d.states.duration
+                    })
+                    if(data.states.duration > max_slice){
+                        timeline.push({
+                            'players': data.players,
+                            'states': data.states
+                        })
+                    }
+                    console.log("Slicestate:", data.states, timeline.length-1);
+                })},
+            ping_duration
+        )
     })
     .catch(TypeError, function(err){
         console.log(err);
@@ -642,6 +790,8 @@ var miniMap = function(timeslice, target, divname, params){
     .catch(function(err){
         console.log(err);
     })
+
+
 
 $(window).scroll(function(e){
   $el = $('.fixedElement');
@@ -670,6 +820,11 @@ $(window).scroll(function(e){
 }*/
 img.table-face{
     max-height: 40px;
+}
+img.table-item{
+    margin: 0px;
+    padding: 0px;
+    height: 40px;
 }
 .fixedElement {
     position:fixed;

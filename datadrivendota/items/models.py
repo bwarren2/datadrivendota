@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class Item(models.Model):
@@ -26,6 +27,20 @@ class Item(models.Model):
     lore = models.TextField(null=True)
     created = models.NullBooleanField()
     slug_name = models.CharField(max_length=100)
+
+    @property
+    def thumbshot_image(self):
+        if self.thumbshot.name is not None and self.thumbshot.name != '':
+            return self.thumbshot.url
+        else:
+            return settings.BLANK_ITEM_THUMBSHOT
+
+    @property
+    def mugshot_image(self):
+        if self.mugshot.name is not None and self.mugshot.name != '':
+            return self.mugshot.url
+        else:
+            return settings.BLANK_ITEM_MUGSHOT
 
     def __unicode__(self):
         return self.internal_name

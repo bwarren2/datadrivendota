@@ -1,27 +1,5 @@
 {% extends "base.html" %}
 
-{% block content %}
-    <div class='row' id='games'>
-        {% comment %}
-        {% for game in games %}
-
-
-        <a href="{% url 'leagues:live_game_detail' match_id=game.steam_id %}">
-        </a>
-        <div id={{league_id}} class='col-md-2'>
-
-            <img id="{{dire_team.team_id}}" src="{{dire_team.logo_url}}" class='thumbnail'>
-            <img id="{{radiant_team.team_id}}"src="{{radiant_team.logo_url}}" class='thumbnail'>
-            <p class='overlayer'>{{match_id}}</p>
-        </div>
-        {% endfor %}
-        {% endcomment %}
-
-    </div>
-
-
-{% endblock content %}
-
 {% block title %}
 Current Live Games
 {% endblock title %}
@@ -30,15 +8,73 @@ Current Live Games
 Current Live Games
 {% endblock page_title %}
 
+
+{% block content %}
+
+<div id='games'>
+    {% for game in games %}
+    <a href="{% url 'leagues:live_game_detail' match_id=game.match_id %}">
+        <div class='game-card'>
+            <div class='sections'>
+                <div class='league-card'>
+                    <div class='league-thumb'>
+                        <img src="{{game.league_logo_url}}" class='thumbnail league-logo'>
+                    </div>
+                    <p class='overlayer'>{{game.scoreboard.duration|time:'H:i'}}</p>
+                </div>
+                <div class='match-card'>
+                    <div class='side-row'>
+                        {% for hero in game.scoreboard.radiant.picks %}
+                            <div class='hero-thumb'>
+                                <img src="{{hero.url}}" class='thumbnail'>
+                            </div>
+                        {% endfor %}
+                        {% if game.radiant_team.logo_url %}
+                            <div class='hero-thumb'>
+                                <img src="{{game.radiant_team.logo_url}}" class='thumbnail'>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class='side-row'>
+                        {% for hero in game.scoreboard.dire.picks %}
+                            <div class='hero-thumb'>
+                                <img src="{{hero.url}}" class='thumbnail'>
+                            </div>
+                        {% endfor %}
+                        {% if game.dire_team.logo_url %}
+                            <div class='hero-thumb'>
+                                <img src="{{game.dire_team.logo_url}}" class='thumbnail'>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <p class='overlayer'>{{game.match_id}}</p>
+                </div>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% endblock content %}
+
+{% block extra_css %}
+<style type="text/css">
+.league-logo {
+    max-height: 175px;
+}
+</style>
+{% endblock extra_css %}
+
 {% block extra_js %}
+
+{% comment %}
 
 <script type="text/javascript" src='https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js'></script>
 <script src="http://cdn.jsdelivr.net/handlebarsjs/3.0.0/handlebars.js"></script>
 
+{% endcomment %}
 
 {% comment %}
     Helperthings!
-{% endcomment %}
 <script type="text/x-handlebars-template" id='game-template'>
 {% verbatim %}
     {{#games}}
@@ -59,10 +95,13 @@ Current Live Games
     {{/games}}
 {% endverbatim %}
 </script>
+{% endcomment %}
 
 
+{% comment %}
 <script type="text/javascript">
 
+    Handlebars is a fun exercise, but not required here.
     var source = $('#game-template').html()
     var template = Handlebars.compile(source);
     console.log(template)
@@ -78,5 +117,6 @@ Current Live Games
         })
 
     })
-</script>
+    </script>
+{% endcomment %}
 {% endblock extra_js %}

@@ -427,8 +427,19 @@ PIPELINE_JS = {
             'js/jquery-1.10.2.js',
         ),
         'output_filename': 'js/jq.js',
+    },
+    'bluebird': {
+        'source_filenames': (
+            'js/bluebird.min.js',
+        ),
+        'output_filename': 'js/bluebird.js',
+    },
+    'handlebars': {
+        'source_filenames': (
+            'js/handlebars.js',
+        ),
+        'output_filename': 'js/handlebars.js',
     }
-
 }
 
 PIPELINE_COMPILERS = (
@@ -549,3 +560,24 @@ REST_FRAMEWORK = {
     'PAGINATE_BY': 10
 }
 ########## END REST CONFIGURATION
+
+
+BLANK_ITEM_THUMBSHOT = (
+    "https://s3.amazonaws.com/datadrivendota/blanks/"
+    "blank_item_thumbshot.png"
+    )
+
+BLANK_ITEM_MUGSHOT = (
+    "https://s3.amazonaws.com/datadrivendota/"
+    "blanks/blank_item.png"
+    )
+
+BLANK_LEAGUE_IMAGE = (
+    'https://s3.amazonaws.com/datadrivendota/'
+    'blanks/blank_league.png'
+)
+
+BLANK_TEAM_IMAGE = (
+    "https://s3.amazonaws.com/datadrivendota/"
+    "blanks/blank_team.png"
+    )

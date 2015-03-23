@@ -11,6 +11,7 @@ from matches.views import parse_preview
 from teams.views import TeamViewSet
 from leagues.views import LeagueViewSet
 from heroes.views import HeroViewSet
+from items.views import ItemViewSet
 from rest_framework.routers import DefaultRouter
 
 admin.autodiscover()
@@ -20,6 +21,7 @@ router = DefaultRouter()
 router.register('teams', TeamViewSet)
 router.register('leagues', LeagueViewSet)
 router.register('heroes', HeroViewSet)
+router.register('items', ItemViewSet)
 
 urlpatterns = patterns(
     '',

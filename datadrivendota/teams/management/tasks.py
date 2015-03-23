@@ -115,9 +115,7 @@ class UpdateTeam(ApiFollower):
 
     def _update_team_logos(self, team):
         logo = team.logo
-        logger.info("Testing!")
         if self._need_logo_update(logo):
-            logger.info("Passed test!")
             c = ApiContext()
             vac = ValveApiCall()
             c.ugcid = team.logo

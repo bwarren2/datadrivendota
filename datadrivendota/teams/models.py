@@ -1,6 +1,8 @@
 from django.db import models
 from .managers import SortedTeamManager, TI4TeamManager
 from django.utils import timezone
+from django.conf import settings
+from datetime import timedelta
 
 
 class Team(models.Model):
@@ -48,13 +50,36 @@ class Team(models.Model):
 
     @property
     def image(self):
+        if self.valve_cdn_image is not None:
+            return self.valve_cdn_image
+        else:
+            return settings.BLANK_TEAM_IMAGE
+
+    @property
+    def sponsor_image(self):
         if self.valve_cdn_sponsor_image is not None:
             return self.valve_cdn_sponsor_image
         else:
-            return (
-                'https://s3.amazonaws.com/datadrivendota/'
-                'blanks/blank_team.png'
+            return settings.BLANK_TEAM_IMAGE
+
+    @property
+    def is_outdated(self):
+        if (
+            (
+                self.valve_cdn_image is None
+                or self.valve_cdn_image == None
+                or self.valve_cdn_image == ''
+            )
+            and self.update_time < (
+                timezone.now() - timedelta(
+                    seconds=settings.UPDATE_LAG_UTC
                 )
+            )
+        ):
+            return True
+        else:
+            return False
+
 
     def save(self, *args, **kwargs):
         self.update_time = timezone.now()

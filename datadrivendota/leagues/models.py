@@ -1,6 +1,8 @@
 from django.db import models
 from .managers import SortedLeagueManager
 from django.utils import timezone
+from django.conf import settings
+from datetime import timedelta
 
 
 class League(models.Model):
@@ -20,10 +22,7 @@ class League(models.Model):
     @property
     def image(self):
         if self.valve_cdn_image is None:
-            return (
-                'https://s3.amazonaws.com/datadrivendota/'
-                'blanks/blank_league.png'
-            )
+            return settings.BLANK_LEAGUE_IMAGE
         else:
             return self.valve_cdn_image
 
@@ -45,6 +44,22 @@ class League(models.Model):
             return 'League #{0}'.format(self.steam_id)
         else:
             return self.name
+
+    @property
+    def is_outdated(self):
+        if (
+            self.valve_cdn_image is None
+            or self.valve_cdn_image == None
+            or self.valve_cdn_image == ''
+            or self.update_time < (
+                timezone.now() - timedelta(
+                    seconds=settings.UPDATE_LAG_UTC
+                )
+            )
+        ):
+            return True
+        else:
+            return False
 
     objects = models.Manager()
     recency = SortedLeagueManager()

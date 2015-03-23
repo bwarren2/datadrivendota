@@ -20,24 +20,24 @@ from .json_samples import (
 from leagues.management.tasks import UpdateLeagueSchedule, UpdateLiveGames
 from model_mommy import mommy
 
+# We are getting rid of the JSON methods anyway
+# class TestWorkingJson(TestCase):
 
-class TestWorkingJson(TestCase):
+#     def setUp(self):
+#         make_matchset()
+#         self.league = League.objects.all()[0]
 
-    def setUp(self):
-        make_matchset()
-        self.league = League.objects.all()[0]
+#     def tearDown(self):
+#         pass
 
-    def tearDown(self):
-        pass
-
-    def test_winrate_json(self):
-        chart = league_winrate_json(
-            league=self.league.steam_id,
-            min_date=None,
-            max_date=None,
-            group_var='alignment',
-        )
-        self.assertGreater(len(chart.datalist), 0)
+#     def test_winrate_json(self):
+#         chart = league_winrate_json(
+#             league=self.league.steam_id,
+#             min_date=None,
+#             max_date=None,
+#             group_var='alignment',
+#         )
+#         self.assertGreater(len(chart.datalist), 0)
 
 
 class TestLeagueScheduleUpdate(TestCase):
@@ -76,40 +76,6 @@ class TestLeagueScheduleUpdate(TestCase):
             2
         )
 
-    def test_object_outdated(self):
-        self.task.delete_unscheduled_games(
-            self.task.clean_urldata(self.good_json)
-        )
-        self.task.create_scheduled_games(
-            self.task.clean_urldata(self.good_json)
-        )
-
-        for team in Team.objects.all():
-            team.valve_cdn_image = None
-            team.save()
-
-        test_team = Team.objects.all()[0]
-        test_team.valve_cdn_image = 'http://www.whatever.com/test.png'
-        test_team.save()
-        # Has logo image, recent update time
-        self.assertEqual(self.task._object_outdated(test_team), False)
-
-        # Has logo image, old update time
-        test_team.update_time = timezone.now() - timedelta(days=10)
-        test_team.valve_cdn_image = 'http://www.whatever.com/test.png'
-        test_team.save()
-        self.assertEqual(self.task._object_outdated(test_team), True)
-
-        # Has no logo image, old update time
-        test_team.valve_cdn_image = ''
-        test_team.save()
-        self.assertEqual(self.task._object_outdated(test_team), True)
-
-        # Has no logo image, new update time
-        test_team.update_time = timezone.now()
-        test_team.save()
-        self.assertEqual(self.task._object_outdated(test_team), True)
-
     def test_find_update_teams(self):
         data = self.task.clean_urldata(self.good_json)
         self.task.delete_unscheduled_games(
@@ -122,22 +88,25 @@ class TestLeagueScheduleUpdate(TestCase):
         for game in data['games']:
 
             t = Team.objects.get(steam_id=game['teams'][0]['team_id'])
-            remove_logo(t)
+            t.valve_cdn_image = 'www.whatever.com/pong.png'
+            t.save()
             teams.append(t)
 
             t = Team.objects.get(steam_id=game['teams'][1]['team_id'])
-            remove_logo(t)
+            t.valve_cdn_image = 'www.whatever.com/pong.png'
+            t.save()
             teams.append(t)
 
-        teams[0].update_time = timezone.now() - timedelta(weeks=20)
-        teams[0].save()
+        # teams[0].update_time = timezone.now() - timedelta(weeks=20)
+        # teams[0].save()
         teams[2].valve_cdn_image = None
         teams[2].save()
 
         # print "Expected: {0}".format([teams[0].steam_id, teams[2].steam_id])
         # print "Got: {0}".format(self.task.find_update_teams(data))
+        # teams[0].steam_id,
         self.assertEqual(
-            [teams[0].steam_id, teams[2].steam_id],
+            [teams[2].steam_id],
             self.task.find_update_teams(data)
         )
 
@@ -155,11 +124,12 @@ class TestLeagueScheduleUpdate(TestCase):
         for game in data['games']:
 
             l = League.objects.get(steam_id=game['league_id'])
-            remove_logo(l)
+            l.valve_cdn_image = 'www.whatever.com/pong.png'
+            l.save()
             leagues.append(l)
 
         # Make a league look very out of date
-        leagues[0].update_time = timezone.now() - timedelta(weeks=20)
+        leagues[0].valve_cdn_image = None
         leagues[0].save()
 
         self.assertEqual(
@@ -261,3 +231,33 @@ class TestLiveGames(FastFixtureTestCase):
 def remove_logo(team):
     team.valve_cdn_image = None
     team.save()
+
+
+class TestModelMethods(TestCase):
+
+    def setUp(self):
+        self.league = mommy.make_recipe('leagues.league')
+
+    def test_update_save(self):
+        self.league.save()
+        self.assertLess(
+            timezone.now()-self.league.update_time,
+            timedelta(seconds=.1)
+        )
+
+    def test_outdated(self):
+        self.league.update_time = timezone.now() - timedelta(weeks=10)
+        self.league.valve_cdn_image = None
+        self.assertEqual(self.league.is_outdated, True)
+
+        self.league.update_time = timezone.now() - timedelta(weeks=10)
+        self.league.valve_cdn_image = 'http://www.whatever.com/test.png'
+        self.assertEqual(self.league.is_outdated, True)
+
+        self.league.update_time = timezone.now()
+        self.league.valve_cdn_image = None
+        self.assertEqual(self.league.is_outdated, True)
+
+        self.league.update_time = timezone.now()
+        self.league.valve_cdn_image = 'http://www.whatever.com/test.png'
+        self.assertEqual(self.league.is_outdated, False)

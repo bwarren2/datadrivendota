@@ -1,19 +1,14 @@
 import json
 from collections import defaultdict
-import gc
 import urllib2
 from datetime import timedelta
 from django.utils import timezone
 from time import mktime
-import socket
-import ssl
 from uuid import uuid4
 from celery import Task, chain
 from django.conf import settings
 from datadrivendota.redis_app import redis_app as redis
-from datadrivendota.redis_app import timeline_key, slice_key
-from django.core.files import File
-from django.utils.text import slugify
+from datadrivendota.redis_app import timeline_key, slice_key, set_games
 from utils.accessors import get_league_schema
 from leagues.models import League
 from heroes.models import Hero
@@ -78,11 +73,11 @@ class UpdateLiveGames(ApiFollower):
 
             self._store_data(formatted_game)
 
+        set_games(urldata)
+
         # Update data if needed
-        if not self.update_leagues:
-            self._update_leagues(self.update_leagues)
-        if not self.update_teams:
-            self._update_teams(self.update_teams)
+        self._update_leagues(self.update_leagues)
+        self._update_teams(self.update_teams)
 
     def _store_data(self, game_snapshot):
         # Store slice
@@ -242,16 +237,19 @@ class UpdateLiveGames(ApiFollower):
                             steam_id=team_id
                             )
                         game[team_type]['logo_url'] = team.image
-                        if t_created:
+                        if t_created or team.is_outdated:
                             update_teams.append(team_id)
+                            team.save()
+                            # Reset update time, avoid stacking update calls
             # Do League
             league_id = game['league_id']
             league, l_created = League.objects.get_or_create(
                 steam_id=league_id
                 )
             game['league_logo_url'] = league.image
-            if l_created:
+            if l_created or league.is_outdated:
                 update_leagues.append(league_id)
+                league.save()  # Reset update time, avoid stacking update calls
 
         self.update_leagues = update_leagues
         self.update_teams = update_teams
@@ -265,12 +263,14 @@ class UpdateLiveGames(ApiFollower):
         return urldata
 
     def _update_teams(self, update_teams):
+        logger.info('Got these teams: {0}'.format(update_teams))
         if update_teams is not None:
             logger.info('Updating these teams: {0}'.format(update_teams))
             mtd = MirrorTeamDetails()
             mtd.s(teams=update_teams).delay()
 
     def _update_leagues(self, update_leagues):
+        logger.info('Got these leagues: {0}'.format(update_leagues))
         if update_leagues is not None:
             logger.info('Updating these leagues: {0}'.format(update_leagues))
             ul = UpdateLeagues()
@@ -425,11 +425,11 @@ class UpdateLeagueSchedule(ApiFollower):
                     steam_id=team_info['team_id']
                 )
 
-                if self._object_outdated(team):
+                if team.is_outdated:
                     update_teams.add(team.steam_id)
 
         logger.info("Teams that need updating: {0}".format(update_teams))
-        return update_teams
+        return list(update_teams)
 
     def find_update_leagues(self, data):
         """
@@ -443,10 +443,10 @@ class UpdateLeagueSchedule(ApiFollower):
             league = League.objects.get(
                 steam_id=game['league_id']
             )
-            if self._object_outdated(league):
+            if league.is_outdated:
                 update_leagues.add(league.steam_id)
         logger.info("Leagues that need updating: {0}".format(update_leagues))
-        return update_leagues
+        return list(update_leagues)
 
     def update_teams(self, teams):
         """
@@ -461,24 +461,6 @@ class UpdateLeagueSchedule(ApiFollower):
         """
         ul = UpdateLeagues()
         ul.s(leagues=leagues).delay()
-
-    def _object_outdated(self, obj):
-        """
-        Works for either team or league.
-        """
-        if (
-            obj.valve_cdn_image is None
-            or obj.valve_cdn_image == None
-            or obj.valve_cdn_image == ''
-            or obj.update_time < (
-                timezone.now() - timedelta(
-                    seconds=settings.UPDATE_LAG_UTC
-                )
-            )
-        ):
-            return True
-        else:
-            return False
 
     def _fingerprint(self, scheduled_match):
         """
@@ -589,6 +571,7 @@ class UpdateLeagues(Task):
                 )
                 ch.delay()
             except KeyError:
+                league.save()  # Reset update time.
                 logger.error("Can't find {0} in schema.  :(".format(league_id))
 
 

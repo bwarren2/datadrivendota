@@ -55,5 +55,10 @@ urlpatterns = patterns(
         views.ApiLiveGameDetail.as_view(),
         name='api_live_game_detail'
         ),
+    url(
+        r'^api/live-game-slice/(?P<match_id>[0-9\-]*)/$',
+        views.ApiLiveGameSlice.as_view(),
+        name='api_live_game_slice'
+        ),
 
 )

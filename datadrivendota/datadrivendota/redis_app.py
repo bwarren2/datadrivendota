@@ -6,9 +6,12 @@ from django.conf import settings
 redis_app = StrictRedis().from_url(getenv('REDISTOGO_URL'))
 
 
-def load_games():
-    redis = redis_app
-    return json.loads(redis.get(settings.LIVE_JSON_KEY))['games']
+def get_games():
+    return json.loads(redis_app.get(settings.LIVE_JSON_KEY))
+
+
+def set_games(data):
+    return redis_app.set(settings.LIVE_JSON_KEY, json.dumps(data))
 
 
 def timeline_key(match_id):
