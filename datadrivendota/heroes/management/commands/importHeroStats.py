@@ -1,14 +1,15 @@
 from optparse import make_option
-from json import dumps, loads
-from BeautifulSoup import BeautifulSoup
-from urllib2 import urlopen, HTTPError
-import re
+from json import loads
 import csv
+import logging
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from heroes.models import Hero, HeroDossier
-from heroes.models import HeroDossier, Hero, Role, Assignment
+from heroes.models import Role, Assignment
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -21,17 +22,15 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        # @todo: This whole method should be decomposed into well-named
-        # smaller methods. Try to keep linecount under a dozen.
-        # --kit 2014-02-16
 
-        with open('json_files/npc_heroes.json') as f:
-            stats = loads(f.read())['DOTAHeroes']
-        try:
-            del stats['Version']  # Purge a junk field
-        except KeyError:
-            # Probably manually deleted.
-            pass
+        """
+        @todo: rafactor this function more.
+        Not a high priority vs other biz logic,
+        but a good palate cleanser as time allows.
+            -- ben 03-25-2015
+        """
+        stats = clean_input()
+
         mapping_dict = {
             "MovementSpeed": "movespeed",
             "StatusHealthRegen": "hp_regen",
@@ -64,10 +63,8 @@ class Command(BaseCommand):
 
         # Core ability attributes
         for machine_name, data_dict in stats.iteritems():
-            # @todo: Probably don't use a magic string here. Possibly set some
-            # per- app cosntants for values consumed from Valve API?
-            # --kit 2014-02-16
-            if machine_name != 'npc_dota_hero_base':
+
+            if machine_name != settings.HERO_BASENAME:
                 print machine_name, data_dict['HeroID']
                 try:
                     hero = Hero.objects.get(
@@ -102,13 +99,12 @@ class Command(BaseCommand):
                     data_dict['AttributePrimary']
                 ]
                 default_dict['mana'] = float(default_dict['intelligence']) * 13
-                # @todo: Please don't use postposed conditionals; bad Python
-                # style.
-                # --kit 2014-02-16
-                default_dict['projectile_speed'] = data_dict.get(
-                    "ProjectileSpeed",
-                    0
-                ) if data_dict.get("ProjectileSpeed", 0) != '' else 0
+
+                if data_dict.get("ProjectileSpeed", 0) != '':
+                    default_dict['projectile_speed'] = data_dict.get(
+                        "ProjectileSpeed", 0)
+                else:
+                    default_dict['projectile_speed'] = 0
 
                 # Valve does not count the dmg gain from primary stat in their
                 # base assessment
@@ -144,28 +140,47 @@ class Command(BaseCommand):
 
                 dos.save()
 
-                try:
-                    key = "Role"
-                    role_list = data_dict.get(key).split(",")
-                    key = "Rolelevels"
-                    role_level_list = data_dict.get(key).split(",")
-                    if role_list != ['']:
-                        role_data = zip(role_list, role_level_list)
-                        for role, level in role_data:
-                            r = Role.objects.get_or_create(name=role)[0]
-                            assignment = Assignment.objects.get_or_create(
-                                hero=hero,
-                                role=r,
-                                magnitude=int(level))[0]
-                            assignment.save()
-                except AttributeError:
-                    pass
-                    #This means roles are not defined.  Sometimes happens with heroes in the prerelease phase/Abaddon.
+                import_roles(hero, data_dict)
 
+        import_animations()
+
+
+def import_roles(hero, data_dict):
+    try:
+        role_list = data_dict.get("Role").split(",")
+        role_level_list = data_dict.get("Rolelevels").split(",")
+        if role_list != ['']:
+            role_data = zip(role_list, role_level_list)
+            for role, level in role_data:
+                r = Role.objects.get_or_create(name=role)[0]
+                assignment = Assignment.objects.get_or_create(
+                    hero=hero,
+                    role=r,
+                    magnitude=int(level))[0]
+                assignment.save()
+
+    except AttributeError:
+        pass
+        #  This means roles are not defined.
+        #  Sometimes happens with heroes in the prerelease phase
+
+
+def clean_input():
+    with open('json_files/npc_heroes.json') as f:
+        stats = loads(f.read())['DOTAHeroes']
+    try:
+        del stats['Version']  # Purge a junk field
+    except KeyError:
+        # Probably manually deleted.
+        pass
+
+
+def import_animations():
         # Backswings
         # Sometimes the wiki does not purge old heroes (skeleton king)
         try:
-            print "Trying animations.  You remembered to format it correctly, right?."
+            logger.info("Trying animations.")
+            logger.info("You remembered to format it correctly, right?")
             with open('animations.csv', 'r') as f:
 
                 reader = csv.reader(

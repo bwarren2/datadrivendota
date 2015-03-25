@@ -115,6 +115,10 @@ class PermissionCode(models.Model):
         subject = 'Datadrivendota upgrade code'
         # @todo: Should really use a template.
         # --kit 2014-02-16
+        # This entire section should be rewritten during the payments refactor.
+        # Will circle back to fix or delete later.
+        # --ben 2015-03-25
+
         message = """
         You are invited to the private beta at DataDrivenDota!
 

@@ -561,6 +561,9 @@ REST_FRAMEWORK = {
 }
 ########## END REST CONFIGURATION
 
+# Valve strings
+HERO_BASENAME = 'npc_dota_hero_base'
+
 
 BLANK_ITEM_THUMBSHOT = (
     "https://s3.amazonaws.com/datadrivendota/blanks/"

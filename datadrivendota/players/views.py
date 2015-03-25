@@ -420,8 +420,6 @@ def date_notate_pms_list(pms_list):
             seconds=pms.match.duration
         ))
         pms.KDA2 = pms.kills - pms.deaths + pms.assists / 2.0
-        # @todo: Again, postposed conditionals.
-        # --kit 2014-02-16
         if pms.KDA2 > 0:
             pms.color_class = 'pos'
             pms.pos = True
