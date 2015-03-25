@@ -24,6 +24,12 @@ def push():
     local('git push heroku master')
 
 
+def deploy():
+    local('git push origin master')
+    collect_static()
+    local('git push heroku master')
+
+
 def hp():
     local('git push heroku master')
     local(collect_static())
