@@ -97,10 +97,9 @@ class TestLeagueScheduleUpdate(TestCase):
             t.save()
             teams.append(t)
 
-        # teams[0].update_time = timezone.now() - timedelta(weeks=20)
-        # teams[0].save()
+        teams[2].update_time = timezone.now() - timedelta(weeks=20)
         teams[2].valve_cdn_image = None
-        teams[2].save()
+        super(Team, teams[2]).save()
 
         # print "Expected: {0}".format([teams[0].steam_id, teams[2].steam_id])
         # print "Got: {0}".format(self.task.find_update_teams(data))
