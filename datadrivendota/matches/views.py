@@ -127,40 +127,30 @@ def match(request, match_id):
             len(dire_infodict[summary.player_slot]['ability_dict'])
         )
 
-    #Identify any pickbans for templating.
-    dire_hero_ids = [
-        pms.hero.steam_id for pms in summaries if pms.which_side() == 'Dire'
-    ]
+    # Identify any pickbans for templating.
     try:
-        pick = [
-            pickban for pickban in match.pickban_set.all() if pickban.is_pick
-        ][0]
-        if pick.hero.steam_id in dire_hero_ids:
-            dire_flag = pick.team
-        else:
-            dire_flag = 1-pick.team
-
+        # Magic numbers are bad, but 0 = radiant.  Fix later
         dire_picks = PickBan.objects.filter(
             match=match,
-            team=dire_flag,
+            team=1,
             is_pick=True
         ).select_related('hero')
 
         dire_bans = PickBan.objects.filter(
             match=match,
-            team=dire_flag,
+            team=1,
             is_pick=False
         ).select_related('hero')
 
         radiant_picks = PickBan.objects.filter(
             match=match,
             is_pick=True
-        ).exclude(team=dire_flag).select_related('hero')
+        ).exclude(team=1).select_related('hero')
 
         radiant_bans = PickBan.objects.filter(
             match=match,
             is_pick=False
-        ).exclude(team=dire_flag).select_related('hero')
+        ).exclude(team=1).select_related('hero')
 
         pickban_length = (
             dire_picks.count() +
