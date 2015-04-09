@@ -275,6 +275,7 @@ LOCAL_APPS = (
     'leagues',
     'teams',
     'accounts',
+    'health',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -584,3 +585,8 @@ BLANK_TEAM_IMAGE = (
     "https://s3.amazonaws.com/datadrivendota/"
     "blanks/blank_team.png"
     )
+
+KEEN_API_URL = getenv('KEEN_API_URL')
+KEEN_PROJECT_ID = getenv('KEEN_PROJECT_ID')
+KEEN_READ_KEY = getenv('KEEN_READ_KEY')
+KEEN_WRITE_KEY = getenv('KEEN_WRITE_KEY')

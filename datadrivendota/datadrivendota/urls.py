@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
-# Uncomment the next two lines to enable the admin:
+
 from django.contrib import admin
 from datadrivendota import views
 from accounts.views import data_applicant
@@ -39,6 +39,7 @@ urlpatterns = patterns(
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^djs2/', include('django_select2.urls')),
+    url(r'^health/', include('health.urls', namespace='health')),
     url(r'^privacy/$', views.privacy, name='privacy'),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
     url(

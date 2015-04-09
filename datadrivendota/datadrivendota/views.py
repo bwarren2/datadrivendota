@@ -14,6 +14,7 @@ from django.db.models import Q
 
 from utils.file_management import outsourceJson, moveJson
 from utils.exceptions import NoDataFound
+from datadrivendota.keen_app import keen_client
 
 from .forms import KeyForm, SearchForm
 from players.models import Player
@@ -41,18 +42,13 @@ except ImportError:
 def base(request):
     p = Player.objects.get(steam_id=70388657)
     h = Hero.objects.get(name='Slark')
-    # if (
-    #     request.user.is_anonymous()
-    #     or request.user.social_auth.filter(provider='steam').count() == 0
-    # ):
-    #     extra_dict = {
-    #         'chart_player': p,
-    #     }
-    # else:
-    #     extra_dict = request.user.social_auth.filter(
-    #         provider='steam'
-    #     )[0].extra_data
-    #     extra_dict.update({'chart_player': p})
+
+    # from keen import client
+    keen_client.add_event(
+        "splashpage_render", {
+            "hit": 1,
+        }
+    )
     extra_dict = {'chart_player': p, 'chart_hero': h}
     return render(request, 'home.html', extra_dict)
 
