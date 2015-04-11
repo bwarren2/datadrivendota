@@ -55,8 +55,8 @@ class TestModel(TestCase):
         self.assertEqual(self.dire_loss.determine_win(), False)
 
     def test_sides(self):
-        self.assertEqual(self.rad_win.which_side(), 'Radiant')
-        self.assertEqual(self.dire_win.which_side(), 'Dire')
+        self.assertEqual(self.rad_win.side, 'Radiant')
+        self.assertEqual(self.dire_win.side, 'Dire')
 
 
 class TestWorkingJson(TestCase):

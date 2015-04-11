@@ -8,6 +8,7 @@ from datadrivendota import views
 from accounts.views import data_applicant
 from matches.views import parse_preview
 
+from matches.views import MatchViewSet, PlayerMatchSummaryViewSet
 from teams.views import TeamViewSet
 from leagues.views import LeagueViewSet
 from heroes.views import HeroViewSet
@@ -22,6 +23,8 @@ router.register('teams', TeamViewSet)
 router.register('leagues', LeagueViewSet)
 router.register('heroes', HeroViewSet)
 router.register('items', ItemViewSet)
+router.register('matches', MatchViewSet)
+router.register('player-match-summary', PlayerMatchSummaryViewSet)
 
 urlpatterns = patterns(
     '',

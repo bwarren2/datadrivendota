@@ -453,7 +453,7 @@ def match_ability_json(match, panel_var=None):
     c = XYPlot()
     for build in skill_builds:
 
-        side = build.player_match_summary.which_side()
+        side = build.player_match_summary.side
         hero = build.player_match_summary.hero.name
         if not valid_var(panel_var):
             split_param = None
@@ -477,7 +477,7 @@ def match_ability_json(match, panel_var=None):
             )
         d.classes.append(
             slugify(
-                unicode(build.player_match_summary.which_side())
+                unicode(build.player_match_summary.side)
             )
         )
 
@@ -515,7 +515,7 @@ def match_parameter_json(match_id, x_var, y_var):
         d.classes = []
         if hero_classes[pms.hero.steam_id] is not None:
             d.classes.extend(hero_classes[pms.hero.steam_id])
-        d.classes.append(slugify(unicode(pms.which_side())))
+        d.classes.append(slugify(unicode(pms.side)))
 
         c.datalist.append(d)
 
@@ -555,7 +555,7 @@ def single_match_parameter_json(match, y_var):
         d.tooltip = pms.hero.safe_name()
         if hero_classes[pms.hero.steam_id] is not None:
             d.classes.extend(hero_classes[pms.hero.steam_id])
-            d.classes.append(slugify(unicode(pms.which_side())))
+            d.classes.append(slugify(unicode(pms.side)))
         c.datalist.append(d)
 
     c.params.x_label = 'Hero'

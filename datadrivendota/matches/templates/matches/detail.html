@@ -301,9 +301,9 @@
               <td>{{ summary.hero_healing }}</td>
               <td class="match-summary-images">
                 {% if summary.is_radiant %}
-                  <img src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.which_side }}'>
+                  <img src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.side }}'>
                 {% else %}
-                  <img src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.which_side }}'>
+                  <img src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.side }}'>
                 {% endif %}
 
               </td>

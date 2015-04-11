@@ -11,7 +11,7 @@ def cast_dict(summary):
             'internal_hero_name': summary.hero.internal_name,
             'hero_id': summary.hero.steam_id,
             'is_win': summary.is_win,
-            'is_radiant': summary.which_side() == 'Radiant',
+            'is_radiant': summary.side == 'Radiant',
             'slot': summary.player_slot,
         }
     except ValueError:
@@ -22,7 +22,7 @@ def cast_dict(summary):
             'hero_safe_name': summary.hero.safe_name,
             'internal_hero_name': summary.hero.internal_name,
             'is_win': summary.is_win,
-            'is_radiant': summary.which_side() == 'Radiant',
+            'is_radiant': summary.side == 'Radiant',
             'slot': summary.player_slot,
         }
     if summary.player.avatar is not None:

@@ -3,6 +3,7 @@ import json
 from functools import wraps
 from itertools import chain
 from time import mktime
+from rest_framework import viewsets
 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
@@ -27,6 +28,7 @@ from .mixins import (
     RoleMixin,
     SetProgressionMixin,
 )
+from .serializers import MatchSerializer, PlayerMatchSummarySerializer
 from datadrivendota.views import ChartFormView, ApiView
 from datadrivendota.forms import FollowMatchForm
 from players.models import Player
@@ -88,7 +90,7 @@ def match(request, match_id):
 
     for summary in summaries:
         summary.kda = summary.kills - summary.deaths + .5*summary.assists
-        if summary.which_side() == 'Radiant':
+        if summary.side == 'Radiant':
             summary.is_radiant = True
         else:
             summary.is_dire = True
@@ -102,7 +104,7 @@ def match(request, match_id):
     ).strftime('%H:%M:%S %Y-%m-%d')
 
     radiant_summaries = [
-        summary for summary in summaries if summary.which_side() == 'Radiant'
+        summary for summary in summaries if summary.side == 'Radiant'
     ]
     radiant_infodict = {}
     radiant_cast_list = []
@@ -115,7 +117,7 @@ def match(request, match_id):
             len(radiant_infodict[summary.player_slot]['ability_dict'])
         )
     dire_summaries = [
-        summary for summary in summaries if summary.which_side() == 'Dire'
+        summary for summary in summaries if summary.side == 'Dire'
     ]
     dire_infodict = {}
     dire_cast_list = []
@@ -219,7 +221,7 @@ def parse_preview(request, match_id=787900748):
     css_color_dict = {}
     for summary in summaries:
         summary.kda = summary.kills - summary.deaths + .5*summary.assists
-        if summary.which_side() == 'Radiant':
+        if summary.side == 'Radiant':
             summary.is_radiant = True
         else:
             summary.is_dire = True
@@ -236,14 +238,14 @@ def parse_preview(request, match_id=787900748):
     ).strftime('%H:%M:%S %Y-%m-%d')
 
     radiant_summaries = [
-        summary for summary in summaries if summary.which_side() == 'Radiant'
+        summary for summary in summaries if summary.side == 'Radiant'
     ]
     radiant_cast_list = []
     for summary in radiant_summaries:
         radiant_cast_list.append(cast_dict(summary))
 
     dire_summaries = [
-        summary for summary in summaries if summary.which_side() == 'Dire'
+        summary for summary in summaries if summary.side == 'Dire'
     ]
     dire_cast_list = []
     for summary in dire_summaries:
@@ -295,7 +297,7 @@ def parse_match(request, match_id=787900748):
     css_color_dict = {}
     for summary in summaries:
         summary.kda = summary.kills - summary.deaths + .5*summary.assists
-        if summary.which_side() == 'Radiant':
+        if summary.side == 'Radiant':
             summary.is_radiant = True
         else:
             summary.is_dire = True
@@ -312,14 +314,14 @@ def parse_match(request, match_id=787900748):
     ).strftime('%H:%M:%S %Y-%m-%d')
 
     radiant_summaries = [
-        summary for summary in summaries if summary.which_side() == 'Radiant'
+        summary for summary in summaries if summary.side == 'Radiant'
     ]
     radiant_cast_list = []
     for summary in radiant_summaries:
         radiant_cast_list.append(cast_dict(summary))
 
     dire_summaries = [
-        summary for summary in summaries if summary.which_side() == 'Dire'
+        summary for summary in summaries if summary.side == 'Dire'
     ]
     dire_cast_list = []
     for summary in dire_summaries:
@@ -736,7 +738,7 @@ def annotated_matches(pms_list, follow_list):
 
     for pms in pms_list:
         id = pms.match.steam_id
-        side = pms.which_side()
+        side = pms.side
         if pms.match.steam_id not in match_data.keys():
             match_data[id] = {}
             match_data[id]['pms_data'] = {}
@@ -877,5 +879,18 @@ class ApiMatchBarChart(SingleMatchParameterMixin, ApiView):
 class ApiRoleChart(RoleMixin, ApiView):
     pass
 
+
 class ApiSetProgressionChart(SetProgressionMixin, ApiView):
     pass
+
+
+class MatchViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Match.objects.all()
+    paginate_by = 10
+    serializer_class = MatchSerializer
+
+
+class PlayerMatchSummaryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = PlayerMatchSummary.objects.all()
+    paginate_by = 10
+    serializer_class = PlayerMatchSummarySerializer

@@ -173,7 +173,20 @@ class PlayerMatchSummary(models.Model):
             + str(self.player.steam_id)
         )
 
-    def which_side(self):
+    @property
+    def kda2(self):
+        return self.kills - self.deaths + self.assists/2.0
+
+    @property
+    def gold_total(self):
+        return self.gold_per_min*self.match.duration/60
+
+    @property
+    def xp_total(self):
+        return self.xp_per_min*self.match.duration/60
+
+    @property
+    def side(self):
         """ Returns radiant or dire based on player slot."""
         if self.player_slot < 5:
             return 'Radiant'
@@ -255,7 +268,7 @@ def fetch_pms_attribute(summary, attribute):
     elif attribute == 'match_id':
         return summary.match.steam_id
     elif attribute == 'which_side':
-        return summary.which_side()
+        return summary.side
     elif attribute == 'gold_total':
         return summary.gold_per_min*summary.match.duration/60
     elif attribute == 'xp_total':
