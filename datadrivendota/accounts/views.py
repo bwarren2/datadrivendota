@@ -38,6 +38,10 @@ from datadrivendota.management.tasks import (
 from players.management.tasks import MirrorClientPersonas
 from players.management.tasks import MirrorPlayerData
 
+# All this needs to be refactored into new ajax.
+# Therefore, it is exempt from the CBV refactor.
+# For now. -- Ben  2015-04-19
+
 
 def data_applicant(request):
     if request.method == 'POST':
@@ -45,7 +49,8 @@ def data_applicant(request):
         if form.is_valid():
 
             """
-            This is some stupid hacky stuff.  What we really want to do is have a uniqueness criterion on the model, a 32bit validator on the field, and a clean() method on the field that takes % 32bit.  We'll do it later."""
+            This is some stupid hacky stuff.  What we really want to do is have a uniqueness criterion on the model, a 32bit validator on the field, and a clean() method on the field that takes % 32bit.  We'll do it later.
+            """
             try:
                 modulo_id = form.cleaned_data['steam_id'] \
                     % settings.ADDER_32_BIT

@@ -1,20 +1,14 @@
-import datetime
-import json
-from time import mktime
 from random import choice
-from django.conf import settings
+from rest_framework import viewsets, filters
+
 from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, render
-from django.contrib.auth.decorators import permission_required
-from .models import Player
-from .forms import (
-    PlayerMatchesFilterForm
-)
+from django.shortcuts import get_object_or_404
+from django.views.generic import ListView, DetailView, TemplateView
 
-from utils.pagination import SmarterPaginator
-from utils import binomial_exceedence
 
-from matches.models import PlayerMatchSummary, Match
+from datadrivendota.mixins import SubscriberRequiredMixin
+from datadrivendota.views import ChartFormView, ApiView
+
 
 from .mixins import (
     WinrateMixin,
@@ -23,189 +17,77 @@ from .mixins import (
     VersusWinrateMixin,
     RoleMixin,
     )
-
+from .models import Player
 from heroes.models import Hero
-from datadrivendota.views import ChartFormView, ApiView
-
-if settings.VERBOSE_PROFILING:
-    try:
-        from line_profiler import LineProfiler
-
-        def do_profile(follow=[]):
-            def inner(func):
-                def profiled_func(*args, **kwargs):
-                    try:
-                        profiler = LineProfiler()
-                        profiler.add_function(func)
-                        for f in follow:
-                            profiler.add_function(f)
-                        profiler.enable_by_count()
-                        return func(*args, **kwargs)
-                    finally:
-                        profiler.print_stats()
-                return profiled_func
-            return inner
-
-    except ImportError:
-        def do_profile(follow=[]):
-            "Helpful if you accidentally leave in production!"
-            def inner(func):
-                def nothing(*args, **kwargs):
-                    return func(*args, **kwargs)
-                return nothing
-            return inner
-else:
-    def do_profile(follow=[]):
-        "Helpful if you accidentally leave in production!"
-        def inner(func):
-            def nothing(*args, **kwargs):
-                return func(*args, **kwargs)
-            return nothing
-        return inner
+from .serializers import PlayerSerializer
 
 
-def index(request):
-    player_list = Player.objects.filter(updated=True)
-    return render(
-        request,
-        'players/index.html',
-        {
-            'player_list': player_list
-        }
-    )
+class PlayerIndexView(ListView):
+    queryset = Player.objects.filter(updated=True)
 
 
-@permission_required('players.can_touch')
-def followed_index(request):
-    player_list = Player.objects.filter(updated=True)
-    player_list = request.user.userprofile.following.all()
-    return render(
-        request,
-        'players/index.html',
-        {
-            'player_list': player_list
-        }
-    )
+class FollowedPlayerIndexView(SubscriberRequiredMixin, ListView):
+
+    def get_queryset(self):
+        return self.request.user.userprofile.following.all()
 
 
-@do_profile()
-def pro_index(request):
-    player_list = Player.TI4.all()
-    return render(
-        request,
-        'players/index.html',
-        {
-            'player_list': player_list
-        }
-    )
+class ProIndexView(ListView):
+    queryset = Player.TI4.all()
 
 
-def detail(request, player_id=None):
-    player = get_object_or_404(Player, steam_id=player_id)
+class PlayerDetailView(DetailView):
+    model = Player
+    slug_url_kwarg = 'player_id'
+    slug_field = 'steam_id'
 
-    # Tech debt: Ignore personalization
-    if request.user.is_authenticated() and False:
-        compare_url = reverse(
+    def get_context_data(self, **kwargs):
+
+        kwargs['player'] = self.object
+        kwargs['pms_list'] = self.object.summaries(36)
+
+        p2s = Player.objects.exclude(pro_name=None,)\
+            .exclude(steam_id=self.object.steam_id,)
+
+        p2 = choice([p for p in p2s])
+
+        kwargs['compare_url'] = reverse(
             'players:comparison',
             kwargs={
-                'player_id_1': request.user.userprofile.player.steam_id,
-                'player_id_2': player.steam_id,
-            })
-        compare_str = 'Compare me to {p2}!'.format(p2=player.display_name)
-    else:
-        p2 = Player.objects.exclude(
-            pro_name=None,
-        ).exclude(
-            steam_id=player.steam_id,
-        )
-
-        p2 = choice([p for p in p2])
-        compare_url = reverse(
-            'players:comparison',
-            kwargs={
-                'player_id_1': player.steam_id,
+                'player_id_1': self.object.steam_id,
                 'player_id_2': p2.steam_id,
             })
-        compare_str = 'Compare {p1} to {p2}!'.format(
-            p1=player.display_name,
+        kwargs['compare_str'] = 'Compare {p1} to {p2}!'.format(
+            p1=self.object.display_name,
             p2=p2.display_name,
         )
 
-    stats = {}
-    try:
-        wins = PlayerMatchSummary.objects.filter(
-            player=player,
-            match__validity=Match.LEGIT,
-            is_win=True
-        ).count()
-    except IndexError:
-        wins = 0
-    try:
-        losses = PlayerMatchSummary.objects.filter(
-            player=player,
-            match__validity=Match.LEGIT,
-            is_win=False
-        ).count()
-    except IndexError:
-        losses = 0
-    try:
-        total = PlayerMatchSummary.objects.filter(
-            player=player,
-        ).count()
-    except IndexError:
-        total = 0
+        stats = {}
+        stats['wins'] = self.object.wins
+        stats['losses'] = self.object.losses
+        stats['total'] = self.object.games
+        stats['winrate'] = round(
+            float(stats['wins']) / (stats['wins'] + stats['losses'])*100 \
+                if stats['wins'] + stats['wins'] > 0 else 0, 2
+        )
+        kwargs['stats'] = stats
 
-    stats['wins'] = wins
-    stats['losses'] = losses
-    stats['total'] = total
-    stats['winrate'] = round(
-        float(wins) / (wins + losses)*100 if wins + losses > 0 else 0,
-        2
-    )
+        # Compare to dendi and s4 by default
+        player_list = [70388657, 41231571, self.object.steam_id]
+        endgame_players = Player.objects.filter(steam_id__in=player_list)
+        kwargs['player_ids'] = ",".join(
+            [str(p.steam_id) for p in endgame_players]
+        )
 
-    pms_list = get_playermatchsummaries_for_player(player, 36)
-    for pms in pms_list:
-        pms.display_date = \
-            datetime.datetime.fromtimestamp(pms.match.start_time)\
-            .strftime('%Y-%m-%d')
+        return super(PlayerDetailView, self).get_context_data(**kwargs)
 
-        pms.display_duration = \
-            str(datetime.timedelta(seconds=pms.match.duration))
-    wins = len([
-        p for p in pms_list
-        if p.match.validity == Match.LEGIT and p.is_win
-    ])
-    games = len([
-        p for p in pms_list
-        if p.match.validity == Match.LEGIT
-    ])
 
-    if games > 0:
-        winrate = round(wins/float(games)*100, 2)
-        odds = round(binomial_exceedence(games, wins, .5)*100, 2)
-    else:
-        winrate = 0
-        odds = 100
-
-    #Compare to dendi and s4 by default
-    player_list = [70388657, 41231571, player.steam_id]
-    endgame_players = Player.objects.filter(steam_id__in=player_list)
-    player_ids = ",".join([str(p.steam_id) for p in endgame_players])
-
-    return render(
-        request,
-        'players/detail.html',
-        {
-            'player': player,
-            'endgame_chart_ids': player_ids,
-            'stats': stats,
-            'compare_url': compare_url,
-            'compare_str': compare_str,
-            'pms_list': pms_list,
-            'winrate': winrate,
-            'odds': odds,
-        }
-    )
+class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
+    lookup_field = 'steam_id'
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('persona_name',)
 
 
 class Winrate(WinrateMixin, ChartFormView):
@@ -285,158 +167,29 @@ class HeroAbilities(HeroAbilitiesMixin, ChartFormView):
         return chart
 
 
-def player_matches(request, player_id=None):
-    player = get_object_or_404(Player, steam_id=player_id)
-    total_results = 500
-    form = PlayerMatchesFilterForm(request.GET)
+class PlayerComparsionView(TemplateView):
+    template_name = 'players/comparison.html'
 
-    if form.is_valid():
-        pms_list = PlayerMatchSummary.objects.select_related()
-        pms_list = pms_list.filter(
-            player=player
+    def get_context_data(self, **kwargs):
+        kwargs['player_1'] = get_object_or_404(
+            Player, steam_id=kwargs['player_id_1']
         )
-        if form.cleaned_data['hero'] is not None:
-            pms_list = pms_list.filter(
-                hero__steam_id=form.cleaned_data['hero']
-            )
-        if form.cleaned_data['min_date'] is not None:
-            min_date_utc = mktime(
-                form.cleaned_data['min_date'].timetuple()
-                )
-            pms_list = pms_list.filter(
-                match__start_time__gte=min_date_utc,
-            )
-        if form.cleaned_data['max_date'] is not None:
-            max_date_utc = mktime(
-                form.cleaned_data['max_date'].timetuple()
-                )
-            pms_list = pms_list.filter(
-                match__start_time__lte=max_date_utc,
-            )
-        pms_list = pms_list.order_by('-match__start_time')[0:total_results]
-        pms_list = date_notate_pms_list(pms_list)
-    else:
-        pms_list = get_playermatchsummaries_for_player(
-            player, total_results
+        kwargs['player_2'] = get_object_or_404(
+            Player, steam_id=kwargs['player_id_2']
         )
 
-    page = request.GET.get('page')
-    paginator = SmarterPaginator(
-        object_list=pms_list,
-        per_page=36,
-        current_page=page
-    )
-    pms_list = paginator.current_page
 
-    return render(
-        request,
-        'players/match_summary.html',
-        {
-            'pms_list': pms_list,
-            'player': player,
-            'form': form
-        }
-    )
+class HeroStyleView(TemplateView):
+    # So much magic in the template!
+    template_name = 'players/hero_style.html'
 
-
-def comparison(request, player_id_1, player_id_2):
-    player_1 = get_object_or_404(Player, steam_id=player_id_1)
-    player_2 = get_object_or_404(Player, steam_id=player_id_2)
-
-    return render(
-        request,
-        'players/comparison.html',
-        {
-            'player1': player_1,
-            'player2': player_2,
-        }
-    )
-
-
-def hero_style(request, player_id, hero_name):
-    #So much magic in the template!
-    player = get_object_or_404(Player, steam_id=player_id)
-    hero = get_object_or_404(Hero, machine_name=hero_name)
-
-    return render(
-        request,
-        'players/hero_style.html',
-        {
-            'player': player,
-            'hero': hero,
-        }
-    )
-
-
-def player_list(request):
-    if request.is_ajax():
-        q = request.GET.get('term', '')
-        players = Player.objects.filter(
-            persona_name__icontains=q,
-            pro_name=None
-        )[:20]
-        pros = Player.objects.filter(
-            pro_name__icontains=q
-        )[:20]
-
-        results = []
-        for player in players:
-            player_json = {}
-            player_json['id'] = player.steam_id
-            player_json['label'] = player.persona_name
-            player_json['value'] = player.steam_id
-            results.append(player_json)
-
-        for player in pros:
-            player_json = {}
-            player_json['id'] = player.steam_id
-            player_json['label'] = player.pro_name
-            player_json['value'] = player.steam_id
-            results.append(player_json)
-        data = json.dumps(results)
-    else:
-        data = 'fail'
-    mimetype = 'application/json'
-    return HttpResponse(data, mimetype)
-
-
-
-
-def get_playermatchsummaries_for_player(player, count):
-    pms_list = PlayerMatchSummary.objects.select_related()
-    pms_list = pms_list.filter(
-        player=player
-    ).order_by('-match__start_time')[0:count]
-    pms_list = date_notate_pms_list(pms_list)
-    return pms_list
-
-
-def date_notate_pms_list(pms_list):
-    for pms in pms_list:
-        pms.display_date = datetime.datetime.fromtimestamp(
-            pms.match.start_time
-        ).strftime('%Y-%m-%d')
-        pms.display_duration = str(datetime.timedelta(
-            seconds=pms.match.duration
-        ))
-        pms.KDA2 = pms.kills - pms.deaths + pms.assists / 2.0
-        if pms.KDA2 > 0:
-            pms.color_class = 'pos'
-            pms.pos = True
-        else:
-            pms.color_class = 'neg'
-            pms.neg = True
-
-        pms.mag = abs(pms.KDA2)*3
-
-        if pms.match.validity == Match.LEGIT:
-            pms.legit = True
-        elif pms.match.validity == Match.UNCOUNTED:
-            pms.invalid = True
-        elif pms.match.validity == Match.UNPROCESSED:
-            pms.unprocessed = True
-
-    return pms_list
+    def get_context_data(self, **kwargs):
+        kwargs['player'] = get_object_or_404(
+            Player, steam_id=kwargs['player_id']
+            )
+        kwargs['hero'] = get_object_or_404(
+            Hero, machine_name=kwargs['hero_name']
+        )
 
 
 class ApiWinrateChart(WinrateMixin, ApiView):

@@ -1,8 +1,8 @@
 from django.db import models
 from .validators import validate_32bit
 from settings.base import ADDER_32_BIT, ANONYMOUS_ID
-from uuid import uuid4
 from django.utils.encoding import smart_str
+from matches.models import PlayerMatchSummary, Match
 
 from .managers import TI4Manager
 
@@ -49,14 +49,48 @@ class Player(models.Model):
         super(Player, self).save(*args, **kwargs)
 
     def is_masked(self):
-        #That's the magic number for anonymous data
         return self.steam_id == ANONYMOUS_ID
 
-    def get_64_bit_id(self):
-        return self.steam_id + ADDER_32_BIT
 
-    def get_32_bit_id(self):
-        return self.steam_id % ADDER_32_BIT
+    @property
+    def wins(self):
+        try:
+            wins = PlayerMatchSummary.objects.filter(
+                player=self,
+                match__validity=Match.LEGIT,
+                is_win=True
+            ).count()
+        except IndexError:
+            wins = 0
+        return wins
+
+    @property
+    def losses(self):
+        try:
+            losses = PlayerMatchSummary.objects.filter(
+                player=self,
+                match__validity=Match.LEGIT,
+                is_win=False
+            ).count()
+        except IndexError:
+            losses = 0
+        return losses
+
+    @property
+    def games(self):
+        try:
+            total = PlayerMatchSummary.objects.filter(
+                player=self,
+            ).count()
+        except IndexError:
+            total = 0
+        return total
+
+    def summaries(self, count):
+        return PlayerMatchSummary.objects.filter(
+            player=self
+        ).select_related().order_by('-match__start_time')[0:count]
+
 
     def __unicode__(self):
         return unicode(self.steam_id)

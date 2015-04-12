@@ -1,13 +1,10 @@
-import json
-from django.http import HttpResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from django.views.generic import ListView, DetailView, TemplateView
 from utils.pagination import SmarterPaginator
 
 from .models import League, ScheduledMatch
 from .serializers import LeagueSerializer
-from matches.models import Match, PlayerMatchSummary
-from matches.views import annotated_matches
+from matches.models import Match
 from .mixins import (
     WinrateMixin,
     PickBanMixin,
@@ -79,16 +76,60 @@ class LeagueDetail(DetailView):
         )
         match_list = paginator.current_page
 
-        pms_list = PlayerMatchSummary.\
-            objects.filter(match__in=match_list)\
-            .select_related().order_by('-match__start_time')[:500]
-        match_data = annotated_matches(pms_list, [])
-
         context = {
             'match_list': match_list,
-            'match_data': match_data,
         }
         return super(LeagueDetail, self).get_context_data(**context)
+
+
+class LiveGameListView(TemplateView):
+    """
+
+    """
+    title = "Particular Game!"
+    template_name = "leagues/live_game_list.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = {
+            'games': sorted(
+                get_games(),
+                key=lambda game: (game['scoreboard']['duration'] if 'scoreboard' in game else 0),
+                reverse=True
+            )
+        }
+        return super(LiveGameListView, self).get_context_data(**context)
+
+
+class LiveGameDetailView(TemplateView):
+    """
+
+    """
+    title = "Live Games!"
+    template_name = "leagues/live_game_detail.html"
+
+    def get_context_data(self, **kwargs):
+
+        match_id = int(kwargs['match_id'])
+        context = {
+            'match_id': match_id
+        }
+        return super(LiveGameDetailView, self).get_context_data(**context)
+
+
+class LeagueViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = League.objects.all()
+    serializer_class = LeagueSerializer
+    lookup_field = 'steam_id'
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+
+
+"""
+WARNING
+Everything below here is deprecated.
+WARNING
+"""
 
 
 class Winrate(WinrateMixin, ChartFormView):
@@ -136,68 +177,12 @@ class PickBan(PickBanMixin, ChartFormView):
     html = "players/form.html"
 
 
-class LiveGameListView(TemplateView):
-    """
-
-    """
-    title = "Particular Game!"
-    template_name = "leagues/live_game_list.html"
-
-    def get_context_data(self, **kwargs):
-
-        context = {
-            'games': sorted(
-                get_games(),
-                key=lambda game: (game['scoreboard']['duration'] if 'scoreboard' in game else 0),
-                reverse=True
-            )
-        }
-        return super(LiveGameListView, self).get_context_data(**context)
-
-
-class LiveGameDetailView(TemplateView):
-    """
-
-    """
-    title = "Live Games!"
-    template_name = "leagues/live_game_detail.html"
-
-    def get_context_data(self, **kwargs):
-
-        match_id = int(kwargs['match_id'])
-        context = {
-            'match_id': match_id
-        }
-        return super(LiveGameDetailView, self).get_context_data(**context)
-
-
 class ApiWinrateChart(WinrateMixin, ApiView):
     pass
 
 
 class ApiPickBanChart(PickBanMixin, ApiView):
     pass
-
-
-def league_list(request):
-    if request.is_ajax():
-        q = request.GET.get('term', '')
-        leagues = League.objects.filter(
-            name__icontains=q,
-        )[:20]
-        results = []
-        for league in leagues:
-            league_json = {}
-            league_json['id'] = league.steam_id
-            league_json['label'] = league.display_name
-            league_json['value'] = league.steam_id
-            results.append(league_json)
-
-        data = json.dumps(results)
-    else:
-        data = 'fail'
-    mimetype = 'application/json'
-    return HttpResponse(data, mimetype)
 
 
 class ApiLiveGamesList(JsonApiView):
@@ -237,9 +222,3 @@ class ApiLiveGameSlice(JsonApiView):
             return data
         else:
             self.fail()
-
-
-class LeagueViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = League.objects.all()
-    serializer_class = LeagueSerializer
-    lookup_field = 'steam_id'

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Cards Swatch Test{% endblock title %}
+{% block page_title %}Cards Swatch Test{% endblock page_title %}
+{% block topbar %}{% endblock topbar %}
+
+{% block content %}
+<div class='container'>
+    <h1>Hero Card</h1>
+    <div class='row'>
+        <div class='col-md-1'>
+            <h1>1</h1>
+            {% include 'heroes/_hero_card.html' %}
+        </div>
+        <div class='col-md-2'>
+            <h1>2</h1>
+            {% include 'heroes/_hero_card.html' %}
+        </div>
+        <div class='col-md-4'>
+            <h1>4</h1>
+            {% include 'heroes/_hero_card.html' %}
+        </div>
+    </div>
+</div>
+
+<div class='container'>
+    <h1>Match Card</h1>
+    <div class='row'>
+        <div class='col-md-12'>
+            <h1>12</h1>
+            {% include 'matches/_match_card.html' %}
+        </div>
+        <div class='col-md-6'>
+            <h1>6</h1>
+            {% include 'matches/_match_card.html' %}
+        </div>
+    </div>
+</div>
+
+<div class='container'>
+    <h1>Player Card</h1>
+    <div class='row'>
+        <div class='col-md-1'>
+            <h1>1</h1>
+            {% include 'players/_player_card.html' %}
+        </div>
+        <div class='col-md-2'>
+            <h1>2</h1>
+            {% include 'players/_player_card.html' %}
+        </div>
+        <div class='col-md-4'>
+            <h1>4</h1>
+            {% include 'players/_player_card.html' %}
+        </div>
+    </div>
+</div>
+<div class='container'>
+    <div class='row'>
+        <div class='col-md-6'>
+            <h1>6</h1>
+            {% include 'players/_player_card.html' %}
+        </div>
+    </div>
+</div>
+<div class='container'>
+    <div class='row'>
+        <div class='col-md-12'>
+            <h1>12</h1>
+            {% include 'players/_player_card.html' %}
+        </div>
+    </div>
+</div>
+
+<div class='container'>
+    <h1>Player Match Summary Card</h1>
+    <div class='row'>
+        <div class='col-md-12'>
+            <h2>12</h2>
+            {% include 'matches/_pms_card.html' %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

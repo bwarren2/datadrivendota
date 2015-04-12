@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from utils import safen
 
@@ -82,6 +83,26 @@ class Match(models.Model):
 
     def __unicode__(self):
         return unicode(self.steam_id)
+
+    @property
+    def hms_duration(self):
+        return datetime.timedelta(seconds=self.duration)
+
+    @property
+    def hms_start_time(self):
+        return datetime.datetime.fromtimestamp(
+            self.start_time
+        ).strftime('%H:%M:%S %Y-%m-%d')
+
+    @property
+    def radiant(self):
+        return self.playermatchsummary_set.\
+            filter(player_slot__lt=5).select_related().order_by('player_slot')
+
+    @property
+    def dire(self):
+        return self.playermatchsummary_set.\
+            filter(player_slot__gte=5).select_related().order_by('player_slot')
 
 
 class GameMode(models.Model):
@@ -186,12 +207,32 @@ class PlayerMatchSummary(models.Model):
         return self.xp_per_min*self.match.duration/60
 
     @property
+    def improper_player(self):
+        return self.leaver.steam_id > 0
+
+    @property
     def side(self):
         """ Returns radiant or dire based on player slot."""
         if self.player_slot < 5:
             return 'Radiant'
         else:
             return 'Dire'
+
+    @property
+    def display_date(self):
+        return str(
+            datetime.datetime.fromtimestamp(
+                self.match.start_time
+            ).strftime('%Y-%m-%d')
+        )
+
+    @property
+    def display_duration(self):
+        return str(
+            datetime.timedelta(
+                seconds=self.match.duration
+            )
+        )
 
 
 class AdditionalUnit(models.Model):

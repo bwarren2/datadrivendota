@@ -124,16 +124,56 @@ svg path.domain{
   fill: black;
 }
 
+circle.radiant{
+  stroke-width: 1;
+  stroke: #000;
+  fill: #7CD51B;
+}
+
+circle.dire{
+  stroke-width: 1;
+  stroke: #000;
+  fill: #BA3B15
+}
+
+// Why does this not work?
+// circle{
+//   stroke-width: 1;
+//   stroke: #000;
+
+//   .radiant{
+//     fill: #7CD51B;
+//   }
+//   .dire{
+//    fill: #BA3B15
+//   }
+// }
+
+svg {
+  background: #444444;
+}
+
+text {
+  fill: #000000;
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: @rich_background;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
 // Glyphs
 .win-glyph{
   font-size:20px;
   color: lightgreen;
-}
-
-.cast-player-image{
-  position: absolute;
-  top:62px;
-  left:62px;
 }
 
 .card-win-pip{
@@ -150,27 +190,19 @@ svg path.domain{
   top: 13px;
 }
 
-.side-pip{
-  position: absolute;
-  left: 34px;
-  top: 16px;
-  max-width: 48px;
-}
+// .side-pip{
+//   position: absolute;
+//   left: 34px;
+//   top: 16px;
+//   max-width: 48px;
+// }
 
-.league-pip{
-  position: absolute;
-  left: -4px;
-  top: 16px;
-  max-width: 75px;
-}
-
-
-.chart-pip{
-  font-size:20px;
-  position: absolute;
-  right: 10px;
-  top: 62px;
-}
+// .league-pip{
+//   position: absolute;
+//   left: -4px;
+//   top: 16px;
+//   max-width: 75px;
+// }
 
 
 .improper-player-pip{
@@ -326,7 +358,7 @@ div#IntercomDefaultWidget {
 
 a.thumbnail:hover,
 a.thumbnail:focus {
-  border-color: #B63BD9; /* @brand-danger, but it looks good. */
+  border-color: @brand-primary;
 }
 
 a.item.thumbnail {
@@ -359,10 +391,6 @@ a.ability {
   }
 }
 
-.ability-card {
-  width: 600px;
-  margin: 0 auto;
-}
 
 /*Enfootening*/
 html,
@@ -384,10 +412,6 @@ body {
   font-style: italic;
 }
 
-img.hero-portrait {
-  height: 70px;
-  width: 124px;
-}
 
 .hero-ability-list{
   margin-top:15px;
@@ -443,29 +467,8 @@ img.hero-portrait {
   text-align: center;
 }
 
-svg {
-  background: #444444;
-}
-
-text {
-  fill: #000000;
-}
-
 .row.controls-button {
   margin-top: 10px;
-}
-
-div.tooltip {
-  position: absolute;
-  text-align: center;
-  width: auto;
-  height: auto;
-  padding: 2px;
-  font: 12px sans-serif;
-  background: @rich_background;
-  border: 0px;
-  border-radius: 8px;
-  pointer-events: none;
 }
 
 td.match-summary-images img {
@@ -689,6 +692,182 @@ div#header ol.breadcrumb li a:visited, div#header ol.breadcrumb li a:link{
   filter: grayscale(100%);
 }
 
+
+
+
+
+.team-tag {
+  .rounded-corners;
+  background-color: #000000;
+  bottom: 12px;
+  color: #f6f7f0; /* @text-color */
+  left: 22px;
+  opacity: 0.7;
+  padding-left: 4px;
+  padding-right: 4px;
+  position: absolute;
+  z-index: 100;
+}
+
+
+
+
+
+p.kills{
+    color: @brand-success;
+}
+p.deaths{
+    color: @brand-danger;
+}
+p.assists{
+    color: @brand-info;
+}
+p.kda2{
+    color: @brand-primary;
+}
+p.gpm{
+    color: #829FB2;
+}
+p.xpm{
+    color: #9282B2;
+}
+.table tbody>tr>td{
+    vertical-align: middle;
+}
+
+@media (min-width: @screen-md-min) {
+  .table-face{
+    max-height:25px;
+  }
+}
+
+.chart > i.toggleface.radiant, .chart > i.d2mh.radiant{
+
+  background-color:rgba(124, 213, 27, .5);
+  box-shadow: 0px 0px 5px #7cd51b;
+}
+.chart > i.toggleface.dire, .chart > i.d2mh.dire{
+  background-color:rgba(186, 59, 21, .5);
+  box-shadow: 0px 0px 5px #ba3b15;
+}
+
+/* Cards! */
+
+div.match-card{
+  .container();
+  div.match-side{
+    .make-row();
+    div.side-card{
+      .make-md-column(1);
+      margin: 0px;
+      padding: 3px;
+      .side-pip{
+        position: absolute;
+        left: 25%;
+        top: 50%;
+        width: 50%;
+      }
+    }
+    div.summary{
+      .make-md-column(2);
+      margin: 0px;
+      padding: 3px;
+
+      .chart-pip{
+        font-size: auto;
+        position: absolute;
+        right: 0%;
+        top: 70%;
+      }
+      .cast-player-image{
+        position: absolute;
+        left: 5%;
+        bottom: 15%;
+      }
+    }
+    div.team-card{
+      .make-md-column(1);
+      margin: 0px;
+      padding: 3px;
+    }
+  }
+}
+
+
+div.hero-card{
+
+}
+
+.ability-card {
+  width: 600px;
+  margin: 0 auto;
+}
+
+
+div#animation-controls{
+  .make-row();
+
+  div#animation-buttons{
+    div#stop-button{
+      .make-md-column(2);
+      .make-xs-column(3);
+    }
+    div#start-button{
+      .make-md-column(2);
+      .make-xs-column(3);
+    }
+    div#forward-button{
+      .make-md-column(2);
+      .make-xs-column(3);
+    }
+    div#back-button{
+      .make-md-column(2);
+      .make-xs-column(3);
+    }
+    div#autoplay-button{
+      .make-md-column(2);
+      .make-xs-column(3);
+    }
+    div#timer{
+      .make-md-column(2);
+      .make-xs-column(4);
+    }
+  }
+}
+
+div#games{
+  .make-row();
+  div.game-card{
+    .make-md-column(12);
+    .make-xs-column(12);
+    padding:10px;
+    div.sections{
+      .make-row();
+      div.league-card{
+        .make-md-column(3);
+        .make-xs-column(3);
+      }
+      div.match-card{
+        .make-md-column(9);
+        .make-xs-column(9);
+        div.side-row{
+          .make-row();
+          margin-left: 0px;
+          margin-right: 0px;
+          div.hero-thumb{
+            .make-md-column(2);
+            .make-xs-column(2);
+            padding-left: 0px;
+            padding-right: 0px;
+          }
+        }
+
+      }
+    }
+  }
+}
+
+
 div#bans{
   .make-row();
 
@@ -777,150 +956,4 @@ div#state{
     }
   }
 
-}
-
-
-div#animation-controls{
-  .make-row();
-
-  div#animation-buttons{
-    div#stop-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#start-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#forward-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#back-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#autoplay-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#timer{
-      .make-md-column(2);
-      .make-xs-column(4);
-    }
-  }
-}
-
-div#games{
-  .make-row();
-  div.game-card{
-    .make-md-column(12);
-    .make-xs-column(12);
-    padding:10px;
-    div.sections{
-      .make-row();
-      div.league-card{
-        .make-md-column(3);
-        .make-xs-column(3);
-      }
-      div.match-card{
-        .make-md-column(9);
-        .make-xs-column(9);
-        div.side-row{
-          .make-row();
-          margin-left: 0px;
-          margin-right: 0px;
-          div.hero-thumb{
-            .make-md-column(2);
-            .make-xs-column(2);
-            padding-left: 0px;
-            padding-right: 0px;
-          }
-        }
-
-      }
-    }
-  }
-}
-// Why does this not work?
-// circle{
-//   stroke-width: 1;
-//   stroke: #000;
-
-//   .radiant{
-//     fill: #7CD51B;
-//   }
-//   .dire{
-//    fill: #BA3B15
-//   }
-// }
-
-.team-tag {
-  .rounded-corners;
-  background-color: #000000;
-  bottom: 12px;
-  color: #f6f7f0; /* @text-color */
-  left: 22px;
-  opacity: 0.7;
-  padding-left: 4px;
-  padding-right: 4px;
-  position: absolute;
-  z-index: 100;
-}
-
-
-
-circle.radiant{
-  stroke-width: 1;
-  stroke: #000;
-  fill: #7CD51B;
-}
-circle.dire{
-  stroke-width: 1;
-  stroke: #000;
-  fill: #BA3B15
-}
-
-
-p.kills{
-    color: @brand-success;
-}
-p.deaths{
-    color: @brand-danger;
-}
-p.assists{
-    color: @brand-info;
-}
-p.kda2{
-    color: @brand-primary;
-}
-p.gpm{
-    color: #829FB2;
-}
-p.xpm{
-    color: #9282B2;
-}
-.table tbody>tr>td{
-    vertical-align: middle;
-}
-
-// @media (min-width: @screen-md-min) {
-//   .table-face{
-//     max-height:40px;
-//   }
-// }
-@media (min-width: @screen-md-min) {
-  .table-face{
-    max-height:25px;
-  }
-}
-
-.chart > i.toggleface.radiant, .chart > i.d2mh.radiant{
-
-  background-color:rgba(124, 213, 27, .5);
-  box-shadow: 0px 0px 5px #7cd51b;
-}
-.chart > i.toggleface.dire, .chart > i.d2mh.dire{
-  background-color:rgba(186, 59, 21, .5);
-  box-shadow: 0px 0px 5px #ba3b15;
 }

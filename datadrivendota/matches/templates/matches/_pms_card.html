@@ -1,0 +1,17 @@
+<div class="{{summary.hero.safe_name}}_slot {{summary.hero.internal_name}}_slot summary">
+
+    <img src="{{ summary.hero.mugshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail player-slot-{{summary.slot}}">
+
+  {% if summary.improper_player %}
+    <div class='glyphicon glyphicon-remove-circle validity-glyph' title='Improper Player (Left/Did Not Connect/Bot)'></div>
+  {% endif %}
+
+  {% if summary.player.avatar %}
+    <img class='cast-player-image' src="{{summary.player.avatar}}" title='{{summary.player.persona_name}}'>
+  {% endif %}
+
+    <a href="{% url 'matches:match_hero_context' %}?matches={{match.steam_id}}&hero={{summary.hero_id}}&outcome=both">
+      <i class='glyphicon glyphicon-signal chart-pip'  title='Performance Context' style='display:inline-block'></i>
+    </a>
+
+</div>

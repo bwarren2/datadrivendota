@@ -1,6 +1,5 @@
 from json import dumps
 from os.path import basename
-from functools import wraps
 
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
@@ -24,47 +23,26 @@ from items.models import Item
 from teams.models import Team
 from leagues.models import League
 
-try:
-    if 'devserver' not in settings.INSTALLED_APPS:
-        raise ImportError
-    from devserver.modules.profile import devserver_profile
-except ImportError:
-    class devserver_profile(object):
-        def __init__(self, *args, **kwargs):
-            pass
 
-        def __call__(self, func):
-            def nothing(*args, **kwargs):
-                return func(*args, **kwargs)
-            return wraps(func)(nothing)
+class LandingView(TemplateView):
+    template_name = 'home.html'
 
+    def get_context_data(self, **kwargs):
+        p = Player.objects.get(steam_id=70388657)
+        h = Hero.objects.get(name='Slark')
+        kwargs['chart_player'] = p
+        kwargs['chart_hero'] = h
 
-def base(request):
-    p = Player.objects.get(steam_id=70388657)
-    h = Hero.objects.get(name='Slark')
-
-    # from keen import client
-    keen_client.add_event(
-        "splashpage_render", {
-            "hit": 1,
-        }
-    )
-    extra_dict = {'chart_player': p, 'chart_hero': h}
-    return render(request, 'home.html', extra_dict)
+        # Log the laod with keen
+        keen_client.add_event(
+            "splashpage_render", {
+                "hit": 1,
+            }
+        )
+        return super(LandingView, self).get_context_data(**kwargs)
 
 
-def blank(request):
-    return render(request, 'base.html')
-
-
-def faq(request):
-    return render(request, 'about.html')
-
-
-def privacy(request):
-    return render(request, 'privacy.html')
-
-
+# The onboarding process is due for a refactor.  Fixing this before that would be a waste of time.
 def upgrade(request):
     if request.method == 'POST':
         form = KeyForm(request.POST)

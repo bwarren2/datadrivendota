@@ -1,20 +1,13 @@
-import datetime
 import json
-from functools import wraps
-from itertools import chain
-from time import mktime
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 
-from django.http import HttpResponse
-from django.contrib.auth.decorators import user_passes_test
-from django.http import Http404
+from django.views.generic import DetailView, ListView
 from django.shortcuts import render
-from django.conf import settings
 from django.views.generic.edit import FormView
 
+from datadrivendota.views import ChartFormView, ApiView
 from utils.views import cast_dict, ability_infodict
-from utils.pagination import SmarterPaginator
-from heroes.models import Hero, Role
+from heroes.models import Hero
 from .models import Match, PlayerMatchSummary, PickBan
 from .forms import ContextSelect
 from .mixins import (
@@ -29,460 +22,368 @@ from .mixins import (
     SetProgressionMixin,
 )
 from .serializers import MatchSerializer, PlayerMatchSummarySerializer
-from datadrivendota.views import ChartFormView, ApiView
-from datadrivendota.forms import FollowMatchForm
-from players.models import Player
-from accounts.models import request_to_player
-
-try:
-    if 'devserver' not in settings.INSTALLED_APPS:
-        raise ImportError
-    from devserver.modules.profile import devserver_profile
-except ImportError:
-    class devserver_profile(object):
-        def __init__(self, *args, **kwargs):
-            pass
-
-        def __call__(self, func):
-            def nothing(*args, **kwargs):
-                return func(*args, **kwargs)
-            return wraps(func)(nothing)
 
 
-@user_passes_test(lambda u: u.is_superuser)
-@devserver_profile()
-def overview(request):
-    skill_levels = range(0, 4)
-    match_info = {}
-    validity_set = [Match.LEGIT, Match.UNCOUNTED, Match.UNPROCESSED]
-    heroes = Hero.objects.filter(visible=True)
-    for hero in heroes:
-        match_info[hero] = {}
-    for skill in skill_levels:
-        match_info[hero][skill] = {}
-        for validity in validity_set:
-            match_info[hero][skill][validity] = PlayerMatchSummary.objects.\
-                filter(
-                    hero=hero,
-                    match__validity=validity,
-                    match__skill=skill
-                ).count()
-
-    return render(
-        request,
-        'matches/index.html',
-        {
-            'match_info': match_info,
-            'skill_levels': skill_levels
-        }
-    )
+class MatchViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Match.objects.all()
+    paginate_by = 10
+    serializer_class = MatchSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
 
 
-@devserver_profile()
-def match(request, match_id):
-    try:
-        match = Match.objects.get(steam_id=match_id)
-    except Match.DoesNotExist:
-        raise Http404
-    summaries = PlayerMatchSummary.objects.filter(
-        match=match
-    ).select_related().order_by('player_slot')
-
-    for summary in summaries:
-        summary.kda = summary.kills - summary.deaths + .5*summary.assists
-        if summary.side == 'Radiant':
-            summary.is_radiant = True
-        else:
-            summary.is_dire = True
-        if summary.leaver.steam_id != 0:
-            summary.improper_player = True
-        if summary.is_win:
-            summary.won = True
-    match.hms_duration = datetime.timedelta(seconds=match.duration)
-    match.hms_start_time = datetime.datetime.fromtimestamp(
-        match.start_time
-    ).strftime('%H:%M:%S %Y-%m-%d')
-
-    radiant_summaries = [
-        summary for summary in summaries if summary.side == 'Radiant'
-    ]
-    radiant_infodict = {}
-    radiant_cast_list = []
-    min_skill_length = 10  # Check if a row lacks data, aka things are borked.
-    for summary in radiant_summaries:
-        radiant_cast_list.append(cast_dict(summary))
-        radiant_infodict[summary.player_slot] = ability_infodict(summary)
-        min_skill_length = min(
-            min_skill_length,
-            len(radiant_infodict[summary.player_slot]['ability_dict'])
-        )
-    dire_summaries = [
-        summary for summary in summaries if summary.side == 'Dire'
-    ]
-    dire_infodict = {}
-    dire_cast_list = []
-    for summary in dire_summaries:
-        dire_cast_list.append(cast_dict(summary))
-        dire_infodict[summary.player_slot] = ability_infodict(summary)
-        min_skill_length = min(
-            min_skill_length,
-            len(dire_infodict[summary.player_slot]['ability_dict'])
-        )
-
-    # Identify any pickbans for templating.
-    try:
-        # Magic numbers are bad, but 0 = radiant.  Fix later
-        dire_picks = PickBan.objects.filter(
-            match=match,
-            team=1,
-            is_pick=True
-        ).select_related('hero')
-
-        dire_bans = PickBan.objects.filter(
-            match=match,
-            team=1,
-            is_pick=False
-        ).select_related('hero')
-
-        radiant_picks = PickBan.objects.filter(
-            match=match,
-            is_pick=True
-        ).exclude(team=1).select_related('hero')
-
-        radiant_bans = PickBan.objects.filter(
-            match=match,
-            is_pick=False
-        ).exclude(team=1).select_related('hero')
-
-        pickban_length = (
-            dire_picks.count() +
-            dire_bans.count() +
-            radiant_picks.count() +
-            radiant_bans.count()
-        )
-
-        return render(
-            request,
-            'matches/detail.html',
-            {
-                'match': match,
-                'summaries': summaries,
-                'radiant_cast_list': radiant_cast_list,
-                'dire_cast_list': dire_cast_list,
-                'radiant_infodict': radiant_infodict,
-                'dire_infodict': dire_infodict,
-                'dire_picks': dire_picks,
-                'radiant_picks': radiant_picks,
-                'dire_bans': dire_bans,
-                'radiant_bans': radiant_bans,
-                'min_skill_length': min_skill_length,
-                'pickban_length': pickban_length,
-            }
-        )
-    except IndexError:
-        return render(
-            request,
-            'matches/detail.html',
-            {
-                'match': match,
-                'summaries': summaries,
-                'radiant_cast_list': radiant_cast_list,
-                'dire_cast_list': dire_cast_list,
-                'radiant_infodict': radiant_infodict,
-                'dire_infodict': dire_infodict,
-                'min_skill_length': min_skill_length,
-            }
-        )
+class PlayerMatchSummaryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = PlayerMatchSummary.objects.all()
+    paginate_by = 10
+    serializer_class = PlayerMatchSummarySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
 
 
-@devserver_profile()
-def parse_preview(request, match_id=787900748):
-    try:
-        match = Match.objects.get(steam_id=match_id)
-    except Match.DoesNotExist:
-        raise Http404
-    summaries = PlayerMatchSummary.objects.filter(
-        match=match
-    ).select_related().order_by('player_slot')
+class MatchDetail(DetailView):
+    model = Match
+    slug_url_kwarg = 'match_id'
+    slug_field = 'steam_id'
 
-    slot_dict = {
-        0: '#7CD51B',  # 1f77b4', #Radiant #7CD51B
-        1: '#7CD51B',  # 7EF6C6',
-        2: '#7CD51B',  # 9A1D9B',
-        3: '#7CD51B',  # ECF14C',
-        4: '#7CD51B',  # DB7226',
-        128: '#BA3B15',  # E890BA',
-        129: '#BA3B15',  # 99B15F',
-        130: '#BA3B15',  # 75D1E1',
-        131: '#BA3B15',  # 147335',
-        132: '#BA3B15',  # 906A2B', #Dire  #BA3B15
-    }
+    def get_context_data(self, **kwargs):
+        kwargs['match'] = self.object
+        summaries = PlayerMatchSummary.objects.filter(
+            match=self.object
+        ).select_related().order_by('player_slot')
 
-    css_color_dict = {}
-    for summary in summaries:
-        summary.kda = summary.kills - summary.deaths + .5*summary.assists
-        if summary.side == 'Radiant':
-            summary.is_radiant = True
-        else:
-            summary.is_dire = True
-        if summary.leaver.steam_id != 0:
-            summary.improper_player = True
-        if summary.is_win:
-            summary.won = True
-        css_color_dict[
-            summary.hero.internal_name
-        ] = slot_dict[summary.player_slot]
-    match.hms_duration = datetime.timedelta(seconds=match.duration)
-    match.hms_start_time = datetime.datetime.fromtimestamp(
-        match.start_time
-    ).strftime('%H:%M:%S %Y-%m-%d')
+        for summary in summaries:
+            summary.kda = summary.kills - summary.deaths + .5*summary.assists
 
-    radiant_summaries = [
-        summary for summary in summaries if summary.side == 'Radiant'
-    ]
-    radiant_cast_list = []
-    for summary in radiant_summaries:
-        radiant_cast_list.append(cast_dict(summary))
+            if summary.side == 'Radiant':
+                summary.is_radiant = True
+            else:
+                summary.is_dire = True
 
-    dire_summaries = [
-        summary for summary in summaries if summary.side == 'Dire'
-    ]
-    dire_cast_list = []
-    for summary in dire_summaries:
-        dire_cast_list.append(cast_dict(summary))
+            if summary.leaver.steam_id != 0:
+                summary.improper_player = True
 
-    return render(
-        request,
-        'matches/parse_preview.html',
-        {
-            'match': match,
-            'summaries': summaries,
-            'radiant_cast_list': radiant_cast_list,
-            'dire_cast_list': dire_cast_list,
-            'css_color_dict': css_color_dict,
-            'slot_dict': slot_dict,
-            'side_kills': 'replay_parse_json/'+str(match.steam_id)+'_kills.json',
-            'side_creeps': 'replay_parse_json/'+str(match.steam_id)+'_creeps.json',
-            'side_towers': 'replay_parse_json/'+str(match.steam_id)+'_towers.json',
-            'hero_kills': 'replay_parse_json/'+str(match.steam_id)+'_kill_dmg.json',
-            'hero_deaths': 'replay_parse_json/'+str(match.steam_id)+'_death_dmg.json',
-            'hero_creeps': 'replay_parse_json/'+str(match.steam_id)+'_hero_creeps.json',
-        }
-    )
+        kwargs['summaries'] = summaries
 
+        radiant_summaries = [
+            summary for summary in summaries if summary.side == 'Radiant'
+        ]
+        radiant_infodict = {}
+        radiant_cast_list = []
+        min_skill_length = 10
+        for summary in radiant_summaries:
+            radiant_cast_list.append(cast_dict(summary))
+            radiant_infodict[summary.player_slot] = ability_infodict(summary)
+            min_skill_length = min(
+                min_skill_length,
+                len(radiant_infodict[summary.player_slot]['ability_dict'])
+            )
+        kwargs['radiant_summaries'] = radiant_summaries
+        kwargs['radiant_infodict'] = radiant_infodict
+        kwargs['radiant_cast_list'] = radiant_cast_list
 
-@devserver_profile()
-def parse_match(request, match_id=787900748):
-    try:
-        match = Match.objects.get(steam_id=match_id)
-    except Match.DoesNotExist:
-        raise Http404
-    summaries = PlayerMatchSummary.objects.filter(
-        match=match
-    ).select_related().order_by('player_slot')
+        dire_summaries = [
+            summary for summary in summaries if summary.side == 'Dire'
+        ]
+        dire_infodict = {}
+        dire_cast_list = []
+        for summary in dire_summaries:
+            dire_cast_list.append(cast_dict(summary))
+            dire_infodict[summary.player_slot] = ability_infodict(summary)
+            min_skill_length = min(
+                min_skill_length,
+                len(dire_infodict[summary.player_slot]['ability_dict'])
+            )
 
-    slot_dict = {
-        0: '#7CD51B',  # 1f77b4', #Radiant #7CD51B
-        1: '#7CD51B',  # 7EF6C6',
-        2: '#7CD51B',  # 9A1D9B',
-        3: '#7CD51B',  # ECF14C',
-        4: '#7CD51B',  # DB7226',
-        128: '#BA3B15',  # E890BA',
-        129: '#BA3B15',  # 99B15F',
-        130: '#BA3B15',  # 75D1E1',
-        131: '#BA3B15',  # 147335',
-        132: '#BA3B15',  # 906A2B', #Dire  #BA3B15
-    }
+        kwargs['dire_summaries'] = dire_summaries
+        kwargs['dire_infodict'] = dire_infodict
+        kwargs['dire_cast_list'] = dire_cast_list
 
-    css_color_dict = {}
-    for summary in summaries:
-        summary.kda = summary.kills - summary.deaths + .5*summary.assists
-        if summary.side == 'Radiant':
-            summary.is_radiant = True
-        else:
-            summary.is_dire = True
-        if summary.leaver.steam_id != 0:
-            summary.improper_player = True
-        if summary.is_win:
-            summary.won = True
-        css_color_dict[
-            summary.hero.internal_name
-        ] = slot_dict[summary.player_slot]
-    match.hms_duration = datetime.timedelta(seconds=match.duration)
-    match.hms_start_time = datetime.datetime.fromtimestamp(
-        match.start_time
-    ).strftime('%H:%M:%S %Y-%m-%d')
+        kwargs['min_skill_length'] = min_skill_length
 
-    radiant_summaries = [
-        summary for summary in summaries if summary.side == 'Radiant'
-    ]
-    radiant_cast_list = []
-    for summary in radiant_summaries:
-        radiant_cast_list.append(cast_dict(summary))
-
-    dire_summaries = [
-        summary for summary in summaries if summary.side == 'Dire'
-    ]
-    dire_cast_list = []
-    for summary in dire_summaries:
-        dire_cast_list.append(cast_dict(summary))
-
-    hero_id_names = {
-        pms.hero.steam_id: pms.hero.internal_name
-        for pms in summaries
-    }
-
-    return render(
-        request,
-        'matches/parse_match.html',
-        {
-            'match': match,
-            'summaries': summaries,
-            'radiant_cast_list': radiant_cast_list,
-            'dire_cast_list': dire_cast_list,
-            'css_color_dict': css_color_dict,
-            'slot_dict': slot_dict,
-            'hero_json': json.dumps(hero_id_names),
-        }
-    )
-
-
-@devserver_profile(follow=[])
-def follow_match_feed(request):
-    results_per_page = 20
-    total_results = 500
-
-    #One of the default load methods, without the form.
-    if request.method != 'POST':
-        form = FollowMatchForm()
+        # Identify any pickbans for templating.
         try:
-            player = request_to_player(request)
-            follow_list = [
-                follow for follow in player.userprofile.following.all()
-            ]
-            match_list = Match.objects.filter(
-                validity=Match.LEGIT,
-                playermatchsummary__player__in=follow_list
-            )
-            match_list = match_list.select_related()\
-                .distinct().order_by('-start_time')[:total_results]
+            # Magic numbers are bad, but 0 = radiant.  Fix later
+            dire_picks = PickBan.objects.filter(
+                match=self.object,
+                team=1,
+                is_pick=True
+            ).select_related('hero')
 
-            page = request.GET.get('page')
-            paginator = SmarterPaginator(
-                object_list=match_list,
-                per_page=results_per_page,
-                current_page=page
-            )
-            match_list = paginator.current_page
+            dire_bans = PickBan.objects.filter(
+                match=self.object,
+                team=1,
+                is_pick=False
+            ).select_related('hero')
 
-            pms_list = PlayerMatchSummary.\
-                objects.filter(match__in=match_list)\
-                .select_related().order_by('-match__start_time')[:500]
-            match_data = annotated_matches(pms_list, follow_list)
-            return render(
-                request,
-                'matches/follow.html',
-                {
-                    'form': form,
-                    'match_list': match_list,
-                    'match_data': match_data,
-                }
+            radiant_picks = PickBan.objects.filter(
+                match=self.object,
+                is_pick=True
+            ).exclude(team=1).select_related('hero')
+
+            radiant_bans = PickBan.objects.filter(
+                match=self.object,
+                is_pick=False
+            ).exclude(team=1).select_related('hero')
+
+            pickban_length = (
+                dire_picks.count() +
+                dire_bans.count() +
+                radiant_picks.count() +
+                radiant_bans.count()
             )
 
-        except AttributeError:
-            pro_list = Player.objects.exclude(pro_name=None)
-            match_list = Match.objects.filter(
-                validity=Match.LEGIT,
-                playermatchsummary__player__in=pro_list
-            )
-            match_list = match_list.select_related()\
-                .distinct().order_by('-start_time')[:total_results]
+            kwargs['dire_picks'] = dire_picks
+            kwargs['dire_bans'] = dire_bans
+            kwargs['radiant_picks'] = radiant_picks
+            kwargs['radiant_bans'] = radiant_bans
+            kwargs['pickban_length'] = pickban_length
 
-            page = request.GET.get('page')
-            paginator = SmarterPaginator(
-                object_list=match_list,
-                per_page=results_per_page,
-                current_page=page
-            )
-            match_list = paginator.current_page
+        except IndexError:
+            raise
+        finally:
+            return super(MatchDetail, self).get_context_data(**kwargs)
 
-            pms_list = PlayerMatchSummary.\
-                objects.filter(match__in=match_list).select_related()
 
-            match_data = annotated_matches(pms_list, [])
-            return render(
-                request,
-                'matches/follow.html',
-                {
-                    'form': form,
-                    'match_list': match_list,
-                    'match_data': match_data,
-                }
-            )
-    #Using the form to submit
-    else:
-        form = FollowMatchForm(request.POST)
-        if form.is_valid():
-            match_list = Match.objects.filter(
-                validity=Match.LEGIT,
-            )
-            if form.cleaned_data['hero'] is not None:
-                match_list = match_list.filter(
-                    playermatchsummary__hero__steam_id=
-                    form.cleaned_data['hero'],
-                )
-            if form.cleaned_data['player'] is not None:
-                match_list = match_list.filter(
-                    playermatchsummary__player__steam_id=
-                    form.cleaned_data['player'],
-                )
-            if form.cleaned_data['min_date'] is not None:
-                min_date_utc = mktime(
-                    form.cleaned_data['min_date'].timetuple()
-                    )
-                match_list = match_list.filter(
-                    start_time__gte=min_date_utc,
-                )
-            if form.cleaned_data['max_date'] is not None:
-                max_date_utc = mktime(
-                    form.cleaned_data['max_date'].timetuple()
-                    )
-                match_list = match_list.filter(
-                    start_time__lte=max_date_utc,
-                )
+class ParseMatchDetail(DetailView):
+    model = Match
+    slug_url_kwarg = 'match_id'
+    slug_field = 'steam_id'
+    template_name = 'matches/parse_match.html'
 
-            match_list = match_list.select_related()\
-                .distinct().order_by('-start_time')[:total_results]
+    def get_context_data(self, **kwargs):
+        kwargs['match'] = self.object
+        summaries = PlayerMatchSummary.objects.filter(
+            match=self.object
+        ).select_related().order_by('player_slot')
 
-            page = request.GET.get('page')
-            paginator = SmarterPaginator(
-                object_list=match_list,
-                per_page=results_per_page,
-                current_page=page
-            )
-            match_list = paginator.current_page
+        slot_dict = {
+            0: '#7CD51B',  # 1f77b4', #Radiant #7CD51B
+            1: '#7CD51B',  # 7EF6C6',
+            2: '#7CD51B',  # 9A1D9B',
+            3: '#7CD51B',  # ECF14C',
+            4: '#7CD51B',  # DB7226',
+            128: '#BA3B15',  # E890BA',
+            129: '#BA3B15',  # 99B15F',
+            130: '#BA3B15',  # 75D1E1',
+            131: '#BA3B15',  # 147335',
+            132: '#BA3B15',  # 906A2B', #Dire  #BA3B15
+        }
+        kwargs['slot_dict'] = slot_dict
 
-            pms_list = PlayerMatchSummary.\
-                objects.filter(match__in=match_list).select_related()
+        css_color_dict = {}
+        for summary in summaries:
 
-            match_data = annotated_matches(pms_list, [])
-            return render(
-                request,
-                'matches/follow.html',
-                {
-                    'form': form,
-                    'match_list': match_list,
-                    'match_data': match_data,
-                }
-            )
-        else:
-            return render(
-                request,
-                'matches/follow.html',
-                {
-                    'form': form,
-                }
-            )
+            if summary.side == 'Radiant':
+                summary.is_radiant = True
+            else:
+                summary.is_dire = True
+
+            if summary.leaver.steam_id != 0:
+                summary.improper_player = True
+
+            css_color_dict[
+                summary.hero.internal_name
+            ] = slot_dict[summary.player_slot]
+        kwargs['summaries'] = summaries
+
+        radiant_summaries = [
+            summary for summary in summaries if summary.side == 'Radiant'
+        ]
+        radiant_cast_list = []
+        for summary in radiant_summaries:
+            radiant_cast_list.append(cast_dict(summary))
+
+        kwargs['radiant_cast_list'] = radiant_cast_list
+
+        dire_summaries = [
+            summary for summary in summaries if summary.side == 'Dire'
+        ]
+        dire_cast_list = []
+        for summary in dire_summaries:
+            dire_cast_list.append(cast_dict(summary))
+        kwargs['dire_cast_list'] = dire_cast_list
+
+        hero_id_names = {
+            pms.hero.steam_id: pms.hero.internal_name
+            for pms in summaries
+        }
+        kwargs['hero_id_names'] = json.dumps(hero_id_names)
+        return super(ParseMatchDetail, self).get_context_data(**kwargs)
+
+
+# Commenting out because we are gutting some functionality for the moment, but I don't want to delete so that the next refactoring step will be easier.  This should be gone within two weeks.  --ben 2015-04-19
+
+
+class MatchListView(ListView):
+    model = Match
+    # results_per_page = 2
+    # total_results = 5
+    queryset = Match.objects.filter(
+        validity=Match.LEGIT,
+    ).select_related()[:20]
+
+    # def paginate_queryset(self, queryset, page_size):
+    #     print "Hai!"
+    #     return None, None, None, None
+    #     match_list = Match.objects.filter(
+    #         validity=Match.LEGIT,
+    #     )
+    #     print len(self.match_list)
+    #     match_list = match_list.select_related()\
+    #         .distinct().order_by('-start_time')[:self.total_results]
+
+    #     print len(self.match_list)
+    #     page = self.request.GET.get('page')
+    #     paginator = SmarterPaginator(
+    #         object_list=match_list,
+    #         per_page=self.results_per_page,
+    #         current_page=page
+    #     )
+    #     self.match_list = paginator.current_page
+    #     print len(self.match_list)
+    #     pms_list = PlayerMatchSummary.\
+    #         objects.filter(match__in=match_list)\
+    #         .select_related().order_by('-match__start_time')[:500]
+    #     self.match_data = annotated_matches(pms_list, [])
+
+    #     return (paginator, page, page.object_list, page.has_other_pages())
+
+
+# def follow_match_feed(request):
+#     results_per_page = 20
+#     total_results = 500
+
+#     # One of the default load methods, without the form.
+#     if request.method != 'POST':
+#         form = FollowMatchForm()
+#         try:
+#             player = request_to_player(request)
+#             follow_list = [
+#                 follow for follow in player.userprofile.following.all()
+#             ]
+#             match_list = Match.objects.filter(
+#                 validity=Match.LEGIT,
+#                 playermatchsummary__player__in=follow_list
+#             )
+#             match_list = match_list.select_related()\
+#                 .distinct().order_by('-start_time')[:total_results]
+
+#             page = request.GET.get('page')
+#             paginator = SmarterPaginator(
+#                 object_list=match_list,
+#                 per_page=results_per_page,
+#                 current_page=page
+#             )
+#             match_list = paginator.current_page
+
+#             pms_list = PlayerMatchSummary.\
+#                 objects.filter(match__in=match_list)\
+#                 .select_related().order_by('-match__start_time')[:500]
+#             match_data = annotated_matches(pms_list, follow_list)
+#             return render(
+#                 request,
+#                 'matches/follow.html',
+#                 {
+#                     'form': form,
+#                     'match_list': match_list,
+#                     'match_data': match_data,
+#                 }
+#             )
+
+#         except AttributeError:
+#             pro_list = Player.objects.exclude(pro_name=None)
+#             match_list = Match.objects.filter(
+#                 validity=Match.LEGIT,
+#                 playermatchsummary__player__in=pro_list
+#             )
+#             match_list = match_list.select_related()\
+#                 .distinct().order_by('-start_time')[:total_results]
+
+#             page = request.GET.get('page')
+#             paginator = SmarterPaginator(
+#                 object_list=match_list,
+#                 per_page=results_per_page,
+#                 current_page=page
+#             )
+#             match_list = paginator.current_page
+
+#             pms_list = PlayerMatchSummary.\
+#                 objects.filter(match__in=match_list).select_related()
+
+#             match_data = annotated_matches(pms_list, [])
+#             return render(
+#                 request,
+#                 'matches/follow.html',
+#                 {
+#                     'form': form,
+#                     'match_list': match_list,
+#                     'match_data': match_data,
+#                 }
+#             )
+#     #Using the form to submit
+#     else:
+#         form = FollowMatchForm(request.POST)
+#         if form.is_valid():
+#             match_list = Match.objects.filter(
+#                 validity=Match.LEGIT,
+#             )
+#             if form.cleaned_data['hero'] is not None:
+#                 match_list = match_list.filter(
+#                     playermatchsummary__hero__steam_id=
+#                     form.cleaned_data['hero'],
+#                 )
+#             if form.cleaned_data['player'] is not None:
+#                 match_list = match_list.filter(
+#                     playermatchsummary__player__steam_id=
+#                     form.cleaned_data['player'],
+#                 )
+#             if form.cleaned_data['min_date'] is not None:
+#                 min_date_utc = mktime(
+#                     form.cleaned_data['min_date'].timetuple()
+#                     )
+#                 match_list = match_list.filter(
+#                     start_time__gte=min_date_utc,
+#                 )
+#             if form.cleaned_data['max_date'] is not None:
+#                 max_date_utc = mktime(
+#                     form.cleaned_data['max_date'].timetuple()
+#                     )
+#                 match_list = match_list.filter(
+#                     start_time__lte=max_date_utc,
+#                 )
+
+#             match_list = match_list.select_related()\
+#                 .distinct().order_by('-start_time')[:total_results]
+
+#             page = request.GET.get('page')
+#             paginator = SmarterPaginator(
+#                 object_list=match_list,
+#                 per_page=results_per_page,
+#                 current_page=page
+#             )
+#             match_list = paginator.current_page
+
+#             pms_list = PlayerMatchSummary.\
+#                 objects.filter(match__in=match_list).select_related()
+
+#             match_data = annotated_matches(pms_list, [])
+#             return render(
+#                 request,
+#                 'matches/follow.html',
+#                 {
+#                     'form': form,
+#                     'match_list': match_list,
+#                     'match_data': match_data,
+#                 }
+#             )
+#         else:
+#             return render(
+#                 request,
+#                 'matches/follow.html',
+#                 {
+#                     'form': form,
+#                 }
+#             )
 
 
 class MatchHeroContext(FormView):
@@ -549,6 +450,9 @@ class MatchHeroContext(FormView):
             self.get_context_data(**amendments),
             )
 
+
+# Everything below here is deprecated and marked for near-term refactor.
+# You are warned.
 
 class MatchParameterChart(MatchParameterMixin, ChartFormView):
     tour = [
@@ -733,119 +637,25 @@ class AbilityBuild(AbilityBuildMixin, ChartFormView):
         return params
 
 
-def annotated_matches(pms_list, follow_list):
-    match_data = {}
-
-    for pms in pms_list:
-        id = pms.match.steam_id
-        side = pms.side
-        if pms.match.steam_id not in match_data.keys():
-            match_data[id] = {}
-            match_data[id]['pms_data'] = {}
-            match_data[id]['pms_data']['Radiant'] = {}
-            match_data[id]['pms_data']['Dire'] = {}
-            match_data[id]['match_data'] = {}
-            match_data[id]['match_data']['Radiant'] = {}
-            match_data[id]['match_data']['Radiant']['is_win'] = False
-            match_data[id]['match_data']['Radiant']['kills'] = 0
-            match_data[id]['match_data']['Radiant']['deaths'] = 0
-            match_data[id]['match_data']['Radiant']['assists'] = 0
-            match_data[id]['match_data']['Radiant']['KDA2'] = 0
-            match_data[id]['match_data']['Dire'] = {}
-            match_data[id]['match_data']['Dire']['is_win'] = False
-            match_data[id]['match_data']['Dire']['kills'] = 0
-            match_data[id]['match_data']['Dire']['deaths'] = 0
-            match_data[id]['match_data']['Dire']['assists'] = 0
-            match_data[id]['match_data']['Dire']['KDA2'] = 0
-            if pms.match.radiant_team is not None:
-                match_data[id]['match_data']['Radiant']['team'] = pms.match.radiant_team
-            if pms.match.dire_team is not None:
-                match_data[id]['match_data']['Dire']['team'] = pms.match.dire_team
-
-        match_data[id]['match_data']['display_date'] = \
-            datetime.datetime.fromtimestamp(pms.match.start_time)
-
-        match_data[id]['match_data']['display_duration'] = \
-            str(datetime.timedelta(seconds=pms.match.duration))
-
-        match_data[id]['match_data']['game_mode'] = \
-            pms.match.game_mode.description
-
-        if pms.is_win:
-            match_data[id]['match_data'][side]['is_win'] = True
-
-        match_data[id]['match_data']['id'] = id
-
-        match_data[id]['match_data'][side]['kills'] += pms.kills
-        match_data[id]['match_data'][side]['deaths'] += pms.deaths
-        match_data[id]['match_data'][side]['assists'] += pms.assists
-        match_data[id]['match_data'][side]['KDA2'] += pms.kills\
-            - pms.deaths + pms.assists/2.0
-
-        pms_data = {}
-        try:
-            pms_data['hero_image'] = pms.hero.thumbshot.url
-        except ValueError:
-            pms_data['hero_image'] = None
-        pms_data['hero_name'] = pms.hero.name
-        pms_data['player_slot'] = pms.player_slot
-        pms_data['side'] = side
-        pms_data['kills'] = pms.kills
-        pms_data['deaths'] = pms.deaths
-        pms_data['assists'] = pms.assists
-        pms_data['KDA2'] = \
-            pms.kills - pms.deaths + pms.assists / 2.0
-        if pms.player.avatar is not None:
-            pms_data['player_image'] = pms.player.avatar
-            pms_data['player_name'] = pms.player.persona_name
-        if pms.player in follow_list:
-            pms_data['followed'] = True
-
-        match_data[id]['pms_data'][side][pms.player_slot] = pms_data
-
-    match_list = []
-    for key in sorted(match_data.iterkeys(), reverse=True):
-        match_list.append(match_data[key])
-    return match_list
-
-
-def match_list(request):
-    if request.is_ajax():
-        q = request.GET.get('term', '')
-        matches = Match.objects.filter(steam_id__icontains=q)[:20]
-        results = []
-        for i, match in enumerate(matches):
-            match_json = {}
-            match_json['id'] = i
-            match_json['label'] = "{0}".format(match.steam_id)
-            match_json['value'] = "{0}".format(match.steam_id)
-            results.append(match_json)
-        data = json.dumps(results)
-    else:
-        data = 'fail'
-    mimetype = 'application/json'
-    return HttpResponse(data, mimetype)
-
-
-def combobox_tags(request):
-    if request.is_ajax():
-        q = request.GET.get('term', '')
-        heroes = [h.name for h in Hero.objects.filter(name__icontains=q)[:5]]
-        alignments = ['Strength', 'Agility', 'Intelligence']
-        matched_alignments = [s for s in alignments if q.lower() in s.lower()]
-        roles = [r.name for r in Role.objects.filter(name__icontains=q)[:5]]
-        results = []
-        for i, string in enumerate(chain(heroes, matched_alignments, roles)):
-            match_json = {}
-            match_json['id'] = i
-            match_json['label'] = string
-            match_json['value'] = string
-            results.append(match_json)
-        data = json.dumps(results)
-    else:
-        data = 'fail'
-    mimetype = 'application/json'
-    return HttpResponse(data, mimetype)
+# def combobox_tags(request):
+#     if request.is_ajax():
+#         q = request.GET.get('term', '')
+#         heroes = [h.name for h in Hero.objects.filter(name__icontains=q)[:5]]
+#         alignments = ['Strength', 'Agility', 'Intelligence']
+#         matched_alignments = [s for s in alignments if q.lower() in s.lower()]
+#         roles = [r.name for r in Role.objects.filter(name__icontains=q)[:5]]
+#         results = []
+#         for i, string in enumerate(chain(heroes, matched_alignments, roles)):
+#             match_json = {}
+#             match_json['id'] = i
+#             match_json['label'] = string
+#             match_json['value'] = string
+#             results.append(match_json)
+#         data = json.dumps(results)
+#     else:
+#         data = 'fail'
+#     mimetype = 'application/json'
+#     return HttpResponse(data, mimetype)
 
 
 class ApiEndgameChart(EndgameMixin, ApiView):
@@ -882,15 +692,3 @@ class ApiRoleChart(RoleMixin, ApiView):
 
 class ApiSetProgressionChart(SetProgressionMixin, ApiView):
     pass
-
-
-class MatchViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Match.objects.all()
-    paginate_by = 10
-    serializer_class = MatchSerializer
-
-
-class PlayerMatchSummaryViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = PlayerMatchSummary.objects.all()
-    paginate_by = 10
-    serializer_class = PlayerMatchSummarySerializer

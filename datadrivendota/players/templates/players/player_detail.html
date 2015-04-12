@@ -1,4 +1,4 @@
-{% extends "players/base.html" %}
+{% extends "base.html" %}
 
 
 {% block title %}Player Summary{% endblock title %}
@@ -50,13 +50,14 @@
   </div>
 
   <div>
-    <h4><a href="{% url 'players:id_matches' player_id=player.steam_id %}">Recent Matches</a>
-    <span  class="info glyphicon glyphicon-info-sign" data-toggle="tooltip" title="" data-placement="right" data-original-title="Winrate in these matches: {{winrate}}%.
-  If each match is a coinflip, odds of getting a winrate better than this one: {{odds}}%"></span>
-
-        Score: <span id='show-score' class='nav-toggle'>Show</span> <span id='hide-score' class='nav-toggle'>Hide</span>
+    <h4>Score: <span id='show-score' class='nav-toggle'>Show</span> <span id='hide-score' class='nav-toggle'>Hide</span>
     </h4>
-        {% include "players/_player_match_cards.html" %}
+    {% for pms in pms_list %}
+      <div class="col-md-2 player-match-row">
+        {% include "players/_player_performance_card.html" %}
+      </div>
+    {% endfor %}
+
   </div>
 {% endblock content %}
 

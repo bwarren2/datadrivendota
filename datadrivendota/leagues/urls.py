@@ -15,16 +15,6 @@ urlpatterns = patterns(
         name='detail'
     ),
     url(
-        r'^winrate/$',
-        views.Winrate.as_view(),
-        name='winrate'
-    ),
-    url(
-        r'^pick-ban/$',
-        views.PickBan.as_view(),
-        name='pick_ban'
-    ),
-    url(
         r'^live-games/$',
         views.LiveGameListView.as_view(),
         name='live_games'
@@ -34,7 +24,16 @@ urlpatterns = patterns(
         views.LiveGameDetailView.as_view(),
         name='live_game_detail'
         ),
-    url(r'^api/getleagues/$', views.league_list, name='league_list'),
+    url(
+        r'^winrate/$',
+        views.Winrate.as_view(),
+        name='winrate'
+    ),
+    url(
+        r'^pick-ban/$',
+        views.PickBan.as_view(),
+        name='pick_ban'
+    ),
     url(
         r'^api/winrate/$',
         views.ApiWinrateChart.as_view(),

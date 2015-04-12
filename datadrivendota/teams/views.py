@@ -1,16 +1,13 @@
-import json
 import datetime
 
-from rest_framework import viewsets
-from django.http import HttpResponse
+from rest_framework import viewsets, filters
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
 from utils.pagination import SmarterPaginator
 
 from .serializers import TeamSerializer
 from .models import Team
-from matches.models import Match, PlayerMatchSummary
-from matches.views import annotated_matches
+from matches.models import Match
 from .mixins import (
     WinrateMixin,
     PickBanMixin,
@@ -65,15 +62,10 @@ class TeamDetail(DetailView):
         )
         match_list = paginator.current_page
 
-        pms_list = PlayerMatchSummary.\
-            objects.filter(match__in=match_list)\
-            .select_related().order_by('-match__start_time')[:500]
-        match_data = annotated_matches(pms_list, [])
         min_date = datetime.date.today() - datetime.timedelta(days=90)
 
         context = {
             'match_list': match_list,
-            'match_data': match_data,
             'min_date': min_date.isoformat(),
         }
         return super(TeamDetail, self).get_context_data(**context)
@@ -139,24 +131,5 @@ class TeamViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
     lookup_field = 'steam_id'
-
-
-def team_list(request):
-    if request.is_ajax():
-        q = request.GET.get('term', '')
-        teams = Team.objects.filter(
-            name__icontains=q,
-        )[:20]
-        results = []
-        for team in teams:
-            team_json = {}
-            team_json['id'] = team.steam_id
-            team_json['label'] = team.name
-            team_json['value'] = team.steam_id
-            results.append(team_json)
-
-        data = json.dumps(results)
-    else:
-        data = 'fail'
-    mimetype = 'application/json'
-    return HttpResponse(data, mimetype)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)

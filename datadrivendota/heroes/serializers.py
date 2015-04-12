@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, filters
 from heroes.models import Hero
 
 
@@ -10,6 +10,8 @@ class HeroSerializer(serializers.ModelSerializer):
             return obj.mugshot.url
         except ValueError:
             return ''
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name')
 
     class Meta:
         model = Hero

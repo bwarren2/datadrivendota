@@ -6,6 +6,7 @@ $(function () {
       theme: 'future'
   }
 
+  // Handle select2 stuff
   function format(state) {
       return state.label;
   }
@@ -15,7 +16,7 @@ $(function () {
     callback(data);
   }
 
-  function multpleInitSelection(element, callback) {
+  function multipleInitSelection(element, callback) {
       var data = [];
       $(element.val().split(",")).each(function () {
           data.push({id: this, text: this});
@@ -23,12 +24,15 @@ $(function () {
       callback(data);
   }
 
-  function ajax_select2ify(selector, multiple, placeholder, api_endpoint) {
+
+  function ajax_select2ify(selector, multiple, placeholder, api_endpoint, cb) {
+
     if (multiple) {
-      var initSelectionFunction = multpleInitSelection;
+      var initSelectionFunction = multipleInitSelection;
     } else {
       var initSelectionFunction = singleInitSelection;
     }
+
     $(selector).select2({
       multiple: multiple,
       placeholder: placeholder,
@@ -36,18 +40,86 @@ $(function () {
       ajax: {
         url: api_endpoint,
         data: function (term) {
-          return {term: term};
+          return {'search': term};
         },
-        results: function (data, page) {
-          return {
-            results: data.map(function (elt) { return {id: elt.value, text: elt.label}; })
-          };
-        },
+        results: cb,
         formatResult: format,
         formatSelection: format
       }
     });
   }
+
+
+  // Not all of these form fields are used now.
+  // But it will be easier to rip them out after the refactor.
+  ajax_select2ify(
+    '.single-player-tags', false, "One Player", "/rest-api/players",
+    function (data, page) {
+      return {
+        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.persona_name}; })
+      };
+    }
+  );
+  ajax_select2ify(
+    '.multi-player-tags', true, "One or more Players", "/rest-api/players",
+    function (data, page) {
+      return {
+        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.persona_name}; })
+      };
+    }
+  );
+  ajax_select2ify(
+    '.single-hero-tags', false, "One Hero", "/rest-api/heroes",
+    function (data, page) {
+      return {
+        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
+      };
+    }
+  );
+  ajax_select2ify(
+    '.multi-hero-tags', true, "One or more Heroes", "/rest-api/heroes",
+    function (data, page) {
+      return {
+        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
+      };
+    }
+
+  );
+  ajax_select2ify(
+    '.single-match-tags', false, "One Match", "/rest-api/matches",
+    function (data, page) {
+      return {
+        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.steam_id}; })
+      };
+    }
+
+  );
+  ajax_select2ify(
+    '.multi-match-tags', true, "One or more Matches", "/rest-api/matches",
+    function (data, page) {
+      return {
+        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.steam_id}; })
+      };
+    }
+  );
+  ajax_select2ify(
+    '.single-team-tags', false, "One Team", "/rest-api/items",
+    function (data, page) {
+      return {
+        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
+      };
+    }
+  );
+  ajax_select2ify(
+    '.single-league-tags', false, "One League", "/rest-api/leagues",
+    function (data, page) {
+      return {
+        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
+      };
+    }
+  );
+  ajax_select2ify('.combobox-tags', false, "One Selector", "/matches/api/gettags");
+
 
   $('#contact-link').click(function () {
     if ($('#IntercomDefaultWidget').length) {
@@ -59,7 +131,6 @@ $(function () {
   });
 
   $('.info').tooltip();
-  // $("#myTable").tablesorter();
 
   $('input[type=checkbox]:checked').parent().addClass('active');
   $('input[type=checkbox]').change(function (evt) {
@@ -73,16 +144,6 @@ $(function () {
   $('select').select2({
     width: "100%"
   });
-
-  ajax_select2ify('.single-player-tags', false, "One Player", "/players/api/getplayers");
-  ajax_select2ify('.multi-player-tags', true, "One or more Players", "/players/api/getplayers");
-  ajax_select2ify('.single-hero-tags', false, "One Hero", "/heroes/api/getheroes");
-  ajax_select2ify('.multi-hero-tags', true, "One or more Heroes", "/heroes/api/getheroes");
-  ajax_select2ify('.single-match-tags', false, "One Match", "/matches/api/getmatches");
-  ajax_select2ify('.multi-match-tags', true, "One or more Matches", "/matches/api/getmatches");
-  ajax_select2ify('.single-team-tags', false, "One Team", "/teams/api/getteams");
-  ajax_select2ify('.single-league-tags', false, "One League", "/leagues/api/getleagues");
-  ajax_select2ify('.combobox-tags', false, "One Selector", "/matches/api/gettags");
 
   /* gettext library */
 

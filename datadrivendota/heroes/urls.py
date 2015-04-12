@@ -3,7 +3,7 @@ from heroes import views
 
 urlpatterns = patterns(
     '',
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^vitals/$', views.Vitals.as_view(), name='vitals'),
     url(r'^lineups/$', views.Lineup.as_view(), name='lineup'),
     url(r'^performance/$',
@@ -30,7 +30,7 @@ urlpatterns = patterns(
     ),
     url(
         r'^ability/(?P<ability_name>[a-zA-Z0-9\-\_]*)/$',
-        views.ability_detail,
+        views.AbilityDetailView.as_view(),
         name='ability_detail'
     ),
     url(
@@ -69,6 +69,9 @@ urlpatterns = patterns(
         name='api_hero_performance_lineup_chart'
     ),
 
-    url(r'^api/getheroes/$', views.hero_list, name='hero_list'),
-    url(r'^(?P<hero_name>[a-zA-Z0-9\-\_]*)/$', views.detail, name="detail"),
+    url(
+        r'^(?P<hero_name>[a-zA-Z0-9\-\_]*)/$',
+        views.HeroDetailView.as_view(),
+        name="detail"
+    ),
 )

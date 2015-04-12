@@ -1,22 +1,36 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from .serializers import ItemSerializer
-from django.shortcuts import get_object_or_404, render
-from items.models import Item
-from django.utils.text import slugify
+from django.views.generic import ListView, DetailView
 
+from items.models import Item
 from datadrivendota.views import ChartFormView, ApiView
 from .mixins import ItemWinrateMixin
 
 
-def index(request):
-    item_list = Item.objects.exclude(cost=0).order_by('slug_name')
-    return render(request, 'items/index.html', {'item_list': item_list})
+class ItemIndex(ListView):
+    queryset = Item.objects.exclude(cost=0).order_by('slug_name')
 
 
-def detail(request, item_name):
-    item_slug = slugify(item_name)
-    current_item = get_object_or_404(Item, slug_name=item_slug)
-    return render(request, 'items/detail.html', {'item': current_item})
+class ItemDetailView(DetailView):
+    queryset = Item.objects.exclude(cost=0).order_by('slug_name')
+    slug_field = 'slug_name'
+    slug_url_kwarg = 'item_name'
+
+
+class ItemViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+    lookup_field = 'steam_id'
+    paginate_by = None
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+
+
+"""
+EVERYTHING BELOW HERE IS DEPRECATED
+
+YOU ARE WARNED.
+"""
 
 
 class ItemWinrateView(ItemWinrateMixin, ChartFormView):
@@ -38,10 +52,3 @@ class ItemWinrateView(ItemWinrateMixin, ChartFormView):
 
 class ApiItemEndgameChart(ItemWinrateMixin, ApiView):
     pass
-
-
-class ItemViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
-    lookup_field = 'steam_id'
-    paginate_by = None

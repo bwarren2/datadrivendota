@@ -22,6 +22,7 @@ EMAIL_HOST_USER = getenv('MAILGUN_SMTP_LOGIN')
 EMAIL_HOST_PASSWORD = getenv('MAILGUN_SMTP_PASSWORD')
 
 INVOICE_FROM_EMAIL = "ben@datadrivendota.com"
+ERROR_RECIPIENT_EMAIL = "ben@datadrivendota.com"
 
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
@@ -233,7 +234,6 @@ DJANGO_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sites',
-    'django.contrib.comments',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',

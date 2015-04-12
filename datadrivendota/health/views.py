@@ -1,28 +1,9 @@
-from django.shortcuts import redirect
 from django.views.generic import TemplateView
 from django.conf import settings
-
-
-class UserCheckMixin(object):
-    user_check_failure_path = ''  # can be path, url name or reverse_lazy
-
-    def check_user(self, user):
-        return True
-
-    def user_check_failed(self, request, *args, **kwargs):
-        return redirect(self.user_check_failure_path)
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.check_user(request.user):
-            return self.user_check_failed(request, *args, **kwargs)
-        return super(UserCheckMixin, self).dispatch(request, *args, **kwargs)
-
-
-class SuperuserRequiredMixin(UserCheckMixin):
-    user_check_failure_path = 'login'  # can be path, url name or reverse_lazy
-
-    def check_user(self, user):
-        return user.is_superuser
+from datadrivendota.mixins import SuperuserRequiredMixin
+from matches.models import Match, PlayerMatchSummary
+from players.models import Player
+from heroes.models import Hero
 
 
 class HealthIndexView(SuperuserRequiredMixin, TemplateView):
@@ -32,3 +13,17 @@ class HealthIndexView(SuperuserRequiredMixin, TemplateView):
         kwargs['read_key'] = settings.KEEN_READ_KEY
         kwargs['project_id'] = settings.KEEN_PROJECT_ID
         return super(HealthIndexView, self).get_context_data(**kwargs)
+
+
+class CardIndexView(SuperuserRequiredMixin, TemplateView):
+    template_name = 'card_index.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['hero'] = Hero.public.all().select_related().order_by('?')[0]
+        kwargs['match'] = Match.objects.all().select_related()\
+            .order_by('-start_time')[0]
+        kwargs['summary'] = PlayerMatchSummary.objects.all().select_related()\
+            .order_by('-id')[0]
+        kwargs['player'] = Player.objects.filter(updated=True)\
+            .select_related()[0]
+        return super(CardIndexView, self).get_context_data(**kwargs)

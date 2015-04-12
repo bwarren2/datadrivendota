@@ -28,7 +28,9 @@
 
     <div class='row' style='padding-top:15px'>
         <div class='col-md-8'>
-            {% include "matches/_match_list.html" %}
+            {% for match in match_list %}
+              {% include "matches/_match_card.html" %}
+            {% endfor %}
         </div>
 
         <div class='col-md-4'>

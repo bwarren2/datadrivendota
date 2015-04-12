@@ -1,15 +1,11 @@
-import json
-from functools import wraps
-from rest_framework import viewsets
+from collections import defaultdict
+from rest_framework import viewsets, filters
 
-from django.conf import settings
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
-from django.utils.text import slugify
+from django.views.generic import ListView, DetailView
 
 from datadrivendota.views import ChartFormView, ApiView
 
-from .models import Hero, Ability, HeroDossier, Role, Assignment
+from .models import Hero, Ability, HeroDossier, Role
 from .serializers import HeroSerializer
 from .mixins import (
     VitalsMixin,
@@ -22,59 +18,78 @@ from .mixins import (
     HeroPickRateMixin,
     )
 
-try:
-    if 'devserver' not in settings.INSTALLED_APPS or not settings.DEBUG:
-        raise ImportError
-    from devserver.modules.profile import devserver_profile
-except ImportError:
-    class devserver_profile(object):
-        def __init__(self, *args, **kwargs):
-            pass
 
-        def __call__(self, func):
-            def nothing(*args, **kwargs):
-                return func(*args, **kwargs)
-            return wraps(func)(nothing)
+class IndexView(ListView):
+    """
+    Return all the heroes.  @TODO: Clean up the role markup step.
+    """
+    queryset = Hero.objects.filter(visible=True).order_by('name')
 
+    def get_context_data(self, **kwargs):
+        """
+        Fetches the heroes and roles lists
 
-def index(request):
-    hero_list = Hero.objects.filter(visible=True).order_by('name')
-    role_list = Role.objects.all()
-    assignments = Assignment.objects.all().select_related()
-    dictAssignments = {}
-    for a in assignments:
-        if a.hero.name not in dictAssignments:
-            dictAssignments[a.hero.name] = []
-        dictAssignments[a.hero.name].append(a.role.name)
+        We want to mark up the heroes with their roles for interactive display.
+        We do some monkeying with
+        """
+        a = self.queryset.values_list('steam_id', 'assignment__role__name')
 
-    for hero in hero_list:
-        try:
-            hero.classes = " ".join(dictAssignments[hero.name])
-        #Some annoying people, like Abaddon, lack assignments.
-        except KeyError:
-            hero.classes = ''
-    return render(request, 'heroes/index.html', {
-        'hero_list': hero_list,
-        'role_list': role_list,
-        })
+        ddct = defaultdict(list)
+        for pair in a:
+            id, role = pair
+            if role is not None:
+                ddct[id].append(role)
+        ddct = {a: " ".join(b) for a, b in ddct.iteritems()}
+
+        for hero in self.object_list:
+            hero.classes = ddct.get(hero.steam_id, "")
+
+        kwargs['hero_list'] = self.object_list
+        kwargs['role_list'] = Role.objects.all().select_related()
+
+        return super(IndexView, self).get_context_data(**kwargs)
 
 
-def detail(request, hero_name):
-    hero_slug = slugify(hero_name)
-    current_hero = get_object_or_404(Hero, machine_name=hero_slug)
-    abilities = Ability.objects.filter(
-        is_core=True,
-        hero=current_hero).order_by('steam_id')
-    dossier = HeroDossier.objects.get(hero=current_hero)
-    return render(
-        request,
-        'heroes/detail.html',
-        {
-            'hero': current_hero,
-            'abilities': abilities,
-            'dossier': dossier,
-        }
-    )
+class HeroDetailView(DetailView):
+    """
+    Take a name, get a hero.
+    """
+    queryset = Hero.public.all()
+    slug_field = 'machine_name'
+    slug_url_kwarg = 'hero_name'
+
+    def get_context_data(self, **kwargs):
+        kwargs['abilities'] = Ability.objects.filter(
+            is_core=True,
+            hero=self.object
+        ).order_by('steam_id')
+        kwargs['dossier'] = HeroDossier.objects.get(hero=self.object)
+        return super(HeroDetailView, self).get_context_data(**kwargs)
+
+
+class AbilityDetailView(DetailView):
+    queryset = Ability.objects.all()
+    slug_field = 'machine_name'
+    slug_url_kwarg = 'ability_name'
+
+
+class HeroViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    DRF hero endpoint
+    """
+    queryset = Hero.objects.all()
+    paginate_by = None
+    serializer_class = HeroSerializer
+    lookup_field = 'steam_id'
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+
+
+"""
+WARNING
+EVERYTHING BELOW THIS IS DEPRECATED.
+IT IS LEAVING SOON.
+"""
 
 
 class Vitals(VitalsMixin, ChartFormView):
@@ -283,24 +298,6 @@ class HeroPickBanLineup(HeroPickRateMixin, ChartFormView):
     html = "heroes/form.html"
 
 
-def hero_list(request):
-    if request.is_ajax():
-        q = request.GET.get('term', '')
-        heroes = Hero.objects.filter(name__icontains=q, visible=True)[:20]
-        results = []
-        for hero in heroes:
-            hero_json = {}
-            hero_json['id'] = hero.steam_id
-            hero_json['label'] = hero.name
-            hero_json['value'] = hero.steam_id
-            results.append(hero_json)
-        data = json.dumps(results)
-    else:
-        data = 'fail'
-    mimetype = 'application/json'
-    return HttpResponse(data, mimetype)
-
-
 # API endpoints
 class ApiVitalsChart(VitalsMixin, ApiView):
     pass
@@ -328,32 +325,3 @@ class ApiUpdatePlayerWinrateChart(UpdatePlayerWinrateMixin, ApiView):
 
 class ApiHeroPerformanceLineupChart(HeroPerformanceLineupMixin, ApiView):
     pass
-
-
-class HeroViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Hero.objects.all()
-    paginate_by = None
-    serializer_class = HeroSerializer
-    lookup_field = 'steam_id'
-
-
-def ability_detail(request, ability_name):
-    if ability_name == 'stats':
-        ability = get_object_or_404(
-            Ability,
-            machine_name=ability_name,
-        )
-    else:
-        ability = get_object_or_404(
-            Ability,
-            machine_name=ability_name,
-        )
-    charts = []
-    return render(
-        request,
-        'heroes/ability.html',
-        {
-            'ability': ability,
-            'charts': charts,
-        }
-    )

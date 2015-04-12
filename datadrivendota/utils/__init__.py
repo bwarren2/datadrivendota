@@ -52,20 +52,6 @@ def match_url(match_id):
     return '/matches/'+str(match_id)
 
 
-def binomial_likelihood(n, k, p):
-    choosing = factorial(n)/(factorial(k)*factorial(n-k))
-    branching = p**k*(1-p)**(n-k)
-    return choosing*branching
-
-
-def binomial_exceedence(n, k, p):
-    if n > 40:
-        raise Exception("This code is not optimized for that!")
-    odds = sum(binomial_likelihood(n, i, p) for i in range(k+1))
-
-    return 1-odds
-
-
 def send_error_email(body):
     smtp = SMTP()
     debuglevel = 0

@@ -3,8 +3,17 @@ from matches import views
 
 urlpatterns = patterns(
     '',
-    url(r'^$', views.follow_match_feed, name='index'),
-    url(r'^follow-matches/$', views.follow_match_feed, name='follow_index'),
+    url(r'^$', views.MatchListView.as_view(), name='index'),
+    url(
+        r'^(?P<match_id>[0-9\-]*)/parse_match$',
+        views.ParseMatchDetail.as_view(),
+        name="parse_match"
+    ),
+    url(
+        r'^(?P<match_id>[0-9\-]*)/$',
+        views.MatchDetail.as_view(),
+        name="match_detail"
+    ),
     url(
         r'^endgame/$',
         views.Endgame.as_view(),
@@ -26,17 +35,6 @@ urlpatterns = patterns(
         name='match_parameter_scatter'
     ),
     url(
-        r'^(?P<match_id>[0-9\-]*)/parse$',
-        views.parse_preview,
-        name="parse"
-    ),
-    url(
-        r'^(?P<match_id>[0-9\-]*)/parse_match$',
-        views.parse_match,
-        name="parse_match"
-    ),
-    url(r'^(?P<match_id>[0-9\-]*)/$', views.match, name="match_detail"),
-    url(
         r'^ability-build/$',
         views.AbilityBuild.as_view(),
         name="ability_build"
@@ -52,8 +50,6 @@ urlpatterns = patterns(
         r'^context/$',
         views.MatchHeroContext.as_view(),
         name="match_hero_context"),
-    # url(r'^overview/$', views.overview, name="overview"),
-    url(r'^api/getmatches/$', views.match_list, name='match_list'),
     url(
         r'^api/endgame/$',
         views.ApiEndgameChart.as_view(),
@@ -98,11 +94,6 @@ urlpatterns = patterns(
         r'^api/role-scatter/$',
         views.ApiRoleChart.as_view(),
         name='api_role_chart'
-        ),
-    url(
-        r'^api/gettags/$',
-        views.combobox_tags,
-        name='combobox_tags'
         ),
 
 )
