@@ -77,6 +77,7 @@ urlpatterns = patterns(
             content_type='text/plain'
         )
     ),
+    url(r'^comments/', include('django.contrib.comments.urls')),
     url(
         '',
         include('social.apps.django_app.urls', namespace='social')
