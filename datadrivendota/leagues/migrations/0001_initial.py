@@ -1,40 +1,38 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import django.utils.timezone
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'League'
-        db.create_table(u'leagues_league', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('steam_id', self.gf('django.db.models.fields.IntegerField')()),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=300)),
-            ('tournament_url', self.gf('django.db.models.fields.CharField')(max_length=300)),
-            ('item_def', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'leagues', ['League'])
+    dependencies = [
+    ]
 
-
-    def backwards(self, orm):
-        # Deleting model 'League'
-        db.delete_table(u'leagues_league')
-
-
-    models = {
-        u'leagues.league': {
-            'Meta': {'object_name': 'League'},
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'item_def': ('django.db.models.fields.IntegerField', [], {}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'steam_id': ('django.db.models.fields.IntegerField', [], {}),
-            'tournament_url': ('django.db.models.fields.CharField', [], {'max_length': '300'})
-        }
-    }
-
-    complete_apps = ['leagues']
+    operations = [
+        migrations.CreateModel(
+            name='League',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('steam_id', models.IntegerField(unique=True)),
+                ('name', models.CharField(max_length=200, null=True)),
+                ('description', models.CharField(max_length=300, null=True)),
+                ('tournament_url', models.CharField(max_length=300, null=True)),
+                ('item_def', models.IntegerField(null=True)),
+                ('valve_cdn_image', models.TextField(help_text=b'Steam cdn image url', null=True)),
+                ('update_time', models.DateTimeField(default=django.utils.timezone.now)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ScheduledMatch',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('game_id', models.IntegerField()),
+                ('start_time', models.IntegerField(help_text=b'Start time in UTC seconds')),
+                ('comment', models.TextField()),
+                ('final', models.BooleanField()),
+                ('league', models.ForeignKey(to='leagues.League')),
+            ],
+        ),
+    ]

@@ -1,44 +1,49 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Item'
-        db.create_table(u'items_item', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('steam_id', self.gf('django.db.models.fields.IntegerField')(unique=True)),
-            ('internal_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('image', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('lore', self.gf('django.db.models.fields.TextField')()),
-            ('external_name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('slug_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-        ))
-        db.send_create_signal(u'items', ['Item'])
+    dependencies = [
+    ]
 
-
-    def backwards(self, orm):
-        # Deleting model 'Item'
-        db.delete_table(u'items_item')
-
-
-    models = {
-        u'items.item': {
-            'Meta': {'object_name': 'Item'},
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'external_name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
-            'internal_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'lore': ('django.db.models.fields.TextField', [], {}),
-            'slug_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'steam_id': ('django.db.models.fields.IntegerField', [], {'unique': 'True'})
-        }
-    }
-
-    complete_apps = ['items']
+    operations = [
+        migrations.CreateModel(
+            name='Item',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('steam_id', models.IntegerField(help_text=b"Valve's normalization id", unique=True)),
+                ('thumbshot', models.ImageField(upload_to=b'items/img/')),
+                ('mugshot', models.ImageField(upload_to=b'items/img/')),
+                ('name', models.CharField(help_text=b'The name for people', max_length=100)),
+                ('internal_name', models.CharField(help_text=b'The underscore name', max_length=100)),
+                ('quality', models.CharField(help_text=b'Internal shop category name', max_length=100)),
+                ('cost', models.IntegerField(default=0, null=True)),
+                ('description', models.TextField(null=True)),
+                ('notes', models.TextField(null=True)),
+                ('mana_cost', models.IntegerField(null=True)),
+                ('cooldown', models.IntegerField(null=True)),
+                ('lore', models.TextField(null=True)),
+                ('created', models.NullBooleanField()),
+                ('slug_name', models.CharField(max_length=100)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ItemAttributes',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('attribute', models.CharField(max_length=100)),
+                ('item', models.ForeignKey(to='items.Item')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ItemComponents',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('ingredient', models.ForeignKey(related_name='ingredients', to='items.Item')),
+                ('product', models.ForeignKey(related_name='product', to='items.Item')),
+            ],
+        ),
+    ]
