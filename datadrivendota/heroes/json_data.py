@@ -30,44 +30,7 @@ from utils.charts import (
     )
 from utils import utcize, match_url
 
-if settings.VERBOSE_PROFILING:
-    try:
-        from line_profiler import LineProfiler
 
-        def do_profile(follow=[]):
-            def inner(func):
-                def profiled_func(*args, **kwargs):
-                    try:
-                        profiler = LineProfiler()
-                        profiler.add_function(func)
-                        for f in follow:
-                            profiler.add_function(f)
-                        profiler.enable_by_count()
-                        return func(*args, **kwargs)
-                    finally:
-                        profiler.print_stats()
-                return profiled_func
-            return inner
-
-    except ImportError:
-        def do_profile(follow=[]):
-            "Helpful if you accidentally leave in production!"
-            def inner(func):
-                def nothing(*args, **kwargs):
-                    return func(*args, **kwargs)
-                return nothing
-            return inner
-else:
-    def do_profile(follow=[]):
-        "Helpful if you accidentally leave in production!"
-        def inner(func):
-            def nothing(*args, **kwargs):
-                return func(*args, **kwargs)
-            return nothing
-        return inner
-
-
-@do_profile()
 def hero_vitals_json(heroes, stats):
     """ Takes a list of ids, gets valid heroes from that list, then makes a chart of all the valid stats given. """
 
@@ -110,7 +73,6 @@ def hero_vitals_json(heroes, stats):
     return c
 
 
-@do_profile()
 def hero_lineup_json(heroes, stat, level):
 
     hero_dossiers = HeroDossier.objects.filter(
@@ -177,7 +139,6 @@ def hero_lineup_json(heroes, stat, level):
     return c
 
 
-@do_profile()
 def hero_performance_chart_json(
     hero,
     player,
@@ -306,7 +267,6 @@ def hero_performance_chart_json(
     return c
 
 
-@do_profile()
 def hero_progression_json(
     hero,
     player,
@@ -479,7 +439,6 @@ def hero_progression_json(
     return c
 
 
-@do_profile()
 def hero_skillbuild_winrate_json(
     hero,
     player,
@@ -528,13 +487,6 @@ def hero_skillbuild_winrate_json(
             'player_match_summary__match__steam_id',
             'ability__steam_id',
         )
-        print SkillBuild.objects.all(), sbs
-        for s in SkillBuild.objects.all():
-            print s.player_match_summary.match.game_mode.steam_id, game_mode_list
-            print s.player_match_summary.hero.steam_id, hero_id
-            print s.player_match_summary.player.steam_id, player_id
-            print s.player_match_summary.level, level
-            print s.player_match_summary.match.validity, Match.LEGIT
 
         match_wins = list(set([
             sb['player_match_summary__match__steam_id']
@@ -567,7 +519,6 @@ def hero_skillbuild_winrate_json(
         dimensions = set(mygen)
 
         for id_str in dimensions:
-            print id_str
             if id_str not in build_dict:
                 build_dict[id_str] = {}
             build_dict[id_str]['games'] = len(
@@ -615,7 +566,6 @@ def hero_skillbuild_winrate_json(
     return c
 
 
-@do_profile()
 def update_player_winrate(
     hero,
     game_modes,

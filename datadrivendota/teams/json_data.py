@@ -1,5 +1,4 @@
 import datetime
-from django.conf import settings
 from django.db.models import Count, Q
 from matches.models import PlayerMatchSummary, GameMode, Match, PickBan
 from .models import Team
@@ -15,44 +14,6 @@ from time import mktime
 from utils import utcize
 
 
-if settings.VERBOSE_PROFILING:
-    try:
-        from line_profiler import LineProfiler
-
-        def do_profile(follow=[]):
-            def inner(func):
-                def profiled_func(*args, **kwargs):
-                    try:
-                        profiler = LineProfiler()
-                        profiler.add_function(func)
-                        for f in follow:
-                            profiler.add_function(f)
-                        profiler.enable_by_count()
-                        return func(*args, **kwargs)
-                    finally:
-                        profiler.print_stats()
-                return profiled_func
-            return inner
-
-    except ImportError:
-        def do_profile(follow=[]):
-            "Helpful if you accidentally leave in production!"
-            def inner(func):
-                def nothing(*args, **kwargs):
-                    return func(*args, **kwargs)
-                return nothing
-            return inner
-else:
-    def do_profile(follow=[]):
-        "Helpful if you accidentally leave in production!"
-        def inner(func):
-            def nothing(*args, **kwargs):
-                return func(*args, **kwargs)
-            return nothing
-        return inner
-
-
-@do_profile()
 def team_winrate_json(
         team,
         game_modes=None,
@@ -166,7 +127,6 @@ def team_winrate_json(
     return c
 
 
-@do_profile()
 def team_pick_ban_json(
         team,
         game_modes=None,

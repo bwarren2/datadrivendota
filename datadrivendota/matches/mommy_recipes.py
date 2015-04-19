@@ -129,7 +129,7 @@ def make_matchset():
     sb3 = mommy.make('matches.skillbuild', level=3, ability=abilities[0])
 
     start_time = mktime(timezone.now().timetuple())
-    print start_time
+
     for skill in range(0, 5):
         mommy.make(
             'matches.playermatchsummary',

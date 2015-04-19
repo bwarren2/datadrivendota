@@ -43,7 +43,7 @@ urlpatterns = patterns(
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
     url(r'^upgrade/$', views.upgrade, name='upgrade'),
     url(r'^payments/', include("payments.urls", namespace='payments')),
-    url(r'^blog/', include('zinnia.urls')),
+    url(r'^blog/', include('blog.urls', namespace='blog')),
     url(r'^rest-api/', include(router.urls, namespace='rest-api')),
     url(
         r'^data-request/$',
@@ -77,7 +77,6 @@ urlpatterns = patterns(
             content_type='text/plain'
         )
     ),
-    url(r'^comments/', include('django.contrib.comments.urls')),
     url(
         '',
         include('social.apps.django_app.urls', namespace='social')

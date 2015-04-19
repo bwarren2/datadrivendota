@@ -179,7 +179,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
     # 'social_auth.context_processors.social_auth_by_type_backends',
-    'zinnia.context_processors.version',  # Optional
 
 )
 
@@ -237,7 +236,6 @@ DJANGO_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.comments',
     # Useful template tags:
     # 'django.contrib.humanize',
 
@@ -248,7 +246,6 @@ DJANGO_APPS = (
 )
 
 THIRD_PARTY_APPS = (
-    # Database migration helpers:
     'social.apps.django_app.default',
     'storages',
     'pipeline',
@@ -258,13 +255,11 @@ THIRD_PARTY_APPS = (
     'django_forms_bootstrap',
     'tagging',
     'mptt',
-    'zinnia',
     'rest_framework',
 )
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
-    #My custom stuff
     'utils',
     'heroes',
     'items',
@@ -275,6 +270,7 @@ LOCAL_APPS = (
     'teams',
     'accounts',
     'health',
+    'blog',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -457,10 +453,10 @@ ITEM_SCHEMA_KEY = 'valve_item_schema_json'
 
 
 # Tests
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = [
-    '--with-coverage',
-]
+# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+# NOSE_ARGS = [
+#     '--with-coverage',
+# ]
 
 
 #Magic Colors

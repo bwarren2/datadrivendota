@@ -1,11 +1,9 @@
-from django_nose import FastFixtureTestCase
+# from django_nose import FastFixtureTestCase
+from django.test import TestCase
 from datetime import timedelta
 from django.utils import timezone
-from django.test import TestCase
 from teams.models import Team
-from leagues.json_data import league_winrate_json
 from leagues.models import League, ScheduledMatch
-from matches.mommy_recipes import make_matchset
 from .json_samples import (
     good_league_schedule,
     good_live_games,
@@ -137,11 +135,13 @@ class TestLeagueScheduleUpdate(TestCase):
         )
 
 
-class TestLiveGames(FastFixtureTestCase):
+class TestLiveGames(TestCase):
     good_json = good_live_games
     fixtures = ['heroes.json']
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
+        super(self, TestLiveGames).setUpClass()
         self.task = UpdateLiveGames()
 
     def test_clean_url(self):
@@ -165,9 +165,7 @@ class TestLiveGames(FastFixtureTestCase):
     def test_get_pickbans(self):
         urldata = self.task._setup(self.good_json)
         lst = []
-        import json
         for game in urldata:
-            print json.dumps(game)
             lst.append(self.task._get_pickbans(game))
 
         self.assertEqual(
@@ -202,8 +200,6 @@ class TestLiveGames(FastFixtureTestCase):
         urldata = self.task._setup(self.good_json)
 
         # Or else get an error from get_or_create w/ sqlite
-        from django.db import transaction
-        transaction.set_autocommit(True)
         data = self.task._merge_logos(urldata)
         self.assertEqual(data, live_merge_logos)
 

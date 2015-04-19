@@ -22,44 +22,7 @@ from utils.charts import (
 from players.models import Player
 from utils import db_arg_map, match_url
 
-if settings.VERBOSE_PROFILING:
-    try:
-        from line_profiler import LineProfiler
 
-        def do_profile(follow=[]):
-            def inner(func):
-                def profiled_func(*args, **kwargs):
-                    try:
-                        profiler = LineProfiler()
-                        profiler.add_function(func)
-                        for f in follow:
-                            profiler.add_function(f)
-                        profiler.enable_by_count()
-                        return func(*args, **kwargs)
-                    finally:
-                        profiler.print_stats()
-                return profiled_func
-            return inner
-
-    except ImportError:
-        def do_profile(follow=[]):
-            "Helpful if you accidentally leave in production!"
-            def inner(func):
-                def nothing(*args, **kwargs):
-                    return func(*args, **kwargs)
-                return nothing
-            return inner
-else:
-    def do_profile(follow=[]):
-        "Helpful if you accidentally leave in production!"
-        def inner(func):
-            def nothing(*args, **kwargs):
-                return func(*args, **kwargs)
-            return nothing
-        return inner
-
-
-@do_profile()
 def player_team_endgame_json(
         players,
         game_modes,
@@ -247,7 +210,6 @@ def player_team_endgame_json(
     return c
 
 
-@do_profile()
 def player_endgame_json(
         players,
         game_modes,
@@ -303,7 +265,6 @@ def player_endgame_json(
     return c
 
 
-@do_profile()
 def team_endgame_json(
         players,
         game_modes,
@@ -439,7 +400,6 @@ def team_endgame_json(
     return c
 
 
-@do_profile()
 def match_ability_json(match, panel_var=None):
 
     skill_builds = SkillBuild.objects.filter(
@@ -492,7 +452,6 @@ def match_ability_json(match, panel_var=None):
     return c
 
 
-@do_profile()
 def match_parameter_json(match_id, x_var, y_var):
     pmses = PlayerMatchSummary.objects.filter(match__steam_id=match_id)\
         .select_related()
@@ -536,7 +495,6 @@ def match_parameter_json(match_id, x_var, y_var):
     return c
 
 
-@do_profile()
 def single_match_parameter_json(match, y_var):
     pmses = PlayerMatchSummary.objects.filter(match__steam_id=match)\
         .select_related()
@@ -576,7 +534,6 @@ def single_match_parameter_json(match, y_var):
     return c
 
 
-@do_profile()
 def match_role_json(match):
     pmses = PlayerMatchSummary.objects.filter(match__steam_id=match)
     if len(pmses) == 0:
@@ -643,7 +600,6 @@ def match_role_json(match):
     return c
 
 
-@do_profile()
 def match_list_json(matches, players):
     pmses = PlayerMatchSummary.objects.filter(
         match__steam_id__in=matches,

@@ -164,6 +164,7 @@ class TestWorkingJson(TestCase):
 
     @classmethod
     def setUpClass(self):
+        super(TestWorkingJson, self).setUpClass()
         self.hero, self.player = make_matchset()
         self.player.updated = True
 

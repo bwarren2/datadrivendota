@@ -6,7 +6,7 @@ TEMPLATE_DEBUG = False
 SOUTH_TESTS_MIGRATE = False
 
 INSTALLED_APPS += (
-    'django_nose',
+    # 'django_nose',
     # 'django_behave',
 )
 

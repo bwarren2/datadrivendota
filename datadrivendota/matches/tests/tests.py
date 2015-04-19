@@ -1,5 +1,6 @@
 from nose.tools import timed
 from django.test import TestCase
+from model_mommy import mommy
 
 from matches.models import PlayerMatchSummary, Match, GameMode, SkillBuild
 from matches.mommy_recipes import make_matchset
@@ -20,33 +21,36 @@ JSON_TIME = .2
 # test_team_endgame_json is using its own time and needs work.
 
 
-class TestMommy(TestCase):
-
-    def test_mommy(self):
-        make_matchset()
-
-
 class TestModel(TestCase):
 
     def setUp(self):
-        rad_win_match = Match(steam_id=1, radiant_win=True)
-        dire_win_match = Match(steam_id=1, radiant_win=False)
-        self.rad_win = PlayerMatchSummary(
-            match=rad_win_match,
+        # rad_win_match = mommy.make_recipe(
+        #     'matches.match', steam_id=1, radiant_win=True
+        # )
+        # dire_win_match = mommy.make_recipe(
+        #     'matches.match', steam_id=2, radiant_win=False
+        # )
+        self.rad_win = mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__radiant_win=True,
             player_slot=0
             )
-        self.dire_win = PlayerMatchSummary(
-            match=dire_win_match,
+        self.dire_win = mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__radiant_win=False,
             player_slot=132
             )
-        self.rad_loss = PlayerMatchSummary(
-            match=dire_win_match,
+        self.rad_loss = mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__radiant_win=False,
             player_slot=0
             )
-        self.dire_loss = PlayerMatchSummary(
-            match=rad_win_match,
+        self.dire_loss = mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__radiant_win=True,
             player_slot=132
             )
+        super(TestModel, self).setUp()
 
     def test_wins(self):
         self.assertEqual(self.rad_win.determine_win(), True)
@@ -67,6 +71,7 @@ class TestWorkingJson(TestCase):
         self.player.updated = True
         sbs = SkillBuild.objects.all()
         self.match_id = sbs[0].player_match_summary.match.steam_id
+        super(TestWorkingJson, self).setUpClass()
 
     def tearDown(self):
         pass

@@ -1,5 +1,3 @@
-import datetime
-from django.conf import settings
 from django.db.models import Count
 from matches.models import PlayerMatchSummary, Match, PickBan
 from .models import League
@@ -11,47 +9,9 @@ from utils.charts import (
 )
 from heroes.models import Hero
 from collections import defaultdict
-from time import mktime
 from utils import utcize
 
-if settings.VERBOSE_PROFILING:
-    try:
-        from line_profiler import LineProfiler
 
-        def do_profile(follow=[]):
-            def inner(func):
-                def profiled_func(*args, **kwargs):
-                    try:
-                        profiler = LineProfiler()
-                        profiler.add_function(func)
-                        for f in follow:
-                            profiler.add_function(f)
-                        profiler.enable_by_count()
-                        return func(*args, **kwargs)
-                    finally:
-                        profiler.print_stats()
-                return profiled_func
-            return inner
-
-    except ImportError:
-        def do_profile(follow=[]):
-            "Helpful if you accidentally leave in production!"
-            def inner(func):
-                def nothing(*args, **kwargs):
-                    return func(*args, **kwargs)
-                return nothing
-            return inner
-else:
-    def do_profile(follow=[]):
-        "Helpful if you accidentally leave in production!"
-        def inner(func):
-            def nothing(*args, **kwargs):
-                return func(*args, **kwargs)
-            return nothing
-        return inner
-
-
-@do_profile()
 def league_winrate_json(
         league,
         min_date=None,
@@ -107,13 +67,14 @@ def league_winrate_json(
         'herodossier__alignment',
         'steam_id',
         )
-    hero_info_dict = {hero['name']:
-                        {
-                            'name': hero['name'],
-                            'machine_name': hero['machine_name'],
-                            'alignment': hero['herodossier__alignment'],
-                            'steam_id': hero['steam_id'],
-                        } for hero in all_heroes
+    hero_info_dict = {
+        hero['name']:
+        {
+            'name': hero['name'],
+            'machine_name': hero['machine_name'],
+            'alignment': hero['herodossier__alignment'],
+            'steam_id': hero['steam_id'],
+        } for hero in all_heroes
     }
 
     c = XYPlot()
@@ -158,7 +119,6 @@ def league_winrate_json(
     return c
 
 
-@do_profile()
 def league_pick_ban_json(
         league,
         min_date=None,
@@ -200,10 +160,6 @@ def league_pick_ban_json(
         raise NoDataFound
 
     hero_classes = hero_classes_dict()
-    heroes = {
-        h.name: h.herodossier.alignment.title()
-        for h in Hero.objects.filter(visible=True).select_related()
-        }
 
     annotations = {}
     for pb in pbs:
