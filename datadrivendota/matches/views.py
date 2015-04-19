@@ -59,9 +59,6 @@ class MatchDetail(DetailView):
             else:
                 summary.is_dire = True
 
-            if summary.leaver.steam_id != 0:
-                summary.improper_player = True
-
         kwargs['summaries'] = summaries
 
         radiant_summaries = [
