@@ -28,16 +28,22 @@ class League(models.Model):
 
     @property
     def display_name(self):
-        str = self.name.replace('#DOTA_Item_League_', '')
-        str = str.replace('#DOTA_Item_', '').replace('_', ' ')
-        return str
+        if self.name is not None:
+            str = self.name.replace('#DOTA_Item_League_', '')
+            str = str.replace('#DOTA_Item_', '').replace('_', ' ')
+            return str
+        else:
+            return ''
 
     @property
     def display_description(self):
-        str = self.description.replace('#DOTA_Item_League_', '')
-        str = str.replace('#DOTA_Item_Desc_', '').replace('_', ' ')
-        str = str.replace('#DOTA_Item_', '').replace('_', ' ')
-        return str
+        if self.description is not None:
+            str = self.description.replace('#DOTA_Item_League_', '')
+            str = str.replace('#DOTA_Item_Desc_', '').replace('_', ' ')
+            str = str.replace('#DOTA_Item_', '').replace('_', ' ')
+            return str
+        else:
+            return ''
 
     def __unicode__(self):
         if self.name is None:

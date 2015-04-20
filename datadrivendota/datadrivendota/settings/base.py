@@ -233,7 +233,6 @@ DJANGO_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sites',
-    'django.contrib.comments',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',

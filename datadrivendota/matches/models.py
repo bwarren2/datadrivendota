@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db import models
 from utils import safen
 
@@ -86,11 +86,11 @@ class Match(models.Model):
 
     @property
     def hms_duration(self):
-        return datetime.timedelta(seconds=self.duration)
+        return timedelta(seconds=self.duration)
 
     @property
     def hms_start_time(self):
-        return datetime.datetime.fromtimestamp(
+        return datetime.fromtimestamp(
             self.start_time
         ).strftime('%H:%M:%S %Y-%m-%d')
 
@@ -221,7 +221,7 @@ class PlayerMatchSummary(models.Model):
     @property
     def display_date(self):
         return str(
-            datetime.datetime.fromtimestamp(
+            datetime.fromtimestamp(
                 self.match.start_time
             ).strftime('%Y-%m-%d')
         )
@@ -229,7 +229,7 @@ class PlayerMatchSummary(models.Model):
     @property
     def display_duration(self):
         return str(
-            datetime.timedelta(
+            timedelta(
                 seconds=self.match.duration
             )
         )
