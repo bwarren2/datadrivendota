@@ -270,7 +270,7 @@ LOCAL_APPS = (
     'teams',
     'accounts',
     'health',
-    'blog',
+    # 'blog',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
