@@ -19,7 +19,7 @@ class UserProfile(models.Model):
     following = models.ManyToManyField('players.Player', related_name='quarry')
     tracking = models.ManyToManyField('players.Player', related_name='feed')
     track_limit = models.IntegerField(default=7)
-    requested = models.ManyToManyField('MatchRequest', null=True)
+    requested = models.ManyToManyField('MatchRequest')
     request_limit = models.IntegerField(default=10)
 
     def add_tracking(self, player):
