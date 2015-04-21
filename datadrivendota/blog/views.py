@@ -4,6 +4,7 @@ from .models import Entry
 
 
 class EntryListView(ListView):
+    paginate_by = 1
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -14,7 +15,11 @@ class EntryListView(ListView):
 
         else:
             qs = Entry.public.all()
-        return qs.order_by('-created')
+        try:
+            return qs.order_by('-created')
+        # Nothing there
+        except IndexError:
+            return qs
 
 
 class EntryDetailView(DetailView):
