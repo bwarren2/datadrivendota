@@ -1,5 +1,5 @@
 from nose.tools import timed
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.forms import ValidationError
 from model_mommy import mommy
 
@@ -109,6 +109,30 @@ class TestMultiFormField(TestCase):
 
         with self.assertRaises(ValidationError):
             self.required.clean('100')
+
+
+class TestUrlconf(TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        super(TestUrlconf, self).setUpClass()
+        self.hero_doss = mommy.make_recipe(
+            'heroes.herodossier', hero__machine_name='natures-prophet'
+        )
+
+    def test_url_ok(self):
+
+        c = Client()
+
+        resp = c.get('/heroes/')
+        self.assertEqual(resp.status_code, 200)
+
+        resp = c.get('/heroes/{0}/'.format(self.hero_doss.hero.machine_name))
+        self.assertEqual(resp.status_code, 200)
+        # Almost all the other urls are to be gutted, so we are done here.
+
+
+# Reminder, things below here are deprecated
 
 
 class TestVitalsJson(TestCase):

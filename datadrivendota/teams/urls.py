@@ -19,7 +19,6 @@ urlpatterns = patterns(
         views.PickBan.as_view(),
         name='pick_ban'
     ),
-    # url(r'^api/getteams/$', views.team_list, name='team_list'),
     url(
         r'^api/winrate/$',
         views.ApiWinrateChart.as_view(),

@@ -5,6 +5,11 @@ urlpatterns = patterns(
     '',
     url(r'^$', views.ProIndexView.as_view(), name='pro_index'),
     url(
+        r'^(?P<player_id>[0-9]*)/$',
+        views.PlayerDetailView.as_view(),
+        name="id_detail"
+    ),
+    url(
         r'^followed/$',
         views.FollowedPlayerIndexView.as_view(),
         name='followed_index'
@@ -23,11 +28,6 @@ urlpatterns = patterns(
         r'^hero-ability-comparison/$',
         views.HeroAbilities.as_view(),
         name='hero_abilities'
-    ),
-    url(
-        r'^(?P<player_id>[0-9]*)/$',
-        views.PlayerDetailView.as_view(),
-        name="id_detail"
     ),
     url(
         r'^hero-style/(?P<player_id>[0-9]*)-(?P<hero_name>[a-zA-Z0-9\-]*)$',

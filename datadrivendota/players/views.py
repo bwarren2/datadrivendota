@@ -49,18 +49,22 @@ class PlayerDetailView(DetailView):
         p2s = Player.objects.exclude(pro_name=None,)\
             .exclude(steam_id=self.object.steam_id,)
 
-        p2 = choice([p for p in p2s])
+        try:
+            p2 = choice([p for p in p2s])
 
-        kwargs['compare_url'] = reverse(
-            'players:comparison',
-            kwargs={
-                'player_id_1': self.object.steam_id,
-                'player_id_2': p2.steam_id,
-            })
-        kwargs['compare_str'] = 'Compare {p1} to {p2}!'.format(
-            p1=self.object.display_name,
-            p2=p2.display_name,
-        )
+            kwargs['compare_url'] = reverse(
+                'players:comparison',
+                kwargs={
+                    'player_id_1': self.object.steam_id,
+                    'player_id_2': p2.steam_id,
+                })
+            kwargs['compare_str'] = 'Compare {p1} to {p2}!'.format(
+                p1=self.object.display_name,
+                p2=p2.display_name,
+            )
+        except IndexError:
+            # If there are no other players, like in tests, this is not a breaking requirement.
+            pass
 
         stats = {}
         stats['wins'] = self.object.wins

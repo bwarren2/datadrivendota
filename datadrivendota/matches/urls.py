@@ -5,7 +5,7 @@ urlpatterns = patterns(
     '',
     url(r'^$', views.MatchListView.as_view(), name='index'),
     url(
-        r'^(?P<match_id>[0-9\-]*)/parse_match$',
+        r'^(?P<match_id>[0-9\-]*)/parse_match/$',
         views.ParseMatchDetail.as_view(),
         name="parse_match"
     ),

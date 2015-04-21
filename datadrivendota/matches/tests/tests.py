@@ -1,5 +1,5 @@
 from nose.tools import timed
-from django.test import TestCase
+from django.test import TestCase, Client
 from model_mommy import mommy
 
 from matches.models import PlayerMatchSummary, Match, GameMode, SkillBuild
@@ -157,3 +157,24 @@ class TestWorkingJson(TestCase):
             match_set_3=[self.match_id],
             )
         self.assertGreater(len(chart.datalist), 1)
+
+class TestUrlconf(TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        super(TestUrlconf, self).setUpClass()
+        self.match = mommy.make_recipe('matches.match')
+
+    def test_url_ok(self):
+        c = Client()
+
+        resp = c.get('/matches/')
+        self.assertEqual(resp.status_code, 200)
+
+        resp = c.get('/matches/{0}/'.format(self.match.steam_id))
+        self.assertEqual(resp.status_code, 200)
+
+        # resp = c.get('/matches/{0}/parse_match/'.format(self.match.steam_id))
+        # self.assertEqual(resp.status_code, 200)
+        # The template relies on a replay file, which breaks here.
+        # This is due for refactor during replay parsing.

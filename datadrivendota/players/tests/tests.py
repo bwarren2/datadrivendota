@@ -1,13 +1,11 @@
-from datetime import datetime
-from django.test import TestCase
+from django.contrib.auth.models import User, Permission
+from django.test import TestCase, Client
 from model_mommy import mommy
 from matches.mommy_recipes import make_matchset
-from heroes.mommy_recipes import make_hero
 from players.json_data import (
     player_winrate_json,
     player_hero_abilities_json,
     player_versus_winrate_json,
-    player_hero_side_json,
     player_role_json,
 )
 
@@ -17,10 +15,12 @@ class TestMommy(TestCase):
     def test_mommy(self):
         mommy.make_recipe('players.player')
 
+
 class TestWorkingJson(TestCase):
 
     @classmethod
     def setUpClass(self):
+        super(TestWorkingJson, self).setUpClass()
         self.hero, self.player = make_matchset()
         self.hero_2, self.player_2 = make_matchset()
 
@@ -78,3 +78,30 @@ class TestWorkingJson(TestCase):
             plot_var='performance',
         )
         self.assertGreater(len(chart.datalist), 0)
+
+
+class TestUrlconf(TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        super(TestUrlconf, self).setUpClass()
+        self.player = mommy.make_recipe('players.player')
+
+    def test_url_ok(self):
+        c = Client()
+
+        resp = c.get('/players/')
+        self.assertEqual(resp.status_code, 200)
+
+        resp = c.get('/players/all-players/')
+        self.assertEqual(resp.status_code, 200)
+
+        resp = c.get('/players/{0}/'.format(self.player.steam_id))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_url_login(self):
+        c = Client()
+        resp = c.get('/players/followed/')
+        self.assertEqual(resp.status_code, 302)
+        # We need to refactor the permissions conventions as well.
+        # Test success later.

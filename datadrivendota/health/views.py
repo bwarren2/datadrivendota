@@ -27,3 +27,7 @@ class CardIndexView(SuperuserRequiredMixin, TemplateView):
         kwargs['player'] = Player.objects.filter(updated=True)\
             .select_related()[0]
         return super(CardIndexView, self).get_context_data(**kwargs)
+
+
+class StylesIndexView(SuperuserRequiredMixin, TemplateView):
+    template_name = 'bootstrap_test.html'

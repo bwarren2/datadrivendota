@@ -1,5 +1,4 @@
-# from django_nose import FastFixtureTestCase
-from django.test import TestCase
+from django.test import TestCase, Client
 from datetime import timedelta
 from django.utils import timezone
 from teams.models import Team
@@ -256,3 +255,27 @@ class TestModelMethods(TestCase):
         self.league.update_time = timezone.now()
         self.league.valve_cdn_image = 'http://www.whatever.com/test.png'
         self.assertEqual(self.league.is_outdated, False)
+
+
+class TestUrlconf(TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        super(TestUrlconf, self).setUpClass()
+        self.league = mommy.make_recipe('leagues.league')
+
+    def test_urls_ok(self):
+        c = Client()
+
+        resp = c.get('/leagues/')
+        self.assertEqual(resp.status_code, 200)
+
+        resp = c.get('/leagues/{0}/'.format(self.league.steam_id))
+        self.assertEqual(resp.status_code, 200)
+
+        resp = c.get('/leagues/scheduled-matches/')
+        self.assertEqual(resp.status_code, 200)
+
+        resp = c.get('/leagues/live-game-detail/1/')
+        self.assertEqual(resp.status_code, 200)
+        # The magic is in the template, so any number is OK
