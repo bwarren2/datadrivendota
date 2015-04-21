@@ -8,13 +8,18 @@ from datetime import timedelta
 # Create your tests here.
 class EntryTestCase(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.public_entry = mommy.make_recipe(
             'blog.entry', publicity=Entry.PUBLIC
+        )
+        self.login_entry = mommy.make_recipe(
+            'blog.entry', publicity=Entry.LOGIN
         )
         self.private_entry = mommy.make_recipe(
             'blog.entry', publicity=Entry.PRIVATE
         )
+        super(EntryTestCase, self).setUpClass()
 
     def test_save_method(self):
         self.public_entry.content = 'Herru'
@@ -28,5 +33,10 @@ class EntryTestCase(TestCase):
         public_entries = Entry.public.all().count()
         self.assertEqual(public_entries, 1)
 
-        entries = Entry.objects.all().count()
+    def test_login_manager(self):
+        entries = Entry.login.all().count()
         self.assertEqual(entries, 2)
+
+    def test_private_manager(self):
+        entries = Entry.private.all().count()
+        self.assertEqual(entries, 3)

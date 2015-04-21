@@ -5,7 +5,7 @@ from .models import Entry
 class EntryFeed(Feed):
     title = 'Blog Entries'
     link = '/entries/'
-    description = "News rom DataDrivenDota"
+    description = "News from DataDrivenDota"
 
     def items(self):
         return Entry.public.all().order_by('-created')[:5]
