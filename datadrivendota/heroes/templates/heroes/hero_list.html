@@ -20,9 +20,11 @@
 {% block content %}
   <div class="row">
     {% for hero in hero_list %}
-      {% if hero.thumbshot and hero.name %}
-        {% include "heroes/_hero_card.html" %}
-      {% endif %}
+      <div class='col-md-3'>
+        {% if hero.thumbshot and hero.name %}
+          {% include "heroes/_hero_card.html" %}
+        {% endif %}
+      </div>
     {% endfor %}
   </div>
 {% endblock %}
