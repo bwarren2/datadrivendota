@@ -4,7 +4,6 @@
 
 {% block page_title %}
   {{ title }}
-  <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>
 {% endblock page_title %}
 
 {% block content %}
@@ -23,24 +22,3 @@
 
 </script>
 {% endblock extra_js %}
-
-{% block tour %}
-<script type="text/javascript">
-  $(function () {
-    var tour = new Tour({
-      backdrop: true
-    });
-
-    tour.addSteps(
-      {{tour|safe}}
-    );
-
-    $(".tourglyph").on("click",function(){
-      tour.restart();
-    })
-
-  });
-</script>
-{% endblock tour %}
-
-

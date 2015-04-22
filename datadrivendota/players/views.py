@@ -95,74 +95,16 @@ class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class Winrate(WinrateMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts hero winrate for a particular player."
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Modes and players you want to see here.  (Hint: don't use ability draft.)"
-        },
-        {
-            'element': "ul.nav-tabs",
-            'title': "Other questions",
-            'content': "For other charts, like endgame data for individuals, try other tabs.",
-            'placement': "bottom"
-        },
-        {
-            'orphan': True,
-            'title': "Ready to go!",
-            'content': "Challenge: Who is Dendi's highest winrate hero of those with 15 games?"
-        }
-    ]
     title = "Hero Winrate"
     html = "players/form.html"
 
 
 class HeroAdversary(HeroAdversaryMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts hero adversarial performance."
-        },
-    ]
     title = "Player Hero Adversary"
     html = "players/form.html"
 
 
 class HeroAbilities(HeroAbilitiesMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts in-game level progression for two players."
-        },
-        {
-            'orphan': True,
-            'title': "Example",
-            'content': "For example, you can compare Dendi's Pudge to XBOCT's Lifestealer."
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Pick two players and two heroes to compare their leveling rates."
-        },
-        {
-            'element': "#main-nav",
-            'title': "Other questions",
-            'content': "For other charts, like data about heroes stats, try other tabs.",
-            'placement': "bottom"
-        },
-        {
-            'orphan': True,
-            'title': "Ready to go!",
-            'content': "Challenge: At what level does Dendi's Pudge start falling behind Funnik's Lifestealer?"
-        }
-    ]
     title = "Hero Skilling Comparison"
     html = "players/form.html"
 

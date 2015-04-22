@@ -452,62 +452,12 @@ class MatchHeroContext(FormView):
 # You are warned.
 
 class MatchParameterChart(MatchParameterMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page scatterplots end-of-game data for a match of your choice."
-        },
-        {
-            'orphan': True,
-            'title': "Example",
-            'content': "For example, you can compare kills and hero damage to see who was killstealing in a match, or hero damage and gold to see who was producing a return on investment."
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Specify which attributes and match you want to render here."
-        },
-        {
-            'element': "ul.nav-tabs",
-            'title': "Other questions",
-            'content': "For other charts, like endgame data for teams, try other tabs.",
-            'placement': "bottom"
-        },
-    ]
+
     title = "Match Parameter Scatter"
     html = "matches/form.html"
 
 
 class Endgame(EndgameMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts end-of-game data for players of your choosing."
-        },
-        {
-            'orphan': True,
-            'title': "Example",
-            'content': "For example, you can compare kills-deaths+assists/2 (KDA2, kind of a net score) between imported players."
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Specify which attributes and players you want to render here."
-        },
-        {
-            'element': "ul.nav-tabs",
-            'title': "Other questions",
-            'content': "For other charts, like endgame data for teams, try other tabs.",
-            'placement': "bottom"
-        },
-        {
-            'orphan': True,
-            'title': "Ready to go!",
-            'content': "Challenge: how do [A]kke's and Funn1k's KDA2s change based on win/loss?  Hint: tweak the group and split vars for different renderings."
-        }
-    ]
     title = "Endgame Charts"
     html = "matches/form.html"
 
@@ -516,47 +466,11 @@ class Endgame(EndgameMixin, ChartFormView):
 
 
 class OwnTeamEndgame(OwnTeamEndgameMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts end-of-game data for teams for each player of your choosing."
-        }
-    ]
     title = "Own-Team Endgame Charts"
     html = "matches/form.html"
 
 
-
 class SameTeamEndgame(SameTeamEndgameMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts end-of-game data for groups of players."
-        },
-        {
-            'orphan': True,
-            'title': "Example",
-            'content': "For example, you can compare team kills to team assists for any game with the given players on the same team."
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Specify which attributes and players you want to render here."
-        },
-        {
-            'element': "ul.nav-tabs",
-            'title': "Other questions",
-            'content': "For other charts, like endgame data for individuals, try other tabs.",
-            'placement': "bottom"
-        },
-        {
-            'orphan': True,
-            'title': "Ready to go!",
-            'content': "Challenge: When Funn1k, Dendi, and XBOCT play together, what KDA2 does their team exceed when they win?"
-        }
-    ]
     title = "Same Team Endgame Charts"
     html = "matches/form.html"
 
@@ -565,27 +479,14 @@ class SameTeamEndgame(SameTeamEndgameMixin, ChartFormView):
 
 
 class ProgressionList(ProgressionListMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts level progression data for specific players in specific matches."
-        }
-    ]
     title = "Match List Hero Progression"
     html = "matches/form.html"
 
     def amend_params(self, params):
         return params
 
+
 class ProgressionSet(SetProgressionMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts level progression data for a specific hero in specific matches."
-        }
-    ]
     title = "Match Set Hero Progression"
     html = "matches/form.html"
 
@@ -594,39 +495,6 @@ class ProgressionSet(SetProgressionMixin, ChartFormView):
 
 
 class AbilityBuild(AbilityBuildMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page is one of the few to chart within-game data: it plots when people place skill points in a game, with the first point placement being 0 minutes."
-        },
-        {
-            'orphan': True,
-            'title': "Example",
-            'content': "For example, you can see how people leveled in game with Dendi on Magnus (550709502)."
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Specify which match id you want and output formatting here."
-        },
-        {
-            'orphan': True,
-            'title': "Important note!",
-            'content': "This only works for games we have imported!  The data management page lets qualified users add players to the import process."
-        },
-        {
-            'element': "#main-nav",
-            'title': "Other questions",
-            'content': "For the overview for a player, try players:index.  For the match overview, try /matches/<match-id>",
-            'placement': "bottom"
-        },
-        {
-            'orphan': True,
-            'title': "Ready to go!",
-            'content': "Challenge: in match 550709502, who slowed down when?  When did Slark and Lifesteal crush their enemies?"
-        }
-    ]
     title = "Match Ability Breakdown"
     html = "matches/form.html"
 

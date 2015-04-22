@@ -133,46 +133,12 @@ WARNING
 
 
 class Winrate(WinrateMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts hero winrate for a particular league."
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Dates and the league you want to see here."
-        },
-        {
-            'orphan': True,
-            'title': "Ready to go!",
-            'content': "Try it out!"
-        }
-    ]
     title = "Hero Winrate"
     html = "players/form.html"
 
 
 class PickBan(PickBanMixin, ChartFormView):
     """What did this league pick/ban?"""
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts picks and bans for matches that have a given league.  (Both side's picks and bans count.)"
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Dates and the league you want to see here."
-        },
-        {
-            'orphan': True,
-            'title': "Ready to go!",
-            'content': "Try it out!?"
-        }
-    ]
     title = "Pick/Bans"
     html = "players/form.html"
 

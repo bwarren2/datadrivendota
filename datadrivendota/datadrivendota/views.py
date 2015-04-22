@@ -88,7 +88,6 @@ class LoginRequiredView(View):
 class FormView(View):
     """This is an outdated method of dispatching and altering charts, scheduled for deprecation.  You can tell by the datalist, params entrypoint of times gone by, before class based charts.  ChartFormView is the preferred method now."""
 
-    tour = None
     form = None
     attrs = None
     json_function = None
@@ -96,7 +95,6 @@ class FormView(View):
     html = None
 
     def get(self, request):
-        self.json_tour = dumps(self.tour)
         if request.GET:
             bound_form = self.form(request.GET)
 
@@ -120,7 +118,6 @@ class FormView(View):
                             'form': bound_form,
                             'json_data': basename(json_data.name),
                             'title': self.title,
-                            'tour': self.json_tour,
                         }
                     )
 
@@ -132,7 +129,6 @@ class FormView(View):
                             'form': bound_form,
                             'error': 'error',
                             'title': self.title,
-                            'tour': self.json_tour,
                         }
                     )
 
@@ -143,7 +139,6 @@ class FormView(View):
                     {
                         'form': bound_form,
                         'title': self.title,
-                        'tour': self.json_tour,
                     }
                 )
 

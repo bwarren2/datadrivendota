@@ -34,14 +34,6 @@ YOU ARE WARNED.
 
 
 class ItemWinrateView(ItemWinrateMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts item usage for a player on a hero."
-        },
-        ]
-
     title = "Item Winrate"
     html = "items/form.html"
 

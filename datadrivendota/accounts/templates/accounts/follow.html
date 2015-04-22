@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block page_title %}Player Management! <span class='glyphicon glyphicon-question-sign tourglyph' title='Click me!'></span>{% endblock page_title %}
+{% block page_title %}Player Management!{% endblock page_title %}
 
 {% block content %}
 <div class='container'>
@@ -88,48 +88,3 @@ $('.purgeButton').click(function(){
 
 </script>
 {% endblock extra_js %}
-
-{% block tour %}
-<script type="text/javascript">
-  $(function () {
-    var tour = new Tour({
-      backdrop: true
-    });
-
-    tour.addSteps([
-      {
-        orphan: true,
-        title: "Ahoy!",
-        content: "Welcome to data management!"
-      },
-      {
-        orphan: true,
-        title: "Ahoy!",
-        content: "Here, you can manage whose data you follow."
-      },
-      {
-        element: ".chart-form",
-        title: "Follow players",
-        content: "Pick players from our dataset to follow here.",
-        placement: "right"
-      },
-      {
-        element: "#followTable",
-        title: "Manage follows",
-        content: "Remove people you are already following here.",
-        placement: "right"
-      },
-      {
-        orphan: true,
-        title: "Ready to go!",
-        content: "That is how you manage data feeds!"
-      }
-    ]);
-
-    $(".tourglyph").on("click",function(){
-      tour.restart();
-    })
-
-  });
-</script>
-{% endblock tour %}
