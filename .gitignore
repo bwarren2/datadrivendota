@@ -64,3 +64,5 @@ kernprof*
 
 datadrivendota/static/replay_parse_json
 datadrivendota/celerybeat-schedule
+
+node_modules/
