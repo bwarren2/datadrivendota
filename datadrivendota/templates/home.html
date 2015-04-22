@@ -6,16 +6,25 @@
 
 {% block content %}
 
-<div id='poll' style='text-align:center'>
-<h4>Hey!  We want your opinion, you might want a free box; <a href="https://www.datadrivendota.com/accounts/poll"> answer our poll!</a></h4></div>
 
-<div id='hidden-feature' class='row'>
-  <div id='slark-chart' class='col-md-8'>
-    <h4>Slark Tower Damage by Skill Level, with Dendi Games</h4>
-  </div>
+<div class='jumbotron'>
+    <h1>Welcome to DataDrivenDota</h1>
+    <p>We think a chart is worth a thousand stats, and are building the framework to prove it.</p>
+    <small>DDD is a passion/learning project dedicated to doing data analysis right for Dota 2.  We are currently boiling down our code for better charts, deeper analytics, and more features.  Check back soon, or follow our <a href="{% url 'blog:index' %}">blog</a> and <a href="https://twitter.com/datadrivendota">twitter</a>!</small>
+</div>
+<div class='container'>
+  <div class='row'>
 
-  <div id='endgame-chart' class='col-md-4'>
-    <h4>Dendi's End-of-Game Kills</h4>
+    <h1>Example charts: Slark by Dendi</h1>
+
+    <div id='slark-chart' class='col-md-8'>
+      <h4>Slark Tower Damage by Skill Level, with Dendi Games</h4>
+    </div>
+
+    <div id='endgame-chart' class='col-md-4'>
+      <h4>Dendi's End-of-Game Kills</h4>
+    </div>
+
   </div>
 </div>
 
@@ -23,7 +32,6 @@
 
 {% block extra_js %}
     <script type="text/javascript">
-      $('#hidden-feature').hide();
 
       window.apiHit(
         "#slark-chart",
