@@ -64,3 +64,6 @@ kernprof*
 
 datadrivendota/static/replay_parse_json
 datadrivendota/celerybeat-schedule
+
+# You should install  these from the package.json
+node_modules/

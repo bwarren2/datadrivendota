@@ -1,0 +1,280 @@
+/* Cards! */
+
+div.match-card{
+  .container();
+  div.match-side{
+    .make-row();
+    div.side-card{
+      .make-md-column(1);
+      margin: 0px;
+      padding: 3px;
+      .side-pip{
+        position: absolute;
+        left: 25%;
+        top: 50%;
+        width: 50%;
+      }
+    }
+    div.summary{
+      .make-md-column(2);
+      margin: 0px;
+      padding: 3px;
+
+      .chart-pip{
+        font-size: auto;
+        position: absolute;
+        right: 0%;
+        top: 70%;
+      }
+      .cast-player-image{
+        position: absolute;
+        left: 5%;
+        bottom: 15%;
+      }
+    }
+    div.team-card{
+      .make-md-column(1);
+      margin: 0px;
+      padding: 3px;
+    }
+  }
+}
+
+
+div.hero-card{
+
+}
+
+
+
+div#animation-controls{
+  .make-row();
+
+  div#animation-buttons{
+    div#stop-button{
+      .make-md-column(2);
+      .make-xs-column(3);
+    }
+    div#start-button{
+      .make-md-column(2);
+      .make-xs-column(3);
+    }
+    div#forward-button{
+      .make-md-column(2);
+      .make-xs-column(3);
+    }
+    div#back-button{
+      .make-md-column(2);
+      .make-xs-column(3);
+    }
+    div#autoplay-button{
+      .make-md-column(2);
+      .make-xs-column(3);
+    }
+    div#timer{
+      .make-md-column(2);
+      .make-xs-column(4);
+    }
+  }
+}
+
+div#games{
+  .make-row();
+  div.game-card{
+    .make-md-column(12);
+    .make-xs-column(12);
+    padding:10px;
+    div.sections{
+      .make-row();
+      div.league-card{
+        .make-md-column(3);
+        .make-xs-column(3);
+      }
+      div.match-card{
+        .make-md-column(9);
+        .make-xs-column(9);
+        div.side-row{
+          .make-row();
+          margin-left: 0px;
+          margin-right: 0px;
+          div.hero-thumb{
+            .make-md-column(2);
+            .make-xs-column(2);
+            padding-left: 0px;
+            padding-right: 0px;
+          }
+        }
+
+      }
+    }
+  }
+}
+
+
+div#bans{
+  .make-row();
+
+  div#radiant-bans, div#dire-bans, div#radiant-picks, div#dire-picks{
+    .make-md-column(6);
+    .make-xs-column(12);
+
+    div.hero-slot{
+      .make-md-column(2);
+      .make-xs-column(4);
+
+      img.hero-face{
+        .img-responsive;
+        .thumbnail;
+      }
+      img.hero-face.ban{
+        .ban;
+      }
+
+    }
+  }
+}
+
+div#scoreboard{
+  .make-row();
+
+  div#radiant, div#dire{
+    .make-md-column(6);
+    .make-xs-column(12);
+
+    div.players{
+      img.table-face{
+        .thumbnail
+      }
+    }
+  }
+}
+
+div#charts{
+  .make-row();
+
+  div#gpm-xpm-chart{
+    .make-md-column(4);
+    .make-xs-column(12);
+
+  }
+  div#kill-death-chart{
+    .make-md-column(4);
+    .make-xs-column(12);
+
+  }
+  div#last-hit-levels{
+    .make-md-column(4);
+    .make-xs-column(12);
+
+  }
+}
+
+div#state{
+  .make-row();
+  div#map{
+    .make-md-column(6);
+    .make-xs-column(12);
+  }
+  div#matchup{
+    .make-md-column(6);
+    .make-xs-column(12);
+    div#logo-lineup{
+      .make-row();
+      div#radiant-logo{
+        .make-md-column(6);
+        .make-xs-column(12);
+      }
+      div#dire-logo{
+        .make-md-column(6);
+        .make-xs-column(12);
+      }
+      div#league-logo{
+        .make-md-column(12);
+        .make-xs-column(12);
+      }
+      div#game-facts{
+        .make-md-column(12);
+        .make-xs-column(12);
+      }
+    }
+  }
+
+}
+
+
+// Ability
+
+.ability-card {
+  width: 600px;
+  margin: 0 auto;
+}
+
+a.ability {
+  display: inline-block;
+  position: relative;
+
+  p.overlayer {
+    bottom: -5px;
+    display: inline-block;
+    left: 5px;
+    max-width: 102px;
+    top: auto;
+  }
+}
+
+.ability-thumbshot{
+  max-width:32px;
+  max-height:32px;
+}
+
+.ability-row-hero{
+  margin-right:8px;
+}
+
+
+// These need to be carded.
+.hero-infobox {
+  float: right;
+  width: 300px;
+  background-color: #333333;
+  a.thumbnail {
+    display: inline-block;
+  }
+
+  img.hero {
+  }
+}
+
+.player-infobox, .team-infobox {
+  border: 1px solid #DDD;
+  border-radius: 4px;
+  max-width: 300px;
+
+  img {
+    display: block;
+    margin: 0 auto;
+  }
+
+  h2 {
+    text-align: center;
+  }
+}
+
+// Needs to go into a player card
+.player-match-row {
+  margin-bottom: 20px;
+}
+
+
+
+.dire-pickban,
+.radiant-pickban {
+  height: 410px;
+  text-align: center;
+}
+
+.radiant-abilities,
+.dire-abilities{
+  margin-top:20px;
+  margin-bot:20px;
+}

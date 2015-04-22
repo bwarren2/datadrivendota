@@ -95,5 +95,10 @@ urlpatterns = patterns(
         views.ApiRoleChart.as_view(),
         name='api_role_chart'
         ),
+    url(
+        r'^api/combobox_tags/$',
+        views.ComboboxAjaxView.as_view(),
+        name='api_combobox'
+        ),
 
 )

@@ -488,41 +488,6 @@ class UpdateLeagueSchedule(ApiFollower):
         )
 
 
-class MirrorLeagues(Task):
-    """
-    DEPRECATED
-
-    Tries to make ALL THE LEAGUES off the list.
-    """
-
-    def run(self):
-        c = ApiContext()
-        c.refresh_records = True
-        vac = ValveApiCall()
-        ul = CreateLeagues()
-        c = chain(vac.s(api_context=c, mode='GetLeagueListing'), ul.s())
-        c.delay()
-
-
-class CreateLeagues(ApiFollower):
-    """
-    DEPRECATED
-
-    Takes all the results from a league list call and inserts them.
-    """
-    def run(self, urldata):
-        for league in self.result['leagues']:
-            l, created = League.objects.get_or_create(
-                steam_id=league['leagueid']
-                )
-            l.update(
-                name=league['name'],
-                description=league['description'],
-                tournament_url=league['tournament_url'],
-                item_def=league['itemdef'],
-            )
-
-
 class UpdateLeagues(Task):
     """
     Reflects the current item schema data for a league and pings for a logo
@@ -595,147 +560,44 @@ class UpdateLeagueLogo(ApiFollower):
         league.save()
         os.remove(f.name)
 
+# Deprecations start here.
 
-class UpdateLeagueGames(Task):
+
+class MirrorLeagues(Task):
     """
     DEPRECATED
 
-    Pulls in all games for all extant leagues
+    Tries to make ALL THE LEAGUES off the list.
     """
 
-    def run(self, min_date=None):
-
-        if min_date is None:
-            min_date = int(
-                mktime(
-                    timezone.now().timetuple()
-                ) - 7*24*60*60
-            )
-
-        if min_date != 'all':
-            c = ApiContext()
-            c.matches_requested = 500
-            c.matches_desired = 500
-            c.date_min = min_date
-            c.skill = 4
-            vac = ValveApiCall()
-            alg = MirrorLeagueGames()
-            c = chain(
-                vac.s(api_context=c, mode='GetScheduledLeagueGames'),
-                alg.s()
-            )
-            c.delay()
-
-        elif min_date == 'all':
-            for league in League.objects.all():
-                c = ApiContext()
-                c.league_id = league.steam_id
-                c.matches_requested = 500
-                c.matches_desired = 500
-                c.skill = 4
-                vac = ValveApiCall()
-                rpr = CycleApiCall()
-                ch = chain(
-                    vac.s(api_context=c, mode='GetMatchHistory'),
-                    rpr.s()
-                )
-                ch.delay()
-        else:
-            raise Exception("What is this min_date?: {0}".format(min_date))
+    def run(self):
+        c = ApiContext()
+        c.refresh_records = True
+        vac = ValveApiCall()
+        ul = CreateLeagues()
+        c = chain(vac.s(api_context=c, mode='GetLeagueListing'), ul.s())
+        c.delay()
 
 
-class MirrorLeagueGames(ApiFollower):
+class CreateLeagues(ApiFollower):
     """
     DEPRECATED
+
+    Takes all the results from a league list call and inserts them.
     """
     def run(self, urldata):
-        data = self.result['games']
-        leagues = [game['league_id'] for game in data]
-        for league_id in leagues:
-            c = ApiContext()
-            c.league_id = league_id
-            c.date_min = self.api_context.date_min
-            c.matches_requested = 500
-            c.matches_desired = 500
-            c.skill = 4
-            vac = ValveApiCall()
-            rpr = CycleApiCall()
-            c = chain(
-                vac.s(api_context=c, mode='GetMatchHistory'),
-                rpr.s()
+        for league in self.result['leagues']:
+            l, created = League.objects.get_or_create(
+                steam_id=league['leagueid']
+                )
+            l.update(
+                name=league['name'],
+                description=league['description'],
+                tournament_url=league['tournament_url'],
+                item_def=league['itemdef'],
             )
-            c.delay()
 
 
-# class MirrorLeagueLogos(Task):
-#     """
-#     DEPRECATED
-
-#     Annexes the url data for league logos from the item schema and updates the logo fields
-#     """
-
-#     def run(self):
-#         c = ApiContext()
-#         vac = ValveApiCall()
-#         ull = UpdateLeagueLogos()
-#         c = chain(vac.s(api_context=c, mode='GetSchema'), ull.s())
-#         c.delay()
-
-
-# class UpdateLeagueLogos(ApiFollower):
-#     """ Takes a given schema result and annexes logo urls."""
-
-#     def run(self, urldata):
-#         raise Exception('Geborked filter, fix.')
-#         leagues = League.objects.filter('')
-#         data = self.result['items']
-#         mapping = {d['defindex']: d['image_url'] for d in data}
-#         blank_URL = (
-#             'http://s3.amazonaws.com/datadrivendota'
-#             '/images/blank-logo.png'
-#         )
-
-#         logger.info('Forming league URLs for {0} leagues'.format(len(leagues)))
-#         for league in leagues:
-#             logger.info('Doing {0} (ID: {1}'.format(
-#                 league.name,
-#                 league.league.steam_id
-#                 ))
-#             filename = slugify(league.name)+'.png'
-#             try:
-#                 url = mapping[league.item_def]
-#                 if url != '':
-#                     imgdata = urllib2.urlopen(url, timeout=5)
-#                     with open('%s.png' % str(uuid4()), 'w+') as f:
-#                         f.write(imgdata.read())
-#                     league.logo_image.save(
-#                         filename, File(open(f.name))
-#                     )
-#                     os.remove(f.name)
-#                 else:
-#                     imgdata = urllib2.urlopen(blank_URL, timeout=5)
-#                     with open('%s.png' % str(uuid4()), 'w+') as f:
-#                         f.write(imgdata.read())
-
-#                     league.logo_image.save(
-#                         filename, File(open(f.name))
-#                         )
-#                     os.remove(f.name)
-
-#             except (urllib2.URLError, ssl.SSLError, socket.timeout):
-#                 self.retry()
-#             except (KeyError):
-#                 if league.logo_image is None:
-#                     imgdata = urllib2.urlopen(blank_URL, timeout=5)
-#                     with open('%s.png' % str(uuid4()), 'w+') as f:
-#                         f.write(imgdata.read())
-
-#                     league.logo_image.save(
-#                         filename, File(open(f.name))
-#                         )
-#                     os.remove(f.name)
-#             imgdata = None
-#             gc.collect()
 
 
 class AcquireHiddenLeagueGames(Task):

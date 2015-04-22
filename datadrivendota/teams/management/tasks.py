@@ -174,43 +174,6 @@ class UpdateTeamLogo(ApiFollower):
         logger.error("I failed :( {0}".format(repr(self.api_context)))
 
 
-def update_team_logos(team):
-    """
-    DEPRECATED
-
-    Refresh the logo
-    """
-    logo = team.logo
-    if logo != 0 and logo is not None:
-        c = ApiContext()
-        vac = ValveApiCall()
-        c.ugcid = team.logo
-        c.team_id = team.steam_id
-        c.logo_type = 'team'
-
-        utl = UpdateTeamLogo()
-
-        c = chain(
-            vac.s(api_context=c, mode='GetUGCFileDetails'), utl.s()
-        )
-        c.delay()
-
-    logo = team.logo_sponsor
-    if logo != 0 and logo is not None:
-        c = ApiContext()
-        vac = ValveApiCall()
-        c.ugcid = team.logo
-        c.team_id = team.steam_id
-        c.logo_type = 'sponsor'
-
-        utl = UpdateTeamLogo()
-
-        c = chain(
-            vac.s(api_context=c, mode='GetUGCFileDetails'), utl.s()
-        )
-        c.delay()
-
-
 def map_team_players(team, team_data):
     player_field_mapping_dict = {
         'player_0': 'player_0_account_id',

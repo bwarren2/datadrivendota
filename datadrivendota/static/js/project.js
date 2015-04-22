@@ -80,7 +80,7 @@ $(function () {
     '.multi-hero-tags', true, "One or more Heroes", "/rest-api/heroes",
     function (data, page) {
       return {
-        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
+        results: data.results.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
       };
     }
 
@@ -98,7 +98,7 @@ $(function () {
     '.multi-match-tags', true, "One or more Matches", "/rest-api/matches",
     function (data, page) {
       return {
-        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.steam_id}; })
+        results: data.results.map(function (elt) { return {id: elt.steam_id, text: elt.steam_id}; })
       };
     }
   );
@@ -118,7 +118,17 @@ $(function () {
       };
     }
   );
-  ajax_select2ify('.combobox-tags', false, "One Selector", "/matches/api/gettags");
+  ajax_select2ify(
+    '.combobox-tags', false, "One Selector", "/matches/api/combobox_tags",
+    function (data, page) {
+      return {
+        results: data.results.map(
+          function (elt) { return {id: elt.label, text: elt.value}; }
+        )
+      };
+    }
+
+  );
 
 
   $('#contact-link').click(function () {

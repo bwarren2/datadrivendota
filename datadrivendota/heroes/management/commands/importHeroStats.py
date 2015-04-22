@@ -181,7 +181,7 @@ def import_animations():
         try:
             logger.info("Trying animations.")
             logger.info("You remembered to format it correctly, right?")
-            with open('animations.csv', 'r') as f:
+            with open('json_files/animations.csv', 'r') as f:
 
                 reader = csv.reader(
                     f, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL

@@ -385,3 +385,23 @@ class SearchView(DjangoFormView):
         }
 
         return render(self.request, self.template_name, context)
+
+
+class AjaxView(TemplateView):
+
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax() or True:
+            context = self.get_result_data(**kwargs)
+            return self.succeed(context)
+        else:
+            return self.fail()
+
+    def fail(self):
+        data = 'fail'
+        mimetype = 'application/json'
+        return HttpResponse(data, mimetype)
+
+    def succeed(self, context):
+        data = dumps(context)
+        mimetype = 'application/json'
+        return HttpResponse(data, mimetype)

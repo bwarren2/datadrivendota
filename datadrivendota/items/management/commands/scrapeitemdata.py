@@ -40,7 +40,7 @@ class Command(BaseCommand):
             i.save()
         #Get the JSON item data feed.
         #url = 'http://www.dota2.com/jsfeed/itemdata'
-        with open('item_detail.json') as f:
+        with open('json_files/item_detail.json') as f:
             site_json = loads(f.read())
 
         #Do some cleanup

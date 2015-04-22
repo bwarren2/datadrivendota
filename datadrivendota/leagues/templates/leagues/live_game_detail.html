@@ -746,11 +746,11 @@ var miniMap = function(timeslice, target, divname, params){
 
         if('radiant' in match_data){
             $('div#logo-lineup div#radiant-logo').append('<img class="thumbnail" src='+match_data.radiant.logo_url+'>')
-            $('div#logo-lineup div#radiant-logo').append('<p class="team-tag">'+match_data.radiant.team_name+'</p>')
+            $('div#logo-lineup div#radiant-logo').append('<p class="overlayer">'+match_data.radiant.team_name+'</p>')
         }
         if('dire' in match_data){
             $('div#logo-lineup div#dire-logo').append('<img class="thumbnail" src='+match_data.dire.logo_url+'>')
-            $('div#logo-lineup div#dire-logo').append('<p class="team-tag">'+match_data.dire.team_name+'</p>')
+            $('div#logo-lineup div#dire-logo').append('<p class="overlayer">'+match_data.dire.team_name+'</p>')
         }
         // $('div#logo-lineup div#league-logo').append('<img class="thumbnail" src='+match_data.dire.logo_url+'>')
         $('div#logo-lineup div#game-facts').append(
@@ -842,5 +842,29 @@ img.table-item{
     z-index:100;
 }
 .row > div > img { width: 100%; display: block; }
+
+p.kills{
+    color: @brand-success;
+}
+p.deaths{
+    color: @brand-danger;
+}
+p.assists{
+    color: @brand-info;
+}
+p.kda2{
+    color: @brand-primary;
+}
+p.gpm{
+    color: #829FB2;
+}
+p.xpm{
+    color: #9282B2;
+}
+.table tbody>tr>td{
+    vertical-align: middle;
+}
+
+
 </style>
 {% endblock extra_css %}

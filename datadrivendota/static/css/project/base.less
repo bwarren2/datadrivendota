@@ -1,0 +1,41 @@
+// Are you modifying a core html element?  That CSS probably lives here.
+
+body {
+  background-image: url('../images/background.png');
+  background-repeat: repeat-x;
+  background-position: top;
+}
+
+h1, h2, h3, h4, h5, h6{
+  color: #FFFFFF;
+}
+
+p, ol, li {
+  color: #CCCCCC
+}
+
+/*Enfootening*/
+html,
+body {
+  height: 100%;    /* to keep .footer on bottom */
+  margin: 0;       /* to get rid of scroll bar, because (100% + default margin = scroll) */
+}
+
+a.thumbnail:hover,
+a.thumbnail:focus {
+  border-color: @brand-primary;
+}
+
+label.active {
+  font-style: italic;
+}
+
+blockquote{
+    color: @text-color;
+}
+
+blockquote.lore{
+    border-left: none;
+    font-style: italic;
+    letter-spacing: 0.03em;
+}

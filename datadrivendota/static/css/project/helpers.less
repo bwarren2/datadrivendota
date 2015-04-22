@@ -1,0 +1,42 @@
+.rounded-corners (@radius: 5px) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  -ms-border-radius: @radius;
+  -o-border-radius: @radius;
+  border-radius: @radius;
+}
+
+.rotate (@deg: 15deg) {
+  -webkit-transform: rotate(@deg);
+  -moz-transform: rotate(@deg);
+  -ms-transform: rotate(@deg);
+  -o-transform: rotate(@deg);
+  transform: rotate(@deg);
+}
+
+.overlayer {
+  .rounded-corners;
+  background-color: #000000;
+  bottom: 12px;
+  color: @text-color; /* @text-color */
+  left: 22px;
+  opacity: 0.7;
+  padding-left: 4px;
+  padding-right: 4px;
+  position: absolute;
+  z-index: 100;
+}
+
+.overlayer-top-right {
+  .rounded-corners;
+  background-color: #000000;
+  top: 4px;
+  color: @text-color; /* @text-color */
+  right: 17px;
+  opacity: 0.7;
+  padding-left: 4px;
+  padding-right: 4px;
+  position: absolute;
+  z-index: 100;
+}
+
