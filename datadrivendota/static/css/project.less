@@ -8,83 +8,25 @@
  * Designed and built with all the love in the world by @mdo and @fat.
  *
  * Customized for Data Driven Dota 2013 Kit La Touche (@wlonk)
+ * Tweaked for Data Driven Dota 2015 Ben Warren (@bwarren24)
  */
 
 // Core variables and mixins
-@import "../bootstrap/less/variables.less";
-@import "../bootstrap/less/mixins.less";
-@import "override_variables.less";
+@import "variables.less";
 
-// Reset
-@import "../bootstrap/less/normalize.less";
-@import "../bootstrap/less/print.less";
-
-// Core CSS
+// Bootstrap Mixins
 @import "../bootstrap/less/scaffolding.less";
-@import "../bootstrap/less/type.less";
-@import "../bootstrap/less/code.less";
 @import "../bootstrap/less/grid.less";
-@import "../bootstrap/less/tables.less";
-@import "../bootstrap/less/forms.less";
-@import "../bootstrap/less/buttons.less";
-
-// Components
-@import "../bootstrap/less/component-animations.less";
-@import "../bootstrap/less/glyphicons.less";
-@import "../bootstrap/less/dropdowns.less";
-@import "../bootstrap/less/button-groups.less";
-@import "../bootstrap/less/input-groups.less";
-@import "../bootstrap/less/navs.less";
-@import "../bootstrap/less/navbar.less";
-@import "../bootstrap/less/breadcrumbs.less";
-@import "../bootstrap/less/pagination.less";
-@import "../bootstrap/less/pager.less";
-@import "../bootstrap/less/labels.less";
-@import "../bootstrap/less/badges.less";
-@import "../bootstrap/less/jumbotron.less";
 @import "../bootstrap/less/thumbnails.less";
-@import "../bootstrap/less/alerts.less";
-@import "../bootstrap/less/progress-bars.less";
-@import "../bootstrap/less/media.less";
-@import "../bootstrap/less/list-group.less";
-@import "../bootstrap/less/panels.less";
-@import "../bootstrap/less/wells.less";
-@import "../bootstrap/less/close.less";
 
-// Components w/ JavaScript
-@import "../bootstrap/less/modals.less";
-@import "../bootstrap/less/tooltip.less";
-@import "../bootstrap/less/popovers.less";
-@import "../bootstrap/less/carousel.less";
-
-// Utility classes
-@import "../bootstrap/less/utilities.less";
-@import "../bootstrap/less/responsive-utilities.less";
-
-/* Mixins */
-
-@interest-color: #AA37CA;
-@interest-focus: #B63BD9;
-@rich_background: #770055;
-@main_block_background: #333333;
-
-.rounded-corners (@radius: 5px) {
-  -webkit-border-radius: @radius;
-  -moz-border-radius: @radius;
-  -ms-border-radius: @radius;
-  -o-border-radius: @radius;
-  border-radius: @radius;
-}
-
-.rotate (@deg: 15deg) {
-  -webkit-transform: rotate(@deg);
-  -moz-transform: rotate(@deg);
-  -ms-transform: rotate(@deg);
-  -o-transform: rotate(@deg);
-  transform: rotate(@deg);
-}
-
-/* Rules */
+// Include content by category
+@import "project/base.less";
+@import "project/helpers.less";
+@import "project/layout.less";
+@import "project/svg.less";
+@import "project/blog.less";
+@import "project/cards.less";
+@import "project/pips_and_glyphs.less";
 
 .release-mark(){
   font-family: "Roboto", sans-serif;
@@ -98,212 +40,30 @@
   .release-mark;
   left: 130px;
 }
-.section-release-mark {
-  .release-mark;
-  left: 60px;
-}
-.item-section-release-mark {
-  .release-mark;
-  left: 30px;
-}
-
-.adbar{
-  margin-top:10px;
-  margin-bottom:10px;
-  margin-left:-10px;
-}
-
-//SVG
-svg text {
-  fill: black;
-}
-svg text.chart-title {
-  fill: white;
-}
-svg path.domain{
-  fill: black;
-}
-
-circle.radiant{
-  stroke-width: 1;
-  stroke: #000;
-  fill: #7CD51B;
-}
-
-circle.dire{
-  stroke-width: 1;
-  stroke: #000;
-  fill: #BA3B15
-}
-
-// Why does this not work?
-// circle{
-//   stroke-width: 1;
-//   stroke: #000;
-
-//   .radiant{
-//     fill: #7CD51B;
-//   }
-//   .dire{
-//    fill: #BA3B15
-//   }
-// }
-
-svg {
-  background: #444444;
-}
-
-text {
-  fill: #000000;
-}
-
-div.tooltip {
-  position: absolute;
-  text-align: center;
-  width: auto;
-  height: auto;
-  padding: 2px;
-  font: 12px sans-serif;
-  background: @rich_background;
-  border: 0px;
-  border-radius: 8px;
-  pointer-events: none;
-}
-
-// Glyphs
-.win-glyph{
-  font-size:20px;
-  color: lightgreen;
-}
-
-.card-win-pip{
-  font-size:15px;
-  position: absolute;
-  left: 7px;
-  top: -9px;
-}
-
-.side-win-pip{
-  font-size:25px;
-  position: absolute;
-  left: 25px;
-  top: 13px;
-}
-
-// .side-pip{
-//   position: absolute;
-//   left: 34px;
-//   top: 16px;
-//   max-width: 48px;
-// }
-
-// .league-pip{
-//   position: absolute;
-//   left: -4px;
-//   top: 16px;
-//   max-width: 75px;
-// }
-
-
-.improper-player-pip{
-  font-size:15px;
-  position: absolute;
-  right: 7px;
-  top: -9px;
-  max-width: 20px;
-}
-
-.validity-glyph{
-  position: absolute;
-  right: 7px;
-  top: -9px;
-  font-size:15px;
-  color: red;
-}
-
-.unprocessed-glyph{
-  position: absolute;
-  right: 7px;
-  top: -9px;
-  font-size:15px;
-  color: yellow;
-}
-
-.select2-results, .select2-result-label, .select2-searching{
-  color:black;
-}
-
-
-body {
-  background-image: url('../images/background.png');
-  background-repeat: repeat-x;
-  background-position: top;
-}
-
-#body.container {
-  margin-bottom: 70px;
-}
-
-
-.nav-tabs {
-  border-bottom: 2px solid #f6dca2;
-}
 
 .navbar-brand {
   font-family: 'Cinzel Decorative', cursive;
   font-variant: small-caps;
 }
 
-form ul {
-  list-style: none;
+.nav-toggle{
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 10px;
+  text-decoration: underline;
 }
 
-label.active {
-  font-style: italic;
+.select2-results, .select2-result-label, .select2-searching{
+  color:black;
 }
 
-img.ability {
-  height: 105px;
-  width: 105px;
-}
-
-.lore {
-  border-left: none;
-  font-style: italic;
-  letter-spacing: 0.03em;
-}
-
+// Not sure where best to put this.  In templates?
 .aligner {
   text-align: center;
 }
 
-
-.infobox {
-  float: right;
-  width: 300px;
-  background-color: #333333;
-  a.thumbnail {
-    display: inline-block;
-  }
-
-  img.hero {
-  }
-}
-
-.help-block {
-    font-style: italic;
-}
-
 .form-container {
   float: left;
-}
-
-div#IntercomDefaultWidget {
-  bottom: 80px;
-}
-
-.databaru {
-  height: 4px;
 }
 
 .pos {
@@ -312,38 +72,6 @@ div#IntercomDefaultWidget {
 
 .neg {
   background-color: red;
-}
-
-.overlayer {
-  .rounded-corners;
-  background-color: #000000;
-  bottom: 12px;
-  color: #f6f7f0; /* @text-color */
-  left: 22px;
-  opacity: 0.7;
-  padding-left: 4px;
-  padding-right: 4px;
-  position: absolute;
-  z-index: 100;
-}
-
-.overlayer-top-right {
-  .rounded-corners;
-  background-color: #000000;
-  top: 4px;
-  color: #f6f7f0; /* @text-color */
-  right: 17px;
-  opacity: 0.7;
-  padding-left: 4px;
-  padding-right: 4px;
-  position: absolute;
-  z-index: 100;
-}
-
-
-a.thumbnail:hover,
-a.thumbnail:focus {
-  border-color: @brand-primary;
 }
 
 a.item.thumbnail {
@@ -363,58 +91,8 @@ a.item.thumbnail {
   }
 }
 
-a.ability {
-  display: inline-block;
-  position: relative;
-
-  p.overlayer {
-    bottom: -5px;
-    display: inline-block;
-    left: 5px;
-    max-width: 102px;
-    top: auto;
-  }
-}
-
-
-/*Enfootening*/
-html,
-body {
-  height: 100%;    /* to keep .footer on bottom */
-  margin: 0;       /* to get rid of scroll bar, because (100% + default margin = scroll) */
-}
-
-#main-wrap {
-  min-height: 100%;   /* to keep .footer on bottom */
-  height: auto;
-  margin: 0 auto -60px;
-  padding: 0 0 60px;
-}
-
-#footer {
-  height: 60px;
-  font-size: smaller;
-  font-style: italic;
-}
-
-
 .hero-ability-list{
   margin-top:15px;
-}
-
-.player-infobox, .team-infobox {
-  border: 1px solid #DDD;
-  border-radius: 4px;
-  max-width: 300px;
-
-  img {
-    display: block;
-    margin: 0 auto;
-  }
-
-  h2 {
-    text-align: center;
-  }
 }
 
 .pagination-wrap {
@@ -436,21 +114,6 @@ body {
   }
 }
 
-#dire-pick,
-#radiant-pick {
-  li {
-    img {
-      height: 72px;
-      width: 128px;
-    }
-  }
-}
-
-.dire-pickban,
-.radiant-pickban {
-  height: 410px;
-  text-align: center;
-}
 
 .row.controls-button {
   margin-top: 10px;
@@ -471,38 +134,6 @@ img.topbar-hero-thumbshot {
   width: 52px;
 }
 
-
-.roles img {
-  margin: 5px;
-}
-
-.role-magnitude-1 {
-  font-size: 90%;
-  color: @brand-success;// @brand-success;
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
-  box-shadow: 0px 0px 2px @brand-success;// @brand-success;
-}
-
-.role-magnitude-2 {
-  font-size: 120%;
-  color: @brand-info; // @brand-info;
-  width: 32px;
-  height: 32px;
-  border-radius: 16px;
-  box-shadow: 0px 0px 5px @brand-info; // @brand-info;
-}
-
-.role-magnitude-3 {
-  font-size: 150%;
-  color: @brand-danger; // @brand-danger;
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  box-shadow: 0px 0px 10px @brand-danger; // @brand-danger;
-}
-
 .match-index-thumbshot{
   width: 53px;
   height: 31px;
@@ -514,207 +145,13 @@ img.topbar-hero-thumbshot {
 }
 
 
-.y-axis,
-.x-axis,
-.x-axis-label,
-.chart-title,
-.legend-text {
-  font-family: 'Roboto', sans-serif;
-}
-
-.ability-thumbshot{
-  max-width:32px;
-  max-height:32px;
-}
-
-.ability-row{
-  margin-top:4px;
-  margin-bottom:4px;
-}
-
-.ability-row-hero{
-  margin-right:8px;
-}
-
-.radiant-abilities,
-.dire-abilities{
-  margin-top:20px;
-  margin-bot:20px;
-}
-
-.nav-toggle{
-  cursor: pointer;
-  margin-left: 10px;
-  margin-right: 10px;
-  text-decoration: underline;
-}
-
-/* Bloggity */
-.inset {
-  margin:5px;
-}
-
-.game {
-  margin-top:40px;
-  margin-bottom:40px;
-}
-
-.buttongroup {
-  margin:20px;
-}
-
-span.inset-img{
-  border-radius: 2px;
-  border-color: black;
-}
-
-.caption{
-  font-family: Arial
-}
-
-.blog-inset{
-  text-align: center;
-}
-
-div#content, div#main-block{
-  // padding:5px;
-  overflow:visible;
-  padding: 10px;
-  background-color: @main_block_background;
-  background-image: url('../images/whitenoise-361x370.png');
-  border-radius: 10px 10px 10px 10px;
-  -moz-border-radius: 10px 10px 10px 10px;
-  -webkit-border-radius: 10px 10px 10px 10px;
-  border: 0px solid #000000;
-}
-
-div#sidebar{
-  border: 0px solid #000000;
-  border-left: 1px solid #17181A;
-}
-
-a:link, a:visited {
-  color: @interest-color;
-}
-a:hover {
-  color: #B63BD9;
-}
-
-h1, h2, h3, h4, h5, h6{
-  color: #FFFFFF;
-}
-
-
-div#search {
-  padding-top: 10px;
-}
-
-ol.breadcrumb{
-  background-color: #686868;
-
-}
-
-p, ol, li {
-  color: #CCCCCC
-}
-
-div#header ol.breadcrumb li a:visited, div#header ol.breadcrumb li a:link{
-  color: white
-}
-
-
-.entry-info {
-  font-style: italic;
-}
-
 .small-date {
   font-size: smaller;
-}
-
-.player-match-row {
-  margin-bottom: 20px;
-}
-
-.player-score {
-  font-size: 12px;
-}
-
-.match-topbar{
-  background-color: #222222
-}
-
-.topscore{
-  font-size: 18px;
-  text-align:  center;
-}
-
-.jumbotron {
-  background-color: #444;
-
-  h1 {
-    text-align: center;
-  }
-}
-.radiant-line {
-  stroke: #7CD51B;
-}
-.dire-line {
-  stroke: #BD3B15;
-}
-.difference-line {
-  stroke: #9C9A18;
-}
-.progress-line{
-  fill: none;
-  stroke-width: 3;
 }
 
 .ban, .dead{
   -webkit-filter: grayscale(100%);
   filter: grayscale(100%);
-}
-
-
-
-
-
-.team-tag {
-  .rounded-corners;
-  background-color: #000000;
-  bottom: 12px;
-  color: #f6f7f0; /* @text-color */
-  left: 22px;
-  opacity: 0.7;
-  padding-left: 4px;
-  padding-right: 4px;
-  position: absolute;
-  z-index: 100;
-}
-
-
-
-
-
-p.kills{
-    color: @brand-success;
-}
-p.deaths{
-    color: @brand-danger;
-}
-p.assists{
-    color: @brand-info;
-}
-p.kda2{
-    color: @brand-primary;
-}
-p.gpm{
-    color: #829FB2;
-}
-p.xpm{
-    color: #9282B2;
-}
-.table tbody>tr>td{
-    vertical-align: middle;
 }
 
 @media (min-width: @screen-md-min) {
@@ -723,219 +160,5 @@ p.xpm{
   }
 }
 
-.chart > i.toggleface.radiant, .chart > i.d2mh.radiant{
-
-  background-color:rgba(124, 213, 27, .5);
-  box-shadow: 0px 0px 5px #7cd51b;
-}
-.chart > i.toggleface.dire, .chart > i.d2mh.dire{
-  background-color:rgba(186, 59, 21, .5);
-  box-shadow: 0px 0px 5px #ba3b15;
-}
-
-/* Cards! */
-
-div.match-card{
-  .container();
-  div.match-side{
-    .make-row();
-    div.side-card{
-      .make-md-column(1);
-      margin: 0px;
-      padding: 3px;
-      .side-pip{
-        position: absolute;
-        left: 25%;
-        top: 50%;
-        width: 50%;
-      }
-    }
-    div.summary{
-      .make-md-column(2);
-      margin: 0px;
-      padding: 3px;
-
-      .chart-pip{
-        font-size: auto;
-        position: absolute;
-        right: 0%;
-        top: 70%;
-      }
-      .cast-player-image{
-        position: absolute;
-        left: 5%;
-        bottom: 15%;
-      }
-    }
-    div.team-card{
-      .make-md-column(1);
-      margin: 0px;
-      padding: 3px;
-    }
-  }
-}
 
 
-div.hero-card{
-
-}
-
-.ability-card {
-  width: 600px;
-  margin: 0 auto;
-}
-
-
-div#animation-controls{
-  .make-row();
-
-  div#animation-buttons{
-    div#stop-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#start-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#forward-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#back-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#autoplay-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#timer{
-      .make-md-column(2);
-      .make-xs-column(4);
-    }
-  }
-}
-
-div#games{
-  .make-row();
-  div.game-card{
-    .make-md-column(12);
-    .make-xs-column(12);
-    padding:10px;
-    div.sections{
-      .make-row();
-      div.league-card{
-        .make-md-column(3);
-        .make-xs-column(3);
-      }
-      div.match-card{
-        .make-md-column(9);
-        .make-xs-column(9);
-        div.side-row{
-          .make-row();
-          margin-left: 0px;
-          margin-right: 0px;
-          div.hero-thumb{
-            .make-md-column(2);
-            .make-xs-column(2);
-            padding-left: 0px;
-            padding-right: 0px;
-          }
-        }
-
-      }
-    }
-  }
-}
-
-
-div#bans{
-  .make-row();
-
-  div#radiant-bans, div#dire-bans, div#radiant-picks, div#dire-picks{
-    .make-md-column(6);
-    .make-xs-column(12);
-
-    div.hero-slot{
-      .make-md-column(2);
-      .make-xs-column(4);
-
-      img.hero-face{
-        .img-responsive;
-        .thumbnail;
-      }
-      img.hero-face.ban{
-        .ban;
-      }
-
-    }
-  }
-}
-
-div#scoreboard{
-  .make-row();
-
-  div#radiant, div#dire{
-    .make-md-column(6);
-    .make-xs-column(12);
-
-    div.players{
-      img.table-face{
-        .thumbnail
-      }
-    }
-  }
-}
-
-div#charts{
-  .make-row();
-
-  div#gpm-xpm-chart{
-    .make-md-column(4);
-    .make-xs-column(12);
-
-  }
-  div#kill-death-chart{
-    .make-md-column(4);
-    .make-xs-column(12);
-
-  }
-  div#last-hit-levels{
-    .make-md-column(4);
-    .make-xs-column(12);
-
-  }
-}
-
-div#state{
-  .make-row();
-  div#map{
-    .make-md-column(6);
-    .make-xs-column(12);
-  }
-  div#matchup{
-    .make-md-column(6);
-    .make-xs-column(12);
-    div#logo-lineup{
-      .make-row();
-      div#radiant-logo{
-        .make-md-column(6);
-        .make-xs-column(12);
-      }
-      div#dire-logo{
-        .make-md-column(6);
-        .make-xs-column(12);
-      }
-      div#league-logo{
-        .make-md-column(12);
-        .make-xs-column(12);
-      }
-      div#game-facts{
-        .make-md-column(12);
-        .make-xs-column(12);
-      }
-    }
-  }
-
-}

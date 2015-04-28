@@ -8,14 +8,70 @@
 
 
 <div class='jumbotron'>
-    <h1>Welcome to DataDrivenDota</h1>
-    <p>We think a chart is worth a thousand stats, and are building the framework to prove it.</p>
-    <small>DDD is a passion/learning project dedicated to doing data analysis right for Dota 2.  We are currently boiling down our code for better charts, deeper analytics, and more features.  Check back soon, or follow our <a href="{% url 'blog:index' %}">blog</a> and <a href="https://twitter.com/datadrivendota">twitter</a>!</small>
+  <h1>Welcome to DataDrivenDota</h1>
+
+    <div class='col-md-12'>
+      <p>We think a chart is worth a thousand stats, and are building the framework to prove it.</p>
+      <small>DataDrivenDota is a passion project dedicated to doing data analysis right in Dota 2.  We are currently boiling down our code for better charts, deeper analytics, and more features.  Check back soon, or follow our <a href="{% url 'blog:index' %}">blog</a> and <a href="https://twitter.com/datadrivendota">twitter</a>!</small>
+    </div>
+
 </div>
+
+<div class='col-md-6'>
+  <div class='big-d-stats'>
+
+    <div class='page-header'>
+      <h1>Stats are useful...</h1>
+    </div>
+
+    <table class='table'>
+      <thead>
+        <tr>
+          <td></td>
+          <td>Avg X</td>
+          <td>Avg Y</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class='group-a'>
+          <td>Group 1</td>
+          <td id='group-a-x'></td>
+          <td id='group-a-y'></td>
+        </tr>
+        <tr class='group-b'>
+          <td>Group 2</td>
+          <td id='group-b-x'></td>
+          <td id='group-b-y'></td>
+        </tr>
+        <tr class='group-c'>
+          <td>Group 3</td>
+          <td id='group-c-x'></td>
+          <td id='group-c-y'></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<div class='col-md-6'>
+
+  <div class='page-header'>
+    <h1>...but miss the big picture</h1>
+  </div>
+
+  <div class='big-d'>
+  </div>
+
+</div>
+
+
 <div class='container'>
   <div class='row'>
 
-    <h1>Example charts: Slark by Dendi</h1>
+    <div class='page-header'>
+      <h1>See how pros succeed, and copy them!</h1>
+    </div>
 
     <div id='slark-chart' class='col-md-8'>
       <h4>Slark Tower Damage by Skill Level, with Dendi Games</h4>
@@ -31,6 +87,13 @@
 {% endblock content %}
 
 {% block extra_js %}
+
+  <script type="text/javascript">
+  $(function(){
+    window.splash_gimmick();
+  })
+  </script>
+
     <script type="text/javascript">
 
       window.apiHit(
@@ -72,3 +135,21 @@
 
     </script>
 {% endblock extra_js %}
+
+{% block extra_css %}
+  <style type="text/css">
+
+  .group-a{
+    fill:#882d61;
+    color:#882d61;
+  }
+  .group-b{
+    fill:#aa3939;
+    color:#aa3939;
+  }
+  .group-c{
+    fill:#2d862d;
+    color:#2d862d;
+  }
+  </style>
+{% endblock extra_css %}

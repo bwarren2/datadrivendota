@@ -1,0 +1,77 @@
+// Things that matter for SVG and their helpers (like hero faces) live here
+svg {
+  background: #444444;
+
+  .outer-chart{
+  }
+  text {
+    fill: black;
+  }
+
+  .chart-title{
+    fill: white;
+  }
+
+  path.domain{
+    fill: black;
+  }
+
+  circle{
+    stroke-width: 1;
+    stroke: #000;
+
+    &.radiant{
+      fill: #7CD51B;
+    }
+    &.dire{
+     fill: #BA3B15
+    }
+  }
+
+
+  .y-axis,
+  .x-axis,
+  .x-axis-label,
+  .chart-title,
+  .legend-text {
+    font-family: 'Roboto', sans-serif;
+  }
+
+  .radiant-line {
+    stroke: #7CD51B;
+  }
+  .dire-line {
+    stroke: #BD3B15;
+  }
+  .difference-line {
+    stroke: #9C9A18;
+  }
+  .progress-line{
+    fill: none;
+    stroke-width: 3;
+  }
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: @rich_background;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+
+.chart > i.toggleface.radiant, .chart > i.d2mh.radiant{
+  background-color:rgba(124, 213, 27, .5);
+  box-shadow: 0px 0px 5px #7cd51b;
+}
+.chart > i.toggleface.dire, .chart > i.d2mh.dire{
+  background-color:rgba(186, 59, 21, .5);
+  box-shadow: 0px 0px 5px #ba3b15;
+}
+

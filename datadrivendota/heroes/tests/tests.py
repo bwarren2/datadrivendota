@@ -127,6 +127,12 @@ class TestUrlconf(TestCase):
         resp = c.get('/heroes/')
         self.assertEqual(resp.status_code, 200)
 
+        resp = c.get('/heroes/vitals/')
+        self.assertEqual(resp.status_code, 200)
+
+        resp = c.get('/heroes/lineups/')
+        self.assertEqual(resp.status_code, 200)
+
         resp = c.get('/heroes/{0}/'.format(self.hero_doss.hero.machine_name))
         self.assertEqual(resp.status_code, 200)
         # Almost all the other urls are to be gutted, so we are done here.
