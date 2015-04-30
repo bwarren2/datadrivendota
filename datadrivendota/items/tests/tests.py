@@ -5,39 +5,39 @@ from model_mommy import mommy
 from items.management.commands.scrapeitemdata import Command as item_command
 
 
-# class TestWorkingJson(TestCase):
+class TestWorkingJson(TestCase):
 
-#     def setUp(self):
-#         self.hero, self.player = make_matchset()
+    def setUp(self):
+        self.hero, self.player = make_matchset()
 
-#     def tearDown(self):
-#         pass
+    def tearDown(self):
+        pass
 
-#     def test_item_endgame_json(self):
-#         chart = item_endgame(
-#             hero=self.hero.steam_id,
-#             player=self.player.steam_id,
-#             skill_level=None,
-#             game_modes=[],
-#         )
-#         self.assertGreater(len(chart.datalist), 0)
+    def test_item_endgame_json(self):
+        chart = item_endgame(
+            hero=self.hero.steam_id,
+            player=self.player.steam_id,
+            skill_level=None,
+            game_modes=[],
+        )
+        self.assertGreater(len(chart.datalist), 0)
 
 
-# class TestUrlconf(TestCase):
+class TestUrlconf(TestCase):
 
-#     def setUp(self):
-#         self.item = mommy.make_recipe(
-#             'items.item', slug_name='dagon', cost=1
-#         )
+    def setUp(self):
+        self.item = mommy.make_recipe(
+            'items.item', slug_name='dagon', cost=1
+        )
 
-#     def test_urls_ok(self):
-#         c = Client()
+    def test_urls_ok(self):
+        c = Client()
 
-#         resp = c.get('/items/')
-#         self.assertEqual(resp.status_code, 200)
+        resp = c.get('/items/')
+        self.assertEqual(resp.status_code, 200)
 
-#         resp = c.get('/items/dagon/')
-#         self.assertEqual(resp.status_code, 200)
+        resp = c.get('/items/dagon/')
+        self.assertEqual(resp.status_code, 200)
 
 
 class TestItemImport(TestCase):
@@ -49,39 +49,39 @@ class TestItemImport(TestCase):
             self.command.site_json(),
         )
 
-    # def test_name_transform(self):
+    def test_name_transform(self):
 
-    #     self.assertEqual(
-    #         self.command.get_name(
-    #             'broadsword',
-    #             self.data['broadsword']
-    #         ),
-    #         'Broadsword'
-    #     )
-    #     self.assertEqual(
-    #         self.command.get_name(
-    #             'blink',
-    #             self.data['blink']
-    #             ),
-    #         'Blink Dagger'
-    #     )
-    #     self.assertEqual(
-    #         self.command.get_name(
-    #             'necronomicon_2',
-    #             self.data['necronomicon_2']
-    #         ),
-    #         'Necronomicon 2'
-    #     )
-    #     self.assertEqual(
-    #         self.command.get_name(
-    #             'dagon',
-    #             self.data['dagon']
-    #         ),
-    #         'Dagon 1'
-    #     )
+        self.assertEqual(
+            self.command.get_name(
+                'broadsword',
+                self.data['broadsword']
+            ),
+            'Broadsword'
+        )
+        self.assertEqual(
+            self.command.get_name(
+                'blink',
+                self.data['blink']
+                ),
+            'Blink Dagger'
+        )
+        self.assertEqual(
+            self.command.get_name(
+                'necronomicon_2',
+                self.data['necronomicon_2']
+            ),
+            'Necronomicon 2'
+        )
+        self.assertEqual(
+            self.command.get_name(
+                'dagon',
+                self.data['dagon']
+            ),
+            'Dagon 1'
+        )
 
-    # def test_item_create(self):
-    #     self.command.make_item('dagon_4', self.data['dagon_4'])
+    def test_item_create(self):
+        self.command.make_item('dagon_4', self.data['dagon_4'])
 
     def test_var_parse(self):
         cd = self.command.parse_var(
