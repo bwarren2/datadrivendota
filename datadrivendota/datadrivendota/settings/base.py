@@ -136,9 +136,10 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
 )
 
-STATICFILES_STORAGE = 'datadrivendota.s3utils.S3PipelineStorage'
+STATICFILES_STORAGE = 'datadrivendota.s3utils.S3PipelineCachedStorage'
 
 ########## END STATIC FILE CONFIGURATION
 
@@ -380,12 +381,6 @@ PIPELINE_CSS = {
             'media': 'screen,projection',
         },
     },
-    'blog': {
-        'source_filenames': (
-            'css/blog.less',
-        ),
-        'output_filename': 'css/blog.css',
-    }
 }
 
 PIPELINE_JS = {

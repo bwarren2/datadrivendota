@@ -1,20 +1,22 @@
 from storages.backends.s3boto import S3BotoStorage
-
-
-from django.contrib.staticfiles.storage import CachedFilesMixin
-from pipeline.storage import PipelineMixin
-
 import urllib
 import urlparse
+
+from django.contrib.staticfiles.storage import (
+    CachedFilesMixin,
+    # ManifestFilesMixin
+)
+
+from pipeline.storage import PipelineMixin, NonPackagingMixin
 
 StaticRootS3BotoStorage = lambda: S3BotoStorage(location='static')
 MediaRootS3BotoStorage = lambda: S3BotoStorage(location='media')
 
 
-# CachedFilesMixin doesn't play well with Boto and S3. It over-quotes things,
-# causing erratic failures. So we subclass.
-# (See http://stackoverflow.com/questions/11820566/inconsistent-
-#    signaturedoesnotmatch-amazon-s3-with-django-pipeline-s3boto-and-st)
+# # CachedFilesMixin doesn't play well with Boto and S3. It over-quotes things,
+# # causing erratic failures. So we subclass.
+# # (See http://stackoverflow.com/questions/11820566/inconsistent-
+# #    signaturedoesnotmatch-amazon-s3-with-django-pipeline-s3boto-and-st)
 class PatchedCachedFilesMixin(CachedFilesMixin):
     def url(self, *a, **kw):
         s = super(PatchedCachedFilesMixin, self).url(*a, **kw)
@@ -26,7 +28,21 @@ class PatchedCachedFilesMixin(CachedFilesMixin):
         return urlparse.urlunsplit((scheme, netloc, path, qs, anchor))
 
 
-class S3PipelineStorage(
+# class S3PipelineManifestStorage(
+#     PipelineMixin, ManifestFilesMixin, S3BotoStorage
+# ):
+#     pass
+
+
+class S3PipelineCachedStorage(
     PipelineMixin, PatchedCachedFilesMixin, S3BotoStorage
 ):
-    pass
+    verbose = True
+    # packing = False
+    # Sometimes there are packing failures.
+    # If CSS is compiled and files don't need to be compressed, packing
+    # can be false.
+    # See also the todo in the readme.
+
+S3PipelineCachedStorage().open('/css/dota2minimapheroes.css').read()
+open('datadrivendota/static/css/dota2minimapheroes.css').read()
