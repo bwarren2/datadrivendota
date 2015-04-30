@@ -56,6 +56,7 @@ def collect_static():
     command = (
         'python datadrivendota/manage.py collectstatic'
         ' -i bootstrap'
+        ' -i rest-framework'
         ' --settings=datadrivendota.settings.production --noinput'
     )
     local(command)
