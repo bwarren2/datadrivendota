@@ -44,5 +44,3 @@ class S3PipelineCachedStorage(
     # can be false.
     # See also the todo in the readme.
 
-S3PipelineCachedStorage().open('/css/dota2minimapheroes.css').read()
-open('datadrivendota/static/css/dota2minimapheroes.css').read()

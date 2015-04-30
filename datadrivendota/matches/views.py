@@ -177,9 +177,6 @@ class ParseMatchDetail(DetailView):
             else:
                 summary.is_dire = True
 
-            if summary.leaver.steam_id != 0:
-                summary.improper_player = True
-
             css_color_dict[
                 summary.hero.internal_name
             ] = slot_dict[summary.player_slot]
