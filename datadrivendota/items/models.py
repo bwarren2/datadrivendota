@@ -13,8 +13,11 @@ class Item(models.Model):
         max_length=100,
         help_text='The name for people'
     )
-    internal_name = models.CharField(max_length=100,
-                                     help_text='The underscore name')
+    internal_name = models.CharField(
+        max_length=100,
+        help_text='The underscore name'
+    )
+    slug_name = models.CharField(max_length=100)
     quality = models.CharField(
         max_length=100,
         help_text='Internal shop category name'
@@ -26,7 +29,6 @@ class Item(models.Model):
     cooldown = models.IntegerField(null=True)
     lore = models.TextField(null=True)
     created = models.NullBooleanField()
-    slug_name = models.CharField(max_length=100)
 
     @property
     def thumbshot_image(self):

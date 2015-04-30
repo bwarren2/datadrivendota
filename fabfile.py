@@ -8,20 +8,32 @@ def test(suite="all"):
         )
     elif suite == 'apps':
         local(
-            'python datadrivendota/manage.py test accounts blog guilds health heroes items leagues matches players teams utils --settings=datadrivendota.settings.test'
+            'python datadrivendota/manage.py test '
+            'accounts blog guilds health heroes items leagues matches players'
+            ' teams utils --settings=datadrivendota.settings.test'
         )
 
     else:
         local(
-            'python datadrivendota/manage.py test {suite} --settings=datadrivendota.settings.test'.format(
-                suite=suite
-            )
+            (
+                'python datadrivendota/manage.py test {suite}'
+                ' --settings=datadrivendota.settings.test'
+            ).format(suite=suite)
         )
 
 
 def push():
     local('git push origin master')
     local('git push heroku master')
+
+
+def shell(setting="local"):
+    local(
+        (
+            'python datadrivendota/manage.py shell '
+            '--settings=datadrivendota.settings.{0}'
+        ).format(setting)
+    )
 
 
 def deploy():
@@ -45,7 +57,9 @@ def rabbit_list():
 
 
 def heroku_migrate():
-    return local("heroku run python datadrivendota/manage.py migrate --no-initial-data")
+    return local(
+        "heroku run python datadrivendota/manage.py migrate --no-initial-data"
+    )
 
 
 def migrate():

@@ -8,7 +8,10 @@ from heroes.models import Role
 
 
 class Command(BaseCommand):
-
+    """
+    Add pips to the roles.  You should not need to do this often,
+    but it is required in restoring from 0.
+    """
     def handle(self, *args, **options):
 
         all_roles = Role.objects.exclude(name='')
@@ -26,7 +29,6 @@ class Command(BaseCommand):
         }
         for role in all_roles:
 
-        # the first bit per API FAQ specs
             url = (
                 'https://s3.amazonaws.com/datadrivendota/pips/{suffix}'.format(
                     suffix=matchingDict[role.name])
@@ -42,4 +44,3 @@ class Command(BaseCommand):
                 print "No thumbshot for %s!  Error %s" % (role.name, err)
 
             role.save()
-            print role.name, role.thumbshot.url
