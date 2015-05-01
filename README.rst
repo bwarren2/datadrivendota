@@ -1,104 +1,380 @@
-========================
-django-twoscoops-project
-========================
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-A project template for Django 1.5.
+- [DataDrivenDota](#datadrivendota)
+- [Intro](#intro)
+  - [Business Proposition](#business-proposition)
+    - [Stretch analogy](#stretch-analogy)
+  - [Napkin math](#napkin-math)
+  - [Design Concept](#design-concept)
+- [Setup](#setup)
+  - [RabbitMQ](#rabbitmq)
+  - [Redis](#redis)
+  - [Postgres](#postgres)
+  - [Necessary environment variables](#necessary-environment-variables)
+  - [Initial Data Acquisition](#initial-data-acquisition)
+    - [Superuser](#superuser)
+    - [Client Data](#client-data)
+    - [API Data](#api-data)
+      - [One more thing](#one-more-thing)
+  - [Push workflow](#push-workflow)
+- [Todos](#todos)
+  - [Static assets](#static-assets)
+      - [Current workaround](#current-workaround)
+  - [Accounts refactor](#accounts-refactor)
+  - [Charts refactor](#charts-refactor)
+  - [Animations import](#animations-import)
+    - [Current workaround](#current-workaround-1)
+  - [Refactor man commands into celerybeat](#refactor-man-commands-into-celerybeat)
+- [Footnotes](#footnotes)
 
-To use this project follow these steps:
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-#. Create your working environment
-#. Install Django
-#. Create the new project using the django-two-scoops template
-#. Install additional dependencies
-#. Use the Django admin to create the project
+# DataDrivenDota
 
-*note: these instructions show creation of a project called "icecream".  You
-should replace this name with the actual name of your project.*
 
-Working Environment
-===================
+# Intro
 
-You have several options in setting up your working environment.  We recommend
-using virtualenv to seperate the dependencies of your project from your system's
-python environment.  If on Linux or Mac OS X, you can also use virtualenvwrapper to help manage multiple virtualenvs across different projects.
+## Business Proposition
 
-Virtualenv Only
----------------
+The business concept behind DDD is about filling a known market niche.  Dota is a complicated game with abundant data, but
+ 1. no one does a good job of visualizing the data well
+  * people pay for the existing bad visualization
+ 2. it is hard to feel in control of one's progress
+  * feeling in control minimizes frustration & improves happiness
+  * progress is incentivized by the eSports theme Valve pushes
+  * Hypothesis: community toxicity is like road rage: it stems from lack of communication and control.  Providing more levers may improve the community.
 
-First, make sure you are using virtualenv (http://www.virtualenv.org). Once
-that's installed, create your virtualenv::
+### Stretch analogy
+Magic the Gathering is a game with complimentary modes: multiplayer is a social game, but requires sync actions and multiple people.  Deckbuilding, theorycrafting, and analysis are solo/async activities.  These two modes together are what allow Magic to replicate and saturate so successfully.  They provide:
+ 1. a finite state machine
+  * (playing or thinking or talking about Magic)
+ 2. that admits several different world configurations
+  * (how many people are there, how sync is your action)
+ 3. that is mutually reinforcing
+  * (playing gathers data for theorycrafting gathers fodder for new decks/play)
+ 4. that provides emotional payoff
+  * (feeling like you really understand or feeling the thrill of victory)
+ 5. that incentivizes more play
 
-    $ virtualenv --distribute icecream
+Dota 2 has a multiplayer mode that is highly successful, and has been growing the hairs of community discussion and media.  However, there is no analytic toolkit that quite counts as a single-player mode.  We want to build that, and capitalize on the success of the medium
 
-You will also need to ensure that the virtualenv has the project directory
-added to the path. Adding the project directory will allow `django-admin.py` to
-be able to change settings using the `--settings` flag.
+## Napkin math
 
-Virtualenv with virtualenvwrapper
---------------------------
+We know that Dotabuff, the main existing stat site, employs 3 full time people and 3 part time people.  Assuming they are only paying average US salary (and not dev salary), that 4.5*50K = $225K/yr to cover salary.  Half of that revenue would be more than sufficient to justify this project.
 
-In Linux and Mac OSX, you can install virtualenvwrapper (http://virtualenvwrapper.readthedocs.org/en/latest/),
-which will take care of managing your virtual environments and adding the
-project path to the `site-directory` for you::
+We know that the player base was 6M 2 years ago (or so), and is ~11M now.  0.1% (1 in 1000) of the player base paying $2.49./mo = $22K/mo if $0.49 goes to expenses.  (This is about 10-15 server hours/user/mo.)  22K/mo = $242K/yr, which is sufficient to justify the project.
 
-    $ mkdir icecream
-    $ mkvirtualenv -a icecream icecream-dev
-    $ cd icecream && add2virtualenv `pwd`
+Amazing case: 1/100 players is $2.42M/yr.  (According to extra credits, in freemium games about 1 in 100 players is a "whale" that spends money profligately.)
 
-Windows
-----------
+Magic Christmasland case: 1/10 players = $24.2M/yr.
 
-In Windows, or if you're not comfortable using the command line, you will need
-to add a `.pth` file to the `site-packages` of your virtualenv. If you have
-been following the book's example for the virtualenv directory (pg. 12), then
-you will need to add a python pathfile named `_virtualenv_path_extensions.pth`
-to the `site-packages`. If you have been following the book, then your
-virtualenv folder will be something like::
+Obviously this all varies with price, but dotabuff charges $6/mo.
 
-`~/.virtualenvs/icecream/lib/python2.7/site-directory/`
+## Design Concept
 
-In the pathfile, you will want to include the following code (from
-virtualenvwrapper):
+DDD is a data acquisition and visualization platform that seeks to mirror Valve's API data.  This reliance on a foreign API leads to some design quirks:
 
-    import sys; sys.__plen = len(sys.path)
-    /home/<youruser>/icecream/icecream/
-    import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)
+ 1. because new data can show up in the API before our database, we need to be accomodating of incomplete data.
+ 2. because incomplete data causes problems, we need to true-up our understanding regularly.
+ 3. overall, we seek convergence: we won't get the full view of the world at any given time, but we want the system to trend toward a complete view.
 
-Installing Django
-=================
+Implementationally, this has a few implications:
 
-To install Django in the new virtual environment, run the following command::
+ 1. The uniqueness criterion we get is a steam_id (the number valve uses to identify various objects).  Everything else might be blank.
+ 2. We have some tasks we want to run when they can, like the API data access.  We use celery for this.
+ 3. We have some other tasks that we want to run regularly (with little delay), such as data integrity checks.  Ideally, we have fast-running queue that is always close enough to empty that we can push these jobs with celery-beat.  Currently, these rely on the heroku scheduler and man commands.  (Fixing this is a todo.)
 
-    $ pip install django
+Keeping this convergence theme in mind will help in understanding why the code works the way it does.
 
-Creating your project
-=====================
+# Setup
+We need to set up a few backing services:
+ * a [RabbitMQ](https://www.rabbitmq.com/install-debian.html) instance (for celery tasks)
+ * A [Redis](http://redis.io/topics/quickstart) instance for short-term persistence (like sleeving API responses)
+ * A [postgres](https://wiki.postgresql.org/wiki/Detailed_installation_guides) instance with database for long-term persistence
 
-To create a new Django project called '**icecream**' using
-django-twoscoops-project, run the following command::
+## RabbitMQ
 
-    $ django-admin.py startproject --template=https://github.com/twoscoops/django-twoscoops-project/zipball/master --extension=py,rst,html icecream
+After setup, put your access URI in the CLOUDAMQP_URL env var.  (This name matches the heroku config var for the addon we use.)
 
-Installation of Dependencies
-=============================
+## Redis
 
-Depending on where you are installing dependencies:
+After setup, put your access URI in the REDISTOGO_URL env var.  (This name matches the heroku config var for the addon we use.)
 
-In development::
+## Postgres
 
-    $ pip install -r requirements/local.txt
+After installation, we need to make a database
 
-For production::
+`su postgres`
 
-    $ pip install -r requirements.txt
+`postgres=# create database datadrivendota;`
 
-*note: We install production requirements this way because many Platforms as a
-Services expect a requirements.txt file in the root of projects.*
+Then we have to do migrations.  Annoyingly, we are using third party libraries that do not respond well to a blanket `python datadrivendota/manage.py migrate`; auth users are expected to exist when they don't and badness ensues.
 
-Acknowledgements
-================
+Currently, the way to get up from zero is:
 
-    - Many thanks to Randall Degges for the inspiration to write the book and django-skel.
-    - All of the contributors_ to this project.
+`> python datadrivendota/manage.py  migrate sites`
 
-.. _contributors: https://github.com/twoscoops/django-twoscoops-project/blob/master/CONTRIBUTORS.txt
+`> python datadrivendota/manage.py  migrate auth`
+
+`> python datadrivendota/manage.py  migrate`
+
+The first two will make progress before erroring, and the last will run to completion.*
+
+Now we have a database, but it is (mostly) empty.  We'll fill it during Initial Data Acquisition later; existing data migrations only add a couple perms and a sample player.
+
+## Necessary environment variables
+
+Under 12 Factor, resources are connected by environment URIs.  DDD expects a whole bunch of these:
+
+```
+# Celery (tasks) configuration
+CELERYD_CONCURRENCY=            2
+CELERY_IGNORE_RESULT=           False
+CELERYD_TASK_SOFT_TIME_LIMIT=   90
+CELERY_REDIS_MAX_CONNECTIONS=   40
+BROKER_POOL_LIMIT=              1
+CELERYD_TASK_TIME_LIMIT=        60
+VALVE_RATE=                     .5/s
+RESULT_EXPIRY_RATE=             600
+BROKER_CONNECTION_TIMEOUT=      6
+CLOUDAMQP_URL=                  <redacted>
+REDISTOGO_URL=                  <redacted>
+
+# Valve data access
+STEAM_API_KEY=                  <redacted>
+
+# Celery queue
+RABBITMQ_USER=                  wattrabbit
+RABBITMQ_VHOST=                 testvhost
+RABBITMQ_PASS=                  <redacted>
+
+# Django
+DJANGO_PROJECT_DIR=             <redacted>
+DJANGO_SETTINGS_MODULE=         datadrivendota.settings.local
+DEBUG=                          TRUE
+SECRET_KEY=                     <redacted>
+
+# Postgres
+DATABASE_URL=                   <redacted>
+
+# Charting analytics
+KEEN_WRITE_KEY=                 <redacted>
+KEEN_PROJECT_ID=                <redacted>
+KEEN_READ_KEY=                  <redacted>
+KEEN_API_URL=                   https://api.keen.io
+
+# User interaction
+INTERCOM_API_SECRET=            <redacted>
+
+# Payments
+STRIPE_PUBLIC_KEY=              <redacted>
+STRIPE_SECRET_KEY=              <redacted>
+
+# Mailing backend
+MAILGUN_SMTP_PORT=              <redacted>
+MAILGUN_SMTP_LOGIN=             <redacted>
+MAILGUN_SMTP_SERVER=            <redacted>
+MAILGUN_SMTP_PASSWORD=          <redacted>
+
+# Aws handles static assets
+AWS_SECRET_ACCESS_KEY=          <redacted>
+AWS_ACCESS_KEY_ID=              <redacted>
+AWS_STORAGE_BUCKET_NAME=        <redacted>
+```
+
+Storing settings in a repo is a bad policy, so talk to ben about getting unredacted copy.  Putting these in the postactivate of your virtualenv is recommended.
+
+## Initial Data Acquisition
+
+### Superuser
+
+In order to access the admin etc, you will need to make a superuser.
+
+`python datadrivendota/manage.py  createsuperuser`
+
+### Client Data
+
+There are certain files only accessible from the game client, and we commit these into json_files/ .  How to get them is a different project.
+
+`fab json_populate` should merge these data files into the database and hit foreign assets for things like images.  If you are starting from a blank DB, also run `python datadrivendota/manage.py  importRoles`; this should only need to happen once in the life of your db.
+
+You can test that this worked by starting a shell:
+
+`fab shell`
+
+then poking at the data models:
+
+`from heroes.models import Hero, Ability, HeroDossier`
+
+`Hero.objects.all().count()`
+
+`HeroDossier.objects.all().count()`
+
+`Ability.objects.all().count()`
+
+Note: Not all heroes will have dossiers, because sometimes heroes are in the data files before they are fully released.
+
+### API Data
+
+With the basic info established, we can hit the API to add more.
+
+You should have the [heroku toolbelt](https://toolbelt.heroku.com/) installed, and we can start a celery worker with `foreman start worker`.  That worker will wait for tasks and chew through the rabbitmq queue as long as it is up.
+
+To put a task in the queue, start a shell (`fab shell`) and start by making a player (this is my steam id):
+
+```
+from players.models import Player
+p, _ = Player.objects.get_or_create(steam_id=66289584, updated=True)
+# updated is a flag for tasks to know which players are intended to be in repeat scrapes.
+
+# Then import my matches
+from players.management.tasks import UpdateClientPersonas, MirrorPlayerData
+from datadrivendota.management.tasks import ApiContext
+
+c = ApiContext()
+c.account_id = 66289584
+c.matches_desired = 50
+UpdateClientPersonas().s().delay(api_context=c)
+MirrorPlayerData().s().delay(api_context=c)
+```
+
+If you look back into the worker tab, it should be happily running along.
+
+Starting a web process (`python datadrivendota/manage.py runserver`) and hitting the player page for my id (http://127.0.0.1:8000/players/66289584/), my games should show up!  Click one of the hero faces to see that game's detail.
+aa
+Note: you might see a bunch of files named like '1d_e1c3be95-e445-44b2-853c-ca044364b509.json' show up.  These are byproducts of a bad implementation of json serving, which is marked for fixing.
+
+#### One more thing
+
+Some parts of the site want to presume the existence of a player.  We can do this with a data migration, but for now try running the import above with an account id of 70388657.
+
+Currently, the game mode switch is broken.  Fuck.
+
+## Push workflow
+
+
+#Todos
+
+## Static assets
+Static asset distribution has weird failures sometimes right now.  (Ex a unicode decode error).  I suspect this comes from production collectstatic occasionally hitting s3 for the files it is trying to pack and compress, and failing.
+
+#### Current workaround
+Using Grunt to manage css compilation allows packing to be turned off if need be, which circumvents the sometimes-breaking step in collectstatic.  This appeared to work in a hand-test for overall distribution of assets.  Oddly, after one success the packing can be turned back on; points to weirness in read location?
+
+## Accounts refactor
+The old model of accounts was useful for a closed-off site, but needs to be refactored for a primarily-public, secondarily-subscriber model.
+
+## Charts refactor
+The existing model of chart construction is really shitty and should be replaced with REST+D3 wrappers.
+
+
+## Animations import
+Importing cast and attack animations is currently a manual hit to a foreign service, combined with some regexing to reformat.  This is annoying, but is only necessary on patch update.
+
+
+### Current workaround
+Some helpful regexen:
+```
+.png[ ]* => @
+(?<=[a-zA-Z])[ ]+(?=Melee|[0-9]) => @
+Melee => 0
+(?<=[0-9])[ ]+(?=[0-9]) => @
+```
+
+## Refactor man commands into celerybeat
+We currently rely on management commands to do some data integrity checks, but this is circuitous: we have a tool for time-based code (celery), and we should use that.  This will require the use of a fast-clearing queue and health metrics to warn when things are getting behind.  Adding a dedicated Rabbitmq instance, configuring it for health metrics, and factoring away the man commands is one code project.
+
+
+
+# Footnotes
+
+*:
+
+Here is a sample of what the output looks like, minus some deprecation warnings.
+
+    > python datadrivendota/manage.py  migrate sites
+
+    Operations to perform:
+      Apply all migrations: sites
+    Running migrations:
+      Rendering model states... DONE
+      Applying sites.0001_initial... OK
+    Traceback (most recent call last):
+      File "datadrivendota/manage.py", line 10, in <module>
+        execute_from_command_line(sys.argv)
+      File "/home/ben/.virtualenvs/ddd-upgrade/local/lib/python2.7/site-packages/django/core/management/__init__.py", line 338, in execute_from_command_line
+        utility.execute()
+      File "/home/ben/.virtualenvs/ddd-upgrade/local/lib/python2.7/site-packages/django/core/management/__init__.py", line 330, in execute
+        self.fetch_command(subcommand).run_from_argv(self.argv)
+      File "/home/ben/.virtualenvs/ddd-upgrade/local/lib/python2.7/site-packages/django/core/management/base.py", line 390, in run_from_argv
+        self.execute(*args, **cmd_options)
+      File "/home/ben/.virtualenvs/ddd-upgrade/local/lib/python2.7/site-packages/django/core/management/base.py", line 441, in execute
+        output = self.handle(*args, **options)
+      File "/home/ben/.virtualenvs/ddd-upgrade/local/lib/python2.7/site-packages/django/core/management/commands/migrate.py", line 225, in handle
+        emit_post_migrate_signal(created_models, self.verbosity, self.interactive, connection.alias)
+      File "/home/ben/.virtualenvs/ddd-upgrade/local/lib/python2.7/site-packages/django/core/management/sql.py", line 280, in emit_post_migrate_signal
+        using=db)
+      File "/home/ben/.virtualenvs/ddd-upgrade/local/lib/python2.7/site-packages/django/dispatch/dispatcher.py", line 201, in send
+        response = receiver(signal=self, sender=sender, **named)
+      File "/home/ben/.virtualenvs/ddd-upgrade/local/lib/python2.7/site-packages/django/contrib/auth/management/__init__.py", line 82, in create_permissions
+        ctype = ContentType.objects.db_manager(using).get_for_model(klass)
+      File "/home/ben/.virtualenvs/ddd-upgrade/local/lib/python2.7/site-packages/django/contrib/contenttypes/models.py", line 78, in get_for_model
+        "Error creating new content types. Please make sure contenttypes "
+    RuntimeError: Error creating new content types. Please make sure contenttypes is migrated before trying to migrate apps individually.
+
+    > python datadrivendota/manage.py  migrate auth
+
+    Operations to perform:
+      Apply all migrations: auth
+    Running migrations:
+      Rendering model states... DONE
+      Applying contenttypes.0001_initial... OK
+      Applying contenttypes.0002_remove_content_type_name... OK
+      Applying auth.0001_initial... OK
+      Applying auth.0002_alter_permission_name_max_length... OK
+      Applying auth.0003_alter_user_email_max_length... OK
+      Applying auth.0004_alter_user_username_opts... OK
+      Applying auth.0005_alter_user_last_login_null... OK
+      Applying auth.0006_require_contenttypes_0002... OK
+
+    > python datadrivendota/manage.py  migrate
+
+    Operations to perform:
+      Synchronize unmigrated apps: pipeline, mptt, corsheaders, staticfiles, debug_toolbar, utils, messages, devserver, debug_toolbar_line_profiler, django_forms_bootstrap, health, payments, template_profiler_panel, rest_framework, storages, bootstrapform, tagging, template_timings_panel
+      Apply all migrations: leagues, sessions, players, admin, items, matches, sites, auth, teams, blog, default, contenttypes, accounts, guilds, heroes
+    Synchronizing apps without migrations:
+      Creating tables...
+        Creating table corsheaders_corsmodel
+        Creating table payments_eventprocessingexception
+        Creating table payments_event
+        Creating table payments_transfer
+        Creating table payments_transferchargefee
+        Creating table payments_customer
+        Creating table payments_currentsubscription
+        Creating table payments_invoice
+        Creating table payments_invoiceitem
+        Creating table payments_charge
+        Creating table tagging_tag
+        Creating table tagging_taggeditem
+        Running deferred SQL...
+      Installing custom SQL...
+    Running migrations:
+      Rendering model states... DONE
+      Applying players.0001_initial... OK
+      Applying accounts.0001_initial... OK
+      Applying accounts.0002_auto_20150420_1410... OK
+      Applying admin.0001_initial... OK
+      Applying blog.0001_initial... OK
+      Applying default.0001_initial... OK
+      Applying default.0002_add_related_name... OK
+      Applying default.0003_alter_email_max_length... OK
+      Applying guilds.0001_initial... OK
+      Applying heroes.0001_initial... OK
+      Applying items.0001_initial... OK
+      Applying leagues.0001_initial... OK
+      Applying teams.0001_initial... OK
+      Applying leagues.0002_auto_20150419_1128... OK
+      Applying matches.0001_initial... OK
+      Applying sessions.0001_initial... OK

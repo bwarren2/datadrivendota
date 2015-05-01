@@ -173,6 +173,7 @@ def clean_input():
     except KeyError:
         # Probably manually deleted.
         pass
+    return stats
 
 
 def import_animations():

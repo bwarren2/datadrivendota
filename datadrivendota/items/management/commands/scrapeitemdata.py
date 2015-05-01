@@ -134,7 +134,8 @@ class Command(BaseCommand):
         names.append(name)
 
         try:
-            names.append(item['internal_data']['ItemAliases'])
+            for item in item['internal_data']['ItemAliases'].split(';'):
+                names.append(item)
         except:
             pass
 

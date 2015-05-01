@@ -21,8 +21,9 @@ class Command(BaseCommand):
 
             self.add_images(h)
             self.add_lore(h)
+            self.validate_visible(h)
 
-    def add_images(hero):
+    def add_images(self, hero):
         """
         Hit Valve APIs for pictures.
         This can be refactored for better testing, but not a high priority yet.
@@ -35,11 +36,18 @@ class Command(BaseCommand):
             )
         )
         try:
-            holder = BytesIO(requests.get(url).content)
-            _ = holder.seek(0)  # Catch to avoid printing
+            r = requests.get(url)
+            if r.status_code == 200:
+                holder = BytesIO(r.content)
+                _ = holder.seek(0)  # Catch to avoid printing
 
-            filename = slugify(hero.name)+'_full.png'
-            hero.mugshot.save(filename, File(holder))
+                filename = slugify(hero.name)+'_full.png'
+                hero.mugshot.save(filename, File(holder))
+            else:
+                print "No mugshot for {0}!  Error code {1}".format(
+                    hero.name, r.status_code
+                )
+
         except:
             err = sys.exc_info()[0]
             print "No mugshot for %s!  Error %s" % (hero.name, err)
@@ -49,17 +57,24 @@ class Command(BaseCommand):
             'http://media.steampowered.com'
             '/apps/dota2/images/heroes/%s_sb.png' % hero.internal_name[14:]
         )
-        try:
-            holder = BytesIO(requests.get(url).content)
-            _ = holder.seek(0)  # Catch to avoid printing
 
-            filename = slugify(hero.name)+'_thumb.png'
-            hero.thumbshot.save(filename, File(holder))
+        try:
+            r = requests.get(url)
+            if r.status_code == 200:
+                holder = BytesIO(r.content)
+                _ = holder.seek(0)  # Catch to avoid printing
+
+                filename = slugify(hero.name)+'_thumb.png'
+                hero.thumbshot.save(filename, File(holder))
+            else:
+                print "No mugshot for {0}!  Error code {1}".format(
+                    hero.name, r.status_code
+                )
         except:
             err = sys.exc_info()[0]
             print "No mugshot for %s!  Error %s" % (hero.name, err)
 
-    def add_lore(hero):
+    def add_lore(self, hero):
         """
         Hit foreign APIs for lore.
         This can be refactored for better testing, but not a high priority yet.
@@ -85,4 +100,12 @@ class Command(BaseCommand):
                 url=herourl
             )
 
+        hero.save()
+
+    def validate_visible(self, hero):
+
+        if hero.has_image:
+            hero.visible = True
+        else:
+            hero.visible = False
         hero.save()

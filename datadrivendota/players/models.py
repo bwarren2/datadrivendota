@@ -51,7 +51,6 @@ class Player(models.Model):
     def is_masked(self):
         return self.steam_id == ANONYMOUS_ID
 
-
     @property
     def wins(self):
         try:

@@ -39,7 +39,7 @@ class EndgameSelect(forms.Form):
     )
     game_modes = MultiGameModeSelect(
         required=True,
-        help_text='Which game modes would you like to sample?'
+        help_text='Which game modes would you like to sample?',
     )
     x_var = forms.ChoiceField(
         choices=X_LIST,
@@ -63,6 +63,10 @@ class EndgameSelect(forms.Form):
         help_text='Which variable colors data within a panel?',
         initial='player'
     )
+
+    # def __init__(self, *args, **kwargs):
+    #     self.game_modes.validators = []
+    #     super(EndgameSelect, self).__init__(*args, **kwargs)
 
 
 class TeamEndgameSelect(forms.Form):

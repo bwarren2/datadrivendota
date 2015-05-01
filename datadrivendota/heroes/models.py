@@ -87,6 +87,11 @@ class Hero(models.Model):
     objects = models.Manager()
     public = VisibleHeroManager()
 
+    @property
+    def has_image(self):
+        """ Used on hero import to check who is visible """
+        return not self.thumbshot.name == 'blanks/blank_hero_thumb.png'
+
     class Meta:
         verbose_name_plural = 'heroes'
         ordering = ['name']
@@ -120,7 +125,6 @@ class Ability(models.Model):
     machine_name = models.CharField(
         help_text="Valve's underscore name, slugified",
         max_length=150,
-        unique=True
     )
     channel_time = models.CharField(
         help_text="Spaced channel time by level",

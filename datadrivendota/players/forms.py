@@ -28,6 +28,7 @@ class PlayerWinrateLevers(forms.Form):
             help_text='Pick one or more stats to graph',
             widget=CheckboxSelectMultiple
         )
+        self.game_modes.setup()
 
     GROUP_CHOICES = [
         (item, item.replace("_", " ").title())

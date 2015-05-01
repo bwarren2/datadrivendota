@@ -237,11 +237,15 @@ class ChartFormView(View):
 class ApiView(View):
 
     def get(self, request):
-        if (request.is_ajax() and request.GET):
+        if (request.is_ajax() and request.GET) or True:
             try:
                 bound_form = self.form(request.GET)
+                print bound_form.is_valid()
+                print bound_form.errors
+
                 if bound_form.is_valid():
                     kwargs = {}
+                    print "In!"
                     for attr in self.attrs:
                         try:
                             kwargs.update(
@@ -249,20 +253,22 @@ class ApiView(View):
                             )
                         except KeyError:
                             pass
-
+                    print "past"
                     chart = self.json_function(
                         **kwargs
                     )
+                    print chart
                     self.amend_params(request, chart)
-                    json_data = moveJson(chart.as_JSON())
 
+                    json_data = moveJson(chart.as_JSON())
+                    print json_data
                     return self.succeed(json_data)
 
                 else:
                     return self.fail()
 
             except NoDataFound:
-                return self.fail()
+                return self.fail('No data')
         else:
             raise SuspiciousOperation
             return self.fail()
@@ -323,8 +329,8 @@ class ApiView(View):
             content_type="application/json"
         )
 
-    def fail(self):
-        data = 'fail'
+    def fail(self, msg=None):
+        data = 'fail: {0}'.format(msg)
         mimetype = 'application/json'
         return HttpResponse(data, mimetype)
 
