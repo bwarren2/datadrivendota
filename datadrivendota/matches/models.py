@@ -31,7 +31,8 @@ class Match(models.Model):
         default=0,
         help_text=(
             'How valve denotes skill bracket.  '
-            '1 is normal, 2 is high, 3 is very high, 0 is my not-assigned, 4 is Tournament'
+            '1 is normal, 2 is high, 3 is very high, '
+            '0 is my not-assigned, 4 is Tournament'
         )
     )
     radiant_guild = models.ForeignKey(
@@ -284,6 +285,28 @@ class SkillBuild(models.Model):
         pass
 
 
+#############################################
+#############################################
+#           Deprecations begin here.        #
+#############################################
+#############################################
+
+
+# This is used in some JS, the json_data functions.
+def skill_name(skill):
+    if skill == 1:
+        return 'Normal Skill'
+    if skill == 2:
+        return 'High Skill'
+    if skill == 3:
+        return 'Very High Skill'
+    if skill == 4:
+        return 'Tournament Game'
+    else:
+        return skill
+
+
+# Everything below here is basically only in the json_data calls.
 def fetch_pms_attribute(summary, attribute):
     if attribute == 'duration':
         return summary.match.duration/60.0
@@ -404,6 +427,8 @@ def pms_db_args(var, summary=None):
     return [var]
 
 
+
+
 def display_attr(var, summary=None):
     if var == 'player':
         if summary is not None:
@@ -422,30 +447,6 @@ def display_attr(var, summary=None):
             return 'Win/Loss'
     if var == 'None' or var is None:
         return None
-
-
-def fetch_single_attribute(summary, attribute, compressor='sum'):
-    if compressor == 'sum':
-        denominator = 1
-    else:
-        denominator = 5
-    if attribute == 'duration':
-        return summary.match.duration/60.0/5
-    elif attribute == 'K-D+.5*A':
-        return (
-            (summary.kills - summary.deaths + summary.assists * .5)
-            / denominator
-        )
-    elif attribute == 'is_win':
-        return 'Won' if summary.is_win else 'Lost'
-    elif attribute == 'game_mode':
-        return summary.match.game_mode.description
-    elif attribute == 'skill':
-        return summary.match.skill
-    elif attribute == 'none':
-        return ''
-    else:
-        return getattr(summary, attribute)/denominator
 
 
 def fetch_attribute_label(attribute):
@@ -474,16 +475,3 @@ def fetch_attribute_label(attribute):
     else:
         label = safen(attribute)
     return label
-
-
-def skill_name(skill):
-    if skill == 1:
-        return 'Normal Skill'
-    if skill == 2:
-        return 'High Skill'
-    if skill == 3:
-        return 'Very High Skill'
-    if skill == 4:
-        return 'Tournament Game'
-    else:
-        return skill
