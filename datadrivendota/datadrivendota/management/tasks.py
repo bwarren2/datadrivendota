@@ -16,7 +16,7 @@ from celery.exceptions import (
 from datadrivendota.settings.base import STEAM_API_KEY
 import logging
 from utils import send_error_email
-# from matches.management.tasks import UpdateMatch
+
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os
 os.environ['http_proxy'] = ''
@@ -44,7 +44,7 @@ class ApiContext(object):
     hero_id = None
     tournament_games_only = None
     format = 'json'
-    # There are magic lists of teh above in the URL constructor.
+    # There are magic lists of the above in the URL constructor.
 
     # Things we care about internally
     start_scrape_time = None

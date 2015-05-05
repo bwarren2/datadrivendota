@@ -29,7 +29,9 @@ class Command(BaseCommand):
             try:
                 for attrib in id_dict[clean_item]['external_data']['attrib']:
                     ItemAttributes.objects.get_or_create(
-                        item=Item.objects.get(internal_name=clean_item),
+                        item=Item.objects.get(
+                            steam_id=id_dict[clean_item]['id']
+                        ),
                         attribute=attrib
                     )
             except KeyError:

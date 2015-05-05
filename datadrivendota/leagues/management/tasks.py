@@ -1,9 +1,6 @@
 import json
 from collections import defaultdict
 import urllib2
-from datetime import timedelta
-from django.utils import timezone
-from time import mktime
 from uuid import uuid4
 from celery import Task, chain
 from django.conf import settings
