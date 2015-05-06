@@ -1,13 +1,14 @@
+import logging
 from itertools import chain as meld
 from copy import deepcopy
 from time import time as now
 from celery import Task, chain
+
+from django.conf import settings
 from players.models import Player
 from teams.models import Team
 from accounts.models import get_tracks
 from teams.models import assemble_pros
-from settings.base import ADDER_32_BIT
-import logging
 
 from datadrivendota.management.tasks import (
     BaseTask,
@@ -24,7 +25,7 @@ os.environ['http_proxy'] = ''
 logger = logging.getLogger(__name__)
 
 
-class MirrorClientPersonas(BaseTask):
+class MirrorClientPersonas(Task):
 
     def run(self):
         """
@@ -46,7 +47,7 @@ class MirrorClientPersonas(BaseTask):
         querylist = []
 
         for counter, user in enumerate(check_list, start=1):
-            id_64_bit = str(user + ADDER_32_BIT)
+            id_64_bit = str(user + settings.ADDER_32_BIT)
             querylist.append(id_64_bit)
 
             # if our list is list_send_length long or we have reached the end
@@ -54,11 +55,11 @@ class MirrorClientPersonas(BaseTask):
                 steamids = ",".join(querylist)
                 vac = ValveApiCall()
                 upp = UpdateClientPersonas()
-                self.api_context.steamids = steamids
-                pass_context = deepcopy(self.api_context)
+                api_context = ApiContext()
+                api_context.steamids = steamids
                 chain(vac.s(
                     mode='GetPlayerSummaries',
-                    api_context=pass_context
+                    api_context=api_context
                 ), upp.s()).delay()
                 querylist = []
 
@@ -80,7 +81,7 @@ class UpdateClientPersonas(ApiFollower):
             )
             # The PlayerSummaries call returns 64 bit ids.  It is super
             # annoying.
-            id_32bit = int(pulled_player['steamid']) % ADDER_32_BIT
+            id_32bit = int(pulled_player['steamid']) % settings.ADDER_32_BIT
 
             player, created = Player.objects.get_or_create(steam_id=id_32bit)
             player.persona_name = pulled_player['personaname']
@@ -92,7 +93,12 @@ class UpdateClientPersonas(ApiFollower):
 
 
 class MirrorPlayerData(BaseTask):
+    """
+    The major entry point to the system.  Creates a player for recurring update
+    and pulls in a bunch of information.
 
+    @todo: refactor this with accounts refactor.
+    """
     def run(self):
         if self.api_context.account_id is None:
             logger.error("Needed an account id, had none, failed.")
@@ -165,7 +171,7 @@ class UpdateProNames(ApiFollower):
             player.save()
 
 
-class MirrorClientMatches(BaseTask):
+class MirrorClientMatches(Task):
 
     def run(self):
         """
@@ -178,22 +184,15 @@ class MirrorClientMatches(BaseTask):
         check_list = [user for user in check_list]
 
         for counter, user in enumerate(check_list, start=1):
+
             context = ApiContext()
             context.account_id = user.steam_id
-
-            if self.api_context.matches_requested is None:
-                context.matches_requested = 20
-            else:
-                context.matches_requested = self.api_context.matches_requested
-
-            if self.api_context.matches_desired is None:
-                context.matches_desired = 20
-            else:
-                context.matches_desired = self.api_context.matches_desired
-
+            context.matches_requested = settings.CLIENT_MATCH_COUNT
+            context.matches_desired = settings.CLIENT_MATCH_COUNT
             context.deepcopy = True
             context.start_scrape_time = now()
             context.last_scrape_time = user.last_scrape_time
+
             logger.info(context)
             vac = ValveApiCall()
             rpr = CycleApiCall()

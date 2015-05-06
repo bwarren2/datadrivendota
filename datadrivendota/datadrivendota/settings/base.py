@@ -69,7 +69,7 @@ DATABASES['default'] = dj_database_url.config(
 
 ########## GENERAL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
-TIME_ZONE = 'America/Los_Angeles'
+TIME_ZONE = 'America/New_York'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = 'en-us'
@@ -580,3 +580,9 @@ KEEN_API_URL = getenv('KEEN_API_URL')
 KEEN_PROJECT_ID = getenv('KEEN_PROJECT_ID')
 KEEN_READ_KEY = getenv('KEEN_READ_KEY')
 KEEN_WRITE_KEY = getenv('KEEN_WRITE_KEY')
+
+### Project specific constants used in tasks
+LOOKBACK_UPDATE_DAYS = 3  # The window we consider for re-checking things.
+HERO_SKILL_MATCH_COUNT = 3  # How many matches to add per hero skill level
+CLIENT_MATCH_COUNT = 3  # How many client matches to get each pull
+### End project specific constants used in tasks

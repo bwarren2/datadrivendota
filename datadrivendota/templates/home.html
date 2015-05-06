@@ -65,25 +65,6 @@
 
 </div>
 
-
-<div class='container'>
-  <div class='row'>
-
-    <div class='page-header'>
-      <h1>See how pros succeed, and copy them!</h1>
-    </div>
-
-    <div id='slark-chart' class='col-md-8'>
-      <h4>Slark Tower Damage by Skill Level, with Dendi Games</h4>
-    </div>
-
-    <div id='endgame-chart' class='col-md-4'>
-      <h4>Dendi's End-of-Game Kills</h4>
-    </div>
-
-  </div>
-</div>
-
 {% endblock content %}
 
 {% block extra_js %}
@@ -94,46 +75,6 @@
   })
   </script>
 
-    <script type="text/javascript">
-
-      window.apiHit(
-        "#slark-chart",
-        '{% url "heroes:api_hero_performance_chart" %}',
-          $.param({
-            hero: '{{chart_hero.steam_id}}',
-            player: '{{chart_player.steam_id}}',
-            game_modes: [1, 2, 3, 4, 5],
-            division: 'Skill',
-            x_var: 'duration',
-            y_var: 'tower_damage',
-            group_var: 'skill_name',
-            panel_var: 'is_win',
-
-            width: 300,
-            height: 300,
-          }, true
-        )
-      );
-
-
-      window.apiHit(
-        "#endgame-chart",
-        '{% url "matches:api_endgame_chart" %}',
-          $.param({
-
-            players: '{{chart_player.steam_id}}',
-            game_modes: [1, 2, 3, 4, 5],
-            x_var: 'duration',
-            y_var: 'kills',
-            panel_var: 'None',
-            group_var: 'player',
-            width: 300,
-            height: 300,
-          }, true
-        )
-      );
-
-    </script>
 {% endblock extra_js %}
 
 {% block extra_css %}

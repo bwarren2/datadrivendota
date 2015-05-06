@@ -25,21 +25,24 @@ class Config(object):
         "datadrivendota.management.tasks",
         )
 
-    ## What happens if we do not use redis?.
+    # What happens if we do not use redis?.
     CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
 
-    #Stop a bazillion fake queues from being made with results.  Time in sec.
+    # What happens if we do not use redis?.
+    CELERY_TIMEZONE = settings.TIME_ZONE
+
+    # Stop a bazillion fake queues from being made with results.  Time in sec.
     CELERY_TASK_RESULT_EXPIRES = int(getenv('RESULT_EXPIRY_RATE'))
 
-    #Only store errors.
-    #NOTE: this means that you cannot get the results of the tasks.
+    # Only store errors.
+    # NOTE: this means that you cannot get the results of the tasks.
     CELERY_IGNORE_RESULT = getenv('CELERY_IGNORE_RESULT') == 'True'
     CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
 
     CELERYD_TASK_TIME_LIMIT = int(getenv('CELERYD_TASK_TIME_LIMIT'))
     CELERY_ACKS_LATE = True
 
-    #Experimenting
+    # Experimenting
     CELERYD_TASK_SOFT_TIME_LIMIT = int(getenv('CELERYD_TASK_SOFT_TIME_LIMIT'))
 
     CELERY_REDIS_MAX_CONNECTIONS = int(getenv('CELERY_REDIS_MAX_CONNECTIONS'))
@@ -56,25 +59,34 @@ class Config(object):
     EMAIL_HOST_USER = settings.EMAIL_HOST_USER
     EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
 
-    #Where celery emails from.
+    # Where celery emails from.
     SERVER_EMAIL = "celery@datadrivendota.com"
 
     CELERY_QUEUES = (
+        # This is a fast queue for tasks that check data integrity.
+        # It should never back up.
         Queue(
-            'management',
-            Exchange('management'),
-            routing_key='management'
+            'integrity',
+            Exchange('integrity'),
+            routing_key='integrity'
         ),
+        # This is a slower queue for tasks that hit Valve's API.
+        # We would love this to be fast and never back up,
+        # but rate limiting gets in the way.
         Queue(
             'api_call',
             Exchange('valve_api'),
             routing_key='valve_api_call'
         ),
+        # This is a slower queue for tasks that hit our database or redis.
+        # Scaling to keep this moving quickly is allowed, based on conn caps.
         Queue(
             'db_upload',
             Exchange('db'),
             routing_key='db'
         ),
+        # This is a slower queue for tasks that cycle through api calls.
+        # It is rate limited by valve's rate, and is broken out for clarity.
         Queue(
             'rpr',
             Exchange('rpr'),
@@ -92,8 +104,8 @@ class Config(object):
             'routing_key': 'rpr'
         },
         'items.management.tasks.MirrorItemSchema': {
-            'exchange': 'db',
-            'routing_key': 'db'
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
         'items.management.tasks.UpdateItemSchema': {
             'exchange': 'db',
@@ -105,80 +117,80 @@ class Config(object):
         },
         'players.management.tasks.UpdateClientPersonas':
         {
-            'exchange': 'management',
-            'routing_key': 'management'
-        },
-        'players.management.tasks.MirrorClientPersonas': {
             'exchange': 'db',
             'routing_key': 'db'
         },
+        'players.management.tasks.MirrorClientPersonas': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
+        },
         'players.management.tasks.MirrorClientMatches': {
-            'exchange': 'management',
-            'routing_key': 'management'
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
         'players.management.tasks.MirrorPlayerData': {
-            'exchange': 'management',
-            'routing_key': 'management'
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
         'heroes.management.tasks.MirrorHeroSkillData': {
-            'exchange': 'management',
-            'routing_key': 'management'
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
+        },
+        'heroes.management.tasks.CheckHeroIntegrity': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
         'matches.management.tasks.MirrorMatches': {
-            'exchange': 'management',
-            'routing_key': 'management'
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
-        'teams.management.tasks.MirrorTeams': {
-            'exchange': 'management',
-            'routing_key': 'management'
+        'matches.management.tasks.UpdateMatchValidity': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
+        },
+        'teams.management.tasks.MirrorRecentTeams': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
+        },
+        'leagues.management.tasks.MirrorLiveGames': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
         'teams.management.tasks.UpdateTeam': {
             'exchange': 'db',
             'routing_key': 'db'
         },
         'teams.management.tasks.MirrorTeamDetails': {
-            'exchange': 'management',
-            'routing_key': 'management'
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
-        'teams.management.tasks.UpdateTeamLogos': {
-            'exchange': 'valve_api',
-            'routing_key': 'valve_api_call'
+        'teams.management.tasks.UpdateTeamLogo': {
+            'exchange': 'db',
+            'routing_key': 'db'
         },
-        'leagues.management.tasks.MirrorLeagues': {
-            'exchange': 'management',
-            'routing_key': 'management'
-        },
-        'leagues.management.tasks.UpdateLeagueGames': {
-            'exchange': 'management',
-            'routing_key': 'management'
+        'leagues.management.tasks.MirrorRecentLeagues': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
         'leagues.management.tasks.CreateLeagues': {
             'exchange': 'db',
             'routing_key': 'db'
-        },
-        'leagues.management.tasks.UpdateLeagueGames': {
-            'exchange': 'management',
-            'routing_key': 'management'
-        },
-        'leagues.management.tasks.MirrorLeagueLogos': {
-            'exchange': 'management',
-            'routing_key': 'management'
         },
         'leagues.management.tasks.UpdateLeagueLogos': {
             'exchange': 'valve_api',
             'routing_key': 'valve_api_call'
         },
         'leagues.management.tasks.MirrorLeagueSchedule': {
-            'exchange': 'valve_api',
-            'routing_key': 'valve_api_call'
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
         'leagues.management.tasks.UpdateLeagueSchedule': {
-            'exchange': 'valve_api',
-            'routing_key': 'valve_api_call'
+            'exchange': 'db',
+            'routing_key': 'db'
         },
         'players.management.tasks.MirrorProNames': {
-            'exchange': 'management',
-            'routing_key': 'management'
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
         'players.management.tasks.UpdateProNames': {
             'exchange': 'db',
@@ -216,7 +228,12 @@ class Config(object):
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
-        'matches.management.tasks.UpdateMatch.': {
+        'matches.management.tasks.UpdateMatch': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'matches.management.tasks.UpdateMatchValidity': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
@@ -247,12 +264,17 @@ class Config(object):
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
+        'heroes.management.tasks.CheckHeroIntegrity': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
         'matches.management.tasks.MirrorMatches': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
-        'teams.management.tasks.MirrorTeams': {
+        'teams.management.tasks.MirrorRecentTeams': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
@@ -267,33 +289,18 @@ class Config(object):
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
-        'teams.management.tasks.UpdateTeamLogos': {
+        'teams.management.tasks.UpdateTeamLogo': {
             "rate_limit": VALVE_RATE,
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
-        'leagues.management.tasks.MirrorLeagues': {
-            'acks_late': True,
-            'max_retries': TASK_MAX_RETRIES,
-            'trail': False,
-        },
-        'leagues.management.tasks.UpdateLeagueGames': {
+        'leagues.management.tasks.MirrorRecentLeagues': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
         'leagues.management.tasks.CreateLeagues': {
-            'acks_late': True,
-            'max_retries': TASK_MAX_RETRIES,
-            'trail': False,
-        },
-        'leagues.management.tasks.UpdateLeagueGames': {
-            'acks_late': True,
-            'max_retries': TASK_MAX_RETRIES,
-            'trail': False,
-        },
-        'leagues.management.tasks.MirrorLeagueLogos': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
@@ -326,19 +333,64 @@ class Config(object):
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
+        'leagues.management.tasks.MirrorLiveGames': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
 
     }
 
     CELERYBEAT_SCHEDULE = {
+        # Weekly
+        'reflect-pro-names-weekly': {
+            'task': 'players.management.tasks.MirrorProNames',
+            'schedule': timedelta(weeks=1),
+        },
+        'reflect-hero-skill-weekly': {
+            'task': 'heroes.management.tasks.MirrorHeroSkillData',
+            'schedule': timedelta(weeks=1),
+        },
+        # Daily
+        'check-hero-integrity-daily': {
+            'task': 'heroes.management.tasks.CheckHeroIntegrity',
+            'schedule': timedelta(days=1),
+        },
+        'check-match-integrity-daily': {
+            'task': 'matches.management.tasks.CheckMatchIntegrity',
+            'schedule': timedelta(days=1),
+        },
+        'check-match-validity-daily': {
+            'task': 'matches.management.tasks.UpdateMatchValidity',
+            'schedule': timedelta(days=1),
+        },
+        'reflect-recent-leagues-daily': {
+            'task': 'leagues.management.tasks.MirrorRecentLeagues',
+            'schedule': timedelta(days=1),
+        },
+        'reflect-recent-teams-daily': {
+            'task': 'teams.management.tasks.MirrorRecentTeams',
+            'schedule': timedelta(days=1),
+        },
+        'reflect-league-schedule-daily': {
+            'task': 'leagues.management.tasks.MirrorLeagueSchedule',
+            'schedule': timedelta(days=1),
+        },
+        'reflect-client-persona-daily': {
+            'task': 'players.management.tasks.MirrorClientPersonas',
+            'schedule': timedelta(days=1),
+        },
+        # Hourly
         'reflect-item-schema-hourly': {
             'task': 'items.management.tasks.MirrorItemSchema',
             'schedule': timedelta(hours=1),
         },
-        'reflect-league-schedule-hourly': {
-            'task': 'leagues.management.tasks.MirrorLeagueSchedule',
+        'reflect-client-matches-hourly': {
+            'task': 'players.management.tasks.MirrorClientMatches',
             'schedule': timedelta(hours=1),
         },
-        'reflect-league-schedule-hourly': {
+        # Fast
+        'reflect-live-games-fast': {
             'task': 'leagues.management.tasks.MirrorLiveGames',
             'schedule': timedelta(seconds=10),
         },

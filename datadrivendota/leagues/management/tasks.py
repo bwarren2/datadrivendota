@@ -1,9 +1,15 @@
+import os
+import logging
 import json
-from collections import defaultdict
 import urllib2
+from collections import defaultdict
 from uuid import uuid4
+from time import mktime
+from datetime import datetime, timedelta
 from celery import Task, chain
+
 from django.conf import settings
+
 from datadrivendota.redis_app import redis_app as redis
 from datadrivendota.redis_app import timeline_key, slice_key, set_games
 from utils.accessors import get_league_schema
@@ -11,9 +17,8 @@ from leagues.models import League
 from heroes.models import Hero
 from items.models import Item
 from teams.models import Team
-from teams.management.tasks import MirrorTeamDetails
 from leagues.models import ScheduledMatch
-import logging
+from matches.models import Match
 from datadrivendota.management.tasks import (
     ApiFollower,
     ApiContext,
@@ -22,7 +27,6 @@ from datadrivendota.management.tasks import (
 from matches.management.tasks import MirrorMatches, CycleApiCall
 
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
-import os
 os.environ['http_proxy'] = ''
 # End Patch
 
@@ -71,10 +75,6 @@ class UpdateLiveGames(ApiFollower):
             self._store_data(formatted_game)
 
         set_games(urldata)
-
-        # Update data if needed
-        self._update_leagues(self.update_leagues)
-        self._update_teams(self.update_teams)
 
     def _store_data(self, game_snapshot):
         # Store slice
@@ -178,7 +178,6 @@ class UpdateLiveGames(ApiFollower):
                         if x['account_id'] == account_id
                     ][0]
                     player['name'] = player_data['name']
-                    # print player_data
                     if player_data['team'] == 0:
                         player['side'] = 'radiant'
                     else:
@@ -195,7 +194,7 @@ class UpdateLiveGames(ApiFollower):
     def _get_heroes(self):
         self.hero_urls = {
             x.steam_id: x.mugshot.url for x in Hero.objects.all()
-            }
+        }
 
     def _get_items(self):
         self.item_names = {
@@ -234,19 +233,13 @@ class UpdateLiveGames(ApiFollower):
                             steam_id=team_id
                             )
                         game[team_type]['logo_url'] = team.image
-                        if t_created or team.is_outdated:
-                            update_teams.append(team_id)
-                            team.save()
-                            # Reset update time, avoid stacking update calls
+
             # Do League
             league_id = game['league_id']
             league, l_created = League.objects.get_or_create(
                 steam_id=league_id
                 )
             game['league_logo_url'] = league.image
-            if l_created or league.is_outdated:
-                update_leagues.append(league_id)
-                league.save()  # Reset update time, avoid stacking update calls
 
         self.update_leagues = update_leagues
         self.update_teams = update_teams
@@ -259,20 +252,6 @@ class UpdateLiveGames(ApiFollower):
         self._get_items()
         return urldata
 
-    def _update_teams(self, update_teams):
-        logger.info('Got these teams: {0}'.format(update_teams))
-        if update_teams is not None:
-            logger.info('Updating these teams: {0}'.format(update_teams))
-            mtd = MirrorTeamDetails()
-            mtd.s(teams=update_teams).delay()
-
-    def _update_leagues(self, update_leagues):
-        logger.info('Got these leagues: {0}'.format(update_leagues))
-        if update_leagues is not None:
-            logger.info('Updating these leagues: {0}'.format(update_leagues))
-            ul = UpdateLeagues()
-            ul.s(leagues=update_leagues).delay()
-
     def _clean_urldata(self, urldata):
         """
         Strips out request-level response from valve.
@@ -282,7 +261,8 @@ class UpdateLiveGames(ApiFollower):
 
 class MirrorLeagueSchedule(Task):
     """
-    Kicks off the API call to match schedules with Valve, and passes the result to Update
+    Kicks off the API call to match schedules with Valve,
+    and passes the result to Update
     """
     def run(self):
 
@@ -308,10 +288,6 @@ class UpdateLeagueSchedule(ApiFollower):
         data = self.clean_urldata(urldata)
         self.delete_unscheduled_games(data)
         self.create_scheduled_games(data)
-        teams = self.find_update_teams(data)
-        self.update_teams(teams)
-        leagues = self.find_update_leagues(data)
-        self.update_leagues(leagues)
 
     def delete_unscheduled_games(self, data):
         """
@@ -407,58 +383,6 @@ class UpdateLeagueSchedule(ApiFollower):
         """
         return urldata['result']
 
-    def find_update_teams(self, data):
-        """
-        Check each team for missing logo/outdated timestamp.
-
-        Results get passed to update task
-        """
-        update_teams = set()
-        for game in data['games']:
-            # Use get because we just made these
-            for team_info in game['teams']:
-
-                team = Team.objects.get(
-                    steam_id=team_info['team_id']
-                )
-
-                if team.is_outdated:
-                    update_teams.add(team.steam_id)
-
-        logger.info("Teams that need updating: {0}".format(update_teams))
-        return list(update_teams)
-
-    def find_update_leagues(self, data):
-        """
-        Check each league for missing logo/outdated timestamp.
-
-        Results get passed to update task
-        """
-        update_leagues = set()
-        for game in data['games']:
-            # Use get because we just made these
-            league = League.objects.get(
-                steam_id=game['league_id']
-            )
-            if league.is_outdated:
-                update_leagues.add(league.steam_id)
-        logger.info("Leagues that need updating: {0}".format(update_leagues))
-        return list(update_leagues)
-
-    def update_teams(self, teams):
-        """
-        Kicks off the celery task to fix teams that need work.
-        """
-        mtd = MirrorTeamDetails()
-        mtd.s(teams=teams).delay()
-
-    def update_leagues(self, leagues):
-        """
-        Kicks off the celery task to fix teams that need work.
-        """
-        ul = UpdateLeagues()
-        ul.s(leagues=leagues).delay()
-
     def _fingerprint(self, scheduled_match):
         """
         Utility function for effective-PKness of an object.
@@ -491,7 +415,8 @@ class UpdateLeagues(Task):
     """
     def run(self, leagues):
         """
-        Presumes iterable of steam ids, hits redis cache of item schema, pings valve per league for the item image
+        Presumes iterable of steam ids, hits redis cache of item schema,
+        pings valve per league for the item image
         """
         logger.info("Updating the given leagues {0}".format(leagues))
         schema = get_league_schema()
@@ -533,7 +458,6 @@ class UpdateLeagues(Task):
                 )
                 ch.delay()
             except KeyError:
-                league.save()  # Reset update time.
                 logger.error("Can't find {0} in schema.  :(".format(league_id))
 
 
@@ -557,24 +481,44 @@ class UpdateLeagueLogo(ApiFollower):
         league.save()
         os.remove(f.name)
 
-# Deprecations start here.
 
-
-class MirrorLeagues(Task):
+class MirrorRecentLeagues(Task):
     """
-    DEPRECATED
+    Find the leagues that have recent/upcoming games and re-ping their data.
 
-    Tries to make ALL THE LEAGUES off the list.
+    Meant to run once a day(ish) via celery beat
     """
-
     def run(self):
-        c = ApiContext()
-        c.refresh_records = True
-        vac = ValveApiCall()
-        ul = CreateLeagues()
-        c = chain(vac.s(api_context=c, mode='GetLeagueListing'), ul.s())
-        c.delay()
+        leagues = self.find_leagues()
+        ul = UpdateLeagues()
+        ul.s().delay(leagues=leagues)
 
+    def find_leagues(self):
+        """
+        Find matches from the last few days that have leagues,
+        and get the distinct ids as a list
+        """
+
+        # The .distinct() method fails with sqlite, so in the interests of
+        # testing we do this goofy list(set()) business.
+        return list(
+            set(
+                Match.objects.filter(
+                    start_time__gte=mktime(
+                        (
+                            datetime.now()-timedelta(
+                                days=settings.LOOKBACK_UPDATE_DAYS
+                                )
+                        ).timetuple()
+                    )
+                )
+                .exclude(league=None)
+                .values_list('league__steam_id', flat=True)
+            )
+        )
+
+
+# Deprecations start here.
 
 class CreateLeagues(ApiFollower):
     """
@@ -593,8 +537,6 @@ class CreateLeagues(ApiFollower):
                 tournament_url=league['tournament_url'],
                 item_def=league['itemdef'],
             )
-
-
 
 
 class AcquireHiddenLeagueGames(Task):

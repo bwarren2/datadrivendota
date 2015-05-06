@@ -240,10 +240,10 @@ UpdateClientPersonas().s().delay(api_context=c)
 MirrorPlayerData().s().delay(api_context=c)
 ```
 
-If you look back into the worker tab, it should be happily running along.
+If you look back into the worker tab, it should be happily running along.  If you want to do some basic monitoring of the celery worker itself, try `flower  --broker=<your amqp url, ex $CLOUDAMQP_URL>`.
 
 Starting a web process (`python datadrivendota/manage.py runserver`) and hitting the player page for my id (http://127.0.0.1:8000/players/66289584/), my games should show up!  Click one of the hero faces to see that game's detail.
-aa
+
 Note: you might see a bunch of files named like '1d_e1c3be95-e445-44b2-853c-ca044364b509.json' show up.  These are byproducts of a bad implementation of json serving, which is marked for fixing.
 
 #### One more thing
@@ -282,11 +282,6 @@ Some helpful regexen:
 Melee => 0
 (?<=[0-9])[ ]+(?=[0-9]) => @
 ```
-
-## Refactor man commands into celerybeat
-We currently rely on management commands to do some data integrity checks, but this is circuitous: we have a tool for time-based code (celery), and we should use that.  This will require the use of a fast-clearing queue and health metrics to warn when things are getting behind.  Adding a dedicated Rabbitmq instance, configuring it for health metrics, and factoring away the man commands is one code project.
-
-
 
 # Footnotes
 

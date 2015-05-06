@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+from time import mktime
+from django.conf import settings
 from django.test import TestCase, Client
 from datetime import timedelta
 from django.utils import timezone
@@ -14,27 +17,12 @@ from .json_samples import (
     live_merge_logos,
     live_states,
     )
-from leagues.management.tasks import UpdateLeagueSchedule, UpdateLiveGames
+from leagues.management.tasks import (
+    UpdateLeagueSchedule,
+    UpdateLiveGames,
+    MirrorLeagues,
+)
 from model_mommy import mommy
-
-# We are getting rid of the JSON methods anyway
-# class TestWorkingJson(TestCase):
-
-#     def setUp(self):
-#         make_matchset()
-#         self.league = League.objects.all()[0]
-
-#     def tearDown(self):
-#         pass
-
-#     def test_winrate_json(self):
-#         chart = league_winrate_json(
-#             league=self.league.steam_id,
-#             min_date=None,
-#             max_date=None,
-#             group_var='alignment',
-#         )
-#         self.assertGreater(len(chart.datalist), 0)
 
 
 class TestLeagueScheduleUpdate(TestCase):
@@ -71,66 +59,6 @@ class TestLeagueScheduleUpdate(TestCase):
         self.assertEqual(
             ScheduledMatch.objects.all().count(),
             2
-        )
-
-    def test_find_update_teams(self):
-        data = self.task.clean_urldata(self.good_json)
-        self.task.delete_unscheduled_games(
-            self.task.clean_urldata(self.good_json)
-        )
-        self.task.create_scheduled_games(
-            self.task.clean_urldata(self.good_json)
-        )
-        teams = []
-        for game in data['games']:
-
-            t = Team.objects.get(steam_id=game['teams'][0]['team_id'])
-            t.valve_cdn_image = 'www.whatever.com/pong.png'
-            t.save()
-            teams.append(t)
-
-            t = Team.objects.get(steam_id=game['teams'][1]['team_id'])
-            t.valve_cdn_image = 'www.whatever.com/pong.png'
-            t.save()
-            teams.append(t)
-
-        teams[2].update_time = timezone.now() - timedelta(weeks=20)
-        teams[2].valve_cdn_image = None
-        super(Team, teams[2]).save()
-
-        # print "Expected: {0}".format([teams[0].steam_id, teams[2].steam_id])
-        # print "Got: {0}".format(self.task.find_update_teams(data))
-        # teams[0].steam_id,
-        self.assertEqual(
-            [teams[2].steam_id],
-            self.task.find_update_teams(data)
-        )
-
-    def test_find_update_leagues(self):
-
-        data = self.task.clean_urldata(self.good_json)
-        self.task.delete_unscheduled_games(
-            self.task.clean_urldata(self.good_json)
-        )
-        self.task.create_scheduled_games(
-            self.task.clean_urldata(self.good_json)
-        )
-
-        leagues = []
-        for game in data['games']:
-
-            l = League.objects.get(steam_id=game['league_id'])
-            l.valve_cdn_image = 'www.whatever.com/pong.png'
-            l.save()
-            leagues.append(l)
-
-        # Make a league look very out of date
-        leagues[0].valve_cdn_image = None
-        leagues[0].save()
-
-        self.assertEqual(
-            [leagues[0].steam_id],
-            self.task.find_update_leagues(data)
         )
 
 
@@ -279,3 +207,24 @@ class TestUrlconf(TestCase):
         resp = c.get('/leagues/live-game-detail/1/')
         self.assertEqual(resp.status_code, 200)
         # The magic is in the template, so any number is OK
+
+
+class TestUpdateLeagues(TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        super(TestUpdateLeagues, self).setUpClass()
+        self.league = mommy.make_recipe('leagues.league')
+        self.match = mommy.make_recipe(
+            'matches.match',
+            league=self.league,
+            start_time=mktime(
+                (datetime.now()-timedelta(
+                    days=settings.LOOKBACK_UPDATE_DAYS-1
+                )).timetuple()
+            )
+        )
+        self.task = MirrorLeagues()
+
+    def test_detect_leagues(self):
+        self.assertEqual(self.task.find_leagues(), [self.league.steam_id])

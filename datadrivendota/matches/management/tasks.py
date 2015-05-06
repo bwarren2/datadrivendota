@@ -1,6 +1,10 @@
 from celery import Task, chain
 from time import time as now
 from copy import deepcopy
+from datetime import datetime, timedelta
+
+from django.db.models import Min, Max, Count
+from django.conf import settings
 from matches.models import (
     Match,
     LobbyType,
@@ -11,6 +15,7 @@ from matches.models import (
     AdditionalUnit,
     PickBan
 )
+from datadrivendota.utilities import error_email
 from players.models import Player
 from heroes.models import Ability, Hero
 from items.models import Item
@@ -288,6 +293,145 @@ def upload_match_summary(players, parent_match, refresh_records):
                     )[0],
                 }
                 AdditionalUnit.objects.get_or_create(**kwargs)
+
+
+class UpdateMatchValidity(Task):
+    """
+    Check for match validity and update accordingly.
+    """
+
+    def run(self):
+        self.update_validity()
+
+    def update_validity(self):
+        unprocessed = Match.objects.filter(validity=Match.UNPROCESSED)
+        self.process_matches(unprocessed)
+
+        a = datetime.utcnow()-timedelta(days=settings.LOOKBACK_UPDATE_DAYS)
+        unprocessed = Match.objects.filter(
+            start_time__gte=a.strftime('%s')
+        )
+        self.process_matches(unprocessed)
+
+    def process_matches(self, unprocessed):
+        if unprocessed.exists():
+            max_id = unprocessed.aggregate(Max('id'))['id__max']
+            min_id = unprocessed.aggregate(Min('id'))['id__min']
+
+            def tournament(unprocessed):
+
+                # Mainly 1v1 practices
+                unprocessed.filter(human_players__lt=10).update(
+                    validity=Match.UNCOUNTED
+                )
+
+                # Failure to load
+                unprocessed.filter(
+                    playermatchsummary__hero__name=''
+                ).update(
+                    validity=Match.UNCOUNTED
+                )
+
+                unprocessed.filter(
+                    playermatchsummary__hero__name='Blank'
+                ).update(
+                    validity=Match.UNCOUNTED
+                )
+
+                unprocessed.filter(
+                    human_players=10,
+                ).exclude(
+                    playermatchsummary__hero__name=''
+                ).update(validity=Match.LEGIT)
+
+            def too_short(unprocessed):
+                matches = unprocessed.filter(
+                    duration__lte=settings.MIN_MATCH_LENGTH
+                )
+                matches.update(validity=Match.UNCOUNTED)
+
+            # Games that do not have ten match summaries are uncounted.
+            def player_count(unprocessed):
+                ms = unprocessed.annotate(Count('playermatchsummary'))
+                ms = ms.filter(playermatchsummary__count__lt=10)
+                keys = ms.values_list('pk', flat=True)
+                ms = unprocessed.filter(pk__in=keys)
+                ms.update(validity=Match.UNCOUNTED)
+
+            # Games against bots do not count.
+            def human_players(unprocessed):
+                ms = unprocessed.filter(human_players__lt=10)
+                ms.update(validity=Match.UNCOUNTED)
+
+            # Games with leavers do not count.
+            def leavers(unprocessed):
+                ms = unprocessed.filter(
+                    playermatchsummary__leaver__steam_id__gt=1
+                )
+                ms.update(validity=Match.UNCOUNTED)
+
+            # Only traditional game modes count.
+            def game_mode_check(unprocessed):
+                ms = unprocessed.exclude(
+                    lobby_type__steam_id__in=[0, 2, 6, 7]
+                )
+                ms.update(validity=Match.UNCOUNTED)
+
+            # Everything we did not just exclude is valid.
+            def legitimize(unprocessed, max_id, min_id):
+                ms = Match.objects.exclude(
+                    id__gt=max_id,
+                    id__lt=min_id
+                )
+                ms = ms.filter(validity=Match.UNPROCESSED)
+                ms.update(validity=Match.LEGIT)
+
+            # Tournament matches get their own special handling.
+            tournament_matches = unprocessed.filter(skill=4)
+            tournament(tournament_matches)
+
+            unprocessed = unprocessed.exclude(skill=4)
+
+            # Mark bad matches
+            too_short(unprocessed)
+            player_count(unprocessed)
+            human_players(unprocessed)
+            leavers(unprocessed)
+            game_mode_check(unprocessed)
+
+            # Mark everything else as alright.
+            legitimize(unprocessed, max_id, min_id)
+        else:
+            pass  # We got passed an empty match set to process.
+
+
+class CheckMatchIntegrity(Task):
+    """
+    Complains if derived features of matches look wrong.
+    """
+
+    def run(self):
+        radiant_badness = PlayerMatchSummary.objects.filter(
+            match__radiant_win=True,
+            player_slot__lte=5,
+            is_win=False
+        )
+        if len(radiant_badness) != 0:
+            error_email(
+                'Database alert!',
+                'We have denormalization for radiant players and iswin=False'
+            )
+
+        dire_badness = PlayerMatchSummary.objects.filter(
+            match__radiant_win=True,
+            player_slot__gte=5,
+            is_win=True
+        )
+        if len(dire_badness) != 0:
+            (
+                'Database alert!',
+                'We have denormalization for dire players and iswin=True'
+            )
 
 
 class CycleApiCall(ApiFollower):

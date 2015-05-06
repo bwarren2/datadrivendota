@@ -1,62 +1,82 @@
-from celery import chain
+from celery import chain, Task
 from copy import deepcopy
 import logging
+from django.conf import settings
+from datadrivendota.utilities import error_email
 from datadrivendota.management.tasks import (
-    BaseTask,
     ValveApiCall,
+    ApiContext,
 )
+from heroes.models import Hero, Role, HeroDossier
 from matches.management.tasks import CycleApiCall
 
 logger = logging.getLogger(__name__)
 
 
-class MirrorHeroSkillData(BaseTask):
+class MirrorHeroSkillData(Task):
     """
-    Hets skill-level games for a given hero from Valve.
+    Gets skill-level games for a given hero from Valve.
     """
 
     def run(self):
+        heroes = Hero.objects.all()
+        for hero in heroes:
 
-        if self.valid_context():
+            for skill in [1, 2, 3]:
 
-            self.fill_default_context()
-
-            for skill in self.api_context.skill_levels:
-
-                self.api_context.skill = skill
+                c = ApiContext()
+                c.matches_requested = settings.HERO_SKILL_MATCH_COUNT
+                c.matches_desired = settings.HERO_SKILL_MATCH_COUNT
+                c.hero_id = hero.steam_id
+                c.deepcopy = False
+                c.skill = skill
                 vac = ValveApiCall()
                 rpr = CycleApiCall()
-                pass_context = deepcopy(self.api_context)
+                pass_context = deepcopy(c)
                 chain(vac.s(
                     mode='GetMatchHistory',
                     api_context=pass_context
                 ), rpr.s()).delay()
 
-            logger.info("Finished kicking off hero skill data")
-        else:
-            logger.error(
-                "Not allowed to have an account_id for this, and need a Hero."
+        logger.info("Finished kicking off hero skill data")
+
+
+class CheckHeroIntegrity(Task):
+    """
+    Checks that we have the things we expect to for hero-models.
+    """
+
+    def run(self):
+        thumbshot_badness = Role.objects.filter(
+            thumbshot=''
+        )
+        if len(thumbshot_badness) != 0:
+            roles = ", ".join([r.name for r in thumbshot_badness])
+            error_email(
+                'Database alert!',
+                'We have roles without thumbshots: {0}'.format(roles)
             )
-            raise ValueError(
-                "Not allowed to have an account_id for this, and need a Hero."
-                )
 
-    def valid_context(self):
-        if (
-            self.api_context.account_id is not None
-            or self.api_context.hero_id is None
-        ):
-            return False
-        else:
-            return True
+        h = Hero.objects.filter(thumbshot='').exclude(visible=False)
+        if len(h) != 0:
+            error_email(
+                'Database alert!',
+                'We have a hero without a thumbshot url'
+            )
 
-    def fill_default_context(self):
-        if self.api_context.matches_requested is None:
-            self.api_context.matches_requested = 100
+        h = Hero.objects.filter(name='').exclude(visible=False)
+        if len(h) != 0:
+            error_email(
+                'Database alert!',
+                'We have a hero without a name'
+            )
 
-        self.api_context.deepcopy = False
-
-        if self.api_context.matches_desired is None:
-            self.api_context.matches_desired = 100
-
-        self.api_context.skill_levels = [1, 2, 3]
+        heroes = Hero.objects.all().exclude(visible=False)
+        error_msg = ''
+        for hero in heroes:
+            try:
+                hero.herodossier
+            except HeroDossier.DoesNotExist:
+                error_msg += "%s is missing a dossier \n" % hero.name
+        if error_msg != '':
+            error_email('Database alert!', error_msg)

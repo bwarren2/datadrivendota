@@ -26,7 +26,7 @@ os.environ['http_proxy'] = ''
 logger = logging.getLogger(__name__)
 
 
-class MirrorTeams(Task):
+class MirrorRecentTeams(Task):
     """ Get new team data from matches. """
     def run(self):
         matches = Match.objects.filter(skill=4).exclude(radiant_team=None)\
@@ -49,7 +49,9 @@ class MirrorTeams(Task):
 
 
 class MirrorTeamDetails(Task):
-
+    """
+    Update a list of given teams.
+    """
     def run(self, teams=None):
         if teams is None:
             teams = [t.steam_id for t in Team.objects.filter(name=None)]
@@ -94,16 +96,16 @@ class UpdateTeam(ApiFollower):
                     team.save()
             except Team.DoesNotExist:
                 team = Team.objects.create(
-                    name=team['name'],
-                    tag=team['tag'],
-                    created=team['time_created'],
-                    logo_sponsor=team['logo_sponsor'],
-                    logo=team['logo'],
-                    country_code=team['country_code'],
-                    url=team['url'],
-                    games_played_with_current_roster=team[
-                        'games_played_with_current_roster'
-                    ],
+                        name=team['name'],
+                        tag=team['tag'],
+                        created=team['time_created'],
+                        logo_sponsor=team['logo_sponsor'],
+                        logo=team['logo'],
+                        country_code=team['country_code'],
+                        url=team['url'],
+                        games_played_with_current_roster=team[
+                            'games_played_with_current_roster'
+                        ],
                     )
                 map_team_players(team, team_data)
                 if 'rating' in team.iterkeys():
