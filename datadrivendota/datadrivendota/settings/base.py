@@ -523,8 +523,6 @@ SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = [
 SUBSCRIPTION_REQUIRED_REDIRECT = 'payments:payments_subscribe'
 ########## END STRIPE CONFIGURATION
 
-VERBOSE_PROFILING = getenv('VERBOSE_PROFILING') == 'True'
-
 TI4_TEAMS = [
     1333179,
     999689,
@@ -543,8 +541,6 @@ TI4_TEAMS = [
     1642908,
 ]
 
-VALVE_CDN_PATH = 'http://cdn.dota2.com/apps/570/'
-UPDATE_LAG_UTC = 60*60*24*3  # 3 Days
 
 ########## START REST CONFIGURATION
 REST_FRAMEWORK = {
@@ -585,4 +581,6 @@ KEEN_WRITE_KEY = getenv('KEEN_WRITE_KEY')
 LOOKBACK_UPDATE_DAYS = 3  # The window we consider for re-checking things.
 HERO_SKILL_MATCH_COUNT = 3  # How many matches to add per hero skill level
 CLIENT_MATCH_COUNT = 3  # How many client matches to get each pull
+VALVE_CDN_PATH = 'http://cdn.dota2.com/apps/570/'
+UPDATE_LAG_UTC = 60*60*24*3  # 3 Days
 ### End project specific constants used in tasks

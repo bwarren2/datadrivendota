@@ -1,9 +1,9 @@
 import os
 import logging
 import json
-import urllib2
+import requests
 from collections import defaultdict
-from uuid import uuid4
+from io import BytesIO
 from time import mktime
 from datetime import datetime, timedelta
 from celery import Task, chain
@@ -413,7 +413,7 @@ class UpdateLeagues(Task):
     """
     Reflects the current item schema data for a league and pings for a logo
     """
-    def run(self, leagues):
+    def run(self, leagues, matches=10):
         """
         Presumes iterable of steam ids, hits redis cache of item schema,
         pings valve per league for the item image
@@ -447,8 +447,8 @@ class UpdateLeagues(Task):
                 c = ApiContext()
                 c.league_id = league.steam_id
                 c.tournament_games_only = True
-                c.matches_requested = 25
-                c.matches_desired = 100
+                c.matches_requested = matches
+                c.matches_desired = matches
                 c.skill = 4
                 vac = ValveApiCall()
                 rpr = CycleApiCall()
@@ -472,14 +472,51 @@ class UpdateLeagueLogo(ApiFollower):
             urldata['result']['path']
         )
 
-        imgdata = urllib2.urlopen(url, timeout=5)
-
-        with open('%s.png' % str(uuid4()), 'w+') as f:
-            f.write(imgdata.read())
+        resp = requests.get(url)
+        if resp.status_code == 200:
+            buff = BytesIO(resp.content)
+            _ = buff.seek(0)  # Stop random printing.
+            #  If we wanted to, we would store the league logo data here.
+            #  We are currently working out whether to hotlink to Valve.
 
         league.valve_cdn_image = url
         league.save()
-        os.remove(f.name)
+
+
+class MirrorLeagues(Task):
+    """
+    Get the big list of leagues and reflect it
+    """
+    def run(self):
+        logger.info("Reflecting Valve's view of upcoming matches with local")
+        context = ApiContext()
+        vac = ValveApiCall()
+        cl = CreateLeagues()
+        c = chain(
+            vac.s(api_context=context, mode='GetLeagueListing'),
+            cl.s()
+        )
+        c.delay()
+
+
+class CreateLeagues(ApiFollower):
+    """
+    Takes all the results from a league list call and inserts them.
+    """
+    def run(self, urldata):
+        league_list = []
+        for league in self.result['leagues']:
+            League.objects.update_or_create(
+                steam_id=league['leagueid'],
+                defaults={
+                    'name': league['name'],
+                    'description': league['description'],
+                    'tournament_url': league['tournament_url'],
+                    'item_def': league['itemdef'],
+                }
+            )
+            league_list.append(league['leagueid'])
+        UpdateLeagues().s().delay(leagues=league_list, matches=1)
 
 
 class MirrorRecentLeagues(Task):
@@ -501,42 +538,29 @@ class MirrorRecentLeagues(Task):
 
         # The .distinct() method fails with sqlite, so in the interests of
         # testing we do this goofy list(set()) business.
-        return list(
-            set(
-                Match.objects.filter(
-                    start_time__gte=mktime(
-                        (
-                            datetime.now()-timedelta(
-                                days=settings.LOOKBACK_UPDATE_DAYS
-                                )
-                        ).timetuple()
-                    )
+        recent_games = set(
+            Match.objects.filter(
+                start_time__gte=mktime(
+                    (
+                        datetime.now()-timedelta(
+                            days=settings.LOOKBACK_UPDATE_DAYS
+                            )
+                    ).timetuple()
                 )
-                .exclude(league=None)
-                .values_list('league__steam_id', flat=True)
             )
+            .exclude(league=None)
+            .values_list('league__steam_id', flat=True)
         )
 
-
-# Deprecations start here.
-
-class CreateLeagues(ApiFollower):
-    """
-    DEPRECATED
-
-    Takes all the results from a league list call and inserts them.
-    """
-    def run(self, urldata):
-        for league in self.result['leagues']:
-            l, created = League.objects.get_or_create(
-                steam_id=league['leagueid']
-                )
-            l.update(
-                name=league['name'],
-                description=league['description'],
-                tournament_url=league['tournament_url'],
-                item_def=league['itemdef'],
-            )
+        recent_schedule = set(
+            ScheduledMatch.objects.all()
+            .values_list('league__steam_id', flat=True)
+        )
+        recent_games.update(recent_schedule)
+        if recent_games is None:
+            return []
+        else:
+            return recent_games
 
 
 class AcquireHiddenLeagueGames(Task):
@@ -583,5 +607,3 @@ class RetrieveHiddenGameResults(ApiFollower):
         matches = [match['match_id'] for match in urldata['result']['matches']]
         am = MirrorMatches()
         am.delay(matches=matches, skill=4)
-
-

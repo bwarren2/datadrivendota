@@ -24,4 +24,3 @@ DATABASES = {
     },
 }
 
-VERBOSE_PROFILING = False

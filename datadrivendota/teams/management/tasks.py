@@ -1,9 +1,4 @@
-import urllib2
-from datetime import datetime
-from uuid import uuid4
 from celery import Task, chain
-from django.core.files import File
-from django.utils.text import slugify
 from matches.models import (
     Match,
 )
@@ -37,6 +32,7 @@ class MirrorRecentTeams(Task):
             .select_related('dire_team__steam_id')
         teams.extend([m.dire_team.steam_id for m in matches])
         teams = list(set(teams))
+        logger.info("Updating {0} teams: {1}".format(len(teams), teams))
         for t in teams:
             c = ApiContext()
             c.refresh_records = True

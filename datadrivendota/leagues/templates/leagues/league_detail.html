@@ -29,6 +29,7 @@
     <div class='row' style='padding-top:15px'>
         <div class='col-md-8'>
             {% for match in match_list %}
+            <h2><a href="/matches/{{match.steam_id}}">Match: {{match.steam_id}}</a></h2>
               {% include "matches/_match_card.html" %}
             {% endfor %}
         </div>
@@ -41,15 +42,6 @@
               </div>
               <div class='col-md-6'>
                 <button id='hide-score' type="button" class="btn btn-primary btn-lg btn-block">Hide Scores</button>
-              </div>
-            </div>
-
-            <div class='row'>
-              <div class='col-md-6'>
-                <button id='score-format-raw' type="button" class="btn btn-primary btn-lg btn-block">K/D/A</button>
-              </div>
-              <div class='col-md-6'>
-                <button id='score-format-kda2' type="button" class="btn btn-primary btn-lg btn-block">K-D+A/2</button>
               </div>
             </div>
 

@@ -17,16 +17,22 @@
     - [Superuser](#superuser)
     - [Client Data](#client-data)
     - [API Data](#api-data)
-      - [One more thing](#one-more-thing)
-  - [Push workflow](#push-workflow)
+  - [Data Sources](#data-sources)
+- [How data gets in](#how-data-gets-in)
+        - [Heroes](#heroes)
+        - [Players](#players)
+        - [Teams](#teams)
+        - [Leagues](#leagues)
+        - [Matches](#matches)
+- [Workflow Support](#workflow-support)
 - [Todos](#todos)
   - [Static assets](#static-assets)
       - [Current workaround](#current-workaround)
   - [Accounts refactor](#accounts-refactor)
   - [Charts refactor](#charts-refactor)
   - [Animations import](#animations-import)
+  - [Error Propagation in Tasks](#error-propagation-in-tasks)
     - [Current workaround](#current-workaround-1)
-  - [Refactor man commands into celerybeat](#refactor-man-commands-into-celerybeat)
 - [Footnotes](#footnotes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -84,13 +90,13 @@ Implementationally, this has a few implications:
 
  1. The uniqueness criterion we get is a steam_id (the number valve uses to identify various objects).  Everything else might be blank.
  2. We have some tasks we want to run when they can, like the API data access.  We use celery for this.
- 3. We have some other tasks that we want to run regularly (with little delay), such as data integrity checks.  Ideally, we have fast-running queue that is always close enough to empty that we can push these jobs with celery-beat.  Currently, these rely on the heroku scheduler and man commands.  (Fixing this is a todo.)
+ 3. We use celery tasks to regularly check in on the data, ensure its integrity (thus the 'integrity' queue), and call new tasks as needed.
 
 Keeping this convergence theme in mind will help in understanding why the code works the way it does.
 
 # Setup
 We need to set up a few backing services:
- * a [RabbitMQ](https://www.rabbitmq.com/install-debian.html) instance (for celery tasks)
+ * A [RabbitMQ](https://www.rabbitmq.com/install-debian.html) instance (for celery tasks)
  * A [Redis](http://redis.io/topics/quickstart) instance for short-term persistence (like sleeving API responses)
  * A [postgres](https://wiki.postgresql.org/wiki/Detailed_installation_guides) instance with database for long-term persistence
 
@@ -184,7 +190,7 @@ AWS_ACCESS_KEY_ID=              <redacted>
 AWS_STORAGE_BUCKET_NAME=        <redacted>
 ```
 
-Storing settings in a repo is a bad policy, so talk to ben about getting unredacted copy.  Putting these in the postactivate of your virtualenv is recommended.
+Storing settings in a repo is a bad policy, so talk to Ben about getting unredacted copy.  Putting these in the postactivate of your virtualenv is recommended.
 
 ## Initial Data Acquisition
 
@@ -226,7 +232,7 @@ To put a task in the queue, start a shell (`fab shell`) and start by making a pl
 
 ```
 from players.models import Player
-p, _ = Player.objects.get_or_create(steam_id=66289584, updated=True)
+p, _ = Player.objects.update_or_create(steam_id=66289584, defaults={'updated': True})
 # updated is a flag for tasks to know which players are intended to be in repeat scrapes.
 
 # Then import my matches
@@ -242,18 +248,96 @@ MirrorPlayerData().s().delay(api_context=c)
 
 If you look back into the worker tab, it should be happily running along.  If you want to do some basic monitoring of the celery worker itself, try `flower  --broker=<your amqp url, ex $CLOUDAMQP_URL>`.
 
-Starting a web process (`python datadrivendota/manage.py runserver`) and hitting the player page for my id (http://127.0.0.1:8000/players/66289584/), my games should show up!  Click one of the hero faces to see that game's detail.
+Starting a web process (`fab devserver`) and hitting the player page for my id ([http://127.0.0.1:8000/players/66289584/](http://127.0.0.1:8000/players/66289584/)), my games should show up!  Click one of the hero faces to see that game's detail.
 
-Note: you might see a bunch of files named like '1d_e1c3be95-e445-44b2-853c-ca044364b509.json' show up.  These are byproducts of a bad implementation of json serving, which is marked for fixing.
+## Data Sources
 
-#### One more thing
+How exactly each type of data gets into our system is a bit complex, because there are many different avenues and the system is only _eventually_ convergent.
 
-Some parts of the site want to presume the existence of a player.  We can do this with a data migration, but for now try running the import above with an account id of 70388657.
+Getting initial data in this eventually-convergent system can be tricky, because some frequent tasks expect there to have been a run of long running tasks, and the long running tasks may expect that the fast tasks have run, etc.  But this is not a deadlock!  Each cycle through the task list makes progress, so the question is how to conveniently run a few iterations.
 
-Currently, the game mode switch is broken.  Fuck.
+For now, there is a process  for initial data which takes about 5-10 minutes.  Here's a list of tasks.  Run the first block in a shell with an active worker, wait for the queues to clear (`fab rabbit_list`) or for the workers to stop actively processing tasks (`flower`, connect to [127.0.0.1:5555/monitor](127.0.0.1:5555/monitor)) whichever comes first, and then repeat with the next block.  Some api calls may fail and go into a long retry loop; if there are tasks in the queue but the workers are not working, you can probably flush the queues (`fab rabbit_reset`).  Allowing better error propagation in tasks is a todo.
 
-## Push workflow
 
+```
+from heroes.management.tasks import CheckHeroIntegrity as tsk
+tsk().s().delay()
+
+from items.management.tasks import MirrorItemSchema as tsk
+tsk().s().delay()
+
+from leagues.management.tasks import MirrorLiveGames as tsk
+tsk().s().delay()
+
+from leagues.management.tasks import MirrorLeagueSchedule as tsk
+tsk().s().delay()
+
+from leagues.management.tasks import MirrorRecentLeagues as tsk
+tsk().s().delay()
+
+from teams.management.tasks import MirrorRecentTeams as tsk
+tsk().s().delay()
+
+from matches.management.tasks import CheckMatchIntegrity as tsk
+tsk().s().delay()
+
+
+from matches.management.tasks import UpdateMatchValidity as tsk
+tsk().s().delay()
+from players.management.tasks import MirrorClientPersonas as tsk
+tsk().s().delay()
+from players.management.tasks import MirrorClientMatches as tsk
+tsk().s().delay()
+
+
+from players.management.tasks import MirrorProNames as tsk
+tsk().s().delay()
+```
+
+Now, you should be able to see:
+ * leagues in [127.0.0.1:8000/leagues](127.0.0.1:8000/leagues), and inspect their games.
+ * teams in [127.0.0.1:8000/teams](127.0.0.1:8000/teams), and inspect their rosters.
+ * pro players in [127.0.0.1:8000/players](127.0.0.1:8000/players).
+ * heroes in [127.0.0.1:8000/heroes](127.0.0.1:8000/heroes).
+
+That's it!
+
+# How data gets in
+
+Eventually-convergent systems can be hard to understand, because for a given kind of data it can be unclear what necessary chain of conditions will be advanced by which tasks to ensure a pipeline of new data.  So let's list it out.  Keep in mind that it is possible for elements to enter the system with only a steam_id if they are needed to support other data, for example a hero being created to import a match (before we get the data to make the hero ourselves).
+
+##### Heroes
+
+These come from data files in the game client itself and are manually extracted to json.  We then run management commands (or the fabric wrapper to run them all) to push their statistics to the db.
+
+##### Players
+
+We automatically poll the API regularly for any player that is a client.  Creating a player with `updated=True` sets that player up to always have their matches stream in.
+
+##### Teams
+
+We automatically poll for league games, and get team stubs to support that import.  There is a recency task that takes all the teams that played recently (or are on the upcoming schedule) and looks for their other matches.
+
+##### Leagues
+
+We have a periodic task that imports stubs for all the leagues, (lacking logos etc,) and pulls 1 match for them.  The more-frequent update task looks for any recent games and sees if there are more.  (This avoids reimporting a ton of games for every league all the time.)
+
+##### Matches
+
+This one is complicated, because matches are kind of an apex data object: they incorporate teams, and players, and heroes, and items, etc.
+
+Matches can be classified a bit.  Matches with a skill level ('skill' between 1 and 3) for heroes come from the hero skill data task (infrequently polling).  Tournament grade matches (skill 4) come from the leagues updating.  Everything else comes from tracking players.  In short, there is no particular "get da matches" process (aside from manual requests, which are available in all things).
+
+
+# Workflow Support
+
+With a populated db, here are the possible support processes to have up:
+
+ * Server (`fab devserver`)  # `foreman start web` does not server statics well locally
+ * Celery Worker (`foreman start worker`)  #
+ * Celery beat Worker (`foreman start beatnik_worker`)  # Useful for work that touches the streaming league task, for example.
+ * Celery Monitor  (`flower`)  # Sets up on 127.0.0.1:5555 by default
+ * Grunt Less Compilation  (`grunt`)  # For monkeying with the styles
 
 #Todos
 
@@ -269,9 +353,11 @@ The old model of accounts was useful for a closed-off site, but needs to be refa
 ## Charts refactor
 The existing model of chart construction is really shitty and should be replaced with REST+D3 wrappers.
 
-
 ## Animations import
 Importing cast and attack animations is currently a manual hit to a foreign service, combined with some regexing to reformat.  This is annoying, but is only necessary on patch update.
+
+## Error Propagation in Tasks
+Because so many processes involve chaining through an API call, there is lots of sensitivity to the API call working.  Unfortunately, it sometimes does not, and we don't propagate errors well.  In order to avoid api calls going into a long retry loop, eventually failing, and killing the chain they were a part of, we need a convention for how errors propagate and are handled.
 
 
 ### Current workaround

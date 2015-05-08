@@ -2,6 +2,10 @@ from fabric.api import local
 
 
 def test(suite="all"):
+    """
+    The core test command.
+    """
+
     if suite == 'all':
         local(
             'python -W ignore datadrivendota/manage.py  test integration_tests'
@@ -23,11 +27,18 @@ def test(suite="all"):
 
 
 def push():
+    """
+    Move local code to github and production.  No statics.
+    """
+
     local('git push origin master')
     local('git push heroku master')
 
 
 def shell(setting="local"):
+    """
+    Open a local shell for CLI access.
+    """
     local(
         (
             'python datadrivendota/manage.py shell '
@@ -36,27 +47,51 @@ def shell(setting="local"):
     )
 
 
+def devserver(setting="local"):
+    """
+    Start a local server process for testing.
+    """
+    local(
+        (
+            'python datadrivendota/manage.py runserver '
+            '--settings=datadrivendota.settings.{0}'
+        ).format(setting)
+    )
+
+
 def deploy():
+    """
+    Push to github, statics to s3, push to production
+    """
+
     local('git push origin master')
     collect_static()
     local('git push heroku master')
 
 
-def hp():
-    local('git push heroku master')
-    local(collect_static())
-    local(heroku_migrate())
-
-
 def rabbit_reset():
-    return local('sh convenience\ files/rabbit_reset')
+    """
+    Flush the rabbitMQ instance
+    """
+    local('sudo rabbitmqctl stop_app')
+    local('sudo rabbitmqctl reset')
+    local('sudo rabbitmqctl start_app')
 
 
 def rabbit_list():
-    return local('sudo rabbitmqctl list_queues')
+    """
+    Show the message count in each rabbitmq queue.
+    """
+
+    local('sudo rabbitmqctl list_queues')
 
 
 def heroku_migrate():
+    """
+    DEPRECATED
+    Not really used.  Reflect migrations on heroku.
+    """
+
     return local(
         "heroku run python datadrivendota/manage.py migrate --no-initial-data"
     )
@@ -67,6 +102,9 @@ def migrate():
 
 
 def collect_static():
+    """
+    Push static files to s3.
+    """
     command = (
         'python datadrivendota/manage.py collectstatic'
         ' -i bootstrap'
@@ -76,22 +114,10 @@ def collect_static():
     local(command)
 
 
-def scrape_valve_heroes():
-    return local('python datadrivendota/manage.py scrapeheroes')
-
-
-def scrape_hero_faces():
-    return local('python datadrivendota/manage.py scrapeloreandmugshot')
-
-
-def scrape_dossiers():
-    return local(
-        'python datadrivendota/manage.py '
-        'importHeroStats --file hero_stats.txt'
-    )
-
-
 def json_populate():
+    """
+    Reflect the game client data files in the db.
+    """
     local('python datadrivendota/manage.py  scrapeheroes')
     local('python datadrivendota/manage.py  scrapeloreandmugshot')
     local('python datadrivendota/manage.py  importHeroStats')
@@ -101,6 +127,9 @@ def json_populate():
 
 
 def generate_heroku_static_pages():
+    """
+    Create error pages.
+    """
     local(
         "python datadrivendota/manage.py "
         "generate_static_error_pages "

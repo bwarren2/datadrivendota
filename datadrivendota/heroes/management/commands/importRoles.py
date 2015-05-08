@@ -1,6 +1,5 @@
-from uuid import uuid4
-from urllib2 import urlopen, HTTPError
-from django.utils.text import slugify
+import requests
+from io import BytesIO
 from django.core.management.base import BaseCommand
 from django.core.files import File
 
@@ -33,14 +32,16 @@ class Command(BaseCommand):
                 'https://s3.amazonaws.com/datadrivendota/pips/{suffix}'.format(
                     suffix=matchingDict[role.name])
             )
-            try:
-                imgdata = urlopen(url)
-                with open('%s.png' % str(uuid4()), 'w+') as f:
-                    f.write(imgdata.read())
+            resp = requests.get(url)
+
+            if resp.status_code == 200:
+                buff = BytesIO(resp.content)
+                _ = buff.seek(0)  # Avoid printing random numbers.
                 filename = matchingDict[role.name]
-                role.thumbshot.save(filename, File(open(f.name)))
-            except HTTPError, err:
+                role.thumbshot.save(filename, File(buff))
+
+            else:
                 role.thumbshot = None
-                print "No thumbshot for %s!  Error %s" % (role.name, err)
+                print "No thumbshot for %s!" % (role.name)
 
             role.save()

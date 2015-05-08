@@ -14,6 +14,14 @@ class Config(object):
     BROKER_CONNECTION_TIMEOUT = int(getenv('BROKER_CONNECTION_TIMEOUT'))
     BROKER_CONNECTION_RETRY = True
     CELERYD_CONCURRENCY = int(getenv('CELERYD_CONCURRENCY'))
+
+    # Note: Pickle is a security concern in celery.
+    # But, when we are passing around API context objects,
+    # it is the only one that works.
+    CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+    CELERY_TASK_SERIALIZER = 'pickle'
+    CELERY_RESULT_SERIALIZER = 'pickle'
+
     # List of modules to import when celery starts.
     CELERY_IMPORTS = (
         "matches.management.tasks",
@@ -148,6 +156,10 @@ class Config(object):
             'exchange': 'integrity',
             'routing_key': 'integrity'
         },
+        'matches.management.tasks.CheckMatchIntegrity': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
+        },
         'teams.management.tasks.MirrorRecentTeams': {
             'exchange': 'integrity',
             'routing_key': 'integrity'
@@ -175,6 +187,10 @@ class Config(object):
         'leagues.management.tasks.CreateLeagues': {
             'exchange': 'db',
             'routing_key': 'db'
+        },
+        'leagues.management.tasks.MirrorLeagues': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
         },
         'leagues.management.tasks.UpdateLeagueLogos': {
             'exchange': 'valve_api',
@@ -274,6 +290,11 @@ class Config(object):
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
         },
+        'matches.management.tasks.CheckMatchIntegrity': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
         'teams.management.tasks.MirrorRecentTeams': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
@@ -301,6 +322,11 @@ class Config(object):
             'trail': False,
         },
         'leagues.management.tasks.CreateLeagues': {
+            'acks_late': True,
+            'max_retries': TASK_MAX_RETRIES,
+            'trail': False,
+        },
+        'leagues.management.tasks.MirrorLeagues': {
             'acks_late': True,
             'max_retries': TASK_MAX_RETRIES,
             'trail': False,
@@ -349,6 +375,10 @@ class Config(object):
         },
         'reflect-hero-skill-weekly': {
             'task': 'heroes.management.tasks.MirrorHeroSkillData',
+            'schedule': timedelta(weeks=1),
+        },
+        'reflect-leagues-daily': {
+            'task': 'leagues.management.tasks.MirrorLeagues',
             'schedule': timedelta(weeks=1),
         },
         # Daily

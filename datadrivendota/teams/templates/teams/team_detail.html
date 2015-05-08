@@ -48,19 +48,12 @@
             {% endif %}
 
 
-        {% comment %}
-
-       <h6>Wins: {{stats.wins}}</h6>
-      <h6>Losses: {{stats.losses}}</h6>
-      <h6>Winrate: {{stats.winrate}}%</h6>
-      <h6>Total Games: {{stats.total}}</h6>
-      <h6>Steam ID: {{ player.steam_id }}</h6>
-      {% endcomment %}
     </div>
     </div>
     <div class='row' style='padding-top:15px'>
         <div class='col-md-8'>
             {% for match in match_list %}
+              <h2><a href="/matches/{{match.steam_id}}">Match: {{match.steam_id}}</a></h2>
               {% include "matches/_match_card.html" %}
             {% endfor %}
         </div>

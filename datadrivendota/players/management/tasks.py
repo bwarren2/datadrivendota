@@ -193,7 +193,6 @@ class MirrorClientMatches(Task):
             context.start_scrape_time = now()
             context.last_scrape_time = user.last_scrape_time
 
-            logger.info(context)
             vac = ValveApiCall()
             rpr = CycleApiCall()
             chain(vac.s(

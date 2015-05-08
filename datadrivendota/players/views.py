@@ -33,10 +33,8 @@ class FollowedPlayerIndexView(SubscriberRequiredMixin, ListView):
 
 
 class ProIndexView(ListView):
-    # The Ti4 manager breaks things when restoring from a blank DB
-    # So we refactor.
     def get_queryset(self):
-        return Player.TI4.all()
+        return Player.objects.exclude(pro_name=None)
 
 
 class PlayerDetailView(DetailView):

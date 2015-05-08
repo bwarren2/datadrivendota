@@ -28,10 +28,6 @@ class LandingView(TemplateView):
     template_name = 'home.html'
 
     def get_context_data(self, **kwargs):
-        p = Player.objects.get(steam_id=70388657)
-        h = Hero.objects.get(name='Slark')
-        kwargs['chart_player'] = p
-        kwargs['chart_hero'] = h
 
         # Log the laod with keen
         keen_client.add_event(
