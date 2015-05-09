@@ -95,6 +95,9 @@ Implementationally, this has a few implications:
 Keeping this convergence theme in mind will help in understanding why the code works the way it does.
 
 # Setup
+
+(Make a venv, pip install -r requirements/local.txt, etc.)
+
 We need to set up a few backing services:
  * A [RabbitMQ](https://www.rabbitmq.com/install-debian.html) instance (for celery tasks)
  * A [Redis](http://redis.io/topics/quickstart) instance for short-term persistence (like sleeving API responses)
