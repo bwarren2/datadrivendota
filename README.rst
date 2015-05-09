@@ -298,6 +298,8 @@ from players.management.tasks import MirrorProNames as tsk
 tsk().s().delay()
 ```
 
+The last task does not need to run all the way throufh; you should see results if any of its subtasks have finished.
+
 Now, you should be able to see:
  * leagues in [127.0.0.1:8000/leagues](127.0.0.1:8000/leagues), and inspect their games.
  * teams in [127.0.0.1:8000/teams](127.0.0.1:8000/teams), and inspect their rosters.
