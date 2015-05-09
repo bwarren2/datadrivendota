@@ -207,24 +207,3 @@ class TestUrlconf(TestCase):
         resp = c.get('/leagues/live-game-detail/1/')
         self.assertEqual(resp.status_code, 200)
         # The magic is in the template, so any number is OK
-
-
-class TestUpdateLeagues(TestCase):
-
-    @classmethod
-    def setUpClass(self):
-        super(TestUpdateLeagues, self).setUpClass()
-        self.league = mommy.make_recipe('leagues.league')
-        self.match = mommy.make_recipe(
-            'matches.match',
-            league=self.league,
-            start_time=mktime(
-                (datetime.now()-timedelta(
-                    days=settings.LOOKBACK_UPDATE_DAYS-1
-                )).timetuple()
-            )
-        )
-        self.task = MirrorLeagues()
-
-    def test_detect_leagues(self):
-        self.assertEqual(self.task.find_leagues(), [self.league.steam_id])

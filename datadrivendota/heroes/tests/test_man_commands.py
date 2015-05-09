@@ -12,12 +12,6 @@ from .json_samples import (
 
 class TestAbilityImport(TestCase):
 
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def test_dict_merge(self):
         lore_dict = ability_text
         number_dict = ability_numbers
@@ -27,12 +21,17 @@ class TestAbilityImport(TestCase):
 
 class TestHeroImport(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
+        super(self, TestHeroImport).setUpClass()     # Call parent first
         self.json_data = heroes
         self.command = hero_task
+        Hero.objects.all().delete()
 
-    def tearDown(self):
-        pass
+    @classmethod
+    def tearDownClass(self):
+        Hero.objects.all().delete()
+        super(self, TestHeroImport).tearDownClass()  # Call parent last
 
     def test_hero_create(self):
         hero_task().create_heroes(self.json_data)

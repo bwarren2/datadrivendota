@@ -130,6 +130,10 @@ The first two will make progress before erroring, and the last will run to compl
 
 Now we have a database, but it is (mostly) empty.  We'll fill it during Initial Data Acquisition later; existing data migrations only add a couple perms and a sample player.
 
+## Grunt
+
+We use grunt for local less compilation.  Install with `npm install`.
+
 ## Necessary environment variables
 
 Under 12 Factor, resources are connected by environment URIs.  DDD expects a whole bunch of these:

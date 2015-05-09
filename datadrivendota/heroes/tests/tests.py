@@ -47,8 +47,16 @@ class TestMommyRecipes(TestCase):
 
 class TestHeroManagers(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
+        super(self, TestHeroManagers).setUpClass()     # Call parent first
+        Hero.objects.all().delete()
         self.heroes = mommy.make_recipe('heroes.hero', _quantity=10)
+
+    @classmethod
+    def tearDownClass(self):
+        Hero.objects.all().delete()
+        super(self, TestHeroManagers).tearDownClass()  # Call parent last
 
     def test_all(self):
         self.assertEqual(Hero.objects.all().count(), 10)
