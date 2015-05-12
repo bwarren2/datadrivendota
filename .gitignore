@@ -27,11 +27,12 @@ datadrivendota/static/temp
 # Twelve-factor secret settings in the environment:
 .env
 
-# Byproducts of LESS compilation:
-datadrivendota/static/css/*.css
-
 #Ignore artifacts of local image construction
 1d_*
+
+#Store less, not CSS
+datadrivendota/static/css/*.css
+
 
 #Rabbit reset bash script
 rabbit_reset

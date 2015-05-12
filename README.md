@@ -96,7 +96,16 @@ Keeping this convergence theme in mind will help in understanding why the code w
 
 # Setup
 
-(Make a venv, pip install -r requirements/local.txt, etc.)
+Make a new virtualenv with
+
+`mkvirtualenv <name>`
+
+then git clone the repo to your favorite directory with
+
+`git clone --recursive https://github.com/bwarren2/datadrivendota`
+
+(This will also clone the submodules we use.)  Then install the requirements with `pip install -r requirements/local.txt` from inside repo_root.
+
 
 We need to set up a few backing services:
  * A [RabbitMQ](https://www.rabbitmq.com/install-debian.html) instance (for celery tasks)
