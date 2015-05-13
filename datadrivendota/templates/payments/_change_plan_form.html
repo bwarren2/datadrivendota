@@ -13,7 +13,7 @@
     {% if error %}
         <div class="alert alert-error">{{ error }}</div>
     {% endif %}
-    <form action="{% url 'payments:payments_ajax_change_plan' %}" method="POST" class="form ajax" data-replace-closest=".change-subscription">
+    <form action="{% url 'payments_ajax_change_plan' %}" method="POST" class="form ajax" data-replace-closest=".change-subscription">
         {% csrf_token %}
         {{ form|as_bootstrap }}
         <button type="submit" class="btn btn-primary">Change</button>

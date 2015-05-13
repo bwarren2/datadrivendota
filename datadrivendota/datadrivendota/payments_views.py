@@ -1,3 +1,6 @@
+"""Attempting to override the base payments views."""
+
+
 import json
 
 from django.conf import settings
@@ -23,6 +26,8 @@ from .models import (
 
 
 class PaymentsContextMixin(object):
+
+    """Writing a test docstring."""
 
     def get_context_data(self, **kwargs):
         context = super(PaymentsContextMixin, self).get_context_data(**kwargs)

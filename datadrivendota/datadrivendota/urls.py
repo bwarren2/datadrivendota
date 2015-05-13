@@ -1,3 +1,4 @@
+"""The core urlconf."""
 from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
 from django.conf import settings
@@ -42,7 +43,7 @@ urlpatterns = patterns(
     url(r'^health/', include('health.urls', namespace='health')),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
     url(r'^upgrade/$', views.upgrade, name='upgrade'),
-    url(r'^payments/', include("payments.urls", namespace='payments')),
+    url(r'^payments/', include("payments.urls")),
     url(r'^blog/', include('blog.urls', namespace='blog')),
     url(r'^rest-api/', include(router.urls, namespace='rest-api')),
     url(

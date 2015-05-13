@@ -6,14 +6,12 @@
 
 {% block extra_nav %}
   {% with request.user.customer.current_subscription as subscription %}
-      {% if subscription and subscription.status != 'active'  %}
       <ul class='nav nav-tabs'>
-        <li class="{% active 'payments:payments_change_card' %}"><a href="{% url 'payments:payments_change_card' %}">Change Card</a></li>
-        <li class="{% active 'payments:payments_change_plan' %}"><a href="{% url 'payments:payments_change_plan' %}">Change Plan</a></li>
-        <li class="{% active 'payments:payments_history' %}"><a href="{% url 'payments:payments_history' %}">Payment History</a></li>
-        <li class="{% active 'payments:payments_cancel' %}"><a href="{% url 'payments:payments_cancel' %}">Cancel Subscription</a></li>
+        <li class="{% active 'payments_change_card' %}"><a href="{% url 'payments_change_card' %}">Change Card</a></li>
+        <li class="{% active 'payments_change_plan' %}"><a href="{% url 'payments_change_plan' %}">Change Plan</a></li>
+        <li class="{% active 'payments_history' %}"><a href="{% url 'payments_history' %}">Payment History</a></li>
+        <li class="{% active 'payments_cancel' %}"><a href="{% url 'payments_cancel' %}">Cancel Subscription</a></li>
       </ul>
-    {% endif %}
   {% endwith %}
 {% endblock extra_nav %}
 

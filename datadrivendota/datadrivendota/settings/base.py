@@ -8,7 +8,7 @@ from sys import path
 
 import dj_database_url
 
-#Celery config is in the celery app
+# Celery config is in the celery app
 
 # Name and email addresses of recipients
 ADMINS = (
@@ -24,7 +24,7 @@ EMAIL_HOST_PASSWORD = getenv('MAILGUN_SMTP_PASSWORD')
 INVOICE_FROM_EMAIL = "ben@datadrivendota.com"
 ERROR_RECIPIENT_EMAIL = "ben@datadrivendota.com"
 
-########## PATH CONFIGURATION
+# PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
 DJANGO_ROOT = dirname(dirname(abspath(__file__)))
 
@@ -37,37 +37,37 @@ SITE_NAME = basename(DJANGO_ROOT)
 # Add our project to our pythonpath, this way we don't need to type our project
 # name in our dotted import paths:
 path.append(DJANGO_ROOT)
-########## END PATH CONFIGURATION
+# END PATH CONFIGURATION
 
 
-########## DEBUG CONFIGURATION
+# DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = getenv('DEBUG', False) == 'True'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
 TEMPLATE_DEBUG = DEBUG
-########## END DEBUG CONFIGURATION
+# END DEBUG CONFIGURATION
 
 
-########## MANAGER CONFIGURATION
+# MANAGER CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
-########## END MANAGER CONFIGURATION
+# END MANAGER CONFIGURATION
 
 
-########## DATABASE CONFIGURATION
+# DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 # Database settings for Heroku
 DATABASES = {}
 DATABASES['default'] = dj_database_url.config(
     default="postgres://localhost/datadrivendota"
 )
-########## END DATABASE CONFIGURATION
+# END DATABASE CONFIGURATION
 
 
-########## GENERAL CONFIGURATION
+# GENERAL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
 TIME_ZONE = 'America/New_York'
 
@@ -86,16 +86,16 @@ USE_L10N = True
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
 
-#Bootstrap support of messages
+# Bootstrap support of messages
 MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.INFO: 'info',
                 message_constants.SUCCESS: 'success',
                 message_constants.WARNING: 'warning',
                 message_constants.ERROR: 'danger',
                 }
-########## END GENERAL CONFIGURATION
+# END GENERAL CONFIGURATION
 
-####STORAGES####
+# STORAGES
 AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID', '')
 AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY', '')
 AWS_STORAGE_BUCKET_NAME = getenv('AWS_STORAGE_BUCKET_NAME', '')
@@ -107,16 +107,16 @@ MEDIA_DIRECTORY = '/media/'
 AWS_S3_SECURE_URLS = True
 # AWS_IS_GZIPPED = True
 
-########## MEDIA CONFIGURATION
+# MEDIA CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
 MEDIA_ROOT = normpath(join(SITE_ROOT, 'media'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = S3_URL + MEDIA_DIRECTORY
-########## END MEDIA CONFIGURATION
+# END MEDIA CONFIGURATION
 
 
-########## STATIC FILE CONFIGURATION
+# STATIC FILE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
 STATIC_ROOT = normpath(join(SITE_ROOT, 'assets'))
 
@@ -141,33 +141,33 @@ STATICFILES_FINDERS = (
 
 STATICFILES_STORAGE = 'datadrivendota.s3utils.S3PipelineCachedStorage'
 
-########## END STATIC FILE CONFIGURATION
+# END STATIC FILE CONFIGURATION
 
 
-########## SECRET CONFIGURATION
+# SECRET CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Note: This key only used for development and testing.
 SECRET_KEY = getenv('SECRET_KEY')
-########## END SECRET CONFIGURATION
+# END SECRET CONFIGURATION
 
 
-########## INTERCOM CONFIGURATION
+# INTERCOM CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Note: This key only used for development and testing.
 INTERCOM_API_SECRET = getenv('INTERCOM_API_SECRET')
-########## END INTERCOM CONFIGURATION
+# END INTERCOM CONFIGURATION
 
 
-########## FIXTURE CONFIGURATION
+# FIXTURE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/
 #      #std:setting-FIXTURE_DIRS
 FIXTURE_DIRS = (
     normpath(join(SITE_ROOT, 'fixtures')),
 )
-########## END FIXTURE CONFIGURATION
+# END FIXTURE CONFIGURATION
 
 
-########## TEMPLATE CONFIGURATION
+# TEMPLATE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/
 #      #template-context-processors
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -193,10 +193,10 @@ TEMPLATE_LOADERS = (
 TEMPLATE_DIRS = (
     normpath(join(SITE_ROOT, 'templates')),
 )
-########## END TEMPLATE CONFIGURATION
+# END TEMPLATE CONFIGURATION
 
 
-########## MIDDLEWARE CONFIGURATION
+# MIDDLEWARE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#middleware-classes
 MIDDLEWARE_CLASSES = (
     # Default Django middleware.
@@ -208,27 +208,27 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'pipeline.middleware.MinifyHTMLMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    #'payments.middleware.ActiveSubscriptionMiddleware',
+    # 'payments.middleware.ActiveSubscriptionMiddleware',
 )
-########## END MIDDLEWARE CONFIGURATION
+# END MIDDLEWARE CONFIGURATION
 
 
-########## BEGIN CORS CONFIGURATION
+# BEGIN CORS CONFIGURATION
 CORS_ORIGIN_WHITELIST = (
     'api.intercom.io',
     'datadrivendota.s3.amazonaws.com',
     'fonts.googleapis.com',
 )
-########## END CORS CONFIGURATION
+# END CORS CONFIGURATION
 
 
-########## URL CONFIGURATION
+# URL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = '%s.urls' % SITE_NAME
-########## END URL CONFIGURATION
+# END URL CONFIGURATION
 
 
-########## APP CONFIGURATION
+# APP CONFIGURATION
 DJANGO_APPS = (
     # Default Django apps:
     'django.contrib.auth',
@@ -276,10 +276,10 @@ LOCAL_APPS = (
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
-########## END APP CONFIGURATION
+# END APP CONFIGURATION
 
 
-########## LOGGING CONFIGURATION
+# LOGGING CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -309,15 +309,15 @@ LOGGING = {
         },
     }
 }
-########## END LOGGING CONFIGURATION
+# END LOGGING CONFIGURATION
 
 
-########## WSGI CONFIGURATION
+# WSGI CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = 'wsgi.application'
-########## END WSGI CONFIGURATION
+# END WSGI CONFIGURATION
 
-########## LOGIN CONFIGURATION
+# LOGIN CONFIGURATION
 LOGIN_URL = '/login/'
 
 AUTHENTICATION_BACKENDS = (
@@ -327,17 +327,17 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_REDIRECT_URL = '/'
 
-###############MAGIC NUMBERS
+# MAGIC NUMBERS
 STEAM_API_KEY = getenv('STEAM_API_KEY')
 # This is valve's magic number for moving between 32 and 64 bit steam ids.
 ADDER_32_BIT = 76561197960265728
-#This is Valve's ID for anonymized players
+# This is Valve's ID for anonymized players
 ANONYMOUS_ID = 4294967295
-#Min length for a match to count in seconds.
+# Min length for a match to count in seconds.
 MIN_MATCH_LENGTH = 600
 
 
-###############SOCIAL AUTH
+# SOCIAL AUTH
 SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.social_details',
     'social.pipeline.social_auth.social_uid',
@@ -355,13 +355,13 @@ SOCIAL_AUTH_PIPELINE = (
 
 SOCIAL_AUTH_STEAM_API_KEY = STEAM_API_KEY
 VALID_KEY_DAYS = 7
-########## END LOGIN CONFIGURATION
+# END LOGIN CONFIGURATION
 
 
 AUTO_RENDER_SELECT2_STATICS = False
 
 
-########## PIPELINE CONFIGURATION
+# PIPELINE CONFIGURATION
 PIPELINE_CSS = {
     'all': {
         'source_filenames': (
@@ -406,7 +406,7 @@ PIPELINE_JS = {
             'js/bootstrap-tour.js',
             'select2-3.4.5/select2.js',
             'js/d3/d3.min.js',
-            'js/eldarion-ajax.min.js',
+            'js/eldarion-ajax.js',
             'js/charting.js',
             'js/gunzip.min.js',
             'js/project.js',
@@ -437,15 +437,13 @@ PIPELINE_COMPILERS = (
     'pipeline.compilers.less.LessCompiler',
 )
 
-########## END PIPELINE CONFIGURATION
+# END PIPELINE CONFIGURATION
 
 
-########## START REDIS CONFIGURATION
+# START REDIS CONFIGURATION
 LIVE_JSON_KEY = 'live_league_json'
 ITEM_SCHEMA_KEY = 'valve_item_schema_json'
-########## END REDIS CONFIGURATION
-
-
+# END REDIS CONFIGURATION
 
 # Tests
 # TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -454,7 +452,7 @@ ITEM_SCHEMA_KEY = 'valve_item_schema_json'
 # ]
 
 
-#Magic Colors
+# Magic Colors
 DIRE_RED = '#BA3B15'
 RADIANT_GREEN = '#7CD51B'
 WON_COLOR = '#FFD700'
@@ -492,7 +490,7 @@ PLAYER_10 = [
     '#906A2B',
 ]
 
-########## START STRIPE CONFIGURATION
+# START STRIPE CONFIGURATION
 STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
 STRIPE_PUBLIC_KEY = getenv('STRIPE_PUBLIC_KEY')
 
@@ -517,11 +515,11 @@ PAYMENTS_PLANS = {
 
 SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = [
     'heroes:index',
-    'payments:payments_subscribe',
-    ]
+    'payments_subscribe',
+]
 
-SUBSCRIPTION_REQUIRED_REDIRECT = 'payments:payments_subscribe'
-########## END STRIPE CONFIGURATION
+SUBSCRIPTION_REQUIRED_REDIRECT = 'payments_subscribe'
+# END STRIPE CONFIGURATION
 
 TI4_TEAMS = [
     1333179,
@@ -542,11 +540,11 @@ TI4_TEAMS = [
 ]
 
 
-########## START REST CONFIGURATION
+# START REST CONFIGURATION
 REST_FRAMEWORK = {
     'PAGINATE_BY': 10
 }
-########## END REST CONFIGURATION
+# END REST CONFIGURATION
 
 # Valve strings
 HERO_BASENAME = 'npc_dota_hero_base'
@@ -555,12 +553,12 @@ HERO_BASENAME = 'npc_dota_hero_base'
 BLANK_ITEM_THUMBSHOT = (
     "https://s3.amazonaws.com/datadrivendota/blanks/"
     "blank_item_thumbshot.png"
-    )
+)
 
 BLANK_ITEM_MUGSHOT = (
     "https://s3.amazonaws.com/datadrivendota/"
     "blanks/blank_item.png"
-    )
+)
 
 BLANK_LEAGUE_IMAGE = (
     'https://s3.amazonaws.com/datadrivendota/'
@@ -570,17 +568,17 @@ BLANK_LEAGUE_IMAGE = (
 BLANK_TEAM_IMAGE = (
     "https://s3.amazonaws.com/datadrivendota/"
     "blanks/blank_team.png"
-    )
+)
 
 KEEN_API_URL = getenv('KEEN_API_URL')
 KEEN_PROJECT_ID = getenv('KEEN_PROJECT_ID')
 KEEN_READ_KEY = getenv('KEEN_READ_KEY')
 KEEN_WRITE_KEY = getenv('KEEN_WRITE_KEY')
 
-### Project specific constants used in tasks
+# Project specific constants used in tasks
 LOOKBACK_UPDATE_DAYS = 3  # The window we consider for re-checking things.
 HERO_SKILL_MATCH_COUNT = 3  # How many matches to add per hero skill level
 CLIENT_MATCH_COUNT = 3  # How many client matches to get each pull
 VALVE_CDN_PATH = 'http://cdn.dota2.com/apps/570/'
-UPDATE_LAG_UTC = 60*60*24*3  # 3 Days
-### End project specific constants used in tasks
+UPDATE_LAG_UTC = 60 * 60 * 24 * 3  # 3 Days
+# End project specific constants used in tasks
