@@ -1,3 +1,4 @@
+""" Tasks to manage match-related data. """
 from celery import Task, chain
 from time import time as now
 from copy import deepcopy
@@ -40,7 +41,10 @@ logger = logging.getLogger(__name__)
 
 class MirrorMatches(Task):
 
+    """ Get the details of a list of matches. """
+
     def run(self, matches=[], skill=None):
+        """ Spin each match into an update call & response. """
         for match in matches:
             logger.info("Requesting match {0}".format(match))
             c = ApiContext()
@@ -59,9 +63,12 @@ class MirrorMatches(Task):
 
 class UpdateMatch(ApiFollower):
 
+    """ Reflect the match detail response in our database. """
+
     def run(self, data):
         """
-        Uploads a match given the return of an API call.
+        Upload a match given the return of an API call.
+
         Only if the match does not exist are the player summaries imported;
         this will not correctly account for players that unanonymize their
         data. More code to the effect of "Look in the hero slot of the player
@@ -98,7 +105,7 @@ class UpdateMatch(ApiFollower):
 
             league = League.objects.get_or_create(
                 steam_id=data['leagueid']
-                )[0]
+            )[0]
             kwargs.update({'league': league})
         except KeyError:
             pass
@@ -179,7 +186,7 @@ class UpdateMatch(ApiFollower):
         if 'radiant_team_id' in data.keys() and update:
             radiant_team = Team.objects.get_or_create(
                 steam_id=data['radiant_team_id']
-                )[0]
+            )[0]
             match.radiant_team = radiant_team
             match.radiant_team_complete = True \
                 if data['radiant_team_id'] == 1 else False
@@ -187,7 +194,7 @@ class UpdateMatch(ApiFollower):
         if 'dire_team_id' in data.keys() and update:
             dire_team = Team.objects.get_or_create(
                 steam_id=data['dire_team_id']
-                )[0]
+            )[0]
             match.dire_team = dire_team
             match.dire_team_complete = True \
                 if data['dire_team_id'] == 1 else False
@@ -196,8 +203,9 @@ class UpdateMatch(ApiFollower):
 
 def upload_match_summary(players, parent_match, refresh_records):
     """
-    Populates the endgame summary data that is associated with a match
-    and invokes the build parser.  This needs to be fixed for players that
+    Populate the endgame summary data for a match.
+
+    This needs to be fixed for players that
     unanonymize by checking on hero_slot, ignoring player, and updating
     if new data has been included (in particular, which player we are
     talking about).
@@ -220,7 +228,7 @@ def upload_match_summary(players, parent_match, refresh_records):
             'player_slot': player['player_slot'],
             'hero': Hero.objects.get_or_create(
                 steam_id=player['hero_id'],
-                )[0],
+            )[0],
             'item_0': Item.objects.get_or_create(steam_id=player['item_0'])[0],
             'item_1': Item.objects.get_or_create(steam_id=player['item_1'])[0],
             'item_2': Item.objects.get_or_create(steam_id=player['item_2'])[0],
@@ -296,27 +304,34 @@ def upload_match_summary(players, parent_match, refresh_records):
 
 
 class UpdateMatchValidity(Task):
-    """
-    Check for match validity and update accordingly.
-    """
+
+    """Check for match validity and update accordingly."""
 
     def run(self):
+        """ Update match validity. """
         self.update_validity()
 
     def update_validity(self):
+        """ Select the match set to update and call processing. """
         unprocessed = Match.objects.filter(validity=Match.UNPROCESSED)
         self.process_matches(unprocessed)
 
-        a = datetime.utcnow()-timedelta(days=settings.LOOKBACK_UPDATE_DAYS)
+        a = datetime.utcnow() - timedelta(days=settings.LOOKBACK_UPDATE_DAYS)
         unprocessed = Match.objects.filter(
             start_time__gte=a.strftime('%s')
         )
         self.process_matches(unprocessed)
 
     def process_matches(self, unprocessed):
+        """ Apply filters to sort match validity. """
         if unprocessed.exists():
             max_id = unprocessed.aggregate(Max('id'))['id__max']
             min_id = unprocessed.aggregate(Min('id'))['id__min']
+
+            def assign_tournament_level(unprocessed):
+                unprocessed.filter(league__steam_id__gt=0).update(
+                    skill=4
+                )
 
             def tournament(unprocessed):
 
@@ -386,6 +401,7 @@ class UpdateMatchValidity(Task):
                 ms = ms.filter(validity=Match.UNPROCESSED)
                 ms.update(validity=Match.LEGIT)
 
+            assign_tournament_level(unprocessed)
             # Tournament matches get their own special handling.
             tournament_matches = unprocessed.filter(skill=4)
             tournament(tournament_matches)
@@ -406,11 +422,11 @@ class UpdateMatchValidity(Task):
 
 
 class CheckMatchIntegrity(Task):
-    """
-    Complains if derived features of matches look wrong.
-    """
+
+    """ Complain if derived features of matches look wrong. """
 
     def run(self):
+        """ Select the match set to update. """
         radiant_badness = PlayerMatchSummary.objects.filter(
             match__radiant_win=True,
             player_slot__lte=5,
@@ -435,17 +451,16 @@ class CheckMatchIntegrity(Task):
 
 
 class CycleApiCall(ApiFollower):
+
     """
     Recycle an API context to dig deeper into match results.
 
-    Only supports get match history right now, but that is the only API that really leans on repeated calls.
+    Only supports get match history right now,
+    but that is the only API that really leans on repeated calls.
     """
 
     def run(self, urldata):
-        """
-        Recursively pings the valve API to get match data and spawns new tasks
-        to deal with the downloaded match IDs.
-        """
+        """ Ping the valve API to get match data & spawns new tasks. """
         # Validate
         if self.result['status'] == 15:
             logger.error(
@@ -463,10 +478,10 @@ class CycleApiCall(ApiFollower):
 
             logger.info("Spawning")
 
-            self.spawnDetailCalls()
+            self.spawn_detail_calls()
 
             logger.info("Checking for more results")
-            if self.moreResultsLeft():
+            if self.more_results_left():
                 self.rebound()
 
             # Successful closeout
@@ -475,10 +490,11 @@ class CycleApiCall(ApiFollower):
                 self.cleanup()
             return True
         else:
-            logger.error("Unhandled status: "+str(self.result['status']))
+            logger.error("Unhandled status: " + str(self.result['status']))
             return True
 
-    def spawnDetailCalls(self):
+    def spawn_detail_calls(self):
+        """ Make match detail calls for each match. """
         for result in self.result['matches']:
             self.api_context.processed += 1
             if self.api_context.processed <= self.api_context.matches_desired:
@@ -502,7 +518,8 @@ class CycleApiCall(ApiFollower):
                     api_context=pass_context
                 ), um.s()).delay()
 
-    def moreResultsLeft(self):
+    def more_results_left(self):
+        """ Evaluate if more matches need to be queried. """
         if not (self.result['results_remaining'] == 0) \
                 and self.api_context.processed <= \
                 self.api_context.matches_desired:
@@ -511,18 +528,13 @@ class CycleApiCall(ApiFollower):
                 (
                     "Did {0} of {1} for {2}. {3} left.  \n "
                     "Logic: remaining: {4}, "
-                    "needing: {5}, in sum: {6}.  Going back"
                 ).format(
                     self.api_context.processed,
                     self.api_context.matches_desired,
                     self.api_context.account_id,
                     self.result['results_remaining'],
                     not (self.result['results_remaining'] == 0),
-                    self.api_context.processed <=
-                        self.api_context.matches_desired,
-                    not (self.result['results_remaining'] == 0)
-                        and self.api_context.processed <=
-                        self.api_context.matches_desired,
+
                 )
             )
             return True
@@ -542,6 +554,7 @@ class CycleApiCall(ApiFollower):
 
     # Until the date_max problem is fixed, date_max cannot work.
     def rebound(self):
+        """ Re-hit the match history list for remaining matches. """
         logger.info("Rebounding")
         self.api_context.start_at_match_id = self.result[
             'matches'
@@ -557,7 +570,7 @@ class CycleApiCall(ApiFollower):
         ), rpr.s()).delay()
 
     def cleanup(self):
-        # If there is a player we have been focusing on
+        """ Do maintenance for if we were focusing on a player. """
         if self.api_context.account_id is not None:
             try:
                 player = Player.objects.get(

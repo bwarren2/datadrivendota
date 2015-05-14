@@ -1,3 +1,4 @@
+"""Views primarily related to players, as a group or particularly."""
 from random import choice
 from rest_framework import viewsets, filters
 
@@ -16,37 +17,80 @@ from .mixins import (
     HeroAbilitiesMixin,
     VersusWinrateMixin,
     RoleMixin,
-    )
+)
 from .models import Player
 from heroes.models import Hero
 from .serializers import PlayerSerializer
 
 
 class PlayerIndexView(ListView):
+
+    """A list of all updated players, aka clients."""
+
+    paginate_by = 30
     queryset = Player.objects.filter(updated=True)
 
 
 class FollowedPlayerIndexView(SubscriberRequiredMixin, ListView):
 
+    """If the user is logged in, show the people they follow."""
+
+    paginate_by = 30
+
     def get_queryset(self):
+        """ Get the list of players to display."""
         return self.request.user.userprofile.following.all()
 
 
 class ProIndexView(ListView):
+
+    """List the players that have pro names."""
+
+    paginate_by = 30
+
     def get_queryset(self):
+        """ Get the list of players to display."""
         return Player.objects.exclude(pro_name=None)
 
 
 class PlayerDetailView(DetailView):
+
+    """ Get a closer look at a particular player."""
+
     model = Player
     slug_url_kwarg = 'player_id'
     slug_field = 'steam_id'
 
     def get_context_data(self, **kwargs):
-
+        """Add in win statistics and a comparison player."""
         kwargs['player'] = self.object
         kwargs['pms_list'] = self.object.summaries(36)
+        self.add_comparison(**kwargs)
 
+        stats = {}
+        stats['wins'] = self.object.wins
+        stats['losses'] = self.object.losses
+        stats['total'] = self.object.games
+        stats['winrate'] = self.get_winrate(stats)
+        kwargs['stats'] = stats
+
+        # Compare to dendi and s4 by default
+        player_list = [70388657, 41231571, self.object.steam_id]
+        endgame_players = Player.objects.filter(steam_id__in=player_list)
+        kwargs['player_ids'] = ",".join(
+            [str(p.steam_id) for p in endgame_players]
+        )
+        return super(PlayerDetailView, self).get_context_data(**kwargs)
+
+    def get_winrate(self, stats):
+        """ Calculate a winrate, allowing for the option of no games played."""
+        if stats['total'] > 0:
+            return round(float(stats['wins']) / stats['total'] * 100)
+        else:
+            return 0
+
+    def add_comparison(self, **kwargs):
+        """Merge in comparison data if it exists."""
         p2s = Player.objects.exclude(pro_name=None,)\
             .exclude(steam_id=self.object.steam_id,)
 
@@ -64,30 +108,16 @@ class PlayerDetailView(DetailView):
                 p2=p2.display_name,
             )
         except IndexError:
-            # If there are no other players, like in tests, this is not a breaking requirement.
+            # If there are no other players, like in tests,
+            # this is not a breaking requirement.
             pass
-
-        stats = {}
-        stats['wins'] = self.object.wins
-        stats['losses'] = self.object.losses
-        stats['total'] = self.object.games
-        stats['winrate'] = round(
-            float(stats['wins']) / (stats['wins'] + stats['losses'])*100 \
-                if stats['wins'] + stats['wins'] > 0 else 0, 2
-        )
-        kwargs['stats'] = stats
-
-        # Compare to dendi and s4 by default
-        player_list = [70388657, 41231571, self.object.steam_id]
-        endgame_players = Player.objects.filter(steam_id__in=player_list)
-        kwargs['player_ids'] = ",".join(
-            [str(p.steam_id) for p in endgame_players]
-        )
-
-        return super(PlayerDetailView, self).get_context_data(**kwargs)
+        return kwargs
 
 
 class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
+
+    """ DRF viewset for player objects."""
+
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
     lookup_field = 'steam_id'
@@ -96,28 +126,42 @@ class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class Winrate(WinrateMixin, ChartFormView):
+
+    """ JSON chart maker for player winrate."""
+
     title = "Hero Winrate"
     html = "players/form.html"
 
 
 class HeroAdversary(HeroAdversaryMixin, ChartFormView):
+
+    """ JSON chart maker for player-hero opposition winrate."""
+
     title = "Player Hero Adversary"
     html = "players/form.html"
 
 
 class HeroAbilities(HeroAbilitiesMixin, ChartFormView):
+
+    """ JSON chart maker for player skilling of a hero."""
+
     title = "Hero Skilling Comparison"
     html = "players/form.html"
 
     def amend_params(self, chart):
+        """ Tweak chart settings for line width."""
         chart.params.path_stroke_width = 1
         return chart
 
 
 class PlayerComparsionView(TemplateView):
+
+    """ View for player-player comparsion."""
+
     template_name = 'players/comparison.html'
 
     def get_context_data(self, **kwargs):
+        """ Merge in the requested players or 404. """
         kwargs['player_1'] = get_object_or_404(
             Player, steam_id=kwargs['player_id_1']
         )
@@ -127,33 +171,51 @@ class PlayerComparsionView(TemplateView):
 
 
 class HeroStyleView(TemplateView):
-    # So much magic in the template!
+
+    """Chart set for contextualizing  a player's use of a hero."""
+
     template_name = 'players/hero_style.html'
 
     def get_context_data(self, **kwargs):
+        """ Get the player and hero requested. """
         kwargs['player'] = get_object_or_404(
             Player, steam_id=kwargs['player_id']
-            )
+        )
         kwargs['hero'] = get_object_or_404(
             Hero, machine_name=kwargs['hero_name']
         )
 
 
 class ApiWinrateChart(WinrateMixin, ApiView):
+
+    """ JSON chart maker for player winrate."""
+
     pass
 
 
 class ApiHeroAdversary(HeroAdversaryMixin, ApiView):
+
+    """ API JSON chart maker for player-hero opposition winrate."""
+
     pass
 
 
 class ApiHeroAbilities(HeroAbilitiesMixin, ApiView):
+
+    """ JSON chart maker for player-hero abilities."""
+
     pass
 
 
 class ApiVersusWinrate(VersusWinrateMixin, ApiView):
+
+    """ JSON chart maker for player comparison."""
+
     pass
 
 
 class ApiRole(RoleMixin, ApiView):
+
+    """ JSON chart maker for player role choice."""
+
     pass
