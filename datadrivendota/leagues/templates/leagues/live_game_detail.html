@@ -314,7 +314,7 @@ $(function(){
 
 
         html_from_cell = function(d){
-            console.log(d)
+            // console.log(d)
             if(img_list.indexOf(d.key)>=0){
                 if (d.key==='hero_url'){
                     return '<img class="table-face toggleface" src='+d.value+'>'
@@ -781,7 +781,7 @@ var miniMap = function(timeslice, target, divname, params){
                             'states': data.states
                         })
                     }
-                    console.log("Slicestate:", data.states, timeline.length-1);
+                    // console.log("Slicestate:", data.states, timeline.length-1);
                 })},
             ping_duration
         )

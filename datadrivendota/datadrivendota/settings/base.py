@@ -541,9 +541,11 @@ TI4_TEAMS = [
 
 
 # START REST CONFIGURATION
-REST_FRAMEWORK = {
-    'PAGINATE_BY': 10
-}
+# REST_FRAMEWORK = {
+#     'PAGINATE_BY': 10
+# }
+# For some reason, this fucks the paginate_by = None on the viewsets
+# into using a paginator.  Do not want.
 # END REST CONFIGURATION
 
 # Valve strings

@@ -133,3 +133,4 @@ class TeamViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'steam_id'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    paginate_by = 10

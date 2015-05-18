@@ -123,6 +123,7 @@ class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'steam_id'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('persona_name',)
+    paginate_by = 10
 
 
 class Winrate(WinrateMixin, ChartFormView):
