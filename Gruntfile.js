@@ -16,12 +16,11 @@ module.exports = function(grunt) {
           "datadrivendota/static/css/bootstrap-tour.css": "datadrivendota/static/css/bootstrap-tour.less",
           "datadrivendota/static/css/variables.css": "datadrivendota/static/css/variables.less",
         }
-        // NOTE: changing the subfiles of project.css does not trigger recompilation!
       }
     },
     watch: {
       styles: {
-        files: ['datadrivendota/static/css/*.less'], // which files to watch
+        files: ['datadrivendota/static/css/*.less', 'datadrivendota/static/css/project/*.less'], // which files to watch
         tasks: ['less'],
         options: {
           nospawn: true

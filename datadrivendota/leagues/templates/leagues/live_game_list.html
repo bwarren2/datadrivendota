@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load human_seconds %}
 {% block title %}
 Current Live Games
 {% endblock title %}
@@ -13,14 +13,20 @@ Current Live Games
 
 <div id='games'>
     {% for game in games %}
-    <a href="{% url 'leagues:live_game_detail' match_id=game.match_id %}">
         <div class='game-card'>
+            <div class='page-header'>
+                <h1>  Match: {{game.match_id}}, {{game.scoreboard.duration|human_seconds}}</h1>
+            </div>
+
+            <a href="{% url 'leagues:live_game_detail' match_id=game.match_id %}" >
+                <span class='default-link'></span>
+            </a>
+
             <div class='sections'>
                 <div class='league-card'>
                     <div class='league-thumb'>
                         <img src="{{game.league_logo_url}}" class='thumbnail league-logo'>
                     </div>
-                    <p class='overlayer'>{{game.scoreboard.duration|time:'H:i'}}</p>
                 </div>
                 <div class='match-card'>
                     <div class='side-row'>
@@ -30,7 +36,7 @@ Current Live Games
                             </div>
                         {% endfor %}
                         {% if game.radiant_team.logo_url %}
-                            <div class='hero-thumb'>
+                            <div class='team-thumb'>
                                 <img src="{{game.radiant_team.logo_url}}" class='thumbnail'>
                             </div>
                         {% endif %}
@@ -42,16 +48,14 @@ Current Live Games
                             </div>
                         {% endfor %}
                         {% if game.dire_team.logo_url %}
-                            <div class='hero-thumb'>
+                            <div class='team-thumb'>
                                 <img src="{{game.dire_team.logo_url}}" class='thumbnail'>
                             </div>
                         {% endif %}
                     </div>
-                    <p class='overlayer'>{{game.match_id}}</p>
                 </div>
             </div>
         </div>
-    </a>
     {% endfor %}
 </div>
 {% endblock content %}

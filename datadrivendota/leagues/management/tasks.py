@@ -1,3 +1,4 @@
+""" Tasks to manage leagues. """
 import os
 import logging
 import json
@@ -9,9 +10,13 @@ from datetime import datetime, timedelta
 from celery import Task, chain
 
 from django.conf import settings
-
 from datadrivendota.redis_app import redis_app as redis
-from datadrivendota.redis_app import timeline_key, slice_key, set_games
+from datadrivendota.redis_app import (
+    timeline_key,
+    slice_key,
+    set_games,
+    get_games
+)
 from utils.accessors import get_league_schema
 from leagues.models import League
 from heroes.models import Hero
@@ -35,11 +40,11 @@ logger = logging.getLogger(__name__)
 
 
 class MirrorLiveGames(Task):
-    """
-    Pings live game JSON and passes it to redis updater
-    """
+
+    """ Pings live game JSON and passes it to redis updater. """
 
     def run(self):
+        """ Do the work. """
         logger.info("Pinging the live league json")
         c = ApiContext()
         vac = ValveApiCall()
@@ -52,11 +57,11 @@ class MirrorLiveGames(Task):
 
 
 class UpdateLiveGames(ApiFollower):
-    """
-    Sets the redis store of live json to the retrieved result
-    """
-    def run(self, urldata):
 
+    """ Sets the redis store of live json to the retrieved result. """
+
+    def run(self, urldata):
+        """ Do the work. """
         urldata = self._setup(urldata)
 
         # Do this all at once to group leagues and teams in one pass
@@ -70,7 +75,8 @@ class UpdateLiveGames(ApiFollower):
             formatted_game['game'] = self._get_game_data(game)
 
             for side in ['radiant', 'dire']:
-                formatted_game[side] = self._get_side_data(game, side)
+                if self._get_side_data(game, side) is not None:
+                    formatted_game[side] = self._get_side_data(game, side)
 
             self._store_data(formatted_game)
 
@@ -78,7 +84,7 @@ class UpdateLiveGames(ApiFollower):
 
     def _store_data(self, game_snapshot):
         # Store slice
-        expiry_seconds = 60*60*24*100  # 1 day
+        expiry_seconds = 60 * 60 * 24 * 100  # 1 day
         key = slice_key(game_snapshot['game']['match_id'])
         redis.set(key, json.dumps(game_snapshot))
         redis.expire(key, expiry_seconds)
@@ -105,8 +111,13 @@ class UpdateLiveGames(ApiFollower):
             extant['timeline'] = []
             extant['timeline'].append(new_timeslice)
             extant['game'] = game_snapshot['game']
-            extant['radiant'] = game_snapshot['radiant']
-            extant['dire'] = game_snapshot['dire']
+
+            if 'radiant' in game_snapshot:
+                extant['radiant'] = game_snapshot['radiant']
+
+            if 'dire' in game_snapshot:
+                extant['dire'] = game_snapshot['dire']
+
             extant['pickbans'] = game_snapshot['pickbans']
             return extant
         else:
@@ -132,7 +143,7 @@ class UpdateLiveGames(ApiFollower):
     def _get_game_data(self, game):
         game_dict = {}
         game_dict['league_id'] = game['league_id']
-        game_dict['league_logo_url'] = game['league_id']
+        # game_dict['league_logo_url'] = game['league_id']
         game_dict['league_tier'] = game['league_tier']
         game_dict['lobby_id'] = game['lobby_id']
         game_dict['match_id'] = game['match_id']
@@ -152,7 +163,7 @@ class UpdateLiveGames(ApiFollower):
                 game['scoreboard']['duration']
             for side in ['radiant', 'dire']:
                 state_dict['{0}_barracks'.format(side)] =\
-                     game['scoreboard'][side]['barracks_state']
+                    game['scoreboard'][side]['barracks_state']
                 state_dict['{0}_towers'.format(side)] =\
                     game['scoreboard'][side]['tower_state']
         else:
@@ -184,7 +195,7 @@ class UpdateLiveGames(ApiFollower):
                         player['side'] = 'dire'
 
                     player['kda2'] = player['kills'] - player['death']\
-                        + player['assists']/2.0
+                        + player['assists'] / 2.0
                     players.append(player)
             else:
                 pass  # Nothing to see here
@@ -199,7 +210,7 @@ class UpdateLiveGames(ApiFollower):
     def _get_items(self):
         self.item_names = {
             x.steam_id: x.internal_name for x in Item.objects.all()
-            }
+        }
 
     def _get_pickbans(self, game):
         pickbans = defaultdict(dict)
@@ -220,10 +231,7 @@ class UpdateLiveGames(ApiFollower):
         return pickbans
 
     def _merge_logos(self, data):
-        update_teams = []
-        update_leagues = []
         for game in data:
-
             # Do Teams
             for team_type in ['radiant_team', 'dire_team']:
                 if team_type in game.keys():
@@ -231,18 +239,15 @@ class UpdateLiveGames(ApiFollower):
                         team_id = game[team_type]['team_id']
                         team, t_created = Team.objects.get_or_create(
                             steam_id=team_id
-                            )
+                        )
                         game[team_type]['logo_url'] = team.image
 
             # Do League
             league_id = game['league_id']
             league, l_created = League.objects.get_or_create(
                 steam_id=league_id
-                )
+            )
             game['league_logo_url'] = league.image
-
-        self.update_leagues = update_leagues
-        self.update_teams = update_teams
 
         return data
 
@@ -253,19 +258,16 @@ class UpdateLiveGames(ApiFollower):
         return urldata
 
     def _clean_urldata(self, urldata):
-        """
-        Strips out request-level response from valve.
-        """
+        """ Strip out request-level response from valve. """
         return urldata['result']['games']
 
 
 class MirrorLeagueSchedule(Task):
-    """
-    Kicks off the API call to match schedules with Valve,
-    and passes the result to Update
-    """
-    def run(self):
 
+    """ Kicks off the API call to match schedules with Valve and passes the result to Update. """
+
+    def run(self):
+        """ Do the work. """
         logger.info("Reflecting Valve's view of upcoming matches with local")
         context = ApiContext()
         vac = ValveApiCall()
@@ -278,12 +280,11 @@ class MirrorLeagueSchedule(Task):
 
 
 class UpdateLeagueSchedule(ApiFollower):
-    """
-    Take the scheduled league games and reflect them in our scheduled matches.
-    """
+
+    """ Take the scheduled league games and reflect them in our scheduled matches. """
 
     def run(self, urldata):
-
+        """ Do the work. """
         logger.info("Saving the schedule")
         data = self.clean_urldata(urldata)
         self.delete_unscheduled_games(data)
@@ -365,7 +366,7 @@ class UpdateLeagueSchedule(ApiFollower):
                     team_2=team_2,
                     game_id=game['game_id'],
                     start_time=game['starttime'],
-                    )
+                )
             except ScheduledMatch.DoesNotExist:
                 ScheduledMatch.objects.create(
                     league=league,
@@ -378,9 +379,7 @@ class UpdateLeagueSchedule(ApiFollower):
                 )
 
     def clean_urldata(self, urldata):
-        """
-        Strips out request-level response from valve.
-        """
+        """ Strip out request-level response from valve. """
         return urldata['result']
 
     def _fingerprint(self, scheduled_match):
@@ -410,14 +409,11 @@ class UpdateLeagueSchedule(ApiFollower):
 
 
 class UpdateLeagues(Task):
-    """
-    Reflects the current item schema data for a league and pings for a logo
-    """
+
+    """ Reflect the current item schema data for a league and pings for a logo. """
+
     def run(self, leagues, matches=10):
-        """
-        Presumes iterable of steam ids, hits redis cache of item schema,
-        pings valve per league for the item image
-        """
+        """ Presume iterable of steam ids, hits redis cache of item schema, pings valve per league for the item image. """
         logger.info("Updating the given leagues {0}".format(leagues))
         schema = get_league_schema()
 
@@ -462,10 +458,11 @@ class UpdateLeagues(Task):
 
 
 class UpdateLeagueLogo(ApiFollower):
-    """
-    Takes an Item Icon URL ping and saves it to a league logo
-    """
+
+    """ Takes an Item Icon URL ping and saves it to a league logo. """
+
     def run(self, urldata):
+        """ Do the work. """
         league = League.objects.get(steam_id=self.api_context.league_id)
         url = '{0}{1}'.format(
             settings.VALVE_CDN_PATH,
@@ -476,6 +473,7 @@ class UpdateLeagueLogo(ApiFollower):
         if resp.status_code == 200:
             buff = BytesIO(resp.content)
             _ = buff.seek(0)  # Stop random printing.
+            _ = _  # Stop the linting.
             #  If we wanted to, we would store the league logo data here.
             #  We are currently working out whether to hotlink to Valve.
 
@@ -484,10 +482,11 @@ class UpdateLeagueLogo(ApiFollower):
 
 
 class MirrorLeagues(Task):
-    """
-    Get the big list of leagues and reflect it
-    """
+
+    """ Get the big list of leagues and reflect it. """
+
     def run(self):
+        """ Do the work. """
         logger.info("Reflecting Valve's view of upcoming matches with local")
         context = ApiContext()
         vac = ValveApiCall()
@@ -500,10 +499,11 @@ class MirrorLeagues(Task):
 
 
 class CreateLeagues(ApiFollower):
-    """
-    Takes all the results from a league list call and inserts them.
-    """
+
+    """ Takes all the results from a league list call and inserts them. """
+
     def run(self, urldata):
+        """ Do the work. """
         league_list = []
         for league in self.result['leagues']:
             League.objects.update_or_create(
@@ -520,31 +520,30 @@ class CreateLeagues(ApiFollower):
 
 
 class MirrorRecentLeagues(Task):
+
     """
     Find the leagues that have recent/upcoming games and re-ping their data.
 
     Meant to run once a day(ish) via celery beat
     """
+
     def run(self):
+        """ Do the work. """
         leagues = self.find_leagues()
         ul = UpdateLeagues()
         ul.s().delay(leagues=leagues)
 
     def find_leagues(self):
-        """
-        Find matches from the last few days that have leagues,
-        and get the distinct ids as a list
-        """
-
+        """ Find matches from the last few days that have leagues, and get the distinct ids as a list. """
         # The .distinct() method fails with sqlite, so in the interests of
         # testing we do this goofy list(set()) business.
         recent_games = set(
             Match.objects.filter(
                 start_time__gte=mktime(
                     (
-                        datetime.now()-timedelta(
+                        datetime.now() - timedelta(
                             days=settings.LOOKBACK_UPDATE_DAYS
-                            )
+                        )
                     ).timetuple()
                 )
             )
@@ -557,6 +556,15 @@ class MirrorRecentLeagues(Task):
             .values_list('league__steam_id', flat=True)
         )
         recent_games.update(recent_schedule)
+
+        data = get_games()
+        lst = []
+        for game in data:
+            league_id = game.get('league_id', None)
+            if league_id is not None:
+                lst.append(int(league_id))
+        recent_games.update(set(lst))
+
         if recent_games is None:
             return []
         else:
@@ -564,9 +572,11 @@ class MirrorRecentLeagues(Task):
 
 
 class AcquireHiddenLeagueGames(Task):
+
     """Deprecated.  A stupid hack to get 'secret' TI4 games."""
 
     def run(self, league_id):
+        """ Do the work. """
         lst = [
             '101495620',  # Alliance
             '94362277',  # Titan
@@ -601,9 +611,11 @@ class AcquireHiddenLeagueGames(Task):
 
 
 class RetrieveHiddenGameResults(ApiFollower):
+
     """Deprecated.  A stupid hack to get 'secret' TI4 games."""
 
     def run(self, urldata):
+        """ Do the work. """
         matches = [match['match_id'] for match in urldata['result']['matches']]
         am = MirrorMatches()
         am.delay(matches=matches, skill=4)

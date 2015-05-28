@@ -1,4 +1,5 @@
 /* Cards! */
+@import "../variables.less";
 
 div.match-card{
   .container();
@@ -49,7 +50,7 @@ div.hero-card{
 
 div#animation-controls{
   .make-row();
-
+  background-color: @main_block_background;
   div#animation-buttons{
     div#stop-button{
       .make-md-column(2);
@@ -84,6 +85,7 @@ div#games{
     .make-md-column(12);
     .make-xs-column(12);
     padding:10px;
+    position:relative;
     div.sections{
       .make-row();
       div.league-card{
@@ -103,8 +105,13 @@ div#games{
             padding-left: 0px;
             padding-right: 0px;
           }
+          div.team-thumb{
+            .make-md-column(2);
+            .make-xs-column(2);
+            padding-left: 0px;
+            padding-right: 0px;
+          }
         }
-
       }
     }
   }

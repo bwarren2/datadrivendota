@@ -15,9 +15,10 @@ Match #{{match_id}}
     <div id='messages'>
     </div>
 
-    <div id='animation-controls'>
+    <div id='test'>
+    <div id='animation-controls' data-spy="affix" data-offset-top="0">
         <h2>Animation Controls</h2>
-        <div id='animation-buttons' class='fixedElement'>
+        <div id='animation-buttons'>
             <div id='stop-button'>
                 <button id='stop-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Stop</button>
             </div>
@@ -43,7 +44,7 @@ Match #{{match_id}}
                 <input style='margin-top:5px' id='time-display' class='form-control' type='text' placeholder='Replay Time' readonly>
             </div>
         </div>
-
+    </div>
     </div>
 
     <div id='state'>
@@ -156,24 +157,20 @@ Match #{{match_id}}
 
 {% block extra_js %}
 
-
 {% comment %}
-    Helperthings!
-{% endcomment %}
+
 <script type="text/x-handlebars-template" id='game-template'>
 {% verbatim %}
     {{#games}}
-
-
         <div id={{league_id}} class='col-md-2'>
-
             <img id="{{league_id}}" src="{{league_logo_url}}" class='thumbnail'>
-            {{!-- <img id="{{radiant_team.team_id}}"src="{{radiant_team.logo_url}}" class='thumbnail'> --}}
+            {{!-- <img id="{{radiant_team.team_id}}"src="{{radiant_team.image}}" class='thumbnail'> --}}
             <p class='overlayer'>{{match_id}}</p>
         </div>
     {{/games}}
 {% endverbatim %}
 </script>
+{% endcomment %}
 
 
 <script type="text/javascript">
@@ -744,15 +741,17 @@ var miniMap = function(timeslice, target, divname, params){
             xp_update(timeslice);
         })
 
-        if('radiant' in match_data){
-            $('div#logo-lineup div#radiant-logo').append('<img class="thumbnail" src='+match_data.radiant.logo_url+'>')
+        if('radiant' in match_data && match_data['radiant']!= null){
+            console.log(Object.keys(match_data))
+            console.log(match_data['radiant'])
+            $('div#logo-lineup div#radiant-logo').append('<a href="/teams/'+match_data.radiant.team_id+'"><img class="thumbnail" src='+match_data.radiant.logo_url+'></a>')
             $('div#logo-lineup div#radiant-logo').append('<p class="overlayer">'+match_data.radiant.team_name+'</p>')
         }
-        if('dire' in match_data){
-            $('div#logo-lineup div#dire-logo').append('<img class="thumbnail" src='+match_data.dire.logo_url+'>')
+        if('dire' in match_data && match_data['dire']!= null){
+            $('div#logo-lineup div#dire-logo').append('<a href="/teams/'+match_data.dire.team_id+'"><img class="thumbnail" src='+match_data.dire.logo_url+'>')
             $('div#logo-lineup div#dire-logo').append('<p class="overlayer">'+match_data.dire.team_name+'</p>')
         }
-        // $('div#logo-lineup div#league-logo').append('<img class="thumbnail" src='+match_data.dire.logo_url+'>')
+        // $('div#logo-lineup div#league-logo').append('<img class="thumbnail" src='+match_data.dire.image+'>')
         $('div#logo-lineup div#game-facts').append(
             "<table id='Summary' class='table table-responsive table-condensed'> \
                 <tbody> \
@@ -802,19 +801,17 @@ var miniMap = function(timeslice, target, divname, params){
     })
 
 
-
-$(window).scroll(function(e){
-  $el = $('.fixedElement');
-  if ($(this).scrollTop() > 200 && $el.css('position') != 'fixed'){
-    $('.fixedElement').css({'position': 'fixed', 'top': '0px'});
-  }
-  if ($(this).scrollTop() < 200 && $el.css('position') == 'fixed')
-  {
-    $('.fixedElement').css({'position': 'static', 'top': '0px'});
-  }
-});
+    $("#animation-controls").affix({
+        offset: {top: 165}
+    });
+    var width = $('#main-block').width()
+    $("#animation-controls").width(width);
+    $("#test").width(width);
+    $("#test").height($("#animation-controls").height());
 
 })
+
+
 </script>
 {% endblock extra_js %}
 
@@ -836,11 +833,17 @@ img.table-item{
     padding: 0px;
     height: 40px;
 }
-.fixedElement {
-    position:fixed;
-    top:0;
-    z-index:100;
+
+#animation-controls{
+    z-index: 1000;
+    /*background: linear-gradient(135deg, red, blue);;*/
 }
+.affix {
+    position: fixed;
+    top:0px;
+    margin: 0 auto;
+}
+
 .row > div > img { width: 100%; display: block; }
 
 p.kills{

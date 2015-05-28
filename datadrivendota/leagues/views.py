@@ -11,15 +11,17 @@ from .mixins import (
 )
 from datadrivendota.views import ChartFormView, ApiView, JsonApiView
 from datadrivendota.redis_app import (
-        get_games,
-        timeline_key,
-        redis_app,
-        slice_key
-    )
+    get_games,
+    timeline_key,
+    redis_app,
+    slice_key
+)
 
 
 class ScheduledMatchList(ListView):
-    """The index of imported leagues"""
+
+    """ The index of imported leagues. """
+
     model = ScheduledMatch
     paginate_by = 32
 
@@ -35,7 +37,9 @@ class ScheduledMatchList(ListView):
 
 
 class LeagueList(ListView):
-    """The index of imported leagues"""
+
+    """ The index of imported leagues. """
+
     model = League
     paginate_by = 32
 
@@ -55,7 +59,8 @@ class LeagueList(ListView):
 
 
 class LeagueDetail(DetailView):
-    """Focusing on a particular league"""
+
+    """ Focusing on a particular league. """
 
     def get_object(self):
         return League.objects.get(steam_id=self.kwargs.get('steam_id'))
@@ -63,7 +68,7 @@ class LeagueDetail(DetailView):
     def get_context_data(self, **kwargs):
         match_list = Match.objects.filter(
             league=self.object
-            )
+        )
 
         match_list = match_list.select_related()\
             .distinct().order_by('-start_time')
@@ -125,31 +130,6 @@ class LeagueViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ('name',)
     paginate_by = 10
 
-"""
-WARNING
-Everything below here is deprecated.
-WARNING
-"""
-
-
-class Winrate(WinrateMixin, ChartFormView):
-    title = "Hero Winrate"
-    html = "players/form.html"
-
-
-class PickBan(PickBanMixin, ChartFormView):
-    """What did this league pick/ban?"""
-    title = "Pick/Bans"
-    html = "players/form.html"
-
-
-class ApiWinrateChart(WinrateMixin, ApiView):
-    pass
-
-
-class ApiPickBanChart(PickBanMixin, ApiView):
-    pass
-
 
 class ApiLiveGamesList(JsonApiView):
 
@@ -188,3 +168,31 @@ class ApiLiveGameSlice(JsonApiView):
             return data
         else:
             self.fail()
+
+
+"""
+WARNING
+Everything below here is deprecated.
+WARNING
+"""
+
+
+class Winrate(WinrateMixin, ChartFormView):
+    title = "Hero Winrate"
+    html = "players/form.html"
+
+
+class PickBan(PickBanMixin, ChartFormView):
+
+    """What did this league pick/ban."""
+
+    title = "Pick/Bans"
+    html = "players/form.html"
+
+
+class ApiWinrateChart(WinrateMixin, ApiView):
+    pass
+
+
+class ApiPickBanChart(PickBanMixin, ApiView):
+    pass

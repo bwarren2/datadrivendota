@@ -394,14 +394,6 @@ class Config(object):
             'task': 'matches.management.tasks.UpdateMatchValidity',
             'schedule': timedelta(days=1),
         },
-        'reflect-recent-leagues-daily': {
-            'task': 'leagues.management.tasks.MirrorRecentLeagues',
-            'schedule': timedelta(days=1),
-        },
-        'reflect-recent-teams-daily': {
-            'task': 'teams.management.tasks.MirrorRecentTeams',
-            'schedule': timedelta(days=1),
-        },
         'reflect-league-schedule-daily': {
             'task': 'leagues.management.tasks.MirrorLeagueSchedule',
             'schedule': timedelta(days=1),
@@ -420,6 +412,14 @@ class Config(object):
             'schedule': timedelta(hours=1),
         },
         # Fast
+        'reflect-recent-leagues-daily': {
+            'task': 'leagues.management.tasks.MirrorRecentLeagues',
+            'schedule': timedelta(seconds=60),
+        },
+        'reflect-recent-teams-daily': {
+            'task': 'teams.management.tasks.MirrorRecentTeams',
+            'schedule': timedelta(seconds=60),
+        },
         'reflect-live-games-fast': {
             'task': 'leagues.management.tasks.MirrorLiveGames',
             'schedule': timedelta(seconds=10),

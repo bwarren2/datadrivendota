@@ -1,3 +1,5 @@
+""" Celery tasks for teams. """
+
 from celery import Task, chain
 from matches.models import (
     Match,
@@ -5,25 +7,25 @@ from matches.models import (
 from players.models import Player
 from teams.models import Team
 import logging
-
+from datadrivendota.redis_app import get_games
 from datadrivendota.management.tasks import (
     ValveApiCall,
     ApiFollower,
     ApiContext
 )
 
-# Patch for <urlopen error [Errno -2] Name or service not known in urllib2
-import os
-os.environ['http_proxy'] = ''
-# End Patch
-
-
 logger = logging.getLogger(__name__)
 
 
 class MirrorRecentTeams(Task):
-    """ Get new team data from matches. """
+
+    """ Get new team data from matches.
+
+    @todo: add scheduled matches for searching.
+    """
+
     def run(self):
+        """ Do the work. """
         matches = Match.objects.filter(skill=4).exclude(radiant_team=None)\
             .select_related('radiant_team__steam_id')
         teams = [m.radiant_team.steam_id for m in matches]
@@ -31,6 +33,18 @@ class MirrorRecentTeams(Task):
         matches = Match.objects.filter(skill=4).exclude(dire_team=None)\
             .select_related('dire_team__steam_id')
         teams.extend([m.dire_team.steam_id for m in matches])
+
+        data = get_games()
+        lst = []
+        for game in data:
+            dire_id = game.get('dire_team', {}).get('team_id', None)
+            radiant_id = game.get('radiant_team', {}).get('team_id', None)
+            if dire_id is not None:
+                lst.append(int(dire_id))
+            if radiant_id is not None:
+                lst.append(int(radiant_id))
+        teams.extend(lst)
+
         teams = list(set(teams))
         logger.info("Updating {0} teams: {1}".format(len(teams), teams))
         for t in teams:
@@ -45,10 +59,11 @@ class MirrorRecentTeams(Task):
 
 
 class MirrorTeamDetails(Task):
-    """
-    Update a list of given teams.
-    """
+
+    """ Update a list of given teams. """
+
     def run(self, teams=None):
+        """ Do the work. """
         if teams is None:
             teams = [t.steam_id for t in Team.objects.filter(name=None)]
         else:
@@ -66,11 +81,15 @@ class MirrorTeamDetails(Task):
 
 
 class UpdateTeam(ApiFollower):
+
+    """ Merge the data for a team into the DB. """
+
     def run(self, urldata):
+        """ Do the work. """
         for team_data in self.result['teams']:
             team, created = Team.objects.get_or_create(
                 steam_id=team_data['team_id']
-                )
+            )
             try:
                 if self.api_context.refresh_records:
                     mapping_dict = {
@@ -92,17 +111,17 @@ class UpdateTeam(ApiFollower):
                     team.save()
             except Team.DoesNotExist:
                 team = Team.objects.create(
-                        name=team['name'],
-                        tag=team['tag'],
-                        created=team['time_created'],
-                        logo_sponsor=team['logo_sponsor'],
-                        logo=team['logo'],
-                        country_code=team['country_code'],
-                        url=team['url'],
-                        games_played_with_current_roster=team[
-                            'games_played_with_current_roster'
-                        ],
-                    )
+                    name=team['name'],
+                    tag=team['tag'],
+                    created=team['time_created'],
+                    logo_sponsor=team['logo_sponsor'],
+                    logo=team['logo'],
+                    country_code=team['country_code'],
+                    url=team['url'],
+                    games_played_with_current_roster=team[
+                        'games_played_with_current_roster'
+                    ],
+                )
                 map_team_players(team, team_data)
                 if 'rating' in team.iterkeys():
                         setattr(team, 'rating', team.get('rating'))
@@ -122,10 +141,14 @@ class UpdateTeam(ApiFollower):
 
             utl = UpdateTeamLogo()
 
-            c = chain(
-                vac.s(api_context=c, mode='GetUGCFileDetails'), utl.s()
-            )
-            c.delay()
+            if c.ugcid != 0:
+                c = chain(
+                    vac.s(api_context=c, mode='GetUGCFileDetails'), utl.s()
+                )
+                c.delay()
+            else:
+                err = "Disregarding ugc serach for {0}; no valid ugc (0 given)"
+                logger.info(err.format(c.team_id))
 
         logo = team.logo_sponsor
         if self._need_logo_update(logo):
@@ -148,31 +171,33 @@ class UpdateTeam(ApiFollower):
 
 
 class UpdateTeamLogo(ApiFollower):
+
+    """ Merge a logo into the db. """
+
     def run(self, urldata):
+        """ Do the work. """
         team = Team.objects.get(steam_id=self.api_context.team_id)
-        URL = urldata['data']['url']
+        url = urldata['data']['url']
         try:
             if self.api_context.logo_type == 'team':
-                team.valve_cdn_image = URL
-                print URL
+                team.valve_cdn_image = url
+                logger.debug(url)
             else:
-                team.valve_cdn_sponsor_image = URL
+                team.valve_cdn_sponsor_image = url
             team.save()
 
         # If we fail, put in a placeholder and freak.
         except Exception:
             if self.api_context.logo_type == 'team':
-                team.valve_cdn_image = URL
-                print URL
+                team.valve_cdn_image = url
+                print url
             else:
-                team.valve_cdn_sponsor_image = URL
+                team.valve_cdn_sponsor_image = url
             raise
-
-    def failout(self):
-        logger.error("I failed :( {0}".format(repr(self.api_context)))
 
 
 def map_team_players(team, team_data):
+    """ A convenience layer to the data attr names. """
     player_field_mapping_dict = {
         'player_0': 'player_0_account_id',
         'player_1': 'player_1_account_id',

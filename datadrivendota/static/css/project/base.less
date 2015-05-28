@@ -39,3 +39,20 @@ blockquote.lore{
     font-style: italic;
     letter-spacing: 0.03em;
 }
+
+
+// Hack for making entire divs linky.  See http://stackoverflow.com/questions/796087/make-a-div-into-a-link
+span.default-link{
+  /* all rules required to make the whole div clickable */
+  position:absolute;
+  width:100%;
+  height:100%;
+  top:0;
+  left: 0;
+  z-index: 1;
+  /* this is a fix for IE7-9 */
+  background-color:#ffffff;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+  opacity:0;
+}
