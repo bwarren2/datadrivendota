@@ -65,7 +65,7 @@ def deploy():
     """
 
     local('git push origin master')
-    collect_static()
+    cs()
     local('git push heroku master')
 
 
@@ -101,7 +101,7 @@ def migrate():
     return local("python datadrivendota/manage.py migrate --no-initial-data")
 
 
-def collect_static():
+def cs():
     """
     Push static files to s3.
     """
