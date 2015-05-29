@@ -2,10 +2,7 @@ from fabric.api import local
 
 
 def test(suite="all"):
-    """
-    The core test command.
-    """
-
+    """ The core test command. """
     if suite == 'all':
         local(
             'python -W ignore datadrivendota/manage.py  test integration_tests'
@@ -27,18 +24,13 @@ def test(suite="all"):
 
 
 def push():
-    """
-    Move local code to github and production.  No statics.
-    """
-
+    """ Move local code to github and production.  No statics. """
     local('git push origin master')
     local('git push heroku master')
 
 
 def shell(setting="local"):
-    """
-    Open a local shell for CLI access.
-    """
+    """ Open a local shell for CLI access. """
     local(
         (
             'python datadrivendota/manage.py shell '
@@ -48,9 +40,7 @@ def shell(setting="local"):
 
 
 def devserver(setting="local"):
-    """
-    Start a local server process for testing.
-    """
+    """ Start a local server process for testing. """
     local(
         (
             'python datadrivendota/manage.py runserver '
@@ -60,54 +50,33 @@ def devserver(setting="local"):
 
 
 def deploy():
-    """
-    Push to github, statics to s3, push to production
-    """
-
+    """ Push to github, statics to s3, push to production. """
     local('git push origin master')
     cs()
     local('git push heroku master')
 
 
 def rabbit_reset():
-    """
-    Flush the rabbitMQ instance
-    """
+    """ Flush the rabbitMQ instance. """
     local('sudo rabbitmqctl stop_app')
     local('sudo rabbitmqctl reset')
     local('sudo rabbitmqctl start_app')
 
 
 def rabbit_list():
-    """
-    Show the message count in each rabbitmq queue.
-    """
-
+    """ Show the message count in each rabbitmq queue. """
     local('sudo rabbitmqctl list_queues')
 
 
-def heroku_migrate():
-    """
-    DEPRECATED
-    Not really used.  Reflect migrations on heroku.
-    """
-
-    return local(
-        "heroku run python datadrivendota/manage.py migrate --no-initial-data"
-    )
-
-
-def migrate():
-    return local("python datadrivendota/manage.py migrate --no-initial-data")
-
-
 def cs():
-    """
-    Push static files to s3.
-    """
+    """ Push static files to s3."""
+    command = "python purge_unmanifested_s3_files.py"
+    local(command)
+
     command = (
         'python datadrivendota/manage.py collectstatic'
         ' -i bootstrap'
+        ' -i d3'
         ' -i rest-framework'
         ' --settings=datadrivendota.settings.production --noinput'
     )
@@ -115,9 +84,7 @@ def cs():
 
 
 def json_populate():
-    """
-    Reflect the game client data files in the db.
-    """
+    """ Reflect the game client data files in the db. """
     local('python datadrivendota/manage.py  scrapeheroes')
     local('python datadrivendota/manage.py  scrapeloreandmugshot')
     local('python datadrivendota/manage.py  importHeroStats')
@@ -127,9 +94,7 @@ def json_populate():
 
 
 def generate_heroku_static_pages():
-    """
-    Create error pages.
-    """
+    """ Create error pages. """
     local(
         "python datadrivendota/manage.py "
         "generate_static_error_pages "
