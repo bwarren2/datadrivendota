@@ -44,7 +44,6 @@ class MirrorLiveGames(Task):
     """ Pings live game JSON and passes it to redis updater. """
 
     def run(self):
-        """ Do the work. """
         logger.info("Pinging the live league json")
         c = ApiContext()
         vac = ValveApiCall()
@@ -61,7 +60,6 @@ class UpdateLiveGames(ApiFollower):
     """ Sets the redis store of live json to the retrieved result. """
 
     def run(self, urldata):
-        """ Do the work. """
         urldata = self._setup(urldata)
 
         # Do this all at once to group leagues and teams in one pass
@@ -267,7 +265,6 @@ class MirrorLeagueSchedule(Task):
     """ Kicks off the API call to match schedules with Valve and passes the result to Update. """
 
     def run(self):
-        """ Do the work. """
         logger.info("Reflecting Valve's view of upcoming matches with local")
         context = ApiContext()
         vac = ValveApiCall()
@@ -284,7 +281,6 @@ class UpdateLeagueSchedule(ApiFollower):
     """ Take the scheduled league games and reflect them in our scheduled matches. """
 
     def run(self, urldata):
-        """ Do the work. """
         logger.info("Saving the schedule")
         data = self.clean_urldata(urldata)
         self.delete_unscheduled_games(data)
@@ -462,7 +458,6 @@ class UpdateLeagueLogo(ApiFollower):
     """ Takes an Item Icon URL ping and saves it to a league logo. """
 
     def run(self, urldata):
-        """ Do the work. """
         league = League.objects.get(steam_id=self.api_context.league_id)
         url = '{0}{1}'.format(
             settings.VALVE_CDN_PATH,
@@ -486,7 +481,6 @@ class MirrorLeagues(Task):
     """ Get the big list of leagues and reflect it. """
 
     def run(self):
-        """ Do the work. """
         logger.info("Reflecting Valve's view of upcoming matches with local")
         context = ApiContext()
         vac = ValveApiCall()
@@ -503,7 +497,6 @@ class CreateLeagues(ApiFollower):
     """ Takes all the results from a league list call and inserts them. """
 
     def run(self, urldata):
-        """ Do the work. """
         league_list = []
         for league in self.result['leagues']:
             League.objects.update_or_create(
@@ -528,7 +521,6 @@ class MirrorRecentLeagues(Task):
     """
 
     def run(self):
-        """ Do the work. """
         leagues = self.find_leagues()
         ul = UpdateLeagues()
         ul.s().delay(leagues=leagues)
@@ -576,7 +568,6 @@ class AcquireHiddenLeagueGames(Task):
     """Deprecated.  A stupid hack to get 'secret' TI4 games."""
 
     def run(self, league_id):
-        """ Do the work. """
         lst = [
             '101495620',  # Alliance
             '94362277',  # Titan
@@ -615,7 +606,6 @@ class RetrieveHiddenGameResults(ApiFollower):
     """Deprecated.  A stupid hack to get 'secret' TI4 games."""
 
     def run(self, urldata):
-        """ Do the work. """
         matches = [match['match_id'] for match in urldata['result']['matches']]
         am = MirrorMatches()
         am.delay(matches=matches, skill=4)
