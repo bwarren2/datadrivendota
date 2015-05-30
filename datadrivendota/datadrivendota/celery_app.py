@@ -414,11 +414,11 @@ class Config(object):
         # Fast
         'reflect-recent-leagues-daily': {
             'task': 'leagues.management.tasks.MirrorRecentLeagues',
-            'schedule': timedelta(seconds=60),
+            'schedule': timedelta(minutes=1),
         },
         'reflect-recent-teams-daily': {
             'task': 'teams.management.tasks.MirrorRecentTeams',
-            'schedule': timedelta(seconds=60),
+            'schedule': timedelta(minutes=1),
         },
         'reflect-live-games-fast': {
             'task': 'leagues.management.tasks.MirrorLiveGames',

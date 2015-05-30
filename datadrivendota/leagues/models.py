@@ -21,7 +21,7 @@ class League(models.Model):
     valve_cdn_image = models.TextField(
         null=True, help_text='Steam cdn image url'
     )
-    image_ugc = models.IntegerField()
+    image_ugc = models.BigIntegerField(null=True)  # Through live league games
     update_time = models.DateTimeField(default=timezone.now)
 
     @property
@@ -60,7 +60,6 @@ class League(models.Model):
     def is_outdated(self):
         if (
             self.valve_cdn_image is None
-            or self.valve_cdn_image == None
             or self.valve_cdn_image == ''
             or self.update_time < (
                 timezone.now() - timedelta(

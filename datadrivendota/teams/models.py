@@ -41,7 +41,7 @@ class Team(models.Model):
     valve_cdn_image = models.TextField(
         null=True, help_text='Steam cdn image url'
     )
-    image_ugc = models.IntegerField()
+    image_ugc = models.BigIntegerField(null=True)  # Through live league games
     valve_cdn_sponsor_image = models.TextField(
         null=True, help_text='Steam cdn sponsor image url'
     )

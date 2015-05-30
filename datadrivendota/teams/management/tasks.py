@@ -1,13 +1,10 @@
 """ Celery tasks for teams. """
 
 from celery import Task, chain
-from matches.models import (
-    Match,
-)
+from matches.models import Match
 from players.models import Player
 from teams.models import Team
 import logging
-from datadrivendota.redis_app import get_games
 from datadrivendota.management.tasks import (
     ValveApiCall,
     ApiFollower,
@@ -34,16 +31,10 @@ class MirrorRecentTeams(Task):
             .select_related('dire_team__steam_id')
         teams.extend([m.dire_team.steam_id for m in matches])
 
-        data = get_games()
-        lst = []
-        for game in data:
-            dire_id = game.get('dire_team', {}).get('team_id', None)
-            radiant_id = game.get('radiant_team', {}).get('team_id', None)
-            if dire_id is not None:
-                lst.append(int(dire_id))
-            if radiant_id is not None:
-                lst.append(int(radiant_id))
-        teams.extend(lst)
+        updatable = Team.objects.exclude(image_ugc=None).filter(
+            valve_cdn_image=None
+        )
+        teams.extend([t.steam_id for t in updatable])
 
         teams = list(set(teams))
         logger.info("Updating {0} teams: {1}".format(len(teams), teams))

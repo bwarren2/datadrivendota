@@ -15,7 +15,6 @@ from datadrivendota.redis_app import (
     timeline_key,
     slice_key,
     set_games,
-    get_games
 )
 from utils.accessors import get_league_schema
 from leagues.models import League
@@ -238,6 +237,9 @@ class UpdateLiveGames(ApiFollower):
                         team, t_created = Team.objects.get_or_create(
                             steam_id=team_id
                         )
+                        if team.image_ugc is None:
+                            team.image_ugc = game[team_type]['team_logo']
+                            team.save()
                         game[team_type]['logo_url'] = team.image
 
             # Do League
@@ -245,6 +247,9 @@ class UpdateLiveGames(ApiFollower):
             league, l_created = League.objects.get_or_create(
                 steam_id=league_id
             )
+            if league.image_ugc is None:
+                team.image_ugc = game[team_type]['team_logo']
+                team.save()
             game['league_logo_url'] = league.image
 
         return data
@@ -549,13 +554,10 @@ class MirrorRecentLeagues(Task):
         )
         recent_games.update(recent_schedule)
 
-        data = get_games()
-        lst = []
-        for game in data:
-            league_id = game.get('league_id', None)
-            if league_id is not None:
-                lst.append(int(league_id))
-        recent_games.update(set(lst))
+        updatable = League.objects.exclude(image_ugc=None).filter(
+            valve_cdn_image=None
+        )
+        recent_games.update(set([t.steam_id for t in updatable]))
 
         if recent_games is None:
             return []
