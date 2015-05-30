@@ -31,7 +31,7 @@ class Config(object):
         "leagues.management.tasks",
         "teams.management.tasks",
         "datadrivendota.management.tasks",
-        )
+    )
 
     # What happens if we do not use redis?.
     CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
@@ -361,7 +361,7 @@ class Config(object):
         },
         'leagues.management.tasks.MirrorLiveGames': {
             'acks_late': True,
-            'max_retries': TASK_MAX_RETRIES,
+            'max_retries': 0,
             'trail': False,
         },
 
