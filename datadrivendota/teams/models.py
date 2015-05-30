@@ -6,7 +6,9 @@ from datetime import timedelta
 
 
 class Team(models.Model):
-    """Pro team data"""
+
+    """ Pro team data. """
+
     steam_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=200, null=True)
     tag = models.CharField(max_length=200, null=True)
@@ -19,26 +21,27 @@ class Team(models.Model):
     games_played_with_current_roster = models.IntegerField(null=True)
     player_0 = models.ForeignKey(
         'players.Player', related_name='player_0', null=True
-        )
+    )
     player_1 = models.ForeignKey(
         'players.Player', related_name='player_1', null=True
-        )
+    )
     player_2 = models.ForeignKey(
         'players.Player', related_name='player_2', null=True
-        )
+    )
     player_3 = models.ForeignKey(
         'players.Player', related_name='player_3', null=True
-        )
+    )
     player_4 = models.ForeignKey(
         'players.Player', related_name='player_4', null=True
-        )
+    )
     admin = models.ForeignKey(
         'players.Player', related_name='team_admin', null=True
-        )
+    )
     leagues = models.ManyToManyField('leagues.League')
     valve_cdn_image = models.TextField(
         null=True, help_text='Steam cdn image url'
     )
+    image_ugc = models.IntegerField()
     valve_cdn_sponsor_image = models.TextField(
         null=True, help_text='Steam cdn sponsor image url'
     )
@@ -67,7 +70,6 @@ class Team(models.Model):
         if (
             (
                 self.valve_cdn_image is None
-                or self.valve_cdn_image == None
                 or self.valve_cdn_image == ''
             )
             and self.update_time < (
@@ -80,13 +82,13 @@ class Team(models.Model):
         else:
             return False
 
-
     def save(self, *args, **kwargs):
         self.update_time = timezone.now()
         super(Team, self).save(*args, **kwargs)
 
 
 def assemble_pros(teams):
+    """ Filter out players on teams. """
     lst = []
     subset = teams.exclude(player_0=None).values('player_0__steam_id')
     addition = [t['player_0__steam_id'] for t in subset]

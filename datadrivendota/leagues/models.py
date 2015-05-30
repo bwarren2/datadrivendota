@@ -6,9 +6,13 @@ from datetime import timedelta
 
 
 class League(models.Model):
+
     """
-    Analogous to a tournament, these are game series to which you can buy a ticket in the game client
+    A tournament.
+
+    These are game series to which you can buy a ticket in the game client
     """
+
     steam_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=200, null=True)  # Made up constant
     description = models.CharField(max_length=300, null=True)
@@ -17,6 +21,7 @@ class League(models.Model):
     valve_cdn_image = models.TextField(
         null=True, help_text='Steam cdn image url'
     )
+    image_ugc = models.IntegerField()
     update_time = models.DateTimeField(default=timezone.now)
 
     @property
