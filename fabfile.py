@@ -70,8 +70,8 @@ def rabbit_list():
 
 def cs():
     """ Push static files to s3."""
-    command = "python purge_unmanifested_s3_files.py"
-    local(command)
+    # command = "python purge_unmanifested_s3_files.py"
+    # local(command)
 
     command = (
         'python datadrivendota/manage.py collectstatic'

@@ -29,12 +29,6 @@ module.exports = function(grunt) {
           'datadrivendota/static/css/custom_bootstrap_compilation.css',
           'datadrivendota/static/css/dota2minimapheroes.css',
           'datadrivendota/static/css/icons_png.css',
-          'datadrivendota/static/css/bootstrap-tour.css',
-          'datadrivendota/static/jquery-ui-bootstrap/jquery-ui-1.10.0.custom.css',
-          'datadrivendota/static/select2-3.4.5/select2.css',
-          'datadrivendota/static/select2-3.4.5/select2-bootstrap.css',
-          'datadrivendota/static/messenger/messenger.css',
-          'datadrivendota/static/messenger/messenger-theme-future.css',
           'datadrivendota/static/css/project.css'
         ]
       }

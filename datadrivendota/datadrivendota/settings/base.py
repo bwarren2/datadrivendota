@@ -363,7 +363,7 @@ AUTO_RENDER_SELECT2_STATICS = False
 
 # PIPELINE CONFIGURATION
 PIPELINE_CSS = {
-    'all': {
+    'project': {
         'source_filenames': (
             'css/release.css',
         ),
@@ -372,6 +372,23 @@ PIPELINE_CSS = {
             'media': 'screen,projection',
         },
     },
+    'third_party': {
+        'source_filenames': (
+            'css/bootstrap-tour.css',
+            'jquery-ui-bootstrap/jquery-ui-1.10.0.custom.css',
+            'select2-3.4.5/select2.css',
+            'select2-3.4.5/select2-bootstrap.css',
+            'messenger/messenger.css',
+            'messenger/messenger-theme-future.css',
+        ),
+        'output_filename': 'css/others.css',
+        'extra_context': {
+            'media': 'screen,projection',
+        },
+    },
+
+
+
 }
 
 PIPELINE_JS = {
