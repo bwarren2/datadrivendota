@@ -363,6 +363,7 @@ AUTO_RENDER_SELECT2_STATICS = False
 
 # PIPELINE CONFIGURATION
 PIPELINE_CSS = {
+    # Why have grunt handle releases?  Because pipeline makes opaque mistakes.
     'project': {
         'source_filenames': (
             'css/release.css',
@@ -386,9 +387,6 @@ PIPELINE_CSS = {
             'media': 'screen,projection',
         },
     },
-
-
-
 }
 
 PIPELINE_JS = {
@@ -441,9 +439,8 @@ PIPELINE_JS = {
     }
 }
 
-PIPELINE_COMPILERS = (
-    'pipeline.compilers.less.LessCompiler',
-)
+# Pipeline fails to incorporate project.css properly.  Make grunt do it.
+PIPELINE_CSS_COMPRESSOR = None
 
 # END PIPELINE CONFIGURATION
 

@@ -19,21 +19,17 @@ module.exports = function(grunt) {
       }
     },
     cssmin: {
-    options: {
-      shorthandCompacting: false,
-      roundingPrecision: -1
-    },
-    target: {
-      files: {
-        'datadrivendota/static/css/release.css': [
-          'datadrivendota/static/css/custom_bootstrap_compilation.css',
-          'datadrivendota/static/css/dota2minimapheroes.css',
-          'datadrivendota/static/css/icons_png.css',
-          'datadrivendota/static/css/project.css'
-        ]
+      target: {
+        files: {
+          'datadrivendota/static/css/release.css': [
+            'datadrivendota/static/css/custom_bootstrap_compilation.css',
+            'datadrivendota/static/css/dota2minimapheroes.css',
+            'datadrivendota/static/css/icons_png.css',
+            'datadrivendota/static/css/project.css'
+          ]
+        }
       }
-    }
-  },
+    },
     watch: {
       styles: {
         files: [
@@ -48,5 +44,5 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('default', ['less', 'watch']);
+  grunt.registerTask('default', ['less', 'cssmin', 'watch']);
 };
