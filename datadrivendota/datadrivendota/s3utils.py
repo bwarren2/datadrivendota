@@ -7,7 +7,7 @@ from django.contrib.staticfiles.storage import (
     # ManifestFilesMixin
 )
 
-from pipeline.storage import PipelineMixin, NonPackagingMixin
+from pipeline.storage import PipelineMixin
 
 StaticRootS3BotoStorage = lambda: S3BotoStorage(location='static')
 MediaRootS3BotoStorage = lambda: S3BotoStorage(location='media')
@@ -43,4 +43,3 @@ class S3PipelineCachedStorage(
     # If CSS is compiled and files don't need to be compressed, packing
     # can be false.
     # See also the todo in the readme.
-

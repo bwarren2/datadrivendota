@@ -1,6 +1,6 @@
 from base import *
 
-########## TEST SETTINGS
+#   TEST SETTINGS
 DEBUG = False
 TEMPLATE_DEBUG = False
 SOUTH_TESTS_MIGRATE = False
@@ -12,7 +12,7 @@ INSTALLED_APPS += (
 
 # TEST_RUNNER = 'django_behave.runner.DjangoBehaveTestSuiteRunner'
 
-########## IN-MEMORY TEST DATABASE
+#   IN-MEMORY TEST DATABASE
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -24,3 +24,8 @@ DATABASES = {
     },
 }
 
+
+#  STORAGE
+STATICFILES_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+#  END STORAGE

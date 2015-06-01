@@ -96,32 +96,20 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
 # END GENERAL CONFIGURATION
 
 # STORAGES
-AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID', '')
-AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY', '')
-AWS_STORAGE_BUCKET_NAME = getenv('AWS_STORAGE_BUCKET_NAME', '')
-DEFAULT_FILE_STORAGE = 'datadrivendota.s3utils.MediaRootS3BotoStorage'
-AWS_QUERYSTRING_AUTH = False
-S3_URL = '//%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-STATIC_DIRECTORY = '/assets/'
-MEDIA_DIRECTORY = '/media/'
-AWS_S3_SECURE_URLS = True
-# AWS_IS_GZIPPED = True
 
 # MEDIA CONFIGURATION
+MEDIA_DIRECTORY = '/media/'
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
 MEDIA_ROOT = normpath(join(SITE_ROOT, 'media'))
 
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = S3_URL + MEDIA_DIRECTORY
 # END MEDIA CONFIGURATION
 
 
 # STATIC FILE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
+STATICFILES_STORAGE = 'datadrivendota.s3utils.S3PipelineCachedStorage'
 STATIC_ROOT = normpath(join(SITE_ROOT, 'assets'))
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
-STATIC_URL = S3_URL + STATIC_DIRECTORY
+STATIC_DIRECTORY = '/assets/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/
 #      #std:setting-STATICFILES_DIRS
@@ -139,7 +127,19 @@ STATICFILES_FINDERS = (
     'pipeline.finders.PipelineFinder',
 )
 
-STATICFILES_STORAGE = 'datadrivendota.s3utils.S3PipelineCachedStorage'
+#  AWS
+AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY', '')
+AWS_STORAGE_BUCKET_NAME = getenv('AWS_STORAGE_BUCKET_NAME', '')
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_SECURE_URLS = True
+S3_URL = '//%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+MEDIA_URL = S3_URL + MEDIA_DIRECTORY
+STATIC_URL = S3_URL + STATIC_DIRECTORY
+
+#  END AWS
+
 
 # END STATIC FILE CONFIGURATION
 
@@ -365,7 +365,7 @@ AUTO_RENDER_SELECT2_STATICS = False
 PIPELINE_CSS = {
     'all': {
         'source_filenames': (
-            'release.css'
+            'css/release.css',
         ),
         'output_filename': 'css/all.css',
         'extra_context': {

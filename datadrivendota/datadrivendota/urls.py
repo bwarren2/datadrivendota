@@ -86,4 +86,4 @@ urlpatterns = patterns(
     # Docs recommend it :/
     # https://python-social-auth.readthedocs.org/en/latest/configuration/django.html
     # Is there a better option?  --ben 2015-04-19
-) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

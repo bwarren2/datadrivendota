@@ -1,25 +1,23 @@
 """Development settings and globals."""
-
-
 from base import *
 
 
-########## DEBUG CONFIGURATION
+#   DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
 TEMPLATE_DEBUG = DEBUG
-########## END DEBUG CONFIGURATION
+#   END DEBUG CONFIGURATION
 
 
-########## EMAIL CONFIGURATION
+#   EMAIL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-########## END EMAIL CONFIGURATION
+#   END EMAIL CONFIGURATION
 
 
-########## DATABASE CONFIGURATION
+#   DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 """DATABASES = {
     'default': {
@@ -31,20 +29,20 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
         'PORT': '',
     }
 }"""
-########## END DATABASE CONFIGURATION
+#   END DATABASE CONFIGURATION
 
 
-########## CACHE CONFIGURATION
+#   CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
-########## END CACHE CONFIGURATION
+#   END CACHE CONFIGURATION
 
 
-########## TOOLBAR CONFIGURATION
+#   TOOLBAR CONFIGURATION
 # See: https://github.com/django-debug-toolbar/django-debug-toolbar/
 #      #installation
 INSTALLED_APPS += (
@@ -64,14 +62,17 @@ INTERNAL_IPS = ('127.0.0.1',)
 MIDDLEWARE_CLASSES += (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
-########## END TOOLBAR CONFIGURATION
+#   END TOOLBAR CONFIGURATION
 
-####### STATIC CONFIGURATION
+# STATIC CONFIGURATION
 STATIC_URL = '/assets/'
+STATIC_ROOT = normpath(join(SITE_ROOT, 'assets'))
+
 MEDIA_URL = '/media/'
+MEDIA_ROOT = normpath(join(SITE_ROOT, 'media'))
+
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
-STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 
 DEVSERVER_MODULES = (
