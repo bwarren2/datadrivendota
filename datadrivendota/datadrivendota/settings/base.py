@@ -411,7 +411,8 @@ PIPELINE_JS = {
             'bootstrap/js/affix.js',
             'js/bootstrap-tour.js',
             'select2-3.4.5/select2.js',
-            'js/d3/d3.min.js',
+            'bower_components/d3/d3.min.js',
+            'bower_components/nvd3/build/nv.d3.min.js',
             'js/eldarion-ajax.js',
             'js/charting.js',
             'js/gunzip.min.js',
@@ -421,13 +422,13 @@ PIPELINE_JS = {
     },
     'jquery': {
         'source_filenames': (
-            'js/jquery-1.10.2.js',
+            'bower_components/jquery/dist/jquery.min.js',
         ),
         'output_filename': 'js/jq.js',
     },
     'bluebird': {
         'source_filenames': (
-            'js/bluebird.min.js',
+            'bower_components/bluebird/js/browser/bluebird.min.js',
         ),
         'output_filename': 'js/bluebird.js',
     },

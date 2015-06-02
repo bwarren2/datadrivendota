@@ -12,5 +12,11 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.4",
+    "nvd3": "~1.7.1",
+    "bluebird": "~2.9.27",
+    "jquery": "~2.1.4"
+  }
 }
