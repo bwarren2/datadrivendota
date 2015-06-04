@@ -1,3 +1,4 @@
+"use strict";
 /* Project specific Javascript goes here. */
 
 $(function () {
@@ -25,110 +26,118 @@ $(function () {
   }
 
 
-  function ajax_select2ify(selector, multiple, placeholder, api_endpoint, cb) {
+  // function ajax_select2ify(selector, multiple, placeholder, api_endpoint, cb) {
 
-    if (multiple) {
-      var initSelectionFunction = multipleInitSelection;
-    } else {
-      var initSelectionFunction = singleInitSelection;
-    }
+  //   if (multiple) {
+  //     var initSelectionFunction = multipleInitSelection;
+  //   } else {
+  //     var initSelectionFunction = singleInitSelection;
+  //   }
 
-    $(selector).select2({
-      multiple: multiple,
-      placeholder: placeholder,
-      initSelection: initSelectionFunction,
-      ajax: {
-        url: api_endpoint,
-        data: function (term) {
-          return {'search': term};
-        },
-        results: cb,
-        formatResult: format,
-        formatSelection: format
-      }
-    });
-  }
+  //     // escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+  //     // minimumInputLength: 1,
+  //     // templateResult: formatRepo, // omitted for brevity, see the source of this page
+  //     // templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+
+
+  //     // multiple: multiple,
+  //     // placeholder: placeholder,
+  //     // initSelection: initSelectionFunction,
+  //     // ajax: {
+  //     //   url: api_endpoint,
+  //     //   data: function (term) {
+  //     //     return {'search': term};
+  //     //   },
+  //     //   results: cb,
+  //     //   formatResult: format,
+  //     //   formatSelection: format
+  //     // }
+  //   });
+  // }
+
+  // // ajax_select2ify(
+  // //   , false, "One Selector", ,
+  //   function (data, page) {
+  //     return {
+  //       results: data.results.map(
+  //         function (elt) { return {id: elt.label, text: elt.value}; }
+  //       )
+  //     };
+  //   }
+
+  // );
+
+
 
 
   // Not all of these form fields are used now.
   // But it will be easier to rip them out after the refactor.
-  ajax_select2ify(
-    '.single-player-tags', false, "One Player", "/rest-api/players",
-    function (data, page) {
-      return {
-        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.persona_name}; })
-      };
-    }
-  );
-  ajax_select2ify(
-    '.multi-player-tags', true, "One or more Players", "/rest-api/players",
-    function (data, page) {
-      return {
-        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.persona_name}; })
-      };
-    }
-  );
-  ajax_select2ify(
-    '.single-hero-tags', false, "One Hero", "/rest-api/heroes",
-    function (data, page) {
-      return {
-        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
-      };
-    }
-  );
-  ajax_select2ify(
-    '.multi-hero-tags', true, "One or more Heroes", "/rest-api/heroes",
-    function (data, page) {
-      return {
-        results: data.results.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
-      };
-    }
+  // ajax_select2ify(
+  //   '.single-player-tags', false, "One Player", "/rest-api/players",
+  //   function (data, page) {
+  //     return {
+  //       results: data.map(function (elt) { return {id: elt.steam_id, text: elt.persona_name}; })
+  //     };
+  //   }
+  // );
+  // ajax_select2ify(
+  //   '.multi-player-tags', true, "One or more Players", "/rest-api/players",
+  //   function (data, page) {
+  //     return {
+  //       results: data.map(function (elt) { return {id: elt.steam_id, text: elt.persona_name}; })
+  //     };
+  //   }
+  // );
+  // ajax_select2ify(
+  //   '.single-hero-tags', false, "One Hero", "/rest-api/heroes",
+  //   function (data, page) {
+  //     return {
+  //       results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
+  //     };
+  //   }
+  // );
+  // ajax_select2ify(
+  //   '.multi-hero-tags', true, "One or more Heroes", "/rest-api/heroes",
+  //   function (data, page) {
+  //     return {
+  //       results: data.results.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
+  //     };
+  //   }
 
-  );
-  ajax_select2ify(
-    '.single-match-tags', false, "One Match", "/rest-api/matches",
-    function (data, page) {
-      return {
-        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.steam_id}; })
-      };
-    }
+  // );
+  // ajax_select2ify(
+  //   '.single-match-tags', false, "One Match", "/rest-api/matches",
+  //   function (data, page) {
+  //     return {
+  //       results: data.map(function (elt) { return {id: elt.steam_id, text: elt.steam_id}; })
+  //     };
+  //   }
 
-  );
-  ajax_select2ify(
-    '.multi-match-tags', true, "One or more Matches", "/rest-api/matches",
-    function (data, page) {
-      return {
-        results: data.results.map(function (elt) { return {id: elt.steam_id, text: elt.steam_id}; })
-      };
-    }
-  );
-  ajax_select2ify(
-    '.single-team-tags', false, "One Team", "/rest-api/items",
-    function (data, page) {
-      return {
-        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
-      };
-    }
-  );
-  ajax_select2ify(
-    '.single-league-tags', false, "One League", "/rest-api/leagues",
-    function (data, page) {
-      return {
-        results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
-      };
-    }
-  );
-  ajax_select2ify(
-    '.combobox-tags', false, "One Selector", "/matches/api/combobox_tags",
-    function (data, page) {
-      return {
-        results: data.results.map(
-          function (elt) { return {id: elt.label, text: elt.value}; }
-        )
-      };
-    }
-
-  );
+  // );
+  // ajax_select2ify(
+  //   '.multi-match-tags', true, "One or more Matches", "/rest-api/matches",
+  //   function (data, page) {
+  //     return {
+  //       results: data.results.map(function (elt) { return {id: elt.steam_id, text: elt.steam_id}; })
+  //     };
+  //   }
+  // );
+  // ajax_select2ify(
+  //   '.single-team-tags', false, "One Team", "/rest-api/items",
+  //   function (data, page) {
+  //     return {
+  //       results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
+  //     };
+  //   }
+  // );
+  // ajax_select2ify(
+  //   '.single-league-tags', false, "One League", "/rest-api/leagues",
+  //   function (data, page) {
+  //     return {
+  //       results: data.map(function (elt) { return {id: elt.steam_id, text: elt.name}; })
+  //     };
+  //   }
+  // );
 
 
   $('#contact-link').click(function () {

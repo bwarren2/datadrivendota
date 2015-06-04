@@ -373,16 +373,13 @@ PIPELINE_CSS = {
             'media': 'screen,projection',
         },
     },
-    'third_party': {
+    'third-party': {
         'source_filenames': (
-            'css/bootstrap-tour.css',
-            'jquery-ui-bootstrap/jquery-ui-1.10.0.custom.css',
-            'select2-3.4.5/select2.css',
-            'select2-3.4.5/select2-bootstrap.css',
-            'messenger/messenger.css',
-            'messenger/messenger-theme-future.css',
+            'bower_components/messenger/build/css/messenger.css',
+            'bower_components/messenger/build/css/messenger-theme-future.css',
+            'bower_components/select2/dist/css/select2.css',
         ),
-        'output_filename': 'css/others.css',
+        'output_filename': 'css/third-party.css',
         'extra_context': {
             'media': 'screen,projection',
         },
@@ -392,30 +389,28 @@ PIPELINE_CSS = {
 PIPELINE_JS = {
     'all': {
         'source_filenames': (
-            'js/jquery-ui.js',
-            'js/jquery.metadata.js',
-            'js/jquery.tablesorter.js',
-            'messenger/messenger.js',
-            'messenger/messenger-theme-future.js',
-            'bootstrap/js/transition.js',
-            'bootstrap/js/modal.js',
-            'bootstrap/js/dropdown.js',
-            'bootstrap/js/scrollspy.js',
-            'bootstrap/js/tab.js',
-            'bootstrap/js/tooltip.js',
-            'bootstrap/js/popover.js',
-            'bootstrap/js/alert.js',
-            'bootstrap/js/button.js',
-            'bootstrap/js/collapse.js',
-            'bootstrap/js/carousel.js',
-            'bootstrap/js/affix.js',
-            'js/bootstrap-tour.js',
-            'select2-3.4.5/select2.js',
+            'bower_components/messenger/build/js/messenger.min.js',
+            'bower_components/messenger/build/js/messenger-theme-future.js',
+            'bower_components/bootstrap/js/transition.js',
+            'bower_components/bootstrap/js/modal.js',
+            'bower_components/bootstrap/js/dropdown.js',
+            'bower_components/bootstrap/js/scrollspy.js',
+            'bower_components/bootstrap/js/tab.js',
+            'bower_components/bootstrap/js/tooltip.js',
+            'bower_components/bootstrap/js/popover.js',
+            'bower_components/bootstrap/js/alert.js',
+            'bower_components/bootstrap/js/button.js',
+            'bower_components/bootstrap/js/collapse.js',
+            'bower_components/bootstrap/js/carousel.js',
+            'bower_components/bootstrap/js/affix.js',
             'bower_components/d3/d3.min.js',
+            'bower_components/jqueryui/jquery-ui.min.js',
             'bower_components/nvd3/build/nv.d3.min.js',
+            'bower_components/bluebird/js/browser/bluebird.min.js',
+            'bower_components/handlebars/handlebars.min.js',
+            'bower_components/select2/dist/js/select2.full.js',
             'js/eldarion-ajax.js',
             'js/charting.js',
-            'js/gunzip.min.js',
             'js/project.js',
         ),
         'output_filename': 'js/all.js',
@@ -426,18 +421,6 @@ PIPELINE_JS = {
         ),
         'output_filename': 'js/jq.js',
     },
-    'bluebird': {
-        'source_filenames': (
-            'bower_components/bluebird/js/browser/bluebird.min.js',
-        ),
-        'output_filename': 'js/bluebird.js',
-    },
-    'handlebars': {
-        'source_filenames': (
-            'js/handlebars.js',
-        ),
-        'output_filename': 'js/handlebars.js',
-    }
 }
 
 # Pipeline fails to incorporate project.css properly.  Make grunt do it.

@@ -9,10 +9,12 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <!-- Le styles -->
-    {% stylesheet 'project' %}
-    {% stylesheet 'third_party' %}
 
-    {% javascript 'jquery' %}
+    {% stylesheet 'project' %}
+    {% stylesheet 'third-party' %}
+
+
+
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -117,11 +119,6 @@
 
 
           </ul>
-          <span id='combobox'>
-            <input type='text' class='combobox-tags' style='margin-top:5px' >
-            <button type='button' class='btn btn-small btn-primary click-selector' style='margin-top:8px; margin-left:3px'>Select</button>
-          </span>
-
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_active %}
             <li><a href="{% url 'accounts:management' %}">Data Management</a></li>
@@ -191,12 +188,8 @@
 
     {% endcomment %}
     {% javascript 'all' %}
-    {% javascript 'bluebird' %}
-    {% javascript 'handlebars' %}
 
-      <script type="text/javascript">
-        window.comboBox();
-      </script>
+
 
     {% block extra_js %}
     {% endblock extra_js %}
