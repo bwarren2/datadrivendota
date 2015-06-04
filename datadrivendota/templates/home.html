@@ -60,10 +60,10 @@
 
 </div>
 <div>
+          {% comment %}
           <select style='width:100px' class="js-data-example-ajax">
             <option></option>
           </select>
-          {% comment %}
 
             <select id='combobox' multiple="multiple">
               <option>Hi</option>
@@ -86,6 +86,8 @@
   <script type="text/javascript">
   $(function(){
     window.splash_gimmick();
+{% comment %}
+
         $(".js-data-example-ajax").select2({
           ajax: {
             delay: 0,
@@ -118,6 +120,7 @@
             }
           }
         });
+{% endcomment %}
 
   })
   </script>
