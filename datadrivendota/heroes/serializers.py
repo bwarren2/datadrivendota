@@ -1,5 +1,5 @@
 from rest_framework import serializers, filters
-from heroes.models import Hero
+from heroes.models import Hero, HeroDossier
 
 
 class HeroSerializer(serializers.ModelSerializer):
@@ -16,3 +16,11 @@ class HeroSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hero
         fields = ('steam_id', 'internal_name', 'name', 'image_url', 'visible')
+
+
+class HeroDossierSerializer(serializers.ModelSerializer):
+    hero = HeroSerializer()
+
+    class Meta:
+        model = HeroDossier
+        exclude = ('id',)

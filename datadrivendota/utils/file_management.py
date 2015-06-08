@@ -1,15 +1,11 @@
-import json
-from io import BytesIO
 from uuid import uuid4
 from django.core.files.storage import default_storage
-from os.path import splitext
 
 
-def s3File(myfile, chosen_name=None):
-    # myfile2 = open(myfile.name, 'r')
-
+def s3_file(myfile, chosen_name=None):
+    """ Move a file to s3. """
     if chosen_name is not None:
-        filename = chosen_name+'.png'
+        filename = chosen_name + '.png'
     else:
         extension = 'json'
         filename = '1d_{filename}{ext}'.format(
@@ -22,16 +18,3 @@ def s3File(myfile, chosen_name=None):
     s3file.write(myfile.read())
     s3file.close()
     return s3file
-
-
-def outsourceJson(data, params):
-    myjson = json.dumps(data, params)
-    return moveJson(myjson)
-
-
-def moveJson(json_data):
-    # datafilename = '1d_%s.json' % str(uuid4())
-
-    datafile = BytesIO(json_data)
-    _ = datafile.seek(0)
-    return s3File(datafile)

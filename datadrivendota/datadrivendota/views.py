@@ -11,7 +11,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 
-from utils.file_management import outsourceJson, moveJson
 from utils.exceptions import NoDataFound
 from datadrivendota.keen_app import keen_client
 
@@ -38,8 +37,12 @@ class LandingView(TemplateView):
         return super(LandingView, self).get_context_data(**kwargs)
 
 
-# The onboarding process is due for a refactor.  Fixing this before that would be a waste of time.
 def upgrade(request):
+    """
+    The onboarding process is due for a refactor.
+
+    Fixing this before that would be a waste of time.
+    """
     if request.method == 'POST':
         form = KeyForm(request.POST)
 
@@ -81,155 +84,6 @@ class LoginRequiredView(View):
         return super(LoginRequiredView, self).dispatch(*args, **kwargs)
 
 
-class FormView(View):
-    """This is an outdated method of dispatching and altering charts, scheduled for deprecation.  You can tell by the datalist, params entrypoint of times gone by, before class based charts.  ChartFormView is the preferred method now."""
-
-    form = None
-    attrs = None
-    json_function = None
-    title = None
-    html = None
-
-    def get(self, request):
-        if request.GET:
-            bound_form = self.form(request.GET)
-
-            if bound_form.is_valid():
-                try:
-                    kwargs = {
-                        attr: bound_form.cleaned_data[attr]
-                        for attr in self.attrs
-                    }
-
-                    datalist, params = self.json_function(
-                        **kwargs
-                    )
-                    params = self.amend_params(params)
-                    json_data = outsourceJson(datalist, params)
-
-                    return render(
-                        request,
-                        self.html,
-                        {
-                            'form': bound_form,
-                            'json_data': basename(json_data.name),
-                            'title': self.title,
-                        }
-                    )
-
-                except NoDataFound:
-                    return render(
-                        request,
-                        self.html,
-                        {
-                            'form': bound_form,
-                            'error': 'error',
-                            'title': self.title,
-                        }
-                    )
-
-            else:
-                return render(
-                    request,
-                    self.html,
-                    {
-                        'form': bound_form,
-                        'title': self.title,
-                    }
-                )
-
-        else:
-            form = self.form
-            return render(
-                request,
-                self.html,
-                {
-                    'form': form,
-                    'title': self.title,
-                    'tour': self.json_tour,
-                }
-            )
-
-    def amend_params(self, params):
-        return params
-
-
-class ChartFormView(View):
-
-    tour = None
-    form = None
-    attrs = None
-    json_function = None
-    title = None
-    html = None
-
-    def get(self, request):
-        self.json_tour = dumps(self.tour)
-        if request.GET:
-            bound_form = self.form(request.GET)
-
-            if bound_form.is_valid():
-                try:
-                    kwargs = {
-                        attr: bound_form.cleaned_data[attr]
-                        for attr in self.attrs
-                    }
-
-                    chart = self.json_function(
-                        **kwargs
-                    )
-                    self.amend_params(chart)
-                    json_data = moveJson(chart.as_JSON())
-                    return render(
-                        request,
-                        self.html,
-                        {
-                            'form': bound_form,
-                            'json_data': basename(json_data.name),
-                            'title': self.title,
-                            'tour': self.json_tour,
-                        }
-                    )
-
-                except NoDataFound:
-                    return render(
-                        request,
-                        self.html,
-                        {
-                            'form': bound_form,
-                            'error': 'error',
-                            'title': self.title,
-                            'tour': self.json_tour,
-                        }
-                    )
-
-            else:
-                return render(
-                    request,
-                    self.html,
-                    {
-                        'form': bound_form,
-                        'title': self.title,
-                        'tour': self.json_tour,
-                    }
-                )
-
-        else:
-            form = self.form
-            return render(
-                request,
-                self.html,
-                {
-                    'form': form,
-                    'title': self.title,
-                    'tour': self.json_tour,
-                }
-            )
-
-    def amend_params(self, chart):
-        return chart
-
-
 class ApiView(View):
 
     def get(self, request):
@@ -250,7 +104,7 @@ class ApiView(View):
                     )
                     self.amend_params(request, chart)
 
-                    json_data = moveJson(chart.as_JSON())
+                    json_data = chart.as_JSON()
                     return self.succeed(json_data)
 
                 else:
@@ -263,19 +117,19 @@ class ApiView(View):
             return self.fail()
 
     def amend_params(self, request, chart):
-        doctorVars = {
+        doctor_vars = {
             'width': 'outerWidth',
             'height': 'outerHeight',
             'draw_legend': 'draw_legend',
             'x_ticks': 'x_ticks',
             'y_ticks': 'y_ticks',
         }
-        for var, adjust in doctorVars.iteritems():
+        for var, adjust in doctor_vars.iteritems():
             reqvar = request.GET.get(var, None)
             if reqvar is not None:
                 setattr(chart.params, adjust, reqvar)
 
-        flagVars = [
+        flag_vars = [
             'no_legend',
             'padding_bottom',
             'padding_top',
@@ -286,7 +140,7 @@ class ApiView(View):
             'margin_left',
             'margin_right',
         ]
-        for var in flagVars:
+        for var in flag_vars:
             reqvar = request.GET.get(var, None)
             if reqvar is not None:
                 if var == 'no_legend':
@@ -359,23 +213,23 @@ class SearchView(DjangoFormView):
         context = {
             'heroes': Hero.public.filter(
                 name__icontains=(search_str)
-                )[:10],
+            )[:10],
             'players': Player.objects.filter(
                 persona_name__icontains=(search_str)
-                )[:10],
+            )[:10],
             'pros': Player.objects.filter(
                 pro_name__icontains=(search_str)
-                )[:10],
+            )[:10],
             'teams': Team.objects.filter(
                 Q(name__icontains=(search_str)) |
                 Q(tag__icontains=(search_str))
-                )[:10],
+            )[:10],
             'items': Item.objects.filter(
                 name__icontains=(search_str)
-                )[:10],
+            )[:10],
             'leagues': League.objects.filter(
                 name__icontains=(search_str)
-                )[:10],
+            )[:10],
             'form': form
         }
 

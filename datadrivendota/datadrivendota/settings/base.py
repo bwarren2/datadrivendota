@@ -358,9 +358,6 @@ VALID_KEY_DAYS = 7
 # END LOGIN CONFIGURATION
 
 
-AUTO_RENDER_SELECT2_STATICS = False
-
-
 # PIPELINE CONFIGURATION
 PIPELINE_CSS = {
     # Why have grunt handle releases?  Because pipeline makes opaque mistakes.
@@ -389,6 +386,7 @@ PIPELINE_CSS = {
 PIPELINE_JS = {
     'all': {
         'source_filenames': (
+            'bower_components/jquery/dist/jquery.min.js',
             'bower_components/messenger/build/js/messenger.min.js',
             'bower_components/messenger/build/js/messenger-theme-future.js',
             'bower_components/bootstrap/js/transition.js',
@@ -405,21 +403,15 @@ PIPELINE_JS = {
             'bower_components/bootstrap/js/affix.js',
             'bower_components/d3/d3.min.js',
             'bower_components/jqueryui/jquery-ui.min.js',
-            'bower_components/nvd3/build/nv.d3.min.js',
+            'bower_components/nvd3/build/nv.d3.js',
             'bower_components/bluebird/js/browser/bluebird.min.js',
             'bower_components/handlebars/handlebars.min.js',
-            'bower_components/select2/dist/js/select2.full.js',
             'js/eldarion-ajax.js',
             'js/charting.js',
             'js/project.js',
+            'bower_components/select2/dist/js/select2.min.js',
         ),
         'output_filename': 'js/all.js',
-    },
-    'jquery': {
-        'source_filenames': (
-            'bower_components/jquery/dist/jquery.min.js',
-        ),
-        'output_filename': 'js/jq.js',
     },
 }
 

@@ -28,3 +28,21 @@
     {% endfor %}
   </div>
 {% endblock %}
+
+
+{% block extra_js %}
+<script type="text/javascript">
+$(function(){
+    $('#hero-filter-select').change(function () {
+    var role_select = $(this).val();
+    if (!!role_select) {
+      $('.col-md-2:not(.' + role_select + ')').fadeOut();
+      $('.col-md-2.' + role_select).fadeIn();
+    } else {
+      $('.col-md-2').fadeIn();
+    }
+  });
+})
+</script>
+
+{% endblock extra_js %}

@@ -8,7 +8,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 
 
 from datadrivendota.mixins import SubscriberRequiredMixin
-from datadrivendota.views import ChartFormView, ApiView
+from datadrivendota.views import ApiView
 
 
 from .mixins import (
@@ -124,35 +124,6 @@ class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('persona_name',)
     paginate_by = 10
-
-
-class Winrate(WinrateMixin, ChartFormView):
-
-    """ JSON chart maker for player winrate."""
-
-    title = "Hero Winrate"
-    html = "players/form.html"
-
-
-class HeroAdversary(HeroAdversaryMixin, ChartFormView):
-
-    """ JSON chart maker for player-hero opposition winrate."""
-
-    title = "Player Hero Adversary"
-    html = "players/form.html"
-
-
-class HeroAbilities(HeroAbilitiesMixin, ChartFormView):
-
-    """ JSON chart maker for player skilling of a hero."""
-
-    title = "Hero Skilling Comparison"
-    html = "players/form.html"
-
-    def amend_params(self, chart):
-        """ Tweak chart settings for line width."""
-        chart.params.path_stroke_width = 1
-        return chart
 
 
 class PlayerComparsionView(TemplateView):

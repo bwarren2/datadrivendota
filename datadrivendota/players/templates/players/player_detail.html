@@ -63,38 +63,53 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-  window.apiHit(
-    "#winrate_chart",
-    '{% url "players:api_winrate_chart" %}',
-      $.param({
-        player: {{player.steam_id}},
-        game_modes: [1, 2, 3, 4, 5],
-        group_var: 'alignment',
-        width: 300,
-        height: 300,
-      }, true
+$(function(){
+  Promise.resolve(
+    $.ajax(
+      '/rest-api/player-match-summary/?'+$.param(
+        {player_id:{{player.steam_id}}}
+      )
     )
-  );
+  )
+  .then(function(data){
+    console.log(data)
+  })
+  .catch(function(e){
+    console.log(e)
+  })
+})
+  // window.apiHit(
+  //   "#winrate_chart",
+  //   '{% url "players:api_winrate_chart" %}',
+  //     $.param({
+  //       player: {{player.steam_id}},
+  //       game_modes: [1, 2, 3, 4, 5],
+  //       group_var: 'alignment',
+  //       width: 300,
+  //       height: 300,
+  //     }, true
+  //   )
+  // );
 
-  window.apiHit(
-    "#endgame_chart",
-    '{% url "matches:api_endgame_chart" %}',
-      $.param({
+  // window.apiHit(
+  //   "#endgame_chart",
+  //   '{% url "matches:api_endgame_chart" %}',
+  //     $.param({
 
-        players: '{{endgame_chart_ids}}',
-        game_modes: [1, 2, 3, 4, 5],
-        x_var: 'duration',
-        y_var: 'K-D+.5*A',
-        panel_var: 'None',
-        group_var: 'player',
-        width: 300,
-        height: 300,
-      }, true
-    )
-  );
+  //       players: '{{endgame_chart_ids}}',
+  //       game_modes: [1, 2, 3, 4, 5],
+  //       x_var: 'duration',
+  //       y_var: 'K-D+.5*A',
+  //       panel_var: 'None',
+  //       group_var: 'player',
+  //       width: 300,
+  //       height: 300,
+  //     }, true
+  //   )
+  // );
 </script>
 <script type="text/javascript">
-  $(window.jsUtils.scorebarToggles())
+  $(function(){window.jsUtils.scorebarToggles()})
 </script>
 
 {% endblock extra_js %}

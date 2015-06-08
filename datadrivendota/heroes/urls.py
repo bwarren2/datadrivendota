@@ -4,30 +4,8 @@ from heroes import views
 urlpatterns = patterns(
     '',
     url(r'^$', views.IndexView.as_view(), name='index'),
-    url(r'^vitals/$', views.Vitals.as_view(), name='vitals'),
-    url(r'^lineups/$', views.Lineup.as_view(), name='lineup'),
-    url(r'^performance/$',
-        views.HeroPerformance.as_view(),
-        name='hero_performance'),
-    url(
-        r'^performance-lineup/$',
-        views.HeroPerformanceLineup.as_view(),
-        name='hero_performance_lineup'
-    ),
-    url(r'^skillbuild-winrate/$',
-        views.HeroBuildLevel.as_view(),
-        name='hero_skill_bars',
-        ),
-    url(
-        r'^skill-progression/$',
-        views.HeroSkillProgression.as_view(),
-        name='hero_skill_progression'
-    ),
-    url(
-        r'^pick-ban-rate/$',
-        views.HeroPickBanLineup.as_view(),
-        name='pick_ban_rate'
-    ),
+    url(r'^vitals/$', views.VitalsView.as_view(), name='vitals'),
+    url(r'^lineups/$', views.LineupView.as_view(), name='lineup'),
     url(
         r'^ability/(?P<ability_name>[a-zA-Z0-9\-\_]*)/$',
         views.AbilityDetailView.as_view(),

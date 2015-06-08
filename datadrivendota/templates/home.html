@@ -60,24 +60,8 @@
 
 </div>
 <div>
-          {% comment %}
-          <select style='width:100px' class="js-data-example-ajax">
-            <option></option>
-          </select>
-
-            <select id='combobox' multiple="multiple">
-              <option>Hi</option>
-            </select>
-            <button type='button' class='btn btn-small btn-primary click-selector' style='margin-top:8px; margin-left:3px'>Select</button>
-          {% endcomment %}
 
 </div>
-          <style type="text/css">
-          .select2-search__field{
-            color:black;
-          }
-          </style>
-
 
 {% endblock content %}
 
@@ -86,42 +70,6 @@
   <script type="text/javascript">
   $(function(){
     window.splash_gimmick();
-{% comment %}
-
-        $(".js-data-example-ajax").select2({
-          ajax: {
-            delay: 0,
-            url: function (params) {
-              console.log('url');
-              return "rest-api/players"
-            },
-            data: function (params) {
-              console.log('data');
-              var queryParameters = {
-                q: params.term
-              }
-
-              return queryParameters;
-            },
-            processResults: function (data) {
-              console.log('process');
-              return {
-                results: data
-              };
-            },
-            transport: function (params, success, failure) {
-              console.log('transport');
-              var $request = $.ajax(params);
-
-              $request.then(success);
-              $request.fail(failure);
-
-              return $request;
-            }
-          }
-        });
-{% endcomment %}
-
   })
   </script>
 

@@ -2230,9 +2230,8 @@ var splash_gimmick = function(){
       $(selector_class).html(y_mean);
 
     }
-
+    setTimeout(update, interval)
   }
-
-  setInterval(update, interval);
+  update()
 }
 window.splash_gimmick = splash_gimmick;

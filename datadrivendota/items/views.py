@@ -3,7 +3,7 @@ from .serializers import ItemSerializer
 from django.views.generic import ListView, DetailView
 
 from items.models import Item
-from datadrivendota.views import ChartFormView, ApiView
+from datadrivendota.views import ApiView
 from .mixins import ItemWinrateMixin
 
 
@@ -31,16 +31,6 @@ EVERYTHING BELOW HERE IS DEPRECATED
 
 YOU ARE WARNED.
 """
-
-
-class ItemWinrateView(ItemWinrateMixin, ChartFormView):
-    title = "Item Winrate"
-    html = "items/form.html"
-
-    def amend_params(self, params):
-        params['draw_legend'] = False
-        return params
-
 
 class ApiItemEndgameChart(ItemWinrateMixin, ApiView):
     pass

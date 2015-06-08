@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from matches.models import Match, PlayerMatchSummary
+from players.serializers import PlayerSerializer
+from heroes.serializers import HeroSerializer
 
 
 class MatchSerializer(serializers.ModelSerializer):
@@ -15,6 +17,8 @@ class MatchSerializer(serializers.ModelSerializer):
 
 
 class PlayerMatchSummarySerializer(serializers.ModelSerializer):
+    player = PlayerSerializer()
+    hero = HeroSerializer()
 
     class Meta:
         model = PlayerMatchSummary
@@ -36,4 +40,6 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
             'xp_total',
             'kda2',
             'side',
+            'player',
+            'hero',
         )

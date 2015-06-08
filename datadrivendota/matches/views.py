@@ -4,14 +4,11 @@ from itertools import chain
 from heroes.models import Role
 
 from django.views.generic import DetailView, ListView
-from django.shortcuts import render
-from django.views.generic.edit import FormView
 
-from datadrivendota.views import ChartFormView, ApiView, AjaxView
+from datadrivendota.views import ApiView, AjaxView
 from utils.views import cast_dict, ability_infodict
 from heroes.models import Hero
 from .models import Match, PlayerMatchSummary, PickBan
-from .forms import ContextSelect
 from .mixins import (
     EndgameMixin,
     OwnTeamEndgameMixin,
@@ -35,11 +32,24 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PlayerMatchSummaryViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = PlayerMatchSummary.objects.all()
-    paginate_by = 10
     serializer_class = PlayerMatchSummarySerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = PlayerMatchSummary.objects.all()
+
+        player = self.request.query_params.get('player_id')
+        if player is not None:
+            queryset.filter(player__steam_id=player)
+        valid = self.request.query_params.get('validity')
+        if valid is not None:
+            if valid == 'LEGIT':
+                queryset.filter(match__validity=Match.LEGIT)
+            elif valid == 'ALL':
+                pass
+            else:
+                pass
+        return queryset
 
 
 class MatchDetail(DetailView):
@@ -54,7 +64,7 @@ class MatchDetail(DetailView):
         ).select_related().order_by('player_slot')
 
         for summary in summaries:
-            summary.kda = summary.kills - summary.deaths + .5*summary.assists
+            summary.kda = summary.kills - summary.deaths + .5 * summary.assists
 
             if summary.side == 'Radiant':
                 summary.is_radiant = True
@@ -380,125 +390,6 @@ class MatchListView(ListView):
 #                     'form': form,
 #                 }
 #             )
-
-
-class MatchHeroContext(FormView):
-    template_name = 'matches/match_hero_context.html'
-    form_class = ContextSelect
-
-    def get(self, request, *args, **kwargs):
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-
-        if form.is_valid():
-            return self.form_valid(form)
-
-        else:
-            return self.form_invalid(form)
-            return render(
-                self.request,
-                self.template_name,
-                {'form': form_class()},
-            )
-
-    def get_form_kwargs(self):
-        """
-        Returns the keyword arguments for instantiating the form.
-        """
-        kwargs = {
-            'initial': self.get_initial(),
-            'prefix': self.get_prefix(),
-        }
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': self.request.POST,
-                'files': self.request.FILES,
-            })
-
-        if self.request.method in ('GET'):
-            kwargs.update({
-                'data': self.request.GET,
-                'files': self.request.FILES,
-            })
-
-        return kwargs
-
-    def form_valid(self, form):
-        hero = form.cleaned_data['hero']
-
-        hero_obj = Hero.objects.get(steam_id=hero)
-
-        hero_name = hero_obj.name
-        machine_name = hero_obj.machine_name
-        matches = ",".join(str(x) for x in form.cleaned_data['matches'])
-        outcome = form.cleaned_data['outcome']
-        amendments = {
-            'form': form,
-            'hero': hero,
-            'matches': matches,
-            'outcome': outcome,
-            'hero_name': hero_name,
-            'machine_name': machine_name,
-        }
-        return render(
-            self.request,
-            self.template_name,
-            self.get_context_data(**amendments),
-            )
-
-
-# Everything below here is deprecated and marked for near-term refactor.
-# You are warned.
-
-class MatchParameterChart(MatchParameterMixin, ChartFormView):
-
-    title = "Match Parameter Scatter"
-    html = "matches/form.html"
-
-
-class Endgame(EndgameMixin, ChartFormView):
-    title = "Endgame Charts"
-    html = "matches/form.html"
-
-    def amend_params(self, params):
-        return params
-
-
-class OwnTeamEndgame(OwnTeamEndgameMixin, ChartFormView):
-    title = "Own-Team Endgame Charts"
-    html = "matches/form.html"
-
-
-class SameTeamEndgame(SameTeamEndgameMixin, ChartFormView):
-    title = "Same Team Endgame Charts"
-    html = "matches/form.html"
-
-    def amend_params(self, params):
-        return params
-
-
-class ProgressionList(ProgressionListMixin, ChartFormView):
-    title = "Match List Hero Progression"
-    html = "matches/form.html"
-
-    def amend_params(self, params):
-        return params
-
-
-class ProgressionSet(SetProgressionMixin, ChartFormView):
-    title = "Match Set Hero Progression"
-    html = "matches/form.html"
-
-    def amend_params(self, params):
-        return params
-
-
-class AbilityBuild(AbilityBuildMixin, ChartFormView):
-    title = "Match Ability Breakdown"
-    html = "matches/form.html"
-
-    def amend_params(self, params):
-        return params
 
 
 class ComboboxAjaxView(AjaxView):

@@ -9,7 +9,7 @@ from .mixins import (
     WinrateMixin,
     PickBanMixin,
 )
-from datadrivendota.views import ChartFormView, ApiView, JsonApiView
+from datadrivendota.views import ApiView, JsonApiView
 from datadrivendota.redis_app import (
     get_games,
     timeline_key,
@@ -175,19 +175,6 @@ WARNING
 Everything below here is deprecated.
 WARNING
 """
-
-
-class Winrate(WinrateMixin, ChartFormView):
-    title = "Hero Winrate"
-    html = "players/form.html"
-
-
-class PickBan(PickBanMixin, ChartFormView):
-
-    """What did this league pick/ban."""
-
-    title = "Pick/Bans"
-    html = "players/form.html"
 
 
 class ApiWinrateChart(WinrateMixin, ApiView):

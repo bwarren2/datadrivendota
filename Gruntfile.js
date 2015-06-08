@@ -15,6 +15,7 @@ module.exports = function(grunt) {
           "datadrivendota/static/css/project.css": "datadrivendota/static/css/project.less",
           "datadrivendota/static/css/bootstrap-tour.css": "datadrivendota/static/css/bootstrap-tour.less",
           "datadrivendota/static/css/variables.css": "datadrivendota/static/css/variables.less",
+          "datadrivendota/static/css/custom_nvd3_compilation.css": "datadrivendota/static/css/custom_nvd3_compilation.less",
         }
       }
     },
@@ -22,6 +23,7 @@ module.exports = function(grunt) {
       target: {
         files: {
           'datadrivendota/static/css/release.css': [
+            'datadrivendota/static/css/custom_nvd3_compilation.css',
             'datadrivendota/static/css/custom_bootstrap_compilation.css',
             'datadrivendota/static/css/dota2minimapheroes.css',
             'datadrivendota/static/css/icons_png.css',

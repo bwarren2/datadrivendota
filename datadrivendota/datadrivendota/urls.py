@@ -7,11 +7,13 @@ from django.contrib import admin
 
 from datadrivendota import views
 from accounts.views import data_applicant
+
+# REST
 from rest_framework.routers import DefaultRouter
 from matches.views import MatchViewSet, PlayerMatchSummaryViewSet
 from teams.views import TeamViewSet
 from leagues.views import LeagueViewSet
-from heroes.views import HeroViewSet
+from heroes.views import HeroViewSet, HeroDossierViewSet
 from items.views import ItemViewSet
 from players.views import PlayerViewSet
 
@@ -22,9 +24,14 @@ router = DefaultRouter()
 router.register('teams', TeamViewSet)
 router.register('leagues', LeagueViewSet)
 router.register('heroes', HeroViewSet)
+router.register('hero-dossiers', HeroDossierViewSet)
 router.register('items', ItemViewSet)
 router.register('matches', MatchViewSet)
-router.register('player-match-summary', PlayerMatchSummaryViewSet)
+router.register(
+    'player-match-summary',
+    PlayerMatchSummaryViewSet,
+    base_name='player-match-summary'
+)
 router.register('players', PlayerViewSet)
 
 urlpatterns = patterns(
@@ -87,3 +94,15 @@ urlpatterns = patterns(
     # https://python-social-auth.readthedocs.org/en/latest/configuration/django.html
     # Is there a better option?  --ben 2015-04-19
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if settings.DEBUG:
+    # static files (images, css, javascript, etc.)
+    urlpatterns += patterns(
+        '',
+        (
+            r'^media/(?P<path>.*)$', 'django.views.static.serve',
+            {
+                'document_root': settings.MEDIA_ROOT
+            }
+        )
+    )

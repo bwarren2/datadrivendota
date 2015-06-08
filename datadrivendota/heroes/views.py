@@ -2,12 +2,12 @@
 from collections import defaultdict
 from rest_framework import viewsets, filters
 
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 
-from datadrivendota.views import ChartFormView, ApiView
+from datadrivendota.views import ApiView
 
 from .models import Hero, Ability, HeroDossier, Role
-from .serializers import HeroSerializer
+from .serializers import HeroSerializer, HeroDossierSerializer
 from .mixins import (
     VitalsMixin,
     LineupMixin,
@@ -16,7 +16,6 @@ from .mixins import (
     HeroBuildLevelMixin,
     UpdatePlayerWinrateMixin,
     HeroPerformanceLineupMixin,
-    HeroPickRateMixin,
 )
 
 
@@ -90,137 +89,47 @@ class HeroViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ('name',)
 
 
-"""
-WARNING
-EVERYTHING BELOW THIS IS DEPRECATED.
-IT IS LEAVING SOON.
-"""
+class HeroDossierViewSet(viewsets.ReadOnlyModelViewSet):
+
+    """ DRF hero endpoint. """
+
+    queryset = HeroDossier.objects.all()
+    paginate_by = None
+    serializer_class = HeroDossierSerializer
 
 
-class Vitals(VitalsMixin, ChartFormView):
-
-    """ Hero vital stats chart. """
-
-    title = "Hero Vitals"
-    html = "heroes/form.html"
-
-    def amend_params(self, chart):
-        """ Do (no) chart editing. """
-        return chart
+class VitalsView(TemplateView):
+    template_name = 'heroes/vitals.html'
 
 
-class Lineup(LineupMixin, ChartFormView):
-
-    """ Hero stat lineup chart. """
-
-    title = "Hero Lineups"
-    html = "heroes/form.html"
-
-    def amend_params(self, chart):
-        """ Tweak chart parameters. """
-        chart.params.draw_legend = True
-        chart.params.legendWidthPercent = .7
-        chart.params.legendHeightPercent = .1
-        return chart
-
-
-class HeroPerformance(HeroPerformanceMixin, ChartFormView):
-
-    """ Hero performance chart. """
-
-    title = "Hero Performance"
-    html = "heroes/form.html"
-
-    def amend_params(self, chart):
-        """ Edit chart display options. """
-        chart.params.draw_legend = True
-        chart.params.legendWidthPercent = .7
-        chart.params.legendHeightPercent = .1
-        return chart
-
-
-class HeroSkillProgression(HeroSkillProgressionMixin, ChartFormView):
-
-    """ Hero skill progression chart. """
-
-    title = "Hero Skilling"
-    html = "heroes/form.html"
-
-    def amend_params(self, chart):
-        """ Edit chart display options. """
-        chart.params.path_stroke_width = 2
-        return chart
-
-
-class HeroBuildLevel(HeroBuildLevelMixin, ChartFormView):
-
-    """ Hero build level chart. """
-
-    title = "SkillBuild Winrate"
-    html = "heroes/form.html"
-
-
-class HeroPerformanceLineup(HeroPerformanceLineupMixin, ChartFormView):
-
-    """ Hero performance chart. """
-
-    title = "Hero Performance Lineup"
-    html = "heroes/form.html"
-
-
-class HeroPickBanLineup(HeroPickRateMixin, ChartFormView):
-
-    """ Pick & Ban lineup. """
-
-    title = "Hero Performance Lineup"
-    html = "heroes/form.html"
+class LineupView(TemplateView):
+    template_name = 'heroes/lineups.html'
 
 
 # API endpoints
 class ApiVitalsChart(VitalsMixin, ApiView):
-
-    """ API chart. """
-
     pass
 
 
 class ApiLineupChart(LineupMixin, ApiView):
-
-    """ API chart. """
-
     pass
 
 
 class ApiHeroPerformanceChart(HeroPerformanceMixin, ApiView):
-
-    """ API chart. """
-
     pass
 
 
 class ApiSkillProgressionChart(HeroSkillProgressionMixin, ApiView):
-
-    """ API chart. """
-
     pass
 
 
 class ApiBuildLevelChart(HeroBuildLevelMixin, ApiView):
-
-    """ API chart. """
-
     pass
 
 
 class ApiUpdatePlayerWinrateChart(UpdatePlayerWinrateMixin, ApiView):
-
-    """ API chart. """
-
     pass
 
 
 class ApiHeroPerformanceLineupChart(HeroPerformanceLineupMixin, ApiView):
-
-    """ API chart. """
-
     pass

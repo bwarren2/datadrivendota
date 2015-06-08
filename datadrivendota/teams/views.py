@@ -12,11 +12,13 @@ from .mixins import (
     WinrateMixin,
     PickBanMixin,
 )
-from datadrivendota.views import ChartFormView, ApiView
+from datadrivendota.views import ApiView
 
 
 class TeamList(ListView):
-    """The index of imported leagues"""
+
+    """ The index of imported leagues. """
+
     model = Team
     paginate_by = 30
     template_name = 'teams/team_list.html'
@@ -37,7 +39,8 @@ class TeamList(ListView):
 
 
 class TeamDetail(DetailView):
-    """Focusing on a particular team"""
+
+    """ Focusing on a particular team. """
 
     def get_object(self):
         return Team.objects.get(steam_id=self.kwargs.get('steam_id'))
@@ -45,11 +48,11 @@ class TeamDetail(DetailView):
     def get_context_data(self, **kwargs):
         match_list = Match.objects.filter(
             skill=4
-            )
+        )
         match_list = match_list.filter(
             Q(radiant_team__steam_id=self.object.steam_id) |
             Q(dire_team__steam_id=self.object.steam_id)
-            )
+        )
 
         match_list = match_list.select_related()\
             .distinct().order_by('-start_time')
@@ -71,51 +74,6 @@ class TeamDetail(DetailView):
         return super(TeamDetail, self).get_context_data(**context)
 
 
-class Winrate(WinrateMixin, ChartFormView):
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts hero winrate for a particular team."
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Dates and the team you want to see here."
-        },
-        {
-            'orphan': True,
-            'title': "Ready to go!",
-            'content': "Try it out!"
-        }
-    ]
-    title = "Hero Winrate"
-    html = "players/form.html"
-
-
-class PickBan(PickBanMixin, ChartFormView):
-    """What did this team pick/ban?"""
-    tour = [
-        {
-            'orphan': True,
-            'title': "Welcome!",
-            'content': "This page charts picks and bans for matches that have a given team.  (Both side's picks and bans count.)"
-        },
-        {
-            'element': ".chart-form",
-            'title': "Asking questions",
-            'content': "Dates and the team you want to see here."
-        },
-        {
-            'orphan': True,
-            'title': "Ready to go!",
-            'content': "Try it out!"
-        }
-    ]
-    title = "Pick/Bans"
-    html = "players/form.html"
-
-
 class ApiWinrateChart(WinrateMixin, ApiView):
     pass
 
@@ -125,9 +83,9 @@ class ApiPickBanChart(PickBanMixin, ApiView):
 
 
 class TeamViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    List and detail for teams.
-    """
+
+    """ List and detail for teams. """
+
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
     lookup_field = 'steam_id'
