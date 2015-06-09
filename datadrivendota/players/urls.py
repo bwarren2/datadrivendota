@@ -25,25 +25,4 @@ urlpatterns = patterns(
         views.PlayerComparsionView.as_view(),
         name="comparison"
     ),
-    url(
-        r'^api/winrate/$',
-        views.ApiWinrateChart.as_view(),
-        name='api_winrate_chart'
-    ),
-    url(
-        r'^api/hero-abilities/$',
-        views.ApiHeroAbilities.as_view(),
-        name='api_hero_abilities_chart'
-    ),
-    url(
-        r'^api/versus-winrate/$',
-        views.ApiVersusWinrate.as_view(),
-        name='api_versus_winrate_chart'
-    ),
-    url(
-        r'^api/role/$',
-        views.ApiRole.as_view(),
-        name='api_role_chart'
-    ),
-
 )

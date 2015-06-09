@@ -4,19 +4,9 @@ from rest_framework import viewsets, filters
 
 from django.views.generic import ListView, DetailView, TemplateView
 
-from datadrivendota.views import ApiView
 
 from .models import Hero, Ability, HeroDossier, Role
 from .serializers import HeroSerializer, HeroDossierSerializer
-from .mixins import (
-    VitalsMixin,
-    LineupMixin,
-    HeroPerformanceMixin,
-    HeroSkillProgressionMixin,
-    HeroBuildLevelMixin,
-    UpdatePlayerWinrateMixin,
-    HeroPerformanceLineupMixin,
-)
 
 
 class IndexView(ListView):
@@ -104,32 +94,3 @@ class VitalsView(TemplateView):
 
 class LineupView(TemplateView):
     template_name = 'heroes/lineups.html'
-
-
-# API endpoints
-class ApiVitalsChart(VitalsMixin, ApiView):
-    pass
-
-
-class ApiLineupChart(LineupMixin, ApiView):
-    pass
-
-
-class ApiHeroPerformanceChart(HeroPerformanceMixin, ApiView):
-    pass
-
-
-class ApiSkillProgressionChart(HeroSkillProgressionMixin, ApiView):
-    pass
-
-
-class ApiBuildLevelChart(HeroBuildLevelMixin, ApiView):
-    pass
-
-
-class ApiUpdatePlayerWinrateChart(UpdatePlayerWinrateMixin, ApiView):
-    pass
-
-
-class ApiHeroPerformanceLineupChart(HeroPerformanceLineupMixin, ApiView):
-    pass

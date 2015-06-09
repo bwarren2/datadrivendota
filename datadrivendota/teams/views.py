@@ -8,11 +8,6 @@ from utils.pagination import SmarterPaginator
 from .serializers import TeamSerializer
 from .models import Team
 from matches.models import Match
-from .mixins import (
-    WinrateMixin,
-    PickBanMixin,
-)
-from datadrivendota.views import ApiView
 
 
 class TeamList(ListView):
@@ -72,14 +67,6 @@ class TeamDetail(DetailView):
             'min_date': min_date.isoformat(),
         }
         return super(TeamDetail, self).get_context_data(**context)
-
-
-class ApiWinrateChart(WinrateMixin, ApiView):
-    pass
-
-
-class ApiPickBanChart(PickBanMixin, ApiView):
-    pass
 
 
 class TeamViewSet(viewsets.ReadOnlyModelViewSet):

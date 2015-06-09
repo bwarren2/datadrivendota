@@ -5,7 +5,9 @@
 {% block page_title %}Hero Lineups{% endblock page_title %}
 
 {% block content %}
+    <div class='col-md-12'>
     <div id='toggles' class='form-inline'>
+
         <div class='form-group'>
             <label>Which attribute?</label>
             <select id='attributes' style='width:140px'>
@@ -45,16 +47,16 @@
             </select>
         </div>
         <div class="checkbox">
-            <label>
-              <input type="checkbox" id='sort'> Check me out
-            </label>
+            <label> <input type="checkbox" id='sort'> Sort by name </label>
         </div>
 
         <button id='update-button' class='btn btn-primary'>Update</button>
 
     </div>
+    </div>
+<div class='col-md-12'>
     <div id='chart'></div>
-
+</div>
 {% endblock content %}
 
 {% block extra_js %}
@@ -91,47 +93,55 @@
                 var level = $('#level').val();
                 var sort_by_name = $('#sort').prop('checked');
 
+                new_data = $.map(api_data, function(v){
+                    return {
+                        'value': fn(attr, level, v),
+                        'name': v.hero.name
+                    }
+                })
 
                 if (sort_by_name){
-                    x.domain(
-                        api_data.sort(
-                            function(a, b){return a.hero.name<b.hero.name}
-                        ).map(function(d){ return d.hero.name})
-                    )
+                    names = new_data.sort(
+                        function(a, b){return a.name<b.name}
+                    ).map(function(d){ return d.name})
+
+                    x.domain(names)
                 } else {
-                    x.domain(
-                        api_data.sort(
-                            function(a, b){
-                                return fn(attr, level, a) < fn(attr, level, b)
-                            }
-                        ).map(function(d){ return d.hero.name})
-                    )
+                    names = new_data.sort(
+                        function(a, b){
+                            return a.value < b.value
+                        }
+                    ).map(function(d){ return d.name})
+
+                    x.domain(names)
                 }
 
                 y.domain(
-                    [0, d3.max(api_data, function(d){
-                    return fn(attr, level, d)})]
+                    [0, d3.max(new_data, function(d){
+                    return d.value})]
                 )
-
 
                 delay = function(d, i) { return i * 50; };
 
-                svg.selectAll(".nv-bar")
+                bargroups = svg.selectAll(".nv-bar")
+                    .data(new_data, function(d){
+                        return d.name
+                    })
                     .transition()
                     .delay(delay)
                     .attr("transform", function(d, i) {
                         x_place = x(d.name);
-                        hero = api_data.filter(function(v){
-                            return v.hero.name == d.name
-                        })[0]
-                        y_place = y(fn(attr, level, hero));
+                        y_place = y(d.value);
                         return "translate("+x_place+","+y_place+")";
-                   });
+                    })
+                    .select('rect')
+                    .attr('height', function(d){
+                        return 205-y(d.value);
+                    })
 
                 chart.xAxis.scale(x)
                 d3.select('.nv-x.nv-axis')
                     .transition()
-                    .delay(delay)
                     .call(chart.xAxis);
 
                 chart.yAxis.scale(y)
@@ -145,7 +155,8 @@
                 chart = nv.models.discreteBarChart()
                     .x(function(d){ return d.name})
                     .y(function(d){ return d.value})
-                    .margin({bottom:180});
+                    .margin({bottom:180})
+                    .tooltips(false);
 
                 svg = d3.select(selector)
                     .append('svg:svg')
@@ -165,8 +176,8 @@
                 svg.datum(plot_data);
                 svg.transition().duration(500).call(chart);
 
-                var xTicks = d3.select('.nv-x.nv-axis > g').selectAll('g');
-                xTicks
+                d3.select('.nv-x.nv-axis > g')
+                .selectAll('g')
                   .selectAll('text')
                   .attr('transform', function(d,i,j) { return 'translate (-7, 65) rotate(-90 0,0)' }) ;
 

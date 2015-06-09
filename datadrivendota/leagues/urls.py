@@ -24,30 +24,5 @@ urlpatterns = patterns(
         views.LiveGameDetailView.as_view(),
         name='live_game_detail'
     ),
-    url(
-        r'^api/winrate/$',
-        views.ApiWinrateChart.as_view(),
-        name='api_winrate_chart'
-    ),
-    url(
-        r'^api/pick-ban/$',
-        views.ApiPickBanChart.as_view(),
-        name='api_pick_ban_chart'
-    ),
-    url(
-        r'^api/live-league-games/$',
-        views.ApiLiveGamesList.as_view(),
-        name='api_live_games_list'
-    ),
-    url(
-        r'^api/live-game-detail/(?P<match_id>[0-9\-]*)/$',
-        views.ApiLiveGameDetail.as_view(),
-        name='api_live_game_detail'
-    ),
-    url(
-        r'^api/live-game-slice/(?P<match_id>[0-9\-]*)/$',
-        views.ApiLiveGameSlice.as_view(),
-        name='api_live_game_slice'
-    ),
 
 )

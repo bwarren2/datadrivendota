@@ -9,9 +9,4 @@ urlpatterns = patterns(
         views.ItemDetailView.as_view(),
         name='detail'
     ),
-    url(
-        r'^api/item-endgame/$',
-        views.ApiItemEndgameChart.as_view(),
-        name='api_item_endgame_chart'
-    ),
 )

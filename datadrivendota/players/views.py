@@ -8,16 +8,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 
 
 from datadrivendota.mixins import SubscriberRequiredMixin
-from datadrivendota.views import ApiView
 
-
-from .mixins import (
-    WinrateMixin,
-    HeroAdversaryMixin,
-    HeroAbilitiesMixin,
-    VersusWinrateMixin,
-    RoleMixin,
-)
 from .models import Player
 from heroes.models import Hero
 from .serializers import PlayerSerializer
@@ -156,38 +147,3 @@ class HeroStyleView(TemplateView):
         kwargs['hero'] = get_object_or_404(
             Hero, machine_name=kwargs['hero_name']
         )
-
-
-class ApiWinrateChart(WinrateMixin, ApiView):
-
-    """ JSON chart maker for player winrate."""
-
-    pass
-
-
-class ApiHeroAdversary(HeroAdversaryMixin, ApiView):
-
-    """ API JSON chart maker for player-hero opposition winrate."""
-
-    pass
-
-
-class ApiHeroAbilities(HeroAbilitiesMixin, ApiView):
-
-    """ JSON chart maker for player-hero abilities."""
-
-    pass
-
-
-class ApiVersusWinrate(VersusWinrateMixin, ApiView):
-
-    """ JSON chart maker for player comparison."""
-
-    pass
-
-
-class ApiRole(RoleMixin, ApiView):
-
-    """ JSON chart maker for player role choice."""
-
-    pass

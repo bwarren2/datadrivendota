@@ -5,16 +5,8 @@ from utils.pagination import SmarterPaginator
 from .models import League, ScheduledMatch
 from .serializers import LeagueSerializer
 from matches.models import Match
-from .mixins import (
-    WinrateMixin,
-    PickBanMixin,
-)
-from datadrivendota.views import ApiView, JsonApiView
 from datadrivendota.redis_app import (
     get_games,
-    timeline_key,
-    redis_app,
-    slice_key
 )
 
 
@@ -88,9 +80,6 @@ class LeagueDetail(DetailView):
 
 
 class LiveGameListView(TemplateView):
-    """
-
-    """
     title = "Particular Game!"
     template_name = "leagues/live_game_list.html"
 
@@ -99,7 +88,7 @@ class LiveGameListView(TemplateView):
         context = {
             'games': sorted(
                 get_games(),
-                key=lambda game: (game['scoreboard']['duration'] if 'scoreboard' in game else 0),
+                key=get_duration,
                 reverse=True
             )
         }
@@ -107,9 +96,9 @@ class LiveGameListView(TemplateView):
 
 
 class LiveGameDetailView(TemplateView):
-    """
 
-    """
+    """ Watch a live game. Lots of template magic. """
+
     title = "Live Games!"
     template_name = "leagues/live_game_detail.html"
 
@@ -131,55 +120,6 @@ class LeagueViewSet(viewsets.ReadOnlyModelViewSet):
     paginate_by = 10
 
 
-class ApiLiveGamesList(JsonApiView):
-
-    def fetch_json(self, *args, **kwargs):
-        data = get_games()
-        return data
-
-
-class ApiLiveGameDetail(JsonApiView):
-
-    def get_context_data(self, **kwargs):
-        if 'match_id' in kwargs:
-            kwargs['match_id'] = int(kwargs['match_id'])
-        return kwargs
-
-    def fetch_json(self, *args, **kwargs):
-        key = timeline_key(kwargs['match_id'])
-        data = redis_app.get(key)
-        if data is not None:
-            return data
-        else:
-            self.fail()
-
-
-class ApiLiveGameSlice(JsonApiView):
-
-    def get_context_data(self, **kwargs):
-        if 'match_id' in kwargs:
-            kwargs['match_id'] = int(kwargs['match_id'])
-        return kwargs
-
-    def fetch_json(self, *args, **kwargs):
-        key = slice_key(kwargs['match_id'])
-        data = redis_app.get(key)
-        if data is not None:
-            return data
-        else:
-            self.fail()
-
-
-"""
-WARNING
-Everything below here is deprecated.
-WARNING
-"""
-
-
-class ApiWinrateChart(WinrateMixin, ApiView):
-    pass
-
-
-class ApiPickBanChart(PickBanMixin, ApiView):
-    pass
+def get_duration(game):
+    """ Helper function for sorting."""
+    return game['scoreboard']['duration'] if 'scoreboard' in game else 0

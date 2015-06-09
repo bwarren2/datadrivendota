@@ -9,14 +9,4 @@ urlpatterns = patterns(
         views.TeamDetail.as_view(),
         name='detail'
     ),
-    url(
-        r'^api/winrate/$',
-        views.ApiWinrateChart.as_view(),
-        name='api_winrate_chart'
-    ),
-    url(
-        r'^api/pick-ban/$',
-        views.ApiPickBanChart.as_view(),
-        name='api_pick_ban_chart'
-    ),
 )

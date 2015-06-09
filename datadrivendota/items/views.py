@@ -3,8 +3,6 @@ from .serializers import ItemSerializer
 from django.views.generic import ListView, DetailView
 
 from items.models import Item
-from datadrivendota.views import ApiView
-from .mixins import ItemWinrateMixin
 
 
 class ItemIndex(ListView):
@@ -24,13 +22,3 @@ class ItemViewSet(viewsets.ReadOnlyModelViewSet):
     paginate_by = None
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-
-
-"""
-EVERYTHING BELOW HERE IS DEPRECATED
-
-YOU ARE WARNED.
-"""
-
-class ApiItemEndgameChart(ItemWinrateMixin, ApiView):
-    pass
