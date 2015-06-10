@@ -187,6 +187,15 @@
     )
   );
 
+  Promise.resolve(
+    $.ajax('(% url "rest-api:player-match-summary %}')
+  ).then(function(data){
+
+  }).catch(function(e){
+    console.log("Error!");
+    console.log(e);
+  })
+
     window.apiHit(
       "#chart3",
       '{% url "heroes:api_hero_performance_chart" %}',

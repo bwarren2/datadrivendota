@@ -5,21 +5,11 @@ from heroes.models import Role
 
 from django.views.generic import DetailView, ListView
 
-from datadrivendota.views import ApiView, AjaxView
+from datadrivendota.views import AjaxView
 from utils.views import cast_dict, ability_infodict
 from heroes.models import Hero
 from .models import Match, PlayerMatchSummary, PickBan
-from .mixins import (
-    EndgameMixin,
-    OwnTeamEndgameMixin,
-    SameTeamEndgameMixin,
-    ProgressionListMixin,
-    AbilityBuildMixin,
-    MatchParameterMixin,
-    SingleMatchParameterMixin,
-    RoleMixin,
-    SetProgressionMixin,
-)
+
 from .serializers import MatchSerializer, PlayerMatchSummarySerializer
 
 
@@ -409,39 +399,3 @@ class ComboboxAjaxView(AjaxView):
             results.append(match_json)
         kwargs['results'] = results
         return kwargs
-
-
-class ApiEndgameChart(EndgameMixin, ApiView):
-    pass
-
-
-class ApiOwnTeamEndgameChart(OwnTeamEndgameMixin, ApiView):
-    pass
-
-
-class ApiSameTeamEndgameChart(SameTeamEndgameMixin, ApiView):
-    pass
-
-
-class ApiProgressionListChart(ProgressionListMixin, ApiView):
-    pass
-
-
-class ApiAbilityBuildChart(AbilityBuildMixin, ApiView):
-    pass
-
-
-class ApiMatchScatterChart(MatchParameterMixin, ApiView):
-    pass
-
-
-class ApiMatchBarChart(SingleMatchParameterMixin, ApiView):
-    pass
-
-
-class ApiRoleChart(RoleMixin, ApiView):
-    pass
-
-
-class ApiSetProgressionChart(SetProgressionMixin, ApiView):
-    pass
