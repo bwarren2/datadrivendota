@@ -4,12 +4,15 @@
 
   <div class="match-side radiant-side">
 
+
+  {% comment %}
     <div class="side-card">
       <img class='side-pip' src="{% static 'images/pips/pip_radiant.png' %}" alt='Radiant' title='Radiant'>
       {% if match.radiant_win %}
         <div class='glyphicon glyphicon-ok-circle win-glyph side-win-pip ' title='Won'></div>
       {% endif %}
     </div>
+  {% endcomment %}
 
     {% for summary in match.radiant %}
           {% include "matches/_pms_card.html" %}
@@ -25,12 +28,15 @@
 
   <div class="match-side dire-side">
 
+  {% comment %}
+
     <div class="side-card">
       <img class='side-pip' src="{% static 'images/pips/pip_dire.png' %}" alt='Dire'  title='Dire'>
       {% if dire_cast_list.0.is_win %}
         <div class='glyphicon glyphicon-ok-circle win-glyph side-win-pip' title='Won'></div>
       {% endif %}
     </div>
+  {% endcomment %}
 
     {% for summary in match.dire %}
           {% include "matches/_pms_card.html" %}

@@ -76,29 +76,13 @@ $(document).ready(function() {
 </script>
 
 <script type="text/javascript">
-  window.apiHit(
-    "#winrate_chart",
-    '{% url "leagues:api_winrate_chart" %}',
-      $.param({
-        league: '{{league.steam_id}}',
-        group_var: 'alignment',
-        min_date: '{{min_date}}',
-        width: 300,
-        height: 300,
-      }, true
-    )
-  );
-  window.apiHit(
-    "#pick_ban",
-    '{% url "leagues:api_pick_ban_chart" %}',
-      $.param({
-        league: '{{league.steam_id}}',
-        group_var: 'alignment',
-        min_date: '{{min_date}}',
-        width: 300,
-        height: 300,
-      }, true
-    )
-  );
+$(function(){
+  Promise.resolve(
+    $.ajax('{% url "rest-api:player-match-summary-list" %}?league_id={{league.steam_id}} ')
+  ).then(function(data){
+    console.log(data)
+  })
+
+})
 </script>
 {% endblock extra_js %}

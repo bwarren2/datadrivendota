@@ -520,8 +520,8 @@ class CycleApiCall(ApiFollower):
 
     def more_results_left(self):
         """ Evaluate if more matches need to be queried. """
-        if not (self.result['results_remaining'] == 0) \
-                and self.api_context.processed <= \
+        if (self.result['results_remaining'] != 0) \
+                and self.api_context.processed < \
                 self.api_context.matches_desired:
 
             logger.info(

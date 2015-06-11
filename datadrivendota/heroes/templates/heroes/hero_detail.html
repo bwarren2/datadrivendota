@@ -153,105 +153,117 @@
 <h4>Hero Performance by Skill Bracket (Wins)</h4>
 <div class="hero-chart-list row">
 
-    <div class='col-md-4' id='chart1'></div>
-    <div class='col-md-4' id='chart2'></div>
-    <div class='col-md-4' id='chart3'></div>
+    <div class='col-md-4' id='gold-duration'></div>
+    <div class='col-md-4' id='xp-duration'></div>
+    <div class='col-md-4' id='twr-dmg-duration'></div>
   </div>
 {% endblock content %}
 
 {% block extra_js %}
-  <script type="text/javascript">
+<script type="text/javascript">
+  $(function(){
 
-    window.apiHit(
-      "#player_winrate",
-      '{% url "heroes:api_update_player_winrate_chart" %}',
-        $.param({
-          hero: "{{ hero.steam_id }}",
-          game_modes: [1,2,3,4,5],
-          width: 300,
-          height: 300,
-        }, true
-      )
-    );
-  window.apiHit(
-    "#high_skill_item_winrate",
-    '{% url "items:api_item_endgame_chart" %}',
-      $.param({
-        hero: "{{hero.steam_id}}",
-        skill_level: '3',
-        game_modes: [1, 2, 3, 4, 5],
-        no_legend: true,
-        width: 300,
-        height: 300,
-      }, true
-    )
-  );
+    Promise.join(
+      $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=1&hero_id={{hero.steam_id}}'),
+      $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=2&hero_id={{hero.steam_id}}'),
+      $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=3&hero_id={{hero.steam_id}}')
+    ).then(function(data){
 
-  Promise.resolve(
-    $.ajax('(% url "rest-api:player-match-summary %}')
-  ).then(function(data){
+      var chart;
+      var chart_data;
+      params = [
+        {
+          'div': '#gold-duration',
+          'param': 'gold_per_min',
+          'y_label': 'Gold Per Min',
+        },
+        {
+          'div': '#xp-duration',
+          'param': 'xp_per_min',
+          'y_label': 'XP Per Min',
+        },
+        {
+          'div': '#twr-dmg-duration',
+          'param': 'tower_damage',
+          'y_label': 'Tower Damage',
+        },
+      ]
+      params.forEach(function(x){
 
-  }).catch(function(e){
-    console.log("Error!");
-    console.log(e);
+        var plot_data = [
+          {
+            key: 'Average Skill',
+            values: data[0]['results'].map(function(v){
+              return {
+                x: v.match.duration,
+                y: v[x.param]
+              }
+            })
+          },
+          {
+            key: 'High Skill',
+            values: data[1]['results'].map(function(v){
+              return {
+                x: v.match.duration,
+                y: v[x.param]
+              }
+            })
+          },
+          {
+            key: 'Very High Skill',
+            values: data[2]['results'].map(function(v){
+              return {
+                x: v.match.duration,
+                y: v[x.param]
+              }
+            })
+          },
+        ]
+
+        nv.addGraph(function(){
+          chart = nv.models.scatterChart()
+            .color(d3.scale.category10().range())
+            .margin({
+              bottom:30,
+              right: 50,
+              top: 70,
+            })
+            .showLegend(true);
+
+          chart.xAxis.tickFormat(
+            window.jsUtils.secondstotime
+          )
+          .axisLabel('Time (ms)')
+
+          chart.yAxis.axisLabel(x.y_label)
+
+          chart.forceY([0, d3.max(plot_data, function(d){
+            return d3.max(d.values, function(v){
+              return [x.param]
+            })
+          })])
+
+          chart_data = d3
+            .select(x.div)
+            .append('svg')
+            .attr('height', 400)
+            .attr('width', 400)
+            .datum(plot_data)
+            .call(chart)
+
+          nv.utils.windowResize(chart.update);
+          return chart;
+        })
+
+      })
+
+    }).catch(function(e){
+      console.log("Error!");
+      console.log(e);
+    })
+
   })
-
-    window.apiHit(
-      "#chart3",
-      '{% url "heroes:api_hero_performance_chart" %}',
-        $.param({
-          hero: "{{ hero.steam_id }}",
-          x_var: 'duration',
-          y_var: 'gold_total',
-          group_var: 'skill_name',
-          panel_var: 'None',
-          chart: 'hero_performance_chart',
-          outcome: 'win',
-          width: 300,
-          height: 300,
-          game_modes: [1,2,3,4,5],
-          x_ticks: 6,
-        }, true
-      )
-    );
-    window.apiHit(
-      "#chart1",
-      '{% url "heroes:api_hero_performance_chart" %}',
-        $.param({
-          hero: "{{ hero.steam_id }}",
-          x_var: 'duration',
-          y_var: 'kills',
-          group_var: 'skill_name',
-          panel_var: 'None',
-          chart: 'hero_performance_chart',
-          outcome: 'win',
-          width: 300,
-          height: 300,
-          game_modes: [1,2,3,4,5],
-          x_ticks: 6,
-        }, true
-      )
-    );
-    window.apiHit(
-      "#chart2",
-      '{% url "heroes:api_hero_performance_chart" %}',
-        $.param({
-          hero: "{{ hero.steam_id }}",
-          x_var: 'duration',
-          y_var: 'K-D+.5*A',
-          group_var: 'skill_name',
-          panel_var: 'None',
-          chart: 'hero_performance_chart',
-          outcome: 'win',
-          game_modes: [1,2,3,4,5],
-          width: 300,
-          height: 300,
-          x_ticks: 6,
-        }, true
-      )
-    );
-
-  </script>
+</script>
 {% endblock extra_js  %}
 
 

@@ -10,8 +10,4 @@
     <img class='cast-player-image' src="{{summary.player.avatar}}" title='{{summary.player.persona_name}}'>
   {% endif %}
 
-    <a href="{% url 'matches:match_hero_context' %}?matches={{match.steam_id}}&hero={{summary.hero_id}}&outcome=both">
-      <i class='glyphicon glyphicon-signal chart-pip'  title='Performance Context' style='display:inline-block'></i>
-    </a>
-
 </div>

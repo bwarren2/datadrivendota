@@ -19,6 +19,7 @@ class MatchSerializer(serializers.ModelSerializer):
 class PlayerMatchSummarySerializer(serializers.ModelSerializer):
     player = PlayerSerializer()
     hero = HeroSerializer()
+    match = MatchSerializer()
 
     class Meta:
         model = PlayerMatchSummary
@@ -42,4 +43,5 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
             'side',
             'player',
             'hero',
+            'match',
         )

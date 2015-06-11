@@ -375,6 +375,7 @@ PIPELINE_CSS = {
             'bower_components/messenger/build/css/messenger.css',
             'bower_components/messenger/build/css/messenger-theme-future.css',
             'bower_components/select2/dist/css/select2.css',
+            'bower_components/nvd3/build/nv.d3.css',
         ),
         'output_filename': 'css/third-party.css',
         'extra_context': {

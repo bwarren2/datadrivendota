@@ -109,29 +109,29 @@ $(document).ready(function() {
 
 <script type="text/javascript">
 
-  window.apiHit(
-    "#winrate_chart",
-    '{% url "teams:api_winrate_chart" %}',
-      $.param({
-        team: '{{team.steam_id}}',
-        group_var: 'alignment',
-        min_date: '{{min_date}}',
-        width: 300,
-        height: 300,
-      }, true
-    )
-  );
-  window.apiHit(
-    "#pick_ban",
-    '{% url "teams:api_pick_ban_chart" %}',
-      $.param({
-        team: '{{team.steam_id}}',
-        group_var: 'alignment',
-        min_date: '{{min_date}}',
-        width: 300,
-        height: 300,
-      }, true
-    )
-  );
+  // window.apiHit(
+  //   "#winrate_chart",
+  //   '{% url "teams:api_winrate_chart" %}',
+  //     $.param({
+  //       team: '{{team.steam_id}}',
+  //       group_var: 'alignment',
+  //       min_date: '{{min_date}}',
+  //       width: 300,
+  //       height: 300,
+  //     }, true
+  //   )
+  // );
+  // window.apiHit(
+  //   "#pick_ban",
+  //   '{% url "teams:api_pick_ban_chart" %}',
+  //     $.param({
+  //       team: '{{team.steam_id}}',
+  //       group_var: 'alignment',
+  //       min_date: '{{min_date}}',
+  //       width: 300,
+  //       height: 300,
+  //     }, true
+  //   )
+  // );
 </script>
 {% endblock extra_js %}

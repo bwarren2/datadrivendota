@@ -1,11 +1,12 @@
 import json
 from rest_framework import viewsets, filters
 from itertools import chain
-from heroes.models import Role
 
 from django.views.generic import DetailView, ListView
+from django.db.models import Q
 
 from datadrivendota.views import AjaxView
+from heroes.models import Role
 from utils.views import cast_dict, ability_infodict
 from heroes.models import Hero
 from .models import Match, PlayerMatchSummary, PickBan
@@ -26,19 +27,72 @@ class PlayerMatchSummaryViewSet(viewsets.ReadOnlyModelViewSet):
     paginate_by = 10
 
     def get_queryset(self):
+
         queryset = PlayerMatchSummary.objects.all()
+
+        queryset = self.filter_player(queryset)
+        queryset = self.filter_hero(queryset)
+        queryset = self.filter_league(queryset)
+        queryset = self.filter_team(queryset)
+        queryset = self.filter_skill(queryset)
+        queryset = self.filter_validity(queryset)
+
+        return queryset
+
+    def filter_player(self, queryset):
 
         player = self.request.query_params.get('player_id')
         if player is not None:
-            queryset.filter(player__steam_id=player)
+            queryset = queryset.filter(player__steam_id=player)
+
+        return queryset
+
+    def filter_validity(self, queryset):
+
         valid = self.request.query_params.get('validity')
         if valid is not None:
             if valid == 'LEGIT':
-                queryset.filter(match__validity=Match.LEGIT)
+                queryset = queryset.filter(match__validity=Match.LEGIT)
             elif valid == 'ALL':
                 pass
             else:
                 pass
+
+        return queryset
+
+    def filter_hero(self, queryset):
+
+        hero = self.request.query_params.get('hero_id')
+        if hero is not None:
+            queryset = queryset.filter(hero__steam_id=hero)
+
+        return queryset
+
+    def filter_league(self, queryset):
+
+        league = self.request.query_params.get('league_id')
+        if league is not None:
+            queryset = queryset.filter(match__league__steam_id=league)
+
+        return queryset
+
+    def filter_skill(self, queryset):
+
+        skill = self.request.query_params.get('skill')
+        if skill is not None:
+            queryset = queryset.filter(match__skill=skill)
+
+        return queryset
+
+    def filter_team(self, queryset):
+
+        team = self.request.query_params.get('team_id')
+        if team is not None:
+            queryset = queryset.filter(
+                Q(match__radiant_team__steam_id=team) |
+                Q(match__dire_team__steam_id=team)
+            )
+
         return queryset
 
 

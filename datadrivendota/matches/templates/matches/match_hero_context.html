@@ -64,117 +64,117 @@
 {% if hero %}
 
 <script type="text/javascript">
-  window.apiHit(
-    "#hero_progression_chart",
-    '{% url "heroes:api_skill_progression_chart" %}',
-      $.param({
-        hero: "{{hero}}",
-        matches: "{{matches}}",
-        outcome: "{{outcome}}",
-        game_modes: [1, 2, 3, 4, 5],
-        division: 'Skill',
-        width: 300,
-        height: 300,
-      }, true
-    )
-  );
+  // window.apiHit(
+  //   "#hero_progression_chart",
+  //   '{% url "heroes:api_skill_progression_chart" %}',
+  //     $.param({
+  //       hero: "{{hero}}",
+  //       matches: "{{matches}}",
+  //       outcome: "{{outcome}}",
+  //       game_modes: [1, 2, 3, 4, 5],
+  //       division: 'Skill',
+  //       width: 300,
+  //       height: 300,
+  //     }, true
+  //   )
+  // );
 
-    window.apiHit(
-      "#tower_damage",
-      '{% url "heroes:api_hero_performance_chart" %}',
-        $.param({
-          hero: "{{ hero }}",
-          matches: "{{matches}}",
-          outcome: "{{outcome}}",
-          x_var: 'duration',
-          y_var: 'tower_damage',
-          group_var: 'skill_name',
-          panel_var: 'None',
-          chart: 'hero_performance_chart',
-          width: 300,
-          height: 300,
-          game_modes: [1,2,3,4,5],
-          x_ticks: 6,
-        }, true
-      )
-    );
-    window.apiHit(
-      "#gold_xp",
-      '{% url "heroes:api_hero_performance_chart" %}',
-        $.param({
-          hero: "{{ hero }}",
-          matches: "{{matches}}",
-          outcome: "{{outcome}}",
-          x_var: 'gold_per_min',
-          y_var: 'xp_per_min',
-          group_var: 'skill_name',
-          panel_var: 'None',
-          chart: 'hero_performance_chart',
-          width: 300,
-          height: 300,
-          game_modes: [1,2,3,4,5],
-          x_ticks: 6,
-        }, true
-      )
-    );
-    window.apiHit(
-      "#hit_deny",
-      '{% url "heroes:api_hero_performance_chart" %}',
-        $.param({
-          hero: "{{ hero }}",
-          matches: "{{matches}}",
-          outcome: "{{outcome}}",
-          x_var: 'last_hits',
-          y_var: 'denies',
-          group_var: 'skill_name',
-          panel_var: 'None',
-          chart: 'hero_performance_chart',
-          width: 300,
-          height: 300,
-          game_modes: [1,2,3,4,5],
-          x_ticks: 6,
-        }, true
-      )
-    );
+  //   window.apiHit(
+  //     "#tower_damage",
+  //     '{% url "heroes:api_hero_performance_chart" %}',
+  //       $.param({
+  //         hero: "{{ hero }}",
+  //         matches: "{{matches}}",
+  //         outcome: "{{outcome}}",
+  //         x_var: 'duration',
+  //         y_var: 'tower_damage',
+  //         group_var: 'skill_name',
+  //         panel_var: 'None',
+  //         chart: 'hero_performance_chart',
+  //         width: 300,
+  //         height: 300,
+  //         game_modes: [1,2,3,4,5],
+  //         x_ticks: 6,
+  //       }, true
+  //     )
+  //   );
+  //   window.apiHit(
+  //     "#gold_xp",
+  //     '{% url "heroes:api_hero_performance_chart" %}',
+  //       $.param({
+  //         hero: "{{ hero }}",
+  //         matches: "{{matches}}",
+  //         outcome: "{{outcome}}",
+  //         x_var: 'gold_per_min',
+  //         y_var: 'xp_per_min',
+  //         group_var: 'skill_name',
+  //         panel_var: 'None',
+  //         chart: 'hero_performance_chart',
+  //         width: 300,
+  //         height: 300,
+  //         game_modes: [1,2,3,4,5],
+  //         x_ticks: 6,
+  //       }, true
+  //     )
+  //   );
+  //   window.apiHit(
+  //     "#hit_deny",
+  //     '{% url "heroes:api_hero_performance_chart" %}',
+  //       $.param({
+  //         hero: "{{ hero }}",
+  //         matches: "{{matches}}",
+  //         outcome: "{{outcome}}",
+  //         x_var: 'last_hits',
+  //         y_var: 'denies',
+  //         group_var: 'skill_name',
+  //         panel_var: 'None',
+  //         chart: 'hero_performance_chart',
+  //         width: 300,
+  //         height: 300,
+  //         game_modes: [1,2,3,4,5],
+  //         x_ticks: 6,
+  //       }, true
+  //     )
+  //   );
 
-    window.apiHit(
-      "#hero_kda2_chart",
-      '{% url "heroes:api_hero_performance_chart" %}',
-        $.param({
-          hero: "{{ hero }}",
-          matches: "{{matches}}",
-          outcome: "{{outcome}}",
-          x_var: 'duration',
-          y_var: 'K-D+.5*A',
-          group_var: 'skill_name',
-          panel_var: 'None',
-          chart: 'hero_performance_chart',
-          width: 300,
-          height: 300,
-          game_modes: [1,2,3,4,5],
-          x_ticks: 6,
-        }, true
-      )
-    );
-    window.apiHit(
-      "#roi_chart",
-      '{% url "heroes:api_hero_performance_chart" %}',
-        $.param({
-          hero: "{{ hero }}",
-          matches: "{{matches}}",
-          outcome: "{{outcome}}",
-          x_var: 'gold_total',
-          y_var: 'hero_damage',
-          group_var: 'skill_name',
-          panel_var: 'None',
-          chart: 'hero_performance_chart',
-          width: 300,
-          height: 300,
-          game_modes: [1,2,3,4,5],
-          x_ticks: 6,
-        }, true
-      )
-    );
+  //   window.apiHit(
+  //     "#hero_kda2_chart",
+  //     '{% url "heroes:api_hero_performance_chart" %}',
+  //       $.param({
+  //         hero: "{{ hero }}",
+  //         matches: "{{matches}}",
+  //         outcome: "{{outcome}}",
+  //         x_var: 'duration',
+  //         y_var: 'K-D+.5*A',
+  //         group_var: 'skill_name',
+  //         panel_var: 'None',
+  //         chart: 'hero_performance_chart',
+  //         width: 300,
+  //         height: 300,
+  //         game_modes: [1,2,3,4,5],
+  //         x_ticks: 6,
+  //       }, true
+  //     )
+  //   );
+  //   window.apiHit(
+  //     "#roi_chart",
+  //     '{% url "heroes:api_hero_performance_chart" %}',
+  //       $.param({
+  //         hero: "{{ hero }}",
+  //         matches: "{{matches}}",
+  //         outcome: "{{outcome}}",
+  //         x_var: 'gold_total',
+  //         y_var: 'hero_damage',
+  //         group_var: 'skill_name',
+  //         panel_var: 'None',
+  //         chart: 'hero_performance_chart',
+  //         width: 300,
+  //         height: 300,
+  //         game_modes: [1,2,3,4,5],
+  //         x_ticks: 6,
+  //       }, true
+  //     )
+  //   );
 </script>
 {% endif %}
 
