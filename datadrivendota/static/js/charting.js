@@ -65,8 +65,8 @@ var winrate_scatter = function(data, destination){
     chart = nv.models.scatterChart()
       .tooltips(true)
       .margin({
-        left: 30,
-        bottom: 30,
+        left: 45,
+        bottom: 45,
       })
       .forceY([0,100])
       .showLegend(false)
@@ -87,6 +87,9 @@ var winrate_scatter = function(data, destination){
         })
       }
     ]
+
+    chart.xAxis.axisLabel("# Games");
+    chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
 
     var svg = make_svg(destination);
     chart_data = svg.datum(plot_data);
@@ -125,13 +128,16 @@ var pickban_scatter = function(data, destination){
     chart = nv.models.scatterChart()
       .tooltips(true)
       .margin({
-        left: 30,
-        bottom: 30,
+        left: 45,
+        bottom: 45,
       })
       .showLegend(false)
       .tooltipContent(function(key, x, y, _, datum) {
         return "<h3>" + key + "</h3>" + "<p>"+datum.point.hero.name+"</p>";
       });
+
+    chart.xAxis.axisLabel("Picks");
+    chart.yAxis.axisLabel("Bans").axisLabelDistance(-20);
 
 
     var svg = make_svg(destination);
