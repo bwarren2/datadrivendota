@@ -1,49 +1,33 @@
 {% load staticfiles player_extras %}
 
-<div class='match-card'>
+<div class='container'>
 
-  <div class="match-side radiant-side">
+  <h2>
+    <a href="/matches/{{match.steam_id}}">Match: {{match.steam_id}}</a>
+  </h2>
 
-
-  {% comment %}
-    <div class="side-card">
-      <img class='side-pip' src="{% static 'images/pips/pip_radiant.png' %}" alt='Radiant' title='Radiant'>
-      {% if match.radiant_win %}
-        <div class='glyphicon glyphicon-ok-circle win-glyph side-win-pip ' title='Won'></div>
-      {% endif %}
-    </div>
-  {% endcomment %}
+  <div class="row">
 
     {% for summary in match.radiant %}
           {% include "matches/_pms_card.html" %}
     {% endfor %}
 
     {% if match.radiant_team %}
-      <div class="team-card">
+      <div class="col-md-1">
         <img class='thumbnail league-pip' src="{{match.radiant_team.image}}" alt='{{ match.radiant_team.name }}' title='{{match.radiant_team.name}}'>
       </div>
     {% endif %}
 
   </div>
 
-  <div class="match-side dire-side">
-
-  {% comment %}
-
-    <div class="side-card">
-      <img class='side-pip' src="{% static 'images/pips/pip_dire.png' %}" alt='Dire'  title='Dire'>
-      {% if dire_cast_list.0.is_win %}
-        <div class='glyphicon glyphicon-ok-circle win-glyph side-win-pip' title='Won'></div>
-      {% endif %}
-    </div>
-  {% endcomment %}
+  <div class="row">
 
     {% for summary in match.dire %}
           {% include "matches/_pms_card.html" %}
     {% endfor %}
 
     {% if match.dire_team %}
-      <div class="team-card">
+      <div class="col-md-1">
         <img class='thumbnail league-pip' src="{{match.dire_team.image}}" alt='{{ match.dire_team.name }}' title='{{match.dire_team.name}}'>
       </div>
     {% endif %}

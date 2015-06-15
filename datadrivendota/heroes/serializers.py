@@ -24,3 +24,53 @@ class HeroDossierSerializer(serializers.ModelSerializer):
     class Meta:
         model = HeroDossier
         exclude = ('id',)
+
+
+class HeroWinrateSerializer(serializers.Serializer):
+    hero = serializers.SerializerMethodField()
+    wins = serializers.IntegerField()
+    losses = serializers.IntegerField()
+    games = serializers.IntegerField()
+
+    def __init__(self, *args, **kwargs):
+        super(HeroWinrateSerializer, self).__init__(*args, **kwargs)
+        self.heroes = {h.steam_id: h for h in Hero.objects.all()}
+
+    def get_hero(self, obj):
+        try:
+            return HeroSerializer(self.heroes[obj['hero__steam_id']]).data
+        except AttributeError:
+            return ''
+
+    class Meta:
+        fields = (
+            'hero',
+            'wins',
+            'losses',
+            'games',
+        )
+
+
+class HeroPickBanSerializer(serializers.Serializer):
+    hero = serializers.SerializerMethodField()
+    picks = serializers.IntegerField()
+    bans = serializers.IntegerField()
+    pick_or_bans = serializers.IntegerField()
+
+    def __init__(self, *args, **kwargs):
+        super(HeroPickBanSerializer, self).__init__(*args, **kwargs)
+        self.heroes = {h.steam_id: h for h in Hero.objects.all()}
+
+    def get_hero(self, obj):
+        try:
+            return HeroSerializer(self.heroes[obj['hero__steam_id']]).data
+        except AttributeError:
+            return ''
+
+    class Meta:
+        fields = (
+            'hero',
+            'picks',
+            'bans',
+            'pick_or_bans',
+        )

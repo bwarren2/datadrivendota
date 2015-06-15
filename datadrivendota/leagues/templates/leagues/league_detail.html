@@ -9,78 +9,60 @@
 {% endblock page_title %}
 {% block content %}
     <div class='row'>
-    <div class='col-md-4'>
-        <h4>Hero Winrate</h4>
-        <span id='winrate_chart'></span>
-    </div>
-    <div class='col-md-4'>
-        <h4>Hero Pick/Ban Rate</h4>
-        <span id='pick_ban'></span>
-    </div>
-    <div class="league-infobox col-md-4">
-        <img class='thumbnail' style='margin-top:10px' src="{{ league.image }}">
-        <h2>{{ league.display_name }}
-        </h2>
+      <div class='col-md-4'>
+          <h4>Hero Winrate</h4>
+          <span id='winrate_chart'></span>
+      </div>
+      <div class='col-md-4'>
+          <h4>Hero Pick/Ban Rate</h4>
+          <span id='pick_ban'></span>
+      </div>
+      <div class="league-infobox col-md-4">
+          <img class='thumbnail' style='margin-top:10px' src="{{ league.image }}">
+          <h2>{{ league.display_name }}
+          </h2>
 
+      </div>
     </div>
-    </div>
+
     {% if match_list %}
+      {% for match in match_list %}
+        {% include "matches/_match_card.html" %}
+      {% endfor %}
+      {% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range_with_ellipses %}
+    {% endif %}
 
-    <div class='row' style='padding-top:15px'>
-        <div class='col-md-8'>
-            {% for match in match_list %}
-            <h2><a href="/matches/{{match.steam_id}}">Match: {{match.steam_id}}</a></h2>
-              {% include "matches/_match_card.html" %}
-            {% endfor %}
-        </div>
-
-        <div class='col-md-4'>
-
-            <div class='row'>
-              <div class='col-md-6'>
-                <button id='show-score' type="button" class="btn btn-primary btn-lg btn-block">Show Scores</button>
-              </div>
-              <div class='col-md-6'>
-                <button id='hide-score' type="button" class="btn btn-primary btn-lg btn-block">Hide Scores</button>
-              </div>
-            </div>
-
-        </div>
-    </div>
-{% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range_with_ellipses %}
-{% endif %}
 {% endblock content %}
 
 {% block extra_js %}
 <script type="text/javascript">
-    function raw_score() {
-  $('div.scorebar').fadeOut('fast', function() {
-    $(this).html($(this).attr('data-raw-score'));
-    $(this).fadeIn('fast');
-  });
-}
-
-function kda2_score() {
-  $('div.scorebar').fadeOut('fast', function() {
-    $(this).html($(this).attr('data-kda2'));
-    $(this).fadeIn('fast');
-  });
-}
-
-
-$(document).ready(function() {
-  $('#score-format-raw').click(raw_score);
-  $('#score-format-kda2').click(kda2_score);
-  window.jsUtils.scorebarToggles();
-});
-</script>
-
-<script type="text/javascript">
 $(function(){
   Promise.resolve(
-    $.ajax('{% url "rest-api:player-match-summary-list" %}?league_id={{league.steam_id}} ')
-  ).then(function(data){
-    console.log(data)
+    $.ajax(
+      '/rest-api/hero-winrate/?'+$.param(
+        {league_id:{{league.steam_id}}}
+      )
+    )
+  )
+  .then(function(data){
+      window.Chartreuse.winrate_scatter(data, '#winrate_chart')
+  })
+  .catch(function(e){
+    console.log(e)
+  })
+
+  Promise.resolve(
+    $.ajax(
+      '{% url "rest-api:hero-pickban-list"%}?'+$.param(
+        {league_id:{{league.steam_id}}}
+      )
+    )
+  )
+  .then(function(data){
+      window.Chartreuse.pickban_scatter(data, '#pick_ban')
+  })
+  .catch(function(e){
+    console.log(e)
   })
 
 })

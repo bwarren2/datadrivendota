@@ -1,13 +1,17 @@
-<div class="{{summary.hero.safe_name}}_slot {{summary.hero.internal_name}}_slot summary">
+<div class='col-md-2'>
 
-    <img src="{{ summary.hero.mugshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail player-slot-{{summary.slot}}">
+    <div class="{{summary.hero.safe_name}}_slot {{summary.hero.internal_name}}_slot summary">
 
-  {% if summary.improper_player %}
-    <div class='glyphicon glyphicon-remove-circle validity-glyph' title='Improper Player (Left/Did Not Connect/Bot)'></div>
-  {% endif %}
+        <img src="{{ summary.hero.mugshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail player-slot-{{summary.slot}}">
 
-  {% if summary.player.avatar %}
-    <img class='cast-player-image' src="{{summary.player.avatar}}" title='{{summary.player.persona_name}}'>
-  {% endif %}
+      {% if summary.improper_player %}
+        <div class='glyphicon glyphicon-remove-circle validity-glyph' title='Improper Player (Left/Did Not Connect/Bot)'></div>
+      {% endif %}
+
+      {% if summary.player.avatar %}
+        <img style='position:absolute;left:40%;bottom:10px' class='cast-player-image' src="{{summary.player.avatar}}" title='{{summary.player.persona_name}}'>
+      {% endif %}
+
+    </div>
 
 </div>

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from django.db import models
-from utils import safen
+
+from .querysets import PMSQuerySet, MatchFilteredQuerySet
 
 
 class Match(models.Model):
@@ -122,7 +123,7 @@ class GameMode(models.Model):
         ordering = ['steam_id']
 
     def __unicode__(self):
-        return self.description+', ('+str(self.steam_id)+')'
+        return self.description + ', (' + str(self.steam_id) + ')'
 
 
 class LobbyType(models.Model):
@@ -138,7 +139,7 @@ class LobbyType(models.Model):
         ordering = ['steam_id']
 
     def __unicode__(self):
-        return self.description+', ('+str(self.steam_id)+')'
+        return self.description + ', (' + str(self.steam_id) + ')'
 
 
 class PlayerMatchSummary(models.Model):
@@ -168,6 +169,8 @@ class PlayerMatchSummary(models.Model):
     level = models.IntegerField()
     is_win = models.BooleanField()
 
+    objects = PMSQuerySet.as_manager()
+
     class Meta:
         ordering = ['match', 'player_slot']
 
@@ -176,11 +179,14 @@ class PlayerMatchSummary(models.Model):
         super(PlayerMatchSummary, self).save(*args, **kwargs)
 
     def determine_win(self):
-        """Tells you whether this player was on the winning side of the match.
+        """
+        Determine win-ness.
+
+        Tell you whether this player was on the winning side of the match.
         5 is a magic number because the left-most bit being set in the returned
         data indicated that the player was dire, the right most bits indicating
-        position (0-4)."""
-
+        position (0-4).
+        """
         if self.match.radiant_win is True and self.player_slot < 5:
             return True
         if self.match.radiant_win is False and self.player_slot > 5:
@@ -197,15 +203,15 @@ class PlayerMatchSummary(models.Model):
 
     @property
     def kda2(self):
-        return self.kills - self.deaths + self.assists/2.0
+        return self.kills - self.deaths + self.assists / 2.0
 
     @property
     def gold_total(self):
-        return self.gold_per_min*self.match.duration/60
+        return self.gold_per_min * self.match.duration / 60
 
     @property
     def xp_total(self):
-        return self.xp_per_min*self.match.duration/60
+        return self.xp_per_min * self.match.duration / 60
 
     @property
     def improper_player(self):
@@ -213,7 +219,7 @@ class PlayerMatchSummary(models.Model):
 
     @property
     def side(self):
-        """ Returns radiant or dire based on player slot."""
+        """ Return radiant or dire based on player slot."""
         if self.player_slot < 5:
             return 'Radiant'
         else:
@@ -254,8 +260,10 @@ class PickBan(models.Model):
     team = models.IntegerField()
     order = models.IntegerField()
 
+    objects = MatchFilteredQuerySet.as_manager()
+
     class Meta:
-        ordering = ['order']
+        ordering = ['match', 'order']
 
 
 class LeaverStatus(models.Model):
@@ -268,7 +276,7 @@ class LeaverStatus(models.Model):
         ordering = ['steam_id']
 
     def __unicode__(self):
-        return self.description+', ('+str(self.steam_id)+')'
+        return self.description + ', (' + str(self.steam_id) + ')'
 
 
 class SkillBuild(models.Model):
@@ -281,197 +289,5 @@ class SkillBuild(models.Model):
         ordering = ['player_match_summary', 'level']
 
     def __unicode__(self):
-        return str(self.player_match_summary.id)+', '+str(self.level)
+        return str(self.player_match_summary.id) + ', ' + str(self.level)
         pass
-
-
-#############################################
-#############################################
-#           Deprecations begin here.        #
-#############################################
-#############################################
-
-
-# This is used in some JS, the json_data functions.
-def skill_name(skill):
-    if skill == 1:
-        return 'Normal Skill'
-    if skill == 2:
-        return 'High Skill'
-    if skill == 3:
-        return 'Very High Skill'
-    if skill == 4:
-        return 'Tournament Game'
-    else:
-        return skill
-
-
-# Everything below here is basically only in the json_data calls.
-def fetch_pms_attribute(summary, attribute):
-    if attribute == 'duration':
-        return summary.match.duration/60.0
-    elif attribute == 'K-D+.5*A':
-        return summary.kills - summary.deaths + summary.assists * .5
-    elif attribute == 'player':
-        return summary.player.display_name
-    elif attribute == 'is_win':
-        return 'Won' if summary.is_win else 'Lost'
-    elif attribute == 'game_mode':
-        return summary.match.game_mode.description
-    elif attribute == 'skill':
-        return summary.match.skill
-    elif attribute == 'skill_name':
-        skill = summary.match.skill
-        return skill_name(skill)
-    elif attribute == 'hero_name':
-        return safen(summary.hero.name)
-    elif attribute == 'hero_steam_id':
-        return summary.hero.steam_id
-    elif attribute == 'first_blood_time':
-        return summary.match.first_blood_time/60.0
-    elif attribute == 'match_id':
-        return summary.match.steam_id
-    elif attribute == 'which_side':
-        return summary.side
-    elif attribute == 'gold_total':
-        return summary.gold_per_min*summary.match.duration/60
-    elif attribute == 'xp_total':
-        return summary.xp_per_min*summary.match.duration/60
-    else:
-        return getattr(summary, attribute)
-
-
-def pms_db_args(var, summary=None):
-    if var == 'gold_total':
-        if summary is None:
-            return ['gold_per_min', 'duration']
-        else:
-            return summary['gold_per_min']*summary['match__duration']/60
-    if var == 'xp_total':
-        if summary is None:
-            return ['xp_per_min', 'duration']
-        else:
-            return summary['xp_per_min']*summary['match__duration']/60
-    if var == 'K-D+.5*A':
-        if summary is None:
-            return ['kills', 'deaths', 'assists']
-        else:
-            return summary['kills'] \
-                - summary['deaths'] + summary['assists'] * .5
-    if var == 'first_blood_time':
-        if summary is None:
-            return ['match__first_blood_time']
-        else:
-            return summary['match__first_blood_time']/60.0
-    if var == 'player':
-        if summary is None:
-            return [
-                'player',
-                'player__steam_id',
-                'player__persona_name',
-                'player__pro_name'
-            ]
-        else:
-            return summary['player__steam_id']
-    if var == 'game_mode':
-        if summary is None:
-            return ['match__game_mode', 'match__game_mode__description']
-        else:
-            return summary['match__game_mode__steam_id']
-    if var == 'duration':
-        if summary is None:
-            return ['match__duration']
-        else:
-            return summary['match__duration']/60.0
-    if var == 'match_id':
-        if summary is None:
-            return ['match__steam_id']
-        else:
-            return summary['match__steam_id']
-    if var == 'hero':
-        if summary is None:
-            return ['hero__name', 'hero__steam_id']
-        else:
-            return summary['hero__steam_id']
-    if var == 'skill':
-        if summary is None:
-            return ['match__skill']
-        else:
-            return summary['match__skill']
-    if var == 'None' or var is None:
-        if summary is None:
-            return []
-        else:
-            return None
-
-    #Specialized subset calls for a given pms
-    if summary is not None:
-        if var == 'is_win':
-            return 'Won' if summary['is_win'] else 'Lost'
-        if var == 'skill_name':
-            return skill_name(summary['match__skill'])
-        if var == 'hero_name':
-            return safen(summary['hero__name'])
-        if var == 'hero_steam_id':
-            return summary['hero__steam_id']
-        if var == 'game_mode_name':
-            return summary['match__game_mode__description']
-        if var == 'player_display_name':
-            if summary['player__pro_name'] is not None:
-                return summary['player__pro_name']
-            else:
-                return summary['player__persona_name']
-        return summary.get(var)
-
-    #Summary is none, not one of the special cases.  Just get that attr.
-    return [var]
-
-
-
-
-def display_attr(var, summary=None):
-    if var == 'player':
-        if summary is not None:
-            return pms_db_args('player_display_name', summary)
-        else:
-            return 'Player Name'
-    if var == 'is_win':
-        if summary is not None:
-            return pms_db_args('is_win', summary)
-        else:
-            return 'Win/Loss'
-    if var == 'game_mode':
-        if summary is not None:
-            return pms_db_args('game_mode_name', summary)
-        else:
-            return 'Win/Loss'
-    if var == 'None' or var is None:
-        return None
-
-
-def fetch_attribute_label(attribute):
-    if attribute == 'duration':
-        label = 'GameLength(m)'
-    elif attribute == 'K-D+.5*A':
-        label = 'Kills-Death+.5*Assists'
-    elif attribute == 'player':
-        label = attribute.title()
-    elif attribute == 'is_win':
-        label = 'WonGame?'
-    elif attribute == 'game_mode':
-        label = 'GameMode'
-    elif attribute == 'skill':
-        label = 'Skill(3=VeryHigh)'
-    elif attribute == 'hero_name':
-        label = 'HeroName'
-    elif attribute == 'first_blood_time':
-        label = 'FirstBloodTime(m)'
-    elif attribute == 'gold_per_min':
-        label = 'Gold Per Min'
-    elif attribute == 'xp_per_min':
-        label = 'XP Per Min'
-    elif attribute == 'none':
-        label = ''
-    else:
-        label = safen(attribute)
-    return label

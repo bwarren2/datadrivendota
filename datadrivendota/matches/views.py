@@ -3,7 +3,6 @@ from rest_framework import viewsets, filters
 from itertools import chain
 
 from django.views.generic import DetailView, ListView
-from django.db.models import Q
 
 from datadrivendota.views import AjaxView
 from heroes.models import Role
@@ -24,74 +23,20 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
 
 class PlayerMatchSummaryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PlayerMatchSummarySerializer
-    paginate_by = 10
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
 
     def get_queryset(self):
+        queryset = PlayerMatchSummary.objects.given(self.request)
 
-        queryset = PlayerMatchSummary.objects.all()
+        limit = self.request.query_params.get(self.page_size_query_param)
 
-        queryset = self.filter_player(queryset)
-        queryset = self.filter_hero(queryset)
-        queryset = self.filter_league(queryset)
-        queryset = self.filter_team(queryset)
-        queryset = self.filter_skill(queryset)
-        queryset = self.filter_validity(queryset)
-
-        return queryset
-
-    def filter_player(self, queryset):
-
-        player = self.request.query_params.get('player_id')
-        if player is not None:
-            queryset = queryset.filter(player__steam_id=player)
-
-        return queryset
-
-    def filter_validity(self, queryset):
-
-        valid = self.request.query_params.get('validity')
-        if valid is not None:
-            if valid == 'LEGIT':
-                queryset = queryset.filter(match__validity=Match.LEGIT)
-            elif valid == 'ALL':
-                pass
-            else:
-                pass
-
-        return queryset
-
-    def filter_hero(self, queryset):
-
-        hero = self.request.query_params.get('hero_id')
-        if hero is not None:
-            queryset = queryset.filter(hero__steam_id=hero)
-
-        return queryset
-
-    def filter_league(self, queryset):
-
-        league = self.request.query_params.get('league_id')
-        if league is not None:
-            queryset = queryset.filter(match__league__steam_id=league)
-
-        return queryset
-
-    def filter_skill(self, queryset):
-
-        skill = self.request.query_params.get('skill')
-        if skill is not None:
-            queryset = queryset.filter(match__skill=skill)
-
-        return queryset
-
-    def filter_team(self, queryset):
-
-        team = self.request.query_params.get('team_id')
-        if team is not None:
-            queryset = queryset.filter(
-                Q(match__radiant_team__steam_id=team) |
-                Q(match__dire_team__steam_id=team)
-            )
+        if limit is not None:
+            result_limit = min(limit, self.max_page_size)
+            queryset = queryset[:result_limit]
+        else:
+            queryset = queryset[:self.page_size]
 
         return queryset
 

@@ -68,7 +68,7 @@ class LeagueDetail(DetailView):
         page = self.request.GET.get('page')
         paginator = SmarterPaginator(
             object_list=match_list,
-            per_page=15,
+            per_page=2,
             current_page=page
         )
         match_list = paginator.current_page

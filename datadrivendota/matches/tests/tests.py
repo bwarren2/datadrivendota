@@ -1,55 +1,32 @@
-from nose.tools import timed
 from django.test import TestCase, Client
 from model_mommy import mommy
 
-from matches.models import PlayerMatchSummary, Match, GameMode, SkillBuild
-from matches.mommy_recipes import make_matchset
-from matches.json_data import (
-    player_team_endgame_json,
-    player_endgame_json,
-    team_endgame_json,
-    match_ability_json,
-    match_parameter_json,
-    single_match_parameter_json,
-    match_role_json,
-    match_list_json,
-    match_set_progression_json,
-    )
-
-JSON_TIME = .2
-
-# test_team_endgame_json is using its own time and needs work.
+from ..models import PlayerMatchSummary
 
 
 class TestModel(TestCase):
 
     def setUp(self):
-        # rad_win_match = mommy.make_recipe(
-        #     'matches.match', steam_id=1, radiant_win=True
-        # )
-        # dire_win_match = mommy.make_recipe(
-        #     'matches.match', steam_id=2, radiant_win=False
-        # )
         self.rad_win = mommy.make_recipe(
             'matches.playermatchsummary',
             match__radiant_win=True,
             player_slot=0
-            )
+        )
         self.dire_win = mommy.make_recipe(
             'matches.playermatchsummary',
             match__radiant_win=False,
             player_slot=132
-            )
+        )
         self.rad_loss = mommy.make_recipe(
             'matches.playermatchsummary',
             match__radiant_win=False,
             player_slot=0
-            )
+        )
         self.dire_loss = mommy.make_recipe(
             'matches.playermatchsummary',
             match__radiant_win=True,
             player_slot=132
-            )
+        )
         super(TestModel, self).setUp()
 
     def test_wins(self):
@@ -63,107 +40,12 @@ class TestModel(TestCase):
         self.assertEqual(self.dire_win.side, 'Dire')
 
 
-class TestWorkingJson(TestCase):
-
-    @classmethod
-    def setUpClass(self):
-        self.hero, self.player = make_matchset()
-        self.player.updated = True
-        sbs = SkillBuild.objects.all()
-        self.match_id = sbs[0].player_match_summary.match.steam_id
-        super(TestWorkingJson, self).setUpClass()
-
-    def tearDown(self):
-        pass
-
-    @timed(JSON_TIME)
-    def test_player_team_endgame_json(self):
-        chart = player_team_endgame_json(
-            players=[self.player.steam_id],
-            game_modes=[x.steam_id for x in GameMode.objects.all()],
-            x_var='duration',
-            y_var='kills',
-            panel_var=None,
-            group_var=None,
-        )
-        self.assertGreater(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_player_endgame_json(self):
-        chart = player_endgame_json(
-            players=[self.player.steam_id],
-            game_modes=[x.steam_id for x in GameMode.objects.all()],
-            x_var='duration',
-            y_var='kills',
-            panel_var=None,
-            group_var=None,
-        )
-        self.assertGreater(len(chart.datalist), 1)
-
-    @timed(1.5)
-    def test_team_endgame_json(self):
-        chart = team_endgame_json(
-            players=[self.player.steam_id],
-            game_modes=[x.steam_id for x in GameMode.objects.all()],
-            x_var='duration',
-            y_var='kills',
-            panel_var=None,
-            group_var=None,
-            compressor=None,
-        )
-        self.assertGreater(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_match_ability_json(self):
-        chart = match_ability_json(
-            self.match_id,
-            panel_var=None
-        )
-        self.assertGreater(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_match_parameter_json(self):
-        chart = match_parameter_json(
-            self.match_id,
-            x_var='kills',
-            y_var='deaths'
-        )
-        self.assertEqual(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_single_match_parameter_json(self):
-        chart = single_match_parameter_json(self.match_id, y_var='kills')
-        self.assertEqual(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_match_role_json(self):
-        chart = match_role_json(self.match_id)
-        self.assertEqual(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_match_list_json(self):
-        chart = match_list_json(
-            matches=[self.match_id],
-            players=[self.player.steam_id]
-            )
-        self.assertGreater(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_match_set_progression_json(self):
-        chart = match_set_progression_json(
-            hero=self.hero.steam_id,
-            match_set_1=[self.match_id],
-            match_set_2=[self.match_id],
-            match_set_3=[self.match_id],
-            )
-        self.assertGreater(len(chart.datalist), 1)
-
 class TestUrlconf(TestCase):
 
     @classmethod
-    def setUpClass(self):
-        super(TestUrlconf, self).setUpClass()
-        self.match = mommy.make_recipe('matches.match')
+    def setUpClass(cls):
+        super(TestUrlconf, cls).setUpClass()
+        cls.match = mommy.make_recipe('matches.match')
 
     def test_url_ok(self):
         c = Client()
@@ -178,3 +60,121 @@ class TestUrlconf(TestCase):
         # self.assertEqual(resp.status_code, 200)
         # The template relies on a replay file, which breaks here.
         # This is due for refactor during replay parsing.
+
+
+class FakeRequest(object):
+
+    def __init__(self, **kwargs):
+
+        self.query_params = kwargs
+
+    def __repr__(self):
+        return ','.join([
+            "{0}->{1}".format(str(x), str(y))
+            for x, y in self.query_params.iteritems()
+        ])
+
+
+class TestFakeRequest(TestCase):
+
+    def test_merge(self):
+        req = FakeRequest(page_size=10, player_id=103)
+        self.assertEqual(
+            req.query_params,
+            {
+                'page_size': 10,
+                'player_id': 103,
+            })
+
+
+class TestQuerySet(TestCase):
+
+    def test_player_filter(self):
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            player__steam_id=103,
+            _quantity=2
+        )
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            player__steam_id=2,
+        )
+
+        request = FakeRequest(player_id=103)
+        pmses = PlayerMatchSummary.objects.given(request)
+        self.assertEqual(pmses.count(), 2)
+
+    def test_validity_filter(self):
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__validity=1,
+            _quantity=2
+        )
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__validity=2,
+        )
+
+        request = FakeRequest(validity='LEGIT')
+        pmses = PlayerMatchSummary.objects.given(request)
+        self.assertEqual(pmses.count(), 2)
+
+    def test_hero_filter(self):
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            hero__steam_id=1,
+            _quantity=2
+        )
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            hero__steam_id=2,
+        )
+
+        request = FakeRequest(hero_id=1)
+        pmses = PlayerMatchSummary.objects.given(request)
+        self.assertEqual(pmses.count(), 2)
+
+    def test_league_filter(self):
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__league__steam_id=1,
+            _quantity=2
+        )
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__league__steam_id=2,
+        )
+
+        request = FakeRequest(league_id=1)
+        pmses = PlayerMatchSummary.objects.given(request)
+        self.assertEqual(pmses.count(), 2)
+
+    def test_skill_filter(self):
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__skill=1,
+            _quantity=2
+        )
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__skill=2,
+        )
+
+        request = FakeRequest(skill=1)
+        pmses = PlayerMatchSummary.objects.given(request)
+        self.assertEqual(pmses.count(), 2)
+
+    def test_team_filter(self):
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__radiant_team__steam_id=1,
+            _quantity=2
+        )
+        mommy.make_recipe(
+            'matches.playermatchsummary',
+            match__radiant_team__steam_id=2,
+        )
+
+        request = FakeRequest(team_id=1)
+        pmses = PlayerMatchSummary.objects.given(request)
+        self.assertEqual(pmses.count(), 2)

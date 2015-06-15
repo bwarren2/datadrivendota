@@ -375,7 +375,7 @@ PIPELINE_CSS = {
             'bower_components/messenger/build/css/messenger.css',
             'bower_components/messenger/build/css/messenger-theme-future.css',
             'bower_components/select2/dist/css/select2.css',
-            'bower_components/nvd3/build/nv.d3.css',
+            'css/nvd3_custom_compilation.css',
         ),
         'output_filename': 'css/third-party.css',
         'extra_context': {
@@ -402,7 +402,7 @@ PIPELINE_JS = {
             'bower_components/bootstrap/js/collapse.js',
             'bower_components/bootstrap/js/carousel.js',
             'bower_components/bootstrap/js/affix.js',
-            'bower_components/d3/d3.min.js',
+            'bower_components/d3/d3.js',
             'bower_components/jqueryui/jquery-ui.min.js',
             'bower_components/nvd3/build/nv.d3.js',
             'bower_components/bluebird/js/browser/bluebird.min.js',

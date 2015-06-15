@@ -18,120 +18,77 @@
         <span id='pick_ban'></span>
     </div>
     <div class="team-infobox col-md-4">
-        <img class='thumbnail' style='margin-top:10px'src="{{ team.image }}">
+      <img class='thumbnail' style='margin-top:10px'src="{{ team.image }}">
 
-        <h2>{{ team.name }}</h2>
-        <h6>Roster:</h6>
-        <ul>
-                <li>
-                    {% player_link team.player_0 %}
-                </li>
-                <li>
-                    {% player_link team.player_1 %}
-                </li>
-                <li>
-                    {% player_link team.player_2 %}
-                </li>
-                <li>
-                    {% player_link team.player_3 %}
-                </li>
-                <li>
-                    {% player_link team.player_4 %}
-                </li>
-        </ul>
-            {% if team.admin %}
-            <h6>Admin:</h6>
+      <h2>{{ team.name }}</h2>
+      <h6>Roster:</h6>
+      <ul>
+              <li>
+                  {% player_link team.player_0 %}
+              </li>
+              <li>
+                  {% player_link team.player_1 %}
+              </li>
+              <li>
+                  {% player_link team.player_2 %}
+              </li>
+              <li>
+                  {% player_link team.player_3 %}
+              </li>
+              <li>
+                  {% player_link team.player_4 %}
+              </li>
+      </ul>
+      {% if team.admin %}
+      <h6>Admin:</h6>
 
-                <ul><li>
-                    {% player_link team.admin %}
-                </li></ul>
-            {% endif %}
-
-
+          <ul><li>
+              {% player_link team.admin %}
+          </li></ul>
+      {% endif %}
     </div>
-    </div>
-    <div class='row' style='padding-top:15px'>
-        <div class='col-md-8'>
-            {% for match in match_list %}
-              <h2><a href="/matches/{{match.steam_id}}">Match: {{match.steam_id}}</a></h2>
-              {% include "matches/_match_card.html" %}
-            {% endfor %}
-        </div>
 
-        <div class='col-md-4'>
+    {% if match_list %}
+      {% for match in match_list %}
+        {% include "matches/_match_card.html" %}
+      {% endfor %}
+      {% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range_with_ellipses %}
+    {% endif %}
 
-            <div class='row'>
-              <div class='col-md-6'>
-                <button id='show-score' type="button" class="btn btn-primary btn-lg btn-block">Show Scores</button>
-              </div>
-              <div class='col-md-6'>
-                <button id='hide-score' type="button" class="btn btn-primary btn-lg btn-block">Hide Scores</button>
-              </div>
-            </div>
-
-            <div class='row'>
-              <div class='col-md-6'>
-                <button id='score-format-raw' type="button" class="btn btn-primary btn-lg btn-block">K/D/A</button>
-              </div>
-              <div class='col-md-6'>
-                <button id='score-format-kda2' type="button" class="btn btn-primary btn-lg btn-block">K-D+A/2</button>
-              </div>
-            </div>
-
-        </div>
-    </div>
 {% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range_with_ellipses %}
 {% endblock content %}
 
 {% block extra_js %}
 <script type="text/javascript">
-    function raw_score() {
-  $('div.scorebar').fadeOut('fast', function() {
-    $(this).html($(this).attr('data-raw-score'));
-    $(this).fadeIn('fast');
+$(function(){
+  Promise.resolve(
+    $.ajax(
+      '{% url "rest-api:hero-winrate-list"%}?'+$.param(
+        {team_id:{{team.steam_id}}}
+      )
+    )
+  )
+  .then(function(data){
+      window.Chartreuse.winrate_scatter(data, '#winrate_chart')
+  })
+  .catch(function(e){
+    console.log(e)
   });
-}
 
-function kda2_score() {
-  $('div.scorebar').fadeOut('fast', function() {
-    $(this).html($(this).attr('data-kda2'));
-    $(this).fadeIn('fast');
-  });
-}
+  Promise.resolve(
+    $.ajax(
+      '{% url "rest-api:hero-pickban-list"%}?'+$.param(
+        {team_id:{{team.steam_id}}}
+      )
+    )
+  )
+  .then(function(data){
+      window.Chartreuse.pickban_scatter(data, '#pick_ban')
+  })
+  .catch(function(e){
+    console.log(e)
+  })
 
-
-$(document).ready(function() {
-  $('#score-format-raw').click(raw_score);
-  $('#score-format-kda2').click(kda2_score);
-  window.jsUtils.scorebarToggles();
-});
-</script>
-
-<script type="text/javascript">
-
-  // window.apiHit(
-  //   "#winrate_chart",
-  //   '{% url "teams:api_winrate_chart" %}',
-  //     $.param({
-  //       team: '{{team.steam_id}}',
-  //       group_var: 'alignment',
-  //       min_date: '{{min_date}}',
-  //       width: 300,
-  //       height: 300,
-  //     }, true
-  //   )
-  // );
-  // window.apiHit(
-  //   "#pick_ban",
-  //   '{% url "teams:api_pick_ban_chart" %}',
-  //     $.param({
-  //       team: '{{team.steam_id}}',
-  //       group_var: 'alignment',
-  //       min_date: '{{min_date}}',
-  //       width: 300,
-  //       height: 300,
-  //     }, true
-  //   )
-  // );
+})
 </script>
 {% endblock extra_js %}
