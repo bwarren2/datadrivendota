@@ -124,7 +124,6 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'pipeline.finders.PipelineFinder',
 )
 
 #  AWS
@@ -209,7 +208,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
-    'pipeline.middleware.MinifyHTMLMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     # 'payments.middleware.ActiveSubscriptionMiddleware',
 )
@@ -252,7 +250,6 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     'social.apps.django_app.default',
     'storages',
-    'pipeline',
     'bootstrapform',
     'corsheaders',
     'payments',
