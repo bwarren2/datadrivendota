@@ -70,8 +70,8 @@ def rabbit_list():
 
 def cs():
     """ Push static files to s3."""
-    command = "python move_glyphicons.py"
-    local(command)
+    # command = "python move_glyphicons.py"
+    # local(command)
 
     command = (
         'python datadrivendota/manage.py collectstatic'

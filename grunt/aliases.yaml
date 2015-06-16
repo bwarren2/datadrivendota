@@ -7,6 +7,7 @@ css:
     tasks:
         - "less"
         - "cssmin"
+        - "concat_css"
 js:
     description: "Concat and minify js"
     tasks:
