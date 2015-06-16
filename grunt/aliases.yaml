@@ -16,3 +16,4 @@ prod:
     description: "Prep all assests."
     tasks:
         - css
+        - js

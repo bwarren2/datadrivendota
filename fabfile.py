@@ -76,9 +76,8 @@ def cs():
     command = (
         'python datadrivendota/manage.py collectstatic'
         ' -i bower_components'
-        ' -i *.less'
-        ' -i d3'
-        ' -i rest-framework'
+        ' -i css'
+        ' -i js'
         ' --settings=datadrivendota.settings.production --noinput'
     )
     local(command)

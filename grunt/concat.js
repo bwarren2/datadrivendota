@@ -27,9 +27,9 @@ module.exports = {
             "bower_components/handlebars/handlebars.min.js",
             "js/eldarion-ajax.js",
             "js/charting.js",
-            "datadrivendota/static/js/project.js",
+            "js/project.js",
             "bower_components/select2/dist/js/select2.min.js",
         ].map(function(file){ return "datadrivendota/static/"+file;}),
-      dest: "datadrivendota/static/js/dist/built.js",
+      dest: "datadrivendota/static/dist/built.js",
     },
 };

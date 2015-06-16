@@ -168,7 +168,7 @@
       $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=2&hero_id={{hero.steam_id}}'),
       $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=3&hero_id={{hero.steam_id}}')
     ).then(function(data){
-
+      console.log(data);
       var chart;
       var chart_data;
       params = [
@@ -193,7 +193,7 @@
         var plot_data = [
           {
             key: 'Average Skill',
-            values: data[0]['results'].map(function(v){
+            values: data[0].map(function(v){
               return {
                 x: v.match.duration,
                 y: v[x.param]
@@ -202,7 +202,7 @@
           },
           {
             key: 'High Skill',
-            values: data[1]['results'].map(function(v){
+            values: data[1].map(function(v){
               return {
                 x: v.match.duration,
                 y: v[x.param]
@@ -211,7 +211,7 @@
           },
           {
             key: 'Very High Skill',
-            values: data[2]['results'].map(function(v){
+            values: data[2].map(function(v){
               return {
                 x: v.match.duration,
                 y: v[x.param]

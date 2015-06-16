@@ -1,7 +1,7 @@
 module.exports = {
   target: {
     files: {
-      'datadrivendota/static/css/release.css': [
+      'datadrivendota/static/dist/release.css': [
         'datadrivendota/static/css/custom_nvd3_compilation.css',
         'datadrivendota/static/css/custom_bootstrap_compilation.css',
         'datadrivendota/static/css/dota2minimapheroes.css',
