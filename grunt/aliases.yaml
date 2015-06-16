@@ -1,0 +1,17 @@
+default:
+    description: "Asset handling"
+    tasks:
+        - watch
+css:
+    description: "Compile and minify css"
+    tasks:
+        - "less"
+        - "cssmin"
+js:
+    description: "Concat and minify js"
+    tasks:
+        - "concat"
+prod:
+    description: "Prep all assests."
+    tasks:
+        - css

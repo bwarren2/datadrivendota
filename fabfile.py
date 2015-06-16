@@ -70,13 +70,13 @@ def rabbit_list():
 
 def cs():
     """ Push static files to s3."""
-    # command = "python purge_unmanifested_s3_files.py"
-    # local(command)
+    command = "python move_glyphicons.py"
+    local(command)
 
     command = (
         'python datadrivendota/manage.py collectstatic'
-        ' -i bootstrap'
         ' -i bower_components'
+        ' -i *.less'
         ' -i d3'
         ' -i rest-framework'
         ' --settings=datadrivendota.settings.production --noinput'

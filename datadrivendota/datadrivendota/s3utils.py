@@ -38,8 +38,19 @@ class S3PipelineCachedStorage(
     PipelineMixin, PatchedCachedFilesMixin, S3BotoStorage
 ):
     verbose = True
-    # packing = False
-    # Sometimes there are packing failures.
-    # If CSS is compiled and files don't need to be compressed, packing
-    # can be false.
-    # See also the todo in the readme.
+
+    # This is a hack from https://github.com/adamcharnock/django-pipeline-forgiving.
+    def hashed_name(self, name, content=None):
+        try:
+            out = super(S3PipelineCachedStorage, self).hashed_name(
+                name,
+                content
+            )
+        except ValueError:
+            # This means that a file could not be found.
+            # normally this would cause a fatal error,
+            # which seems rather excessive given that
+            # some packages have missing files in their css all the time.
+            out = name
+            print "Had a hash error for {0}, using raw name".format(name)
+        return out
