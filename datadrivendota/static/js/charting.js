@@ -151,3 +151,187 @@ var pickban_scatter = function(data, destination){
 };
 
 window.Chartreuse.pickban_scatter = pickban_scatter;
+
+
+var splash_gimmick = function(){
+  var mydiv = d3.select('div.big-d');
+  var width = 293;
+  var height = width;
+  var delay = 1000;
+  var interval = 1500;
+
+  var r = 5;
+  var point_max = 75;
+
+  var x_min = 0;
+  var x_max = 10;
+
+  var y_min = 0;
+  var y_max = 10;
+
+  var x_domain = [-5, 9];
+  var y_domain = [-1, 12];
+
+  var svg = mydiv.append('svg')
+      .attr('width', width)
+      .attr('height', height);
+
+  var x_scale = d3.scale
+      .linear()
+      .domain(x_domain)
+      .range([0, width])
+
+  var y_scale = d3.scale
+      .linear()
+      .domain(y_domain)
+      .range([height, 0])
+
+  var datapoints = [];
+  var intersection_x = 6;
+  var lines = [
+      {
+        m: 99999999,
+        b: 0,
+        class_odds: [.1, .4, .5],
+        x_domain: [0, 1],
+        y_domain: [0, 10]
+      },
+      {
+        m: -5/intersection_x,
+        b: 10,
+        class_odds: [.1, .6, .3],
+        x_domain: [0, intersection_x],
+        y_domain: [-.5, .5]
+      },
+      {
+        m: 5/intersection_x,
+        b: 0,
+        class_odds: [.7, .1, .2],
+        x_domain: [0, intersection_x],
+        y_domain: [-.5, .5]
+      },
+  ];
+
+  var n = 0
+  var make_point = function(line){
+    n += 1;
+    if (n>point_max*2){
+      n-=point_max*2;
+    }
+
+    // x_rand = z.nextGaussian();
+    // y_rand = z.nextGaussian();
+    x_rand = Math.random();
+    var x = x_rand*(line.x_domain[1]-line.x_domain[0])-line.x_domain[0];
+
+    if(line.m < 99999999){
+      y_rand = Math.random();
+      var y = (x*line.m+line.b)+y_rand;
+    }
+    else {
+      y_rand = Math.random();
+      var y = y_rand*(line.y_domain[1]-line.y_domain[0])-line.y_domain[0];
+    }
+
+    class_str = classify(line)
+    return {
+        'x': x,
+        'y': y,
+        'x_rand': x_rand,
+        'y_rand': y_rand,
+        'classing': class_str,
+        'id': n,
+    }
+  }
+
+  var classify = function(line){
+    class_rand = Math.random();
+    var break_1 = line.class_odds[0];
+    var break_2 = break_1 + line.class_odds[1];
+    var break_3 = break_2 + line.class_odds[2];
+
+    if(class_rand < break_1){
+      return 'group-a'
+    }
+    else if(class_rand < break_2){
+      return 'group-b'
+    }
+    else {
+      return 'group-c'
+    }
+
+  }
+
+  var update = function(){
+
+      for(var i=0; i<lines.length; i++){
+
+          datapoints.push(
+              make_point(lines[i])
+          )
+          datapoints.push(
+              make_point(lines[i])
+          )
+          datapoints.push(
+              make_point(lines[i])
+          )
+          datapoints.push(
+              make_point(lines[i])
+          )
+
+          while(datapoints.length>point_max){
+              datapoints.shift();
+          }
+      }
+
+      circles = svg.selectAll('circle')
+          .data(datapoints, function(d){
+              return d.id;
+          })
+
+      circles
+          .enter()
+          .append('circle')
+          .attr('cx', function(d){
+              return x_scale(d.x);
+          })
+          .attr('cy', function(d){
+              return y_scale(d.y);
+          })
+          .attr('r', 0)
+          .attr('class', function(d){return d.classing})
+          .transition()
+          .delay(delay)
+          .attr('r', r)
+
+      circles
+        .exit()
+        .transition()
+        .delay(delay)
+        .attr('r', 0)
+        .remove();
+
+    // Fix Averages in table
+    var round_places = 2;
+    groups = ['group-a', 'group-b', 'group-c',]
+    for(var i=0; i < groups.length; i++){
+
+      var selection = datapoints.filter(function(d){
+        return d.classing == groups[i]
+      })
+
+      var x_mean = d3.mean(selection, function(d){return d.x}).toFixed(round_places);
+      selector_class = '#'+groups[i]+'-x';
+      $(selector_class).html(x_mean);
+
+      var y_mean = d3.mean(selection, function(d){return d.y}).toFixed(round_places);
+      selector_class = '#'+groups[i]+'-y';
+      $(selector_class).html(y_mean);
+
+    }
+
+  }
+
+  setInterval(update, interval);
+}
+window.splash_gimmick = splash_gimmick;
