@@ -68,3 +68,5 @@ datadrivendota/celerybeat-schedule
 
 node_modules/
 bower_components/
+
+dist/
