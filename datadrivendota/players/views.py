@@ -56,7 +56,7 @@ class PlayerDetailView(DetailView):
         """Add in win statistics and a comparison player."""
         kwargs['player'] = self.object
         kwargs['pms_list'] = self.object.summaries(36)
-        self.add_comparison(**kwargs)
+        # self.add_comparison(**kwargs)
 
         stats = {}
         stats['wins'] = self.object.wins
@@ -80,29 +80,29 @@ class PlayerDetailView(DetailView):
         else:
             return 0
 
-    def add_comparison(self, **kwargs):
-        """Merge in comparison data if it exists."""
-        p2s = Player.objects.exclude(pro_name=None,)\
-            .exclude(steam_id=self.object.steam_id,)
+    # def add_comparison(self, **kwargs):
+    #     """Merge in comparison data if it exists."""
+    #     p2s = Player.objects.exclude(pro_name=None,)\
+    #         .exclude(steam_id=self.object.steam_id,)
 
-        try:
-            p2 = choice([p for p in p2s])
+    #     try:
+    #         p2 = choice([p for p in p2s])
 
-            kwargs['compare_url'] = reverse(
-                'players:comparison',
-                kwargs={
-                    'player_id_1': self.object.steam_id,
-                    'player_id_2': p2.steam_id,
-                })
-            kwargs['compare_str'] = 'Compare {p1} to {p2}!'.format(
-                p1=self.object.display_name,
-                p2=p2.display_name,
-            )
-        except IndexError:
-            # If there are no other players, like in tests,
-            # this is not a breaking requirement.
-            pass
-        return kwargs
+    #         kwargs['compare_url'] = reverse(
+    #             'players:comparison',
+    #             kwargs={
+    #                 'player_id_1': self.object.steam_id,
+    #                 'player_id_2': p2.steam_id,
+    #             })
+    #         kwargs['compare_str'] = 'Compare {p1} to {p2}!'.format(
+    #             p1=self.object.display_name,
+    #             p2=p2.display_name,
+    #         )
+    #     except IndexError:
+    #         # If there are no other players, like in tests,
+    #         # this is not a breaking requirement.
+    #         pass
+    #     return kwargs
 
 
 class PlayerViewSet(viewsets.ReadOnlyModelViewSet):

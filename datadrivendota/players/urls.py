@@ -20,9 +20,4 @@ urlpatterns = patterns(
         views.HeroStyleView.as_view(),
         name='hero_style'
     ),
-    url(
-        r'^comparison/(?P<player_id_1>[0-9]*)-(?P<player_id_2>[0-9]*)/$',
-        views.PlayerComparsionView.as_view(),
-        name="comparison"
-    ),
 )
