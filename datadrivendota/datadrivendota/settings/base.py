@@ -126,7 +126,16 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-MEDIA_URL = MEDIA_DIRECTORY
+#  AWS
+AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY', '')
+AWS_STORAGE_BUCKET_NAME = getenv('AWS_STORAGE_BUCKET_NAME', '')
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_SECURE_URLS = True
+S3_URL = '//%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+DEFAULT_FILE_STORAGE = 'datadrivendota.s3utils.MediaRootS3BotoStorage'
+MEDIA_URL = S3_URL + MEDIA_DIRECTORY
+
 STATIC_URL = STATIC_DIRECTORY
 
 #  END AWS
