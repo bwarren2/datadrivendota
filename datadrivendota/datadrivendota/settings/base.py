@@ -137,9 +137,6 @@ STATICFILES_FINDERS = (
 # MEDIA_URL = S3_URL + MEDIA_DIRECTORY
 # STATIC_URL = S3_URL + STATIC_DIRECTORY
 
-STATIC_HOST = '//d8xjhtew3s726.cloudfront.net' if not DEBUG else ''
-STATIC_URL = STATIC_HOST + '/static/'
-
 #  END AWS
 
 
