@@ -15,7 +15,7 @@
   ],
   "dependencies": {
     "bootstrap": "~3.3.4",
-    "nvd3": "~1.7.1",
+    "nvd3": "https://github.com/novus/nvd3/",
     "bluebird": "~2.9.27",
     "jquery": "~2.1.4",
     "messenger": "~1.4.1",

@@ -63,16 +63,13 @@ var winrate_scatter = function(data, destination){
 
   nv.addGraph(function(){
     chart = nv.models.scatterChart()
-      .tooltips(true)
       .margin({
         left: 45,
         bottom: 45,
       })
       .forceY([0,100])
-      .showLegend(false)
-      .tooltipContent(function(key, x, y, _, datum) {
-        return "<h3>" + key + "</h3>" + "<p>"+datum.point.hero.name+"</p>";
-      });
+      .showLegend(false);
+    chart.tooltip.enabled();
 
     var plot_data = [
       {
@@ -81,12 +78,13 @@ var winrate_scatter = function(data, destination){
           var datum = {
             y: v.games ? +(v.wins/v.games * 100).toFixed(2) : 0,
             x: v.games ? v.games : 0,
-            hero: v.hero,
+            // hero: v.hero,
           };
           return datum;
         })
       }
     ]
+    console.log(JSON.stringify(plot_data));
 
     chart.xAxis.axisLabel("# Games");
     chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
@@ -118,23 +116,21 @@ var pickban_scatter = function(data, destination){
           var datum = {
             x: +v.picks.toFixed(0),
             y: +v.bans.toFixed(0),
-            hero: v.hero,
+            // hero: v.hero,
           };
           return datum;
         })
       }
     ]
+    console.log(JSON.stringify(plot_data));
 
     chart = nv.models.scatterChart()
-      .tooltips(true)
       .margin({
         left: 45,
         bottom: 45,
       })
-      .showLegend(false)
-      .tooltipContent(function(key, x, y, _, datum) {
-        return "<h3>" + key + "</h3>" + "<p>"+datum.point.hero.name+"</p>";
-      });
+      .showLegend(false);
+    chart.tooltip.enabled();
 
     chart.xAxis.axisLabel("Picks");
     chart.yAxis.axisLabel("Bans").axisLabelDistance(-20);
@@ -335,3 +331,5 @@ var splash_gimmick = function(){
   setInterval(update, interval);
 }
 window.splash_gimmick = splash_gimmick;
+
+

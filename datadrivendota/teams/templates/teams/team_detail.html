@@ -69,6 +69,7 @@ $(function(){
     )
   )
   .then(function(data){
+      console.log(JSON.stringify(data));
       window.Chartreuse.winrate_scatter(data, '#winrate_chart')
   })
   .catch(function(e){
@@ -83,6 +84,7 @@ $(function(){
     )
   )
   .then(function(data){
+      console.log(JSON.stringify(data));
       window.Chartreuse.pickban_scatter(data, '#pick_ban')
   })
   .catch(function(e){
