@@ -77,6 +77,7 @@ def cs():
         'python datadrivendota/manage.py collectstatic'
         ' -i bower_components'
         ' -i css'
+        ' -i rest_framework'
         ' -i js'
         ' --settings=datadrivendota.settings.production --noinput'
     )
