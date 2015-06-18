@@ -9,45 +9,9 @@ from datadrivendota import views
 from accounts.views import data_applicant
 
 # REST
-from rest_framework.routers import DefaultRouter
-from matches.views import MatchViewSet, PlayerMatchSummaryViewSet
-from teams.views import TeamViewSet
-from leagues.views import LeagueViewSet
-from heroes.views import (
-    HeroViewSet,
-    HeroDossierViewSet,
-    HeroWinrateViewSet,
-    HeroPickBanViewSet,
-)
-from items.views import ItemViewSet
-from players.views import PlayerViewSet
-
+from .rest_urls import router
 admin.autodiscover()
 
-# DRF is great
-router = DefaultRouter()
-router.register('teams', TeamViewSet)
-router.register('leagues', LeagueViewSet)
-router.register('heroes', HeroViewSet)
-router.register(
-    'hero-winrate',
-    HeroWinrateViewSet,
-    base_name='hero-winrate'
-)
-router.register(
-    'hero-pickban',
-    HeroPickBanViewSet,
-    base_name='hero-pickban'
-)
-router.register('hero-dossiers', HeroDossierViewSet)
-router.register('items', ItemViewSet)
-router.register('matches', MatchViewSet)
-router.register(
-    'player-match-summary',
-    PlayerMatchSummaryViewSet,
-    base_name='player-match-summary'
-)
-router.register('players', PlayerViewSet)
 
 urlpatterns = patterns(
     '',

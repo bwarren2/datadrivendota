@@ -47,14 +47,19 @@ function getColorScale(params){
   return color;
 }
 
-function make_svg(destination){
+window.Chartreuse = {};
+
+function make_svg(destination, width){
+  if (width === undefined){
+    width = $(destination).width();
+  }
   return d3.select(destination)
     .append("svg")
-    .attr("width", $(destination).width())
-    .attr("height", $(destination).width());
+    .attr("width", width)
+    .attr("height", width);
 }
 
-window.Chartreuse = {};
+window.Chartreuse.make_svg = make_svg;
 
 var winrate_scatter = function(data, destination){
 
@@ -83,8 +88,7 @@ var winrate_scatter = function(data, destination){
           return datum;
         })
       }
-    ]
-    console.log(JSON.stringify(plot_data));
+    ];
 
     chart.xAxis.axisLabel("# Games");
     chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
@@ -100,8 +104,6 @@ var winrate_scatter = function(data, destination){
 };
 
 window.Chartreuse.winrate_scatter = winrate_scatter;
-
-
 
 var pickban_scatter = function(data, destination){
 
@@ -122,7 +124,6 @@ var pickban_scatter = function(data, destination){
         })
       }
     ]
-    console.log(JSON.stringify(plot_data));
 
     chart = nv.models.scatterChart()
       .margin({
@@ -148,6 +149,36 @@ var pickban_scatter = function(data, destination){
 
 window.Chartreuse.pickban_scatter = pickban_scatter;
 
+var scatter = function(destination, plot_data, xlab, ylab){
+  nv.addGraph(function(){
+
+    var svg = window.make_svg(destination, 230);
+
+    var chart = nv.models.scatterChart().showLegend(false)
+      .margin({
+        left:60,
+        bottom:40
+      });
+
+    chart.xAxis.axisLabel(xlab).axisLabelDistance(-10);
+    chart.yAxis.axisLabel(ylab).axisLabelDistance(-10);
+    chart.xAxis.tickFormat(window.smartTicks);
+    chart.yAxis.tickFormat(window.smartTicks);
+    // chart.tooltip.contentGenerator(function(d){
+    //   return sprintf(
+    //     "%1$s: %2$s <br> %3$s: %4$s ",
+    //     chart.xAxis.axisLabel, d.x,
+    //     chart.yAxis.axisLabel, d.y
+    //   );
+    // });
+
+    var chart_data = svg.datum(plot_data);
+    chart_data.transition().duration(500).call(chart);
+
+  });
+};
+
+window.Chartreuse.scatter = scatter;
 
 var splash_gimmick = function(){
   var mydiv = d3.select('div.big-d');
@@ -331,5 +362,3 @@ var splash_gimmick = function(){
   setInterval(update, interval);
 }
 window.splash_gimmick = splash_gimmick;
-
-

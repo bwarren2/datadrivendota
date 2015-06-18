@@ -15,9 +15,4 @@ urlpatterns = patterns(
         name='followed_index'
     ),
     url(r'^all-players/$', views.PlayerIndexView.as_view(), name='index'),
-    url(
-        r'^hero-style/(?P<player_id>[0-9]*)-(?P<hero_name>[a-zA-Z0-9\-]*)$',
-        views.HeroStyleView.as_view(),
-        name='hero_style'
-    ),
 )

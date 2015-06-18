@@ -33,6 +33,7 @@ class Player(models.Model):
 
     objects = models.Manager()
     TI4 = TI4Manager()
+    pros = TI4Manager()
 
     @property
     def display_name(self):
@@ -89,7 +90,6 @@ class Player(models.Model):
         return PlayerMatchSummary.objects.filter(
             player=self
         ).select_related().order_by('-match__start_time')[0:count]
-
 
     def __unicode__(self):
         return unicode(self.steam_id)

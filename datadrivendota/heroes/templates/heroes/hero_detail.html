@@ -106,14 +106,10 @@
     <div class='row'>
 
       <div class='col-md-4'>
-        <h4>Winrate by Player</h4>
-        <span id='player_winrate'></span>
+        <h4>Winrate by pro</h4>
+        <div id='pro_winrate'></div>
       </div>
 
-      <div class='col-md-4'>
-        <h4>Very High Skill Item Use</h4>
-        <span id='high_skill_item_winrate'></span>
-      </div>
 
       <div class="hero-ability-list col-md-8">
         <h4>Abilities</h4>
@@ -168,7 +164,6 @@
       $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=2&hero_id={{hero.steam_id}}'),
       $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=3&hero_id={{hero.steam_id}}')
     ).then(function(data){
-      console.log(data);
       var chart;
       var chart_data;
       params = [
@@ -262,6 +257,54 @@
       console.log(e);
     })
 
+  })
+</script>
+<script type="text/javascript">
+  $(function(){
+    var url = '{% url "rest-api:player-winrate-list"%}?hero_id={{hero.steam_id}}';
+    Promise.resolve($.ajax(url))
+    .then(function(data){
+      var destination = '#pro_winrate';
+      var max_y = 0;
+      var plot_data = [
+        {
+          key: "Winrate",
+          values: data.map(function(v){
+            var datum = {
+              y: v.games ? +(v.wins/v.games * 100).toFixed(2) : 0,
+              x: v.games ? v.games : 0,
+              // hero: v.hero,
+            };
+            max_y = Math.max(max_y, datum.y)
+            return datum;
+          })
+        }
+      ];
+
+      nv.addGraph(function(data){
+
+        svg = window.make_svg(destination);
+
+        chart = nv.models.scatterChart()
+        .showLegend(false)
+        .margin({
+          left:60,
+          bottom:40
+        })
+        .forceY(0, 100)
+        .forceX(0, max_y);
+
+        chart.xAxis.axisLabel("# Games").axisLabelDistance(-20);
+        chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
+
+
+        chart_data = svg.datum(plot_data);
+        chart_data.transition().duration(500).call(chart);
+
+      });
+
+
+    })
   })
 </script>
 {% endblock extra_js  %}

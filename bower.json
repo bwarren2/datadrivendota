@@ -15,12 +15,14 @@
   ],
   "dependencies": {
     "bootstrap": "~3.3.4",
-    "nvd3": "https://github.com/novus/nvd3/",
     "bluebird": "~2.9.27",
     "jquery": "~2.1.4",
     "messenger": "~1.4.1",
     "handlebars": "~3.0.3",
     "select2": "~4.0.0",
-    "jqueryui": "~1.11.4"
+    "jqueryui": "~1.11.4",
+    "nvd3": "git+https://github.com/novus/nvd3#9a218b856a657ca57b33e6cc013dfe64ee12dd01",
+    "eldarion-ajax": "git+https://github.com/eldarion/eldarion-ajax#37a7fe46a2e0acbc2a98316a6f1ffc94c52782d5",
+    "sprintf": "~1.0.2"
   }
 }

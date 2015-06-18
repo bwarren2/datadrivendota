@@ -1,16 +1,15 @@
 """Views primarily related to players, as a group or particularly."""
-from random import choice
 from rest_framework import viewsets, filters
 
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView
 
 
 from datadrivendota.mixins import SubscriberRequiredMixin
+from django.db.models import When, Case, Value, IntegerField, Sum
 
+from .serializers import PlayerWinrateSerializer
+from matches.models import PlayerMatchSummary
 from .models import Player
-from heroes.models import Hero
 from .serializers import PlayerSerializer
 
 
@@ -117,33 +116,47 @@ class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
     paginate_by = 10
 
 
-class PlayerComparsionView(TemplateView):
+class PlayerWinrateViewSet(viewsets.ReadOnlyModelViewSet):
 
-    """ View for player-player comparsion."""
+    """
+    DRF player winrate endpoint.
 
-    template_name = 'players/comparison.html'
+    Useful for seeing who is best with a hero.
+    """
 
-    def get_context_data(self, **kwargs):
-        """ Merge in the requested players or 404. """
-        kwargs['player_1'] = get_object_or_404(
-            Player, steam_id=kwargs['player_id_1']
+    paginate_by = None
+    serializer_class = PlayerWinrateSerializer
+
+    def get_queryset(self):
+
+        data_queryset = PlayerMatchSummary.objects.given(self.request)
+        print Player.pros.all()
+        data_queryset = data_queryset.filter(player__in=Player.pros.all())
+        print data_queryset
+
+        data_queryset = data_queryset.values('player__steam_id')\
+            .order_by()\
+            .annotate(
+                wins=Sum(
+                    Case(
+                        When(is_win=True, then=1),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    )
+                ),
+                losses=Sum(
+                    Case(
+                        When(is_win=False, then=1),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    )
+                ),
+                games=Sum(
+                    Case(
+                        default=Value(1),
+                        output_field=IntegerField()
+                    )
+                )
         )
-        kwargs['player_2'] = get_object_or_404(
-            Player, steam_id=kwargs['player_id_2']
-        )
 
-
-class HeroStyleView(TemplateView):
-
-    """Chart set for contextualizing  a player's use of a hero."""
-
-    template_name = 'players/hero_style.html'
-
-    def get_context_data(self, **kwargs):
-        """ Get the player and hero requested. """
-        kwargs['player'] = get_object_or_404(
-            Player, steam_id=kwargs['player_id']
-        )
-        kwargs['hero'] = get_object_or_404(
-            Hero, machine_name=kwargs['hero_name']
-        )
+        return data_queryset

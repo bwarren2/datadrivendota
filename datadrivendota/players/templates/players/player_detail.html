@@ -10,11 +10,11 @@
   <div class="row">
     <div class="player-charts col-md-4">
       <h4>Hero Winrate</h4>
-        <span id='winrate_chart'></span>
+        <div id='winrate_chart'></div>
     </div>
     <div class="player-charts col-md-4">
       <h4>Endgame Comparison</h4>
-        <span id='endgame_chart'></span>
+        <div id='endgame_chart'></div>
     </div>
 
     <div class="player-infobox col-md-4">
@@ -79,9 +79,41 @@ $(function(){
   })
 })
 </script>
+<script type="text/javascript">
+$(function(){
+  Promise.resolve(
+    $.ajax(
+      "{% url 'rest-api:player-match-summary-list' %}?"+$.param(
+        {
+          player_id:{{player.steam_id}},
+          page_size:200
+        }
+      )
+    )
+  )
+  .then(function(data){
+    var destination = '#endgame_chart';
+    var plot_data = [
+      {
+        key:'KDA2 over time',
+        values:data.map(function(d){
+          return {
+            x:d.match.duration,
+            y:d.kda2,
+          }
+        }),
+      }
+    ];
+    window.Chartreuse.scatter(destination, plot_data, 'Game End Time', 'KDA2');
+  })
+  .catch(function(e){
+    console.log(e)
+  })
+})
+</script>
 
 <script type="text/javascript">
-  $(function(){window.jsUtils.scorebarToggles()})
+  // $(function(){window.jsUtils.scorebarToggles()})
 </script>
 
 {% endblock extra_js %}

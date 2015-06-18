@@ -8,9 +8,13 @@ from datadrivendota.views import AjaxView
 from heroes.models import Role
 from utils.views import cast_dict, ability_infodict
 from heroes.models import Hero
-from .models import Match, PlayerMatchSummary, PickBan
+from .models import Match, PlayerMatchSummary, PickBan, SkillBuild
 
-from .serializers import MatchSerializer, PlayerMatchSummarySerializer
+from .serializers import (
+    MatchSerializer,
+    PlayerMatchSummarySerializer,
+    SkillBuildSerializer
+)
 
 
 class MatchViewSet(viewsets.ReadOnlyModelViewSet):
@@ -32,6 +36,33 @@ class PlayerMatchSummaryViewSet(viewsets.ReadOnlyModelViewSet):
 
         limit = self.request.query_params.get(self.page_size_query_param)
 
+        if limit is not None:
+            result_limit = min(limit, self.max_page_size)
+            queryset = queryset[:result_limit]
+        else:
+            queryset = queryset[:self.page_size]
+
+        return queryset
+
+
+class SkillBuildViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = SkillBuildSerializer
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def get_queryset(self):
+        queryset = SkillBuild.objects.all()
+
+        match_id = self.request.query_params.get('match_id')
+        if match_id is not None:
+            queryset = queryset.filter(
+                playermatchsummary__match__steam_id=match_id
+            )
+        else:
+            queryset = queryset[:self.page_size]
+
+        limit = self.request.query_params.get(self.page_size_query_param)
         if limit is not None:
             result_limit = min(limit, self.max_page_size)
             queryset = queryset[:result_limit]

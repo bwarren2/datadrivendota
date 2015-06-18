@@ -14,6 +14,7 @@ class MatchFilteredQuerySet(models.QuerySet):
             self.filter_team,
             self.filter_skill,
             self.filter_validity,
+            self.filter_match,
         ]
 
     def given(self, request):
@@ -69,6 +70,16 @@ class MatchFilteredQuerySet(models.QuerySet):
             queryset = queryset.filter(
                 Q(match__radiant_team__steam_id=team) |
                 Q(match__dire_team__steam_id=team)
+            )
+
+        return queryset
+
+    def filter_match(self, queryset):
+
+        match = self.request.query_params.get('match_id')
+        if match is not None:
+            queryset = queryset.filter(
+                match__steam_id=match
             )
 
         return queryset

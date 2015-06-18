@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from matches.models import Match, PlayerMatchSummary
+from matches.models import Match, PlayerMatchSummary, SkillBuild
 from players.serializers import PlayerSerializer
 from heroes.serializers import HeroSerializer
 
@@ -16,10 +16,27 @@ class MatchSerializer(serializers.ModelSerializer):
             'skill')
 
 
+class SkillBuildSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SkillBuild
+        fields = (
+            'ability',
+            'time',
+            'level',
+        )
+
+
 class PlayerMatchSummarySerializer(serializers.ModelSerializer):
     player = PlayerSerializer()
     hero = HeroSerializer()
     match = MatchSerializer()
+    skillbuild = serializers.SerializerMethodField()
+
+    def get_skillbuild(self, obj):
+        return [
+            SkillBuildSerializer(x).data for x in obj.skillbuild_set.all()
+        ]
 
     class Meta:
         model = PlayerMatchSummary
@@ -44,4 +61,5 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
             'player',
             'hero',
             'match',
+            'skillbuild',
         )

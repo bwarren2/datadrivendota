@@ -16,38 +16,43 @@
   <div class="row">
     <div id='level-row' class="charts col-md-6">
     <h4>Level Progression</h4>
-          <span id='abilities'></span>
+          <div id='abilities'></div>
     </div>
 
-    <div class="charts col-md-4">
-    <h4>Total Role Level (Stars)</h4>
-        <span id='roles'></span>
-    </div>
+    <div id='matchup-charts' class='col-md-6'>
+      <div class='row'>
+        <div id='kill_dmg' class="charts col-md-6">
+          <h4>Kills vs Damage</h4>
+        </div>
+        <div id='xp_gold' class="charts col-md-6">
+          <h4>Gold vs EXP</h4>
+        </div>
+        <div id='kill_death' class="charts col-md-6">
+          <h4>Kills vs Deaths</h4>
+        </div>
+        <div id='lh_denies' class="charts col-md-6">
+          <h4>Last Hits vs Denies</h4>
+        </div>
+
+      </div>
   </div>
 
   <div class="row">
-    <div id='matchup-data' class="charts col-md-6">
-    <h4>Matchup Data</h4>
-        <span id='kill_dmg'></span>
-        <span id='xp_gold'></span>
     </div>
 
     <div class="charts col-md-4">
     <h4>Pushing Damage</h4>
-        <span id='tower_damage'></span>
+        <div id='tower_damage'></div>
     </div>
 
-  </div>
-
-  <div class="row">
-    <div id='last-hit-chart' class="charts col-md-6">
+    <div class="charts col-md-4">
     <h4>Last Hits</h4>
-        <span id='last_hits'></span>
+        <div id='last_hits'></div>
     </div>
 
-    <div class="charts col-md-6">
+    <div class="charts col-md-4">
     <h4>KDA2</h4>
-        <span id='kda'></span>
+        <div id='kda2'></div>
     </div>
   </div>
 
@@ -358,5 +363,142 @@
   })
 </script>
 <script type="text/javascript">
+$(function(){
+  var url = '{% url "rest-api:player-match-summary-list" %}?match_id={{match.steam_id}}';
+
+  Promise.resolve($.ajax(url))
+  .then(function(data){
+
+    var destination = '#kill_dmg';
+    var plot_data = [
+      {
+        key:'Kills vs Hero Damage',
+        values:data.map(function(d){
+          return {
+            x:d.kills,
+            y:d.hero_damage,
+          }
+        }),
+      }
+    ]
+    window.Chartreuse.scatter(destination, plot_data, 'Kills', 'Hero Damage');
+
+
+    var destination = '#xp_gold';
+    var plot_data = [
+      {
+        key:'Gold Gain vs XP Gain',
+        values:data.map(function(d){
+          return {
+            x:d.xp_per_min,
+            y:d.gold_per_min,
+          }
+        }),
+      }
+    ];
+    window.Chartreuse.scatter(destination, plot_data, 'XP per min', 'Gold per min');
+
+
+    var destination = '#kill_death';
+    var plot_data = [
+      {
+        key:'Kills vs Deaths',
+        values:data.map(function(d){
+          return {
+            x:d.deaths,
+            y:d.kills,
+          }
+        }),
+      }
+    ];
+    window.Chartreuse.scatter(destination, plot_data, 'Deaths', 'Kills');
+
+    var destination = '#lh_denies';
+    var plot_data = [
+      {
+        key:'Last Hits vs Denies',
+        values:data.map(function(d){
+          return {
+            x:d.last_hits,
+            y:d.denies,
+          }
+        }),
+      }
+    ];
+    window.Chartreuse.scatter(destination, plot_data, 'Last Hits', 'Denies');
+
+
+    (function(){
+      var destination = '#kda2';
+      nv.addGraph(function(){
+        var plot_data = [{
+          key:'KDA2',
+          values:data.map(function(d){
+            return {
+              label: d.hero.name,
+              value: d.kda2
+            }
+          })
+        }];
+        chart = nv.models.classDiscreteBarChart(destination, plot_data);
+      })
+    })();
+
+    (function(){
+      var destination = '#last_hits';
+      nv.addGraph(function(){
+        var plot_data = [{
+          key:'Last Hits',
+          values:data.map(function(d){
+            return {
+              label: d.hero.name,
+              value: d.last_hits
+            }
+          })
+        }];
+        chart = nv.models.classDiscreteBarChart(destination, plot_data);
+      })
+    })();
+
+
+    (function(){
+      var destination = '#tower_damage';
+      nv.addGraph(function(){
+        var plot_data = [{
+          key:'KDA2',
+          values:data.map(function(d){
+            return {
+              label: d.hero.name,
+              value: d.tower_damage
+            }
+          })
+        }];
+        chart = nv.models.classDiscreteBarChart(destination, plot_data);
+      })
+    })();
+
+    (function(){
+      var destination = '#abilities';
+      var plot_data = data.map(function(d){
+        return {
+          key: d.hero.name,
+          values: d.skillbuild
+        }
+      });
+      nv.addGraph(function(){
+        chart = nv.models.lineChart()
+          .x(function(d){return d.time})
+          .y(function(d){return d.level})
+        svg = window.make_svg(destination, 230);
+        chart_data = svg.datum(plot_data);
+        chart_data.transition().duration(500).call(chart);
+
+      })
+    })();
+
+
+
+  })
+})
 </script>
 {% endblock extra_js %}
