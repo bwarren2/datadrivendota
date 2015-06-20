@@ -2,11 +2,16 @@ from rest_framework import viewsets, filters
 from django.views.generic import ListView, DetailView, TemplateView
 from utils.pagination import SmarterPaginator
 
+from datadrivendota.views import JsonApiView
+
 from .models import League, ScheduledMatch
 from .serializers import LeagueSerializer
 from matches.models import Match
 from datadrivendota.redis_app import (
     get_games,
+    timeline_key,
+    redis_app,
+    slice_key
 )
 
 
@@ -123,3 +128,42 @@ class LeagueViewSet(viewsets.ReadOnlyModelViewSet):
 def get_duration(game):
     """ Helper function for sorting."""
     return game['scoreboard']['duration'] if 'scoreboard' in game else 0
+
+
+class ApiLiveGamesList(JsonApiView):
+
+    def fetch_json(self, *args, **kwargs):
+        data = get_games()
+        return data
+
+
+class ApiLiveGameDetail(JsonApiView):
+
+    def get_context_data(self, **kwargs):
+        if 'match_id' in kwargs:
+            kwargs['match_id'] = int(kwargs['match_id'])
+        return kwargs
+
+    def fetch_json(self, *args, **kwargs):
+        key = timeline_key(kwargs['match_id'])
+        data = redis_app.get(key)
+        if data is not None:
+            return data
+        else:
+            self.fail()
+
+
+class ApiLiveGameSlice(JsonApiView):
+
+    def get_context_data(self, **kwargs):
+        if 'match_id' in kwargs:
+            kwargs['match_id'] = int(kwargs['match_id'])
+        return kwargs
+
+    def fetch_json(self, *args, **kwargs):
+        key = slice_key(kwargs['match_id'])
+        data = redis_app.get(key)
+        if data is not None:
+            return data
+        else:
+            self.fail()
