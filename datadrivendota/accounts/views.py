@@ -38,114 +38,6 @@ from datadrivendota.management.tasks import (
 from players.management.tasks import MirrorClientPersonas
 from players.management.tasks import MirrorPlayerData
 
-# All this needs to be refactored into new ajax.
-# Therefore, it is exempt from the CBV refactor.
-# For now. -- Ben  2015-04-19
-
-
-def data_applicant(request):
-    if request.method == 'POST':
-        form = ApplicantForm(request.POST)
-        if form.is_valid():
-
-            """
-            This is some stupid hacky stuff.  What we really want to do is have a uniqueness criterion on the model, a 32bit validator on the field, and a clean() method on the field that takes % 32bit.  We'll do it later.
-            """
-            try:
-                modulo_id = form.cleaned_data['steam_id'] \
-                    % settings.ADDER_32_BIT
-                Applicant.objects.get(
-                    steam_id=modulo_id
-                )
-                status = 'preexisting'
-            except Applicant.DoesNotExist:
-                form.save()
-                status = 'success'
-
-            return render(
-                request,
-                'players/data_applicant.html',
-                {
-                    'form': form,
-                    status: status
-                }
-            )
-        else:
-            status = 'error'
-            return render(
-                request,
-                'players/data_applicant.html',
-                {
-                    'form': form,
-                    status: status
-                }
-            )
-    else:
-        form = ApplicantForm()
-        return render(
-            request,
-            'players/data_applicant.html',
-            {'form': form}
-        )
-
-
-@permission_required('players.can_touch')
-def player_management(request):
-    player = request_to_player(request)
-    if player is not None:
-        if request.method == 'POST':
-            form = PlayerAddFollowForm(request.POST)
-            if form.is_valid():
-                follow_player_id = form.cleaned_data['player']
-                follow_player = Player.objects.get(steam_id=follow_player_id)
-                player.userprofile.following.add(follow_player)
-        form = PlayerAddFollowForm()
-        follow_list = [follow for follow in player.userprofile.following.all()]
-        track_list = [track for track in player.userprofile.tracking.all()]
-        return render(
-            request,
-            'accounts/management.html',
-            {
-                'follow_list': follow_list,
-                'track_list': track_list,
-                'track_limit': player.userprofile.track_limit,
-                'form': form
-            }
-        )
-
-
-class TrackingView(LoginRequiredView, TemplateView):
-    """Where users can adjust who they follow"""
-    template_name = 'accounts/tracking.html'
-
-    def get_context_data(self, *args, **kwargs):
-        if 'follow_list' not in kwargs:
-            kwargs['track_list'] = [
-                track for track in self.request.user.userprofile.tracking.all()
-            ]
-        return super(TrackingView, self).get_context_data(*args, **kwargs)
-
-
-class FollowView(LoginRequiredView, FormView):
-    """Where users can adjust who they follow"""
-    form_class = PlayerAddFollowForm
-    template_name = 'accounts/follow.html'
-
-    def form_valid(self, form):
-        follow_player_id = form.cleaned_data['player']
-        follow_player = Player.objects.get(steam_id=follow_player_id)
-        self.request.user.userprofile.following.add(follow_player)
-        messages.add_message(self.request, messages.SUCCESS, "Follow added")
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_context_data(self, *args, **kwargs):
-        if 'follow_list' not in kwargs:
-            kwargs['follow_list'] = [
-                follow for follow in
-                self.request.user.userprofile.following.all()
-            ]
-        return super(FollowView, self).get_context_data(*args, **kwargs)
-
 
 class MatchRequestView(LoginRequiredView, FormView):
     form_class = MatchRequestForm
@@ -192,7 +84,6 @@ class MatchRequestView(LoginRequiredView, FormView):
 
 
 class PollView(FormView):
-    """Where users can adjust who they follow"""
     form_class = PollForm
     template_name = 'accounts/poll.html'
 
