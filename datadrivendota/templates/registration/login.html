@@ -2,12 +2,12 @@
 
 {% block title %}Login!{%endblock title %}
 
-{% block page_title %Login{%endblock page_title %}
+{% block page_title %} Login{%endblock page_title %}
 
 {% block content %}
     <p>
       Log in with
-      <a href="{% url 'social:begin' 'steam' %}?next={{ request.path }}">Steam</a> to apply an upgrade
+      <a href="{% url 'social:begin' 'steam' %}?next={{ request.GET.next }}">Steam</a> to apply an upgrade
       code.
     </p>
 {%endblock content %}

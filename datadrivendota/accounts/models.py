@@ -1,6 +1,12 @@
+from uuid import uuid4
 from django.db import models
 from django.contrib.auth.models import User
 from utils.exceptions import DataCapReached, ValidationException
+
+
+def get_code():
+    """ Get a uuid code. """
+    return str(uuid4())
 
 
 class UserProfile(models.Model):
