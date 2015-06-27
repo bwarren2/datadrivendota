@@ -14,9 +14,8 @@ from django.db.models import Q
 from utils.exceptions import NoDataFound
 from datadrivendota.keen_app import keen_client
 
-from .forms import KeyForm, SearchForm
+from .forms import SearchForm
 from players.models import Player
-from accounts.models import PermissionCode
 from heroes.models import Hero
 from items.models import Item
 from teams.models import Team
@@ -35,46 +34,6 @@ class LandingView(TemplateView):
             }
         )
         return super(LandingView, self).get_context_data(**kwargs)
-
-
-def upgrade(request):
-    """
-    The onboarding process is due for a refactor.
-
-    Fixing this before that would be a waste of time.
-    """
-    if request.method == 'POST':
-        form = KeyForm(request.POST)
-
-        if request.user.is_authenticated():
-            if form.is_valid():
-                code = form.cleaned_data['code']
-                try:
-                    pcode = PermissionCode.objects.get(key=code)
-                    application = pcode.associate(request.user.id)
-                    if application:
-                        msg = "Code applied successfully!  Privileges upgraded"
-                    else:
-                        if pcode.registrant is not None:
-                            msg = "That code has been used already"
-                        else:
-                            msg = "Code failed to apply.  :("
-
-                except PermissionCode.DoesNotExist:
-                    msg = "We do not recognize that code."
-            else:
-                msg = ""
-            return render(
-                request,
-                'registration/upgrade.html',
-                {
-                    'form': form,
-                    'message': msg,
-                }
-            )
-    else:
-        form = KeyForm()
-        return render(request, 'registration/upgrade.html', {'form': form})
 
 
 class LoginRequiredView(View):

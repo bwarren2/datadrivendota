@@ -2,18 +2,12 @@
 
 {% block title %}Login!{%endblock title %}
 
-{% block page_title %}Some parts of our site are currently private.{%endblock page_title %}
+{% block page_title %Login{%endblock page_title %}
 
 {% block content %}
-  {% if not request.user.is_anonymous %}
     <p>
-      If you have an invitation code, <a href="{% url 'upgrade' %}">upgrade</a> your account privileges .
-    </p>
-  {% else %}
-    <p>
-      Log into a validated account with
-      <a href="{% url 'social:begin' 'steam' %}">Steam</a> to apply an upgrade
+      Log in with
+      <a href="{% url 'social:begin' 'steam' %}?next={{ request.path }}">Steam</a> to apply an upgrade
       code.
     </p>
-  {% endif %}
 {%endblock content %}

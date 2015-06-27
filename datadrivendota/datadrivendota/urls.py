@@ -6,7 +6,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from datadrivendota import views
-from accounts.views import data_applicant
 
 # REST
 from .rest_urls import router
@@ -28,15 +27,9 @@ urlpatterns = patterns(
     url(r'^djs2/', include('django_select2.urls')),
     url(r'^health/', include('health.urls', namespace='health')),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
-    url(r'^upgrade/$', views.upgrade, name='upgrade'),
     url(r'^payments/', include("payments.urls")),
     url(r'^blog/', include('blog.urls', namespace='blog')),
     url(r'^rest-api/', include(router.urls, namespace='rest-api')),
-    url(
-        r'^data-request/$',
-        data_applicant,
-        name="data_applicant"
-    ),
     url(
         r'^logout/$',
         'django.contrib.auth.views.logout',
