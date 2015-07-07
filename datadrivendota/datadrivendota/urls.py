@@ -15,6 +15,8 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     url(r'^$', views.LandingView.as_view(), name='landing'),
+
+    # App URLs
     url(r'^heroes/', include('heroes.urls', namespace='heroes')),
     url(r'^items/', include('items.urls', namespace='items')),
     url(r'^matches/', include('matches.urls', namespace='matches')),
@@ -22,32 +24,25 @@ urlpatterns = patterns(
     url(r'^leagues/', include('leagues.urls', namespace='leagues')),
     url(r'^teams/', include('teams.urls', namespace='teams')),
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
-    url(r'^search/$', views.SearchView.as_view(), name='search'),
+
+    # Internals URLS
     url(r'^admin/', include(admin.site.urls)),
     url(r'^djs2/', include('django_select2.urls')),
+    url(r'^rest-api/', include(router.urls, namespace='rest-api')),
     url(r'^health/', include('health.urls', namespace='health')),
-    url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
+
+    # One-off URLs
+    url(r'^search/$', views.SearchView.as_view(), name='search'),
     url(r'^payments/', include("payments.urls")),
     url(r'^blog/', include('blog.urls', namespace='blog')),
-    url(r'^rest-api/', include(router.urls, namespace='rest-api')),
-    url(
-        r'^logout/$',
-        'django.contrib.auth.views.logout',
-        {'next_page': '/'},
-        name='logout'
-    ),
     url(
         r'^faq/$',
-        TemplateView.as_view(
-            template_name='about.html',
-        ),
+        TemplateView.as_view(template_name='about.html',),
         name='faq'
     ),
     url(
         r'^privacy/$',
-        TemplateView.as_view(
-            template_name='robots.txt',
-        ),
+        TemplateView.as_view(template_name='privacy.txt',),
         name='privacy'
     ),
     url(
@@ -57,10 +52,7 @@ urlpatterns = patterns(
             content_type='text/plain'
         )
     ),
-    url(
-        '',
-        include('social.apps.django_app.urls', namespace='social')
-    ),
+    url(r'', include('social.apps.django_app.urls', namespace='social'))
     # Wat? Why are we including this at root? Seems risky. --kit 2014-02-16
     # Docs recommend it :/
     # https://python-social-auth.readthedocs.org/en/latest/configuration/django.html

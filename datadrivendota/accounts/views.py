@@ -1,9 +1,13 @@
 
 from django.views.generic.edit import FormView
+from django.views.generic import TemplateView
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.contrib import messages
+from django.conf import settings
+from django.contrib.auth import logout as auth_logout
 
+from social.backends.utils import load_backends
 from accounts.models import MatchRequest
 from datadrivendota.forms import MatchRequestForm
 from matches.management.tasks import MirrorMatches
@@ -54,3 +58,55 @@ class MatchRequestView(LoginRequiredView, FormView):
 
     def get_success_url(self):
         return reverse('players:management')
+
+
+class LoginView(TemplateView):
+    template_name = 'accounts/login.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['available_backends'] = load_backends(
+            settings.AUTHENTICATION_BACKENDS
+        )
+        return kwargs
+
+
+class LogoutView(TemplateView):
+    template_name = 'accounts/logout.html'
+
+    def get(self, request, *args, **kwargs):
+        auth_logout(request)
+        return super(LogoutView, self).get(self, request, *args, **kwargs)
+
+
+class DoneView(TemplateView):
+    template_name = 'accounts/done.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['available_backends'] = load_backends(
+            settings.AUTHENTICATION_BACKENDS
+        )
+        return kwargs
+
+
+class AccountsHome(TemplateView):
+    template_name = 'accounts/home.html'
+
+
+class ValidationView(TemplateView):
+    template_name = 'accounts/login.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['validation_sent'] = True,
+        kwargs['email'] = self.request.session.get('email_validation_address')
+
+        return kwargs
+
+
+class EmailRequiredView(TemplateView):
+    template_name = 'accounts/login.html'
+
+    def get_context_data(self, **kwargs):
+        backend = self.request.session['partial_pipeline']['backend']
+        kwargs['email_required'] = True
+        kwargs['backend'] = backend
+        return kwargs

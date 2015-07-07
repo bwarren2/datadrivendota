@@ -179,8 +179,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
-    # 'social_auth.context_processors.social_auth_by_type_backends',
-
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
@@ -320,10 +320,11 @@ LOGIN_URL = '/login/'
 
 AUTHENTICATION_BACKENDS = (
     'social.backends.steam.SteamOpenId',
+    'social.backends.email.EmailAuth',
+    'social.backends.username.UsernameAuth',
     'django.contrib.auth.backends.ModelBackend',
 )
 
-LOGIN_REDIRECT_URL = '/'
 
 # MAGIC NUMBERS
 STEAM_API_KEY = getenv('STEAM_API_KEY')
@@ -342,12 +343,15 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.auth_allowed',
     'social.pipeline.social_auth.social_user',
     'social.pipeline.user.get_username',
+    'accounts.pipeline.require_email',
     'social.pipeline.mail.mail_validation',
     'social.pipeline.user.create_user',
     'social.pipeline.social_auth.associate_user',
+    # 'social.pipeline.debug.debug',
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details',
-    'players.pipeline.create_player',
+    # 'social.pipeline.debug.debug',
+    # 'players.pipeline.create_player',
 )
 
 
@@ -481,3 +485,16 @@ CLIENT_MATCH_COUNT = 3  # How many client matches to get each pull
 VALVE_CDN_PATH = 'http://cdn.dota2.com/apps/570/'
 UPDATE_LAG_UTC = 60 * 60 * 24 * 3  # 3 Days
 # End project specific constants used in tasks
+
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/done/'
+EMAIL_FROM = 'bwarren2@gmail.com'
+SOCIAL_AUTH_EMAIL_FORM_HTML = 'email_signup.html'
+SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = 'accounts.mail.send_validation'
+SOCIAL_AUTH_EMAIL_VALIDATION_URL = '/email-sent/'
+SOCIAL_AUTH_USERNAME_FORM_HTML = 'username_signup.html'
+SOCIAL_AUTH_URL_NAMESPACE = 'accounts'
+
+# SOCIAL_AUTH_STRATEGY = 'social.strategies.django_strategy.DjangoStrategy'
+# SOCIAL_AUTH_STORAGE = 'social.apps.django_app.default.models.DjangoStorage'

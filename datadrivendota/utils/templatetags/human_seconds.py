@@ -9,10 +9,8 @@ register = template.Library()
 @register.filter(name='human_seconds')
 def human_seconds(value, arg=''):
     """ Turn seconds into a pretty string. """
-    try:
-        secs = int(value)
-    except ValueError:
-        return 'No duration'
+    # Place seconds in to integer
+    secs = int(value)
 
     # If seconds are greater than 0
     if secs > 0:
