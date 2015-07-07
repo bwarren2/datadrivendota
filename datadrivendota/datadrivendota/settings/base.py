@@ -347,10 +347,10 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.mail.mail_validation',
     'social.pipeline.user.create_user',
     'social.pipeline.social_auth.associate_user',
-    # 'social.pipeline.debug.debug',
+    'social.pipeline.debug.debug',
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details',
-    # 'social.pipeline.debug.debug',
+    'social.pipeline.debug.debug',
     # 'players.pipeline.create_player',
 )
 
@@ -492,7 +492,7 @@ LOGIN_REDIRECT_URL = '/done/'
 EMAIL_FROM = 'bwarren2@gmail.com'
 SOCIAL_AUTH_EMAIL_FORM_HTML = 'email_signup.html'
 SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = 'accounts.mail.send_validation'
-SOCIAL_AUTH_EMAIL_VALIDATION_URL = '/email-sent/'
+SOCIAL_AUTH_EMAIL_VALIDATION_URL = '/accounts/email-sent/'
 SOCIAL_AUTH_USERNAME_FORM_HTML = 'username_signup.html'
 SOCIAL_AUTH_URL_NAMESPACE = 'accounts'
 

@@ -82,6 +82,13 @@ class DoneView(TemplateView):
     template_name = 'accounts/done.html'
 
     def get_context_data(self, **kwargs):
+        return kwargs
+
+
+class CompleteView(TemplateView):
+    template_name = 'accounts/done.html'
+
+    def get_context_data(self, **kwargs):
         kwargs['available_backends'] = load_backends(
             settings.AUTHENTICATION_BACKENDS
         )
@@ -110,3 +117,10 @@ class EmailRequiredView(TemplateView):
         kwargs['email_required'] = True
         kwargs['backend'] = backend
         return kwargs
+
+
+def add_backends(context):
+    context['available_backends'] = load_backends(
+        settings.AUTHENTICATION_BACKENDS
+    )
+    return context

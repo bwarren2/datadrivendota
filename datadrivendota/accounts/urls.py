@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import patterns, url
 from accounts import views
 
 urlpatterns = patterns(
@@ -15,6 +15,11 @@ urlpatterns = patterns(
     url(r'^done/$', views.DoneView.as_view(), name='done'),
     # url(r'^ajax-auth/(?P<backend>[^/]+)/$', views.ajax_auth,
     #     name='ajax-auth'),
+    url(
+        r'^complete/(?P<backend>[^/]+)/$',
+        views.CompleteView.as_view(),
+        name='complete'
+    ),
     url(r'^email-sent/', views.ValidationView.as_view(), name='email-sent'),
     url(r'^email/$', views.EmailRequiredView.as_view(), name='require_email'),
 )
