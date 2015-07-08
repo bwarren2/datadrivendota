@@ -487,14 +487,13 @@ UPDATE_LAG_UTC = 60 * 60 * 24 * 3  # 3 Days
 # End project specific constants used in tasks
 
 
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/done/'
-EMAIL_FROM = 'bwarren2@gmail.com'
-SOCIAL_AUTH_EMAIL_FORM_HTML = 'email_signup.html'
-SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = 'accounts.mail.send_validation'
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/accounts/done/'
 SOCIAL_AUTH_EMAIL_VALIDATION_URL = '/accounts/email-sent/'
+EMAIL_FROM = 'noreply@datadrivendota.com'
+
+SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = 'accounts.mail.send_validation'
+
+SOCIAL_AUTH_EMAIL_FORM_HTML = 'email_signup.html'
 SOCIAL_AUTH_USERNAME_FORM_HTML = 'username_signup.html'
 SOCIAL_AUTH_URL_NAMESPACE = 'accounts'
-
-# SOCIAL_AUTH_STRATEGY = 'social.strategies.django_strategy.DjangoStrategy'
-# SOCIAL_AUTH_STORAGE = 'social.apps.django_app.default.models.DjangoStorage'

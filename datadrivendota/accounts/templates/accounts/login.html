@@ -10,7 +10,7 @@
     h1 { padding: 0 30px; }
     .col-md-2 { width: 18.6667%; }
     .buttons { display: block; table-layout: fixed; border-radius: 7px; border: 1px solid #ccc;
-               margin: 20px; background: #eee; padding: 30px; }
+               margin: 20px; background: #555; padding: 30px; }
     .buttons > div a { margin: 5px 10px; }
     .buttons > div:not(:first-child) { margin-top: 10px; border-top: 1px solid #ccc;
                                        padding-top: 10px; text-align: center; }
@@ -79,7 +79,7 @@
       </div>
 
       <div>
-        <a class="btn btn-primary" href="/logout/">
+        <a class="btn btn-primary" href="{% url 'accounts:logout' %}">
           <i class="fa fa-sign-out"></i>
           Logout
         </a>

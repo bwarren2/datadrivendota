@@ -105,7 +105,7 @@ class ValidationView(TemplateView):
     def get_context_data(self, **kwargs):
         kwargs['validation_sent'] = True,
         kwargs['email'] = self.request.session.get('email_validation_address')
-
+        kwargs = add_backends(kwargs)
         return kwargs
 
 
