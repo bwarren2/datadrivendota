@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from datadrivendota import views
+from accounts.views import LoginView
 
 # REST
 from .rest_urls import router
@@ -35,6 +36,9 @@ urlpatterns = patterns(
     url(r'^search/$', views.SearchView.as_view(), name='search'),
     url(r'^payments/', include("payments.urls")),
     url(r'^blog/', include('blog.urls', namespace='blog')),
+
+    # When django wants a login, redir to social login
+    url(r'^login/', LoginView.as_view(), name='login'),
     url(
         r'^faq/$',
         TemplateView.as_view(template_name='about.html',),

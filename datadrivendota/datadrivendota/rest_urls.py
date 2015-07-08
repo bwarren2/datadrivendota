@@ -13,11 +13,13 @@ from heroes.views import (
     HeroPickBanViewSet,
 )
 from items.views import ItemViewSet
+from accounts.views import MatchRequestViewSet
 from players.views import PlayerViewSet, PlayerWinrateViewSet
 
 
 # DRF is great
 router = DefaultRouter()
+router.register('match-request', MatchRequestViewSet)
 router.register('teams', TeamViewSet)
 router.register('leagues', LeagueViewSet)
 router.register('heroes', HeroViewSet)

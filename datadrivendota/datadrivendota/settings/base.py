@@ -5,10 +5,10 @@ from django.contrib.messages import constants as message_constants
 from os.path import abspath, basename, dirname, join, normpath
 from os import getenv
 from sys import path
-
 import dj_database_url
 
-# Celery config is in the celery app
+# Celery config is in the celery app, but we need this for the java parser
+BROKER_URL = getenv('CLOUDAMQP_URL')
 
 # Name and email addresses of recipients
 ADMINS = (
@@ -497,3 +497,5 @@ SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = 'accounts.mail.send_validation'
 SOCIAL_AUTH_EMAIL_FORM_HTML = 'email_signup.html'
 SOCIAL_AUTH_USERNAME_FORM_HTML = 'username_signup.html'
 SOCIAL_AUTH_URL_NAMESPACE = 'accounts'
+
+REPLAY_SERVICE_URL = getenv('REPLAY_SERVICE_URL')

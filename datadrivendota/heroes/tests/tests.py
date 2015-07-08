@@ -1,24 +1,11 @@
-from nose.tools import timed
 from django.test import TestCase, Client
 from django.forms import ValidationError
 from model_mommy import mommy
 
 from heroes.models import Hero
-from matches.models import GameMode
 from utils import safen
 from heroes.form_fields import SingleHeroSelect, MultiHeroSelect
-from heroes.json_data import (
-    hero_vitals_json,
-    hero_lineup_json,
-    hero_performance_chart_json,
-    hero_progression_json,
-    hero_skillbuild_winrate_json,
-    update_player_winrate,
-    hero_performance_lineup,
-    )
-from matches.mommy_recipes import make_matchset
 from heroes.mommy_recipes import make_hero
-from utils.exceptions import NoDataFound
 
 JSON_TIME = 2
 
@@ -48,15 +35,15 @@ class TestMommyRecipes(TestCase):
 class TestHeroManagers(TestCase):
 
     @classmethod
-    def setUpClass(self):
-        super(self, TestHeroManagers).setUpClass()     # Call parent first
+    def setUpClass(cls):
+        super(cls, TestHeroManagers).setUpClass()     # Call parent first
         Hero.objects.all().delete()
-        self.heroes = mommy.make_recipe('heroes.hero', _quantity=10)
+        cls.heroes = mommy.make_recipe('heroes.hero', _quantity=10)
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         Hero.objects.all().delete()
-        super(self, TestHeroManagers).tearDownClass()  # Call parent last
+        super(cls, TestHeroManagers).tearDownClass()  # Call parent last
 
     def test_all(self):
         self.assertEqual(Hero.objects.all().count(), 10)
@@ -122,9 +109,9 @@ class TestMultiFormField(TestCase):
 class TestUrlconf(TestCase):
 
     @classmethod
-    def setUpClass(self):
-        super(TestUrlconf, self).setUpClass()
-        self.hero_doss = mommy.make_recipe(
+    def setUpClass(cls):
+        super(TestUrlconf, cls).setUpClass()
+        cls.hero_doss = mommy.make_recipe(
             'heroes.herodossier', hero__machine_name='natures-prophet'
         )
 
@@ -144,126 +131,3 @@ class TestUrlconf(TestCase):
         resp = c.get('/heroes/{0}/'.format(self.hero_doss.hero.machine_name))
         self.assertEqual(resp.status_code, 200)
         # Almost all the other urls are to be gutted, so we are done here.
-
-
-# Reminder, things below here are deprecated
-
-
-class TestVitalsJson(TestCase):
-
-    def setUp(self):
-        make_hero(steam_id=1)
-        make_hero(steam_id=2)
-
-    @timed(JSON_TIME)
-    def test_working_json(self):
-        """If these raise exceptions, that would be bad"""
-
-        chart = hero_vitals_json(heroes=[1], stats=['strength'])
-        self.assertGreater(len(chart.datalist), 10)
-        chart = hero_vitals_json(heroes=[1, 2], stats=['strength'])
-        self.assertGreater(len(chart.datalist), 10)
-        chart = hero_vitals_json(heroes=[1, 2], stats=['strength', 'agility'])
-        self.assertGreater(len(chart.datalist), 10)
-
-    def test_broken_json(self):
-        with self.assertRaises(NoDataFound):
-            hero_vitals_json(heroes=[], stats=['strength'])
-        with self.assertRaises(NoDataFound):
-            hero_vitals_json(heroes=[1], stats=['bink'])
-
-
-class TestLineupJson(TestCase):
-
-    def setUp(self):
-        make_hero(steam_id=1)
-        make_hero(steam_id=2)
-
-    def tearDown(self):
-        pass
-
-    @timed(JSON_TIME)
-    def test_working_json(self):
-        """If these raise exceptions, that would be bad"""
-
-        chart = hero_lineup_json(heroes=[1, 2], stat='strength', level=2)
-        self.assertGreater(len(chart.datalist), 1)
-        chart = hero_lineup_json(heroes=[], stat='strength', level=2)
-        self.assertGreater(len(chart.datalist), 1)
-
-    def test_broken_json(self):
-        with self.assertRaises(NoDataFound):
-            hero_lineup_json(heroes=[], stat='stren', level=2)
-        with self.assertRaises(NoDataFound):
-            hero_lineup_json(heroes=[], stat='strength', level=26)
-
-
-class TestWorkingJson(TestCase):
-
-    @classmethod
-    def setUpClass(self):
-        super(TestWorkingJson, self).setUpClass()
-        self.hero, self.player = make_matchset()
-        self.player.updated = True
-
-    @timed(JSON_TIME)
-    def test_performance_json(self):
-        chart = hero_performance_chart_json(
-            self.hero.steam_id,
-            self.player.steam_id,
-            x_var='duration',
-            y_var='kills',
-            group_var=None,
-            panel_var=None,
-            game_modes=None,
-            matches=None,
-            outcome='both',
-        )
-        self.assertGreater(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_progression_json(self):
-        chart = hero_progression_json(
-            self.hero.steam_id,
-            self.player.steam_id,
-            division='Skill',
-            game_modes=None,
-            matches=None,
-            outcome=None,
-        )
-        self.assertGreater(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_skillbuild_json(self):
-        chart = hero_skillbuild_winrate_json(
-            self.hero.steam_id,
-            self.player.steam_id,
-            game_modes=None,
-            levels=[1, 3],
-        )
-        self.assertGreater(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_winrate_json(self):
-        chart = update_player_winrate(
-            self.hero.steam_id,
-            game_modes=GameMode.objects.all(),
-        )
-        self.assertEqual(len(chart.datalist), 1)
-
-    # Fix travis.  This functionality is condemned.
-    # @timed(JSON_TIME)
-    # def test_performance_lineup_json(self):
-    #     chart = hero_performance_lineup(
-    #         stat='kills',
-    #         skill_level=1,
-    #         outcome='win',
-    #         heroes=[],
-    #         min_date=None,
-    #         game_modes=None,
-    #     )
-    #     self.assertEqual(len(chart.datalist), 1)
-
-    @timed(JSON_TIME)
-    def test_pick_winrate_json(self):
-        pass

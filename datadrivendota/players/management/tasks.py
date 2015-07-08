@@ -1,5 +1,4 @@
 import logging
-from itertools import chain as meld
 from copy import deepcopy
 from time import time as now
 from celery import Task, chain
@@ -7,7 +6,6 @@ from celery import Task, chain
 from django.conf import settings
 from players.models import Player
 from teams.models import Team
-from accounts.models import get_tracks
 from teams.models import assemble_pros
 
 from datadrivendota.management.tasks import (
@@ -29,19 +27,18 @@ class MirrorClientPersonas(Task):
 
     def run(self):
         """
+        Get valve player data for clients.
+
         Go through the users for whom update is True and group them into lists
         of 50.  The profile update API actually supports up to 100
         """
         list_send_length = 50
         users = Player.objects.filter(updated=True)
-        tracked = get_tracks(users)
 
         teams = Team.objects.all()
         pros = assemble_pros(teams)
 
-        track_list = meld(users, tracked)
-
-        check_list = [user.steam_id for user in track_list]
+        check_list = [user.steam_id for user in users]
         check_list.extend(pros)
 
         querylist = []
@@ -93,12 +90,15 @@ class UpdateClientPersonas(ApiFollower):
 
 
 class MirrorPlayerData(BaseTask):
+
     """
-    The major entry point to the system.  Creates a player for recurring update
-    and pulls in a bunch of information.
+    The major entry point to the system.
+
+    Creates a player for recurring update and pulls in a bunch of information.
 
     @todo: refactor this with accounts refactor.
     """
+
     def run(self):
         if self.api_context.account_id is None:
             logger.error("Needed an account id, had none, failed.")
@@ -127,7 +127,8 @@ class MirrorPlayerData(BaseTask):
 
 
 class MirrorProNames(Task):
-    """Gets the pro name for each person in the current roster set"""
+
+    """ Gets the pro name for each person in the current roster set. """
 
     def run(self):
         # Purge out the people that have pro names but are not on teams.
@@ -153,14 +154,13 @@ class MirrorProNames(Task):
 
 
 class UpdateProNames(ApiFollower):
-    """
-    Takes a ping to the official player database and updates that player's
-    pro name
-    """
+
+    """ Takes a ping to the official player database and update pro name. """
+
     def run(self, urldata):
         player = Player.objects.get_or_create(
             steam_id=self.api_context.AccountID
-            )[0]
+        )[0]
         if self.result['Name'] == '':
             player.pro_name = None
             player.save()
@@ -175,13 +175,13 @@ class MirrorClientMatches(Task):
 
     def run(self):
         """
+        Get matches for clients.
+
         Go through the users for whom update is True and pull match histories
         since their last scrape time
         """
         users = Player.objects.filter(updated=True).select_related()
-        tracked = get_tracks(users)
-        check_list = meld(users, tracked)
-        check_list = [user for user in check_list]
+        check_list = [user for user in users]
 
         for counter, user in enumerate(check_list, start=1):
 

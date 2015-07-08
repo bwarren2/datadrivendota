@@ -10,7 +10,7 @@ app = Celery('datadrivendota')
 
 class Config(object):
     BROKER_POOL_LIMIT = int(getenv('BROKER_POOL_LIMIT', 1))
-    BROKER_URL = getenv('CLOUDAMQP_URL')
+    BROKER_URL = settings.BROKER_URL
     BROKER_CONNECTION_TIMEOUT = int(getenv('BROKER_CONNECTION_TIMEOUT'))
     BROKER_CONNECTION_RETRY = True
     CELERYD_CONCURRENCY = int(getenv('CELERYD_CONCURRENCY'))
@@ -25,11 +25,13 @@ class Config(object):
     # List of modules to import when celery starts.
     CELERY_IMPORTS = (
         "matches.management.tasks",
+        "matches.management.parser_tasks",
         "items.management.tasks",
         "heroes.management.tasks",
         "players.management.tasks",
         "leagues.management.tasks",
         "teams.management.tasks",
+        "accounts.management.tasks",
         "datadrivendota.management.tasks",
     )
 
@@ -412,18 +414,18 @@ class Config(object):
             'schedule': timedelta(hours=1),
         },
         # Fast
-        'reflect-recent-leagues-daily': {
-            'task': 'leagues.management.tasks.MirrorRecentLeagues',
-            'schedule': timedelta(minutes=1),
-        },
-        'reflect-recent-teams-daily': {
-            'task': 'teams.management.tasks.MirrorRecentTeams',
-            'schedule': timedelta(minutes=1),
-        },
-        'reflect-live-games-fast': {
-            'task': 'leagues.management.tasks.MirrorLiveGames',
-            'schedule': timedelta(seconds=10),
-        },
+        # 'reflect-recent-leagues-daily': {
+        #     'task': 'leagues.management.tasks.MirrorRecentLeagues',
+        #     'schedule': timedelta(minutes=1),
+        # },
+        # 'reflect-recent-teams-daily': {
+        #     'task': 'teams.management.tasks.MirrorRecentTeams',
+        #     'schedule': timedelta(minutes=1),
+        # },
+        # 'reflect-live-games-fast': {
+        #     'task': 'leagues.management.tasks.MirrorLiveGames',
+        #     'schedule': timedelta(seconds=10),
+        # },
     }
 
 app.config_from_object(Config)

@@ -200,6 +200,8 @@ class UpdateMatch(ApiFollower):
                 if data['dire_team_id'] == 1 else False
         match.save()
 
+        return self.api_context
+
 
 def upload_match_summary(players, parent_match, refresh_records):
     """
