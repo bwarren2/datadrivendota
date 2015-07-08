@@ -78,13 +78,6 @@ class LogoutView(TemplateView):
         return super(LogoutView, self).get(self, request, *args, **kwargs)
 
 
-class DoneView(TemplateView):
-    template_name = 'accounts/done.html'
-
-    def get_context_data(self, **kwargs):
-        return kwargs
-
-
 class CompleteView(TemplateView):
     template_name = 'accounts/done.html'
 
