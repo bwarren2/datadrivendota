@@ -48,6 +48,7 @@ class CreateMatchParse(Task):
 
         url = settings.REPLAY_SERVICE_URL
         payload = {'match_id': match_id}
+        print url
         r = requests.get(url, params=payload)
         if r.status_code == 200:
             replay_url = r.json()['replay_url']
