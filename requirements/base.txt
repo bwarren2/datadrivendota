@@ -57,3 +57,4 @@ stripe==1.22.2
 wsgiref==0.1.2
 whitenoise==1.0.6
 pika==0.9.14
+opbeat==3.0.2
