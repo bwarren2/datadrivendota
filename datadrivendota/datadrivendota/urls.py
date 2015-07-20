@@ -46,7 +46,7 @@ urlpatterns = patterns(
     ),
     url(
         r'^privacy/$',
-        TemplateView.as_view(template_name='privacy.txt',),
+        TemplateView.as_view(template_name='privacy.html',),
         name='privacy'
     ),
     url(
