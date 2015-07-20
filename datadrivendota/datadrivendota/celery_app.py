@@ -25,7 +25,6 @@ class Config(object):
     # List of modules to import when celery starts.
     CELERY_IMPORTS = (
         "matches.management.tasks",
-        "matches.management.parser_tasks",
         "items.management.tasks",
         "heroes.management.tasks",
         "players.management.tasks",
@@ -102,6 +101,13 @@ class Config(object):
             Exchange('rpr'),
             routing_key='rpr'
         ),
+        # This handles the callbacks of the java parser.  Unknown speed.
+        Queue(
+            'python_parse',
+            Exchange('python_parse'),
+            routing_key='python_parse'
+        ),
+
     )
 
     CELERY_ROUTES = {
@@ -214,7 +220,22 @@ class Config(object):
             'exchange': 'db',
             'routing_key': 'db'
         },
-
+        'accounts.management.tasks.ReadParseResults': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
+        },
+        'accounts.management.tasks.KickoffMatchRequests': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
+        },
+        'accounts.management.tasks.CreateMatchParse': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
+        },
+        'accounts.management.tasks.MergeMatchRequestReplay': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
+        },
     }
 
     CELERY_DEFAULT_EXCHANGE = 'default'
@@ -366,7 +387,26 @@ class Config(object):
             'max_retries': 0,
             'trail': False,
         },
-
+        'accounts.management.tasks.KickoffMatchRequests': {
+            'acks_late': True,
+            'max_retries': 0,
+            'trail': False,
+        },
+        'accounts.management.tasks.CreateMatchParse': {
+            'acks_late': True,
+            'max_retries': 0,
+            'trail': False,
+        },
+        'accounts.management.tasks.ReadParseResults': {
+            'acks_late': True,
+            'max_retries': 0,
+            'trail': False,
+        },
+        'accounts.management.tasks.MergeMatchRequestReplay': {
+            'acks_late': True,
+            'max_retries': 0,
+            'trail': False,
+        },
     }
 
     CELERYBEAT_SCHEDULE = {
@@ -422,10 +462,14 @@ class Config(object):
         #     'task': 'teams.management.tasks.MirrorRecentTeams',
         #     'schedule': timedelta(minutes=1),
         # },
-        # 'reflect-live-games-fast': {
-        #     'task': 'leagues.management.tasks.MirrorLiveGames',
-        #     'schedule': timedelta(seconds=10),
-        # },
+        'drain-java-result-fast': {
+            'task': 'accounts.management.tasks.ReadParseResults',
+            'schedule': timedelta(seconds=10),
+        },
+        'handdle-match-requests': {
+            'task': 'accounts.management.tasks.KickoffMatchRequests',
+            'schedule': timedelta(seconds=10),
+        },
     }
 
 app.config_from_object(Config)
