@@ -102,3 +102,10 @@ class MatchRequest(models.Model):
         return "Match Request: match#: {0}, status: {1}".format(
             self.match_id, dict(choices).get(self.status)
         )
+
+    @property
+    def file_url(self):
+        return (
+            "https://s3.amazonaws.com/datadrivendota/"
+            "raw_replay_parse/{0}"
+        ).format(self.raw_parse_url)

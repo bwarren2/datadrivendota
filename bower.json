@@ -21,7 +21,7 @@
     "handlebars": "~3.0.3",
     "select2": "~4.0.0",
     "jqueryui": "~1.11.4",
-    "nvd3": "git+https://github.com/novus/nvd3#9a218b856a657ca57b33e6cc013dfe64ee12dd01",
+    "nvd3": "git+https://github.com/novus/nvd3#f54d2d6ff35190ec4664ee7d52d763ac4759dbf5",
     "eldarion-ajax": "git+https://github.com/eldarion/eldarion-ajax#37a7fe46a2e0acbc2a98316a6f1ffc94c52782d5",
     "sprintf": "~1.0.2"
   }

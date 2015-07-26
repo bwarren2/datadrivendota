@@ -1,7 +1,9 @@
 import time
 import pika
+import sys
 import json
 import requests
+from django.core.files import File
 from celery import Task, chain
 from accounts.models import MatchRequest
 from datadrivendota.management.tasks import ValveApiCall, ApiContext
@@ -9,6 +11,7 @@ from matches.management.tasks import UpdateMatch
 from django.conf import settings
 
 from matches.models import Match
+from io import BytesIO
 
 
 class KickoffMatchRequests(Task):
@@ -150,7 +153,6 @@ class ReadParseResults(Task):
         start = time.time()
 
         def drain(queue_name):
-            # {"filename":"1652732189_parse.json","match_id":1652732189}
 
             method_frame, header_frame, body = channel.basic_get(queue_name)
             if not method_frame:
@@ -172,9 +174,33 @@ class ReadParseResults(Task):
 class MergeMatchRequestReplay(Task):
 
     def run(self, json_data):
-        print json_data
         match_id = json_data['match_id']
+        filename = json_data['filename']
         mr = MatchRequest.objects.get(match_id=match_id)
-        mr.raw_parse_url = json_data['filename']
-        mr.status = MatchRequest.PARSED
-        mr.save()
+        self.merge_to_request(mr, filename)
+        self.merge_to_match(mr, match_id)
+
+    def merge_to_match(self, mr, match_id):
+        filename = "{0}_parse.json".format(match_id)
+        match = Match.objects.get(steam_id=match_id)
+        mr = MatchRequest.objects.get(match_id=match_id)
+        url = mr.file_url
+        try:
+            r = requests.get(url)
+            if r.status_code == 200:
+                holder = BytesIO(r.content)
+                _ = holder.seek(0)  # Catch to avoid printing
+                _ = _  # Shut off linting from stray var _
+                match.replay.save(filename, File(holder))
+            else:
+                print "Could not get the replay {0}!  Error code {1}".format(
+                    url, r.status_code
+                )
+        except:
+            err = sys.exc_info()[0]
+            print "Replay parsing error for  %s!  Error %s" % (match_id, err)
+
+    def merge_to_request(self, match_request, filename):
+        match_request.raw_parse_url = filename
+        match_request.status = MatchRequest.PARSED
+        match_request.save()

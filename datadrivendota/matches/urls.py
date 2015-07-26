@@ -5,10 +5,10 @@ urlpatterns = patterns(
     '',
     url(r'^$', views.MatchListView.as_view(), name='index'),
     url(
-        r'^(?P<match_id>[0-9\-]*)/parse_match/$',
-        views.ParseMatchDetail.as_view(),
-        name="parse_match"
-    ),
+        r'^(?P<match_id>[0-9\-]*)/replay_parse/$',
+        views.MatchReplayDetail.as_view(),
+        name="replay_parse"
+    ),  # Transitioning to this version
     url(
         r'^(?P<match_id>[0-9\-]*)/$',
         views.MatchDetail.as_view(),

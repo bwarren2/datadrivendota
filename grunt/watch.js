@@ -12,7 +12,7 @@ module.exports = {
     },
     js: {
       files: [
-        "js/*.js",
+        "js/**/*.js",
         "bower_components/**/*.js",
       ].map(function(filename){return "datadrivendota/static/"+filename;}),
       tasks: ["concat"],

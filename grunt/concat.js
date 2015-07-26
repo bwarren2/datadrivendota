@@ -1,7 +1,16 @@
 "use strict";
 module.exports = {
     options: {
-      separator: ";",
+        separator: ';\n'
+    },
+    nvd3_extensions: {
+        src: [
+            "setup.js",
+            "models/classDiscreteBar.js",
+        ].map(function(file){
+            return "datadrivendota/static/js/nvd3-extensions/"+file;
+        }),
+      dest: "datadrivendota/static/js/build/nvd3-extensions.js",
     },
     dist: {
         src: [
@@ -20,17 +29,18 @@ module.exports = {
             "bower_components/bootstrap/js/collapse.js",
             "bower_components/bootstrap/js/carousel.js",
             "bower_components/bootstrap/js/affix.js",
-            "bower_components/d3/d3.min.js",
+            "bower_components/d3/d3.js",
             "bower_components/jqueryui/jquery-ui.min.js",
             "bower_components/nvd3/build/nv.d3.js",
             "bower_components/bluebird/js/browser/bluebird.min.js",
             "bower_components/handlebars/handlebars.min.js",
             "bower_components/eldarion-ajax/js/eldarion-ajax.min.js",
             "bower_components/sprintf/dist/sprintf.min.js",
-            "js/nvd3-extensions.js",
+            "bower_components/select2/dist/js/select2.js",
             "js/charting.js",
+            "js/parse.js",
             "js/project.js",
-            "bower_components/select2/dist/js/select2.min.js",
+            "js/build/nvd3-extensions.js",
         ].map(function(file){ return "datadrivendota/static/"+file;}),
       dest: "datadrivendota/static/dist/built.js",
     },

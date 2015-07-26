@@ -1,5 +1,4 @@
-"use strict";
-nv.models.classDiscreteBarChart = function(destination, plot_data){
+nv.extensions.models.classDiscreteBarChart = function(destination, plot_data){
 
     var svg = window.make_svg(destination);
 
@@ -24,4 +23,3 @@ nv.models.classDiscreteBarChart = function(destination, plot_data){
     return chart;
 
 };
-

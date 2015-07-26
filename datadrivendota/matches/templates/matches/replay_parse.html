@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% load staticfiles player_extras %}
+
+{% block title %}Match #{{ match.steam_id }}{% endblock title %}
+
+{% block page_title %}
+    {% include "matches/_match_header_card.html" %}
+{% endblock page_title %}
+
+{% block content %}
+
+    {% include "matches/_time_control_card.html" %}
+    <div class='container'>
+
+        <div class='col-md-12' id='minimap'>
+            <h4>Minimap</h4>
+        </div>
+
+        <div class='col-md-6'>
+            <h4>Scatterplots</h4>
+            <div class='row' >
+                <div class='col-md-3' id='lh_level'></div>
+                <div class='col-md-3' id='kill_dmg'></div>
+                <div class='col-md-3' id='death_dmg'></div>
+                <div class='col-md-3' id='gold_exp'></div>
+            </div>
+        </div>
+
+    </div>
+{% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+var replay;
+var gold;
+var time_idx = 0;
+$(function(){
+    // Set up animation controls.
+    $('#stop-animation').toggle()
+    $('#start-animation, #stop-animation').click(function(){
+        $('#start-animation').toggle();
+        $('#stop-animation').toggle();
+        $('#back-animation').toggle();
+        $('#forward-animation').toggle();
+        $('#slider').toggle();
+    });
+
+    Promise.resolve(
+        $.ajax({
+            url: '{{match.replay.url}}',
+            dataType: 'json',
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                if (XMLHttpRequest.status == 0) {
+                  console.log(' Check Your Network.');
+                } else if (XMLHttpRequest.status == 404) {
+                  console.log('Requested URL not found.');
+                } else if (XMLHttpRequest.status == 500) {
+                  console.log('Internel Server Error.');
+                }  else {
+                   console.log('Unknow Error.\n' + XMLHttpRequest.responseText);
+                }
+            }
+        })
+    ).then(function(data){
+        replay = data.slice(data, data.length/2);
+        window.ParseCharts.cumsum_chart(
+            replay, 'gold_reasons', '#minimap', 'Time', 'Net Worth');
+        window.ParseCharts.cumsum_chart(
+            replay, 'xp_reasons', '#minimap', 'Time', 'XP'
+        );
+    }).catch(function(jqXhr, err, errStr){
+        // console.log('Error :(');
+        // console.log(jqXhr);
+        // console.log(jqXhr.responseText);
+        // console.log(jqXhr.status);
+        // console.log(jqXhr.statusText);
+        // console.log(jqXhr.statusCode());
+    })
+
+})
+</script>
+{% endblock extra_js %}
+
+{% block extra_css %}
+{% endblock extra_css %}
+

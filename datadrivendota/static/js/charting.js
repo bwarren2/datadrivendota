@@ -49,9 +49,12 @@ function getColorScale(params){
 
 window.Chartreuse = {};
 
-function make_svg(destination, width){
+function make_svg(destination, width, height){
   if (width === undefined){
     width = $(destination).width();
+  }
+  if (height === undefined){
+    height = width;
   }
   return d3.select(destination)
     .append("svg")
@@ -164,13 +167,6 @@ var scatter = function(destination, plot_data, xlab, ylab){
     chart.yAxis.axisLabel(ylab).axisLabelDistance(-10);
     chart.xAxis.tickFormat(window.smartTicks);
     chart.yAxis.tickFormat(window.smartTicks);
-    // chart.tooltip.contentGenerator(function(d){
-    //   return sprintf(
-    //     "%1$s: %2$s <br> %3$s: %4$s ",
-    //     chart.xAxis.axisLabel, d.x,
-    //     chart.yAxis.axisLabel, d.y
-    //   );
-    // });
 
     var chart_data = svg.datum(plot_data);
     chart_data.transition().duration(500).call(chart);
@@ -362,3 +358,18 @@ var splash_gimmick = function(){
   setInterval(update, interval);
 }
 window.splash_gimmick = splash_gimmick;
+
+
+var cumsum_heroes = function(data, attr){
+  for (var j=0; j < data.length; j++){
+      for(var i=0; i < data[j]['values'].length; i++){
+          if (i==0) {}
+          else {
+              data[j]['values'][i].value += data[j]['values'][i-1].value;
+          }
+      }
+  }
+  return data;
+}
+
+

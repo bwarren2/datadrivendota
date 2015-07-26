@@ -12,6 +12,11 @@
 
 {% block content %}
 
+  {% if match.replay %}
+  <div class="alert alert-success" role="alert">
+    Parsed replay exists!  See it <a href="{% url "matches:replay_parse" match_id=match.steam_id %}">here.</a>
+    </div>
+  {% endif %}
 
   <div class="row">
     <div id='level-row' class="charts col-md-6">
@@ -440,7 +445,7 @@ $(function(){
             }
           })
         }];
-        chart = nv.models.classDiscreteBarChart(destination, plot_data);
+        chart = nv.extensions.models.classDiscreteBarChart(destination, plot_data);
       })
     })();
 
@@ -456,7 +461,7 @@ $(function(){
             }
           })
         }];
-        chart = nv.models.classDiscreteBarChart(destination, plot_data);
+        chart = nv.extensions.models.classDiscreteBarChart(destination, plot_data);
       })
     })();
 
@@ -473,7 +478,7 @@ $(function(){
             }
           })
         }];
-        chart = nv.models.classDiscreteBarChart(destination, plot_data);
+        chart = nv.extensions.models.classDiscreteBarChart(destination, plot_data);
       })
     })();
 
