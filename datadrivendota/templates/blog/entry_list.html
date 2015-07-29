@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block sections %}
+    <div class='container'>
+        <div class='row' id='entry-list'>
+            {% if object_list %}
+                {% for entry in object_list %}
+                    {% include "blog/_entry.html" %}
+                {% endfor %}
+                {% else %}
+                    <div class='jumbotron'>
+                    <h1>Your blog is online!</h1>
+                    <p>Now try adding some entries!</p>
+                    </div>
+            {% endif %}
+        </div>
+    </div>
+    {% include "_pagination.html" %}
+{% endblock sections %}

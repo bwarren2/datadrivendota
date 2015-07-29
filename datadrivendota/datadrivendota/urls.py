@@ -40,11 +40,6 @@ urlpatterns = patterns(
     # When django wants a login, redir to social login
     url(r'^login/', LoginView.as_view(), name='login'),
     url(
-        r'^faq/$',
-        TemplateView.as_view(template_name='about.html',),
-        name='faq'
-    ),
-    url(
         r'^privacy/$',
         TemplateView.as_view(template_name='privacy.html',),
         name='privacy'

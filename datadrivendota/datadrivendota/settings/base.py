@@ -509,3 +509,10 @@ SOCIAL_AUTH_USERNAME_FORM_HTML = 'username_signup.html'
 SOCIAL_AUTH_URL_NAMESPACE = 'accounts'
 
 REPLAY_SERVICE_URL = getenv('REPLAY_SERVICE_URL')
+
+
+# Blog Settings
+BLOG_TITLE = "DataDrivenDota Tech Blog"
+BLOG_DESCRIPTION = "Writings from the devs doing analytics"
+BLOG_ENTRIES_PER_PAGE = 1
+BLOG_ENTRIES_PER_RSS = 5

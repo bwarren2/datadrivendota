@@ -1,9 +1,14 @@
 // Sectional divisions of a page layout live here.
-#main-wrap {
+#bodyblock {
+  // min-height: 100%;   /* to keep .footer on bottom */
+  height: 100%;
+}
+
+#contentblock {
   min-height: 100%;   /* to keep .footer on bottom */
-  height: auto;
+  height: 100%;
   margin: 0 auto -60px;
-  padding: 0 0 60px;
+  // padding: 60px 0 0;
 }
 
 #footer {
@@ -35,4 +40,8 @@ img.ability {
       width: 128px;
     }
   }
+}
+
+.content {
+  background-color: @content-color;
 }
