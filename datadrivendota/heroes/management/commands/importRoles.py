@@ -7,37 +7,56 @@ from heroes.models import Role
 
 
 class Command(BaseCommand):
+
     """
-    Add pips to the roles.  You should not need to do this often,
+    Add pips to the roles.
+
+    You should not need to do this often,
     but it is required in restoring from 0.
     """
+
     def handle(self, *args, **options):
 
         all_roles = Role.objects.exclude(name='')
-        matchingDict = {
-            'Nuker': u'32px-Pip_ganker.png',
-            'Disabler': u'32px-Pip_disabler.png',
-            'Escape': u'32px-Pip_tank.png',
-            'Initiator': u'32px-Pip_initiator.png',
-            'Support': u'32px-Pip_roamer.png',
-            'Jungler': u'32px-Pip_jungler.png',
-            'Pusher': u'32px-Pip_pusher.png',
-            'Durable': u'32px-Pip_tank.png',
-            'LaneSupport': u'32px-Pip_babysitter.png',
-            'Carry': u'32px-Pip_carry.png',
+        # matching_dict = {
+        #     'Nuker': u'32px-Pip_ganker.png',
+        #     'Disabler': u'32px-Pip_disabler.png',
+        #     'Escape': u'32px-Pip_tank.png',
+        #     'Initiator': u'32px-Pip_initiator.png',
+        #     'Support': u'32px-Pip_roamer.png',
+        #     'Jungler': u'32px-Pip_jungler.png',
+        #     'Pusher': u'32px-Pip_pusher.png',
+        #     'Durable': u'32px-Pip_tank.png',
+        #     'LaneSupport': u'32px-Pip_babysitter.png',
+        #     'Carry': u'32px-Pip_carry.png',
+        # }
+
+        matching_dict = {
+            'Nuker': u'ganker.png',
+            'Disabler': u'disabler.png',
+            'Escape': u'tank.png',
+            'Initiator': u'initiator.png',
+            'Support': u'roamer.png',
+            'Jungler': u'jungler.png',
+            'Pusher': u'pusher.png',
+            'Durable': u'tank.png',
+            'LaneSupport': u'babysitter.png',
+            'Carry': u'carry.png',
         }
         for role in all_roles:
 
             url = (
-                'https://s3.amazonaws.com/datadrivendota/pips/{suffix}'.format(
-                    suffix=matchingDict[role.name])
+                'https://s3.amazonaws.com/datadrivendota/images/pips/{suffix}'.format(
+                    suffix=matching_dict[role.name])
             )
+            print url
             resp = requests.get(url)
 
             if resp.status_code == 200:
                 buff = BytesIO(resp.content)
                 _ = buff.seek(0)  # Avoid printing random numbers.
-                filename = matchingDict[role.name]
+                _ = _
+                filename = matching_dict[role.name]
                 role.thumbshot.save(filename, File(buff))
 
             else:
