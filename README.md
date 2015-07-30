@@ -12,6 +12,7 @@
   - [RabbitMQ](#rabbitmq)
   - [Redis](#redis)
   - [Postgres](#postgres)
+  - [Grunt](#grunt)
   - [Necessary environment variables](#necessary-environment-variables)
   - [Initial Data Acquisition](#initial-data-acquisition)
     - [Superuser](#superuser)
@@ -26,13 +27,10 @@
         - [Matches](#matches)
 - [Workflow Support](#workflow-support)
 - [Todos](#todos)
-  - [Static assets](#static-assets)
-      - [Current workaround](#current-workaround)
   - [Accounts refactor](#accounts-refactor)
-  - [Charts refactor](#charts-refactor)
   - [Animations import](#animations-import)
   - [Error Propagation in Tasks](#error-propagation-in-tasks)
-    - [Current workaround](#current-workaround-1)
+    - [Current workaround](#current-workaround)
 - [Footnotes](#footnotes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -359,17 +357,8 @@ With a populated db, here are the possible support processes to have up:
 
 #Todos
 
-## Static assets
-Static asset distribution has weird failures sometimes right now.  (Ex a unicode decode error).  I suspect this comes from production collectstatic occasionally hitting s3 for the files it is trying to pack and compress, and failing.
-
-#### Current workaround
-Using Grunt to manage css compilation allows packing to be turned off if need be, which circumvents the sometimes-breaking step in collectstatic.  This appeared to work in a hand-test for overall distribution of assets.  Oddly, after one success the packing can be turned back on; points to weirness in read location?
-
 ## Accounts refactor
 The old model of accounts was useful for a closed-off site, but needs to be refactored for a primarily-public, secondarily-subscriber model.
-
-## Charts refactor
-The existing model of chart construction is really shitty and should be replaced with REST+D3 wrappers.
 
 ## Animations import
 Importing cast and attack animations is currently a manual hit to a foreign service, combined with some regexing to reformat.  This is annoying, but is only necessary on patch update.

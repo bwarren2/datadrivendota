@@ -35,6 +35,7 @@ class Command(BaseCommand):
                 hero.internal_name[14:]
             )
         )
+        print url
         try:
             r = requests.get(url)
             if r.status_code == 200:
