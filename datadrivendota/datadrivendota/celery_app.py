@@ -415,10 +415,10 @@ class Config(object):
             'task': 'players.management.tasks.MirrorProNames',
             'schedule': timedelta(weeks=1),
         },
-        'reflect-hero-skill-weekly': {
-            'task': 'heroes.management.tasks.MirrorHeroSkillData',
-            'schedule': timedelta(weeks=1),
-        },
+        # 'reflect-hero-skill-weekly': {
+        #     'task': 'heroes.management.tasks.MirrorHeroSkillData',
+        #     'schedule': timedelta(weeks=1),
+        # },
         'reflect-leagues-daily': {
             'task': 'leagues.management.tasks.MirrorLeagues',
             'schedule': timedelta(weeks=1),
