@@ -93,11 +93,6 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Leagues<b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li class="{% active 'leagues:index' %}"><a href="{% url 'leagues:index' %}">Leagues Index</a></li>
-                {% comment %}
-                // Not ready yet; move js out of tempalte.
-                <li class="{% active 'leagues:live_games' %}"><a href="{% url 'leagues:live_games' %}">Live Matches</a></li>
-                <li class="{% active 'leagues:scheduled_matches' %}"><a href="{% url 'leagues:scheduled_matches' %}">Scheduled Matches</a></li>
-                {% endcomment %}
               </ul>
             </li>
             <li class="{% active 'about' main_nav %}">
