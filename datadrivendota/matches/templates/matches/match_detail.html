@@ -7,10 +7,12 @@
 {% block title %}Match #{{ match.steam_id }}{% endblock title %}
 
 {% block page_title %}
-    {% include "matches/_match_header_card.html" %}
 {% endblock page_title %}
 
 {% block content %}
+  {% include "matches/_match_header_card.html" %}
+
+  {% include "matches/_match_card.html" %}
 
   {% if match.replay %}
   <div class="alert alert-success" role="alert">
