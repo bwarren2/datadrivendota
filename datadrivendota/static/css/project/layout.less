@@ -1,47 +1,52 @@
 // Sectional divisions of a page layout live here.
-#bodyblock {
-  // min-height: 100%;   /* to keep .footer on bottom */
-  height: 100%;
+html {
+    min-height: 100%;
+    position: relative;
 }
 
 #contentblock {
-  min-height: 100%;   /* to keep .footer on bottom */
-  height: 100%;
-  margin: 0 auto -60px;
-  // padding: 60px 0 0;
+    margin: 0 auto 60px;
 }
 
 #footer {
-  height: 60px;
-  font-size: smaller;
-  font-style: italic;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    height: 60px;
+    width: 100%;
+    font-size: smaller;
+    font-style: italic;
+}
+
+.navbar-right {
+    margin-right: 0;
 }
 
 div#IntercomDefaultWidget {
-  bottom: 80px;
+    bottom: 80px;
 }
 
 div.adbar{
-  margin-top:10px;
-  margin-bottom:10px;
-  margin-left:-10px;
+    margin-top:10px;
+    margin-bottom:10px;
+    margin-left:-10px;
 }
 
 img.ability {
-  height: 105px;
-  width: 105px;
+    height: 105px;
+    width: 105px;
 }
 
 #dire-pick,
 #radiant-pick {
-  li {
-    img {
-      height: 72px;
-      width: 128px;
+    li {
+        img {
+            height: 72px;
+            width: 128px;
+        }
     }
-  }
 }
 
 .content {
-  background-color: @content-color;
+    background-color: @content-color;
 }

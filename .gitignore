@@ -20,6 +20,7 @@ build
 #Media
 media/
 assets/
+datadrivendota/static/dist/
 
 #Tempfiles
 datadrivendota/static/temp
