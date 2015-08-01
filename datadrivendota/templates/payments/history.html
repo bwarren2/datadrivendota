@@ -3,6 +3,11 @@
 {% block title %}Payment History{% endblock title %}
 
 {% block content %}
+<div class="row">
+    <div class="col-md-3">
+        {{ block.super }}
+    </div>
+    <div class="col-md-9">
     {% include "payments/_subscription_status.html" %}
     <h2>Payment History</h2>
     {% if request.user.customer.invoices.all %}
@@ -34,4 +39,6 @@
     {% else %}
         <p>You have not made any payments yet.</p>
     {% endif %}
+    </div>
+</div>
 {% endblock content %}

@@ -4,20 +4,21 @@
 
 {% block page_title %}{% endblock page_title %}
 
-{% block extra_nav %}
+{% block content %}
   {% with request.user.customer.current_subscription as subscription %}
-      <ul class='nav nav-tabs'>
+      <ul class='nav nav-pills nav-stacked'>
+        <li class="{% active 'payments_subscribe' %}"><a href="{% url 'payments_subscribe' %}">Subscribe</a></li>
         <li class="{% active 'payments_change_card' %}"><a href="{% url 'payments_change_card' %}">Change Card</a></li>
         <li class="{% active 'payments_change_plan' %}"><a href="{% url 'payments_change_plan' %}">Change Plan</a></li>
         <li class="{% active 'payments_history' %}"><a href="{% url 'payments_history' %}">Payment History</a></li>
         <li class="{% active 'payments_cancel' %}"><a href="{% url 'payments_cancel' %}">Cancel Subscription</a></li>
       </ul>
   {% endwith %}
-{% endblock extra_nav %}
+{% endblock content %}
 
 
 {% block extra_js %}
-	<script src="//checkout.stripe.com/v2/checkout.js"></script>
+<script src="https://checkout.stripe.com/v2/checkout.js"></script>
 <script>
     $(function() {
         $('body').on("click", '.change-card, .subscribe-form button[type=submit]', function(e) {

@@ -3,6 +3,13 @@
 {% block title %}Change Subscription{% endblock title %}
 
 {% block content %}
+<div class="row">
+    <div class="col-md-3">
+        {{ block.super }}
+    </div>
+    <div class="col-md-9">
     {% include "payments/_subscription_status.html" %}
     {% include "payments/_change_plan_form.html" %}
+    </div>
+</div>
 {% endblock content %}
