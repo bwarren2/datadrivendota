@@ -34,13 +34,13 @@ class Command(BaseCommand):
         matching_dict = {
             'Nuker': u'ganker.png',
             'Disabler': u'disabler.png',
-            'Escape': u'tank.png',
             'Initiator': u'initiator.png',
             'Support': u'roamer.png',
             'Jungler': u'jungler.png',
             'Pusher': u'pusher.png',
-            'Durable': u'tank.png',
-            'LaneSupport': u'babysitter.png',
+            'Escape': u'durable.png',
+            'Durable': u'durable.png',
+            'LaneSupport': u'lanesupport.png',
             'Carry': u'carry.png',
         }
         for role in all_roles:

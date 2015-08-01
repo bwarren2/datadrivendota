@@ -16,6 +16,9 @@
         </div>
     {% endfor %}
 
-{% include "_pagination.html" with pages_list=team_list page_links_to_display=team_list.paginator.page_range_with_ellipses %}
 
 {% endblock content %}
+
+{% block content_foot %}
+    {% include "_pagination.html" with pages_list=team_list page_links_to_display=team_list.paginator.page_range_with_ellipses %}
+{% endblock content_foot  %}

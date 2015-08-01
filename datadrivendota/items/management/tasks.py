@@ -37,6 +37,7 @@ class UpdateItemSchema(ApiFollower):
     """
     def run(self, urldata):
         url = urldata['result']['items_game_url']
+        logger.info("Item schema url: {0}".format(url))
         response = requests.get(url)
         data = vdf.loads(response.text)
         json_data = json.dumps(data)
