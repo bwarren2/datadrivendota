@@ -238,9 +238,6 @@ class UpdateLiveGames(ApiFollower):
             league, l_created = League.objects.get_or_create(
                 steam_id=league_id
             )
-            if league.image_ugc is None:
-                team.image_ugc = game[team_type]['team_logo']
-                team.save()
             game['league_logo_url'] = league.image
 
         return data
