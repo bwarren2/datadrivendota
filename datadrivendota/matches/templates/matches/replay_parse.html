@@ -13,18 +13,8 @@
     {% include "matches/_time_control_card.html" %}
     <div class='container'>
 
-        <div class='col-md-12' id='minimap'>
-            <h4>Minimap</h4>
-        </div>
-
-        <div class='col-md-6'>
-            <h4>Scatterplots</h4>
-            <div class='row' >
-                <div class='col-md-3' id='lh_level'></div>
-                <div class='col-md-3' id='kill_dmg'></div>
-                <div class='col-md-3' id='death_dmg'></div>
-                <div class='col-md-3' id='gold_exp'></div>
-            </div>
+        <div class='col-md-12' id='charts'>
+            <h4>charts</h4>
         </div>
 
     </div>
@@ -65,9 +55,9 @@ $(function(){
     ).then(function(data){
         replay = data.slice(data, data.length/2);
         window.ParseCharts.cumsum_chart(
-            replay, 'gold_reasons', '#minimap', 'Time', 'Net Worth');
+            replay, 'gold_reasons', '#charts', 'Time', 'Net Worth');
         window.ParseCharts.cumsum_chart(
-            replay, 'xp_reasons', '#minimap', 'Time', 'XP'
+            replay, 'xp_reasons', '#charts', 'Time', 'XP'
         );
     }).catch(function(jqXhr, err, errStr){
         // console.log('Error :(');
