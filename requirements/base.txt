@@ -12,7 +12,7 @@ certifi==2015.04.28
 dj-database-url==0.3.0
 django-bootstrap-form==3.2
 django-braces==1.8.0
-django-cors-headers==1.0.0
+django-cors-headers==1.1.0
 django-filter==0.9.2
 django-forms-bootstrap==3.0.1
 django-jsonfield==0.9.13
@@ -59,4 +59,4 @@ whitenoise==1.0.6
 pika==0.9.14
 opbeat==3.0.2
 django-pipeline==1.5.0
-django-basic-blog==0.9
+django-basic-blog==0.10

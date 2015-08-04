@@ -37,46 +37,96 @@ class UpdateLeagues(Task):
     def run(self, leagues, matches=10):
 
         logger.info("Updating the given leagues {0}".format(leagues))
-        schema = get_league_schema()
+        self.schema = get_league_schema()
 
         for league_id in leagues:
             try:
-                data = schema[league_id]
-                league = League.objects.get_or_create(steam_id=league_id)[0]
-                league.name = data['name']
-                league.description = data['item_description']
-                league.tournament_url = data['tournament_url']
-                league.item_def = data['itemdef']
-                league.save()
-
-                # Get a new logo
-                vac = ValveApiCall()
-                ul = UpdateLeagueLogo()
-                c = ApiContext()
-                c.league_id = league_id
-                iconname = data['image_inventory'].split('/')[-1]
-                c.iconname = iconname
-                chain(
-                    vac.s(mode='GetItemIconPath', api_context=c),
-                    ul.s()
-                ).delay()
-
-                # Retrieve recent games
-                c = ApiContext()
-                c.league_id = league.steam_id
-                c.tournament_games_only = True
-                c.matches_requested = matches
-                c.matches_desired = matches
-                c.skill = 4
-                vac = ValveApiCall()
-                rpr = CycleApiCall()
-                ch = chain(
-                    vac.s(api_context=c, mode='GetMatchHistory'),
-                    rpr.s()
-                )
-                ch.delay()
+                self.create(league_id)
+                self.logo_update(league_id)
+                self.game_update(league_id, matches)
             except KeyError:
                 logger.error("Can't find {0} in schema.  :(".format(league_id))
+
+    def create(self, league_id):
+        data = self.schema[league_id]
+
+        league = League.objects.get_or_create(steam_id=league_id)[0]
+        league.name = data['name']
+        league.description = data['item_description']
+        league.tournament_url = data['tournament_url']
+        league.item_def = data['itemdef']
+
+        league.fantasy = self._get_fantasy(data, league_id)
+        league.tier = self._get_tier(data, league_id)
+        league.save()
+
+    def _get_tier(self, data, league_id):
+        usage_def = self._get_def(data)
+        if 'tier' in usage_def:
+            tier = usage_def['tier']
+            if tier == 'professional':
+                return League.PRO
+            elif tier == 'amateur':
+                return League.AMATEUR
+            elif tier == 'premium':
+                return League.PREMIUM
+            else:
+                raise Exception(
+                    'Tier type {0} for league steam id {1} is ???'.format(
+                        tier,
+                        league_id
+                    )
+                )
+
+    def _get_fantasy(self, data, league_id):
+        usage_def = self._get_def(data)
+
+        if 'fantasy' in usage_def:
+            fantasy = usage_def['fantasy']
+            if fantasy == '0':
+                return False
+            elif fantasy == '1':
+                return True
+            else:
+                raise Exception(
+                    'fantasy of {0} for league steam id {1} is ???'.format(
+                        fantasy,
+                        league_id
+                    )
+                )
+        else:
+            return None
+
+    def _get_def(self, data):
+        return data.get('tool', {}).get('usage', {})
+
+    def logo_update(self, league_id):
+        data = self.schema[league_id]
+        vac = ValveApiCall()
+        ul = UpdateLeagueLogo()
+        c = ApiContext()
+        c.league_id = league_id
+        iconname = data['image_inventory'].split('/')[-1]
+        c.iconname = iconname
+        chain(
+            vac.s(mode='GetItemIconPath', api_context=c),
+            ul.s()
+        ).delay()
+
+    def game_update(self, league_id, matches):
+        c = ApiContext()
+        c.league_id = league_id
+        c.tournament_games_only = True
+        c.matches_requested = matches
+        c.matches_desired = matches
+        c.skill = 4
+        vac = ValveApiCall()
+        rpr = CycleApiCall()
+        ch = chain(
+            vac.s(api_context=c, mode='GetMatchHistory'),
+            rpr.s()
+        )
+        ch.delay()
 
 
 class UpdateLeagueLogo(ApiFollower):
@@ -100,42 +150,6 @@ class UpdateLeagueLogo(ApiFollower):
 
         league.valve_cdn_image = url
         league.save()
-
-
-class MirrorLeagues(Task):
-
-    """ Get the big list of leagues and reflect it. """
-
-    def run(self):
-        logger.info("Reflecting Valve's view of upcoming matches with local")
-        context = ApiContext()
-        vac = ValveApiCall()
-        cl = CreateLeagues()
-        c = chain(
-            vac.s(api_context=context, mode='GetLeagueListing'),
-            cl.s()
-        )
-        c.delay()
-
-
-class CreateLeagues(ApiFollower):
-
-    """ Takes all the results from a league list call and inserts them. """
-
-    def run(self, urldata):
-        league_list = []
-        for league in self.result['leagues']:
-            League.objects.update_or_create(
-                steam_id=league['leagueid'],
-                defaults={
-                    'name': league['name'],
-                    'description': league['description'],
-                    'tournament_url': league['tournament_url'],
-                    'item_def': league['itemdef'],
-                }
-            )
-            league_list.append(league['leagueid'])
-        UpdateLeagues().s().delay(leagues=league_list, matches=1)
 
 
 class MirrorRecentLeagues(Task):
