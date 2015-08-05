@@ -58,7 +58,10 @@
       {% endfor %}
       {% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range_with_ellipses %}
     {% endif %}
-{% endblock content_foot  %}
+
+{% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range_with_ellipses %}
+
+{% endblock content %}
 
 {% block extra_js %}
 <script type="text/javascript">

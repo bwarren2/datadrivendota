@@ -1,0 +1,279 @@
+{
+  "2733":
+    {
+      "prefab": "league",
+      "image_banner": "econ/leagues/subscriptions_international_2015_ingame",
+      "name": "The International 2015",
+      "item_name": "#DOTA_Item_The_International_2015",
+      "image_inventory": "econ/tools/international_2015_ticket",
+      "tool": {
+        "usage": {
+          "free_to_spectate": "1",
+          "prize_pool": {
+            "base_prize_pool": "1600000",
+            "items": {
+              "1": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16408"
+              },
+              "0": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16412"
+              },
+              "3": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16410"
+              },
+              "2": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16409"
+              },
+              "5": {
+                "revenue_percent": "0.250000",
+                "itemdef": "10924"
+              },
+              "4": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16491"
+              }
+            },
+            "stop_sales_time": "1438992000"
+          },
+          "league_id": "2733",
+          "private": "0",
+          "fantasy": "1",
+          "tier": "premium",
+          "order": "34"
+        },
+        "type": "league_view_pass",
+        "use_string": "#ConsumeItem"
+      },
+      "item_type_name": "#DOTA_WearableType_Ticket",
+      "creation_date": "2015-03-20",
+      "tournament_url": "http://www.dota2.com/international/overview/",
+      "itemdef": "16413",
+      "item_description": "#DOTA_Item_Desc_The_International_2015"
+    },
+
+  "1234":
+    {
+      "prefab": "league",
+      "image_banner": "econ/leagues/subscriptions_international_2015_ingame",
+      "name": "The International 2015",
+      "item_name": "#DOTA_Item_The_International_2015",
+      "image_inventory": "econ/tools/international_2015_ticket",
+      "tool": {
+        "usage": {
+          "free_to_spectate": "1",
+          "prize_pool": {
+            "base_prize_pool": "1600000",
+            "items": {
+              "1": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16408"
+              },
+              "0": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16412"
+              },
+              "3": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16410"
+              },
+              "2": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16409"
+              },
+              "5": {
+                "revenue_percent": "0.250000",
+                "itemdef": "10924"
+              },
+              "4": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16491"
+              }
+            },
+            "stop_sales_time": "1438992000"
+          },
+          "league_id": "2733",
+          "private": "1",
+          "fantasy": "0",
+          "tier": "amateur",
+          "order": "34"
+        },
+        "type": "league_view_pass",
+        "use_string": "#ConsumeItem"
+      },
+      "item_type_name": "#DOTA_WearableType_Ticket",
+      "creation_date": "2015-03-20",
+      "tournament_url": "http://www.dota2.com/international/overview/",
+      "itemdef": "16413",
+      "item_description": "#DOTA_Item_Desc_The_International_2015"
+    },
+
+  "007":
+    {
+      "prefab": "league",
+      "image_banner": "econ/leagues/subscriptions_international_2015_ingame",
+      "name": "The International 2015",
+      "item_name": "#DOTA_Item_The_International_2015",
+      "image_inventory": "econ/tools/international_2015_ticket",
+      "tool": {
+        "usage": {
+          "free_to_spectate": "1",
+          "prize_pool": {
+            "base_prize_pool": "1600000",
+            "items": {
+              "1": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16408"
+              },
+              "0": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16412"
+              },
+              "3": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16410"
+              },
+              "2": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16409"
+              },
+              "5": {
+                "revenue_percent": "0.250000",
+                "itemdef": "10924"
+              },
+              "4": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16491"
+              }
+            },
+            "stop_sales_time": "1438992000"
+          },
+          "league_id": "2733",
+          "tier": "professional",
+          "order": "34"
+        },
+        "type": "league_view_pass",
+        "use_string": "#ConsumeItem"
+      },
+      "item_type_name": "#DOTA_WearableType_Ticket",
+      "creation_date": "2015-03-20",
+      "tournament_url": "http://www.dota2.com/international/overview/",
+      "itemdef": "16413",
+      "item_description": "#DOTA_Item_Desc_The_International_2015"
+    },
+
+  "10":
+    {
+      "prefab": "league",
+      "image_banner": "econ/leagues/subscriptions_international_2015_ingame",
+      "name": "The International 2015",
+      "item_name": "#DOTA_Item_The_International_2015",
+      "image_inventory": "econ/tools/international_2015_ticket",
+      "tool": {
+        "usage": {
+          "free_to_spectate": "1",
+          "prize_pool": {
+            "base_prize_pool": "1600000",
+            "items": {
+              "1": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16408"
+              },
+              "0": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16412"
+              },
+              "3": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16410"
+              },
+              "2": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16409"
+              },
+              "5": {
+                "revenue_percent": "0.250000",
+                "itemdef": "10924"
+              },
+              "4": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16491"
+              }
+            },
+            "stop_sales_time": "1438992000"
+          },
+          "league_id": "2733",
+          "private": "peanut",
+          "fantasy": "butter",
+          "order": "34"
+        },
+        "type": "league_view_pass",
+        "use_string": "#ConsumeItem"
+      },
+      "item_type_name": "#DOTA_WearableType_Ticket",
+      "creation_date": "2015-03-20",
+      "tournament_url": "http://www.dota2.com/international/overview/",
+      "itemdef": "16413",
+      "item_description": "#DOTA_Item_Desc_The_International_2015"
+    },
+
+  "4444":
+    {
+      "prefab": "league",
+      "image_banner": "econ/leagues/subscriptions_international_2015_ingame",
+      "name": "The International 2015",
+      "item_name": "#DOTA_Item_The_International_2015",
+      "image_inventory": "econ/tools/international_2015_ticket",
+      "tool": {
+        "usage": {
+          "free_to_spectate": "1",
+          "prize_pool": {
+            "base_prize_pool": "1600000",
+            "items": {
+              "1": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16408"
+              },
+              "0": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16412"
+              },
+              "3": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16410"
+              },
+              "2": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16409"
+              },
+              "5": {
+                "revenue_percent": "0.250000",
+                "itemdef": "10924"
+              },
+              "4": {
+                "revenue_percent": "0.250000",
+                "itemdef": "16491"
+              }
+            },
+            "stop_sales_time": "1438992000"
+          },
+          "league_id": "2733",
+          "private": "1",
+          "fantasy": "0",
+          "tier": "sandwich",
+          "order": "34"
+        },
+        "type": "league_view_pass",
+        "use_string": "#ConsumeItem"
+      },
+      "item_type_name": "#DOTA_WearableType_Ticket",
+      "creation_date": "2015-03-20",
+      "tournament_url": "http://www.dota2.com/international/overview/",
+      "itemdef": "16413",
+      "item_description": "#DOTA_Item_Desc_The_International_2015"
+    }
+
+}

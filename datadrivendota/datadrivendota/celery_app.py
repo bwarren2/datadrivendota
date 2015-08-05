@@ -236,6 +236,10 @@ class Config(object):
             'exchange': 'integrity',
             'routing_key': 'integrity'
         },
+        'leagues.management.tasks.deprecated.MirrorTI5': {
+            'exchange': 'integrity',
+            'routing_key': 'integrity'
+        },
     }
 
     CELERY_DEFAULT_EXCHANGE = 'default'
@@ -407,6 +411,11 @@ class Config(object):
             'max_retries': 0,
             'trail': False,
         },
+        'leagues.management.tasks.deprecated.MirrorTI5': {
+            'acks_late': True,
+            'max_retries': 0,
+            'trail': False,
+        },
     }
 
     CELERYBEAT_SCHEDULE = {
@@ -432,44 +441,48 @@ class Config(object):
             'task': 'matches.management.tasks.CheckMatchIntegrity',
             'schedule': timedelta(days=1),
         },
-        'check-match-validity-daily': {
-            'task': 'matches.management.tasks.UpdateMatchValidity',
-            'schedule': timedelta(days=1),
-        },
         'reflect-league-schedule-daily': {
             'task': 'leagues.management.tasks.MirrorLeagueSchedule',
             'schedule': timedelta(days=1),
         },
-        'reflect-client-persona-daily': {
-            'task': 'players.management.tasks.MirrorClientPersonas',
+        # 'reflect-client-persona-daily': {
+        #     'task': 'players.management.tasks.MirrorClientPersonas',
+        #     'schedule': timedelta(days=1),
+        # },
+        'reflect-item-schema-hourly': {
+            'task': 'items.management.tasks.MirrorItemSchema',
             'schedule': timedelta(days=1),
         },
         # Hourly
-        'reflect-item-schema-hourly': {
-            'task': 'items.management.tasks.MirrorItemSchema',
-            'schedule': timedelta(hours=1),
-        },
-        'reflect-client-matches-hourly': {
-            'task': 'players.management.tasks.MirrorClientMatches',
-            'schedule': timedelta(hours=1),
-        },
+        # 'reflect-client-matches-hourly': {
+        #     'task': 'players.management.tasks.MirrorClientMatches',
+        #     'schedule': timedelta(hours=1),
+        # },
         # Fast
         # 'reflect-recent-leagues-daily': {
         #     'task': 'leagues.management.tasks.MirrorRecentLeagues',
         #     'schedule': timedelta(minutes=1),
         # },
-        # 'reflect-recent-teams-daily': {
-        #     'task': 'teams.management.tasks.MirrorRecentTeams',
-        #     'schedule': timedelta(minutes=1),
+        'check-match-validity-daily': {
+            'task': 'matches.management.tasks.UpdateMatchValidity',
+            'schedule': timedelta(minutes=30),
+        },
+        'reflect-TI5': {
+            'task': 'leagues.management.tasks.deprecated.MirrorTI5',
+            'schedule': timedelta(minutes=30),
+        },
+        'reflect-recent-teams-daily': {
+            'task': 'teams.management.tasks.MirrorRecentTeams',
+            'schedule': timedelta(minutes=30),
+        },
+        # 'drain-java-result-fast': {
+        #     'task': 'accounts.management.tasks.ReadParseResults',
+        #     'schedule': timedelta(seconds=10),
         # },
-        'drain-java-result-fast': {
-            'task': 'accounts.management.tasks.ReadParseResults',
-            'schedule': timedelta(seconds=10),
-        },
-        'handdle-match-requests': {
-            'task': 'accounts.management.tasks.KickoffMatchRequests',
-            'schedule': timedelta(seconds=10),
-        },
+        # 'handdle-match-requests': {
+        #     'task': 'accounts.management.tasks.KickoffMatchRequests',
+        #     'schedule': timedelta(seconds=10),
+        # },
     }
 
 app.config_from_object(Config)

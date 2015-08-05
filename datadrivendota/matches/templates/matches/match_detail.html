@@ -6,14 +6,14 @@
 
 {% block title %}Match #{{ match.steam_id }}{% endblock title %}
 
-{% block page_title %}
-{% endblock page_title %}
 
 {% block content %}
   {% include "matches/_match_header_card.html" %}
 
   {% include "matches/_match_card.html" %}
 
+  {% include "matches/_match_card.html" %}
+  {% include "matches/_match_header_card.html" %}
   {% if match.replay %}
   <div class="alert alert-success" role="alert">
     Parsed replay exists!  See it <a href="{% url "matches:replay_parse" match_id=match.steam_id %}">here.</a>

@@ -1,5 +1,5 @@
-""" Celery tasks for teams. """
-
+from time import time
+from django.conf import settings
 from celery import Task, chain
 from matches.models import Match
 from players.models import Player
@@ -22,12 +22,13 @@ class MirrorRecentTeams(Task):
     """
 
     def run(self):
-        """ Do the work. """
         matches = Match.objects.filter(skill=4).exclude(radiant_team=None)\
+            .filter(start_time__gte=time() - settings.UPDATE_LAG_UTC)\
             .select_related('radiant_team__steam_id')
         teams = [m.radiant_team.steam_id for m in matches]
 
         matches = Match.objects.filter(skill=4).exclude(dire_team=None)\
+            .filter(start_time__gte=time() - settings.UPDATE_LAG_UTC)\
             .select_related('dire_team__steam_id')
         teams.extend([m.dire_team.steam_id for m in matches])
 
@@ -54,7 +55,7 @@ class MirrorTeamDetails(Task):
     """ Update a list of given teams. """
 
     def run(self, teams=None):
-        """ Do the work. """
+
         if teams is None:
             teams = [t.steam_id for t in Team.objects.filter(name=None)]
         else:
@@ -76,7 +77,7 @@ class UpdateTeam(ApiFollower):
     """ Merge the data for a team into the DB. """
 
     def run(self, urldata):
-        """ Do the work. """
+
         for team_data in self.result['teams']:
             team, created = Team.objects.get_or_create(
                 steam_id=team_data['team_id']
@@ -166,7 +167,7 @@ class UpdateTeamLogo(ApiFollower):
     """ Merge a logo into the db. """
 
     def run(self, urldata):
-        """ Do the work. """
+
         team = Team.objects.get(steam_id=self.api_context.team_id)
         url = urldata['data']['url']
         try:

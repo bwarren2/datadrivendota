@@ -13,6 +13,15 @@ class League(models.Model):
     These are game series to which you can buy a ticket in the game client
     """
 
+    AMATEUR = 0
+    PRO = 1
+    PREMIUM = 2
+    LEAGUE_TYPES = (
+        (AMATEUR, 'Amateur'),
+        (PRO, 'Professional'),
+        (PREMIUM, 'Premium'),
+    )
+
     steam_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=200, null=True)  # Made up constant
     description = models.CharField(max_length=300, null=True)
@@ -22,6 +31,8 @@ class League(models.Model):
         null=True, help_text='Steam cdn image url'
     )
     image_ugc = models.BigIntegerField(null=True)  # Through live league games
+    tier = models.IntegerField(choices=LEAGUE_TYPES, null=True, blank=True)
+    fantasy = models.NullBooleanField(null=True, blank=True)
     update_time = models.DateTimeField(default=timezone.now)
 
     @property

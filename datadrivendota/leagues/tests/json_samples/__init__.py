@@ -54,34 +54,39 @@ good_league_schedule = json.loads(schedule_strng)
 
 
 # Live games test samples
-with open(file_location+'/live_games.json', 'r') as f:
+with open(file_location + '/live_games.json', 'r') as f:
     data = f.read()
 good_live_games = json.loads(data)
 
-with open(file_location+'/clean_url_data.json', 'r') as f:
+with open(file_location + '/clean_url_data.json', 'r') as f:
     data = f.read()
 live_clean_url_json = json.loads(data)
 
-with open(file_location+'/live_get_players.json', 'r') as f:
+with open(file_location + '/live_get_players.json', 'r') as f:
     data = f.read()
 live_get_players = json.loads(data)
 
-with open(file_location+'/live_game_data.json', 'r') as f:
+with open(file_location + '/live_game_data.json', 'r') as f:
     data = f.read()
 live_game_data = json.loads(data)
 
-with open(file_location+'/live_side_data.json', 'r') as f:
+with open(file_location + '/live_side_data.json', 'r') as f:
     data = f.read()
 live_side_data = json.loads(data)
 
-with open(file_location+'/live_pickbans.json', 'r') as f:
+with open(file_location + '/live_pickbans.json', 'r') as f:
     data = f.read()
 live_pickbans = json.loads(data)
 
-with open(file_location+'/live_merge_logos.json', 'r') as f:
+with open(file_location + '/live_merge_logos.json', 'r') as f:
     data = f.read()
 live_merge_logos = json.loads(data)
 
-with open(file_location+'/live_states.json', 'r') as f:
+with open(file_location + '/live_states.json', 'r') as f:
     data = f.read()
 live_states = json.loads(data)
+
+with open(file_location + '/league_schema.json', 'r') as f:
+    data = f.read()
+temp_dict = json.loads(data)
+league_schema = {int(key): value for key, value in temp_dict.items()}
