@@ -38,7 +38,8 @@ urlpatterns = patterns(
     url(r'^blog/', include('blog.urls', namespace='blog')),
 
     # When django wants a login, redir to social login
-    url(r'^login/', LoginView.as_view(), name='login'),
+    url(r'^login/(?P<method>[^/]+)/$', LoginView.as_view(), name='login'),
+    url(r'^login/$', LoginView.as_view(), name='login'),
     url(
         r'^privacy/$',
         TemplateView.as_view(template_name='privacy.html',),

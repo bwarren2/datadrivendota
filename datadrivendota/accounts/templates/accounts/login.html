@@ -11,12 +11,12 @@
     .col-md-2 { width: 18.6667%; }
     .buttons { display: block; table-layout: fixed; border-radius: 7px; border: 1px solid #ccc;
                margin: 20px; background: #555; padding: 30px; }
-    .buttons > div a { margin: 5px 10px; }
     .buttons > div:not(:first-child) { margin-top: 10px; border-top: 1px solid #ccc;
                                        padding-top: 10px; text-align: center; }
     .user-details { text-align: center; font-size: 16px; font-weight: bold; }
     .disconnect-form { padding: 0; margin: 0px 10px; }
     .disconnect-form > a { display: block; margin: 5px 0 !important; }
+    .social { text-align: center; }
   </style>
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
@@ -38,29 +38,25 @@
       {% endif %}
 
       <div class="social">
+          <div class="btn-group-vertical" role="group">
         {% for sublist in available_backends|social_backends %}
-          <div class="row">
             {% for name, backend in sublist %}
               {% associated backend %}
               {% if association %}
-                <form class="disconnect-form col-md-2" action="{% url "social:disconnect_individual" backend=association.provider association_id=association.id %}" method="post">{% csrf_token %}
+                <form class="disconnect-form" action="{% url "social:disconnect_individual" backend=association.provider association_id=association.id %}" method="post">{% csrf_token %}
                   <a class="btn btn-danger" name="{{ backend|backend_class }}" href="#">
                     <i class="fa fa-{{ name|icon_name }}"></i>
                     Disconnect {{ backend|backend_name }}
                   </a>
                 </form>
               {% else %}
-                <a class="col-md-2 btn btn-default" name="{{ backend|backend_class }}" href="{% url "social:begin" backend=name %}">
+                <a class="btn btn-default" name="{{ backend|backend_class }}" href="{% url "social:begin" backend=name %}">
                   <i class="fa fa-{{ name|icon_name }}"></i>
                   {{ backend|backend_name }}
                 </a>
               {% endif %}
             {% endfor %}
-          </div>
         {% endfor %}
-      </div>
-
-      <div class="legacy">
         {% for name, backend in available_backends|legacy_backends %}
           {% associated backend %}
           {% if association %}
@@ -77,6 +73,7 @@
             </a>
           {% endif %}
         {% endfor %}
+        </div>
 
       </div>
 
@@ -88,7 +85,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-              <h4 class="modal-title">Email Authentication</h4>
+              <h4 class="modal-title">Username Authentication</h4>
             </div>
 
             <div class="modal-body">
@@ -357,10 +354,12 @@
           }
       };
 
+      var loginMethod = "{{ method }}";
+
       var modalDialog = function (modalId, modalLinkName, submitHandler) {
         var $modal;
 
-        $modal = $(modalId).modal({show: false});
+        $modal = $(modalId).modal({show: modalLinkName === loginMethod});
 
         $modal.on('click', '.btn-primary', submitHandler || function (event) {
           event.preventDefault();

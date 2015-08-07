@@ -34,7 +34,11 @@ class MatchRequestView(LoginRequiredView, FormView):
                 self.request.user, match_id
             )
 
-            msg = "Request submitted!  We have tossed this in the task queue.  It should be finished in the next two minutes, and then <a href='{0}'>this link</a> will work".format(
+            msg = (
+                "Request submitted!  We have tossed this in the task queue.  "
+                "It should be finished in the next two minutes, and then "
+                "<a href='{0}'>this link</a> will work"
+            ).format(
                 reverse(
                     'matches:match_detail',
                     kwargs={'match_id': match_request.match_id}
@@ -69,6 +73,7 @@ class LoginView(TemplateView):
         kwargs['available_backends'] = load_backends(
             settings.AUTHENTICATION_BACKENDS
         )
+        kwargs['method'] = self.kwargs.get('method', None)
         return kwargs
 
 

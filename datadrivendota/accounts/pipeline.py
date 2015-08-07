@@ -7,8 +7,9 @@ from social.pipeline.partial import partial
 def require_email(
     strategy, details, backend, user=None, is_new=False, *args, **kwargs
 ):
-    if user.email or backend.name != 'email':
+    if getattr(user, 'email', None) or backend.name != 'email':
         return
+
     elif is_new and not details.get('email'):
         email = strategy.request_data().get('email')
         if email:
