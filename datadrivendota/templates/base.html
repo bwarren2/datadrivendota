@@ -125,6 +125,12 @@
     {% block sections %}
     {% endblock sections %}
 
+    {% if show_control_bar %}
+    <div id="control_bar">
+        I am a control bar.
+    </div>
+    {% endif %}
+
     <div id='footer'>
       <div class="container">
         <p>Copyright 2013 Deep Dive Data LLC. Dota 2 is a registered trademark of

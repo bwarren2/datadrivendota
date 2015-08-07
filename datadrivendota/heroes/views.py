@@ -61,6 +61,11 @@ class HeroDetailView(DetailView):
             hero=self.object
         ).order_by('steam_id')
         kwargs['dossier'] = HeroDossier.objects.get(hero=self.object)
+
+        # TODO Temporary for testing. Put this where you actually want the
+        # control bar to show.
+        kwargs['show_control_bar'] = True
+
         return super(HeroDetailView, self).get_context_data(**kwargs)
 
 
