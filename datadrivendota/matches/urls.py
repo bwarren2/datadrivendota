@@ -12,7 +12,7 @@ urlpatterns = patterns(
     url(
         r'^(?P<match_id>[0-9\-]*)/$',
         views.MatchDetail.as_view(),
-        name="match_detail"
+        name="detail"
     ),
     url(
         r'^api/combobox_tags/$',

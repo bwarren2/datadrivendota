@@ -1,9 +1,11 @@
-from rest_framework import viewsets, filters
 from django.views.generic import ListView, DetailView, TemplateView
+from django.shortcuts import get_object_or_404
+
+from rest_framework import viewsets, filters
+
 from utils.pagination import SmarterPaginator
 
 from datadrivendota.views import JsonApiView
-
 from .models import League, ScheduledMatch
 from .serializers import LeagueSerializer
 from matches.models import Match
@@ -60,7 +62,7 @@ class LeagueDetail(DetailView):
     """ Focusing on a particular league. """
 
     def get_object(self):
-        return League.objects.get(steam_id=self.kwargs.get('steam_id'))
+        return get_object_or_404(League, steam_id=self.kwargs.get('steam_id'))
 
     def get_context_data(self, **kwargs):
         match_list = Match.objects.filter(

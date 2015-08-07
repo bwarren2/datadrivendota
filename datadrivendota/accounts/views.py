@@ -40,7 +40,7 @@ class MatchRequestView(LoginRequiredView, FormView):
                 "<a href='{0}'>this link</a> will work"
             ).format(
                 reverse(
-                    'matches:match_detail',
+                    'matches:detail',
                     kwargs={'match_id': match_request.match_id}
                 ))
             task = MirrorMatches()

@@ -1,8 +1,11 @@
 import datetime
 
-from rest_framework import viewsets, filters
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+
+from rest_framework import viewsets, filters
+
 from utils.pagination import SmarterPaginator
 
 from .serializers import TeamSerializer
@@ -38,7 +41,7 @@ class TeamDetail(DetailView):
     """ Focusing on a particular team. """
 
     def get_object(self):
-        return Team.objects.get(steam_id=self.kwargs.get('steam_id'))
+        return get_object_or_404(Team, steam_id=self.kwargs.get('steam_id'))
 
     def get_context_data(self, **kwargs):
         match_list = Match.objects.filter(

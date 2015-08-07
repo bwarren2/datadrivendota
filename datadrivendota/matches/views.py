@@ -1,7 +1,9 @@
-from rest_framework import viewsets, filters
 from itertools import chain
 
 from django.views.generic import DetailView, ListView
+from django.shortcuts import get_object_or_404
+
+from rest_framework import viewsets, filters
 
 from datadrivendota.views import AjaxView
 from heroes.models import Role
@@ -72,9 +74,9 @@ class SkillBuildViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class MatchDetail(DetailView):
-    model = Match
-    slug_url_kwarg = 'match_id'
-    slug_field = 'steam_id'
+
+    def get_object(self):
+        return get_object_or_404(Match, steam_id=self.kwargs.get('match_id'))
 
     def get_context_data(self, **kwargs):
         kwargs['match'] = self.object

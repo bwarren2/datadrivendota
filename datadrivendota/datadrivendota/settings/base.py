@@ -200,7 +200,6 @@ TEMPLATES = [
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#middleware-classes
 MIDDLEWARE_CLASSES = (
     # Default Django middleware.
-    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -221,13 +220,6 @@ CORS_ORIGIN_WHITELIST = (
 )
 # END CORS CONFIGURATION
 
-# OPBEAT
-OPBEAT = {
-    'ORGANIZATION_ID': '0b51d18c2c2344e08eae846a0dfaee1b',
-    'APP_ID': '2a07cf7866',
-    'SECRET_TOKEN': '5125923a754944a57373d7311b00bde93fe88652',
-}
-# END OPBEAT
 
 # URL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
@@ -264,7 +256,6 @@ THIRD_PARTY_APPS = (
     'tagging',
     'mptt',
     'rest_framework',
-    'opbeat.contrib.django',
 )
 
 # Apps specific for this project go here.
