@@ -354,7 +354,7 @@
           }
       };
 
-      var loginMethod = "{{ method }}";
+      var loginMethod = "{{ method|escapejs }}";
 
       var modalDialog = function (modalId, modalLinkName, submitHandler) {
         var $modal;
