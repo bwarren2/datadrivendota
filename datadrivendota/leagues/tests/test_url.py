@@ -18,6 +18,11 @@ class TestUrlconf(TestCase):
         resp = c.get('/leagues/{0}/'.format(self.league.steam_id))
         self.assertEqual(resp.status_code, 200)
 
+        # The -1 represents a team that does not exist,
+        # because steam ids are positive.
+        resp = c.get('/leagues/{0}/'.format(-1))
+        self.assertEqual(resp.status_code, 404)
+
         resp = c.get('/leagues/scheduled-matches/')
         self.assertEqual(resp.status_code, 200)
 

@@ -27,6 +27,9 @@ class TestUrlconf(TestCase):
         resp = c.get('/players/{0}/'.format(self.player.steam_id))
         self.assertEqual(resp.status_code, 200)
 
+        resp = c.get('/players/{0}/'.format(-1))
+        self.assertEqual(resp.status_code, 404)
+
     def test_url_login(self):
         c = Client()
         resp = c.get('/players/followed/')

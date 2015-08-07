@@ -1,8 +1,8 @@
 """Views primarily related to players, as a group or particularly."""
-from rest_framework import viewsets, filters
-
 from django.views.generic import ListView, DetailView
+from django.shortcuts import get_object_or_404
 
+from rest_framework import viewsets, filters
 
 from datadrivendota.mixins import SubscriberRequiredMixin
 from django.db.models import When, Case, Value, IntegerField, Sum
@@ -47,9 +47,8 @@ class PlayerDetailView(DetailView):
 
     """ Get a closer look at a particular player."""
 
-    model = Player
-    slug_url_kwarg = 'player_id'
-    slug_field = 'steam_id'
+    def get_object(self):
+        return get_object_or_404(Player, steam_id=self.kwargs.get('player_id'))
 
     def get_context_data(self, **kwargs):
         """Add in win statistics and a comparison player."""
@@ -78,30 +77,6 @@ class PlayerDetailView(DetailView):
             return round(float(stats['wins']) / stats['total'] * 100)
         else:
             return 0
-
-    # def add_comparison(self, **kwargs):
-    #     """Merge in comparison data if it exists."""
-    #     p2s = Player.objects.exclude(pro_name=None,)\
-    #         .exclude(steam_id=self.object.steam_id,)
-
-    #     try:
-    #         p2 = choice([p for p in p2s])
-
-    #         kwargs['compare_url'] = reverse(
-    #             'players:comparison',
-    #             kwargs={
-    #                 'player_id_1': self.object.steam_id,
-    #                 'player_id_2': p2.steam_id,
-    #             })
-    #         kwargs['compare_str'] = 'Compare {p1} to {p2}!'.format(
-    #             p1=self.object.display_name,
-    #             p2=p2.display_name,
-    #         )
-    #     except IndexError:
-    #         # If there are no other players, like in tests,
-    #         # this is not a breaking requirement.
-    #         pass
-    #     return kwargs
 
 
 class PlayerViewSet(viewsets.ReadOnlyModelViewSet):

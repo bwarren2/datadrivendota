@@ -1,26 +1,6 @@
 from django.test import TestCase, Client
-from matches.mommy_recipes import make_matchset
-from items.json_data import item_endgame
 from model_mommy import mommy
-from items.management.commands.scrapeitemdata import Command as item_command
-
-
-class TestWorkingJson(TestCase):
-
-    def setUp(self):
-        self.hero, self.player = make_matchset()
-
-    def tearDown(self):
-        pass
-
-    def test_item_endgame_json(self):
-        chart = item_endgame(
-            hero=self.hero.steam_id,
-            player=self.player.steam_id,
-            skill_level=None,
-            game_modes=[],
-        )
-        self.assertGreater(len(chart.datalist), 0)
+from items.management.commands.scrapeitemdata import Command as itemCommand
 
 
 class TestUrlconf(TestCase):
@@ -43,7 +23,7 @@ class TestUrlconf(TestCase):
 class TestItemImport(TestCase):
 
     def setUp(self):
-        self.command = item_command()
+        self.command = itemCommand()
         self.data = self.command.dict_merge(
             self.command.name_dict(),
             self.command.site_json(),
@@ -62,7 +42,7 @@ class TestItemImport(TestCase):
             self.command.get_name(
                 'blink',
                 self.data['blink']
-                ),
+            ),
             'Blink Dagger'
         )
         self.assertEqual(
@@ -104,4 +84,3 @@ class TestItemImport(TestCase):
             'black_king_bar'
         )
         self.assertEqual(cd, 80)
-
