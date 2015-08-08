@@ -1,3 +1,4 @@
+from django.templatetags.static import static
 from datetime import timedelta
 from django.test import TestCase
 from django.utils import timezone
@@ -33,3 +34,13 @@ class TestModelMethods(TestCase):
         self.league.update_time = timezone.now()
         self.league.valve_cdn_image = 'http://www.whatever.com/test.png'
         self.assertEqual(self.league.is_outdated, False)
+
+    def test_image(self):
+
+        l = mommy.make('leagues.league', valve_cdn_image=None)
+        self.assertEqual(l.image, static('blank_league.png'))
+        l.delete()
+
+        l = mommy.make('leagues.league', valve_cdn_image='image.png')
+        self.assertNotEqual(l.image, static('blank_league.png'))
+        l.delete()

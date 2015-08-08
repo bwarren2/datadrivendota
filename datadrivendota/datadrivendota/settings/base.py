@@ -454,26 +454,6 @@ SUBSCRIPTION_REQUIRED_REDIRECT = 'payments_subscribe'
 HERO_BASENAME = 'npc_dota_hero_base'
 
 
-BLANK_ITEM_THUMBSHOT = (
-    "https://s3.amazonaws.com/datadrivendota/blanks/"
-    "blank_item_thumbshot.png"
-)
-
-BLANK_ITEM_MUGSHOT = (
-    "https://s3.amazonaws.com/datadrivendota/"
-    "blanks/blank_item.png"
-)
-
-BLANK_LEAGUE_IMAGE = (
-    'https://s3.amazonaws.com/datadrivendota/'
-    'blanks/blank_league.png'
-)
-
-BLANK_TEAM_IMAGE = (
-    "https://s3.amazonaws.com/datadrivendota/"
-    "blanks/blank_team.png"
-)
-
 KEEN_API_URL = getenv('KEEN_API_URL')
 KEEN_PROJECT_ID = getenv('KEEN_PROJECT_ID')
 KEEN_READ_KEY = getenv('KEEN_READ_KEY')

@@ -1,3 +1,4 @@
+from django.templatetags.static import static
 from django.db import models
 from .managers import SortedTeamManager, TI4TeamManager
 from django.utils import timezone
@@ -53,17 +54,13 @@ class Team(models.Model):
 
     @property
     def image(self):
-        if self.valve_cdn_image is not None:
-            return self.valve_cdn_image
-        else:
-            return settings.BLANK_TEAM_IMAGE
+        return self.valve_cdn_image or static('blank_team.png')
 
     @property
     def sponsor_image(self):
-        if self.valve_cdn_sponsor_image is not None:
-            return self.valve_cdn_sponsor_image
-        else:
-            return settings.BLANK_TEAM_IMAGE
+        # Sponsor images are shaped identially to team images, so
+        # a separate file is not needed.
+        return self.valve_cdn_image or static('blank_team.png')
 
     @property
     def is_outdated(self):

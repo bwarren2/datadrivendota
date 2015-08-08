@@ -2,7 +2,7 @@
 
     <div class="{{summary.hero.safe_name}}_slot {{summary.hero.internal_name}}_slot summary">
 
-        <img src="{{ summary.hero.mugshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail player-slot-{{summary.slot}}">
+        <img src="{{ summary.hero.mugshot_url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail player-slot-{{summary.slot}}">
 
       {% if summary.improper_player %}
         <div class='glyphicon glyphicon-remove-circle validity-glyph' title='Improper Player (Left/Did Not Connect/Bot)'></div>

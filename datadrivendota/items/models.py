@@ -1,5 +1,5 @@
+from django.templatetags.static import static
 from django.db import models
-from django.conf import settings
 
 
 class Item(models.Model):
@@ -31,18 +31,18 @@ class Item(models.Model):
     created = models.NullBooleanField()
 
     @property
-    def thumbshot_image(self):
-        if self.thumbshot.name is not None and self.thumbshot.name != '':
+    def thumbshot_url(self):
+        try:
             return self.thumbshot.url
-        else:
-            return settings.BLANK_ITEM_THUMBSHOT
+        except ValueError:
+            return static('blank_item_small.png')
 
     @property
-    def mugshot_image(self):
-        if self.mugshot.name is not None and self.mugshot.name != '':
+    def mugshot_url(self):
+        try:
             return self.mugshot.url
-        else:
-            return settings.BLANK_ITEM_MUGSHOT
+        except ValueError:
+            return static('blank_item.png')
 
     def __unicode__(self):
         return self.internal_name

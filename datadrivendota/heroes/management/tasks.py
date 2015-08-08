@@ -61,7 +61,7 @@ class CheckHeroIntegrity(Task):
         if len(h) != 0:
             error_email(
                 'Database alert!',
-                'We have a hero without a thumbshot url'
+                'We have a hero without a thumbshot_url'
             )
 
         h = Hero.objects.filter(name='').exclude(visible=False)

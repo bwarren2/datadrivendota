@@ -88,7 +88,7 @@
                 <li data-pborder="{{ pb.order }}">
                   {% if pb.hero.mugshot %}
                   <a href="#" class="thumbnail">
-                    <img src="{{ pb.hero.thumbshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                    <img src="{{ pb.hero.thumbshot_url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
                   </a>
                   {% else %}
                   {{ pb.hero.name }}
@@ -104,7 +104,7 @@
                 <li data-pborder="{{ pb.order }}">
                   {% if pb.hero.mugshot %}
                     <a href="#" class="thumbnail">
-                      <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                      <img src="{{ pb.hero.mugshot_url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
                     </a>
                   {% else %}
                   {{ pb.hero.name }}
@@ -125,7 +125,7 @@
               {% for pb in dire_bans %}
                 <li data-pborder="{{ pb.order }}">
                   <a href="#" class="thumbnail">
-                    <img src="{{ pb.hero.thumbshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                    <img src="{{ pb.hero.thumbshot_url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
                   </a>
                 </li>
               {% endfor %}
@@ -137,7 +137,7 @@
               {% for pb in dire_picks %}
                 <li data-pborder="{{ pb.order }}">
                   <a href="#" class="thumbnail">
-                    <img src="{{ pb.hero.mugshot.url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                    <img src="{{ pb.hero.mugshot_url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
                   </a>
                 </li>
               {% endfor %}
@@ -242,7 +242,7 @@
           {% for summary in summaries %}
             <tr>
               {% if summary.hero.thumbshot %}
-                <td><img src="{{ summary.hero.thumbshot.url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
+                <td><img src="{{ summary.hero.thumbshot_url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
               {% else %}
                 <td></td>
               {% endif %}
@@ -257,42 +257,42 @@
               <td class="match-summary-images">
                 {% if summary.item_0.mugshot %}
                 <a href="{%url 'items:detail' item_name=summary.item_0.slug_name%}">
-                  <img src="{{ summary.item_0.thumbshot.url }}"
+                  <img src="{{ summary.item_0.thumbshot_url }}"
                   alt="{{ summary.item_0.name }}"
                   title="{{ summary.item_0.name }}"
                   ></a>
                 {% endif %}
                 {% if summary.item_1.thumbshot %}
                 <a href="{%url 'items:detail' item_name=summary.item_1.slug_name%}">
-                  <img src="{{ summary.item_1.thumbshot.url }}"
+                  <img src="{{ summary.item_1.thumbshot_url }}"
                   alt="{{ summary.item_1.name }}"
                   title="{{ summary.item_1.name }}"
                   ></a>
                 {% endif %}
                 {% if summary.item_2.thumbshot %}
                 <a href="{%url 'items:detail' item_name=summary.item_2.slug_name%}">
-                  <img src="{{ summary.item_2.thumbshot.url }}"
+                  <img src="{{ summary.item_2.thumbshot_url }}"
                   alt="{{ summary.item_2.name }}"
                   title="{{ summary.item_2.name }}"
                   ></a>
                 {% endif %}
                 {% if summary.item_3.thumbshot %}
                 <a href="{%url 'items:detail' item_name=summary.item_3.slug_name%}">
-                  <img src="{{ summary.item_3.thumbshot.url }}"
+                  <img src="{{ summary.item_3.thumbshot_url }}"
                   alt="{{ summary.item_3.name }}"
                   title="{{ summary.item_3.name }}"
                   ></a>
                 {% endif %}
                 {% if summary.item_4.thumbshot %}
                 <a href="{%url 'items:detail' item_name=summary.item_4.slug_name%}">
-                  <img src="{{ summary.item_4.thumbshot.url }}"
+                  <img src="{{ summary.item_4.thumbshot_url }}"
                   alt="{{ summary.item_4.name }}"
                   title="{{ summary.item_4.name }}"
                   ></a>
                 {% endif %}
                 {% if summary.item_5.thumbshot %}
                 <a href="{%url 'items:detail' item_name=summary.item_5.slug_name%}">
-                  <img src="{{ summary.item_5.thumbshot.url }}"
+                  <img src="{{ summary.item_5.thumbshot_url }}"
                   alt="{{ summary.item_5.name }}"
                   title="{{ summary.item_5.name }}"
                   ></a>

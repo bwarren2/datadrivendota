@@ -13,12 +13,12 @@
       {% if hero.mugshot %}
       <div class="aligner">
         <a class="thumbnail">
-          <img class="hero" src='{{ hero.mugshot.url }}'>
+          <img class="hero" src='{{ hero.mugshot_url }}'>
         </a>
         <div class='roles'>
           {% for assignment in hero.assignment_set.all %}
             {# <p alt="{{ assignment.role.name }}" title="{{ assignment.role.name }}" class="role-magnitude-{{ assignment.magnitude }}">{{ assignment.role.name }}</p> #}
-            <img src="{{ assignment.role.thumbshot.url }}" alt="{{ assignment.role.name }}" title="{{ assignment.role.name }}" class="role-magnitude-{{ assignment.magnitude }}">
+            <img src="{{ assignment.role.thumbshot_url }}" alt="{{ assignment.role.name }}" title="{{ assignment.role.name }}" class="role-magnitude-{{ assignment.magnitude }}">
           {% endfor %}
         </div>
       </div>

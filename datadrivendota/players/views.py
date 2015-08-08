@@ -105,9 +105,7 @@ class PlayerWinrateViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
 
         data_queryset = PlayerMatchSummary.objects.given(self.request)
-        print Player.pros.all()
         data_queryset = data_queryset.filter(player__in=Player.pros.all())
-        print data_queryset
 
         data_queryset = data_queryset.values('player__steam_id')\
             .order_by()\
