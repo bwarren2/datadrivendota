@@ -42,6 +42,16 @@ class TestHeroes(TestCase):
         self.assertNotEqual(h.thumbshot_url, static('blank_hero_thumb.png'))
         h.delete()
 
+    def test_has_image(self):
+
+        h = mommy.make('heroes.hero', thumbshot=None)
+        self.assertEqual(h.has_image, False)
+        h.delete()
+
+        h = mommy.make('heroes.hero')
+        self.assertEqual(h.has_image, True)
+        h.delete()
+
 
 class TestMommyRecipes(TestCase):
 

@@ -105,7 +105,7 @@ class Hero(models.Model):
     @property
     def has_image(self):
         """ Used on hero import to check who is visible. """
-        return not self.thumbshot_url == static('blank_hero_thumb.png')
+        return hasattr(self.thumbshot, 'url')
 
     class Meta:
         verbose_name_plural = 'heroes'
@@ -204,7 +204,10 @@ class Ability(models.Model):
         verbose_name_plural = 'abilities'
 
     def __unicode__(self):
-        return self.internal_name + ' (' + str(self.steam_id) + ')'
+        return "{0} ({1})".format(
+            self.internal_name,
+            str(self.steam_id)
+        )
 
     def save(self, *args, **kwargs):
         self.machine_name = slugify(self.internal_name)
@@ -229,7 +232,10 @@ class AbilitySpecialValues(models.Model):
         return self.key.replace('_', ' ').title()
 
     def __unicode__(self):
-        return ' (' + str(self.key) + ': ' + self.value + ')'
+        return "{0} ({1})".format(
+            str(self.key),
+            str(self.value)
+        )
 
 
 class AbilityBehavior(models.Model):
