@@ -1,3 +1,4 @@
+from django.templatetags.static import static
 from django.test import TestCase, Client
 from model_mommy import mommy
 from django.utils import timezone
@@ -54,3 +55,23 @@ class TestUrlconf(TestCase):
         # because steam ids are positive.
         resp = c.get('/teams/{0}/'.format(-1))
         self.assertEqual(resp.status_code, 404)
+
+    def test_image(self):
+
+        t = mommy.make('teams.team', valve_cdn_image=None)
+        self.assertEqual(t.image, static('blank_team.png'))
+        t.delete()
+
+        t = mommy.make('teams.team', valve_cdn_image='hi.png')
+        self.assertNotEqual(t.image, static('blank_team.png'))
+        t.delete()
+
+    def test_sponsor_image(self):
+
+        t = mommy.make('teams.team', valve_cdn_image=None)
+        self.assertEqual(t.sponsor_image, static('blank_team.png'))
+        t.delete()
+
+        t = mommy.make('teams.team', valve_cdn_image='hi.png')
+        self.assertNotEqual(t.sponsor_image, static('blank_team.png'))
+        t.delete()

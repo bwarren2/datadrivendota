@@ -7,7 +7,7 @@ class HeroSerializer(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
         try:
-            return obj.mugshot.url
+            return obj.mugshot_url
         except ValueError:
             return ''
     filter_backends = (filters.SearchFilter,)

@@ -192,7 +192,7 @@ class UpdateLiveGames(ApiFollower):
 
     def _get_heroes(self):
         self.hero_urls = {
-            x.steam_id: x.mugshot.url for x in Hero.objects.all()
+            x.steam_id: x.mugshot_url for x in Hero.objects.all()
         }
 
     def _get_items(self):

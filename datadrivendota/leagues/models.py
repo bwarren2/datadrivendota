@@ -1,3 +1,4 @@
+from django.templatetags.static import static
 from django.db import models
 from .managers import SortedLeagueManager
 from django.utils import timezone
@@ -37,10 +38,7 @@ class League(models.Model):
 
     @property
     def image(self):
-        if self.valve_cdn_image is None:
-            return settings.BLANK_LEAGUE_IMAGE
-        else:
-            return self.valve_cdn_image
+        return self.valve_cdn_image or static('blank_league.png')
 
     @property
     def display_name(self):

@@ -10,7 +10,7 @@
       {% if item.mugshot and item.name %}
         <div class="col-md-2 text-center">
           <a href="{% url 'items:detail' item_name=item.slug_name %}" class="item thumbnail">
-            <img src="{{ item.mugshot.url }}" alt="{{ item.name }}">
+            <img src="{{ item.mugshot_url }}" alt="{{ item.name }}">
             <p class='overlayer'>{{ item.name }}</p>
           </a>
         </div>

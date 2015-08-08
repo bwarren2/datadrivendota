@@ -1,7 +1,7 @@
 <div class="hero-card">
     <div class="{{hero.classes}}">
       <a href="{% url 'heroes:detail' hero_name=hero.machine_name %}" class="thumbnail">
-        <img src="{{ hero.mugshot.url }}" alt="{{ hero.name }}" class="hero-portrait">
+        <img src="{{ hero.mugshot_url }}" alt="{{ hero.name }}" class="hero-portrait">
         <p class='overlayer'>{{ hero.name }}</p>
       </a>
     </div>

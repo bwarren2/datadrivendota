@@ -1,11 +1,8 @@
+from django.templatetags.static import static
 from django.db import models
 from django.utils.text import slugify
 from .managers import VisibleHeroManager
 from utils import safen
-from utils.exceptions import NoDataFound
-# For the name, internal_name, and valve_id, see:
-# https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/
-#       ?key=<YOURKEY>&language=en_us
 
 
 class Role(models.Model):
@@ -39,6 +36,10 @@ class Role(models.Model):
     machine_name = models.CharField(max_length=50)
     desc = models.TextField()
     thumbshot = models.ImageField(null=True, upload_to='heroes/img/')
+
+    @property
+    def thumbshot_url(self):
+        return self.thumbshot.url or static('blank_role.png')
 
     @property
     def url(self):
@@ -88,9 +89,23 @@ class Hero(models.Model):
     public = VisibleHeroManager()
 
     @property
+    def thumbshot_url(self):
+        try:
+            return self.thumbshot.url
+        except ValueError:
+            return static('blank_hero_thumb.png')
+
+    @property
+    def mugshot_url(self):
+        try:
+            return self.mugshot.url
+        except ValueError:
+            return static('blank_hero_mugshot.png')
+
+    @property
     def has_image(self):
-        """ Used on hero import to check who is visible """
-        return not self.thumbshot.name == 'blanks/blank_hero_thumb.png'
+        """ Used on hero import to check who is visible. """
+        return not self.thumbshot_url == static('blank_hero_thumb.png')
 
     class Meta:
         verbose_name_plural = 'heroes'
@@ -176,7 +191,7 @@ class Ability(models.Model):
     target_type = models.ManyToManyField('AbilityUnitTargetType')
     target_team = models.ManyToManyField('AbilityUnitTargetTeam')
 
-    #Things that come from the jsfeed http://www.dota2.com/jsfeed/abilitydata
+    # Things that come from the jsfeed http://www.dota2.com/jsfeed/abilitydata
     name = models.TextField(help_text="Valve's underscore name")
     description = models.TextField(help_text="Tooltip", blank=True)
     notes = models.TextField(help_text="Errata", blank=True)
@@ -189,7 +204,7 @@ class Ability(models.Model):
         verbose_name_plural = 'abilities'
 
     def __unicode__(self):
-        return self.internal_name+' ('+str(self.steam_id)+')'
+        return self.internal_name + ' (' + str(self.steam_id) + ')'
 
     def save(self, *args, **kwargs):
         self.machine_name = slugify(self.internal_name)
@@ -214,7 +229,7 @@ class AbilitySpecialValues(models.Model):
         return self.key.replace('_', ' ').title()
 
     def __unicode__(self):
-        return ' ('+str(self.key)+': '+self.value+')'
+        return ' (' + str(self.key) + ': ' + self.value + ')'
 
 
 class AbilityBehavior(models.Model):
@@ -229,7 +244,7 @@ class AbilityBehavior(models.Model):
     def display_name(self):
         return self.internal_name.replace(
             'DOTA_ABILITY_BEHAVIOR_', ''
-            ).replace('_', ' ').title()
+        ).replace('_', ' ').title()
 
 
 class AbilityUnitTargetFlags(models.Model):
@@ -241,7 +256,7 @@ class AbilityUnitTargetFlags(models.Model):
     def display_name(self):
         return self.internal_name.replace(
             'DOTA_UNIT_TARGET_FLAG_', ''
-            ).replace('_', ' ').title()
+        ).replace('_', ' ').title()
 
     def __unicode__(self):
         return safen(self.internal_name)
@@ -256,7 +271,7 @@ class AbilityUnitTargetType(models.Model):
     def display_name(self):
         return self.internal_name.replace(
             'DOTA_UNIT_TARGET_', ''
-            ).replace('_', ' ').title()
+        ).replace('_', ' ').title()
 
     def __unicode__(self):
         return safen(self.internal_name)
@@ -271,7 +286,7 @@ class AbilityUnitTargetTeam(models.Model):
     def display_name(self):
         return self.internal_name.replace(
             'DOTA_UNIT_TARGET_TEAM_', ''
-            ).replace('_', ' ').title()
+        ).replace('_', ' ').title()
 
     def __unicode__(self):
         return safen(self.internal_name)
@@ -323,92 +338,3 @@ class HeroDossier(models.Model):
 
     def __unicode__(self):
         return self.hero.name
-
-    def level_stat(self, stat, level):
-        if stat == 'level':
-            return level
-        elif stat == 'strength':
-            return self.strength + (level-1)*self.strength_gain
-        elif stat == 'agility':
-            return self.agility + (level-1)*self.agility_gain
-        elif stat == 'intelligence':
-            return self.intelligence + (level-1)*self.intelligence_gain
-        elif stat == 'armor':
-            return self.armor + (level-1)*self.agility_gain/7
-        elif stat == 'hp':
-            return self.hp+(level-1)*self.strength_gain*19
-        elif stat == 'effective_hp':
-            return (
-                (1 + 0.06 * (self.level_stat('armor', level)))
-                * self.level_stat('hp', level)
-            )
-        elif stat == 'mana':
-            return self.mana+(level-1)*self.intelligence_gain*13
-        else:
-            raise Exception("{0},{1},{2}, buh?".format(self, stat, level))
-
-    def fetch_value(self, stat, level):
-        easy_list = [
-            'day_vision',
-            'night_vision',
-            'atk_point',
-            'atk_backswing',
-            'cast_point',
-            'cast_backswing',
-            'turn_rate',
-            'legs',
-            'movespeed',
-            'projectile_speed',
-            'range',
-            'base_atk_time',
-            'strength_gain',
-            'agility_gain',
-            'intelligence_gain',
-        ]
-        if level not in range(1, 26):
-            raise NoDataFound("That is not a real level")
-        if hasattr(self, stat) and stat in easy_list:
-            return getattr(self, stat)
-        elif stat == "strength":
-            return scale_stat(self.strength, level, self.strength_gain)
-        elif stat == "intelligence":
-            return scale_stat(self.intelligence, level, self.intelligence_gain)
-        elif stat == "agility":
-            return scale_stat(self.agility, level, self.agility_gain)
-        elif stat == "modified_armor":
-            return self.armor + ((level-1)*self.agility_gain)/7.0
-        elif stat == "effective_hp":
-            armor = self.armor + ((level-1)*self.agility_gain)/7.0
-            strength_add = (level-1)*self.strength_gain
-            hp = self.hp + strength_add*19
-            return (1+0.06*armor) * hp
-        elif stat == 'hp':
-            strength_add = (level-1)*self.strength_gain
-            hp = self.hp + strength_add*19
-            return hp
-        elif stat == 'mana':
-            intelligence_add = (level-1)*self.intelligence_gain
-            mana = self.mana + intelligence_add*13
-            return mana
-        elif stat == "hp_regen":
-            return self.hp_regen + ((level-1)*self.strength_gain)*0.03
-        elif stat == "mana_regen":
-            return self.mana_regen + self.fetch_value(
-                'intelligence', level
-                )*0.04
-        elif stat == "damage":
-            base_dmg = (self.max_dmg + self.min_dmg) / 2
-            if self.alignment == 'intelligence':
-                add_dmg = (level-1)*self.intelligence_gain
-            elif self.alignment == 'strength':
-                add_dmg = (level-1)*self.strength_gain
-            elif self.alignment == 'agility':
-                add_dmg = (level-1)*self.agility_gain
-            return base_dmg + add_dmg
-
-        else:
-            raise NoDataFound("What is %s" % stat)
-
-
-def scale_stat(base, addon, level):
-    return base+(level-1)*addon

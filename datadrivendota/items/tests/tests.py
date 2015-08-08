@@ -1,3 +1,4 @@
+from django.templatetags.static import static
 from django.test import TestCase, Client
 from model_mommy import mommy
 from items.management.commands.scrapeitemdata import Command as itemCommand
@@ -84,3 +85,26 @@ class TestItemImport(TestCase):
             'black_king_bar'
         )
         self.assertEqual(cd, 80)
+
+
+class TestModel(TestCase):
+
+    def test_mugshot(self):
+
+        i = mommy.make('items.item', mugshot=None)
+        self.assertEqual(i.mugshot_url, static('blank_item.png'))
+        i.delete()
+
+        i = mommy.make('items.item')
+        self.assertNotEqual(i.mugshot_url, static('blank_item.png'))
+        i.delete()
+
+    def test_thumbshot(self):
+
+        i = mommy.make('items.item', thumbshot=None)
+        self.assertEqual(i.thumbshot_url, static('blank_item_small.png'))
+        i.delete()
+
+        i = mommy.make('items.item')
+        self.assertNotEqual(i.thumbshot_url, static('blank_item_small.png'))
+        i.delete()

@@ -18,7 +18,7 @@
   {% endif %}
 
   {% if pms.hero.mugshot %}
-  <img src="{{ pms.hero.mugshot.url }}" alt="{{ hero.name }}" class="player-match-portrait">
+  <img src="{{ pms.hero.mugshot_url }}" alt="{{ hero.name }}" class="player-match-portrait">
   {% endif %}
   <p class='overlayer'>{{ pms.hero.name }}<span class='scorebar'><br />{{ pms.kills }}/{{ pms.deaths }}/{{ pms.assists }}/{{ pms.kda2 }}</span></p>
   <p class='overlayer-top-right small-date'>{{pms.display_date}}, {{pms.display_duration}}</p>

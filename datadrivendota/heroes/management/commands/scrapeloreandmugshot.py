@@ -1,5 +1,4 @@
 import sys
-import logging
 from urllib2 import urlopen, HTTPError
 from io import BytesIO
 import requests
@@ -11,8 +10,6 @@ from django.core.files import File
 from BeautifulSoup import BeautifulSoup
 
 from heroes.models import Hero
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):

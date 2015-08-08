@@ -5,7 +5,7 @@ def cast_dict(summary):
     try:
         datadict = {
             'hero_mugshot': summary.hero.mugshot,
-            'hero_mugshot_url': summary.hero.mugshot.url,
+            'hero_mugshot_url': summary.hero.mugshot_url,
             'hero_name': summary.hero.name,
             'hero_safe_name': summary.hero.safe_name,
             'internal_hero_name': summary.hero.internal_name,
@@ -36,7 +36,7 @@ def ability_infodict(summary):
     try:
         datadict = {
             'hero_thumbshot': summary.hero.thumbshot,
-            'hero_thumbshot_url': summary.hero.thumbshot.url,
+            'hero_thumbshot_url': summary.hero.thumbshot_url,
             'hero_name': summary.hero.name,
             'hero_machine_name': summary.hero.machine_name,
             'ability_dict': [

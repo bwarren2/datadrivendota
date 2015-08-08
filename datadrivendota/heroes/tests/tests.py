@@ -1,3 +1,4 @@
+from django.templatetags.static import static
 from django.test import TestCase, Client
 from django.forms import ValidationError
 from model_mommy import mommy
@@ -20,6 +21,26 @@ class TestHeroes(TestCase):
     def test_names(self):
         self.assertEqual(self.hero.__unicode__(), self.hero.name)
         self.assertEqual(self.hero.safe_name(), safen(self.hero.machine_name))
+
+    def test_mugshot(self):
+
+        h = mommy.make('heroes.hero', mugshot=None)
+        self.assertEqual(h.mugshot_url, static('blank_hero_mugshot.png'))
+        h.delete()
+
+        h = mommy.make('heroes.hero')
+        self.assertNotEqual(h.mugshot_url, static('blank_hero_mugshot.png'))
+        h.delete()
+
+    def test_thumbshot(self):
+
+        h = mommy.make('heroes.hero', thumbshot=None)
+        self.assertEqual(h.thumbshot_url, static('blank_hero_thumb.png'))
+        h.delete()
+
+        h = mommy.make('heroes.hero')
+        self.assertNotEqual(h.thumbshot_url, static('blank_hero_thumb.png'))
+        h.delete()
 
 
 class TestMommyRecipes(TestCase):
