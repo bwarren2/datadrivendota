@@ -36,7 +36,6 @@ def user_password(
         user.set_password(password)
         user.save()
     elif not check:
-        print check, user.password, password
         messages.add_message(
             strategy.request, messages.WARNING, 'Incorrect password :/'
         )
