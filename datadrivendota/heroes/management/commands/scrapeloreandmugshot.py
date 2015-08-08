@@ -1,4 +1,5 @@
 import sys
+import logging
 from urllib2 import urlopen, HTTPError
 from io import BytesIO
 import requests
@@ -10,6 +11,8 @@ from django.core.files import File
 from BeautifulSoup import BeautifulSoup
 
 from heroes.models import Hero
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -26,6 +29,7 @@ class Command(BaseCommand):
     def add_images(self, hero):
         """
         Hit Valve APIs for pictures.
+
         This can be refactored for better testing, but not a high priority yet.
         """
         # Full-size images
@@ -42,7 +46,7 @@ class Command(BaseCommand):
                 holder = BytesIO(r.content)
                 _ = holder.seek(0)  # Catch to avoid printing
 
-                filename = slugify(hero.name)+'_full.png'
+                filename = slugify(hero.name) + '_full.png'
                 hero.mugshot.save(filename, File(holder))
             else:
                 print "No mugshot for {0}!  Error code {1}".format(
@@ -58,14 +62,14 @@ class Command(BaseCommand):
             'http://media.steampowered.com'
             '/apps/dota2/images/heroes/%s_sb.png' % hero.internal_name[14:]
         )
-
+        print url
         try:
             r = requests.get(url)
             if r.status_code == 200:
                 holder = BytesIO(r.content)
                 _ = holder.seek(0)  # Catch to avoid printing
-
-                filename = slugify(hero.name)+'_thumb.png'
+                _ = _
+                filename = slugify(hero.name) + '_thumb.png'
                 hero.thumbshot.save(filename, File(holder))
             else:
                 print "No mugshot for {0}!  Error code {1}".format(
@@ -78,11 +82,12 @@ class Command(BaseCommand):
     def add_lore(self, hero):
         """
         Hit foreign APIs for lore.
+
         This can be refactored for better testing, but not a high priority yet.
         """
         undername = hero.name.replace(" ", "_")
         undername = undername.replace("'", "")
-        herourl = "http://www.dota2.com/hero/"+undername
+        herourl = "http://www.dota2.com/hero/" + undername
         try:
             html = urlopen(herourl).read()
             bs = BeautifulSoup(html)
