@@ -42,7 +42,7 @@ class Command(BaseCommand):
             if r.status_code == 200:
                 holder = BytesIO(r.content)
                 _ = holder.seek(0)  # Catch to avoid printing
-
+                _ = _  # Avoid linting
                 filename = slugify(hero.name) + '_full.png'
                 hero.mugshot.save(filename, File(holder))
             else:
