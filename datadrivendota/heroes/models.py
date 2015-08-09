@@ -39,7 +39,10 @@ class Role(models.Model):
 
     @property
     def thumbshot_url(self):
-        return self.thumbshot.url or static('blank_role.png')
+        try:
+            return self.thumbshot.url
+        except ValueError:
+            return static('blank_role.png')
 
     @property
     def url(self):
