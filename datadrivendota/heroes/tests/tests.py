@@ -162,3 +162,16 @@ class TestUrlconf(TestCase):
         resp = c.get('/heroes/{0}/'.format(self.hero_doss.hero.machine_name))
         self.assertEqual(resp.status_code, 200)
         # Almost all the other urls are to be gutted, so we are done here.
+
+
+class TestRoles(TestCase):
+
+    def test_thumbshot(self):
+
+        h = mommy.make('heroes.role', thumbshot=None)
+        self.assertEqual(h.thumbshot_url, static('blank_role.png'))
+        h.delete()
+
+        h = mommy.make('heroes.role', thumbshot='hi.png')
+        self.assertNotEqual(h.thumbshot_url, static('blank_role.png'))
+        h.delete()
