@@ -31450,11 +31450,14 @@ $(function () {
 
             if (!$('.click-selector').hasClass('clicked')){
 
-                // var str = '.nv-point:not(.'+window.jsUtils.convertToSlug(
-                //     $('#combo-select').text().trim()
-                // )+')';
-                var str = '.nv-point';
+                $('.click-selector').addClass('clicked');
+                $('.click-selector').text('Unselect');
+
+                var str = '.nv-point:not(.'+window.jsUtils.convertToSlug(
+                    $('#combo-select').text().trim()
+                )+')';
                 console.log(str);
+                // var str = '.nv-point:not(.nv-point-0)';
                 selection = d3.selectAll(str)
                 .transition()
                 .duration(500)
@@ -31463,8 +31466,6 @@ $(function () {
                 .style('visibility', 'hidden');
                 console.log('2');
 
-                $('.click-selector').addClass('clicked');
-                $('.click-selector').text('Unselect');
 
             } else {
                 console.log('3');
