@@ -191,17 +191,24 @@ class MatchListView(ListView):
 class ComboboxAjaxView(AjaxView):
 
     def get_result_data(self, **kwargs):
-        q = self.request.GET.get('search', '')
+
+        q = self.request.GET.get('q', '')
+        print q
+        print self.request.GET
         heroes = [h.name for h in Hero.objects.filter(name__icontains=q)[:5]]
-        alignments = ['Strength', 'Agility', 'Intelligence', 'point-0']
+        print heroes
+        alignments = ['Strength', 'Agility', 'Intelligence', 'nv-point-0']
         matched_alignments = [s for s in alignments if q.lower() in s.lower()]
+
         roles = [r.name for r in Role.objects.filter(name__icontains=q)[:5]]
         results = []
+
         for i, string in enumerate(chain(heroes, matched_alignments, roles)):
             match_json = {}
             match_json['id'] = i
             match_json['label'] = string
             match_json['value'] = string
             results.append(match_json)
+
         kwargs['results'] = results
         return kwargs

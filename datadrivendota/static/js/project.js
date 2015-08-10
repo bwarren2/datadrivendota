@@ -113,22 +113,28 @@ $(function () {
     function comboBox(){
         d3.selectAll('.click-selector')
         .on('click', function(d){
+
             if (!$('.click-selector').hasClass('clicked')){
-                var str = '.data-toggleable:not(.'+window.jsUtils.convertToSlug(
-                    $('span#combobox .select2-chosen').text()
-                )+')';
+
+                // var str = '.nv-point:not(.'+window.jsUtils.convertToSlug(
+                //     $('#combo-select').text().trim()
+                // )+')';
+                var str = '.nv-point';
+                console.log(str);
                 selection = d3.selectAll(str)
                 .transition()
                 .duration(500)
                 .style('opacity',0)
                 .transition().duration(0)
                 .style('visibility', 'hidden');
+                console.log('2');
 
                 $('.click-selector').addClass('clicked');
                 $('.click-selector').text('Unselect');
 
             } else {
-                var str = '.data-toggleable';
+                console.log('3');
+                var str = '.nv-point';
                 d3.selectAll(str)
                 .transition()
                 .duration(500)
@@ -139,8 +145,7 @@ $(function () {
                 $('.click-selector').text('Select');
 
             }
-        }
-           );
+        });
     }
 
     window.comboBox = comboBox;
