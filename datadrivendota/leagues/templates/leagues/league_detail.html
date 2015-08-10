@@ -40,6 +40,22 @@
 {% block extra_js %}
 <script type="text/javascript">
 $(function(){
+
+  $('#combo-select').select2({
+    ajax: {
+      delay: 250,
+      url:'/matches/api/combobox_tags/',
+      processResults: function (data) {
+        var res = data.results.map(function (elt) {
+         return {id: elt.label, text: elt.value}; }
+        )
+        return {results: res};
+      },
+    },
+    minimumInputLength: 3,
+  });
+
+
   Promise.resolve(
     $.ajax(
       '/rest-api/hero-winrate/?'+$.param(

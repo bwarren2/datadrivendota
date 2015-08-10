@@ -193,7 +193,7 @@ class ComboboxAjaxView(AjaxView):
     def get_result_data(self, **kwargs):
         q = self.request.GET.get('search', '')
         heroes = [h.name for h in Hero.objects.filter(name__icontains=q)[:5]]
-        alignments = ['Strength', 'Agility', 'Intelligence']
+        alignments = ['Strength', 'Agility', 'Intelligence', 'point-0']
         matched_alignments = [s for s in alignments if q.lower() in s.lower()]
         roles = [r.name for r in Role.objects.filter(name__icontains=q)[:5]]
         results = []

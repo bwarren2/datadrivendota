@@ -127,7 +127,11 @@
 
     {% if show_control_bar %}
     <div id="control_bar">
-        I am a control bar.
+      <span id='combobox'>
+        <select id="combo-select">
+        </select>
+        <button type='button' class='btn btn-small btn-primary click-selector' id='combo-button'>Select</button>
+      </span>
     </div>
     {% endif %}
 
