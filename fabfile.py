@@ -91,7 +91,7 @@ def json_populate():
     local('python datadrivendota/manage.py  importHeroStats')
     local('python datadrivendota/manage.py  scrapeabilitydata')
     local('python datadrivendota/manage.py  scrapeitemdata')
-    # python datadrivendota/manage.py  importRoles
+    local('python datadrivendota/manage.py  importRoles')
 
 
 def generate_heroku_static_pages():
