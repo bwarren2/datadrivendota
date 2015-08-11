@@ -121,7 +121,7 @@ var pickban_scatter = function(data, destination){
           var datum = {
             x: +v.picks.toFixed(0),
             y: +v.bans.toFixed(0),
-            // hero: v.hero,
+            hero: v.hero,
           };
           return datum;
         })

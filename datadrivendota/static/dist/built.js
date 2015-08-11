@@ -30928,7 +30928,7 @@ var pickban_scatter = function(data, destination){
           var datum = {
             x: +v.picks.toFixed(0),
             y: +v.bans.toFixed(0),
-            // hero: v.hero,
+            hero: v.hero,
           };
           return datum;
         })
@@ -31458,7 +31458,7 @@ $(function () {
                 )+')';
                 console.log(str);
                 // var str = '.nv-point:not(.nv-point-0)';
-                selection = d3.selectAll(str)
+                var selection = d3.selectAll(str)
                 .transition()
                 .duration(500)
                 .style('opacity',0)

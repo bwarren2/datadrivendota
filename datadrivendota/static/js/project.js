@@ -124,7 +124,7 @@ $(function () {
                 )+')';
                 console.log(str);
                 // var str = '.nv-point:not(.nv-point-0)';
-                selection = d3.selectAll(str)
+                var selection = d3.selectAll(str)
                 .transition()
                 .duration(500)
                 .style('opacity',0)
