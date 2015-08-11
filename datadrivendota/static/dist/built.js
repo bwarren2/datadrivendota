@@ -30871,44 +30871,58 @@ function make_svg(destination, width, height){
 
 window.Chartreuse.make_svg = make_svg;
 
-var winrate_scatter = function(data, destination){
+var winrate_scatter = function(winrate_data, dossier_data, destination){
 
   var chart;
   var chart_data;
 
-  nv.addGraph(function(){
-    chart = nv.models.scatterChart()
-      .margin({
-        left: 45,
-        bottom: 45,
-      })
-      .forceY([0,100])
-      .showLegend(false);
-    chart.tooltip.enabled();
-
-    var plot_data = [
-      {
-        key: "Winrate",
-        values: data.map(function(v){
-          var datum = {
-            y: v.games ? +(v.wins/v.games * 100).toFixed(2) : 0,
-            x: v.games ? v.games : 0,
-            // hero: v.hero,
-          };
-          return datum;
+  nv.addGraph(
+    function(){
+      chart = nv.models.scatterChart()
+        .margin({
+          left: 45,
+          bottom: 45,
         })
-      }
-    ];
+        .forceY([0,100])
+        .showLegend(false);
+      chart.tooltip.enabled();
 
-    chart.xAxis.axisLabel("# Games");
-    chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
+      var plot_data = [
+        {
+          key: "Winrate",
+          values: winrate_data.map(function(v){
+            var datum = {
+              y: v.games ? +(v.wins/v.games * 100).toFixed(2) : 0,
+              x: v.games ? v.games : 0,
+              hero: v.hero,
+            };
+            return datum;
+          })
+        }
+      ];
 
-    var svg = make_svg(destination);
-    chart_data = svg.datum(plot_data);
-    chart_data.transition().duration(500).call(chart);
+      chart.xAxis.axisLabel("# Games");
+      chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
 
-    return chart;
-  });
+      var svg = make_svg(destination);
+      chart_data = svg.datum(plot_data);
+      chart_data.transition().duration(500).call(chart);
+
+
+      return chart;
+    },
+    function(chart){
+      var place = destination + ' path.nv-point';
+
+      d3.selectAll(place).attr(
+        'class',
+        function(d){
+            var str = (d[0].hero || {}).internal_name || '';
+            return d3.select(this).attr('class') + ' '+ str;
+        }
+      );
+    }
+  );
 
   return chart;
 };
@@ -31456,7 +31470,7 @@ $(function () {
                 var str = '.nv-point:not(.'+window.jsUtils.convertToSlug(
                     $('#combo-select').text().trim()
                 )+')';
-                console.log(str);
+
                 // var str = '.nv-point:not(.nv-point-0)';
                 var selection = d3.selectAll(str)
                 .transition()
@@ -31464,11 +31478,9 @@ $(function () {
                 .style('opacity',0)
                 .transition().duration(0)
                 .style('visibility', 'hidden');
-                console.log('2');
-
 
             } else {
-                console.log('3');
+
                 var str = '.nv-point';
                 d3.selectAll(str)
                 .transition()
@@ -31523,11 +31535,20 @@ $(function () {
     $('#pause-play').click(function() {
         var icon = $(this).children('span');
         if (icon.hasClass('glyphicon-play')) {
+            $(window).trigger('play');
             icon.removeClass('glyphicon-play').addClass('glyphicon-pause');
         } else {
+            $(window).trigger('pause');
             icon.addClass('glyphicon-play').removeClass('glyphicon-pause');
         }
     });
+    $('#back-animation').click(function() {
+        $(window).trigger('back');
+    });
+    $('#forward-animation').click(function() {
+        $(window).trigger('forward');
+    });
+
 });
 
 ;

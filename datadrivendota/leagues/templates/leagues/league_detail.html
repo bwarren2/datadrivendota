@@ -40,6 +40,7 @@
 {% block extra_js %}
 <script type="text/javascript">
 $(function(){
+
   window.comboBox();
   $('#combo-select').select2({
     ajax: {
@@ -56,15 +57,27 @@ $(function(){
   });
 
 
-  Promise.resolve(
+  Promise.join(
     $.ajax(
       '/rest-api/hero-winrate/?'+$.param(
         {league_id:{{league.steam_id}}}
       )
+    ),
+    $.ajax(
+      '/rest-api/hero-dossiers/?'+$.param(
+        {league_id:{{league.steam_id}}}
+      )
     )
+
   )
   .then(function(data){
-      window.Chartreuse.winrate_scatter(data, '#winrate_chart')
+      var winrate_data = data[0];
+      var dossier_data = data[1];
+      window.Chartreuse.winrate_scatter(
+        winrate_data,
+        dossier_data,
+        '#winrate_chart'
+      )
   })
   .catch(function(e){
     console.log(e)
@@ -87,3 +100,13 @@ $(function(){
 })
 </script>
 {% endblock extra_js %}
+
+{% block extra_css %}
+  <style type="text/css">
+  .npc_dota_hero_ember_spirit{
+    stroke:red;
+    fill:red;
+    stroke-fill:red;
+  }
+  </style>
+{% endblock extra_css %}

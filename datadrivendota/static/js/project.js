@@ -122,7 +122,7 @@ $(function () {
                 var str = '.nv-point:not(.'+window.jsUtils.convertToSlug(
                     $('#combo-select').text().trim()
                 )+')';
-                console.log(str);
+
                 // var str = '.nv-point:not(.nv-point-0)';
                 var selection = d3.selectAll(str)
                 .transition()
@@ -130,11 +130,9 @@ $(function () {
                 .style('opacity',0)
                 .transition().duration(0)
                 .style('visibility', 'hidden');
-                console.log('2');
-
 
             } else {
-                console.log('3');
+
                 var str = '.nv-point';
                 d3.selectAll(str)
                 .transition()
@@ -189,10 +187,19 @@ $(function () {
     $('#pause-play').click(function() {
         var icon = $(this).children('span');
         if (icon.hasClass('glyphicon-play')) {
+            $(window).trigger('play');
             icon.removeClass('glyphicon-play').addClass('glyphicon-pause');
         } else {
+            $(window).trigger('pause');
             icon.addClass('glyphicon-play').removeClass('glyphicon-pause');
         }
     });
+    $('#back-animation').click(function() {
+        $(window).trigger('back');
+    });
+    $('#forward-animation').click(function() {
+        $(window).trigger('forward');
+    });
+
 });
 
