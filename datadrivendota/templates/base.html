@@ -126,14 +126,9 @@
     {% endblock sections %}
 
     {% if show_control_bar %}
+    <div id="control_bar_margin"></div>
     <div id="control_bar">
     {% include "matches/_time_control_card.html" %}
-
-      <span id='combobox'>
-        <select id="combo-select">
-        </select>
-        <button type='button' class='btn btn-small btn-primary click-selector' id='combo-button'>Select</button>
-      </span>
     </div>
     {% endif %}
 

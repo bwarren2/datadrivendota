@@ -182,5 +182,17 @@ $(function () {
                 return 0
         }
     }
+
+    /**
+     * Handling the play/pause button.
+     */
+    $('#pause-play').click(function() {
+        var icon = $(this).children('span');
+        if (icon.hasClass('glyphicon-play')) {
+            icon.removeClass('glyphicon-play').addClass('glyphicon-pause');
+        } else {
+            icon.addClass('glyphicon-play').removeClass('glyphicon-pause');
+        }
+    });
 });
 
