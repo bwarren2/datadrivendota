@@ -270,7 +270,7 @@ How exactly each type of data gets into our system is a bit complex, because the
 
 Getting initial data in this eventually-convergent system can be tricky, because some frequent tasks expect there to have been a run of long running tasks, and the long running tasks may expect that the fast tasks have run, etc.  But this is not a deadlock!  Each cycle through the task list makes progress, so the question is how to conveniently run a few iterations.
 
-For now, there is a process for initial data which takes about 5-10 minutes.  Here's a list of tasks.  Run the first block in a shell with an active worker, wait for the queues to clear (`fab rabbit_list`) or for the workers to stop actively processing tasks (`flower`, connect to [127.0.0.1:5555/monitor](127.0.0.1:5555/monitor)) whichever comes first, and then repeat with the next block.  Some api calls may fail and go into a long retry loop; if there are tasks in the queue but the workers are not working, you can probably flush the queues (`fab rabbit_reset`).  Allowing better error propagation in tasks is a todo.
+For now, there is a process for initial data which takes about ~5 minutes.  Here's a list of tasks.  Run the first block in a shell with an active worker, wait for the queues to clear (`fab rabbit_list`) or for the workers to stop actively processing tasks (`flower`, connect to [127.0.0.1:5555/monitor](127.0.0.1:5555/monitor)) whichever comes first, and then repeat with the next block.  Some api calls may fail and go into a long retry loop; if there are tasks in the queue but the workers are not working, you can probably flush the queues (`fab rabbit_reset`).  Allowing better error propagation in tasks is a todo.
 
 
 ```
