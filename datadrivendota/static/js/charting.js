@@ -110,8 +110,11 @@ var winrate_scatter = function(winrate_data, dossier_data, destination){
       d3.selectAll(place).attr(
         'class',
         function(d){
-            var str = (d[0].hero || {}).internal_name || '';
-            return d3.select(this).attr('class') + ' '+ str;
+            var hero_name = (d[0].hero || {}).internal_name || '';
+            var hero = dossier_data.filter(function(d){
+              return d.hero.internal_name === hero_name
+            })[0]
+            return d3.select(this).attr('class') + ' '+ hero.alignment + ' ' + hero_name;
         }
       );
     }
