@@ -11,8 +11,8 @@
 
   <nav>
     <ul class="nav nav-pills">
-      <li role="presentation" class="active"><a href="#">Overview</a></li>
-      <li role="presentation"><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
+      <li role="presentation"><a href="#">Overview</a></li>
+      <li role="presentation" class="active"><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
     </ul>
   </nav>
 
@@ -24,12 +24,6 @@
     <div class='col-md-4'>
         <h4>Hero Pick/Ban Rate</h4>
         <div id='pick_ban'></div>
-    </div>
-    <div class="league-infobox col-md-4">
-        <img class='thumbnail' style='margin-top:10px' src="{{ league.image }}">
-        <h2>{{ league.display_name }}
-        </h2>
-
     </div>
   </div>
 
@@ -59,7 +53,7 @@ $(function(){
 
   Promise.join(
     $.ajax(
-      '/rest-api/hero-winrate/?'+$.param(
+      '/rest-api/match-pickban/?'+$.param(
         {league_id:{{league.steam_id}}}
       )
     ),
@@ -73,29 +67,68 @@ $(function(){
   .then(function(data){
       var winrate_data = data[0];
       var dossier_data = data[1];
-      window.Chartreuse.winrate_scatter(
-        winrate_data,
-        dossier_data,
-        '#winrate_chart'
-      )
+
+      var blank_data = function(dossiers){
+        var return_obj = {};
+        var values_ary = [];
+        var test = dossiers.map(function(h){
+          var steam_id = h.hero.steam_id;
+          values_ary[steam_id] = {
+            picks: 0,
+            bans: 0,
+            wins: 0,
+            losses: 0,
+            hero: h.hero
+          };
+        });
+        return_obj['key'] = 'Winrate';
+        return_obj['values'] = values_ary;
+        return return_obj;
+      }
+
+      var extract = function(winrate_data, dossier_data){
+        var data = blank_data(dossier_data);
+
+        winrate_data.map(function(match){
+          pickbans = match.pickbans;
+          pickbans.map(function(pickban){
+            var steam_id = pickban.hero;
+            var is_win = (
+              match.radiant_win && pickban.team == 0 ||
+              !match.radiant_win && pickban.team == 1
+              );
+            if (pickban.is_pick){
+              if(is_win){
+                data.values[steam_id].wins +=1;
+              } else {
+                data.values[steam_id].losses +=1;
+              }
+              data.values[steam_id].picks += 1;
+            } else {
+              data.values[steam_id].bans += 1;
+            }
+          })
+        })
+
+        var values = data.values.filter(function(d){
+          return d.picks > 0 || d.bans > 0;
+        })
+
+        data.values = values;
+
+        return data;
+      };
+      plot_data = extract(winrate_data, dossier_data);
+      console.log(plot_data);
+      window.Chartreuse.winrate_scatter_walk(
+        [plot_data], '#winrate_chart'
+      );
+
   })
   .catch(function(e){
     console.log(e)
   })
 
-  Promise.resolve(
-    $.ajax(
-      '{% url "rest-api:hero-pickban-list"%}?'+$.param(
-        {league_id:{{league.steam_id}}}
-      )
-    )
-  )
-  .then(function(data){
-      window.Chartreuse.pickban_scatter(data, '#pick_ban')
-  })
-  .catch(function(e){
-    console.log(e)
-  })
 
 })
 </script>
