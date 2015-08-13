@@ -19,11 +19,7 @@
   <div class='row'>
     <div class='col-md-4'>
         <h4>Hero Winrate</h4>
-        <div id='winrate_chart'></div>
-    </div>
-    <div class='col-md-4'>
-        <h4>Hero Pick/Ban Rate</h4>
-        <div id='pick_ban'></div>
+        <div id='pickban_chart'></div>
     </div>
   </div>
 
@@ -51,6 +47,10 @@ $(function(){
   });
 
 
+  var winrate_data;
+  var dossier_data;
+  var working_set;
+
   Promise.join(
     $.ajax(
       '/rest-api/match-pickban/?'+$.param(
@@ -62,11 +62,39 @@ $(function(){
         {league_id:{{league.steam_id}}}
       )
     )
-
   )
   .then(function(data){
-      var winrate_data = data[0];
-      var dossier_data = data[1];
+      winrate_data = data[0];
+      dossier_data = data[1];
+      var idx = 0;
+      var get_working_set = function(idx){
+        var data = winrate_data.slice(0, idx);
+        return data;
+      }
+
+      working_set = get_working_set(idx);
+
+      var update = function(tick){
+        idx = (idx + tick).mod(winrate_data.length);
+        $(window).trigger('update', [get_working_set(idx)]);
+      }
+
+      // Set up timing controls
+      $(window).on('play', function(){
+        timer = setTimeout(update(1), 1000);
+      });
+      $(window).on('pause', function(){
+         clearTimeout(timer);
+      });
+      $(window).on('forward', function(){
+        update(1);
+      });
+      $(window).on('back', function(){
+        update(-1);
+      });
+
+  })
+  .then(function(){
 
       var blank_data = function(dossiers){
         var return_obj = {};
@@ -86,10 +114,10 @@ $(function(){
         return return_obj;
       }
 
-      var extract = function(winrate_data, dossier_data){
+      var extract = function(working_set, dossier_data){
         var data = blank_data(dossier_data);
 
-        winrate_data.map(function(match){
+        working_set.map(function(match){
           pickbans = match.pickbans;
           pickbans.map(function(pickban){
             var steam_id = pickban.hero;
@@ -110,18 +138,30 @@ $(function(){
           })
         })
 
-        var values = data.values.filter(function(d){
-          return d.picks > 0 || d.bans > 0;
+        // Because nvd3 has baked-in assumptions about values being an array starting at 0.
+        values = []
+        data.values.map(function(d){
+          values.push(d);
+        })
+        data.values=values;
+        return [data];
+      };
+
+      plot_data = extract(working_set, dossier_data);
+      callback = function(svg, chart){
+        $(window).on('update', function(e, p1){
+
+          new_data = extract(p1, dossier_data);
+          chart_data = svg.datum(new_data);
+          chart_data.transition().duration(500).call(chart);
+
+
+          nv.utils.windowResize(chart.update);
         })
 
-        data.values = values;
-
-        return data;
-      };
-      plot_data = extract(winrate_data, dossier_data);
-      console.log(plot_data);
-      window.Chartreuse.winrate_scatter_walk(
-        [plot_data], '#winrate_chart'
+      }
+      window.Chartreuse.pickban_scatter_walk(
+        plot_data, '#pickban_chart', callback
       );
 
   })

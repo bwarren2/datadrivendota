@@ -93,7 +93,7 @@ var winrate_scatter = function(winrate_data, dossier_data, destination){
           })
         }
       ];
-
+      console.log(plot_data);
       chart.xAxis.axisLabel("# Games");
       chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
 
@@ -126,10 +126,11 @@ var winrate_scatter = function(winrate_data, dossier_data, destination){
 window.Chartreuse.winrate_scatter = winrate_scatter;
 
 
-var winrate_scatter_walk = function(plot_data, destination){
+var pickban_scatter_walk = function(plot_data, destination, cb){
 
   var chart;
   var chart_data;
+  var svg = make_svg(destination);
 
   nv.addGraph(
     function(){
@@ -138,19 +139,17 @@ var winrate_scatter_walk = function(plot_data, destination){
           left: 45,
           bottom: 45,
         })
-        // .forceY([0,100])
-        .x(function(d){return d.bans})
-        .y(function(d){return d.picks})
+        .x(function(d){return d.bans;})
+        .y(function(d){return d.picks;})
         .showLegend(false);
       chart.tooltip.enabled();
 
       chart.xAxis.axisLabel("# Games");
       chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
 
-      var svg = make_svg(destination);
       chart_data = svg.datum(plot_data);
       chart_data.transition().duration(500).call(chart);
-
+      console.log('Drew');
       return chart;
     },
     function(chart){
@@ -159,19 +158,18 @@ var winrate_scatter_walk = function(plot_data, destination){
       d3.selectAll(place).attr(
         'class',
         function(d){
-          console.log(d);
             var hero_name = (d[0].hero || {}).internal_name || '';
             var hero = d[0].hero;
             return d3.select(this).attr('class') + ' '+ hero.alignment + ' ' + hero_name;
         }
       );
+      cb(svg, chart);
     }
   );
 
-  return chart;
 };
 
-window.Chartreuse.winrate_scatter_walk = winrate_scatter_walk;
+window.Chartreuse.pickban_scatter_walk = pickban_scatter_walk;
 
 var pickban_scatter = function(data, destination){
 
@@ -436,5 +434,3 @@ var cumsum_heroes = function(data, attr){
   }
   return data;
 }
-
-
