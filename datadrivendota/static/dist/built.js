@@ -30951,8 +30951,8 @@ var pickban_scatter_walk = function(plot_data, destination, cb){
         .showLegend(false);
       chart.tooltip.enabled();
 
-      chart.xAxis.axisLabel("# Games");
-      chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
+      chart.xAxis.axisLabel("# Games Banned");
+      chart.yAxis.axisLabel("# Games Picked").axisLabelDistance(-20);
 
       chart_data = svg.datum(plot_data);
       chart_data.transition().duration(500).call(chart);
