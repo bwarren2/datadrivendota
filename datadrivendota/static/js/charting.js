@@ -141,6 +141,7 @@ var pickban_scatter_walk = function(plot_data, destination, cb){
         })
         .x(function(d){return d.bans;})
         .y(function(d){return d.picks;})
+        .useVoronoi(false)
         .showLegend(false);
       chart.tooltip.enabled();
 

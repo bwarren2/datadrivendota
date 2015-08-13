@@ -32,6 +32,7 @@ class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
     page_size = 10
     page_size_query_param = 'page_size'
     serializer_class = MatchPickBansSerializer
+    max_page_size = 200
     # filter_backends = (filters.SearchFilter,)
     # search_fields = ('name',)
 
@@ -228,10 +229,7 @@ class ComboboxAjaxView(AjaxView):
     def get_result_data(self, **kwargs):
 
         q = self.request.GET.get('q', '')
-        print q
-        print self.request.GET
         heroes = [h.name for h in Hero.objects.filter(name__icontains=q)[:5]]
-        print heroes
         alignments = ['Strength', 'Agility', 'Intelligence', 'nv-point-0']
         matched_alignments = [s for s in alignments if q.lower() in s.lower()]
 
@@ -241,8 +239,10 @@ class ComboboxAjaxView(AjaxView):
         for i, string in enumerate(chain(heroes, matched_alignments, roles)):
             match_json = {}
             match_json['id'] = i
-            match_json['label'] = string
-            match_json['value'] = string
+            match_json['label'] = 'npc_dota_hero_' + string.lower().replace(
+                ' ', '_'
+            )  # Attr
+            match_json['value'] = string  # Goes visible
             results.append(match_json)
 
         kwargs['results'] = results

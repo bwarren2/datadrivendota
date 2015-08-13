@@ -54,7 +54,10 @@ $(function(){
   Promise.join(
     $.ajax(
       '/rest-api/match-pickban/?'+$.param(
-        {league_id:{{league.steam_id}}}
+        {
+          league_id:{{league.steam_id}},
+          page_size:100
+        }
       )
     ),
     $.ajax(

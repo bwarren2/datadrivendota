@@ -120,9 +120,11 @@ $(function () {
                 $('.click-selector').text('Unselect');
 
                 var str = '.nv-point:not(.'+window.jsUtils.convertToSlug(
-                    $('#combo-select').text().trim()
+                    // $('#combo-select').text().trim()
+                    $('#combo-select option').val().trim()
                 )+')';
-
+                // Use this to refactor around hidden selector.
+                //
                 // var str = '.nv-point:not(.nv-point-0)';
                 var selection = d3.selectAll(str)
                 .transition()
@@ -132,7 +134,7 @@ $(function () {
                 .style('visibility', 'hidden');
 
             } else {
-
+                $('#combo-select option').remove().trigger("change");
                 var str = '.nv-point';
                 d3.selectAll(str)
                 .transition()
