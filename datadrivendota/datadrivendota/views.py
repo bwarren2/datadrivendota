@@ -33,7 +33,8 @@ class LandingView(TemplateView):
         )
         kwargs['blog_entry'] = Entry.public.all().order_by(
             '-created'
-        )[0] or None
+        ).first()
+
         return super(LandingView, self).get_context_data(**kwargs)
 
 

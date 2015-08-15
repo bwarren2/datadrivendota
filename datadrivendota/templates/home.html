@@ -79,19 +79,21 @@
     </div>
   </div>
 
-  <div class='section'>
-    <div class="container">
-      <div class="row">
-        <div class='col-md-12'>
-            <h4>Currently on the blog:</h4>
-            <h2>
-               <a href="{{blog_entry.get_absolute_url}}">{{blog_entry.title}} <small>{{blog_entry.description}}</small></a>
-            </h2>
-        </div>
+  {% if blog_entry %}
+    <div class='section'>
+      <div class="container">
+        <div class="row">
+          <div class='col-md-12'>
+              <h4>Currently on the blog:</h4>
+              <h2>
+                 <a href="{{blog_entry.get_absolute_url}}">{{blog_entry.title}} <small>{{blog_entry.description}}</small></a>
+              </h2>
+          </div>
 
-      </div>
-    </div> <!-- /container -->
-  </div>
+        </div>
+      </div> <!-- /container -->
+    </div>
+  {% endif %}
 
 </div>
 {% endblock sections %}
