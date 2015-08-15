@@ -270,40 +270,40 @@ How exactly each type of data gets into our system is a bit complex, because the
 
 Getting initial data in this eventually-convergent system can be tricky, because some frequent tasks expect there to have been a run of long running tasks, and the long running tasks may expect that the fast tasks have run, etc.  But this is not a deadlock!  Each cycle through the task list makes progress, so the question is how to conveniently run a few iterations.
 
-For now, there is a process  for initial data which takes about 5-10 minutes.  Here's a list of tasks.  Run the first block in a shell with an active worker, wait for the queues to clear (`fab rabbit_list`) or for the workers to stop actively processing tasks (`flower`, connect to [127.0.0.1:5555/monitor](127.0.0.1:5555/monitor)) whichever comes first, and then repeat with the next block.  Some api calls may fail and go into a long retry loop; if there are tasks in the queue but the workers are not working, you can probably flush the queues (`fab rabbit_reset`).  Allowing better error propagation in tasks is a todo.
+For now, there is a process for initial data which takes about ~5 minutes.  Here's a list of tasks.  Run the first block in a shell with an active worker, wait for the queues to clear (`fab rabbit_list`) or for the workers to stop actively processing tasks (`flower`, connect to [127.0.0.1:5555/monitor](127.0.0.1:5555/monitor)) whichever comes first, and then repeat with the next block.  Some api calls may fail and go into a long retry loop; if there are tasks in the queue but the workers are not working, you can probably flush the queues (`fab rabbit_reset`).  Allowing better error propagation in tasks is a todo.
 
 
 ```
-from heroes.management.tasks import CheckHeroIntegrity as tsk
-tsk().s().delay()
 
-from items.management.tasks import MirrorItemSchema as tsk
-tsk().s().delay()
+from items.management.tasks import MirrorItemSchema
+from leagues.management.tasks.league import UpdateLeagues
+MirrorItemSchema().s().delay()
 
-from leagues.management.tasks import MirrorLiveGames as tsk
-tsk().s().delay()
+// Wait for the queue to clear
+UpdateLeagues().s().delay(matches=100, leagues=[2733])
 
-from leagues.management.tasks import MirrorLeagueSchedule as tsk
-tsk().s().delay()
-
+// Wait for the queue to clear
 from leagues.management.tasks import MirrorRecentLeagues as tsk
 tsk().s().delay()
-
 from teams.management.tasks import MirrorRecentTeams as tsk
 tsk().s().delay()
-
 from matches.management.tasks import CheckMatchIntegrity as tsk
 tsk().s().delay()
 
-
+// Wait for the queue to clear
 from matches.management.tasks import UpdateMatchValidity as tsk
 tsk().s().delay()
-from players.management.tasks import MirrorClientPersonas as tsk
-tsk().s().delay()
-from players.management.tasks import MirrorClientMatches as tsk
+
+// Most of the work is done!  Things past here are optional.
+
+// This should be fast.  It
+from heroes.management.tasks import CheckHeroIntegrity as tsk
 tsk().s().delay()
 
-
+// This gets the official names for pro players.
+// It works on all the currently imported players affiliated with a team, so
+// it might take a while if you have lots of pro games.  *For starting dev,
+// you don't need it,* but it is here for completeness.
 from players.management.tasks import MirrorProNames as tsk
 tsk().s().delay()
 ```
