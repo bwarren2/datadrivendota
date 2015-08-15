@@ -28,9 +28,9 @@
 
         <div class='col-md-12'>
           <div class='jumbotron'>
-            <h1>Welcome to DataDrivenDota</h1>
+            <span id='intro'><h1>Welcome to DataDrivenDota</h1></span>
                 <p>We think a chart is worth a thousand stats, and are building the framework to prove it.</p>
-                <p>DataDrivenDota is a project dedicated to doing data analysis correctly in Dota 2.  We are currently boiling down our code for better charts, deeper analytics, and more features.  Check back soon, or follow our <a href="{% url 'blog:index' %}">blog</a> and <a href="https://twitter.com/datadrivendota">twitter</a>!</p>
+                <p>We are building better charts, deeper analytics, and more features to help you improve.  Check back soon, or follow our <a href="{% url 'blog:index' %}">blog</a> and <a href="https://twitter.com/datadrivendota">twitter</a>!</p>
           </div>
         </div>
 
@@ -123,6 +123,9 @@
   }
   .section{
     padding:15px;
+  }
+  #intro{
+    text-align: center;
   }
   </style>
 {% endblock extra_css %}
