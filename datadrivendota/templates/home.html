@@ -8,80 +8,94 @@
 
 <div id='home'>
 
-<div class="container">
-  <div id='main-block'  class="row">
+  <div class='section'>
+    <div class="container">
+      <div class="row">
 
-    {# Django has a messaging framework, so lets use it. #}
-    {% block messages %}
-      <div class='messages'>
-        {% if messages %}
-          {% for message in messages %}
-            <div class='alert alert-{{message.tags}}'>
-              <button type='button' class='close' data-dismiss="alert"></button>
-              {{message|safe}}
-            </div>
-          {% endfor %}
-        {% endif %}
-      </div>
-    {% endblock messages %}
+        {# Django has a messaging framework, so lets use it. #}
+        {% block messages %}
+          <div class='messages'>
+            {% if messages %}
+              {% for message in messages %}
+                <div class='alert alert-{{message.tags}}'>
+                  <button type='button' class='close' data-dismiss="alert"></button>
+                  {{message|safe}}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        {% endblock messages %}
 
-    <div class='jumbotron'>
-      <h1>Welcome to DataDrivenDota</h1>
-
-          <p>We think a chart is worth a thousand stats, and are building the framework to prove it.</p>
-          <p>DataDrivenDota is a project dedicated to doing data analysis correctly in Dota 2.  We are currently boiling down our code for better charts, deeper analytics, and more features.  Check back soon, or follow our <a href="{% url 'blog:index' %}">blog</a> and <a href="https://twitter.com/datadrivendota">twitter</a>!</p>
-    </div>
-
-    <div class='col-md-6'>
-
-      <div class='big-d-stats'>
-        <div class='page-header'>
-          <h1>Stats are useful...</h1>
+        <div class='col-md-12'>
+          <div class='jumbotron'>
+            <span id='intro'><h1>Welcome to DataDrivenDota</h1></span>
+                <p>We think a chart is worth a thousand stats, and are building the framework to prove it.</p>
+                <p>We are building better charts, deeper analytics, and more features to help you improve.  Check back soon, or follow our <a href="{% url 'blog:index' %}">blog</a> and <a href="https://twitter.com/datadrivendota">twitter</a>!</p>
+          </div>
         </div>
-        <table class='table'>
-          <thead>
-            <tr>
-              <td></td>
-              <td>Avg X</td>
-              <td>Avg Y</td>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class='group-a'>
-              <td>Group 1</td>
-              <td id='group-a-x'></td>
-              <td id='group-a-y'></td>
-            </tr>
-            <tr class='group-b'>
-              <td>Group 2</td>
-              <td id='group-b-x'></td>
-              <td id='group-b-y'></td>
-            </tr>
-            <tr class='group-c'>
-              <td>Group 3</td>
-              <td id='group-c-x'></td>
-              <td id='group-c-y'></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
 
+        <div class='col-md-6'>
+          <div class='big-d-stats'>
+            <div class='page-header'>
+              <h2>Stats are useful...</h2>
+            </div>
+            <table class='table'>
+              <thead>
+                <tr>
+                  <td></td>
+                  <td>Avg X</td>
+                  <td>Avg Y</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class='group-a'>
+                  <td>Group 1</td>
+                  <td id='group-a-x'></td>
+                  <td id='group-a-y'></td>
+                </tr>
+                <tr class='group-b'>
+                  <td>Group 2</td>
+                  <td id='group-b-x'></td>
+                  <td id='group-b-y'></td>
+                </tr>
+                <tr class='group-c'>
+                  <td>Group 3</td>
+                  <td id='group-c-x'></td>
+                  <td id='group-c-y'></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class='col-md-6'>
+          <div class='page-header'>
+            <h2>...but miss the big picture</h2>
+          </div>
+          <div class='big-d centered'></div>
+        </div>
+
+      </div>
     </div>
-
-    <div class='col-md-6'>
-
-      <div class='page-header'>
-        <h1>...but miss the big picture</h1>
-      </div>
-
-      <div class='big-d'>
-      </div>
-
-    </div>
-
   </div>
-</div> <!-- /container -->
 
+  {% if blog_entry %}
+    <div class='section'>
+      <div class="container">
+        <div class="row">
+          <div class='col-md-12'>
+              <h4>Currently on the blog:</h4>
+              <h2>
+                 <a href="{{blog_entry.get_absolute_url}}">{{blog_entry.title}} <small>{{blog_entry.description}}</small></a>
+              </h2>
+          </div>
+
+        </div>
+      </div> <!-- /container -->
+    </div>
+  {% endif %}
+
+</div>
 {% endblock sections %}
 
 {% block extra_js %}
@@ -108,6 +122,18 @@
   .group-c{
     fill:#2d862d;
     color:#2d862d;
+  }
+  .section{
+    padding:15px;
+  }
+  #intro{
+    text-align: center;
+  }
+  .centered{
+    text-align: center;
+  }
+  td{
+    font-size: 18px;
   }
   </style>
 {% endblock extra_css %}
