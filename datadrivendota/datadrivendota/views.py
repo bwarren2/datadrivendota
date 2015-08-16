@@ -10,6 +10,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 
 from datadrivendota.keen_app import keen_client
+from datadrivendota.mixins import FeatureFlagContext
 
 from .forms import SearchForm
 from players.models import Player
@@ -20,7 +21,7 @@ from leagues.models import League
 from blog.models import Entry
 
 
-class LandingView(TemplateView):
+class LandingView(FeatureFlagContext, TemplateView):
     template_name = 'home.html'
 
     def get_context_data(self, **kwargs):

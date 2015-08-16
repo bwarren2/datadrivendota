@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from django.conf import settings
 
 
 class UserCheckMixin(object):
@@ -28,3 +29,12 @@ class SubscriberRequiredMixin(UserCheckMixin):
 
     def check_user(self, user):
         return user.has_perm('players.can_touch')
+
+
+class FeatureFlagContext(object):
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(FeatureFlagContext, self).get_context_data(**kwargs)
+        for flag in settings.FEATURE_FLAGS:
+            kwargs[flag] = getattr(settings, flag)
+        return kwargs
