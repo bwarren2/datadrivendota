@@ -2,7 +2,9 @@ from rest_framework.routers import DefaultRouter
 from matches.views import (
     MatchViewSet,
     PlayerMatchSummaryViewSet,
-    SkillBuildViewSet
+    SkillBuildViewSet,
+    MatchPickBanViewSet,
+    PickBanViewSet,
 )
 from teams.views import TeamViewSet
 from leagues.views import LeagueViewSet
@@ -23,6 +25,12 @@ router.register('match-request', MatchRequestViewSet)
 router.register('teams', TeamViewSet)
 router.register('leagues', LeagueViewSet)
 router.register('heroes', HeroViewSet)
+router.register('pickbans', PickBanViewSet)
+router.register(
+    'match-pickban',
+    MatchPickBanViewSet,
+    base_name='match-pickban'
+)
 router.register(
     'hero-winrate',
     HeroWinrateViewSet,

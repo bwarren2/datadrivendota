@@ -113,22 +113,29 @@ $(function () {
     function comboBox(){
         d3.selectAll('.click-selector')
         .on('click', function(d){
+
             if (!$('.click-selector').hasClass('clicked')){
-                var str = '.data-toggleable:not(.'+window.jsUtils.convertToSlug(
-                    $('span#combobox .select2-chosen').text()
+
+                $('.click-selector').addClass('clicked');
+                $('.click-selector').text('Unselect');
+
+                var str = '.nv-point:not(.'+window.jsUtils.convertToSlug(
+                    // $('#combo-select').text().trim()
+                    $('#combo-select option').val().trim()
                 )+')';
-                selection = d3.selectAll(str)
+                // Use this to refactor around hidden selector.
+                //
+                // var str = '.nv-point:not(.nv-point-0)';
+                var selection = d3.selectAll(str)
                 .transition()
                 .duration(500)
                 .style('opacity',0)
                 .transition().duration(0)
                 .style('visibility', 'hidden');
 
-                $('.click-selector').addClass('clicked');
-                $('.click-selector').text('Unselect');
-
             } else {
-                var str = '.data-toggleable';
+                $('#combo-select option').remove().trigger("change");
+                var str = '.nv-point';
                 d3.selectAll(str)
                 .transition()
                 .duration(500)
@@ -139,8 +146,7 @@ $(function () {
                 $('.click-selector').text('Select');
 
             }
-        }
-           );
+        });
     }
 
     window.comboBox = comboBox;
@@ -176,5 +182,29 @@ $(function () {
                 return 0
         }
     }
+
+    /**
+     * Handling the play/pause button.
+     */
+    $('#pause-play').click(function() {
+        var icon = $(this).children('span');
+        if (icon.hasClass('glyphicon-play')) {
+            $(window).trigger('play');
+            icon.removeClass('glyphicon-play').addClass('glyphicon-pause');
+        } else {
+            $(window).trigger('pause');
+            icon.addClass('glyphicon-play').removeClass('glyphicon-pause');
+        }
+    });
+    $('#back-animation').click(function() {
+        $(window).trigger('back');
+    });
+    $('#forward-animation').click(function() {
+        $(window).trigger('forward');
+    });
+
 });
 
+Number.prototype.mod = function(n) {
+    return (( this % n) + n) % n;
+}

@@ -15,6 +15,11 @@ urlpatterns = patterns(
         name='detail'
     ),
     url(
+        r'^(?P<steam_id>[0-9\-]*)/time-walk$',
+        views.LeagueDetailTimeWalk.as_view(),
+        name='detail-timewalk'
+    ),
+    url(
         r'^live-games/$',
         views.LiveGameListView.as_view(),
         name='live_games'

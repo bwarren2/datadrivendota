@@ -61,6 +61,7 @@ class HeroDetailView(DetailView):
             hero=self.object
         ).order_by('steam_id')
         kwargs['dossier'] = HeroDossier.objects.get(hero=self.object)
+
         return super(HeroDetailView, self).get_context_data(**kwargs)
 
 

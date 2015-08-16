@@ -57,6 +57,20 @@ class LeagueList(ListView):
         return (paginator, page, objs, True)
 
 
+class LeagueDetailTimeWalk(DetailView):
+
+    """ Timestepping for a particular league. """
+
+    template_name = 'leagues/league_timewalk.html'
+
+    def get_object(self):
+        return get_object_or_404(League, steam_id=self.kwargs.get('steam_id'))
+
+    def get_context_data(self, **kwargs):
+        kwargs['show_control_bar'] = True
+        return super(LeagueDetailTimeWalk, self).get_context_data(**kwargs)
+
+
 class LeagueDetail(DetailView):
 
     """ Focusing on a particular league. """
@@ -80,10 +94,12 @@ class LeagueDetail(DetailView):
         )
         match_list = paginator.current_page
 
-        context = {
-            'match_list': match_list,
-        }
-        return super(LeagueDetail, self).get_context_data(**context)
+        # TODO Temporary for testing. Put this where you actually want the
+        # control bar to show.
+        kwargs['show_control_bar'] = True
+
+        kwargs['match_list'] = match_list
+        return super(LeagueDetail, self).get_context_data(**kwargs)
 
 
 class LiveGameListView(TemplateView):

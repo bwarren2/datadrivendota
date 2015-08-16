@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from django.db import models
 
-from .querysets import PMSQuerySet, MatchFilteredQuerySet
+from .querysets import PMSQuerySet, MatchFilteredQuerySet, FilteredQuerySet
 
 
 class Match(models.Model):
@@ -82,6 +82,8 @@ class Match(models.Model):
         choices=VALIDITY_CHOICES,
         default=UNPROCESSED
     )
+
+    objects = FilteredQuerySet.as_manager()
 
     class Meta:
         verbose_name_plural = 'matches'
@@ -261,7 +263,7 @@ class PickBan(models.Model):
     match = models.ForeignKey('Match')
     is_pick = models.BooleanField()
     hero = models.ForeignKey('heroes.Hero')
-    team = models.IntegerField()
+    team = models.IntegerField()  # 0 is radiant, 1 is dire
     order = models.IntegerField()
 
     objects = MatchFilteredQuerySet.as_manager()

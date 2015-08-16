@@ -8,6 +8,13 @@
     {{league.display_name}}
 {% endblock page_title %}
 {% block content %}
+
+  <nav>
+    <ul class="nav nav-pills">
+      <li role="presentation" class="active"><a href="#">Overview</a></li>
+      <li role="presentation"><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
+    </ul>
+  </nav>
     <div class='row'>
       <div class='col-md-4'>
           <h4>Hero Winrate</h4>
@@ -40,15 +47,44 @@
 {% block extra_js %}
 <script type="text/javascript">
 $(function(){
-  Promise.resolve(
+
+  window.comboBox();
+  $('#combo-select').select2({
+    ajax: {
+      delay: 250,
+      url:'/matches/api/combobox_tags/',
+      processResults: function (data) {
+        var res = data.results.map(function (elt) {
+         return {id: elt.label, text: elt.value}; }
+        )
+        return {results: res};
+      },
+    },
+    minimumInputLength: 3,
+  });
+
+
+  Promise.join(
     $.ajax(
       '/rest-api/hero-winrate/?'+$.param(
         {league_id:{{league.steam_id}}}
       )
+    ),
+    $.ajax(
+      '/rest-api/hero-dossiers/?'+$.param(
+        {league_id:{{league.steam_id}}}
+      )
     )
+
   )
   .then(function(data){
-      window.Chartreuse.winrate_scatter(data, '#winrate_chart')
+      var winrate_data = data[0];
+      var dossier_data = data[1];
+      window.Chartreuse.winrate_scatter(
+        winrate_data,
+        dossier_data,
+        '#winrate_chart'
+      )
   })
   .catch(function(e){
     console.log(e)
@@ -71,3 +107,23 @@ $(function(){
 })
 </script>
 {% endblock extra_js %}
+
+{% block extra_css %}
+  <style type="text/css">
+  .agility{
+    stroke:green;
+    fill:green;
+    stroke-fill:green;
+  }
+  .strength{
+    stroke:red;
+    fill:red;
+    stroke-fill:red;
+  }
+  .intelligence{
+    stroke:blue;
+    fill:blue;
+    stroke-fill:blue;
+  }
+  </style>
+{% endblock extra_css %}

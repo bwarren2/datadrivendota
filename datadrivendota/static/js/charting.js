@@ -64,49 +64,113 @@ function make_svg(destination, width, height){
 
 window.Chartreuse.make_svg = make_svg;
 
-var winrate_scatter = function(data, destination){
+var winrate_scatter = function(winrate_data, dossier_data, destination){
 
   var chart;
   var chart_data;
 
-  nv.addGraph(function(){
-    chart = nv.models.scatterChart()
-      .margin({
-        left: 45,
-        bottom: 45,
-      })
-      .forceY([0,100])
-      .showLegend(false);
-    chart.tooltip.enabled();
-
-    var plot_data = [
-      {
-        key: "Winrate",
-        values: data.map(function(v){
-          var datum = {
-            y: v.games ? +(v.wins/v.games * 100).toFixed(2) : 0,
-            x: v.games ? v.games : 0,
-            // hero: v.hero,
-          };
-          return datum;
+  nv.addGraph(
+    function(){
+      chart = nv.models.scatterChart()
+        .margin({
+          left: 45,
+          bottom: 45,
         })
-      }
-    ];
+        .forceY([0,100])
+        .showLegend(false);
+      chart.tooltip.enabled();
 
-    chart.xAxis.axisLabel("# Games");
-    chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
+      var plot_data = [
+        {
+          key: "Winrate",
+          values: winrate_data.map(function(v){
+            var datum = {
+              y: v.games ? +(v.wins/v.games * 100).toFixed(2) : 0,
+              x: v.games ? v.games : 0,
+              hero: v.hero,
+            };
+            return datum;
+          })
+        }
+      ];
+      console.log(plot_data);
+      chart.xAxis.axisLabel("# Games");
+      chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
 
-    var svg = make_svg(destination);
-    chart_data = svg.datum(plot_data);
-    chart_data.transition().duration(500).call(chart);
+      var svg = make_svg(destination);
+      chart_data = svg.datum(plot_data);
+      chart_data.transition().duration(500).call(chart);
 
-    return chart;
-  });
+
+      return chart;
+    },
+    function(chart){
+      var place = destination + ' path.nv-point';
+
+      d3.selectAll(place).attr(
+        'class',
+        function(d){
+            var hero_name = (d[0].hero || {}).internal_name || '';
+            var hero = dossier_data.filter(function(d){
+              return d.hero.internal_name === hero_name
+            })[0]
+            return d3.select(this).attr('class') + ' '+ hero.alignment + ' ' + hero_name;
+        }
+      );
+    }
+  );
 
   return chart;
 };
 
 window.Chartreuse.winrate_scatter = winrate_scatter;
+
+
+var pickban_scatter_walk = function(plot_data, destination, cb){
+
+  var chart;
+  var chart_data;
+  var svg = make_svg(destination);
+
+  nv.addGraph(
+    function(){
+      chart = nv.models.scatterChart()
+        .margin({
+          left: 45,
+          bottom: 45,
+        })
+        .x(function(d){return d.bans;})
+        .y(function(d){return d.picks;})
+        .useVoronoi(false)
+        .showLegend(false);
+      chart.tooltip.enabled();
+
+      chart.xAxis.axisLabel("# Games Banned");
+      chart.yAxis.axisLabel("# Games Picked").axisLabelDistance(-20);
+
+      chart_data = svg.datum(plot_data);
+      chart_data.transition().duration(500).call(chart);
+      console.log('Drew');
+      return chart;
+    },
+    function(chart){
+      var place = destination + ' path.nv-point';
+
+      d3.selectAll(place).attr(
+        'class',
+        function(d){
+            var hero_name = (d[0].hero || {}).internal_name || '';
+            var hero = d[0].hero;
+            return d3.select(this).attr('class') + ' '+ hero.alignment + ' ' + hero_name;
+        }
+      );
+      cb(svg, chart);
+    }
+  );
+
+};
+
+window.Chartreuse.pickban_scatter_walk = pickban_scatter_walk;
 
 var pickban_scatter = function(data, destination){
 
@@ -121,7 +185,7 @@ var pickban_scatter = function(data, destination){
           var datum = {
             x: +v.picks.toFixed(0),
             y: +v.bans.toFixed(0),
-            // hero: v.hero,
+            hero: v.hero,
           };
           return datum;
         })
@@ -371,5 +435,3 @@ var cumsum_heroes = function(data, attr){
   }
   return data;
 }
-
-
