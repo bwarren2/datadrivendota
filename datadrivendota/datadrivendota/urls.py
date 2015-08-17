@@ -17,29 +17,15 @@ urlpatterns = patterns(
     '',
     url(r'^$', views.LandingView.as_view(), name='landing'),
 
-    # App URLs
-    url(r'^heroes/', include('heroes.urls', namespace='heroes')),
-    url(r'^items/', include('items.urls', namespace='items')),
-    url(r'^matches/', include('matches.urls', namespace='matches')),
-    url(r'^players/', include('players.urls', namespace='players')),
-    url(r'^leagues/', include('leagues.urls', namespace='leagues')),
-    url(r'^teams/', include('teams.urls', namespace='teams')),
-    url(r'^accounts/', include('accounts.urls', namespace='accounts')),
 
     # Internals URLS
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^djs2/', include('django_select2.urls')),
     url(r'^rest-api/', include(router.urls, namespace='rest-api')),
     url(r'^health/', include('health.urls', namespace='health')),
 
     # One-off URLs
-    url(r'^search/$', views.SearchView.as_view(), name='search'),
-    url(r'^payments/', include("payments.urls")),
     url(r'^blog/', include('blog.urls', namespace='blog')),
 
-    # When django wants a login, redir to social login
-    url(r'^login/(?P<method>[^/]+)/$', LoginView.as_view(), name='login'),
-    url(r'^login/$', LoginView.as_view(), name='login'),
     url(
         r'^privacy/$',
         TemplateView.as_view(template_name='privacy.html',),
@@ -58,6 +44,59 @@ urlpatterns = patterns(
     # https://python-social-auth.readthedocs.org/en/latest/configuration/django.html
     # Is there a better option?  --ben 2015-04-19
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if settings.SHOW_LEAGUES:
+    urlpatterns += patterns(
+        '',
+        url(r'^leagues/', include('leagues.urls', namespace='leagues')),
+    )
+if settings.SHOW_HEROES:
+    urlpatterns += patterns(
+        '',
+        url(r'^heroes/', include('heroes.urls', namespace='heroes')),
+    )
+if settings.SHOW_ITEMS:
+    urlpatterns += patterns(
+        '',
+        url(r'^items/', include('items.urls', namespace='items')),
+    )
+if settings.SHOW_MATCHES:
+    urlpatterns += patterns(
+        '',
+        url(r'^matches/', include('matches.urls', namespace='matches')),
+    )
+if settings.SHOW_PLAYERS:
+    urlpatterns += patterns(
+        '',
+        url(r'^players/', include('players.urls', namespace='players')),
+    )
+if settings.SHOW_TEAMS:
+    urlpatterns += patterns(
+        '',
+        url(r'^teams/', include('teams.urls', namespace='teams')),
+    )
+if settings.SHOW_ACCOUNTS:
+    urlpatterns += patterns(
+        '',
+        url(r'^accounts/', include('accounts.urls', namespace='accounts')),
+    )
+if settings.SHOW_PAYMENTS:
+    urlpatterns += patterns(
+        '',
+        url(r'^payments/', include("payments.urls")),
+    )
+if settings.SHOW_AUTH:
+    urlpatterns += patterns(
+        '',
+        # When django wants a login, redir to social login
+        url(r'^login/(?P<method>[^/]+)/$', LoginView.as_view(), name='login'),
+        url(r'^login/$', LoginView.as_view(), name='login'),
+    )
+if settings.SHOW_SEARCH:
+    urlpatterns += patterns(
+        '',
+        url(r'^search/$', views.SearchView.as_view(), name='search'),
+    )
 
 if settings.DEBUG:
     # static files (images, css, javascript, etc.)

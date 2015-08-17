@@ -186,6 +186,7 @@ TEMPLATES = [
                 'django.core.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 'django.core.context_processors.request',
+                'datadrivendota.context_processors.feature_flag',
                 'social.apps.django_app.context_processors.backends',
                 'social.apps.django_app.context_processors.login_redirect',
             ],
@@ -347,10 +348,10 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.mail.mail_validation',
     'social.pipeline.user.create_user',
     'social.pipeline.social_auth.associate_user',
-    'social.pipeline.debug.debug',
     'accounts.pipeline.user_password',
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details',
+    'social.pipeline.debug.debug',
     'social.pipeline.debug.debug',
     # 'players.pipeline.create_player',
 )
@@ -487,3 +488,31 @@ BLOG_TITLE = "DataDrivenDota Tech Blog"
 BLOG_DESCRIPTION = "Writings from the devs doing analytics"
 BLOG_ENTRIES_PER_PAGE = 1
 BLOG_ENTRIES_PER_RSS = 5
+
+
+# Feature flagging:
+SHOW_ACCOUNTS = getenv('SHOW_ACCOUNTS', False)
+SHOW_AUTH = getenv('SHOW_AUTH', False)
+SHOW_BLOG = getenv('SHOW_BLOG', False)
+SHOW_HEROES = getenv('SHOW_HEROES', False)
+SHOW_ITEMS = getenv('SHOW_ITEMS', False)
+SHOW_LEAGUES = getenv('SHOW_LEAGUES', False)
+SHOW_MATCHES = getenv('SHOW_MATCHES', False)
+SHOW_PAYMENTS = getenv('SHOW_PAYMENTS', False)
+SHOW_PLAYERS = getenv('SHOW_PLAYERS', False)
+SHOW_SEARCH = getenv('SHOW_SEARCH', False)
+SHOW_TEAMS = getenv('SHOW_TEAMS', False)
+
+FEATURE_FLAGS = [
+    'SHOW_ACCOUNTS',
+    'SHOW_AUTH',
+    'SHOW_BLOG',
+    'SHOW_HEROES',
+    'SHOW_ITEMS',
+    'SHOW_LEAGUES',
+    'SHOW_MATCHES',
+    'SHOW_PAYMENTS',
+    'SHOW_PLAYERS',
+    'SHOW_SEARCH',
+    'SHOW_TEAMS',
+]
