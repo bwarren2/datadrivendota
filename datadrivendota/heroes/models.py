@@ -106,6 +106,14 @@ class Hero(models.Model):
             return static('blank_hero_mugshot.png')
 
     @property
+    def css_id(self):
+        return self.machine_name
+
+    @property
+    def css_classes(self):
+        return "{0} {1}".format(self.css_id, self.herodossier.alignment)
+
+    @property
     def has_image(self):
         """ Used on hero import to check who is visible. """
         return hasattr(self.thumbshot, 'url')

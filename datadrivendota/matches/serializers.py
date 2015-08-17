@@ -2,9 +2,32 @@ from rest_framework import serializers
 from matches.models import Match, PlayerMatchSummary, SkillBuild, PickBan
 from players.serializers import PlayerSerializer
 from heroes.serializers import HeroSerializer
+import six
+from rest_framework.relations import RelatedField
+
+
+class MyStringRelatedField(RelatedField):
+
+    """A read only field that represents its targets using unicode."""
+
+    def __init__(self, **kwargs):
+        kwargs['read_only'] = True
+        super(MyStringRelatedField, self).__init__(**kwargs)
+
+    def to_representation(self, value):
+        print '$'
+        print type(value.name), value.name
+        print '$'
+        if value.name is None:
+            return ''
+        else:
+            return six.text_type(value)
 
 
 class MatchSerializer(serializers.ModelSerializer):
+
+    radiant_team = MyStringRelatedField()
+    dire_team = MyStringRelatedField()
 
     class Meta:
         model = Match
@@ -13,7 +36,10 @@ class MatchSerializer(serializers.ModelSerializer):
             'start_time',
             'duration',
             'radiant_win',
-            'skill')
+            'skill',
+            'radiant_team',
+            'dire_team',
+        )
 
 
 class SkillBuildSerializer(serializers.ModelSerializer):
@@ -66,6 +92,7 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
 
 
 class PickbanSerializer(serializers.ModelSerializer):
+    hero = HeroSerializer()
 
     class Meta:
         model = PickBan
@@ -81,7 +108,7 @@ class MatchPickBansSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Match
-        ordering = ('-start_time',)
+        # ordering = (,)
         fields = (
             'steam_id',
             'start_time',

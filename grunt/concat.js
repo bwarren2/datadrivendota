@@ -3,15 +3,6 @@ module.exports = {
     options: {
         separator: ';\n'
     },
-    nvd3_extensions: {
-        src: [
-            "setup.js",
-            "models/classDiscreteBar.js",
-        ].map(function(file){
-            return "datadrivendota/static/js/nvd3-extensions/"+file;
-        }),
-      dest: "datadrivendota/static/js/build/nvd3-extensions.js",
-    },
     dist: {
         src: [
             "bower_components/jquery/dist/jquery.min.js",

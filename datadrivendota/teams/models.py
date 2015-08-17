@@ -83,6 +83,9 @@ class Team(models.Model):
         self.update_time = timezone.now()
         super(Team, self).save(*args, **kwargs)
 
+    def __unicode__(self):
+        return self.name
+
 
 def assemble_pros(teams):
     """ Filter out players on teams. """

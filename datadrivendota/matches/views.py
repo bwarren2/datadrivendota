@@ -3,110 +3,12 @@ from itertools import chain
 from django.views.generic import DetailView, ListView
 from django.shortcuts import get_object_or_404
 
-from rest_framework import viewsets, filters
-
 from datadrivendota.views import AjaxView
 from heroes.models import Role
 from utils.views import cast_dict, ability_infodict
+
 from heroes.models import Hero
-from .models import Match, PlayerMatchSummary, PickBan, SkillBuild, GameMode
-
-from .serializers import (
-    MatchSerializer,
-    PlayerMatchSummarySerializer,
-    SkillBuildSerializer,
-    MatchPickBansSerializer,
-    PickbanSerializer,
-)
-
-
-class MatchViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Match.objects.all()
-    paginate_by = 10
-    serializer_class = MatchSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-
-
-class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    serializer_class = MatchPickBansSerializer
-    max_page_size = 200
-    # filter_backends = (filters.SearchFilter,)
-    # search_fields = ('name',)
-
-    def get_queryset(self):
-        queryset = Match.objects.filter(
-            game_mode__in=GameMode.objects.filter(
-                description__icontains='capt'
-            )
-        ).given(self.request).order_by('-start_time')
-
-        limit = self.request.query_params.get(self.page_size_query_param)
-
-        if limit is not None:
-            result_limit = min(limit, self.max_page_size)
-            queryset = queryset[:result_limit]
-        else:
-            queryset = queryset[:self.page_size]
-
-        return queryset.select_related()
-
-
-class PickBanViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = PickBan.objects.all()
-    paginate_by = 10
-    serializer_class = PickbanSerializer
-    # filter_backends = (filters.SearchFilter,)
-    # search_fields = ('name',)
-
-
-class PlayerMatchSummaryViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = PlayerMatchSummarySerializer
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
-
-    def get_queryset(self):
-        queryset = PlayerMatchSummary.objects.given(self.request)
-
-        limit = self.request.query_params.get(self.page_size_query_param)
-
-        if limit is not None:
-            result_limit = min(limit, self.max_page_size)
-            queryset = queryset[:result_limit]
-        else:
-            queryset = queryset[:self.page_size]
-
-        return queryset
-
-
-class SkillBuildViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = SkillBuildSerializer
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-
-    def get_queryset(self):
-        queryset = SkillBuild.objects.all()
-
-        match_id = self.request.query_params.get('match_id')
-        if match_id is not None:
-            queryset = queryset.filter(
-                playermatchsummary__match__steam_id=match_id
-            )
-        else:
-            queryset = queryset[:self.page_size]
-
-        limit = self.request.query_params.get(self.page_size_query_param)
-        if limit is not None:
-            result_limit = min(limit, self.max_page_size)
-            queryset = queryset[:result_limit]
-        else:
-            queryset = queryset[:self.page_size]
-
-        return queryset
+from .models import Match, PlayerMatchSummary, PickBan
 
 
 class MatchDetail(DetailView):
@@ -229,14 +131,22 @@ class ComboboxAjaxView(AjaxView):
     def get_result_data(self, **kwargs):
 
         q = self.request.GET.get('q', '')
-        heroes = [h.name for h in Hero.objects.filter(name__icontains=q)[:5]]
+        heroes = Hero.objects.filter(name__icontains=q)[:5]
         alignments = ['Strength', 'Agility', 'Intelligence', 'nv-point-0']
         matched_alignments = [s for s in alignments if q.lower() in s.lower()]
 
         roles = [r.name for r in Role.objects.filter(name__icontains=q)[:5]]
         results = []
 
-        for i, string in enumerate(chain(heroes, matched_alignments, roles)):
+        for hero in heroes:
+            match_json = {}
+            match_json['id'] = hero.steam_id
+            match_json['label'] = hero.css_id  # Attr
+            match_json['value'] = hero.name  # Goes visible
+
+            results.append(match_json)
+
+        for i, string in enumerate(chain(matched_alignments, roles)):
             match_json = {}
             match_json['id'] = i
             match_json['label'] = 'npc_dota_hero_' + string.lower().replace(

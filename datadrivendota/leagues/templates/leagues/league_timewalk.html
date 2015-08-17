@@ -18,8 +18,16 @@
 
   <div class='row'>
     <div class='col-md-4'>
-        <h4>Hero Winrate</h4>
+        <h4>Hero Picks &amp; Bans</h4>
         <div id='pickban_chart'></div>
+    </div>
+    <div class='col-md-4'>
+        <h4>Hero Winrate</h4>
+        <div id='winrate_chart'></div>
+    </div>
+    <div class='col-md-8'>
+        <h4>Relative Strength</h4>
+        <div id='strength_barchart'></div>
     </div>
   </div>
 
@@ -46,137 +54,52 @@ $(function(){
     minimumInputLength: 3,
   });
 
-
-  var winrate_data;
-  var dossier_data;
-  var working_set;
-
-  Promise.join(
+  Promise.resolve(
     $.ajax(
-      '/rest-api/match-pickban/?'+$.param(
-        {
-          league_id:{{league.steam_id}},
-          page_size:100
-        }
-      )
-    ),
-    $.ajax(
-      '/rest-api/hero-dossiers/?'+$.param(
-        {league_id:{{league.steam_id}}}
+      "/rest-api/matches/?" + $.param(
+        {league_id:{{league.steam_id}}, page_size:300}
       )
     )
-  )
-  .then(function(data){
-      winrate_data = data[0];
-      dossier_data = data[1];
-      var idx = 0;
-      var get_working_set = function(idx){
-        var data = winrate_data.slice(0, idx);
-        return data;
-      }
+  ).then(function(data){
+    winrate_data = data;
+    var idx = 0;
+    var update = function(tick){
+      idx = (idx + tick).mod(winrate_data.length);
+      $(window).trigger('update', idx);
+    }
 
-      working_set = get_working_set(idx);
+    var timer;
+    $(window).on('play', function(){
+      console.log('Playing');
+      timer = setTimeout(
+        function(){
+          update(1);
+        }, 1000);
+    });
+    $(window).on('pause', function(){
+       console.log('Stopping');
+       clearTimeout(timer);
+    });
+    $(window).on('forward', function(){
+      update(1);
+    });
+    $(window).on('back', function(){
+      update(-1);
+    });
 
-      var update = function(tick){
-        idx = (idx + tick).mod(winrate_data.length);
-        $(window).trigger('update', [get_working_set(idx)]);
-      }
+    d7.extensions.charts.heroes.pickban_scatter(
+      '#pickban_chart', {league_id:{{league.steam_id}}, page_size:300}
+    );
+    d7.extensions.charts.heroes.winrate_scatter(
+      '#winrate_chart', {league_id:{{league.steam_id}}, page_size:300}
+    );
+    d7.extensions.charts.heroes.quality_barchart(
+      '#strength_barchart', {league_id:{{league.steam_id}}, page_size:100}
+    );
 
-      // Set up timing controls
-      var timer;
-      $(window).on('play', function(){
-        console.log('Playing');
-        timer = setTimeout(
-          function(){
-            update(1);
-          }, 1000);
-      });
-      $(window).on('pause', function(){
-         console.log('Stopping');
-         clearTimeout(timer);
-      });
-      $(window).on('forward', function(){
-        update(1);
-      });
-      $(window).on('back', function(){
-        update(-1);
-      });
 
   })
-  .then(function(){
 
-      var blank_data = function(dossiers){
-        var return_obj = {};
-        var values_ary = [];
-        var test = dossiers.map(function(h){
-          var steam_id = h.hero.steam_id;
-          values_ary[steam_id] = {
-            picks: 0,
-            bans: 0,
-            wins: 0,
-            losses: 0,
-            hero: h.hero
-          };
-        });
-        return_obj['key'] = 'Winrate';
-        return_obj['values'] = values_ary;
-        return return_obj;
-      }
-
-      var extract = function(working_set, dossier_data){
-        var data = blank_data(dossier_data);
-
-        working_set.map(function(match){
-          pickbans = match.pickbans;
-          pickbans.map(function(pickban){
-            var steam_id = pickban.hero;
-            var is_win = (
-              match.radiant_win && pickban.team == 0 ||
-              !match.radiant_win && pickban.team == 1
-              );
-            if (pickban.is_pick){
-              if(is_win){
-                data.values[steam_id].wins +=1;
-              } else {
-                data.values[steam_id].losses +=1;
-              }
-              data.values[steam_id].picks += 1;
-            } else {
-              data.values[steam_id].bans += 1;
-            }
-          })
-        })
-
-        // Because nvd3 has baked-in assumptions about values being an array starting at 0.
-        values = []
-        data.values.map(function(d){
-          values.push(d);
-        })
-        data.values=values;
-        return [data];
-      };
-
-      plot_data = extract(working_set, dossier_data);
-      callback = function(svg, chart){
-        $(window).on('update', function(e, p1){
-
-          new_data = extract(p1, dossier_data);
-          chart_data = svg.datum(new_data);
-          chart_data.transition().duration(500).call(chart);
-
-
-          nv.utils.windowResize(chart.update);
-        })
-
-      }
-      window.Chartreuse.pickban_scatter_walk(
-        plot_data, '#pickban_chart', callback
-      );
-
-  })
-  .catch(function(e){
-    console.log(e)
-  })
 
 
 })
@@ -184,21 +107,41 @@ $(function(){
 {% endblock extra_js %}
 
 {% block extra_css %}
-  <style type="text/css">
-  .agility{
-    stroke:green;
-    fill:green;
-    stroke-fill:green;
-  }
-  .strength{
-    stroke:red;
-    fill:red;
-    stroke-fill:red;
-  }
-  .intelligence{
-    stroke:blue;
-    fill:blue;
-    stroke-fill:blue;
-  }
-  </style>
+
+<style type="text/css">
+
+.tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(100, 100, 100, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+circle:hover {
+  fill: #F700FF;
+}
+
+/* Style northward tooltips differently */
+/*.tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+*/
+</style>
 {% endblock extra_css %}

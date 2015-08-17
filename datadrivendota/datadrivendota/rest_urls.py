@@ -1,22 +1,22 @@
 from rest_framework.routers import DefaultRouter
-from matches.views import (
+from matches.viewsets import (
     MatchViewSet,
     PlayerMatchSummaryViewSet,
     SkillBuildViewSet,
     MatchPickBanViewSet,
     PickBanViewSet,
 )
-from teams.views import TeamViewSet
-from leagues.views import LeagueViewSet
-from heroes.views import (
+from heroes.viewsets import (
     HeroViewSet,
     HeroDossierViewSet,
     HeroWinrateViewSet,
     HeroPickBanViewSet,
 )
-from items.views import ItemViewSet
-from accounts.views import MatchRequestViewSet
-from players.views import PlayerViewSet, PlayerWinrateViewSet
+from items.viewsets import ItemViewSet
+from teams.viewsets import TeamViewSet
+from leagues.viewsets import LeagueViewSet
+from players.viewsets import PlayerViewSet, PlayerWinrateViewSet
+from accounts.viewsets import MatchRequestViewSet
 
 
 # DRF is great

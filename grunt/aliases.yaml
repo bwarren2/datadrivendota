@@ -12,6 +12,7 @@ js:
     description: "Concat and minify js"
     tasks:
         - "concat"
+        - "browserify"
 prod:
     description: "Prep all assests."
     tasks:
