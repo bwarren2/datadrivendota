@@ -38,11 +38,6 @@ urlpatterns = patterns(
             content_type='text/plain'
         )
     ),
-    url(r'', include('social.apps.django_app.urls', namespace='social'))
-    # Wat? Why are we including this at root? Seems risky. --kit 2014-02-16
-    # Docs recommend it :/
-    # https://python-social-auth.readthedocs.org/en/latest/configuration/django.html
-    # Is there a better option?  --ben 2015-04-19
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.SHOW_LEAGUES:
@@ -85,18 +80,24 @@ if settings.SHOW_PAYMENTS:
         '',
         url(r'^payments/', include("payments.urls")),
     )
+if settings.SHOW_SEARCH:
+    urlpatterns += patterns(
+        '',
+        url(r'^search/$', views.SearchView.as_view(), name='search'),
+    )
 if settings.SHOW_AUTH:
     urlpatterns += patterns(
         '',
         # When django wants a login, redir to social login
         url(r'^login/(?P<method>[^/]+)/$', LoginView.as_view(), name='login'),
         url(r'^login/$', LoginView.as_view(), name='login'),
+        url(r'', include('social.apps.django_app.urls', namespace='social'))
+        # Wat? Why are we including this at root? Seems risky. --kit 2014-02-16
+        # Docs recommend it :/
+        # https://python-social-auth.readthedocs.org/en/latest/configuration/django.html
+        # Is there a better option?  --ben 2015-04-19
     )
-if settings.SHOW_SEARCH:
-    urlpatterns += patterns(
-        '',
-        url(r'^search/$', views.SearchView.as_view(), name='search'),
-    )
+
 
 if settings.DEBUG:
     # static files (images, css, javascript, etc.)
