@@ -202,7 +202,6 @@ $(function () {
     $('#forward-animation').click(function() {
         $(window).trigger('forward');
     });
-
 });
 
 Number.prototype.mod = function(n) {
