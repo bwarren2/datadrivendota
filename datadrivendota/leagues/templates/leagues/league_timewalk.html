@@ -74,22 +74,26 @@ $(function(){
         var data = winrate_data.slice(0, idx);
         return data;
       }
+      $('#progress-bar-current').html(0);
+      $('#progress-bar-max').html(winrate_data.length);
 
       working_set = get_working_set(idx);
 
       var update = function(tick){
+        console.log("Tick");
         idx = (idx + tick).mod(winrate_data.length);
         $(window).trigger('update', [get_working_set(idx)]);
       }
 
       // Set up timing controls
       var timer;
+      function runner() {
+        update(1);
+        timer = setTimeout(runner, 1000);
+      }
       $(window).on('play', function(){
         console.log('Playing');
-        timer = setTimeout(
-          function(){
-            update(1);
-          }, 1000);
+        runner();
       });
       $(window).on('pause', function(){
          console.log('Stopping');
@@ -101,7 +105,14 @@ $(function(){
       $(window).on('back', function(){
         update(-1);
       });
-
+      $(window).on('update', function (evt, position_array) {
+        var width = (position_array.length / winrate_data.length) * 100;
+        $('#progress-bar').css('width', '' + width + '%');
+        $('#progress-bar').attr('aria-valuenow', width);
+        // Update progress bar time.
+        // @TODO make this show time, not ticks?
+        $('#progress-bar-current').html(position_array.length);
+      });
   })
   .then(function(){
 
