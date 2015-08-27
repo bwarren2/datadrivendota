@@ -68,34 +68,39 @@ $(function(){
       $(window).trigger('update', idx);
     }
 
-      // Set up timing controls
-      var timer;
-      function runner() {
-        update(1);
-        timer = setTimeout(runner, 1000);
-      }
-      $(window).on('play', function(){
-        console.log('Playing');
-        runner();
-      });
-      $(window).on('pause', function(){
-         console.log('Stopping');
-         clearTimeout(timer);
-      });
-      $(window).on('forward', function(){
-        update(1);
-      });
-      $(window).on('back', function(){
-        update(-1);
-      });
-      $(window).on('update', function (evt, position_array) {
-        var width = (position_array.length / winrate_data.length) * 100;
-        $('#progress-bar').css('width', '' + width + '%');
-        $('#progress-bar').attr('aria-valuenow', width);
-        // Update progress bar time.
-        // @TODO make this show time, not ticks?
-        $('#progress-bar-current').html(position_array.length);
-      });
+    $('#progress-bar-current').html(0);
+    $('#progress-bar-max').html(winrate_data.length);
+
+
+    // Set up timing controls
+    var timer;
+    function runner() {
+      update(1);
+      timer = setTimeout(runner, 1000);
+    }
+    $(window).on('play', function(){
+      console.log('Playing');
+      runner();
+    });
+    $(window).on('pause', function(){
+       console.log('Stopping');
+       clearTimeout(timer);
+    });
+    $(window).on('forward', function(){
+      update(1);
+    });
+    $(window).on('back', function(){
+      update(-1);
+    });
+
+    $(window).on('update', function (evt, idx) {
+      var width = (idx / winrate_data.length) * 100;
+      $('#progress-bar').css('width', '' + width + '%');
+      $('#progress-bar').attr('aria-valuenow', width);
+      // Update progress bar time.
+      // @TODO make this show time, not ticks?
+      $('#progress-bar-current').html(idx);
+    });
 
     d7.extensions.charts.heroes.pickban_scatter(
       '#pickban_chart', {league_id:{{league.steam_id}}, page_size:300}
