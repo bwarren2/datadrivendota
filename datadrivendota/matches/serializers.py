@@ -15,9 +15,6 @@ class MyStringRelatedField(RelatedField):
         super(MyStringRelatedField, self).__init__(**kwargs)
 
     def to_representation(self, value):
-        print '$'
-        print type(value.name), value.name
-        print '$'
         if value.name is None:
             return ''
         else:

@@ -18,7 +18,7 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ('name',)
     page_size = 10
     page_size_query_param = 'page_size'
-    max_page_size = 200
+    max_page_size = 400
 
     def get_queryset(self):
         queryset = Match.objects.all()\
@@ -42,7 +42,7 @@ class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
     page_size = 10
     page_size_query_param = 'page_size'
     serializer_class = MatchPickBansSerializer
-    max_page_size = 200
+    max_page_size = 400
 
     def get_queryset(self):
         queryset = Match.objects.filter(
@@ -51,6 +51,7 @@ class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
             )
         )\
             .prefetch_related('pickban_set__hero')\
+            .prefetch_related('pickban_set__hero__herodossier')\
             .prefetch_related('pickban_set')\
             .given(self.request)\
             .order_by('start_time')

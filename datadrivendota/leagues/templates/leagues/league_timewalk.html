@@ -25,6 +25,16 @@
         <h4>Hero Winrate</h4>
         <div id='winrate_chart' class='vert-md-1'></div>
     </div>
+    <div class='col-md-4'>
+        <h4>Current Match</h4>
+        <div id='current_match' class='vert-md-1'>
+        <h3 id='match_id'></h3>
+        <h3 id='duration'></h3>
+        <h3 id='start_time'></h3>
+        <p id='radiant_team'></p>
+        <p id='dire_team'></p>
+        </div>
+    </div>
     <div class='col-md-8'>
         <h4>Relative Strength</h4>
         <div id='strength_barchart' class='vert-md-1'></div>
@@ -61,15 +71,15 @@ $(function(){
       )
     )
   ).then(function(data){
-    winrate_data = data;
+    match_data = data;
     var idx = 0;
     var update = function(tick){
-      idx = (idx + tick).mod(winrate_data.length);
+      idx = (idx + tick).mod(match_data.length);
       $(window).trigger('update', idx);
     }
 
     $('#progress-bar-current').html(0);
-    $('#progress-bar-max').html(winrate_data.length);
+    $('#progress-bar-max').html(match_data.length);
 
 
     // Set up timing controls
@@ -94,12 +104,23 @@ $(function(){
     });
 
     $(window).on('update', function (evt, idx) {
-      var width = (idx / winrate_data.length) * 100;
+
+      // Progbar
+      var width = (idx / match_data.length) * 100;
       $('#progress-bar').css('width', '' + width + '%');
       $('#progress-bar').attr('aria-valuenow', width);
       // Update progress bar time.
       // @TODO make this show time, not ticks?
       $('#progress-bar-current').html(idx);
+
+      //Match card
+      var current_match = match_data[idx]
+      $('#match_id').html(current_match.steam_id)
+      $('#duration').html(current_match.duration)
+      $('#start_time').html(current_match.start_time)
+      $('#radiant_team').html(current_match.radiant_team)
+      $('#dire_team').html(current_match.dire_team)
+      console.log(current_match);
     });
 
     d7.extensions.charts.heroes.pickban_scatter(
