@@ -19,15 +19,15 @@
   <div class='row'>
     <div class='col-md-4'>
         <h4>Hero Picks &amp; Bans</h4>
-        <div id='pickban_chart'></div>
+        <div id='pickban_chart' class='vert-md-1'></div>
     </div>
     <div class='col-md-4'>
         <h4>Hero Winrate</h4>
-        <div id='winrate_chart'></div>
+        <div id='winrate_chart' class='vert-md-1'></div>
     </div>
     <div class='col-md-8'>
         <h4>Relative Strength</h4>
-        <div id='strength_barchart'></div>
+        <div id='strength_barchart' class='vert-md-1'></div>
     </div>
   </div>
 
@@ -143,6 +143,9 @@ $(function(){
   text-align: center;
 }
 
+.vert-md-1{
+  height:303px;
+}
 circle:hover {
   fill: #F700FF;
 }
