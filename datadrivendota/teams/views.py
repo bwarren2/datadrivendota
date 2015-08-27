@@ -4,11 +4,8 @@ from django.views.generic import ListView, DetailView
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
-from rest_framework import viewsets, filters
-
 from utils.pagination import SmarterPaginator
 
-from .serializers import TeamSerializer
 from .models import Team
 from matches.models import Match
 
@@ -70,15 +67,3 @@ class TeamDetail(DetailView):
             'min_date': min_date.isoformat(),
         }
         return super(TeamDetail, self).get_context_data(**context)
-
-
-class TeamViewSet(viewsets.ReadOnlyModelViewSet):
-
-    """ List and detail for teams. """
-
-    queryset = Team.objects.all()
-    serializer_class = TeamSerializer
-    lookup_field = 'steam_id'
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    paginate_by = 10

@@ -1,14 +1,13 @@
 from django.views.generic import ListView, DetailView, TemplateView
 from django.shortcuts import get_object_or_404
 
-from rest_framework import viewsets, filters
-
 from utils.pagination import SmarterPaginator
-
 from datadrivendota.views import JsonApiView
+
 from .models import League, ScheduledMatch
-from .serializers import LeagueSerializer
+
 from matches.models import Match
+
 from datadrivendota.redis_app import (
     get_games,
     timeline_key,
@@ -134,20 +133,6 @@ class LiveGameDetailView(TemplateView):
         return super(LiveGameDetailView, self).get_context_data(**context)
 
 
-class LeagueViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = League.objects.all()
-    serializer_class = LeagueSerializer
-    lookup_field = 'steam_id'
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    paginate_by = 10
-
-
-def get_duration(game):
-    """ Helper function for sorting."""
-    return game['scoreboard']['duration'] if 'scoreboard' in game else 0
-
-
 class ApiLiveGamesList(JsonApiView):
 
     def fetch_json(self, *args, **kwargs):
@@ -185,3 +170,8 @@ class ApiLiveGameSlice(JsonApiView):
             return data
         else:
             self.fail()
+
+
+def get_duration(game):
+    """ Helper function for sorting."""
+    return game['scoreboard']['duration'] if 'scoreboard' in game else 0

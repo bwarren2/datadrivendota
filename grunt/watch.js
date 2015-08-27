@@ -15,7 +15,7 @@ module.exports = {
         "js/**/*.js",
         "bower_components/**/*.js",
       ].map(function(filename){return "datadrivendota/static/"+filename;}),
-      tasks: ["concat"],
+      tasks: ["concat", "browserify"],
       options: {
         nospawn: true
       }
