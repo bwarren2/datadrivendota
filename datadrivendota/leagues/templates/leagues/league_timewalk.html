@@ -46,6 +46,7 @@
 
 
 {% block extra_js %}
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js'></script>
 <script type="text/javascript">
 $(function(){
 
@@ -115,11 +116,15 @@ $(function(){
 
       //Match card
       var current_match = match_data[idx]
-      $('#match_id').html(current_match.steam_id)
-      $('#duration').html(current_match.duration)
-      $('#start_time').html(current_match.start_time)
-      $('#radiant_team').html(current_match.radiant_team)
-      $('#dire_team').html(current_match.dire_team)
+      $('#match_id').html("Match #: " + current_match.steam_id)
+
+      var start_time = moment.unix(current_match.start_time).format("dddd, MMMM Do YYYY, h:mm:ss a");
+      var duration = moment.duration(current_match.duration*1000).asMinutes().toFixed(2);
+
+      $('#duration').html(duration+' minutes');
+      $('#start_time').html(start_time);
+      $('#radiant_team').html(current_match.radiant_team);
+      $('#dire_team').html(current_match.dire_team);
       console.log(current_match);
     });
 
