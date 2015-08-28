@@ -6,7 +6,7 @@ from .serializers import (
     MatchSerializer,
     PlayerMatchSummarySerializer,
     SkillBuildSerializer,
-    MatchPickBansSerializer,
+    FastMatchPickBansSerializer,
     PickbanSerializer,
 )
 
@@ -41,30 +41,73 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
 class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
     page_size = 10
     page_size_query_param = 'page_size'
-    serializer_class = MatchPickBansSerializer
+    serializer_class = FastMatchPickBansSerializer
     max_page_size = 400
 
-    def get_queryset(self):
-        queryset = Match.objects.filter(
+    def _get_matches(self):
+        matches = Match.objects.filter(
             game_mode__in=GameMode.objects.filter(
                 description__icontains='capt'
             )
         )\
-            .prefetch_related('pickban_set__hero')\
-            .prefetch_related('pickban_set__hero__herodossier')\
-            .prefetch_related('pickban_set')\
             .given(self.request)\
-            .order_by('start_time')
+            .order_by('start_time')\
+            .values('steam_id')
 
         limit = self.request.query_params.get(self.page_size_query_param)
-
         if limit is not None:
             result_limit = min(limit, self.max_page_size)
-            queryset = queryset[:result_limit]
+            matches = matches[:result_limit]
         else:
-            queryset = queryset[:self.page_size]
+            matches = matches[:self.page_size]
+        return matches
 
-        return queryset.select_related()
+    def _get_pickban_queryset(self, matches):
+        return Match.objects.filter(steam_id__in=matches)\
+            .prefetch_related('pickban_set__hero')\
+            .prefetch_related('pickban_set')\
+            .values(
+                'steam_id',
+                'start_time',
+                'radiant_win',
+                'duration',
+                'pickban__is_pick',
+                'pickban__team',
+                'pickban__order',
+                'pickban__hero__steam_id',
+        )
+
+    def _refactor_pickbans(self, pickban_queryset):
+        temp = {}
+        for m in pickban_queryset:
+
+            sid = m['steam_id']
+            if sid not in temp:
+                temp[sid] = {
+                    'steam_id': sid,
+                    'start_time': m['start_time'],
+                    'radiant_win': m['radiant_win'],
+                    'pickbans': []
+                }
+            temp[sid]['pickbans'].append(
+                {
+                    'hero': {'steam_id': m['pickban__hero__steam_id']},
+                    'is_pick': m['pickban__is_pick'],
+                    'team': m['pickban__team'],
+                    'order': m['pickban__order'],
+                }
+            )
+
+        return temp.values()
+
+    def get_queryset(self):
+        import time
+        print time.time()
+        matches = self._get_matches()
+        pickban_queryset = self._get_pickban_queryset(matches)
+        data = self._refactor_pickbans(pickban_queryset)
+        print time.time()
+        return data
 
 
 class PickBanViewSet(viewsets.ReadOnlyModelViewSet):

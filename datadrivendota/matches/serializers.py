@@ -88,8 +88,18 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
         )
 
 
+from heroes.models import Hero
+
+
+class HeroStubSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Hero
+        fields = ('steam_id',)
+
+
 class PickbanSerializer(serializers.ModelSerializer):
-    hero = HeroSerializer()
+    hero = HeroStubSerializer()
 
     class Meta:
         model = PickBan
@@ -112,3 +122,22 @@ class MatchPickBansSerializer(serializers.ModelSerializer):
             'radiant_win',
             'pickbans',
         )
+
+
+class FastHeroStubSerializer(serializers.Serializer):
+    steam_id = serializers.IntegerField()
+
+
+class FastPickbanSerializer(serializers.Serializer):
+    is_pick = serializers.BooleanField()
+    team = serializers.IntegerField()
+    order = serializers.IntegerField()
+    hero = HeroStubSerializer()
+
+
+class FastMatchPickBansSerializer(serializers.Serializer):
+
+    steam_id = serializers.IntegerField()
+    start_time = serializers.IntegerField()
+    radiant_win = serializers.BooleanField()
+    pickbans = FastPickbanSerializer(many=True, read_only=True)
