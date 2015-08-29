@@ -208,7 +208,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    # 'payments.middleware.ActiveSubscriptionMiddleware',
+    'payments.middleware.ActiveSubscriptionMiddleware',
 )
 # END MIDDLEWARE CONFIGURATION
 

@@ -4,6 +4,7 @@ from players.serializers import PlayerSerializer
 from heroes.serializers import HeroSerializer
 import six
 from rest_framework.relations import RelatedField
+from heroes.models import Hero
 
 
 class MyStringRelatedField(RelatedField):
@@ -86,9 +87,6 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
             'match',
             'skillbuild',
         )
-
-
-from heroes.models import Hero
 
 
 class HeroStubSerializer(serializers.ModelSerializer):
