@@ -7,34 +7,34 @@ from matches.mommy_recipes import make_league_match
 from matches.models import PickBan, Match, GameMode
 
 
-# class TestUrlconf(TestCase):
+class TestUrlconf(TestCase):
 
-#     @classmethod
-#     def setUpClass(cls):
-#         super(TestUrlconf, cls).setUpClass()
-#         cls.match = mommy.make_recipe('matches.match')
+    @classmethod
+    def setUpClass(cls):
+        super(TestUrlconf, cls).setUpClass()
+        cls.match = mommy.make_recipe('matches.match')
 
-#     def test_url_ok(self):
-#         c = Client()
+    def test_url_ok(self):
+        c = Client()
 
-#         resp = c.get(reverse('matches:index'))
-#         self.assertEqual(resp.status_code, 200)
+        resp = c.get(reverse('matches:index'))
+        self.assertEqual(resp.status_code, 200)
 
-#         resp = c.get(
-#             reverse(
-#                 'matches:detail',
-#                 kwargs={'match_id': self.match.steam_id}
-#             )
-#         )
-#         self.assertEqual(resp.status_code, 200)
+        resp = c.get(
+            reverse(
+                'matches:detail',
+                kwargs={'match_id': self.match.steam_id}
+            )
+        )
+        self.assertEqual(resp.status_code, 200)
 
-#         resp = c.get(
-#             reverse(
-#                 'matches:detail',
-#                 kwargs={'match_id': -1}
-#             )
-#         )
-#         self.assertEqual(resp.status_code, 404)
+        resp = c.get(
+            reverse(
+                'matches:detail',
+                kwargs={'match_id': -1}
+            )
+        )
+        self.assertEqual(resp.status_code, 404)
 
 
 class TestTrickyViewsets(TestCase):
