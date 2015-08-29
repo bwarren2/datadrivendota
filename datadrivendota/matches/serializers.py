@@ -5,6 +5,8 @@ from heroes.serializers import HeroSerializer
 import six
 from rest_framework.relations import RelatedField
 
+from heroes.serializers import FastHeroStubSerializer, HeroStubSerializer
+
 
 class MyStringRelatedField(RelatedField):
 
@@ -15,9 +17,6 @@ class MyStringRelatedField(RelatedField):
         super(MyStringRelatedField, self).__init__(**kwargs)
 
     def to_representation(self, value):
-        print '$'
-        print type(value.name), value.name
-        print '$'
         if value.name is None:
             return ''
         else:
@@ -92,7 +91,7 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
 
 
 class PickbanSerializer(serializers.ModelSerializer):
-    hero = HeroSerializer()
+    hero = HeroStubSerializer()
 
     class Meta:
         model = PickBan
@@ -115,3 +114,18 @@ class MatchPickBansSerializer(serializers.ModelSerializer):
             'radiant_win',
             'pickbans',
         )
+
+
+class FastPickbanSerializer(serializers.Serializer):
+    is_pick = serializers.BooleanField()
+    team = serializers.IntegerField()
+    order = serializers.IntegerField()
+    hero = FastHeroStubSerializer()
+
+
+class FastMatchPickBansSerializer(serializers.Serializer):
+
+    steam_id = serializers.IntegerField()
+    start_time = serializers.IntegerField()
+    radiant_win = serializers.BooleanField()
+    pickbans = FastPickbanSerializer(many=True, read_only=True)

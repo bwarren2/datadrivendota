@@ -6,19 +6,6 @@ $(function () {
         theme: 'future'
     };
 
-    $('#combo-select').select2({
-        ajax: {
-            delay: 250,
-            url:'/matches/api/combobox_tags/',
-            processResults: function (data) {
-                var res = data.results.map(function (elt) {
-                    return {id: elt.label, text: elt.value};
-                })
-                return {results: res};
-            },
-        },
-        minimumInputLength: 3,
-    });
 
     $('#contact-link').click(function () {
         if ($('#IntercomDefaultWidget').length) {
@@ -150,6 +137,22 @@ $(function () {
     }
 
     window.comboBox = comboBox;
+
+    window.comboBox();
+    $('#combo-select').select2({
+        ajax: {
+          delay: 250,
+          url:'/matches/api/combobox_tags/',
+          processResults: function (data) {
+            var res = data.results.map(function (elt) {
+             return {id: elt.label, text: elt.value}; }
+            )
+            return {results: res};
+          },
+        },
+        minimumInputLength: 3,
+    });
+
 
     function show_progress_bar (identifier) {
         var progressbar = $('<div>');

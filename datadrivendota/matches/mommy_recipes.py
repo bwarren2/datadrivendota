@@ -11,7 +11,7 @@ from heroes.models import Ability
 match = Recipe(
     Match,
     steam_id=seq(1),
-    )
+)
 
 game_mode = Recipe(
     GameMode,
@@ -29,7 +29,7 @@ playermatchsummary = Recipe(
     item_3=foreign_key(item),
     item_4=foreign_key(item),
     item_5=foreign_key(item),
-    )
+)
 
 
 def make_pmses(hero=None, player=None, skill=0, qty=1):
@@ -203,3 +203,41 @@ def make_matchset():
     )
 
     return h, p
+
+
+def make_league_match():
+
+    gm = GameMode.objects.get(steam_id=2)
+    match = mommy.make_recipe('matches.match', game_mode=gm)
+
+    i = mommy.make('items.item', thumbshot=None, mugshot=None)
+    heroes = mommy.make_recipe('heroes.hero', _quantity=20)
+    picks = heroes[:10]
+    bans = heroes[10:]
+    for pick in picks:
+        mommy.make(
+            'matches.playermatchsummary',
+            hero=pick,
+            match=match,
+            match__validity=Match.LEGIT,
+            item_0=i,
+            item_1=i,
+            item_2=i,
+            item_3=i,
+            item_4=i,
+            item_5=i,
+        )
+        mommy.make(
+            'matches.pickban',
+            match=match,
+            hero=pick,
+            is_pick=True
+        )
+
+    for ban in bans:
+        mommy.make(
+            'matches.pickban',
+            match=match,
+            hero=ban,
+            is_pick=False
+        )

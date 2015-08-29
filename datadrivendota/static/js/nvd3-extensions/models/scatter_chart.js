@@ -239,8 +239,11 @@ var scatter_chart = function() {
             });
 
             points
-                .on("mouseover", tip.show)
-                .on("mouseout", tip.hide);
+                .on("mouseenter", function(d, i){
+                    tip.show(d, i);
+                    setTimeout(tip.hide, 3000);
+                })
+                .on("mouseleave", tip.hide);
 
 
             // store old scales for use in transitions on update
