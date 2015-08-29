@@ -14,7 +14,19 @@ var classify_points = function(destination){
     "class",
     function(d){
         var hero = d[0].hero;
-        return d3.select(this).attr("class") + " "+ hero.css_classes;
+        return d3.select(this).attr("class") + " hero-datum "+ hero.css_classes;
+    }
+  );
+}
+
+var classify_bars = function(destination){
+
+  var place = destination + " rect.discreteBar";
+  d3.selectAll(place).attr(
+    "class",
+    function(d){
+        var hero = d.hero;
+        return d3.select(this).attr("class") + " hero-datum "+ hero.css_classes;
     }
   );
 }
@@ -37,6 +49,7 @@ var pickban_scatter = function(destination, params){
     winrate_data = data[0];
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);
+    $(destination).empty();
     return winrate_data.slice(0, 1);
   })
   .then(function(working_set){
@@ -48,7 +61,6 @@ var pickban_scatter = function(destination, params){
     var svg = utils.svg.square_svg(destination);
     var xlab = "# Games Banned";
     var ylab = "# Games Picked";
-
     nv.addGraph(
 
       function(){
@@ -120,6 +132,7 @@ var winrate_scatter = function(destination, params){
     winrate_data = data[0];
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);
+    $(destination).empty();
     return winrate_data.slice(0, 1);
 
   })
@@ -213,6 +226,7 @@ var quality_barchart = function(destination, params){
     winrate_data = data[0];
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);
+    $(destination).empty();
     return winrate_data.slice(0, 1);
   })
   .then(function(working_set){
@@ -237,7 +251,6 @@ var quality_barchart = function(destination, params){
     nv.addGraph(
 
       function(){
-        console.log(models);
         chart = models.discrete_bar_chart()
           .margin({
             left: 45,
@@ -258,7 +271,7 @@ var quality_barchart = function(destination, params){
 
       function(chart){
 
-        classify_points(destination);
+        classify_bars(destination);
 
         $(window).on(
           "update",

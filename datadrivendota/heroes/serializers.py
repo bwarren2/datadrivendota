@@ -81,3 +81,14 @@ class HeroPickBanSerializer(serializers.Serializer):
             'bans',
             'pick_or_bans',
         )
+
+
+class HeroStubSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Hero
+        fields = ('steam_id',)
+
+
+class FastHeroStubSerializer(serializers.Serializer):
+    steam_id = serializers.IntegerField()

@@ -4,7 +4,8 @@ from players.serializers import PlayerSerializer
 from heroes.serializers import HeroSerializer
 import six
 from rest_framework.relations import RelatedField
-from heroes.models import Hero
+
+from heroes.serializers import FastHeroStubSerializer, HeroStubSerializer
 
 
 class MyStringRelatedField(RelatedField):
@@ -89,13 +90,6 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
         )
 
 
-class HeroStubSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Hero
-        fields = ('steam_id',)
-
-
 class PickbanSerializer(serializers.ModelSerializer):
     hero = HeroStubSerializer()
 
@@ -122,15 +116,11 @@ class MatchPickBansSerializer(serializers.ModelSerializer):
         )
 
 
-class FastHeroStubSerializer(serializers.Serializer):
-    steam_id = serializers.IntegerField()
-
-
 class FastPickbanSerializer(serializers.Serializer):
     is_pick = serializers.BooleanField()
     team = serializers.IntegerField()
     order = serializers.IntegerField()
-    hero = HeroStubSerializer()
+    hero = FastHeroStubSerializer()
 
 
 class FastMatchPickBansSerializer(serializers.Serializer):
