@@ -94,6 +94,23 @@ $(function(){
     $(window).on('back', function(){
       update(-1);
     });
+    var isDragging = false;
+    $('#progress-bar').mousedown(function (evt) {
+        isDragging = true;
+        // Brittle af
+        var progressBarWidth = $(evt.currentTarget).children('span').width();
+        idx = ((evt.offsetX / progressBarWidth) * winrate_data.length) | 0;
+        $(window).trigger('update', idx);
+    }).mousemove(function (evt) {
+        if (isDragging) {
+            // Brittle af
+            var progressBarWidth = $(evt.currentTarget).children('span').width();
+            idx = ((evt.offsetX / progressBarWidth) * winrate_data.length) | 0;
+            $(window).trigger('update', idx);
+        }
+    }).mouseup(function (evt) {
+        isDragging = false;
+    });
 
     $(window).on('update', function (evt, idx) {
 
