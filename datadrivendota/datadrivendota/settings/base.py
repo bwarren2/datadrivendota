@@ -491,17 +491,17 @@ BLOG_ENTRIES_PER_RSS = 5
 
 
 # Feature flagging:
-SHOW_ACCOUNTS = getenv('SHOW_ACCOUNTS', False)
-SHOW_AUTH = getenv('SHOW_AUTH', False)
-SHOW_BLOG = getenv('SHOW_BLOG', False)
-SHOW_HEROES = getenv('SHOW_HEROES', False)
-SHOW_ITEMS = getenv('SHOW_ITEMS', False)
-SHOW_LEAGUES = getenv('SHOW_LEAGUES', False)
-SHOW_MATCHES = getenv('SHOW_MATCHES', False)
-SHOW_PAYMENTS = getenv('SHOW_PAYMENTS', False)
-SHOW_PLAYERS = getenv('SHOW_PLAYERS', False)
-SHOW_SEARCH = getenv('SHOW_SEARCH', False)
-SHOW_TEAMS = getenv('SHOW_TEAMS', False)
+SHOW_ACCOUNTS = getenv('SHOW_ACCOUNTS', False) == 'True'
+SHOW_AUTH = getenv('SHOW_AUTH', False) == 'True'
+SHOW_BLOG = getenv('SHOW_BLOG', False) == 'True'
+SHOW_HEROES = getenv('SHOW_HEROES', False) == 'True'
+SHOW_ITEMS = getenv('SHOW_ITEMS', False) == 'True'
+SHOW_LEAGUES = getenv('SHOW_LEAGUES', False) == 'True'
+SHOW_MATCHES = getenv('SHOW_MATCHES', False) == 'True'
+SHOW_PAYMENTS = getenv('SHOW_PAYMENTS', False) == 'True'
+SHOW_PLAYERS = getenv('SHOW_PLAYERS', False) == 'True'
+SHOW_SEARCH = getenv('SHOW_SEARCH', False) == 'True'
+SHOW_TEAMS = getenv('SHOW_TEAMS', False) == 'True'
 
 FEATURE_FLAGS = [
     'SHOW_ACCOUNTS',
