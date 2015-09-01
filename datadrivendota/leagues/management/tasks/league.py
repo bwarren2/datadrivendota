@@ -199,7 +199,7 @@ class MirrorRecentLeagues(Task):
         recent_games.update(recent_schedule)
 
         updatable = League.objects.exclude(image_ugc=None).filter(
-            valve_cdn_image=None
+            stored_image=''
         )
         recent_games.update(set([t.steam_id for t in updatable]))
 
