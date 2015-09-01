@@ -147,8 +147,7 @@ class UpdateLeagueLogo(ApiFollower):
             resp = requests.get(url)
             if resp.status_code == 200:
                 buff = BytesIO(resp.content)
-                _ = buff.seek(0)  # Stop random printing.
-                _ = _  # Stop the linting.
+                _ = buff.seek(0)  # NOQA
                 filename = slugify(league.steam_id) + '_full.png'
                 league.stored_image.save(filename, File(buff))
             league.save()
