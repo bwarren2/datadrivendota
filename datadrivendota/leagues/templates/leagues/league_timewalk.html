@@ -19,13 +19,13 @@
   <div class='row'>
     <div class='col-md-4'>
         <h4>Hero Picks &amp; Bans</h4>
-        <div id='pickban_chart' class='vert-md-1'>
+        <div id='pickban_chart' class='vert-md-1 chart'>
           <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
         </div>
     </div>
     <div class='col-md-4'>
         <h4>Hero Winrate</h4>
-        <div id='winrate_chart' class='vert-md-1'>
+        <div id='winrate_chart' class='vert-md-1 chart'>
           <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
         </div>
     </div>
@@ -60,7 +60,7 @@
     </div>
     <div class='col-md-8'>
         <h4>Relative Strength</h4>
-        <div id='strength_barchart' class='vert-md-1'>
+        <div id='strength_barchart' class='vert-md-1 chart'>
           <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
         </div>
     </div>
@@ -119,20 +119,20 @@ $(function(){
     });
     var isDragging = false;
     $('#progress-bar').mousedown(function (evt) {
-        isDragging = true;
+      isDragging = true;
+      // Brittle af
+      var progressBarWidth = $(evt.currentTarget).children('span').width();
+      idx = ((evt.offsetX / progressBarWidth) * match_data.length) | 0;
+      $(window).trigger('update', idx);
+    }).mousemove(function (evt) {
+      if (isDragging) {
         // Brittle af
         var progressBarWidth = $(evt.currentTarget).children('span').width();
         idx = ((evt.offsetX / progressBarWidth) * match_data.length) | 0;
         $(window).trigger('update', idx);
-    }).mousemove(function (evt) {
-        if (isDragging) {
-            // Brittle af
-            var progressBarWidth = $(evt.currentTarget).children('span').width();
-            idx = ((evt.offsetX / progressBarWidth) * match_data.length) | 0;
-            $(window).trigger('update', idx);
-        }
+      }
     }).mouseup(function (evt) {
-        isDragging = false;
+      isDragging = false;
     });
 
     doss_map = []
@@ -198,8 +198,35 @@ $(function(){
       '#strength_barchart', {league_id:{{league.steam_id}}, page_size:300}
     );
 
-  })
-})
+  });
+
+  // Highlights
+  $('.chart')
+  .on(
+    "mouseenter", ".nv-point, rect",
+    function (evt) {
+      var hero = $(evt.currentTarget).data('hero');
+      $('[data-hero=' + hero + ']').each(function () {
+        var target = $(this);
+        var classes = target.attr('class').split(' ');
+        classes.push('hover');
+        target.attr('class', classes.join(' '));
+      });
+    }
+  ).on(
+    "mouseleave", ".nv-point, rect",
+    function (evt) {
+      var hero = $(evt.currentTarget).data('hero');
+      $('[data-hero=' + hero + ']').each(function () {
+        var target = $(this);
+        var classes = target.attr('class').split(' ').filter( function (e) {
+            return e !== 'hover';
+        });
+        target.attr('class', classes.join(' '));
+      });
+    }
+  );
+});
 </script>
 {% endblock extra_js %}
 
