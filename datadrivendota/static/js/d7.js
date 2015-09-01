@@ -23008,7 +23008,9 @@ var pickban_scatter = function(destination, params){
             bottom: 45,
           })
           .x(function(d){return d.bans;})
-          .y(function(d){return d.picks;});
+          .y(function(d){return d.picks;})
+          .showLegend(false);
+
 
         chart.contentGenerator(
           tooltips.hero_tooltip(
@@ -23097,7 +23099,8 @@ var winrate_scatter = function(destination, params){
           .y(function(d){
             if (d.wins + d.losses === 0) return 0;
             else { return 100 * d.wins / (d.wins + d.losses); }
-          });
+          })
+          .showLegend(false);
 
 
         chart.contentGenerator(
@@ -23196,7 +23199,6 @@ var quality_barchart = function(destination, params){
           .x(function(d){return d.hero.name;})
           .y(function(d){return strength(d);})
           .showXAxis(false);
-
 
         chart.xAxis.axisLabel(xlab);
         chart.yAxis.axisLabel(ylab).axisLabelDistance(-20);
