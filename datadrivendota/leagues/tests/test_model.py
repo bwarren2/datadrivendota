@@ -1,13 +1,11 @@
-from io import BytesIO
 from datetime import timedelta
 
-from django.utils.text import slugify
-from django.core.files import File
 from django.templatetags.static import static
 from django.test import TestCase
 from django.utils import timezone
 
 from model_mommy import mommy
+from utils.file_management import fake_image
 
 
 class TestModelMethods(TestCase):
@@ -49,12 +47,3 @@ class TestModelMethods(TestCase):
         l = fake_image(l)
         self.assertNotEqual(l.image, static('blank_league.png'))
         l.delete()
-
-
-def fake_image(l):
-    buff = BytesIO('11')
-    _ = buff.seek(0)  # Stop random printing.
-    _ = _  # Stop the linting.
-    filename = slugify(l.steam_id) + '_full.png'
-    l.stored_image.save(filename, File(buff))
-    return l

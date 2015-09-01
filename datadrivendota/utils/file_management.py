@@ -1,3 +1,7 @@
+from io import BytesIO
+from django.utils.text import slugify
+from django.core.files import File
+
 from uuid import uuid4
 from django.core.files.storage import default_storage
 
@@ -18,3 +22,12 @@ def s3_file(myfile, chosen_name=None):
     s3file.write(myfile.read())
     s3file.close()
     return s3file
+
+
+def fake_image(l):
+    buff = BytesIO('11')
+    _ = buff.seek(0)  # Stop random printing.
+    _ = _  # Stop the linting.
+    filename = slugify(l.steam_id) + '_full.png'
+    l.stored_image.save(filename, File(buff))
+    return l

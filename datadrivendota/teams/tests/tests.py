@@ -3,6 +3,7 @@ from django.test import TestCase, Client
 from model_mommy import mommy
 from django.utils import timezone
 from datetime import timedelta
+from utils.file_management import fake_image
 
 
 class TestModelMethods(TestCase):
@@ -19,19 +20,19 @@ class TestModelMethods(TestCase):
 
     def test_outdated(self):
         self.team.update_time = timezone.now() - timedelta(weeks=10)
-        self.team.valve_cdn_image = None
+        self.team.stored_image = None
         self.assertEqual(self.team.is_outdated, True)
 
+        self.team = fake_image(self.team)
         self.team.update_time = timezone.now() - timedelta(weeks=10)
-        self.team.valve_cdn_image = 'http://www.whatever.com/test.png'
         self.assertEqual(self.team.is_outdated, False)
 
         self.team.update_time = timezone.now()
-        self.team.valve_cdn_image = None
+        self.team.stored_image = None
         self.assertEqual(self.team.is_outdated, False)
 
+        self.team = fake_image(self.team)
         self.team.update_time = timezone.now()
-        self.team.valve_cdn_image = 'http://www.whatever.com/test.png'
         self.assertEqual(self.team.is_outdated, False)
 
 
@@ -58,20 +59,12 @@ class TestUrlconf(TestCase):
 
     def test_image(self):
 
-        t = mommy.make('teams.team', valve_cdn_image=None)
+        t = mommy.make('teams.team', stored_image=None)
         self.assertEqual(t.image, static('blank_team.png'))
         t.delete()
 
-        t = mommy.make('teams.team', valve_cdn_image='hi.png')
+        t = mommy.make('teams.team')
+        t = fake_image(t)
+
         self.assertNotEqual(t.image, static('blank_team.png'))
-        t.delete()
-
-    def test_sponsor_image(self):
-
-        t = mommy.make('teams.team', valve_cdn_image=None)
-        self.assertEqual(t.sponsor_image, static('blank_team.png'))
-        t.delete()
-
-        t = mommy.make('teams.team', valve_cdn_image='hi.png')
-        self.assertNotEqual(t.sponsor_image, static('blank_team.png'))
         t.delete()
