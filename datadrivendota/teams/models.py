@@ -16,7 +16,6 @@ class Team(models.Model):
     created = models.IntegerField(null=True)
     rating = models.CharField(max_length=50, null=True)
     logo = models.BigIntegerField(null=True)
-    logo_sponsor = models.BigIntegerField(null=True)
     country_code = models.CharField(max_length=10, null=True)
     url = models.CharField(max_length=200, null=True)
     games_played_with_current_roster = models.IntegerField(null=True)
@@ -43,9 +42,7 @@ class Team(models.Model):
         null=True, help_text='Steam cdn image url'
     )
     image_ugc = models.BigIntegerField(null=True)  # Through live league games
-    valve_cdn_sponsor_image = models.TextField(
-        null=True, help_text='Steam cdn sponsor image url'
-    )
+    stored_image = models.ImageField(null=True, upload_to='teams/img/')
     update_time = models.DateTimeField(default=timezone.now)
 
     objects = models.Manager()
@@ -54,21 +51,15 @@ class Team(models.Model):
 
     @property
     def image(self):
-        return self.valve_cdn_image or static('blank_team.png')
-
-    @property
-    def sponsor_image(self):
-        # Sponsor images are shaped identially to team images, so
-        # a separate file is not needed.
-        return self.valve_cdn_image or static('blank_team.png')
+        try:
+            return self.stored_image.url
+        except ValueError:
+            return static('blank_team.png')
 
     @property
     def is_outdated(self):
         if (
-            (
-                self.valve_cdn_image is None
-                or self.valve_cdn_image == ''
-            )
+            self.image == static('blank_team.png')
             and self.update_time < (
                 timezone.now() - timedelta(
                     seconds=settings.UPDATE_LAG_UTC

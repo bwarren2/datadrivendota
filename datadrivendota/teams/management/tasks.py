@@ -1,5 +1,13 @@
+from io import BytesIO
 from time import time
+import sys
+
+import requests
+
+from django.utils.text import slugify
+from django.core.files import File
 from django.conf import settings
+
 from celery import Task, chain
 from matches.models import Match
 from players.models import Player
@@ -33,7 +41,7 @@ class MirrorRecentTeams(Task):
         teams.extend([m.dire_team.steam_id for m in matches])
 
         updatable = Team.objects.exclude(image_ugc=None).filter(
-            valve_cdn_image=None
+            stored_image=''
         )
         teams.extend([t.steam_id for t in updatable])
 
@@ -89,7 +97,6 @@ class UpdateTeam(ApiFollower):
                         'tag': 'tag',
                         'created': 'time_created',
                         'logo': 'logo',
-                        'logo_sponsor': 'logo_sponsor',
                         'country_code': 'country_code',
                         'url': 'url',
                         'games_played_with_current_roster':
@@ -106,7 +113,6 @@ class UpdateTeam(ApiFollower):
                     name=team['name'],
                     tag=team['tag'],
                     created=team['time_created'],
-                    logo_sponsor=team['logo_sponsor'],
                     logo=team['logo'],
                     country_code=team['country_code'],
                     url=team['url'],
@@ -142,21 +148,6 @@ class UpdateTeam(ApiFollower):
                 err = "Disregarding ugc serach for {0}; no valid ugc (0 given)"
                 logger.info(err.format(c.team_id))
 
-        logo = team.logo_sponsor
-        if self._need_logo_update(logo):
-            c = ApiContext()
-            vac = ValveApiCall()
-            c.ugcid = team.logo
-            c.team_id = team.steam_id
-            c.logo_type = 'sponsor'
-
-            utl = UpdateTeamLogo()
-
-            c = chain(
-                vac.s(api_context=c, mode='GetUGCFileDetails'), utl.s()
-            )
-            c.delay()
-
     def _need_logo_update(self, logo):
         return True
         return logo != 0 and logo is not None
@@ -172,20 +163,30 @@ class UpdateTeamLogo(ApiFollower):
         url = urldata['data']['url']
         try:
             if self.api_context.logo_type == 'team':
-                team.valve_cdn_image = url
-                logger.debug(url)
+                try:
+                    resp = requests.get(url)
+                    if resp.status_code == 200:
+                        buff = BytesIO(resp.content)
+                        _ = buff.seek(0)  # Stop random printing.
+                        _ = _  # Stop the linting.
+                        filename = slugify(team.steam_id) + '_full.png'
+                        team.stored_image.save(filename, File(buff))
+                    team.save()
+                    logger.debug(url)
+                except:
+                    err = sys.exc_info()[0]
+                    print "No image for %s!  Error %s" % (team.steam_id, err)
+
             else:
-                team.valve_cdn_sponsor_image = url
+                logging.error(
+                    'How did we get a non-team image for team {0}'.format(
+                        team.steam_id
+                    )
+                )
             team.save()
 
-        # If we fail, put in a placeholder and freak.
-        except Exception:
-            if self.api_context.logo_type == 'team':
-                team.valve_cdn_image = url
-                print url
-            else:
-                team.valve_cdn_sponsor_image = url
-            raise
+        except:
+            logging.error('No image for team {0}!'.format(team.steam_id))
 
 
 def map_team_players(team, team_data):

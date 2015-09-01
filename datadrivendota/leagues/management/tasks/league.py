@@ -1,4 +1,5 @@
 """ Tasks to manage leagues. """
+import sys
 import os
 import logging
 import requests
@@ -7,6 +8,8 @@ from time import mktime
 from datetime import datetime, timedelta
 from celery import Task, chain
 
+from django.utils.text import slugify
+from django.core.files import File
 from django.conf import settings
 from utils.accessors import get_league_schema
 from leagues.models import League, ScheduledMatch
@@ -139,17 +142,18 @@ class UpdateLeagueLogo(ApiFollower):
             settings.VALVE_CDN_PATH,
             urldata['result']['path']
         )
-
-        resp = requests.get(url)
-        if resp.status_code == 200:
-            buff = BytesIO(resp.content)
-            _ = buff.seek(0)  # Stop random printing.
-            _ = _  # Stop the linting.
-            #  If we wanted to, we would store the league logo data here.
-            #  We are currently working out whether to hotlink to Valve.
-
-        league.valve_cdn_image = url
-        league.save()
+        logging.info('Getting league logo at {0}'.format(url))
+        try:
+            resp = requests.get(url)
+            if resp.status_code == 200:
+                buff = BytesIO(resp.content)
+                _ = buff.seek(0)  # NOQA
+                filename = slugify(league.steam_id) + '_full.png'
+                league.stored_image.save(filename, File(buff))
+            league.save()
+        except:
+            err = sys.exc_info()[0]
+            print "No image for %s!  Error %s" % (league.steam_id, err)
 
 
 class MirrorRecentLeagues(Task):
@@ -194,7 +198,7 @@ class MirrorRecentLeagues(Task):
         recent_games.update(recent_schedule)
 
         updatable = League.objects.exclude(image_ugc=None).filter(
-            valve_cdn_image=None
+            stored_image=''
         )
         recent_games.update(set([t.steam_id for t in updatable]))
 
