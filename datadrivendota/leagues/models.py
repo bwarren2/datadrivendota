@@ -28,17 +28,20 @@ class League(models.Model):
     description = models.CharField(max_length=300, null=True)
     tournament_url = models.CharField(max_length=300, null=True)
     item_def = models.IntegerField(null=True)
-    valve_cdn_image = models.TextField(
-        null=True, help_text='Steam cdn image url'
-    )
-    image_ugc = models.BigIntegerField(null=True)  # Through live league games
+
     tier = models.IntegerField(choices=LEAGUE_TYPES, null=True, blank=True)
     fantasy = models.NullBooleanField(null=True, blank=True)
     update_time = models.DateTimeField(default=timezone.now)
 
+    stored_image = models.ImageField(null=True, upload_to='leagues/img/')
+    image_ugc = models.BigIntegerField(null=True)  # Through live league games
+
     @property
     def image(self):
-        return self.valve_cdn_image or static('blank_league.png')
+        try:
+            return self.stored_image.url
+        except ValueError:
+            return static('blank_league.png')
 
     @property
     def display_name(self):
@@ -68,8 +71,7 @@ class League(models.Model):
     @property
     def is_outdated(self):
         if (
-            self.valve_cdn_image is None
-            or self.valve_cdn_image == ''
+            self.image == static('blank_league.png')
             or self.update_time < (
                 timezone.now() - timedelta(
                     seconds=settings.UPDATE_LAG_UTC
