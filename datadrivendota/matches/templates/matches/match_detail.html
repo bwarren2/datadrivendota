@@ -173,9 +173,15 @@
 
             {% if summary.ability_dict %}
               {% for ability in summary.ability_dict %}
+
+                {% if SHOW_HEROES %}
                 <a href="{%url 'heroes:ability_detail' ability_name=ability.machine_name%}">
                     <img class='ability-thumbshot' src="{{ability.picture_url}}" title="{{ability.name}}" >
                 </a>
+                {% else %}
+                  <img class='ability-thumbshot' src="{{ability.picture_url}}" title="{{ability.name}}" >
+                {% endif %}
+
               {% endfor %}
             {% else %}
                 <text>Not given :(</text>
@@ -198,9 +204,16 @@
             {% endif %}
           {% if summary.ability_dict %}
             {% for ability in summary.ability_dict %}
+
+
+            {% if SHOW_HEROES %}
             <a href="{%url 'heroes:ability_detail' ability_name=ability.machine_name%}">
                 <img class='ability-thumbshot' src="{{ability.picture_url}}" title="{{ability.name}}">
               </a>
+            {% else %}
+                <img class='ability-thumbshot' src="{{ability.picture_url}}" title="{{ability.name}}">
+            {% endif %}
+
             {% endfor %}
           {% else %}
               <text>Not given :(</text>
@@ -254,12 +267,14 @@
               <td>{{ summary.kda2 }}</td>
 
               <td class="match-summary-images">
+                {% if SHOW_ITEMS %}
                 {% if summary.item_0.mugshot %}
                 <a href="{%url 'items:detail' item_name=summary.item_0.slug_name%}">
                   <img src="{{ summary.item_0.thumbshot_url }}"
                   alt="{{ summary.item_0.name }}"
                   title="{{ summary.item_0.name }}"
-                  ></a>
+                  >
+                  </a>
                 {% endif %}
                 {% if summary.item_1.thumbshot %}
                 <a href="{%url 'items:detail' item_name=summary.item_1.slug_name%}">
@@ -296,6 +311,47 @@
                   title="{{ summary.item_5.name }}"
                   ></a>
                 {% endif %}
+
+                {% else %}
+                {% if summary.item_0.mugshot %}
+                  <img src="{{ summary.item_0.thumbshot_url }}"
+                  alt="{{ summary.item_0.name }}"
+                  title="{{ summary.item_0.name }}"
+                  >
+                {% endif %}
+                {% if summary.item_1.thumbshot %}
+                  <img src="{{ summary.item_1.thumbshot_url }}"
+                  alt="{{ summary.item_1.name }}"
+                  title="{{ summary.item_1.name }}"
+                  ><
+                {% endif %}
+                {% if summary.item_2.thumbshot %}
+                  <img src="{{ summary.item_2.thumbshot_url }}"
+                  alt="{{ summary.item_2.name }}"
+                  title="{{ summary.item_2.name }}"
+                  >
+                {% endif %}
+                {% if summary.item_3.thumbshot %}
+                  <img src="{{ summary.item_3.thumbshot_url }}"
+                  alt="{{ summary.item_3.name }}"
+                  title="{{ summary.item_3.name }}"
+                  >
+                {% endif %}
+                {% if summary.item_4.thumbshot %}
+                  <img src="{{ summary.item_4.thumbshot_url }}"
+                  alt="{{ summary.item_4.name }}"
+                  title="{{ summary.item_4.name }}"
+                  >
+                {% endif %}
+                {% if summary.item_5.thumbshot %}
+                  <img src="{{ summary.item_5.thumbshot_url }}"
+                  alt="{{ summary.item_5.name }}"
+                  title="{{ summary.item_5.name }}"
+                  >
+                {% endif %}
+
+                {% endif %}
+
 
               </td>
 
