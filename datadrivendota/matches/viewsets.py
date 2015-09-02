@@ -75,7 +75,7 @@ class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
                 'pickban__team',
                 'pickban__order',
                 'pickban__hero__steam_id',
-        )
+        ).order_by('start_time')
 
     def _refactor_pickbans(self, pickban_queryset):
         temp = {}
@@ -98,7 +98,7 @@ class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
                 }
             )
 
-        return temp.values()
+        return sorted(temp.values(), key=lambda x: x['start_time'])
 
     def get_queryset(self):
         matches = self._get_matches()

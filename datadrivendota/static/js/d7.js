@@ -24747,7 +24747,6 @@ module.exports = {
 
 var extract_pickbans = function(blanks, working_set){
     var data = JSON.parse(JSON.stringify(blanks));
-
     working_set.map(function(match){
       var pickbans = match.pickbans;
 
