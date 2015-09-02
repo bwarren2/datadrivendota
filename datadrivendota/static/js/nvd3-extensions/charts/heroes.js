@@ -26,7 +26,7 @@ var classify_bars = function(destination){
     "class",
     function(d){
         var hero = d.hero;
-        return d3.select(this).attr("class") + " hero-datum "+ hero.css_classes;
+        return d3.select(this).attr("class")+ " hero-datum "+hero.css_classes;
     }
   );
 }
