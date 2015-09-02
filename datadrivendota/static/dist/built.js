@@ -31502,10 +31502,10 @@ $(function () {
                 $('.click-selector').addClass('clicked');
                 $('.click-selector').text('Unselect');
 
-                var str = '.nv-point:not(.'+window.jsUtils.convertToSlug(
-                    // $('#combo-select').text().trim()
+                var hero_class = window.jsUtils.convertToSlug(
                     $('#combo-select option').val().trim()
-                )+')';
+                );
+                var str = '.nv-point:not(.'+hero_class+'), .discreteBar:not(.'+hero_class+')';
                 // Use this to refactor around hidden selector.
                 //
                 // var str = '.nv-point:not(.nv-point-0)';
@@ -31518,7 +31518,7 @@ $(function () {
 
             } else {
                 $('#combo-select option').remove().trigger("change");
-                var str = '.nv-point';
+                var str = '.nv-point, .discreteBar';
                 d3.selectAll(str)
                 .transition()
                 .duration(500)

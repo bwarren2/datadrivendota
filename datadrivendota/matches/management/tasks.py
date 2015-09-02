@@ -440,6 +440,18 @@ class CheckMatchIntegrity(Task):
                 'We have denormalization for radiant players and iswin=False'
             )
 
+        not_main_event_ti5 = Match.objects.filter(
+            start_time__lte=1437980497,  # Magic time for the earlier stages
+            league__steam_id=2733  # TI5 league id
+        ).count()
+        if len(not_main_event_ti5) != 0:
+            error_email(
+                'Database alert!',
+                'We have reimported the not-main-event TI5 games.'
+                'This muddies the data for that very important league.'
+                'You probably want to delete them.'
+            )
+
         dire_badness = PlayerMatchSummary.objects.filter(
             match__radiant_win=True,
             player_slot__gte=5,
