@@ -22987,7 +22987,7 @@ var pickban_scatter = function(destination, params){
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);
     $(destination).empty();
-    return winrate_data.slice(0, 1);
+    return winrate_data.slice(0, 0);
   })
   .then(function(working_set){
     var plot_data = d7.extensions.utils.reduce.extract_pickbans(
@@ -23072,7 +23072,7 @@ var winrate_scatter = function(destination, params){
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);
     $(destination).empty();
-    return winrate_data.slice(0, 1);
+    return winrate_data.slice(0, 0);
 
   })
   .then(function(working_set){
@@ -23167,7 +23167,7 @@ var quality_barchart = function(destination, params){
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);
     $(destination).empty();
-    return winrate_data.slice(0, 1);
+    return winrate_data.slice(0, 0);
   })
   .then(function(working_set){
     var plot_data = d7.extensions.utils.reduce.extract_pickbans(

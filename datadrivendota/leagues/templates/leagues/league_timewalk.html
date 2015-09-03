@@ -30,13 +30,32 @@
         </div>
     </div>
     <div class='col-md-4'>
-        <h4>Current Match</h4>
+        <h4 class=' text-primary'>Next Match:</h4>
         <div id='current_match' class='vert-md-1'>
-        <h3 id='match_id'></h3>
-        <h3 id='duration'></h3>
-        <h3 id='start_time'></h3>
-        <p id='radiant_team'></p>
-        <p id='dire_team'></p>
+          <h5 id='match_id'></h5>
+          <h5 id='duration'></h5>
+          <h5 id='start_time'></h5>
+
+          <div >
+            <h5><span class='radiant-team text-primary'></h5>
+            <div>
+              <span>Picks:</span> <span id='radiant-picks'></span>
+            </div>
+            <div>
+              <span>Bans:</span> <span id='radiant-bans'></span>
+            </div>
+          </div>
+
+          <div >
+            <h5><span class='dire-team  text-primary'></h5>
+            <div>
+              <span>Picks:</span> <span id='dire-picks'></span>
+            </div>
+            <div>
+              <span>Bans:</span> <span id='dire-bans'></span>
+            </div>
+          </div>
+
         </div>
     </div>
     <div class='col-md-8'>
@@ -44,6 +63,10 @@
         <div id='strength_barchart' class='vert-md-1'>
           <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
         </div>
+    </div>
+    <div class='col-md-4'>
+      <h4>What is relative strength?</h4>
+      <p>This metric tries to condense wins &amp; losses for each hero down to a single number.  Is a hero that went 5-2 better or worse than one that went 3-0?  This tries to answer.  More is better. </p>
     </div>
   </div>
 
@@ -56,14 +79,16 @@
 <script type="text/javascript">
 $(function(){
 
-  Promise.resolve(
+  Promise.join(
     $.ajax(
-      "/rest-api/matches/?" + $.param(
+      "/rest-api/match-pickban/?" + $.param(
         {league_id:{{league.steam_id}}, page_size:300}
       )
-    )
+    ),
+    $.ajax("/rest-api/hero-dossiers/")
   ).then(function(data){
-    match_data = data;
+    match_data = data[0];
+    dossiers = data[1];
     var idx = 0;
     var update = function(tick){
       idx = (idx + tick).mod(match_data.length);
@@ -81,11 +106,9 @@ $(function(){
       timer = setTimeout(runner, 1000);
     }
     $(window).on('play', function(){
-      console.log('Playing');
       runner();
     });
     $(window).on('pause', function(){
-       console.log('Stopping');
        clearTimeout(timer);
     });
     $(window).on('forward', function(){
@@ -112,6 +135,28 @@ $(function(){
         isDragging = false;
     });
 
+    doss_map = []
+    dossiers.map(function(d){
+        doss_map[d.hero.steam_id] = d.hero.internal_name
+    })
+
+    var pickfaces = function(idx, team, pick){
+
+      if (team=='Radiant'){
+        var team_id=0;
+      } else if (team=='Dire'){
+        var team_id=1;
+      } else {
+        console.log('What is this team? '+ team)
+      }
+
+      var faces = match_data[idx].pickbans.filter(
+          function(d){return d.team==team_id && d.is_pick==pick}
+      ).map(
+      function(d){return "<span><i class='d2mh "+doss_map[d.hero.steam_id]+"'></i></span>"}
+      ).join(separator='');
+      return faces;
+    }
     $(window).on('update', function (evt, idx) {
 
       // Progbar
@@ -131,9 +176,17 @@ $(function(){
 
       $('#duration').html(duration+' minutes');
       $('#start_time').html(start_time);
-      $('#radiant_team').html(current_match.radiant_team);
-      $('#dire_team').html(current_match.dire_team);
+      // $('#teams').html(current_match.radiant_team+' vs. '+current_match.dire_team);
+      $('.radiant-team').html(current_match.radiant_team);
+      $('.dire-team').html(current_match.dire_team);
+
+      $('#radiant-picks').html(pickfaces(idx, 'Radiant', true));
+      $('#dire-picks').html(pickfaces(idx, 'Dire', true));
+      $('#radiant-bans').html(pickfaces(idx, 'Radiant', false));
+      $('#dire-bans').html(pickfaces(idx, 'Dire', false));
     });
+
+    $(window).trigger('update', 0);
 
     d7.extensions.charts.heroes.pickban_scatter(
       '#pickban_chart', {league_id:{{league.steam_id}}, page_size:300}

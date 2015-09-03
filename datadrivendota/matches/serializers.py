@@ -107,7 +107,6 @@ class MatchPickBansSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Match
-        # ordering = (,)
         fields = (
             'steam_id',
             'start_time',
@@ -128,4 +127,7 @@ class FastMatchPickBansSerializer(serializers.Serializer):
     steam_id = serializers.IntegerField()
     start_time = serializers.IntegerField()
     radiant_win = serializers.BooleanField()
+    duration = serializers.IntegerField()
+    radiant_team = serializers.CharField()
+    dire_team = serializers.CharField()
     pickbans = FastPickbanSerializer(many=True, read_only=True)

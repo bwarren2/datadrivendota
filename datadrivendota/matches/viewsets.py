@@ -65,12 +65,16 @@ class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
     def _get_pickban_queryset(self, matches):
         return Match.objects.filter(steam_id__in=matches)\
             .prefetch_related('pickban_set__hero')\
+            .prefetch_related('radiant_team__name')\
+            .prefetch_related('dire_team__name')\
             .prefetch_related('pickban_set')\
             .values(
                 'steam_id',
                 'start_time',
                 'radiant_win',
                 'duration',
+                'radiant_team__name',
+                'dire_team__name',
                 'pickban__is_pick',
                 'pickban__team',
                 'pickban__order',
@@ -81,15 +85,18 @@ class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
         temp = {}
         for m in pickban_queryset:
 
-            sid = m['steam_id']
-            if sid not in temp:
-                temp[sid] = {
-                    'steam_id': sid,
+            steam_id = m['steam_id']
+            if steam_id not in temp:
+                temp[steam_id] = {
+                    'steam_id': steam_id,
                     'start_time': m['start_time'],
+                    'radiant_team': m['radiant_team__name'],
+                    'dire_team': m['dire_team__name'],
+                    'duration': m['duration'],
                     'radiant_win': m['radiant_win'],
                     'pickbans': []
                 }
-            temp[sid]['pickbans'].append(
+            temp[steam_id]['pickbans'].append(
                 {
                     'hero': {'steam_id': m['pickban__hero__steam_id']},
                     'is_pick': m['pickban__is_pick'],
