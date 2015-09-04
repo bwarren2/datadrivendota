@@ -1,5 +1,6 @@
 from django.db.models import When, Case, Value, IntegerField, Sum
 
+from rest_framework_extensions.cache.mixins import CacheResponseMixin
 from rest_framework import viewsets, filters
 
 from matches.models import PlayerMatchSummary, PickBan
@@ -102,7 +103,7 @@ class HeroPickBanViewSet(viewsets.ReadOnlyModelViewSet):
         return data_queryset
 
 
-class HeroDossierViewSet(viewsets.ReadOnlyModelViewSet):
+class HeroDossierViewSet(CacheResponseMixin, viewsets.ReadOnlyModelViewSet):
 
     """ DRF hero endpoint. """
 

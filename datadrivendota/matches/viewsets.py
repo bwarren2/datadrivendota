@@ -1,4 +1,5 @@
 from rest_framework import viewsets, filters
+from rest_framework_extensions.cache.mixins import CacheResponseMixin
 
 from .models import Match, PlayerMatchSummary, PickBan, SkillBuild, GameMode
 
@@ -38,7 +39,7 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset.select_related()
 
 
-class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
+class MatchPickBanViewSet(CacheResponseMixin, viewsets.ReadOnlyModelViewSet):
     page_size = 10
     page_size_query_param = 'page_size'
     serializer_class = FastMatchPickBansSerializer
@@ -104,7 +105,6 @@ class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
                     'order': m['pickban__order'],
                 }
             )
-
         return sorted(temp.values(), key=lambda x: x['start_time'])
 
     def get_queryset(self):

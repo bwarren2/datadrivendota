@@ -516,3 +516,12 @@ FEATURE_FLAGS = [
     'SHOW_SEARCH',
     'SHOW_TEAMS',
 ]
+
+
+def key_func(*args, **kwargs):
+    return len(kwargs['request'].query_params)
+
+REST_FRAMEWORK_EXTENSIONS = {
+    'DEFAULT_OBJECT_CACHE_KEY_FUNC': key_func,
+    'DEFAULT_LIST_CACHE_KEY_FUNC': key_func,
+}
