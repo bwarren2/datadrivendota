@@ -93,10 +93,6 @@ class LeagueDetail(DetailView):
         )
         match_list = paginator.current_page
 
-        # TODO Temporary for testing. Put this where you actually want the
-        # control bar to show.
-        kwargs['show_control_bar'] = True
-
         kwargs['match_list'] = match_list
         return super(LeagueDetail, self).get_context_data(**kwargs)
 
