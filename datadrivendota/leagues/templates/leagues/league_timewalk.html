@@ -32,11 +32,10 @@
         </div>
     </div>
     <div class='col-md-4'>
-        <h4 class=' text-primary'>Next Match:</h4>
         <div id='current_match' class='vert-md-1'>
-          <h5 id='match_id'></h5>
-          <h5 id='duration'></h5>
-          <h5 id='start_time'></h5>
+          <h5 class='text-primary' id='match_id'></h5>
+          <p id='duration'></p>
+          <p id='start_time'></p>
 
           <div >
             <h5><span class='radiant-team text-primary'></h5>
@@ -171,7 +170,7 @@ $(function(){
 
       //Match card
       var current_match = match_data[idx]
-      $('#match_id').html("Match #: " + current_match.steam_id)
+      $('#match_id').html("Next Match #: " + current_match.steam_id)
 
       var start_time = moment.unix(current_match.start_time).format("dddd, MMMM Do YYYY, h:mm:ss a");
       var duration = moment.duration(current_match.duration*1000).asMinutes().toFixed(2);
