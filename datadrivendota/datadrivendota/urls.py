@@ -8,6 +8,7 @@ from django.contrib import admin
 from datadrivendota import views
 from accounts.views import LoginView
 
+
 # REST
 from .rest_urls import router
 admin.autodiscover()
