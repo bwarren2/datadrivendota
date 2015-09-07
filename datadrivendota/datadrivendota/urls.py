@@ -8,6 +8,7 @@ from django.contrib import admin
 from datadrivendota import views
 from accounts.views import LoginView
 
+
 # REST
 from .rest_urls import router
 admin.autodiscover()
@@ -30,6 +31,11 @@ urlpatterns = patterns(
         r'^privacy/$',
         TemplateView.as_view(template_name='privacy.html',),
         name='privacy'
+    ),
+    url(
+        r'^api/combobox_tags/$',
+        views.ComboboxAjaxView.as_view(),
+        name='api_combobox'
     ),
     url(
         r'^robots\.txt/$',

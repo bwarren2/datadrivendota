@@ -121,3 +121,34 @@ class AjaxView(TemplateView):
         data = dumps(context)
         mimetype = 'application/json'
         return HttpResponse(data, mimetype)
+
+
+class ComboboxAjaxView(AjaxView):
+
+    def get_result_data(self, **kwargs):
+
+        q = self.request.GET.get('q', '')
+        heroes = Hero.objects.filter(name__icontains=q)[:5]
+
+        alignments = ['Strength', 'Agility', 'Intelligence']
+        matched_alignments = [s for s in alignments if q.lower() in s.lower()]
+
+        results = []
+
+        for hero in heroes:
+            match_json = {}
+            match_json['id'] = hero.steam_id
+            match_json['label'] = hero.css_id  # Attr
+            match_json['value'] = hero.name  # Goes visible
+
+            results.append(match_json)
+
+        for i, string in enumerate(matched_alignments):
+            match_json = {}
+            match_json['id'] = i
+            match_json['label'] = string.lower()  # Attr
+            match_json['value'] = string  # Goes visible
+            results.append(match_json)
+
+        kwargs['results'] = results
+        return kwargs

@@ -173,7 +173,9 @@ var discreteBar = function() {
                 .style('fill', function(d,i) { return d.color || color(d,i) })
                 .style('stroke', function(d,i) { return d.color || color(d,i) })
                 .select('rect')
-                .attr('class', rectClass)
+                .attr('class', function(d){
+                    return rectClass+' foo';
+                })
                 .watchTransition(renderWatch, 'discreteBar: bars rect')
                 .attr('width', x.rangeBand() * .9 / data.length);
             bars.watchTransition(renderWatch, 'discreteBar: bars')

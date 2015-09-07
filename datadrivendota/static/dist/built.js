@@ -31503,12 +31503,10 @@ $(function () {
                 $('.click-selector').text('Unselect');
 
                 var hero_class = window.jsUtils.convertToSlug(
-                    $('#combo-select option').val().trim()
+                    $('.select2-selection__rendered').html().trim()
                 );
                 var str = '.nv-point:not(.'+hero_class+'), .discreteBar:not(.'+hero_class+')';
-                // Use this to refactor around hidden selector.
-                //
-                // var str = '.nv-point:not(.nv-point-0)';
+
                 var selection = d3.selectAll(str)
                 .transition()
                 .duration(500)
@@ -31517,7 +31515,8 @@ $(function () {
                 .style('visibility', 'hidden');
 
             } else {
-                $('#combo-select option').remove().trigger("change");
+                // We have to clear the option each time because select2 is fine to add new instances on top of old ones.
+                // $('#combo-select option').remove().trigger("change");
                 var str = '.nv-point, .discreteBar';
                 d3.selectAll(str)
                 .transition()
@@ -31535,10 +31534,11 @@ $(function () {
     window.comboBox = comboBox;
 
     window.comboBox();
+
     $('#combo-select').select2({
         ajax: {
           delay: 250,
-          url:'/matches/api/combobox_tags/',
+          url:'/api/combobox_tags/',
           processResults: function (data) {
             var res = data.results.map(function (elt) {
              return {id: elt.label, text: elt.value}; }
@@ -31546,7 +31546,7 @@ $(function () {
             return {results: res};
           },
         },
-        minimumInputLength: 3,
+        minimumInputLength: 2,
     });
 
 

@@ -9,12 +9,14 @@
 {% endblock page_title %}
 {% block content %}
 
-  <nav>
+
+ <nav>
     <ul class="nav nav-pills">
-      <li role="presentation"><a href="#">Overview</a></li>
+      <li role="presentation" ><a href="#">Overview</a></li>
       <li role="presentation" class="active"><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
     </ul>
   </nav>
+
 
   <div class='row'>
     <div class='col-md-4'>
@@ -30,11 +32,10 @@
         </div>
     </div>
     <div class='col-md-4'>
-        <h4 class=' text-primary'>Next Match:</h4>
         <div id='current_match' class='vert-md-1'>
-          <h5 id='match_id'></h5>
-          <h5 id='duration'></h5>
-          <h5 id='start_time'></h5>
+          <h5 class='text-primary' id='match_id'></h5>
+          <p id='duration'></p>
+          <p id='start_time'></p>
 
           <div >
             <h5><span class='radiant-team text-primary'></h5>
@@ -169,7 +170,7 @@ $(function(){
 
       //Match card
       var current_match = match_data[idx]
-      $('#match_id').html("Match #: " + current_match.steam_id)
+      $('#match_id').html("Next Match #: " + current_match.steam_id)
 
       var start_time = moment.unix(current_match.start_time).format("dddd, MMMM Do YYYY, h:mm:ss a");
       var duration = moment.duration(current_match.duration*1000).asMinutes().toFixed(2);
@@ -202,51 +203,3 @@ $(function(){
 })
 </script>
 {% endblock extra_js %}
-
-{% block extra_css %}
-
-<style type="text/css">
-
-.tip {
-  line-height: 1;
-  font-weight: bold;
-  padding: 12px;
-  background: rgba(100, 100, 100, 0.8);
-  color: #fff;
-  border-radius: 2px;
-}
-
-/* Creates a small triangle extender for the tooltip */
-.tip:after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
-  width: 100%;
-  line-height: 1;
-  color: rgba(0, 0, 0, 0.8);
-  content: "\25BC";
-  position: absolute;
-  text-align: center;
-}
-
-.vert-md-1{
-  height:303px;
-}
-
-.ajax-loader {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  margin-left: -32px; /* -1 * image width / 2 */
-  margin-top: -32px; /* -1 * image height / 2 */
-}
-
-/* Style northward tooltips differently */
-/*.tip.n:after {
-  margin: -1px 0 0 0;
-  top: 100%;
-  left: 0;
-}
-*/
-</style>
-{% endblock extra_css %}

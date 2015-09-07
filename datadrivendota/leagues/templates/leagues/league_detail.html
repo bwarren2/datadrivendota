@@ -15,115 +15,38 @@
       <li role="presentation"><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
     </ul>
   </nav>
-    <div class='row'>
-      <div class='col-md-4'>
-          <h4>Hero Winrate</h4>
-          <div id='winrate_chart'></div>
-      </div>
-      <div class='col-md-4'>
-          <h4>Hero Pick/Ban Rate</h4>
-          <div id='pick_ban'></div>
-      </div>
-      <div class="league-infobox col-md-4">
-          <img class='thumbnail' style='margin-top:10px' src="{{ league.image }}">
-          <h2>{{ league.display_name }}
-          </h2>
 
-      </div>
+  <div class='row'>
+    <div class='col-md-4'>
+        <h4>Hero Winrate</h4>
+        <div id='winrate_chart'></div>
     </div>
+    <div class='col-md-4'>
+        <h4>Hero Pick/Ban Rate</h4>
+        <div id='pick_ban'></div>
+    </div>
+    <div class="league-infobox col-md-4">
+        <img class='thumbnail' style='margin-top:10px' src="{{ league.image }}">
+        <h2>{{ league.display_name }}
+        </h2>
 
+    </div>
+  </div>
 
 {% endblock content %}
-
-{% block content_foot %}
-    {% if match_list %}
-      {% for match in match_list %}
-        {% include "matches/_match_card.html" %}
-      {% endfor %}
-      {% include "_pagination.html" with pages_list=match_list page_links_to_display=match_list.paginator.page_range_with_ellipses %}
-    {% endif %}
-{% endblock content_foot  %}
 
 {% block extra_js %}
 <script type="text/javascript">
 $(function(){
 
-  window.comboBox();
-  $('#combo-select').select2({
-    ajax: {
-      delay: 250,
-      url:'/matches/api/combobox_tags/',
-      processResults: function (data) {
-        var res = data.results.map(function (elt) {
-         return {id: elt.label, text: elt.value}; }
-        )
-        return {results: res};
-      },
-    },
-    minimumInputLength: 3,
-  });
-
-
-  Promise.join(
-    $.ajax(
-      '/rest-api/hero-winrate/?'+$.param(
-        {league_id:{{league.steam_id}}}
-      )
-    ),
-    $.ajax(
-      '/rest-api/hero-dossiers/?'+$.param(
-        {league_id:{{league.steam_id}}}
-      )
-    )
-
-  )
-  .then(function(data){
-      var winrate_data = data[0];
-      var dossier_data = data[1];
-      window.Chartreuse.winrate_scatter(
-        winrate_data,
-        dossier_data,
-        '#winrate_chart'
-      )
-  })
-  .catch(function(e){
-    console.log(e)
-  })
-
-  Promise.resolve(
-    $.ajax(
-      '{% url "rest-api:hero-pickban-list"%}?'+$.param(
-        {league_id:{{league.steam_id}}}
-      )
-    )
-  )
-  .then(function(data){
-      window.Chartreuse.pickban_scatter(data, '#pick_ban')
-  })
-  .catch(function(e){
-    console.log(e)
-  })
+    d7.extensions.charts.heroes.pickban_scatter(
+      '#pick_ban', {league_id:{{league.steam_id}}, page_size:300}, true
+    );
+    d7.extensions.charts.heroes.winrate_scatter(
+      '#winrate_chart', {league_id:{{league.steam_id}}, page_size:300}, true
+    );
 
 })
 </script>
 {% endblock extra_js %}
 
-{% block extra_css %}
-  <style type="text/css">
-  .agility{
-    stroke:green;
-    fill:green;
-    stroke-fill:green;
-  }
-  .strength{
-    stroke:red;
-    fill:red;
-    stroke-fill:red;
-  }
-  .intelligence{
-    stroke:blue;
-    fill:blue;
-    stroke-fill:blue;
-  }
-  </style>
-{% endblock extra_css %}
