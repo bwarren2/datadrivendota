@@ -22945,7 +22945,6 @@ var d3 = window.d3;
 var tooltips = require("./tooltips.js");
 
 var classify_points = function(destination){
-
   var place = destination + " circle.nv-point";
   d3.selectAll(place).attr(
     "class",
@@ -22953,21 +22952,34 @@ var classify_points = function(destination){
         var hero = d[0].hero;
         return d3.select(this).attr("class") + " hero-datum "+ hero.css_classes;
     }
+  ).attr(
+    "data-hero",
+    function (d) {
+      // Hacky as hell, but I don't want to make backend changes right now.
+      // --kit 2015-09-02
+      return d[0].hero.css_classes.split(' ')[0];
+    }
   );
 };
 
 var classify_bars = function(destination){
 
-    var place = destination + " rect.discreteBar";
-    d3.selectAll(place).attr("class",
-      function(d){
-          var hero = d.hero;
-          var classes = "discreteBar hero-datum "+hero.css_classes;
-          return classes;
-      }
-    );
-
-};
+  var place = destination + " rect.discreteBar";
+  d3.selectAll(place).attr(
+    "class",
+    function(d){
+        var hero = d.hero;
+        return d3.select(this).attr("class")+ " hero-datum "+hero.css_classes;
+    }
+  ).attr(
+    "data-hero",
+    function (d) {
+      // Hacky as hell, but I don't want to make backend changes right now.
+      // --kit 2015-09-02
+      return d.hero.css_classes.split(' ')[0];
+    }
+  );
+}
 
 
 var pickban_scatter = function(destination, params, display_final_product){
