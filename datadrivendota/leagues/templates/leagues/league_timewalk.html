@@ -9,12 +9,14 @@
 {% endblock page_title %}
 {% block content %}
 
-  <nav>
+
+ <nav>
     <ul class="nav nav-pills">
-      <li role="presentation"><a href="#">Overview</a></li>
+      <li role="presentation" ><a href="#">Overview</a></li>
       <li role="presentation" class="active"><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
     </ul>
   </nav>
+
 
   <div class='row'>
     <div class='col-md-4'>
@@ -202,51 +204,3 @@ $(function(){
 })
 </script>
 {% endblock extra_js %}
-
-{% block extra_css %}
-
-<style type="text/css">
-
-.tip {
-  line-height: 1;
-  font-weight: bold;
-  padding: 12px;
-  background: rgba(100, 100, 100, 0.8);
-  color: #fff;
-  border-radius: 2px;
-}
-
-/* Creates a small triangle extender for the tooltip */
-.tip:after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
-  width: 100%;
-  line-height: 1;
-  color: rgba(0, 0, 0, 0.8);
-  content: "\25BC";
-  position: absolute;
-  text-align: center;
-}
-
-.vert-md-1{
-  height:303px;
-}
-
-.ajax-loader {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  margin-left: -32px; /* -1 * image width / 2 */
-  margin-top: -32px; /* -1 * image height / 2 */
-}
-
-/* Style northward tooltips differently */
-/*.tip.n:after {
-  margin: -1px 0 0 0;
-  top: 100%;
-  left: 0;
-}
-*/
-</style>
-{% endblock extra_css %}

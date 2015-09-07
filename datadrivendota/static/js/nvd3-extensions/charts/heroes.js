@@ -17,22 +17,23 @@ var classify_points = function(destination){
         return d3.select(this).attr("class") + " hero-datum "+ hero.css_classes;
     }
   );
-}
+};
 
 var classify_bars = function(destination){
 
-  var place = destination + " rect.discreteBar";
-  d3.selectAll(place).attr(
-    "class",
-    function(d){
-        var hero = d.hero;
-        return d3.select(this).attr("class")+ " hero-datum "+hero.css_classes;
-    }
-  );
-}
+    var place = destination + " rect.discreteBar";
+    d3.selectAll(place).attr("class",
+      function(d){
+          var hero = d.hero;
+          var classes = "discreteBar hero-datum "+hero.css_classes;
+          return classes;
+      }
+    );
+
+};
 
 
-var pickban_scatter = function(destination, params){
+var pickban_scatter = function(destination, params, display_final_product){
 
   var winrate_data;
   var dossiers;
@@ -46,11 +47,20 @@ var pickban_scatter = function(destination, params){
       "/rest-api/hero-dossiers/"
     )
   ).then(function(data){
+
     winrate_data = data[0];
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);
+
+    var idx;
+    if (display_final_product !== undefined){
+      idx = winrate_data.length;
+    } else {
+      idx = 0;
+    }
+
     $(destination).empty();
-    return winrate_data.slice(0, 0);
+    return winrate_data.slice(0, idx);
   })
   .then(function(working_set){
     var plot_data = d7.extensions.utils.reduce.extract_pickbans(
@@ -117,7 +127,7 @@ var pickban_scatter = function(destination, params){
 };
 
 
-var winrate_scatter = function(destination, params){
+var winrate_scatter = function(destination, params, display_final_product){
 
   var winrate_data;
   var dossiers;
@@ -134,8 +144,17 @@ var winrate_scatter = function(destination, params){
     winrate_data = data[0];
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);
+
+
+    var idx;
+    if (display_final_product !== undefined){
+      idx = winrate_data.length;
+    } else {
+      idx = 0;
+    }
+
     $(destination).empty();
-    return winrate_data.slice(0, 0);
+    return winrate_data.slice(0, idx);
 
   })
   .then(function(working_set){
@@ -240,8 +259,7 @@ var quality_barchart = function(destination, params){
     var chart_data;
     var svg = utils.svg.square_svg(destination);
     var xlab = "Hero";
-    var ylab = "relative Strength";
-
+    var ylab = "Relative Strength";
     var strength = function(hero){
       if (hero.wins + hero.losses === 0){return 0;}
       else{
@@ -251,6 +269,7 @@ var quality_barchart = function(destination, params){
         return (phat + z*z/(2*n) - z * Math.sqrt((phat*(1-phat)+z*z/(4*n))/n))/(1+z*z/n)
       }
     }
+
     nv.addGraph(
 
       function(){
@@ -274,7 +293,6 @@ var quality_barchart = function(destination, params){
       function(chart){
 
         classify_bars(destination);
-
         $(window).on(
           "update",
           function(e, p1){

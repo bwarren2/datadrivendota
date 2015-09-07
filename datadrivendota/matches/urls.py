@@ -14,10 +14,4 @@ urlpatterns = patterns(
         views.MatchDetail.as_view(),
         name="detail"
     ),
-    url(
-        r'^api/combobox_tags/$',
-        views.ComboboxAjaxView.as_view(),
-        name='api_combobox'
-    ),
-
 )

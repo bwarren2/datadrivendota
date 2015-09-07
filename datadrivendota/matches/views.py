@@ -1,13 +1,8 @@
-from itertools import chain
-
 from django.views.generic import DetailView, ListView
 from django.shortcuts import get_object_or_404
 
-from datadrivendota.views import AjaxView
-from heroes.models import Role
 from utils.views import cast_dict, ability_infodict
 
-from heroes.models import Hero
 from .models import Match, PlayerMatchSummary, PickBan
 
 
@@ -124,36 +119,3 @@ class MatchListView(ListView):
     queryset = Match.objects.filter(
         validity=Match.LEGIT,
     ).select_related()[:20]
-
-
-class ComboboxAjaxView(AjaxView):
-
-    def get_result_data(self, **kwargs):
-
-        q = self.request.GET.get('q', '')
-        heroes = Hero.objects.filter(name__icontains=q)[:5]
-        alignments = ['Strength', 'Agility', 'Intelligence', 'nv-point-0']
-        matched_alignments = [s for s in alignments if q.lower() in s.lower()]
-
-        roles = [r.name for r in Role.objects.filter(name__icontains=q)[:5]]
-        results = []
-
-        for hero in heroes:
-            match_json = {}
-            match_json['id'] = hero.steam_id
-            match_json['label'] = hero.css_id  # Attr
-            match_json['value'] = hero.name  # Goes visible
-
-            results.append(match_json)
-
-        for i, string in enumerate(chain(matched_alignments, roles)):
-            match_json = {}
-            match_json['id'] = i
-            match_json['label'] = 'npc_dota_hero_' + string.lower().replace(
-                ' ', '_'
-            )  # Attr
-            match_json['value'] = string  # Goes visible
-            results.append(match_json)
-
-        kwargs['results'] = results
-        return kwargs

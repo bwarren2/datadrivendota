@@ -32,6 +32,11 @@ urlpatterns = patterns(
         name='privacy'
     ),
     url(
+        r'^api/combobox_tags/$',
+        views.ComboboxAjaxView.as_view(),
+        name='api_combobox'
+    ),
+    url(
         r'^robots\.txt/$',
         TemplateView.as_view(
             template_name='robots.txt',
