@@ -1,5 +1,6 @@
 """Common settings and globals."""
 
+from collections import OrderedDict
 
 from django.contrib.messages import constants as message_constants
 from os.path import abspath, basename, dirname, join, normpath
@@ -518,8 +519,22 @@ FEATURE_FLAGS = [
 ]
 
 
-def key_func(*args, **kwargs):
-    return len(kwargs['request'].query_params)
+def key_func(
+    *args,
+    **kwargs
+):
+    request = kwargs['request']
+    param_dct = OrderedDict()
+    for x in sorted(request.query_params):
+        param_dct[x] = request.query_params[x]
+
+    dct = {
+        'method': request.method,
+        'params': frozenset(param_dct.items()),
+        'path': request.path,
+        'format': request.accepted_renderer.format,
+    }
+    return hash(frozenset(dct.items()))
 
 REST_FRAMEWORK_EXTENSIONS = {
     'DEFAULT_OBJECT_CACHE_KEY_FUNC': key_func,
