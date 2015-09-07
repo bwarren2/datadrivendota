@@ -65,6 +65,18 @@ div.tooltip {
   pointer-events: none;
 }
 
+.tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 87%; /* Center the down arrow. */
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
 
 .chart > i.toggleface.radiant, .chart > i.d2mh.radiant{
   background-color:rgba(124, 213, 27, .5);
