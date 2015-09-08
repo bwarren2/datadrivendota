@@ -166,6 +166,7 @@ class MirrorRecentLeagues(Task):
 
     def run(self):
         leagues = self.find_leagues()
+        logger.info("Mirroring these leagues: {0}".format(leagues))
         ul = UpdateLeagues()
         ul.s().delay(leagues=leagues)
 

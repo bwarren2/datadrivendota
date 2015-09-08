@@ -1,9 +1,11 @@
+from datetime import timedelta
+
 from django.templatetags.static import static
 from django.db import models
-from .managers import SortedLeagueManager
 from django.utils import timezone
 from django.conf import settings
-from datetime import timedelta
+
+from .managers import SortedLeagueManager
 
 
 class League(models.Model):
@@ -22,6 +24,11 @@ class League(models.Model):
         (PRO, 'Professional'),
         (PREMIUM, 'Premium'),
     )
+    URL_MAP = {
+        AMATEUR: 'am',
+        PRO: 'pro',
+        PREMIUM: 'premium',
+    }
 
     steam_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=200, null=True)  # Made up constant
@@ -110,4 +117,27 @@ class ScheduledMatch(models.Model):
     class Meta:
         unique_together = (
             'league', 'game_id', 'team_1', 'team_2', 'start_time'
+        )
+
+
+class LiveMatch(models.Model):
+    league_id = models.PositiveIntegerField()
+    steam_id = models.PositiveIntegerField()
+    radiant_team = models.PositiveIntegerField(null=True, blank=True)
+    dire_team = models.PositiveIntegerField(null=True, blank=True)
+    radiant_logo_ugc = models.BigIntegerField(null=True, blank=True)
+    dire_logo_ugc = models.BigIntegerField(null=True, blank=True)
+    failed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def ready(self):
+        return self.created_at < timezone.now() - timedelta(
+            minutes=settings.LIVE_MATCH_LOOKBACK_MINUTES,
+        )
+
+    @property
+    def expired(self):
+        return self.created_at < timezone.now() - timedelta(
+            days=settings.FAILED_LIVEMATCH_KEEP_DAYS
         )

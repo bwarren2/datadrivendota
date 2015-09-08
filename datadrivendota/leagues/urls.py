@@ -3,11 +3,21 @@ from leagues import views
 
 urlpatterns = patterns(
     '',
-    url(r'^$', views.LeagueList.as_view(), name='index'),
+    url(r'^$', views.LeagueOverview.as_view(), name='overview'),
+    url(
+        r'^(?P<tier>pro|am|premium)/$',
+        views.LeagueList.as_view(),
+        name='index'
+    ),
     url(
         r'^scheduled-matches/$',
         views.ScheduledMatchList.as_view(),
         name='scheduled_matches'
+    ),
+    url(
+        r'^live-matches/$',
+        views.LiveMatchList.as_view(),
+        name='live_matches'
     ),
     url(
         r'^(?P<steam_id>[0-9\-]*)/$',

@@ -1,11 +1,12 @@
 from django.views.generic import ListView, DetailView, TemplateView
 from django.shortcuts import get_object_or_404
+from django.http import Http404
+from django.conf import settings
 
 from utils.pagination import SmarterPaginator
 from datadrivendota.views import JsonApiView
 
-from .models import League, ScheduledMatch
-
+from .models import League, ScheduledMatch, LiveMatch
 from matches.models import Match
 
 from datadrivendota.redis_app import (
@@ -16,22 +17,23 @@ from datadrivendota.redis_app import (
 )
 
 
-class ScheduledMatchList(ListView):
+class LeagueOverview(TemplateView):
 
-    """ The index of imported leagues. """
+    """ The leagues with recent games by category. """
 
-    model = ScheduledMatch
-    paginate_by = 32
+    template_name = 'leagues/league_overview.html'
 
-    def paginate_queryset(self, queryset, page_size):
-        page = self.request.GET.get('page')
-        paginator = SmarterPaginator(
-            object_list=queryset,
-            per_page=page_size,
-            current_page=page
-        )
-        objs = paginator.current_page
-        return (paginator, page, objs, True)
+    def get_context_data(self, **kwargs):
+        kwargs['premium_list'] = League.recency.filter(
+            tier=League.PREMIUM
+        ).select_related()[:settings.OVERVIEW_LEAGUE_COUNT]
+        kwargs['pro_list'] = League.recency.filter(
+            tier=League.PRO
+        ).select_related()[:settings.OVERVIEW_LEAGUE_COUNT]
+        kwargs['am_list'] = League.recency.filter(
+            tier=League.AMATEUR
+        ).select_related()[:settings.OVERVIEW_LEAGUE_COUNT]
+        return super(LeagueOverview, self).get_context_data(**kwargs)
 
 
 class LeagueList(ListView):
@@ -41,8 +43,19 @@ class LeagueList(ListView):
     model = League
     paginate_by = 32
 
-    def get_queryset(self):
-        qs = self.model.recency.all().select_related()
+    def get_queryset(self, **kwargs):
+        if self.kwargs['tier'] == League.URL_MAP[League.PREMIUM]:
+            qs = self.model.recency.filter(
+                tier=League.PREMIUM
+            ).select_related()
+        elif self.kwargs['tier'] == League.URL_MAP[League.PRO]:
+            qs = self.model.recency.filter(tier=League.PRO).select_related()
+        elif self.kwargs['tier'] == League.URL_MAP[League.AMATEUR]:
+            qs = self.model.recency.filter(
+                tier=League.AMATEUR
+            ).select_related()
+        else:
+            raise Http404
         return qs
 
     def paginate_queryset(self, queryset, page_size):
@@ -55,19 +68,9 @@ class LeagueList(ListView):
         objs = paginator.current_page
         return (paginator, page, objs, True)
 
-
-class LeagueDetailTimeWalk(DetailView):
-
-    """ Timestepping for a particular league. """
-
-    template_name = 'leagues/league_timewalk.html'
-
-    def get_object(self):
-        return get_object_or_404(League, steam_id=self.kwargs.get('steam_id'))
-
     def get_context_data(self, **kwargs):
-        kwargs['show_control_bar'] = True
-        return super(LeagueDetailTimeWalk, self).get_context_data(**kwargs)
+        kwargs['tier'] = "{0} Leagues".format(self.kwargs['tier'].title())
+        return super(LeagueList, self).get_context_data(**kwargs)
 
 
 class LeagueDetail(DetailView):
@@ -95,6 +98,87 @@ class LeagueDetail(DetailView):
 
         kwargs['match_list'] = match_list
         return super(LeagueDetail, self).get_context_data(**kwargs)
+
+
+class LeagueDetailTimeWalk(DetailView):
+
+    """ Timestepping for a particular league. """
+
+    template_name = 'leagues/league_timewalk.html'
+
+    def get_object(self):
+        return get_object_or_404(League, steam_id=self.kwargs.get('steam_id'))
+
+    def get_context_data(self, **kwargs):
+        kwargs['show_control_bar'] = True
+        return super(LeagueDetailTimeWalk, self).get_context_data(**kwargs)
+
+
+class ScheduledMatchList(ListView):
+
+    """ The index of imported leagues. """
+
+    model = ScheduledMatch
+    paginate_by = 32
+
+    def paginate_queryset(self, queryset, page_size):
+        page = self.request.GET.get('page')
+        paginator = SmarterPaginator(
+            object_list=queryset,
+            per_page=page_size,
+            current_page=page
+        )
+        objs = paginator.current_page
+        return (paginator, page, objs, True)
+
+
+class LiveMatchList(ListView):
+
+    """ The index of imported leagues. """
+
+    model = LiveMatch
+
+    def get_context_data(self, **kwargs):
+        """
+        Created lists of matches flagging if we have pulled in their data.
+
+        This logic will probably be factored out into managers or something.
+        """
+        live_matches = LiveMatch.objects.all()
+
+        matches = Match.objects.filter(
+            steam_id__in=[x.steam_id for x in live_matches]
+        ).values_list('steam_id', flat=True)
+
+        for match in live_matches:
+
+            if match.steam_id in matches:
+                match.has_match = True
+            else:
+                match.has_match = False
+
+            if match.has_match:
+                match.finished = True
+            elif match.ready is False:
+                match.finished = 'Unready'
+            else:
+                match.finished = False
+
+        kwargs['complete_matches'] = [
+            x for x in live_matches if x.has_match
+        ]
+        kwargs['incomplete_matches'] = [
+            x for x in live_matches
+            if x.finished is False and x.ready and not x.failed
+        ]
+        kwargs['unready_matches'] = [
+            x for x in live_matches if x.ready is False
+        ]
+        kwargs['failed_matches'] = [
+            x for x in live_matches if x.failed and not x.has_match
+        ]
+
+        return super(LiveMatchList, self).get_context_data(**kwargs)
 
 
 class LiveGameListView(TemplateView):

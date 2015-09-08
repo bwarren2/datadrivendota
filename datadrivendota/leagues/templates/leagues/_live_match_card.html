@@ -1,0 +1,17 @@
+{% if x.finished == True %}
+<div class='live-match-card complete'>
+{% elif x.finished == 'Unready' %}
+<div class='live-match-card unready'>
+{% elif x.failed == True %}
+<div class='live-match-card failed'>
+{% else %}
+<div class='live-match-card incomplete'>
+{% endif %}
+    <p >League ID: {{x.league_id}}</p>
+    <p >Match ID: {{x.steam_id}}</p>
+    <p >Created at: {{x.created_at|date:'Y-m-d H:i:s'}}</p>
+
+    {% if not x.has_match %}
+        <p >Missing Match</p>
+    {% endif %}
+</div>

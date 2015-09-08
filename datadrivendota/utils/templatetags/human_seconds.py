@@ -1,5 +1,6 @@
 # Import template library
 from django import template
+from datetime import datetime
 
 # Set register
 register = template.Library()
@@ -141,3 +142,10 @@ def human_seconds(value, arg=''):
 
         # Provide 'No duration' message
         return 'No duration'
+
+
+@register.filter(name='seconds_to_date')
+def seconds_to_date(value, arg=''):
+    """ Turn seconds into a pretty string. """
+    # Place seconds in to integer
+    return datetime.fromtimestamp(value)
