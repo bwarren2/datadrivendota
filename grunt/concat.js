@@ -23,7 +23,7 @@ module.exports = {
             "bower_components/d3/d3.js",
             "bower_components/jqueryui/jquery-ui.min.js",
             "bower_components/nvd3/build/nv.d3.js",
-            "bower_components/bluebird/js/browser/bluebird.min.js",
+            "bower_components/bluebird/js/browser/bluebird.js",
             "bower_components/handlebars/handlebars.min.js",
             "bower_components/eldarion-ajax/js/eldarion-ajax.min.js",
             "bower_components/sprintf/dist/sprintf.min.js",

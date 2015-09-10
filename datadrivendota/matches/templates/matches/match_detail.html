@@ -20,22 +20,38 @@
   <div class="row">
     <div id='level-row' class="charts col-md-6">
     <h4>Level Progression</h4>
-          <div id='abilities'></div>
+          <div id='abilities' class='vert-md-4 chart'>
+            <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+          </div>
+
     </div>
 
     <div id='matchup-charts' class='col-md-6'>
       <div class='row'>
-        <div id='kill_dmg' class="charts col-md-6">
+        <div class="charts col-md-6">
           <h4>Kills vs Damage</h4>
+          <div id='kill_dmg' class='vert-md-4 chart'>
+            <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+          </div>
         </div>
-        <div id='xp_gold' class="charts col-md-6">
+        <div class="charts col-md-6">
           <h4>Gold vs EXP</h4>
+          <div id='xp_gold' class='vert-md-4 chart'>
+            <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+          </div>
         </div>
-        <div id='kill_death' class="charts col-md-6">
+        <div class="charts col-md-6">
           <h4>Kills vs Deaths</h4>
+          <div id='kill_death' class='vert-md-4 chart'>
+            <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+          </div>
+
         </div>
-        <div id='lh_denies' class="charts col-md-6">
+        <div class="charts col-md-6">
           <h4>Last Hits vs Denies</h4>
+          <div id='lh_denies' class='vert-md-4 chart'>
+            <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+          </div>
         </div>
 
       </div>
@@ -70,49 +86,24 @@ $(function(){
   Promise.resolve($.ajax(url))
   .then(function(data){
 
-    var destination = '#kill_dmg';
-    var plot_data = [
-      {
-        key:'Kills vs Hero Damage',
-        values:data.map(function(d){
-          return {
-            x:d.kills,
-            y:d.hero_damage,
-          }
-        }),
-      }
-    ]
-    window.Chartreuse.scatter(destination, plot_data, 'Kills', 'Hero Damage');
+    d7.extensions.charts.matches.kill_dmg_scatter(
+      '#kill_dmg', {match_id:{{match.steam_id}}}
+    );
 
 
-    var destination = '#xp_gold';
-    var plot_data = [
-      {
-        key:'Gold Gain vs XP Gain',
-        values:data.map(function(d){
-          return {
-            x:d.xp_per_min,
-            y:d.gold_per_min,
-          }
-        }),
-      }
-    ];
-    window.Chartreuse.scatter(destination, plot_data, 'XP per min', 'Gold per min');
+    d7.extensions.charts.matches.xpm_gpm_scatter(
+      '#xp_gold', {match_id:{{match.steam_id}}}
+    );
 
 
-    var destination = '#kill_death';
-    var plot_data = [
-      {
-        key:'Kills vs Deaths',
-        values:data.map(function(d){
-          return {
-            x:d.deaths,
-            y:d.kills,
-          }
-        }),
-      }
-    ];
-    window.Chartreuse.scatter(destination, plot_data, 'Deaths', 'Kills');
+    d7.extensions.charts.matches.kill_death_scatter(
+      '#kill_death', {match_id:{{match.steam_id}}}
+    );
+
+    d7.extensions.charts.matches.lh_denies_scatter(
+      '#lh_denies', {match_id:{{match.steam_id}}}
+    );
+
 
     var destination = '#lh_denies';
     var plot_data = [
@@ -145,57 +136,61 @@ $(function(){
       })
     })();
 
-    (function(){
-      var destination = '#last_hits';
-      nv.addGraph(function(){
-        var plot_data = [{
-          key:'Last Hits',
-          values:data.map(function(d){
-            return {
-              label: d.hero.name,
-              value: d.last_hits
-            }
-          })
-        }];
-        chart = nv.models.discreteBarChart(destination, plot_data);
-      })
-    })();
+    // (function(){
+    //   var destination = '#last_hits';
+    //   nv.addGraph(function(){
+    //     var plot_data = [{
+    //       key:'Last Hits',
+    //       values:data.map(function(d){
+    //         return {
+    //           label: d.hero.name,
+    //           value: d.last_hits
+    //         }
+    //       })
+    //     }];
+    //     chart = nv.models.discreteBarChart(destination, plot_data);
+    //   })
+    // })();
+
+    // d7.extensions.charts.matches.pms_scatter(
+    //   '#last_hits', {match_id:{{match.steam_id}}}
+    // );
 
 
-    (function(){
-      var destination = '#tower_damage';
-      nv.addGraph(function(){
-        var plot_data = [{
-          key:'KDA2',
-          values:data.map(function(d){
-            return {
-              label: d.hero.name,
-              value: d.tower_damage
-            }
-          })
-        }];
-        chart = nv.models.discreteBarChart(destination, plot_data);
-      })
-    })();
+    // (function(){
+    //   var destination = '#tower_damage';
+    //   nv.addGraph(function(){
+    //     var plot_data = [{
+    //       key:'KDA2',
+    //       values:data.map(function(d){
+    //         return {
+    //           label: d.hero.name,
+    //           value: d.tower_damage
+    //         }
+    //       })
+    //     }];
+    //     chart = nv.models.discreteBarChart(destination, plot_data);
+    //   })
+    // })();
 
-    (function(){
-      var destination = '#abilities';
-      var plot_data = data.map(function(d){
-        return {
-          key: d.hero.name,
-          values: d.skillbuild
-        }
-      });
-      nv.addGraph(function(){
-        chart = nv.models.lineChart()
-          .x(function(d){return d.time})
-          .y(function(d){return d.level})
-        svg = window.make_svg(destination, 230);
-        chart_data = svg.datum(plot_data);
-        chart_data.transition().duration(500).call(chart);
+    // (function(){
+    //   var destination = '#abilities';
+    //   var plot_data = data.map(function(d){
+    //     return {
+    //       key: d.hero.name,
+    //       values: d.skillbuild
+    //     }
+    //   });
+    //   nv.addGraph(function(){
+    //     chart = nv.models.lineChart()
+    //       .x(function(d){return d.time})
+    //       .y(function(d){return d.level})
+    //     svg = window.make_svg(destination, 230);
+    //     chart_data = svg.datum(plot_data);
+    //     chart_data.transition().duration(500).call(chart);
 
-      })
-    })();
+    //   })
+    // })();
 
 
 
