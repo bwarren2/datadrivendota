@@ -1,0 +1,134 @@
+{% extends "matches/match_base.html" %}
+
+{% load staticfiles player_extras %}
+
+{% block extra_css %}{{ form.media }}{% endblock extra_css %}
+
+{% block title %}Match #{{ match.steam_id }}{% endblock title %}
+
+
+{% block match_content %}
+
+  {% include "matches/_match_header_card.html" %}
+  {% include "matches/_match_card.html" %}
+
+  {% if dire_bans or radiant_bans %}
+    <h4 id='pickban-tool'>Picks and Bans</h4>
+    <div class="row controls-button">
+      <div class="col-sm-12 text-center">
+        <div>
+          Pick/ban
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-default" id="pickban-backward"><i class="glyphicon glyphicon-backward"></i></button>
+          <button class="btn btn-default disabled" id="pickban-reveal">Pick/Ban</button>
+          <button class="btn btn-default" id="pickban-forward"><i class="glyphicon glyphicon-forward"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+
+      <div class="radiant-pickban col-md-6">
+        <h3>Radiant</h3>
+        <div class="row">
+          <div class="col-md-3">
+            <h4>Ban</h4>
+            <ul class="pickban-list" id="dire-ban">
+              {% for pb in radiant_bans %}
+                <li data-pborder="{{ pb.order }}">
+                  {% if pb.hero.mugshot %}
+                  <a href="#" class="thumbnail">
+                    <img src="{{ pb.hero.thumbshot_url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                  </a>
+                  {% else %}
+                  {{ pb.hero.name }}
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="col-md-9">
+            <h4>Pick</h4>
+            <ul class="pickban-list" id="dire-pick">
+              {% for pb in radiant_picks %}
+                <li data-pborder="{{ pb.order }}">
+                  {% if pb.hero.mugshot %}
+                    <a href="#" class="thumbnail">
+                      <img src="{{ pb.hero.mugshot_url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                    </a>
+                  {% else %}
+                  {{ pb.hero.name }}
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="dire-pickban col-md-6">
+        <h3>Dire</h3>
+        <div class="row">
+          <div class="col-md-3">
+            <h4>Ban</h4>
+            <ul class="pickban-list" id="dire-ban">
+              {% for pb in dire_bans %}
+                <li data-pborder="{{ pb.order }}">
+                  <a href="#" class="thumbnail">
+                    <img src="{{ pb.hero.thumbshot_url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="col-md-9">
+            <h4>Pick</h4>
+            <ul class="pickban-list" id="dire-pick">
+              {% for pb in dire_picks %}
+                <li data-pborder="{{ pb.order }}">
+                  <a href="#" class="thumbnail">
+                    <img src="{{ pb.hero.mugshot_url }}" alt="{{ pb.hero.name }}" title="{{ pb.hero.name }}">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  {% endif %}
+{% endblock match_content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+  $(document).ready(function () {
+    // @todo: store the pickban items in an array, so we know things like how many there are.
+    var PICKBAN_LIMIT = {{ pickban_length }};
+    var pickban_position = -1;
+
+    // Set-up:
+    $('.pickban-list li').hide();
+
+    // Manual cycling:
+    $('#pickban-forward').click(function () {
+      if (pickban_position === PICKBAN_LIMIT - 1) {
+        return;
+      }
+      $('.dire-pickban, .radiant-pickban').show();
+      pickban_position++;
+      $('[data-pborder=' + pickban_position + ']').fadeIn();
+    });
+    $('#pickban-backward').click(function () {
+      if (pickban_position === -1) {
+        return;
+      }
+      $('.dire-pickban, .radiant-pickban').show();
+      $('[data-pborder=' + pickban_position + ']').fadeOut();
+      pickban_position--;
+    });
+  });
+</script>
+{% endblock extra_js %}
