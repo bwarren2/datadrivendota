@@ -28,6 +28,7 @@ module.exports = {
             "bower_components/eldarion-ajax/js/eldarion-ajax.min.js",
             "bower_components/sprintf/dist/sprintf.min.js",
             "bower_components/select2/dist/js/select2.js",
+            "bower_components/moment/min/moment.min.js",
             "js/charting.js",
             "js/parse.js",
             "js/project.js",
