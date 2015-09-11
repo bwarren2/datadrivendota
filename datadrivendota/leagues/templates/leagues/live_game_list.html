@@ -15,7 +15,7 @@ Current Live Games
     {% for game in games %}
         <div class='game-card'>
             <div class='page-header'>
-                <h1>  Match: {{game.match_id}}, {{game.scoreboard.duration|human_seconds}}</h1>
+                {# <h1>  Match: {{game.match_id}}, {{game.scoreboard.duration|human_seconds}}</h1> #}
             </div>
             <a href="{% url 'leagues:live_game_detail' match_id=game.match_id %}" >
                 <span class='default-link'></span>

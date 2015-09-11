@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% block title %}
+    Leagues!
+{% endblock title %}
+
+{% block sections %}
+    <div class='container'>
+        <h2>Leagues by last game played</h2>
+        <h3><a href="{% url "leagues:index" tier='premium'%}">Premium</a></h3>
+        <div class='row'>
+            {% for league in premium_list %}
+                <div class='col-md-3'>
+                    {% include "leagues/_league_card.html" %}
+                </div>
+            {% endfor %}
+        </div>
+        <h3><a href="{% url "leagues:index" tier='pro'%}">Pro</a></h3>
+        <div class='row'>
+            {% for league in pro_list %}
+                <div class='col-md-3'>
+                    {% include "leagues/_league_card.html" %}
+                </div>
+            {% endfor %}
+        </div>
+        <h3><a href="{% url "leagues:index" tier='am'%}">Amateur</a></h3>
+        <div class='row'>
+            {% for league in am_list %}
+                <div class='col-md-3'>
+                    {% include "leagues/_league_card.html" %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock sections %}
+

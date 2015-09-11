@@ -1,8 +1,14 @@
 {% extends "row_base.html" %}
+{% load human_seconds %}
 {% block content %}
 
-Harru
 {% for x in object_list %}
-    <p>foo</p>
+    <div class='col-md-4'>
+        <img class='thumbnail' src="{{x.league.image}}">
+        <p class='overlayer'>
+            {{x.league.display_name}}
+            {{x.start_time|seconds_to_date|date:'Y-m-d H:i:s'}}
+        </p>
+    </div>
 {% endfor %}
 {% endblock content %}

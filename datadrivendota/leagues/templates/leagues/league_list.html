@@ -4,10 +4,8 @@
 {% block title %}
     Leagues!
 {% endblock title %}
-{% block page_title %}
-    Leagues!
-{% endblock page_title %}
 {% block content %}
+    <h3>{{tier}}</h3>
     {% for league in league_list %}
         <div class='col-md-3'>
             <a href="{% url 'leagues:detail' steam_id=league.steam_id %}" class='thumbnail'>
@@ -17,7 +15,6 @@
 
         </div>
     {% endfor %}
-    </div>
 {% endblock content %}
 
 {% block content_foot %}

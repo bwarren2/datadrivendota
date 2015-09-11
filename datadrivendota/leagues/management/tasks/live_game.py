@@ -11,10 +11,12 @@ from datadrivendota.redis_app import (
     slice_key,
     set_games,
 )
-from leagues.models import League
+
+from leagues.models import League, LiveMatch
 from heroes.models import Hero
 from items.models import Item
 from teams.models import Team
+from matches.models import Match
 from datadrivendota.management.tasks import (
     ApiFollower,
     ApiContext,
@@ -67,8 +69,25 @@ class UpdateLiveGames(ApiFollower):
                     formatted_game[side] = self._get_side_data(game, side)
 
             self._store_data(formatted_game)
+            self.make_record(formatted_game)
 
         set_games(urldata)
+
+    def make_record(self, formatted_game):
+        LiveMatch.objects.get_or_create(
+            league_id=formatted_game['game']['league_id'],
+            steam_id=formatted_game['game']['match_id'],
+            radiant_team=formatted_game.get('radiant', {}).get(
+                'team_id', None
+            ),
+            dire_team=formatted_game.get('dire', {}).get('team_id', None),
+            radiant_logo_ugc=formatted_game.get('radiant', {}).get(
+                'team_logo', None
+            ),
+            dire_logo_ugc=formatted_game.get('dire', {}).get(
+                'team_logo', None
+            ),
+        )
 
     def _store_data(self, game_snapshot):
         # Store slice
@@ -251,3 +270,18 @@ class UpdateLiveGames(ApiFollower):
     def _clean_urldata(self, urldata):
         """ Strip out request-level response from valve. """
         return urldata['result']['games']
+
+
+class UpdateLiveMatches(Task):
+
+    def run(self):
+        live_matches = LiveMatch.objects.all()
+
+        matches = Match.objects.filter(
+            steam_id__in=[x.steam_id for x in live_matches]
+        ).values_list('steam_id', flat=True)
+
+        for match in live_matches:
+
+            if (match.steam_id in matches or match.expired):
+                match.delete()

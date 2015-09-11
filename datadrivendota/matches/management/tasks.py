@@ -4,6 +4,7 @@ from time import time as now
 from copy import deepcopy
 from datetime import datetime, timedelta
 
+from django.utils import timezone
 from django.db.models import Min, Max, Count
 from django.conf import settings
 from matches.models import (
@@ -20,7 +21,7 @@ from datadrivendota.utilities import error_email
 from players.models import Player
 from heroes.models import Ability, Hero
 from items.models import Item
-from leagues.models import League
+from leagues.models import League, LiveMatch
 from guilds.models import Guild
 from teams.models import Team
 import logging
@@ -61,6 +62,22 @@ class MirrorMatches(Task):
             c.delay()
 
 
+class MirrorRecentMatches(Task):
+
+    """ All the live games that have happened recently should come in. """
+
+    def run(self, matches=[], skill=None):
+        recent_live = set(
+            LiveMatch.objects.filter(
+                created_at__lte=timezone.now() - timedelta(
+                    minutes=settings.LIVE_MATCH_LOOKBACK_MINUTES
+                )
+            )
+            .values_list('steam_id', flat=True)
+        )
+        MirrorMatches().delay(matches=list(recent_live))
+
+
 class UpdateMatch(ApiFollower):
 
     """ Reflect the match detail response in our database. """
@@ -77,130 +94,139 @@ class UpdateMatch(ApiFollower):
         overall match data.
         """
         data = self.result
+        if 'error' in data:
+            logging.error(data['error'])
+            logging.error(self.api_context)
+            try:
+                LiveMatch.objects.get(
+                    steam_id=self.api_context.match_id
+                ).update(failed=True)
+            except:
+                logging.error('No live match to fail.')
+        else:
+            kwargs = {
+                'radiant_win': data['radiant_win'],
+                'duration': data['duration'],
+                'start_time': data['start_time'],
+                'steam_id': data['match_id'],
+                'match_seq_num': data['match_seq_num'],
+                'tower_status_radiant': data['tower_status_radiant'],
+                'tower_status_dire': data['tower_status_dire'],
+                'barracks_status_radiant': data['barracks_status_radiant'],
+                'barracks_status_dire': data['barracks_status_dire'],
+                'cluster': data['cluster'],
+                'first_blood_time': data['first_blood_time'],
+                'lobby_type': LobbyType.objects.get_or_create(
+                    steam_id=data['lobby_type']
+                )[0],
+                'human_players': data['human_players'],
+                'positive_votes': data['positive_votes'],
+                'negative_votes': data['negative_votes'],
+                'game_mode': GameMode.objects.get_or_create(
+                    steam_id=data['game_mode']
+                )[0],
+                'skill': self.api_context.skill,
+            }
+            try:
 
-        kwargs = {
-            'radiant_win': data['radiant_win'],
-            'duration': data['duration'],
-            'start_time': data['start_time'],
-            'steam_id': data['match_id'],
-            'match_seq_num': data['match_seq_num'],
-            'tower_status_radiant': data['tower_status_radiant'],
-            'tower_status_dire': data['tower_status_dire'],
-            'barracks_status_radiant': data['barracks_status_radiant'],
-            'barracks_status_dire': data['barracks_status_dire'],
-            'cluster': data['cluster'],
-            'first_blood_time': data['first_blood_time'],
-            'lobby_type': LobbyType.objects.get_or_create(
-                steam_id=data['lobby_type']
-            )[0],
-            'human_players': data['human_players'],
-            'positive_votes': data['positive_votes'],
-            'negative_votes': data['negative_votes'],
-            'game_mode': GameMode.objects.get_or_create(
-                steam_id=data['game_mode']
-            )[0],
-            'skill': self.api_context.skill,
-        }
-        try:
+                league = League.objects.get_or_create(
+                    steam_id=data['leagueid']
+                )[0]
+                kwargs.update({'league': league})
+            except KeyError:
+                pass
 
-            league = League.objects.get_or_create(
-                steam_id=data['leagueid']
-            )[0]
-            kwargs.update({'league': league})
-        except KeyError:
-            pass
+            update = False
+            try:
+                match = Match.objects.get(steam_id=data['match_id'])
+                if self.api_context.refresh_records:
+                    for key, value in kwargs.iteritems():
+                        setattr(match, key, value)
+                    match.save()
+                    upload_match_summary(
+                        players=data['players'],
+                        parent_match=match,
+                        refresh_records=self.api_context.refresh_records
+                    )
+                    update = True
 
-        update = False
-        try:
-            match = Match.objects.get(steam_id=data['match_id'])
-            if self.api_context.refresh_records:
-                for key, value in kwargs.iteritems():
-                    setattr(match, key, value)
+            except Match.DoesNotExist:
+                update = True
+                match = Match.objects.create(**kwargs)
                 match.save()
                 upload_match_summary(
                     players=data['players'],
                     parent_match=match,
                     refresh_records=self.api_context.refresh_records
                 )
-                update = True
 
-        except Match.DoesNotExist:
-            update = True
-            match = Match.objects.create(**kwargs)
-            match.save()
-            upload_match_summary(
-                players=data['players'],
-                parent_match=match,
-                refresh_records=self.api_context.refresh_records
-            )
+            if 'picks_bans' in data.keys() and update:
+                for pickban in data['picks_bans']:
+                    datadict = {
+                        'match': match,
+                        'is_pick': pickban['is_pick'],
+                        'hero': Hero.objects.get_or_create(
+                            steam_id=pickban['hero_id']
+                        )[0],
+                        'team': pickban['team'],
+                        'order': pickban['order'],
 
-        if 'picks_bans' in data.keys() and update:
-            for pickban in data['picks_bans']:
+                    }
+                    pb = PickBan.objects.get_or_create(
+                        match=match,
+                        order=pickban['order'],
+                        defaults=datadict
+                    )[0]
+                    pb.save()
+
+            if 'series_id' in data.keys() and update:
+                match.series_id = data['series_id']
+
+            if 'series_type' in data.keys() and update:
+                match.series_type = data['series_type']
+
+            if 'radiant_guild_id' in data.keys() and update:
                 datadict = {
-                    'match': match,
-                    'is_pick': pickban['is_pick'],
-                    'hero': Hero.objects.get_or_create(
-                        steam_id=pickban['hero_id']
-                    )[0],
-                    'team': pickban['team'],
-                    'order': pickban['order'],
-
+                    'steam_id': data["radiant_guild_id"],
+                    'name': data["radiant_guild_name"],
+                    'logo': data["radiant_guild_logo"],
                 }
-                pb = PickBan.objects.get_or_create(
-                    match=match,
-                    order=pickban['order'],
+                g = Guild.objects.get_or_create(
+                    steam_id=data["radiant_guild_id"],
                     defaults=datadict
                 )[0]
-                pb.save()
+                match.radiant_guild = g
 
-        if 'series_id' in data.keys() and update:
-            match.series_id = data['series_id']
+            if 'dire_guild_id' in data.keys() and update:
+                datadict = {
+                    'steam_id': data["dire_guild_id"],
+                    'name': data["dire_guild_name"],
+                    'logo': data["dire_guild_logo"],
+                }
+                g = Guild.objects.get_or_create(
+                    steam_id=data["dire_guild_id"],
+                    defaults=datadict
+                )[0]
+                match.dire_guild = g
 
-        if 'series_type' in data.keys() and update:
-            match.series_type = data['series_type']
+            if 'radiant_team_id' in data.keys() and update:
+                radiant_team = Team.objects.get_or_create(
+                    steam_id=data['radiant_team_id']
+                )[0]
+                match.radiant_team = radiant_team
+                match.radiant_team_complete = True \
+                    if data['radiant_team_id'] == 1 else False
 
-        if 'radiant_guild_id' in data.keys() and update:
-            datadict = {
-                'steam_id': data["radiant_guild_id"],
-                'name': data["radiant_guild_name"],
-                'logo': data["radiant_guild_logo"],
-            }
-            g = Guild.objects.get_or_create(
-                steam_id=data["radiant_guild_id"],
-                defaults=datadict
-            )[0]
-            match.radiant_guild = g
+            if 'dire_team_id' in data.keys() and update:
+                dire_team = Team.objects.get_or_create(
+                    steam_id=data['dire_team_id']
+                )[0]
+                match.dire_team = dire_team
+                match.dire_team_complete = True \
+                    if data['dire_team_id'] == 1 else False
+            match.save()
 
-        if 'dire_guild_id' in data.keys() and update:
-            datadict = {
-                'steam_id': data["dire_guild_id"],
-                'name': data["dire_guild_name"],
-                'logo': data["dire_guild_logo"],
-            }
-            g = Guild.objects.get_or_create(
-                steam_id=data["dire_guild_id"],
-                defaults=datadict
-            )[0]
-            match.dire_guild = g
-
-        if 'radiant_team_id' in data.keys() and update:
-            radiant_team = Team.objects.get_or_create(
-                steam_id=data['radiant_team_id']
-            )[0]
-            match.radiant_team = radiant_team
-            match.radiant_team_complete = True \
-                if data['radiant_team_id'] == 1 else False
-
-        if 'dire_team_id' in data.keys() and update:
-            dire_team = Team.objects.get_or_create(
-                steam_id=data['dire_team_id']
-            )[0]
-            match.dire_team = dire_team
-            match.dire_team_complete = True \
-                if data['dire_team_id'] == 1 else False
-        match.save()
-
-        return self.api_context
+            return self.api_context
 
 
 def upload_match_summary(players, parent_match, refresh_records):
@@ -444,7 +470,7 @@ class CheckMatchIntegrity(Task):
             start_time__lte=1437980497,  # Magic time for the earlier stages
             league__steam_id=2733  # TI5 league id
         ).count()
-        if len(not_main_event_ti5) != 0:
+        if not_main_event_ti5 != 0:
             error_email(
                 'Database alert!',
                 'We have reimported the not-main-event TI5 games.'
