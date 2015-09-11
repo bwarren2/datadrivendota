@@ -1,0 +1,173 @@
+{% extends "matches/match_base.html" %}
+
+{% load staticfiles player_extras %}
+
+{% block extra_css %}{{ form.media }}{% endblock extra_css %}
+
+{% block title %}Match #{{ match.steam_id }}{% endblock title %}
+
+
+{% block match_content %}
+
+  {% include "matches/_match_header_card.html" %}
+  {% include "matches/_match_card.html" %}
+  {% if match.replay %}
+  <div class="alert alert-success" role="alert">
+    Parsed replay exists!  See it <a href="{% url "matches:replay_parse" match_id=match.steam_id %}">here.</a>
+    </div>
+  {% endif %}
+
+  <div class="row">
+    <div class='col-md-12'>
+      <h4>Endgame Table</h4>
+      <table class="table  table-condensed" id='myTable'>
+        <thead>
+          <tr>
+            <th>Hero</th>
+            <th colspan="2">Player</th>
+            <th title='Kills'>K</th>
+            <th title='Deaths'>D</th>
+            <th title='Assists'>A</th>
+            <th title='Kills - Deaths + Assists/2'>KDA2</th>
+            <th title='Items'>Items</th>
+            <th title='Level'>Lvl</th>
+            <th title='Last Hits'>LH</th>
+            <th title='Denies'>DN</th>
+            <th title='Gold per minute'>GPM</th>
+            <th title='Experience per minute'>XPM</th>
+            <th title='Damage to heroes'>H Dmg</th>
+            <th title='Damage to Towers'>T Dmg</th>
+            <th title='Heal to heroes'>Hero Heal</th>
+            <th title='Which side did they play for?'>Side</th>
+            <th title='Did they win?'>Win?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for summary in summaries %}
+            <tr>
+              {% if summary.hero.thumbshot %}
+                <td><img src="{{ summary.hero.thumbshot_url }}" alt="{{ summary.hero.name }}" title="{{ summary.hero.name }}" class="summary-hero-thumbshot"></td>
+              {% else %}
+                <td></td>
+              {% endif %}
+
+              <td>{% player_link summary.player %}</td>
+              <td></td>
+              <td>{{ summary.kills }}</td>
+              <td>{{ summary.deaths }}</td>
+              <td>{{ summary.assists }}</td>
+              <td>{{ summary.kda2 }}</td>
+
+              <td class="match-summary-images">
+                {% if SHOW_ITEMS %}
+                {% if summary.item_0.mugshot %}
+                <a href="{%url 'items:detail' item_name=summary.item_0.slug_name%}">
+                  <img src="{{ summary.item_0.thumbshot_url }}"
+                  alt="{{ summary.item_0.name }}"
+                  title="{{ summary.item_0.name }}"
+                  >
+                  </a>
+                {% endif %}
+                {% if summary.item_1.thumbshot %}
+                <a href="{%url 'items:detail' item_name=summary.item_1.slug_name%}">
+                  <img src="{{ summary.item_1.thumbshot_url }}"
+                  alt="{{ summary.item_1.name }}"
+                  title="{{ summary.item_1.name }}"
+                  ></a>
+                {% endif %}
+                {% if summary.item_2.thumbshot %}
+                <a href="{%url 'items:detail' item_name=summary.item_2.slug_name%}">
+                  <img src="{{ summary.item_2.thumbshot_url }}"
+                  alt="{{ summary.item_2.name }}"
+                  title="{{ summary.item_2.name }}"
+                  ></a>
+                {% endif %}
+                {% if summary.item_3.thumbshot %}
+                <a href="{%url 'items:detail' item_name=summary.item_3.slug_name%}">
+                  <img src="{{ summary.item_3.thumbshot_url }}"
+                  alt="{{ summary.item_3.name }}"
+                  title="{{ summary.item_3.name }}"
+                  ></a>
+                {% endif %}
+                {% if summary.item_4.thumbshot %}
+                <a href="{%url 'items:detail' item_name=summary.item_4.slug_name%}">
+                  <img src="{{ summary.item_4.thumbshot_url }}"
+                  alt="{{ summary.item_4.name }}"
+                  title="{{ summary.item_4.name }}"
+                  ></a>
+                {% endif %}
+                {% if summary.item_5.thumbshot %}
+                <a href="{%url 'items:detail' item_name=summary.item_5.slug_name%}">
+                  <img src="{{ summary.item_5.thumbshot_url }}"
+                  alt="{{ summary.item_5.name }}"
+                  title="{{ summary.item_5.name }}"
+                  ></a>
+                {% endif %}
+
+                {% else %}
+                {% if summary.item_0.thumbshot %}
+                  <img src="{{ summary.item_0.thumbshot_url }}"
+                  alt="{{ summary.item_0.name }}"
+                  title="{{ summary.item_0.name }}"
+                  >
+                {% endif %}
+                {% if summary.item_1.thumbshot %}
+                  <img src="{{ summary.item_1.thumbshot_url }}"
+                  alt="{{ summary.item_1.name }}"
+                  title="{{ summary.item_1.name }}"
+                  >
+                {% endif %}
+                {% if summary.item_2.thumbshot %}
+                  <img src="{{ summary.item_2.thumbshot_url }}"
+                  alt="{{ summary.item_2.name }}"
+                  title="{{ summary.item_2.name }}"
+                  >
+                {% endif %}
+                {% if summary.item_3.thumbshot %}
+                  <img src="{{ summary.item_3.thumbshot_url }}"
+                  alt="{{ summary.item_3.name }}"
+                  title="{{ summary.item_3.name }}"
+                  >
+                {% endif %}
+                {% if summary.item_4.thumbshot %}
+                  <img src="{{ summary.item_4.thumbshot_url }}"
+                  alt="{{ summary.item_4.name }}"
+                  title="{{ summary.item_4.name }}"
+                  >
+                {% endif %}
+                {% if summary.item_5.thumbshot %}
+                  <img src="{{ summary.item_5.thumbshot_url }}"
+                  alt="{{ summary.item_5.name }}"
+                  title="{{ summary.item_5.name }}"
+                  >
+                {% endif %}
+
+                {% endif %}
+
+
+              </td>
+
+              <td>{{ summary.level }}</td>
+              <td>{{ summary.last_hits }}</td>
+              <td>{{ summary.denies }}</td>
+              <td>{{ summary.gold_per_min }}</td>
+              <td>{{ summary.xp_per_min }}</td>
+              <td>{{ summary.hero_damage }}</td>
+              <td>{{ summary.tower_damage }}</td>
+              <td>{{ summary.hero_healing }}</td>
+              <td class="match-summary-images">
+                {% if summary.is_radiant %}
+                  <img src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.side }}'>
+                {% else %}
+                  <img src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.side }}'>
+                {% endif %}
+
+              </td>
+              <td>{% if summary.is_win %} <div class='glyphicon glyphicon-ok-circle win-glyph' title='Won' style='font-size:15px'></div>{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock match_content %}
