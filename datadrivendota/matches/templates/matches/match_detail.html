@@ -85,15 +85,10 @@
 {% block extra_js %}
 <script type="text/javascript">
 $(function(){
-  var url = '{% url "rest-api:player-match-summary-list" %}?match_id={{match.steam_id}}';
-
-  Promise.resolve($.ajax(url))
-  .then(function(data){
 
     d7.extensions.charts.matches.kill_dmg_scatter(
       '#kill_dmg', {match_id:{{match.steam_id}}}
     );
-
 
     d7.extensions.charts.matches.xpm_gpm_scatter(
       '#xp_gold', {match_id:{{match.steam_id}}}
@@ -108,87 +103,22 @@ $(function(){
       '#lh_denies', {match_id:{{match.steam_id}}}
     );
 
-
-
-    var destination = '#kda2';
-    console.log(data);
-    nv.addGraph(function(){
-      var plot_data = [{
-        key:'KDA2',
-        values:data.map(function(d){
-          return {
-            label: d.hero.name,
-            value: d.kda2
-          }
-        })
-      }];
-      chart = nv.models.discreteBarChart(destination, plot_data);
-    })
-
-    // (function(){
-    //   var destination = '#last_hits';
-    //   nv.addGraph(function(){
-    //     var plot_data = [{
-    //       key:'Last Hits',
-    //       values:data.map(function(d){
-    //         return {
-    //           label: d.hero.name,
-    //           value: d.last_hits
-    //         }
-    //       })
-    //     }];
-    //     chart = nv.models.discreteBarChart(destination, plot_data);
-    //   })
-    // })();
-
-    // d7.extensions.charts.matches.pms_scatter(
-    //   '#last_hits', {match_id:{{match.steam_id}}}
-    // );
-
-
-    // (function(){
-    //   var destination = '#tower_damage';
-    //   nv.addGraph(function(){
-    //     var plot_data = [{
-    //       key:'KDA2',
-    //       values:data.map(function(d){
-    //         return {
-    //           label: d.hero.name,
-    //           value: d.tower_damage
-    //         }
-    //       })
-    //     }];
-    //     chart = nv.models.discreteBarChart(destination, plot_data);
-    //   })
-    // })();
-
-
     d7.extensions.charts.matches.ability_lines(
       '#abilities', {match_id:{{match.steam_id}}}
     );
 
-    // (function(){
-    //   var destination = '#abilities';
-    //   var plot_data = data.map(function(d){
-    //     return {
-    //       key: d.hero.name,
-    //       values: d.skillbuild
-    //     }
-    //   });
-    //   nv.addGraph(function(){
-    //     chart = nv.models.lineChart()
-    //       .x(function(d){return d.time})
-    //       .y(function(d){return d.level})
-    //     svg = window.make_svg(destination, 230);
-    //     chart_data = svg.datum(plot_data);
-    //     chart_data.transition().duration(500).call(chart);
+    d7.extensions.charts.matches.lh_barchart(
+      '#last_hits', {match_id:{{match.steam_id}}}
+    );
 
-    //   })
-    // })();
+    d7.extensions.charts.matches.kda2_barchart(
+      '#kda2', {match_id:{{match.steam_id}}}
+    );
 
+    d7.extensions.charts.matches.tower_dmg_barchart(
+      '#tower_damage', {match_id:{{match.steam_id}}}
+    );
 
-
-  })
 })
 </script>
 {% endblock extra_js %}

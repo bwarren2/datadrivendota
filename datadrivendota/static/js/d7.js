@@ -23396,10 +23396,10 @@ var ability_lines = function(destination, params){
             left: 45,
             bottom: 45,
           })
-          .showLegend(false);
+          .showLegend(true);
 
-        chart.xAxis.axisLabel('Level');
-        chart.yAxis.axisLabel('Time');
+        chart.xAxis.axisLabel("Level");
+        chart.yAxis.axisLabel("Time");
 
         chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
@@ -23412,7 +23412,76 @@ var ability_lines = function(destination, params){
     console.log(e);
   });
 
-}
+};
+
+var pms_bar_chart = function(destination, params, y_var, y_lab){
+    Promise.resolve(
+    $.ajax(
+      "/rest-api/player-match-summary/?" + $.param(params)
+    )
+  ).then(function(pmses){
+    $(destination).empty();
+    var plot_data = [{
+        "key": y_lab,
+        values: pmses.map(function(d){
+          return {
+            y: d[y_var],
+            x: d.hero.name,
+          };
+        })
+      }]
+    ;
+    console.log(plot_data);
+
+    var chart;
+    var chart_data;
+    var svg = utils.svg.square_svg(destination);
+    nv.addGraph(
+      function(){
+
+        chart = nv.models.discreteBarChart()
+          .margin({
+            left: 45,
+            bottom: 105,
+          });
+
+        chart.xAxis.axisLabel();
+        chart.yAxis.axisLabel(y_lab);
+
+        chart_data = svg.datum(plot_data);
+        chart_data.transition().duration(500).call(chart);
+        return chart;
+      },
+      function(){
+        d3.select(destination + " .nv-x.nv-axis > g :not(.nv-axislabel)")
+          .selectAll("g")
+          .selectAll("text")
+          .attr("transform", function(d, i, j) {
+            return "translate (-7, 65) rotate(-90 0,0)"
+          }) ;
+      }
+
+    );
+
+  }).catch(function(e){
+    console.log(e);
+  });
+
+};
+
+var lh_barchart = function(destination, params){
+    pms_bar_chart(destination, params, "last_hits", "Last Hits");
+};
+
+var kda2_barchart = function(destination, params){
+    pms_bar_chart(destination, params, "kda2", "K-D+A/2");
+};
+
+var tower_dmg_barchart = function(destination, params){
+    pms_bar_chart(destination, params, "tower_damage", "Tower Damage");
+};
+
+
 
 module.exports = {
   pms_scatter: pms_scatter,
@@ -23421,6 +23490,9 @@ module.exports = {
   xpm_gpm_scatter: xpm_gpm_scatter,
   lh_denies_scatter: lh_denies_scatter,
   ability_lines: ability_lines,
+  lh_barchart: lh_barchart,
+  kda2_barchart: kda2_barchart,
+  tower_dmg_barchart: tower_dmg_barchart,
 };
 
 },{"../models":11,"../utils":15,"./tooltips.js":7,"bluebird":18}],7:[function(require,module,exports){
