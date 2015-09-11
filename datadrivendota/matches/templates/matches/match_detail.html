@@ -18,9 +18,9 @@
   {% endif %}
 
   <div class="row">
-    <div id='level-row' class="charts col-md-6">
+    <div class="col-md-6">
     <h4>Level Progression</h4>
-          <div id='abilities' class='vert-md-4 chart'>
+          <div id='abilities' class='vert-md-6 chart'>
             <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
           </div>
 
@@ -28,49 +28,47 @@
 
     <div id='matchup-charts' class='col-md-6'>
       <div class='row'>
-        <div class="charts col-md-6">
+        <div class="col-md-6">
           <h4>Kills vs Damage</h4>
-          <div id='kill_dmg' class='vert-md-4 chart'>
+          <div id='kill_dmg' class='vert-md-3 chart'>
             <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
           </div>
         </div>
-        <div class="charts col-md-6">
+        <div class="col-md-6">
           <h4>Gold vs EXP</h4>
-          <div id='xp_gold' class='vert-md-4 chart'>
+          <div id='xp_gold' class='vert-md-3 chart'>
             <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
           </div>
         </div>
-        <div class="charts col-md-6">
+        <div class="col-md-6">
           <h4>Kills vs Deaths</h4>
-          <div id='kill_death' class='vert-md-4 chart'>
+          <div id='kill_death' class='vert-md-3 chart'>
             <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
           </div>
 
         </div>
-        <div class="charts col-md-6">
+        <div class="col-md-6">
           <h4>Last Hits vs Denies</h4>
-          <div id='lh_denies' class='vert-md-4 chart'>
+          <div id='lh_denies' class='vert-md-3 chart'>
             <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
           </div>
         </div>
 
       </div>
-  </div>
-
-  <div class="row">
     </div>
 
-    <div class="charts col-md-4">
+
+    <div class="col-md-4">
     <h4>Pushing Damage</h4>
         <div id='tower_damage'></div>
     </div>
 
-    <div class="charts col-md-4">
+    <div class="col-md-4">
     <h4>Last Hits</h4>
         <div id='last_hits'></div>
     </div>
 
-    <div class="charts col-md-4">
+    <div class="col-md-4">
     <h4>KDA2</h4>
         <div id='kda2'></div>
     </div>
@@ -104,20 +102,6 @@ $(function(){
       '#lh_denies', {match_id:{{match.steam_id}}}
     );
 
-
-    var destination = '#lh_denies';
-    var plot_data = [
-      {
-        key:'Last Hits vs Denies',
-        values:data.map(function(d){
-          return {
-            x:d.last_hits,
-            y:d.denies,
-          }
-        }),
-      }
-    ];
-    window.Chartreuse.scatter(destination, plot_data, 'Last Hits', 'Denies');
 
 
     (function(){
