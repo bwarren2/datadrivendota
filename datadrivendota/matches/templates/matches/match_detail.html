@@ -110,21 +110,20 @@ $(function(){
 
 
 
-    (function(){
-      var destination = '#kda2';
-      nv.addGraph(function(){
-        var plot_data = [{
-          key:'KDA2',
-          values:data.map(function(d){
-            return {
-              label: d.hero.name,
-              value: d.kda2
-            }
-          })
-        }];
-        chart = nv.models.discreteBarChart(destination, plot_data);
-      })
-    })();
+    var destination = '#kda2';
+    console.log(data);
+    nv.addGraph(function(){
+      var plot_data = [{
+        key:'KDA2',
+        values:data.map(function(d){
+          return {
+            label: d.hero.name,
+            value: d.kda2
+          }
+        })
+      }];
+      chart = nv.models.discreteBarChart(destination, plot_data);
+    })
 
     // (function(){
     //   var destination = '#last_hits';
@@ -162,6 +161,11 @@ $(function(){
     //     chart = nv.models.discreteBarChart(destination, plot_data);
     //   })
     // })();
+
+
+    d7.extensions.charts.matches.ability_lines(
+      '#abilities', {match_id:{{match.steam_id}}}
+    );
 
     // (function(){
     //   var destination = '#abilities';
