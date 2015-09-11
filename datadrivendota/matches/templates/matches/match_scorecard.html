@@ -52,7 +52,7 @@
               {% endif %}
 
               <td>{% player_link summary.player %}</td>
-              <td><img src="{{ summary.player.avatar }}" class="summary-hero-thumbshot"></td>
+              <td></td>
               <td>{{ summary.kills }}</td>
               <td>{{ summary.deaths }}</td>
               <td>{{ summary.assists }}</td>
@@ -105,7 +105,7 @@
                 {% endif %}
 
                 {% else %}
-                {% if summary.item_0.mugshot %}
+                {% if summary.item_0.thumbshot %}
                   <img src="{{ summary.item_0.thumbshot_url }}"
                   alt="{{ summary.item_0.name }}"
                   title="{{ summary.item_0.name }}"
@@ -115,7 +115,7 @@
                   <img src="{{ summary.item_1.thumbshot_url }}"
                   alt="{{ summary.item_1.name }}"
                   title="{{ summary.item_1.name }}"
-                  ><
+                  >
                 {% endif %}
                 {% if summary.item_2.thumbshot %}
                   <img src="{{ summary.item_2.thumbshot_url }}"
