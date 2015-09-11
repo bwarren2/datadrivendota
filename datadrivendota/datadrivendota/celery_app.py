@@ -405,11 +405,11 @@ class Config(object):
             'task': 'leagues.management.live_game.UpdateLiveMatches',
             'schedule': timedelta(days=1),
         },
+        'reflect-recent-leagues-daily': {
+            'task': 'leagues.management.tasks.MirrorRecentLeagues',
+            'schedule': timedelta(days=1),
+        },
         # Fast
-        # 'reflect-recent-leagues-daily': {
-        #     'task': 'leagues.management.tasks.MirrorRecentLeagues',
-        #     'schedule': timedelta(days=1),
-        # },
         'reflect-recent-matches-hourly': {
             'task': 'matches.management.tasks.MirrorRecentMatches',
             'schedule': timedelta(minutes=30),
