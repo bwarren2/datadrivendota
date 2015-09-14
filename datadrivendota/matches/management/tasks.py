@@ -95,7 +95,9 @@ class UpdateMatch(ApiFollower):
         """
         data = self.result
         if 'error' in data:
-            logging.error(data['error'])
+            logging.error("{0}, {1}".format(
+                data['error'], self.api_context.match_id)
+            )
             logging.error(self.api_context)
             try:
                 LiveMatch.objects.get(
