@@ -403,7 +403,7 @@ class Config(object):
         },
         'delete-finished-live-matches-daily': {
             'task': 'leagues.management.live_game.UpdateLiveMatches',
-            'schedule': timedelta(days=1),
+            'schedule': timedelta(hours=2),
         },
         'reflect-recent-leagues-daily': {
             'task': 'leagues.management.tasks.MirrorRecentLeagues',
