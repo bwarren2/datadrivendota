@@ -385,10 +385,6 @@ class Config(object):
             'task': 'heroes.management.tasks.CheckHeroIntegrity',
             'schedule': timedelta(days=1),
         },
-        'check-match-integrity-daily': {
-            'task': 'matches.management.tasks.CheckMatchIntegrity',
-            'schedule': timedelta(days=1),
-        },
         'reflect-league-schedule-daily': {
             'task': 'leagues.management.tasks.league.MirrorLeagueSchedule',
             'schedule': timedelta(days=1),
@@ -401,15 +397,19 @@ class Config(object):
             'task': 'teams.management.tasks.MirrorRecentTeams',
             'schedule': timedelta(days=1),
         },
-        'delete-finished-live-matches-daily': {
-            'task': 'leagues.management.live_game.UpdateLiveMatches',
-            'schedule': timedelta(hours=2),
-        },
         'reflect-recent-leagues-daily': {
             'task': 'leagues.management.tasks.MirrorRecentLeagues',
             'schedule': timedelta(days=1),
         },
         # Fast
+        'check-match-integrity-hourly': {
+            'task': 'matches.management.tasks.CheckMatchIntegrity',
+            'schedule': timedelta(hours=1),
+        },
+        'delete-finished-live-matches-hourly': {
+            'task': 'leagues.management.live_game.UpdateLiveMatches',
+            'schedule': timedelta(hours=2),
+        },
         'reflect-recent-matches-hourly': {
             'task': 'matches.management.tasks.MirrorRecentMatches',
             'schedule': timedelta(minutes=30),
