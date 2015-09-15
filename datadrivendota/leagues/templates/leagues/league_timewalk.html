@@ -87,6 +87,9 @@ $(function(){
     ),
     $.ajax("/rest-api/hero-dossiers/")
   ).then(function(data){
+
+    Messenger().post("Use the playback controls to change the charts");
+
     match_data = data[0];
     dossiers = data[1];
     var idx = 0;
