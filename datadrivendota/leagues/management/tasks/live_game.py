@@ -201,19 +201,22 @@ class UpdateLiveGames(ApiFollower):
                     player['hero_url'] = self.hero_urls[player['hero_id']]
 
                     account_id = player['account_id']
-                    player_data = [
-                        x for x in game['players']
-                        if x['account_id'] == account_id
-                    ][0]
-                    player['name'] = player_data['name']
-                    if player_data['team'] == 0:
-                        player['side'] = 'radiant'
-                    else:
-                        player['side'] = 'dire'
+                    try:
+                        player_data = [
+                            x for x in game['players']
+                            if x['account_id'] == account_id
+                        ][0]
+                        player['name'] = player_data['name']
+                        if player_data['team'] == 0:
+                            player['side'] = 'radiant'
+                        else:
+                            player['side'] = 'dire'
 
-                    player['kda2'] = player['kills'] - player['death']\
-                        + player['assists'] / 2.0
-                    players.append(player)
+                        player['kda2'] = player['kills'] - player['death']\
+                            + player['assists'] / 2.0
+                        players.append(player)
+                    except IndexError:
+                        pass  # No player found
             else:
                 pass  # Nothing to see here
 
