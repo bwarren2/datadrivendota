@@ -406,10 +406,6 @@ class Config(object):
             'task': 'matches.management.tasks.CheckMatchIntegrity',
             'schedule': timedelta(hours=1),
         },
-        'delete-finished-live-matches-hourly': {
-            'task': 'leagues.management.live_game.UpdateLiveMatches',
-            'schedule': timedelta(hours=2),
-        },
         'reflect-recent-matches-hourly': {
             'task': 'matches.management.tasks.MirrorRecentMatches',
             'schedule': timedelta(minutes=30),

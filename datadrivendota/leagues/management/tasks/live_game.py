@@ -46,6 +46,16 @@ class MirrorLiveGames(Task):
         )
         c.delay()
 
+        logger.info("Deleting out-of-date matches")
+        live_matches = LiveMatch.objects.all()
+        matches = Match.objects.filter(
+            steam_id__in=[x.steam_id for x in live_matches]
+        ).values_list('steam_id', flat=True)
+
+        for match in live_matches:
+            if (match.steam_id in matches or match.expired):
+                match.delete()
+
 
 class UpdateLiveGames(ApiFollower):
 
@@ -270,18 +280,3 @@ class UpdateLiveGames(ApiFollower):
     def _clean_urldata(self, urldata):
         """ Strip out request-level response from valve. """
         return urldata['result']['games']
-
-
-class UpdateLiveMatches(Task):
-
-    def run(self):
-        live_matches = LiveMatch.objects.all()
-
-        matches = Match.objects.filter(
-            steam_id__in=[x.steam_id for x in live_matches]
-        ).values_list('steam_id', flat=True)
-
-        for match in live_matches:
-
-            if (match.steam_id in matches or match.expired):
-                match.delete()
