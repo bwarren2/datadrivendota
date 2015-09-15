@@ -12,7 +12,7 @@ from celery.exceptions import (
     MaxRetriesExceededError,
     TimeLimitExceeded,
     WorkerLostError,
-    )
+)
 from datadrivendota.settings.base import STEAM_API_KEY
 import logging
 from utils import send_error_email
@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class ApiContext(object):
+
     """
     A box of configuration for interacting with Valve's API.
 
@@ -63,45 +64,45 @@ class ApiContext(object):
         self.key = STEAM_API_KEY
         super(ApiContext, self).__init__(*args, **kwargs)
 
-    def toUrlDict(self, mode):
+    def to_url_dict(self, mode):
         if mode == 'GetPlayerSummaries':
-            valve_URL_vars = ['steamids', 'key']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['steamids', 'key']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetTeamInfoByTeamID':
-            valve_URL_vars = ['key', 'start_at_team_id', 'teams_requested']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['key', 'start_at_team_id', 'teams_requested']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetUGCFileDetails':
-            valve_URL_vars = ['key', 'ugcid', 'appid']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['key', 'ugcid', 'appid']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetLeagueListing':
-            valve_URL_vars = ['key']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['key']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetSchema':
-            valve_URL_vars = ['key']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['key']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetSchemaURL':
-            valve_URL_vars = ['key']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['key']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetItemIconPath':
-            valve_URL_vars = ['key', 'format', 'iconname']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['key', 'format', 'iconname']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetPlayerOfficialInfo':
-            valve_URL_vars = ['key', 'AccountID']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['key', 'AccountID']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetMatchDetails':
-            valve_URL_vars = ['match_id', 'key']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['match_id', 'key']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetTournamentPlayerStats':
-            valve_URL_vars = ['league_id', 'account_id', 'key']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['league_id', 'account_id', 'key']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetScheduledLeagueGames':
-            valve_URL_vars = ['date_min', 'date_max', 'key']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['date_min', 'date_max', 'key']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetLiveLeagueGames':
-            valve_URL_vars = ['key']
-            return self.dictVars(valve_URL_vars)
+            valve_url_vars = ['key']
+            return self.dict_vars(valve_url_vars)
         elif mode == 'GetMatchHistory':
-            valve_URL_vars = [
+            valve_url_vars = [
                 'account_id',
                 'hero_id',
                 'matches_requested',
@@ -112,11 +113,11 @@ class ApiContext(object):
                 'start_at_match_id',
                 'key',
             ]
-            return self.dictVars(valve_URL_vars)
+            return self.dict_vars(valve_url_vars)
         else:
-            logger.error("I did not understand mode: "+mode)
+            logger.error("I did not understand mode: " + mode)
 
-    def dictVars(self, url_vars):
+    def dict_vars(self, url_vars):
         return_dict = {}
         for var in url_vars:
             if getattr(self, var, None) is not None:
@@ -160,15 +161,13 @@ class ApiContext(object):
 
 # Parents
 class BaseTask(Task):
-    """
-    A subcase of celery tasks with a magic api context and garbage collection
-    """
+
+    """A subcase of celery tasks with a api context and garbage collection. """
+
     abstract = True
 
     def __call__(self, *args, **kwargs):
-        """
-        Expects an ApiContext instance in calling.
-        """
+        """ Expect an ApiContext instance in calling. """
         self.api_context = kwargs['api_context']
         del kwargs['api_context']
         return super(BaseTask, self).__call__(*args, **kwargs)
@@ -181,9 +180,9 @@ class BaseTask(Task):
 
 
 class ApiFollower(Task):
-    """
-    Expects an api context and a result
-    """
+
+    """ Expect an api context and a result. """
+
     abstract = True
 
     def __call__(self, *args, **kwargs):
@@ -203,7 +202,7 @@ class ValveApiCall(BaseTask):
         try:
 
             # The steam API accepts a limited set of URLs, and requires a key
-            modeDict = {
+            mode_dict = {
                 'GetMatchHistory': (
                     'https://api.steampowered.com'
                     '/IDOTA2Match_570/GetMatchHistory/v001/'
@@ -274,11 +273,11 @@ class ValveApiCall(BaseTask):
             # If you attempt to access a URL I do not think valve supports, I
             # complain.
             try:
-                url = modeDict[mode]
+                url = mode_dict[mode]
             except KeyError:
                 logger.info("Keyerrors on API call!")
                 raise
-            URL = url + '?' + urlencode(self.api_context.toUrlDict(mode))
+            URL = url + '?' + urlencode(self.api_context.to_url_dict(mode))
             logger.info("URL: " + URL)
             # Exception handling for the URL opening.
             try:
@@ -288,7 +287,7 @@ class ValveApiCall(BaseTask):
                     logger.error(
                         "Got error 104 (connection reset by peer) for mode "
                         + str(mode)
-                        + self.api_context.toUrlDict()
+                        + self.api_context.to_url_dict()
                         + ".  Retrying."
                     )
                     self.retry(mode=mode)
@@ -372,5 +371,3 @@ class ValveApiCall(BaseTask):
         except ValueError:
                 send_error_email(self.api_context.__str__())
                 raise
-
-
