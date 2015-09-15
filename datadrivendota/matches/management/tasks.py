@@ -104,7 +104,11 @@ class UpdateMatch(ApiFollower):
                     steam_id=self.api_context.match_id
                 ).update(failed=True)
             except:
-                logging.error('No live match to fail.')
+                logging.error(
+                    'No live match to fail. ({0})'.format(
+                        self.api_context.match_id
+                    )
+                )
         else:
             kwargs = {
                 'radiant_win': data['radiant_win'],
