@@ -9,8 +9,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 
-from datadrivendota.keen_app import keen_client
-
 from .forms import SearchForm
 from players.models import Player
 from heroes.models import Hero
@@ -25,12 +23,6 @@ class LandingView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        # Log the laod with keen
-        keen_client.add_event(
-            "splashpage_render", {
-                "hit": 1,
-            }
-        )
         kwargs['blog_entry'] = Entry.public.all().order_by(
             '-created'
         ).first()
