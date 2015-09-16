@@ -21,7 +21,7 @@ urlpatterns = patterns(
     ),
     url(
         r'^(?P<steam_id>[0-9\-]*)/$',
-        views.LeagueDetail.as_view(),
+        views.LeagueDetailTimeWalk.as_view(),
         name='detail'
     ),
     url(
