@@ -1,3 +1,4 @@
+import logging
 import time
 import pika
 import sys
@@ -14,6 +15,8 @@ from accounts.models import MatchRequest
 from datadrivendota.management.tasks import ValveApiCall, ApiContext
 from matches.management.tasks import UpdateMatch
 from matches.models import Match
+
+logger = logging.getLogger(__name__)
 
 
 class KickoffMatchRequests(Task):
@@ -113,6 +116,11 @@ class CreateMatchParse(Task):
         channel = connection.channel()
         queue_name = 'java_parse'
         channel.exchange_declare(exchange=queue_name, type='direct')
+        logger.info(
+            'Creating match requests.  Queue durability is {0}'.format(
+                settings.JAVA_QUEUE_DURABILITY
+            )
+        )
         result = channel.queue_declare(
             queue=queue_name,
             durable=settings.JAVA_QUEUE_DURABILITY,
