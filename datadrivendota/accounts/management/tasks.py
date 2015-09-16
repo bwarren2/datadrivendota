@@ -3,15 +3,17 @@ import pika
 import sys
 import json
 import requests
-from django.core.files import File
+from io import BytesIO
+
 from celery import Task, chain
+
+from django.core.files import File
+from django.conf import settings
+
 from accounts.models import MatchRequest
 from datadrivendota.management.tasks import ValveApiCall, ApiContext
 from matches.management.tasks import UpdateMatch
-from django.conf import settings
-
 from matches.models import Match
-from io import BytesIO
 
 
 class KickoffMatchRequests(Task):
@@ -113,7 +115,7 @@ class CreateMatchParse(Task):
         channel.exchange_declare(exchange=queue_name, type='direct')
         result = channel.queue_declare(
             queue=queue_name,
-            durable=True,
+            durable=settings.JAVA_QUEUE_DURABILITY,
         )
         channel.queue_bind(
             exchange=queue_name,
@@ -142,7 +144,7 @@ class ReadParseResults(Task):
         channel.exchange_declare(exchange=queue_name, type='direct')
         result = channel.queue_declare(
             queue=queue_name,
-            durable=True,
+            durable=settings.JAVA_QUEUE_DURABILITY,
         )
         channel.queue_bind(
             exchange=queue_name,
