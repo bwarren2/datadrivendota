@@ -470,7 +470,7 @@ LIVE_MATCH_LOOKBACK_MINUTES = 90  # We store live matches.  Wait this many minut
 FAILED_LIVEMATCH_KEEP_DAYS = 2  # If a match fails and gets to 2 days old, delete it anyway.
 # End project specific constants used in tasks
 OVERVIEW_LEAGUE_COUNT = 4  # Number of leagues/category to show in overview
-JAVA_QUEUE_DURABILITY = getenv('JAVA_QUEUE_DURABILITY', False)
+JAVA_QUEUE_DURABILITY = getenv('JAVA_QUEUE_DURABILITY' == 'True', False)
 
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accounts/done/'
