@@ -9,14 +9,10 @@
 {% endblock page_title %}
 
 {% block content %}
-
-    {% include "matches/_time_control_card.html" %}
     <div class='container'>
-
         <div class='col-md-12' id='charts'>
             <h4>charts</h4>
         </div>
-
     </div>
 {% endblock content %}
 
@@ -38,7 +34,7 @@ $(function(){
 
     Promise.resolve(
         $.ajax({
-            url: '{{match.replay.url}}',
+            url: '{{match.compressed_replay.url}}',
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 if (XMLHttpRequest.status == 0) {
@@ -53,7 +49,8 @@ $(function(){
             }
         })
     ).then(function(data){
-        replay = data.slice(data, data.length/2);
+        console.log("{{match.compressed_replay.url}}")
+        replay = data;
         window.ParseCharts.cumsum_chart(
             replay, 'gold_reasons', '#charts', 'Time', 'Net Worth');
         window.ParseCharts.cumsum_chart(

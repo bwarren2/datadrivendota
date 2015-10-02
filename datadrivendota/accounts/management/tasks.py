@@ -13,7 +13,7 @@ from django.conf import settings
 
 from accounts.models import MatchRequest
 from datadrivendota.management.tasks import ValveApiCall, ApiContext
-from matches.management.tasks import UpdateMatch
+from matches.management.tasks import UpdateMatch, UpdatePmsReplays
 from matches.models import Match
 
 logger = logging.getLogger(__name__)
@@ -70,18 +70,20 @@ class CreateMatchParse(Task):
             Match.objects.get(steam_id=match_id)
 
             mr = MatchRequest.objects.get(
-                match_id=match_id,
+                steam_id=match_id,
                 status=MatchRequest.FINDING_MATCH
+            ).update(
+                status=MatchRequest.MATCH_FOUND
             )
-
-            mr.status = MatchRequest.MATCH_FOUND
-            mr.save()
 
             return mr
 
         except Match.DoesNotExist:
-            mr = MatchRequest.objects.get(steam_id=match_id)
-            mr.status = MatchRequest.MATCH_NOT_FOUND
+            mr = MatchRequest.objects.get(
+                steam_id=match_id
+            ).update(
+                status=MatchRequest.MATCH_NOT_FOUND
+            )
             mr.save()
             return None
 
@@ -189,6 +191,7 @@ class MergeMatchRequestReplay(Task):
         mr = MatchRequest.objects.get(match_id=match_id)
         self.merge_to_request(mr, filename)
         self.merge_to_match(mr, match_id)
+        UpdatePmsReplays().delay(match_id=match_id)  # Queue for postprocessing
 
     def merge_to_match(self, mr, match_id):
         filename = "{0}_parse.json".format(match_id)
@@ -202,6 +205,7 @@ class MergeMatchRequestReplay(Task):
                 _ = holder.seek(0)  # Catch to avoid printing
                 _ = _  # Shut off linting from stray var _
                 match.replay.save(filename, File(holder))
+                mr.update()
             else:
                 print "Could not get the replay {0}!  Error code {1}".format(
                     url, r.status_code
@@ -211,6 +215,7 @@ class MergeMatchRequestReplay(Task):
             print "Replay parsing error for  %s!  Error %s" % (match_id, err)
 
     def merge_to_request(self, match_request, filename):
-        match_request.raw_parse_url = filename
-        match_request.status = MatchRequest.PARSED
-        match_request.save()
+        match_request.update(
+            raw_parse_url=filename,
+            status=MatchRequest.PARSED
+        )

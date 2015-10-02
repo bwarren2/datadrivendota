@@ -1,3 +1,7 @@
+import boto
+from boto.s3.key import Key
+
+from django.conf import settings
 from datetime import datetime, timedelta
 from django.db import models
 
@@ -64,6 +68,11 @@ class Match(models.Model):
     series_type = models.IntegerField(null=True)
 
     replay = models.FileField(
+        upload_to='matches/replays/',
+        null=True,
+        blank=True,
+    )
+    compressed_replay = models.FileField(
         upload_to='matches/replays/',
         null=True,
         blank=True,
@@ -175,6 +184,12 @@ class PlayerMatchSummary(models.Model):
     level = models.IntegerField()
     is_win = models.BooleanField()
 
+    replay_shard = models.FileField(
+        upload_to='playermatchsummaries/replays/',
+        null=True,
+        blank=True,
+    )
+
     objects = PMSQuerySet.as_manager()
 
     class Meta:
@@ -246,6 +261,28 @@ class PlayerMatchSummary(models.Model):
                 seconds=self.match.duration
             )
         )
+
+    def set_encoding(self):
+        if self.replay_shard.url is None:
+            return True
+        else:
+            url = self.replay_shard.url
+
+            conn = boto.connect_s3(
+                settings.AWS_ACCESS_KEY_ID,
+                settings.AWS_SECRET_ACCESS_KEY
+            )
+            bucket = conn.get_bucket(settings.AWS_STORAGE_BUCKET_NAME)
+            path = url.split('.com/')[-1]  # drop domain
+            k = Key(bucket)
+            k.key = path
+            md = k.metadata
+            md.update({
+                'Content-Type': 'application/json',
+                'Content-Encoding': 'gzip',
+            })
+            k = k.copy(k.bucket.name, k.name, md, preserve_acl=True)
+            # Infer the key and set encoding here
 
 
 class AdditionalUnit(models.Model):

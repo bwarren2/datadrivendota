@@ -303,6 +303,12 @@ class Config(object):
                 'routing_key': 'integrity'
             }
         },
+        'matches.management.tasks.UpdatePmsReplays': {
+            'routes': {
+                'exchange': 'integrity',
+                'routing_key': 'integrity'
+            }
+        },
         'players.management.tasks.MirrorClientMatches': {
             'routes': {
                 'exchange': 'integrity',
