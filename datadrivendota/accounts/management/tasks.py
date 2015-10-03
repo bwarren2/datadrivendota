@@ -15,6 +15,7 @@ from accounts.models import MatchRequest
 from datadrivendota.management.tasks import ValveApiCall, ApiContext
 from matches.management.tasks import UpdateMatch, UpdatePmsReplays
 from matches.models import Match
+from utils import gzip_str
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +51,7 @@ class KickoffMatchRequests(Task):
 class CreateMatchParse(Task):
 
     def run(self, api_context):
+
         match_id = api_context.match_id
 
         match_req = self.have_match(match_id)
@@ -69,18 +71,18 @@ class CreateMatchParse(Task):
         try:
             Match.objects.get(steam_id=match_id)
 
-            mr = MatchRequest.objects.get(
-                steam_id=match_id,
+            MatchRequest.objects.filter(
+                match_id=match_id,
                 status=MatchRequest.FINDING_MATCH
             ).update(
                 status=MatchRequest.MATCH_FOUND
             )
-
+            mr = MatchRequest.objects.get(match_id=match_id)
             return mr
 
         except Match.DoesNotExist:
-            mr = MatchRequest.objects.get(
-                steam_id=match_id
+            mr = MatchRequest.objects.filter(
+                match_id=match_id
             ).update(
                 status=MatchRequest.MATCH_NOT_FOUND
             )
@@ -93,6 +95,7 @@ class CreateMatchParse(Task):
         payload = {'match_id': match_id}
         r = requests.get(url, params=payload)
         if r.status_code == 200:
+            logger.info(r.content)
             replay_url = r.json()['replay_url']
             self._save_url(replay_url, match_req)
 
@@ -136,10 +139,12 @@ class CreateMatchParse(Task):
             'url': url,
             'match_id': match_id,
         })
-        channel.basic_publish(exchange=queue_name,
-                              routing_key=queue_name,
-                              body=msg)
-        print " [x] Sent {0}".format(msg)
+        channel.basic_publish(
+            exchange=queue_name,
+            routing_key=queue_name,
+            body=msg
+        )
+        logger.info(" [x] Sent {0}".format(msg))
         connection.close()
 
 
@@ -164,10 +169,13 @@ class ReadParseResults(Task):
 
         start = time.time()
 
+        any_scheduled = False
+
         def drain(queue_name):
 
             method_frame, header_frame, body = channel.basic_get(queue_name)
             if not method_frame:
+
                 return None
             else:
                 MergeMatchRequestReplay().s().delay(json_data=json.loads(body))
@@ -178,6 +186,9 @@ class ReadParseResults(Task):
         while time.time() - start < 2:
             drain(queue_name)
 
+        if any_scheduled:
+            logger.info('Scheduled merge')
+
         channel.cancel()
         channel.close()
         connection.close()
@@ -186,15 +197,18 @@ class ReadParseResults(Task):
 class MergeMatchRequestReplay(Task):
 
     def run(self, json_data):
+
         match_id = json_data['match_id']
         filename = json_data['filename']
+
+        logger.info('Merging {0}'.format(match_id))
+
         mr = MatchRequest.objects.get(match_id=match_id)
         self.merge_to_request(mr, filename)
         self.merge_to_match(mr, match_id)
         UpdatePmsReplays().delay(match_id=match_id)  # Queue for postprocessing
 
     def merge_to_match(self, mr, match_id):
-        filename = "{0}_parse.json".format(match_id)
         match = Match.objects.get(steam_id=match_id)
         mr = MatchRequest.objects.get(match_id=match_id)
         url = mr.file_url
@@ -204,18 +218,28 @@ class MergeMatchRequestReplay(Task):
                 holder = BytesIO(r.content)
                 _ = holder.seek(0)  # Catch to avoid printing
                 _ = _  # Shut off linting from stray var _
+                filename = "{0}_parse.json".format(match_id)
                 match.replay.save(filename, File(holder))
-                mr.update()
+
+                holder = BytesIO(gzip_str(r.content))
+                _ = holder.seek(0)  # Catch to avoid printing
+                _ = _  # Shut off linting from stray var _
+                filename = "{0}_parse.json.gz".format(match_id)
+                match.compressed_replay.save(filename, File(holder))
+
             else:
-                print "Could not get the replay {0}!  Error code {1}".format(
-                    url, r.status_code
+                logging.infp(
+                    "Could not get the replay {0}!  Error code {1}".format(
+                        url, r.status_code
+                    )
                 )
         except:
             err = sys.exc_info()[0]
-            print "Replay parsing error for  %s!  Error %s" % (match_id, err)
+            logging.infp(
+                "Replay parsing error for  %s!  Error %s" % (match_id, err)
+            )
 
     def merge_to_request(self, match_request, filename):
-        match_request.update(
-            raw_parse_url=filename,
-            status=MatchRequest.PARSED
-        )
+        match_request.raw_parse_url = filename
+        match_request.status = MatchRequest.PARSED
+        match_request.save()

@@ -646,6 +646,8 @@ class CycleApiCall(ApiFollower):
 class UpdatePmsReplays(Task):
 
     def run(self, match_id):
+        logger.info('Sharding replay for {0}'.format(match_id))
+
         pmses = PlayerMatchSummary.objects.filter(
             match__steam_id=match_id
         ).select_related('hero')
