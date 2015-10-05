@@ -29,4 +29,9 @@ urlpatterns = patterns(
         views.MatchDetailAbilities.as_view(),
         name="detail_abilities"
     ),
+    url(
+        r'^replicate/$',
+        views.ReplicateDetail.as_view(),
+        name="replicate"
+    ),
 )

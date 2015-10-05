@@ -1,4 +1,4 @@
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, TemplateView
 
 from utils.views import ability_infodict
 
@@ -130,6 +130,10 @@ class MatchReplayDetail(DetailView):
     slug_url_kwarg = 'match_id'
     slug_field = 'steam_id'
     template_name = 'matches/replay_parse.html'
+
+
+class ReplicateDetail(TemplateView):
+    template_name = 'matches/replicate.html'
 
 
 class MatchListView(ListView):

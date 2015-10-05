@@ -22,15 +22,6 @@ var replay;
 var gold;
 var time_idx = 0;
 $(function(){
-    // Set up animation controls.
-    $('#stop-animation').toggle()
-    $('#start-animation, #stop-animation').click(function(){
-        $('#start-animation').toggle();
-        $('#stop-animation').toggle();
-        $('#back-animation').toggle();
-        $('#forward-animation').toggle();
-        $('#slider').toggle();
-    });
 
     Promise.resolve(
         $.ajax({

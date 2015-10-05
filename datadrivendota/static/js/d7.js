@@ -23269,14 +23269,15 @@ module.exports = {
   quality_barchart: quality_barchart,
 };
 
-},{"../models":11,"../utils":15,"./tooltips.js":7,"bluebird":18}],5:[function(require,module,exports){
+},{"../models":12,"../utils":16,"./tooltips.js":8,"bluebird":19}],5:[function(require,module,exports){
 module.exports = {
     heroes: require('./heroes.js'),
     matches: require('./matches.js'),
     bar: require('./bar.js'),
+    pms_shards: require('./pms_replay_shards.js'),
 }
 
-},{"./bar.js":3,"./heroes.js":4,"./matches.js":6}],6:[function(require,module,exports){
+},{"./bar.js":3,"./heroes.js":4,"./matches.js":6,"./pms_replay_shards.js":7}],6:[function(require,module,exports){
 "use strict";
 var utils = require("../utils");
 var Promise = require("bluebird");
@@ -23495,7 +23496,81 @@ module.exports = {
   tower_dmg_barchart: tower_dmg_barchart,
 };
 
-},{"../models":11,"../utils":15,"./tooltips.js":7,"bluebird":18}],7:[function(require,module,exports){
+},{"../models":12,"../utils":16,"./tooltips.js":8,"bluebird":19}],7:[function(require,module,exports){
+"use strict";
+var utils = require("../utils");
+var Promise = require("bluebird");
+var models = require("../models");
+var $ = window.$;
+var nv = window.nv;
+var d3 = window.d3;
+var tooltips = require("./tooltips.js");
+
+var shard_lineup = function(destination, params){
+  Promise.join(
+    $.ajax({
+        url: "https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_1_parse_shard.json.gz",
+        dataType: "json",
+    }),
+    $.ajax({
+        url: "https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_130_parse_shard.json.gz",
+        dataType: "json",
+    })
+
+  ).then(function(data){
+    console.log(data);
+    $(destination).empty();
+    var plot_data = data.map(function(d){
+      var cumsum = 0;
+      return {
+        "key": toTitleCase(d[0].unit),
+        "values": d.filter(function(m){
+          return m.type == "gold_reasons";
+        }).map(function(m){
+          m.cumsum = cumsum + m.value;
+          cumsum += m.value;
+          return m;
+        })
+      };
+    });
+    var chart;
+    var chart_data;
+    var svg = utils.svg.square_svg(destination);
+
+    var xlab = "Time";
+    var ylab = "Gold";
+
+    nv.addGraph(
+
+      function(){
+        chart = nv.models.lineChart()
+          .margin({
+            left: 45,
+            bottom: 45,
+          })
+          .x(function(d){return d.offset_time;})
+          .y(function(d){return d.cumsum;})
+          .showLegend(false)
+          .interpolate('step-after');
+
+        chart.xAxis.axisLabel(xlab);
+        chart.yAxis.axisLabel(ylab).axisLabelDistance(-20);
+
+        chart_data = svg.datum(plot_data);
+        chart_data.transition().duration(500).call(chart);
+        return chart;
+      }
+    );
+
+  }).catch(function(e){
+    console.log(e);
+  });
+};
+module.exports = {
+  shard_lineup: shard_lineup
+};
+
+},{"../models":12,"../utils":16,"./tooltips.js":8,"bluebird":19}],8:[function(require,module,exports){
 "use strict"
 var d3 = window.d3;
 
@@ -23589,7 +23664,7 @@ module.exports = {
     hero_tooltip: heroContentGenerator
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 var d3 = require('../../bower_components/d3/d3.js');
@@ -23604,7 +23679,7 @@ nvd3.extensions.models = require('./models')
 
 module.exports = nvd3;
 
-},{"../../bower_components/d3/d3.js":1,"../../bower_components/nvd3/build/nv.d3.js":2,"./charts":5,"./models":11,"./utils":15}],9:[function(require,module,exports){
+},{"../../bower_components/d3/d3.js":1,"../../bower_components/nvd3/build/nv.d3.js":2,"./charts":5,"./models":12,"./utils":16}],10:[function(require,module,exports){
 //TODO: consider deprecating by adding necessary features to multiBar model
 var discreteBar = function() {
     "use strict";
@@ -23862,7 +23937,7 @@ module.exports = {
     discrete_bar: discreteBar
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 
 var discreteBarChart = function() {
     "use strict";
@@ -24117,7 +24192,7 @@ module.exports = {
     discrete_bar_chart: discreteBarChart
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 var scatter = require('./scatter.js').scatter;
 var scatter_chart = require('./scatter_chart.js').scatter_chart;
@@ -24131,7 +24206,7 @@ module.exports = {
     discrete_bar_chart: discrete_bar_chart,
 };
 
-},{"./discrete_bar.js":9,"./discrete_bar_chart.js":10,"./scatter.js":12,"./scatter_chart.js":13}],12:[function(require,module,exports){
+},{"./discrete_bar.js":10,"./discrete_bar_chart.js":11,"./scatter.js":13,"./scatter_chart.js":14}],13:[function(require,module,exports){
 'use strict';
 var d3 = window.d3;
 var utils = require('../utils');
@@ -24565,7 +24640,7 @@ module.exports = {
     scatter: scatter
 }
 
-},{"../utils":15}],13:[function(require,module,exports){
+},{"../utils":16}],14:[function(require,module,exports){
 "use strict";
 var models = require("./scatter.js");
 var d3 = window.d3;
@@ -24885,7 +24960,7 @@ module.exports = {
     scatter_chart: scatter_chart
 }
 
-},{"./scatter.js":12,"d3-tip":20}],14:[function(require,module,exports){
+},{"./scatter.js":13,"d3-tip":21}],15:[function(require,module,exports){
 var blank_hero_pickbans = function(dossiers){
     var return_obj = {};
     var values_ary = [];
@@ -24908,7 +24983,7 @@ module.exports = {
     blank_hero_pickbans: blank_hero_pickbans
 }
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 var svg = require('./svg.js');
@@ -24994,7 +25069,7 @@ module.exports = {
     initOptions: initOptions,
 }
 
-},{"./blanks.js":14,"./reduce.js":16,"./svg.js":17}],16:[function(require,module,exports){
+},{"./blanks.js":15,"./reduce.js":17,"./svg.js":18}],17:[function(require,module,exports){
 "use strict";
 
 var extract_pickbans = function(blanks, working_set){
@@ -25047,7 +25122,7 @@ module.exports = {
   extract_pickbans: extract_pickbans
 };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 function square_svg(destination, width, height){
   if (width === undefined){
     width = $(destination).width();
@@ -25065,7 +25140,7 @@ module.exports = {
   square_svg: square_svg,
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -29925,7 +30000,7 @@ module.exports = ret;
 },{"./es5.js":14}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":19}],19:[function(require,module,exports){
+},{"_process":20}],20:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -30017,7 +30092,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 // d3.tip
 // Copyright (c) 2013 Justin Palmer
 //
@@ -30323,5 +30398,5 @@ process.umask = function() { return 0; };
 
 }));
 
-},{}]},{},[8])(8)
+},{}]},{},[9])(9)
 });
