@@ -226,14 +226,14 @@ class MergeMatchRequestReplay(Task):
                 match.compressed_replay.save(filename, File(holder))
 
             else:
-                logging.infp(
+                logger.info(
                     "Could not get the replay {0}!  Error code {1}".format(
                         url, r.status_code
                     )
                 )
         except:
             err = sys.exc_info()[0]
-            logging.infp(
+            logger.info(
                 "Replay parsing error for  %s!  Error %s" % (match_id, err)
             )
 
