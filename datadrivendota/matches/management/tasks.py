@@ -672,7 +672,6 @@ class UpdatePmsReplays(Task):
             ]
             buff = BytesIO(gzip_str(json.dumps(hero_msgs)))
             _ = buff.seek(0)  # NOQA
-            _ = _
             filename = '{0}_{1}_parse_shard.json.gz'.format(
                 match.steam_id,
                 pms.player_slot

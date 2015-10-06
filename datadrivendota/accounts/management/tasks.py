@@ -216,14 +216,12 @@ class MergeMatchRequestReplay(Task):
             r = requests.get(url)
             if r.status_code == 200:
                 holder = BytesIO(r.content)
-                _ = holder.seek(0)  # Catch to avoid printing
-                _ = _  # Shut off linting from stray var _
+                _ = holder.seek(0)  # NOQA
                 filename = "{0}_parse.json".format(match_id)
                 match.replay.save(filename, File(holder))
 
                 holder = BytesIO(gzip_str(r.content))
-                _ = holder.seek(0)  # Catch to avoid printing
-                _ = _  # Shut off linting from stray var _
+                _ = holder.seek(0)  # NOQA
                 filename = "{0}_parse.json.gz".format(match_id)
                 match.compressed_replay.save(filename, File(holder))
 

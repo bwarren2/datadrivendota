@@ -264,7 +264,7 @@ class PlayerMatchSummary(models.Model):
 
     def set_encoding(self):
         if self.replay_shard.url is None:
-            return True
+            return
         else:
             url = self.replay_shard.url
 

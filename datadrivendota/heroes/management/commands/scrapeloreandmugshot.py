@@ -36,45 +36,47 @@ class Command(BaseCommand):
                 hero.internal_name[14:]
             )
         )
-        print url
+        print(url)
         try:
             r = requests.get(url)
             if r.status_code == 200:
                 holder = BytesIO(r.content)
-                _ = holder.seek(0)  # Catch to avoid printing
-                _ = _  # Avoid linting
+                _ = holder.seek(0)  # NOQA
                 filename = slugify(hero.name) + '_full.png'
                 hero.mugshot.save(filename, File(holder))
             else:
-                print "No mugshot for {0}!  Error code {1}".format(
-                    hero.name, r.status_code
+                print(
+                    "No mugshot for {0}!  Error code {1}".format(
+                        hero.name, r.status_code
+                    )
                 )
 
         except:
             err = sys.exc_info()[0]
-            print "No mugshot for %s!  Error %s" % (hero.name, err)
+            print("No mugshot for %s!  Error %s" % (hero.name, err))
 
         # Thumb-size images
         url = (
             'http://media.steampowered.com'
             '/apps/dota2/images/heroes/%s_sb.png' % hero.internal_name[14:]
         )
-        print url
+        print(url)
         try:
             r = requests.get(url)
             if r.status_code == 200:
                 holder = BytesIO(r.content)
-                _ = holder.seek(0)  # Catch to avoid printing
-                _ = _
+                _ = holder.seek(0)  # NOQA
                 filename = slugify(hero.name) + '_thumb.png'
                 hero.thumbshot.save(filename, File(holder))
             else:
-                print "No mugshot for {0}!  Error code {1}".format(
-                    hero.name, r.status_code
+                print(
+                    "No mugshot for {0}!  Error code {1}".format(
+                        hero.name, r.status_code
+                    )
                 )
         except:
             err = sys.exc_info()[0]
-            print "No mugshot for %s!  Error %s" % (hero.name, err)
+            print("No mugshot for %s!  Error %s" % (hero.name, err))
 
     def add_lore(self, hero):
         """
@@ -95,12 +97,14 @@ class Command(BaseCommand):
             hero.lore = lore
 
         except HTTPError as err:
-            print "No lore for %s!  Error %s" % (hero.name, err)
+            print("No lore for %s!  Error %s" % (hero.name, err))
         except AttributeError as err:
-            print "{hero} has no lore {err} {url}".format(
-                hero=hero.name,
-                err=err,
-                url=herourl
+            print(
+                "{hero} has no lore {err} {url}".format(
+                    hero=hero.name,
+                    err=err,
+                    url=herourl
+                )
             )
 
         hero.save()
