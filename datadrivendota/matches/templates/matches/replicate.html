@@ -16,6 +16,12 @@
               <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
             </div>
         </div>
+        <div class='col-md-4'>
+            <h4>hack</h4>
+            <div id='hack_chart' class='vert-md-4 chart'>
+              <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+            </div>
+        </div>
     </div>
 {% endblock content %}
 
@@ -24,6 +30,7 @@
 $(function(){
 
     d7.extensions.charts.pms_shards.shard_lineup('#gold_chart', {});
+    d7.extensions.charts.pms_shards.hack('#gold_chart', {});
 
 })
 

@@ -67,6 +67,26 @@ var shard_lineup = function(destination, params){
     console.log(e);
   });
 };
+
+var hack = function(destination, params){
+    Promise.resolve(
+        $.ajax({
+            url: 'https://s3.amazonaws.com/datadrivendota/raw_replay_parse/1843672837_raw_parse.json',
+            dataType: 'json'
+        })
+    ).then(function(data){
+        console.log(data)
+    }).catch(function(jqXhr, err, errStr){
+        // console.log('Error :(');
+        // console.log(jqXhr);
+        // console.log(jqXhr.responseText);
+        // console.log(jqXhr.status);
+        // console.log(jqXhr.statusText);
+        // console.log(jqXhr.statusCode());
+    })
+};
+
 module.exports = {
-  shard_lineup: shard_lineup
+  shard_lineup: shard_lineup,
+  hack: hack,
 };
