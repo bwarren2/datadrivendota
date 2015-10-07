@@ -1,9 +1,14 @@
 """ Tasks to manage match-related data. """
+import json
+import logging
 from celery import Task, chain
 from time import time as now
 from copy import deepcopy
 from datetime import datetime, timedelta
 
+from django.core.files import File
+from utils import gzip_str
+from io import BytesIO
 from django.utils import timezone
 from django.db.models import Min, Max, Count
 from django.conf import settings
@@ -15,8 +20,10 @@ from matches.models import (
     PlayerMatchSummary,
     SkillBuild,
     AdditionalUnit,
-    PickBan
+    PickBan,
 )
+from accounts.models import MatchRequest
+
 from datadrivendota.utilities import error_email
 from players.models import Player
 from heroes.models import Ability, Hero
@@ -24,12 +31,12 @@ from items.models import Item
 from leagues.models import League, LiveMatch
 from guilds.models import Guild
 from teams.models import Team
-import logging
 from datadrivendota.management.tasks import (
     ValveApiCall,
     ApiFollower,
     ApiContext
 )
+from utils import gunzip_str
 
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os
@@ -634,3 +641,66 @@ class CycleApiCall(ApiFollower):
                         self.api_context.account_id
                     )
                 )
+
+
+class UpdatePmsReplays(Task):
+
+    def run(self, match_id):
+        logger.info('Sharding replay for {0}'.format(match_id))
+
+        pmses = PlayerMatchSummary.objects.filter(
+            match__steam_id=match_id
+        ).select_related('hero')
+        match = Match.objects.get(steam_id=match_id)
+
+        replay = json.loads(gunzip_str(match.compressed_replay.read()))
+        states = [
+            x for x in replay if x['type'] == 'state' and x['key'] == 'PLAYING'
+        ]
+        try:
+            offset = states[0]['time']
+        except IndexError:
+            offset = 0
+            logger.error(
+                'Failed to get an offset with match {0}'.format(match_id)
+            )
+
+        for pms in pmses:
+
+            hero_msgs = [
+                offset_msg(x, offset) for x in replay if filter_msgs(pms, x)
+            ]
+            buff = BytesIO(gzip_str(json.dumps(hero_msgs)))
+            _ = buff.seek(0)  # NOQA
+            filename = '{0}_{1}_parse_shard.json.gz'.format(
+                match.steam_id,
+                pms.player_slot
+            )
+            pms.replay_shard.save(filename, File(buff))
+            pms.set_encoding()
+
+        MatchRequest.objects.get(match_id=match_id).update(
+            raw_parse_url=filename,
+            status=MatchRequest.PARSED
+        )
+
+
+def filter_msgs(pms, msg):
+    hero_name = pms.hero.internal_name
+    unit = msg.get('unit', None)  # Most messages
+    target_source = msg.get('target_source', None)   # Kill/smg
+    slot = msg.get('slot', None)   # Buyback
+
+    if (
+        target_source == hero_name
+        or unit == hero_name
+        or slot == pms.player_slot
+    ):
+        return True
+    else:
+        return False
+
+
+def offset_msg(msg, offset):
+    msg['offset_time'] = msg['time'] - offset
+    return msg

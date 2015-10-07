@@ -167,15 +167,17 @@ class UpdateTeamLogo(ApiFollower):
                     resp = requests.get(url)
                     if resp.status_code == 200:
                         buff = BytesIO(resp.content)
-                        _ = buff.seek(0)  # Stop random printing.
-                        _ = _  # Stop the linting.
+
+                        # Stops printing of the index
+                        _ = buff.seek(0)  # NOQA
+
                         filename = slugify(team.steam_id) + '_full.png'
                         team.stored_image.save(filename, File(buff))
                     team.save()
                     logger.debug(url)
                 except:
                     err = sys.exc_info()[0]
-                    print "No image for %s!  Error %s" % (team.steam_id, err)
+                    print("No image for %s!  Error %s" % (team.steam_id, err))
 
             else:
                 logging.error(

@@ -49,18 +49,17 @@ class Command(BaseCommand):
                 'https://s3.amazonaws.com/datadrivendota/images/pips/{suffix}'.format(
                     suffix=matching_dict[role.name])
             )
-            print url
+            print(url)
             resp = requests.get(url)
 
             if resp.status_code == 200:
                 buff = BytesIO(resp.content)
-                _ = buff.seek(0)  # Avoid printing random numbers.
-                _ = _
+                _ = buff.seek(0)  # NOQA
                 filename = matching_dict[role.name]
                 role.thumbshot.save(filename, File(buff))
 
             else:
                 role.thumbshot = None
-                print "No thumbshot for %s!" % (role.name)
+                print("No thumbshot for %s!" % (role.name))
 
             role.save()

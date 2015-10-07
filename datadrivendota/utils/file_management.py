@@ -26,8 +26,7 @@ def s3_file(myfile, chosen_name=None):
 
 def fake_image(l):
     buff = BytesIO('11')
-    _ = buff.seek(0)  # Stop random printing.
-    _ = _  # Stop the linting.
+    _ = buff.seek(0)  # NOQA
     filename = slugify(l.steam_id) + '_full.png'
     l.stored_image.save(filename, File(buff))
     return l

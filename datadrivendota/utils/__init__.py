@@ -1,6 +1,7 @@
 from smtplib import SMTP
 from django.core.mail import send_mail
-from math import factorial
+import StringIO
+import gzip
 from utils.exceptions import NoDataFound
 from time import mktime
 import datetime
@@ -13,7 +14,7 @@ def utcize(min_date, max_date):
     else:
         max_date_utc = mktime(max_date.timetuple())
 
-    max_date_utc += 24*60*60 - 1  # Look at end of day.
+    max_date_utc += 24 * 60 * 60 - 1  # Look at end of day.
 
     if min_date is None:
         min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
@@ -49,7 +50,7 @@ def db_arg_map(lst, fn):
 
 def match_url(match_id):
     """Yes, I know.  This is a dumb hack because calling reverse() a million times starts taking up a meaningful fraction of the load time.  At least this way the hack is centralized, and this function can be gutted if needed."""
-    return '/matches/'+str(match_id)
+    return '/matches/' + str(match_id)
 
 
 def send_error_email(body):
@@ -69,3 +70,14 @@ def send_error_email(body):
 
     smtp.sendmail(from_addr, to_addr, msg)
     smtp.quit()
+
+
+def gzip_str(content):
+    out = StringIO.StringIO()
+    with gzip.GzipFile(fileobj=out, mode="w") as f:
+        f.write(content)
+    return out.getvalue()
+
+
+def gunzip_str(content):
+    return gzip.GzipFile(fileobj=StringIO.StringIO(content)).read()
