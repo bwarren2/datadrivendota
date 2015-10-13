@@ -16,12 +16,6 @@
               <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
             </div>
         </div>
-        <div class='col-md-4'>
-            <h4>hack</h4>
-            <div id='hack_chart' class='vert-md-4 chart'>
-              <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
-            </div>
-        </div>
     </div>
 {% endblock content %}
 
@@ -29,8 +23,19 @@
 <script type="text/javascript">
 $(function(){
 
+    $.ajax({
+        url: "",
+        dataType: "json",
+    })
+
+
+    // Do promise magic
+    var urls = [
+        'https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_1_parse_shard.json.gz',
+        'https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_130_parse_shard.json.gz'
+    ];
+
     d7.extensions.charts.pms_shards.shard_lineup('#gold_chart', {});
-    d7.extensions.charts.pms_shards.hack('#gold_chart', {});
 
 })
 
