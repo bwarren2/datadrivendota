@@ -87,6 +87,7 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
             'hero',
             'match',
             'skillbuild',
+            'replay_shard',
         )
 
 

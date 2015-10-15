@@ -1,3 +1,5 @@
+import json
+
 from django.db import models
 from django.db.models import Q
 
@@ -9,6 +11,7 @@ class MatchFilteredQuerySet(models.QuerySet):
     def __init__(self, *args, **kwargs):
         super(MatchFilteredQuerySet, self).__init__(*args, **kwargs)
         self.filter_pipeline = [
+            self.filter_ids,
             self.filter_hero,
             self.filter_league,
             self.filter_team,
@@ -24,6 +27,13 @@ class MatchFilteredQuerySet(models.QuerySet):
 
         for filter_fn in self.filter_pipeline:
             queryset = filter_fn(queryset)
+        return queryset
+
+    def filter_ids(self, queryset):
+        ids = json.loads(self.request.query_params.get('ids'))
+        if ids is not None:
+            queryset = queryset.filter(id__in=ids)
+
         return queryset
 
     def filter_validity(self, queryset):
