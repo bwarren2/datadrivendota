@@ -30,13 +30,13 @@ $(function(){
 
 
     // Do promise magic
-    var ids = [8799, 8800, 8804, 8806];
+    var ids = [8799, 8800, 8801, 8802, 8803, 8804, 8805, 8806, 8807, 8808];
 
     d7.extensions.charts.pms_shards.shard_lineup(
         ids,
-        d7.extensions.utils.filter.kills,
-        d7.extensions.utils.map.count,
-        d7.extensions.utils.reshape.noop,
+        d7.extensions.utils.filter.healing,
+        d7.extensions.utils.map.cumsum,
+        d7.extensions.utils.reshape.sides,
         d7.extensions.components.axes.offset_time,
         d7.extensions.components.axes.cumsum,
         '#gold_chart'

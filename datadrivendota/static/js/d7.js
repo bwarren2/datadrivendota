@@ -23573,20 +23573,33 @@ var shard_lineup = function(
     // Clear the div
     $(destination).empty();
 
-    // Reshape into something else if needed.
-    data = msg_reshape(data);
+    data = utils.reshape.pms_merge(data, pmses);
 
-    // Filter, map, cast data into plotting format
-    var plot_data = data.map(function(d){
-      var pms = pmses.filter(function(p){
-        return p.hero.internal_name === d[0].unit;
-      })[0];
+    data = data.map(function(d){
       return {
-        "key": pms.hero.name,
-        "values": d.filter(msg_filter(pms)).map(msg_map(pms))
+        icon: d.icon,
+        values: d.values.filter(msg_filter(d.icon))
       };
     });
 
+    console.log(data);
+    // Reshape into something else if needed.
+    data = msg_reshape(data);
+    console.log(data);
+
+
+    var key_fn = function(d){
+      return d.name;
+    }
+
+    // Filter, map, cast data into plotting format
+    var plot_data = data.map(function(d){
+      return {
+        "key": key_fn(d.icon),
+        "values": d.values.map(msg_map(d.icon))
+      };
+    });
+    console.log(plot_data);
     var svg = utils.svg.square_svg(destination);
 
     nv.addGraph(
@@ -23618,157 +23631,8 @@ var shard_lineup = function(
   });
 };
 
-var cumsum_heroes = function(data, attr){
-  for (var j=0; j < data.length; j++){
-      for(var i=0; i < data[j]['values'].length; i++){
-          if (i==0) {}
-          else {
-              data[j]['values'][i].value += data[j]['values'][i-1].value;
-          }
-      }
-  }
-  return data;
-};
-
-
-var contentGenerator = function(getX, getY, xlab, ylab){
-  var return_fn = function(d){
-      if (d === null) {
-        return '';
-      }
-      getx = getX;
-      gety = getY;
-      var table = d3.select(document.createElement("table"));
-
-
-        var theadEnter = table.selectAll("thead")
-            .data([d])
-            .enter().append("thead");
-
-        var trowEnter = theadEnter.selectAll("tr")
-                .data(function(p) { return p.series})
-                .enter()
-                .append("tr")
-                .classed("highlight", function(p) { return p.highlight});
-
-        trowEnter.append("td")
-            .classed("legend-color-guide",true)
-            .append("div")
-            .style("background-color", function(p) { return p.color});
-
-        trowEnter.append("td")
-            .classed("key", true)
-            .classed("total",function(p) { return !!p.total})
-            .html(function(p) { return p.key});
-      // if (headerEnabled) {}
-
-      var tbodyEnter = table.selectAll("tbody")
-          .data([d])
-          .enter().append("tbody");
-
-      var trowEnter = tbodyEnter.append("tr");
-
-      trowEnter
-          .append("td")
-          .html(xlab+': ');
-
-      trowEnter.append("td")
-          .classed("value",true)
-          .html(function(p) {
-            return getx(p)
-        });
-
-
-      var tBodyRowEnter = tbodyEnter.append("tr");
-
-      tBodyRowEnter
-          .append("td")
-          .html(ylab+': ');
-
-      tBodyRowEnter.append("td")
-          .classed("value",true)
-          .html(function(p, i) {
-            return gety(p)
-          });
-
-      tBodyRowEnter.selectAll("td").each(function(p) {
-          if (p.highlight) {
-              var opacityScale = d3.scale.linear().domain([0,1]).range(["#fff",p.color]);
-              var opacity = 0.6;
-              d3.select(this)
-                  .style("border-bottom-color", opacityScale(opacity))
-                  .style("border-top-color", opacityScale(opacity))
-              ;
-          }
-      });
-
-      var html = table.node().outerHTML;
-      if (d.footer !== undefined)
-          html += "<div class='footer'>" + d.footer + "</div>";
-      return html;
-
-  }
-  return return_fn
-};
-
-
-var hack = function(datatype, destination, xlab, ylab){
-    $(destination).empty();
-
-    Promise.resolve(
-        AjaxCache.get({
-            url: 'https://s3.amazonaws.com/datadrivendota/raw_replay_parse/1843672837_raw_parse.json',
-            dataType: 'json'
-        })
-    ).then(function(replay){
-
-      var gold = replay.filter(function(x){
-          return x.type == datatype &&
-          'npc_dota_hero_'==x.unit.slice(0, 14) &&
-          (x.unit.slice(14,30) == 'nevermore' || x.unit.slice(14,30) == 'templar_assassin' );
-      }).sort(function(a, b){
-          return a.time > b.time;
-      });
-
-      var plot_data = d3.nest()
-          .key(function(d){
-            return toTitleCase(d.unit.slice(14).replace('_',' '))
-          }).entries(gold);
-
-      plot_data = cumsum_heroes(plot_data, 'value')
-
-      nv.addGraph(function(){
-
-          var svg = d3.select(destination)
-            .append("svg")
-            .attr("width", 900)
-            .attr("height", 450);
-
-          var chart = nv.models.lineChart()
-              .x(function(d) {
-                  return d.time;
-              })
-              .y(function(d) { return d.value })
-              .color(d3.scale.category10().range())
-              .showLegend(false)
-              .interpolate('step-after');
-
-          var accessx = function(a){return a.point.time};
-
-          chart.xAxis.axisLabel(xlab).axisLabelDistance(-10);
-          chart.yAxis.axisLabel(ylab).axisLabelDistance(-10);
-
-          var chart_data = svg.datum(plot_data);
-          chart_data.transition().duration(500).call(chart);
-
-      })
-
-    }).catch(function(jqXhr, err, errStr){})
-};
-
 module.exports = {
   shard_lineup: shard_lineup,
-  hack: hack,
 };
 
 },{"../ajax_cache":3,"../models":15,"../utils":20,"./tooltips.js":9,"bluebird":25}],9:[function(require,module,exports){
@@ -25209,23 +25073,48 @@ module.exports = {
 }
 
 },{}],19:[function(require,module,exports){
+"use strict";
+
 var kills = function(icon){
     var icon = icon;
 
     return function(msg){
-
-      return msg.type == "kills" &&
-      msg.unit == icon.hero.internal_name && // Is hero
-      msg.key.substring(0,14) == 'npc_dota_hero_' && // Kills hero
-      msg.target_illusion==false &&
-      msg.target_hero==true &&
+      return msg.type === "kills" &&
+      msg.unit === icon.hero.internal_name && // Is hero
+      msg.key.substring(0,14) === 'npc_dota_hero_' && // Kills hero
+      msg.target_illusion === false &&
+      msg.target_hero === true &&
       msg.side !== icon.side;
     };
-}
+};
+
+var gold = function(icon){
+    var icon = icon;
+    return function(msg){
+      return msg.type === "gold_reasons";
+    };
+};
+
+var xp = function(icon){
+    var icon = icon;
+    return function(msg){
+      return msg.type === "xp_reasons";
+    };
+};
+
+var healing = function(icon){
+    var icon = icon;
+    return function(msg){
+      return msg.type === "healing";
+    };
+};
 
 
 module.exports = {
-    kills: kills
+    kills: kills,
+    gold: gold,
+    xp: xp,
+    healing: healing,
 }
 
 },{}],20:[function(require,module,exports){
@@ -25336,9 +25225,25 @@ var count = function(icon){
     }
 }
 
+var cumsum = function(icon){
+    var icon = icon;
+
+    return function(msg, idx, ary){
+      var prev_index = idx-1;
+      if (prev_index >= 0 && prev_index < ary.length){
+        var prev_value = ary[prev_index].cumsum;
+        msg.cumsum = prev_value + msg.value;
+      } else{
+        msg.cumsum = msg.value;
+      }
+      return msg;
+    }
+}
+
 
 module.exports = {
-    count: count
+    count: count,
+    cumsum: cumsum
 }
 
 },{}],22:[function(require,module,exports){
@@ -25395,14 +25300,54 @@ module.exports = {
 };
 
 },{}],23:[function(require,module,exports){
+'use strict';
 
-var noop = function(data){
-  return data;
+var pms_merge = function(data, pmses){
+  return data.map(function (d){
+
+    var pms = pmses.filter(
+        function(p){
+            return p.hero.internal_name === d[0].unit;
+        }
+    )[0];
+
+    return {
+        icon: pms,
+        values: d
+    };
+  });
 };
 
+var sides = function(data){
+
+  var foo =  ['Radiant', 'Dire'].map(function(side){
+
+      var side_data = data.filter(function(d){
+        return d.icon.side === side;
+      }).reduce(function(a, b){
+        return a.concat(b.values);
+      }, []);
+
+      return {
+        icon: {
+            name: side
+        },
+        values: side_data.sort(function(a,b){
+            return a.offset_time - b.offset_time;
+        })
+      }
+  });
+  return foo;
+};
+
+var noop = function(data){
+    return data;
+};
 
 module.exports = {
-    noop: noop
+    pms_merge: pms_merge,
+    sides: sides,
+    noop: noop,
 }
 
 },{}],24:[function(require,module,exports){
