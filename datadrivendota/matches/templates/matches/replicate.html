@@ -11,8 +11,8 @@
 {% block content %}
     <div class='container'>
         <div class='col-md-4'>
-            <h4>Gold Accrual</h4>
-            <div id='gold_chart' class='vert-md-4 chart'>
+            <h4>Chart</h4>
+            <div id='test_chart' class='vert-md-4 chart'>
               <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
             </div>
         </div>
@@ -39,7 +39,7 @@ $(function(){
         d7.extensions.utils.reshape.sides,
         d7.extensions.components.axes.offset_time,
         d7.extensions.components.axes.cumsum,
-        '#gold_chart'
+        '#test_chart'
     );
 
 })
