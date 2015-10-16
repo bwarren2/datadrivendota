@@ -23582,15 +23582,13 @@ var shard_lineup = function(
       };
     });
 
-    console.log(data);
     // Reshape into something else if needed.
     data = msg_reshape(data);
-    console.log(data);
 
 
     var key_fn = function(d){
       return d.name;
-    }
+    };
 
     // Filter, map, cast data into plotting format
     var plot_data = data.map(function(d){
@@ -23599,7 +23597,7 @@ var shard_lineup = function(
         "values": d.values.map(msg_map(d.icon))
       };
     });
-    console.log(plot_data);
+
     var svg = utils.svg.square_svg(destination);
 
     nv.addGraph(
@@ -23734,8 +23732,9 @@ var offset_time = {
   label: "Time",
   access: function(d){return d.offset_time;}
 };
+
 var cumsum = {
-  label: "Time",
+  label: "Total",
   access: function(d){return d.cumsum;}
 };
 

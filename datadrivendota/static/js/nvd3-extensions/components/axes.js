@@ -2,8 +2,9 @@ var offset_time = {
   label: "Time",
   access: function(d){return d.offset_time;}
 };
+
 var cumsum = {
-  label: "Time",
+  label: "Total",
   access: function(d){return d.cumsum;}
 };
 
