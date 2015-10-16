@@ -30,12 +30,17 @@ $(function(){
 
 
     // Do promise magic
-    var urls = [
-        'https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_1_parse_shard.json.gz',
-        'https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_130_parse_shard.json.gz'
-    ];
+    var ids = [8799, 8800, 8804, 8806];
 
-    d7.extensions.charts.pms_shards.shard_lineup('#gold_chart', {});
+    d7.extensions.charts.pms_shards.shard_lineup(
+        ids,
+        d7.extensions.utils.filter.kills,
+        d7.extensions.utils.map.count,
+        d7.extensions.utils.reshape.noop,
+        d7.extensions.components.axes.offset_time,
+        d7.extensions.components.axes.cumsum,
+        '#gold_chart'
+    );
 
 })
 
