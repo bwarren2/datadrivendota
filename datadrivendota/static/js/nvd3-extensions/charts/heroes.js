@@ -1,6 +1,7 @@
 "use strict";
 var utils = require("../utils");
 var Promise = require("bluebird");
+var AjaxCache = require("../ajax_cache");
 var models = require("../models");
 var $ = window.$;
 var nv = window.nv;
@@ -52,10 +53,10 @@ var pickban_scatter = function(destination, params, display_final_product){
   var blanks;
 
   Promise.join(
-    $.ajax(
+    AjaxCache.get(
       "/rest-api/match-pickban/?" + $.param(params)
     ),
-    $.ajax(
+    AjaxCache.get(
       "/rest-api/hero-dossiers/"
     )
   ).then(function(data){
