@@ -11,11 +11,6 @@
 
   {% include "matches/_match_header_card.html" %}
   {% include "matches/_match_card.html" %}
-  {% if match.replay %}
-  <div class="alert alert-success" role="alert">
-    Parsed replay exists!  See it <a href="{% url "matches:replay_parse" match_id=match.steam_id %}">here.</a>
-    </div>
-  {% endif %}
 
   <div class="row">
     <div class="col-md-6">
