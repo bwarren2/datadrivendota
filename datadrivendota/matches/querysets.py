@@ -30,11 +30,15 @@ class MatchFilteredQuerySet(models.QuerySet):
         return queryset
 
     def filter_ids(self, queryset):
-        ids = json.loads(self.request.query_params.get('ids'))
-        if ids is not None:
-            queryset = queryset.filter(id__in=ids)
+        try:
+            ids = json.loads(self.request.query_params.get('ids'))
+            if ids is not None:
+                queryset = queryset.filter(id__in=ids)
+            return queryset
 
-        return queryset
+        except TypeError:
+            # no parameter named ids
+            return queryset
 
     def filter_validity(self, queryset):
         valid = self.request.query_params.get('validity')
