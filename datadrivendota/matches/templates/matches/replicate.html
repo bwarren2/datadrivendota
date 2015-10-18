@@ -11,14 +11,8 @@
 {% block content %}
     <div class='container'>
         <div class='col-md-4'>
-            <h4>Gold Accrual</h4>
-            <div id='gold_chart' class='vert-md-4 chart'>
-              <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
-            </div>
-        </div>
-        <div class='col-md-4'>
-            <h4>hack</h4>
-            <div id='hack_chart' class='vert-md-4 chart'>
+            <h4>Chart</h4>
+            <div id='test_chart' class='vert-md-4 chart'>
               <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
             </div>
         </div>
@@ -29,8 +23,24 @@
 <script type="text/javascript">
 $(function(){
 
-    d7.extensions.charts.pms_shards.shard_lineup('#gold_chart', {});
-    d7.extensions.charts.pms_shards.hack('#gold_chart', {});
+    $.ajax({
+        url: "",
+        dataType: "json",
+    })
+
+
+    // Do promise magic
+    var ids = [8799, 8800, 8801, 8802, 8803, 8804, 8805, 8806, 8807, 8808];
+
+    d7.extensions.charts.pms_shards.shard_lineup(
+        ids,
+        d7.extensions.utils.filter.healing,
+        d7.extensions.utils.map.cumsum,
+        d7.extensions.utils.reshape.sides,
+        d7.extensions.components.axes.offset_time,
+        d7.extensions.components.axes.cumsum,
+        '#test_chart'
+    );
 
 })
 

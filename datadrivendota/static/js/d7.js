@@ -22929,7 +22929,7 @@ var aj = new AjaxCache();
 
 module.exports = aj;
 
-},{"bluebird":20}],4:[function(require,module,exports){
+},{"bluebird":25}],4:[function(require,module,exports){
 module.exports = {
   classDiscreteBarChart: function(destination, plot_data){
 
@@ -23294,7 +23294,7 @@ module.exports = {
   quality_barchart: quality_barchart,
 };
 
-},{"../ajax_cache":3,"../models":13,"../utils":17,"./tooltips.js":9,"bluebird":20}],6:[function(require,module,exports){
+},{"../ajax_cache":3,"../models":15,"../utils":20,"./tooltips.js":9,"bluebird":25}],6:[function(require,module,exports){
 module.exports = {
     heroes: require('./heroes.js'),
     matches: require('./matches.js'),
@@ -23522,7 +23522,7 @@ module.exports = {
   tower_dmg_barchart: tower_dmg_barchart,
 };
 
-},{"../ajax_cache":3,"../models":13,"../utils":17,"./tooltips.js":9,"bluebird":20}],8:[function(require,module,exports){
+},{"../ajax_cache":3,"../models":15,"../utils":20,"./tooltips.js":9,"bluebird":25}],8:[function(require,module,exports){
 "use strict";
 var utils = require("../utils");
 var Promise = require("bluebird");
@@ -23533,57 +23533,92 @@ var nv = window.nv;
 var d3 = window.d3;
 var tooltips = require("./tooltips.js");
 
-var shard_lineup = function(destination, params){
-  Promise.join(
+var shard_lineup = function(
+  pms_ids,
+  msg_filter,
+  msg_map,
+  msg_reshape,
+  x_data,
+  y_data,
+  destination
+){
+
+  var url ='http://127.0.0.1:8000/rest-api/player-match-summary/?ids=['+pms_ids.toString()+']';
+  var pmses;
+
+  // Get the PMS info
+  Promise.resolve(
     AjaxCache.get({
-        url: "https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_1_parse_shard.json.gz",
-        dataType: "json",
-    }),
-    AjaxCache.get({
-        url: "https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_130_parse_shard.json.gz",
-        dataType: "json",
+      url: url,
+      dataType: "json"
     })
 
   ).then(function(data){
-    console.log(data);
+
+    pmses = data;
+
+    // Get their replays
+    return Promise.all(
+      data.map(function(pms){
+        return Promise.resolve(
+          $.ajax({
+            url: pms.replay_shard,
+            dataType: "json",
+          })
+        );
+      })
+    )
+  }).then(function(data){
+
+    // Clear the div
     $(destination).empty();
-    var plot_data = data.map(function(d){
-      var cumsum = 0;
+
+    data = utils.reshape.pms_merge(data, pmses);
+
+    data = data.map(function(d){
       return {
-        "key": toTitleCase(d[0].unit),
-        "values": d.filter(function(m){
-          return m.type == "gold_reasons";
-        }).map(function(m){
-          m.cumsum = cumsum + m.value;
-          cumsum += m.value;
-          return m;
-        })
+        icon: d.icon,
+        values: d.values.filter(msg_filter(d.icon))
       };
     });
-    var chart;
-    var chart_data;
-    var svg = utils.svg.square_svg(destination);
 
-    var xlab = "Time";
-    var ylab = "Gold";
+    // Reshape into something else if needed.
+    data = msg_reshape(data);
+
+
+    var key_fn = function(d){
+      return d.name;
+    };
+
+    // Filter, map, cast data into plotting format
+    var plot_data = data.map(function(d){
+      return {
+        "key": key_fn(d.icon),
+        "values": d.values.map(msg_map(d.icon))
+      };
+    });
+
+    var svg = utils.svg.square_svg(destination);
 
     nv.addGraph(
 
       function(){
-        chart = nv.models.lineChart()
+        var chart = nv.models.lineChart()
           .margin({
             left: 45,
             bottom: 45,
           })
-          .x(function(d){return d.offset_time;})
-          .y(function(d){return d.cumsum;})
+          .x(x_data.access)
+          .y(y_data.access)
           .showLegend(false)
-          .interpolate('step-after');
+          .interpolate('step-after')
+          .forceY(0)
+          .forceX(0);
 
-        chart.xAxis.axisLabel(xlab);
-        chart.yAxis.axisLabel(ylab).axisLabelDistance(-20);
+        chart.xAxis.axisLabel(x_data.label);
+        chart.yAxis.axisLabel(y_data.label).axisLabelDistance(-20);
 
-        chart_data = svg.datum(plot_data);
+        var chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
         return chart;
       }
@@ -23594,30 +23629,11 @@ var shard_lineup = function(destination, params){
   });
 };
 
-var hack = function(destination, params){
-    Promise.resolve(
-        AjaxCache.get({
-            url: 'https://s3.amazonaws.com/datadrivendota/raw_replay_parse/1843672837_raw_parse.json',
-            dataType: 'json'
-        })
-    ).then(function(data){
-        console.log(data)
-    }).catch(function(jqXhr, err, errStr){
-        // console.log('Error :(');
-        // console.log(jqXhr);
-        // console.log(jqXhr.responseText);
-        // console.log(jqXhr.status);
-        // console.log(jqXhr.statusText);
-        // console.log(jqXhr.statusCode());
-    })
-};
-
 module.exports = {
   shard_lineup: shard_lineup,
-  hack: hack,
 };
 
-},{"../ajax_cache":3,"../models":13,"../utils":17,"./tooltips.js":9,"bluebird":20}],9:[function(require,module,exports){
+},{"../ajax_cache":3,"../models":15,"../utils":20,"./tooltips.js":9,"bluebird":25}],9:[function(require,module,exports){
 "use strict"
 var d3 = window.d3;
 
@@ -23712,6 +23728,30 @@ module.exports = {
 };
 
 },{}],10:[function(require,module,exports){
+var offset_time = {
+  label: "Time",
+  access: function(d){return d.offset_time;}
+};
+
+var cumsum = {
+  label: "Total",
+  access: function(d){return d.cumsum;}
+};
+
+module.exports = {
+    cumsum: cumsum,
+    offset_time: offset_time,
+}
+
+},{}],11:[function(require,module,exports){
+'use strict';
+var axes = require('./axes.js');
+
+module.exports = {
+    axes: axes,
+};
+
+},{"./axes.js":10}],12:[function(require,module,exports){
 'use strict';
 
 var d3 = require('../../bower_components/d3/d3.js');
@@ -23722,11 +23762,12 @@ nvd3.extensions = {};
 nvd3.extensions.charts = require('./charts')
 nvd3.extensions.utils = require('./utils')
 nvd3.extensions.models = require('./models')
+nvd3.extensions.components = require('./components')
 
 
 module.exports = nvd3;
 
-},{"../../bower_components/d3/d3.js":1,"../../bower_components/nvd3/build/nv.d3.js":2,"./charts":6,"./models":13,"./utils":17}],11:[function(require,module,exports){
+},{"../../bower_components/d3/d3.js":1,"../../bower_components/nvd3/build/nv.d3.js":2,"./charts":6,"./components":11,"./models":15,"./utils":20}],13:[function(require,module,exports){
 //TODO: consider deprecating by adding necessary features to multiBar model
 var discreteBar = function() {
     "use strict";
@@ -23984,7 +24025,7 @@ module.exports = {
     discrete_bar: discreteBar
 }
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 
 var discreteBarChart = function() {
     "use strict";
@@ -24239,7 +24280,7 @@ module.exports = {
     discrete_bar_chart: discreteBarChart
 }
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 var scatter = require('./scatter.js').scatter;
 var scatter_chart = require('./scatter_chart.js').scatter_chart;
@@ -24253,7 +24294,7 @@ module.exports = {
     discrete_bar_chart: discrete_bar_chart,
 };
 
-},{"./discrete_bar.js":11,"./discrete_bar_chart.js":12,"./scatter.js":14,"./scatter_chart.js":15}],14:[function(require,module,exports){
+},{"./discrete_bar.js":13,"./discrete_bar_chart.js":14,"./scatter.js":16,"./scatter_chart.js":17}],16:[function(require,module,exports){
 'use strict';
 var d3 = window.d3;
 var utils = require('../utils');
@@ -24687,7 +24728,7 @@ module.exports = {
     scatter: scatter
 }
 
-},{"../utils":17}],15:[function(require,module,exports){
+},{"../utils":20}],17:[function(require,module,exports){
 "use strict";
 var models = require("./scatter.js");
 var d3 = window.d3;
@@ -25007,7 +25048,7 @@ module.exports = {
     scatter_chart: scatter_chart
 }
 
-},{"./scatter.js":14,"d3-tip":22}],16:[function(require,module,exports){
+},{"./scatter.js":16,"d3-tip":27}],18:[function(require,module,exports){
 var blank_hero_pickbans = function(dossiers){
     var return_obj = {};
     var values_ary = [];
@@ -25030,12 +25071,60 @@ module.exports = {
     blank_hero_pickbans: blank_hero_pickbans
 }
 
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
+"use strict";
+
+var kills = function(icon){
+    var icon = icon;
+
+    return function(msg){
+      return msg.type === "kills" &&
+      msg.unit === icon.hero.internal_name && // Is hero
+      msg.key.substring(0,14) === 'npc_dota_hero_' && // Kills hero
+      msg.target_illusion === false &&
+      msg.target_hero === true &&
+      msg.side !== icon.side;
+    };
+};
+
+var gold = function(icon){
+    var icon = icon;
+    return function(msg){
+      return msg.type === "gold_reasons";
+    };
+};
+
+var xp = function(icon){
+    var icon = icon;
+    return function(msg){
+      return msg.type === "xp_reasons";
+    };
+};
+
+var healing = function(icon){
+    var icon = icon;
+    return function(msg){
+      return msg.type === "healing";
+    };
+};
+
+
+module.exports = {
+    kills: kills,
+    gold: gold,
+    xp: xp,
+    healing: healing,
+}
+
+},{}],20:[function(require,module,exports){
 'use strict';
 
 var svg = require('./svg.js');
 var blanks = require('./blanks.js');
 var reduce = require('./reduce.js');
+var map = require('./map.js');
+var reshape = require('./reshape.js');
+var filter = require('./filter.js');
 
 var getSet = function(value){
     var val = value;
@@ -25111,12 +25200,52 @@ module.exports = {
     svg: svg,
     blanks: blanks,
     reduce: reduce,
+    map: map,
+    reshape: reshape,
+    filter: filter,
     getSet: getSet,
     getSetFunctor: getSetFunctor,
     initOptions: initOptions,
 }
 
-},{"./blanks.js":16,"./reduce.js":18,"./svg.js":19}],18:[function(require,module,exports){
+},{"./blanks.js":18,"./filter.js":19,"./map.js":21,"./reduce.js":22,"./reshape.js":23,"./svg.js":24}],21:[function(require,module,exports){
+var count = function(icon){
+    var icon = icon;
+
+    return function(msg, idx, ary){
+      var prev_index = idx-1;
+      if (prev_index >= 0 && prev_index < ary.length){
+        var prev_value = ary[prev_index].cumsum;
+        msg.cumsum = prev_value + 1;
+      } else{
+        msg.cumsum = 1;
+      }
+      return msg;
+    }
+}
+
+var cumsum = function(icon){
+    var icon = icon;
+
+    return function(msg, idx, ary){
+      var prev_index = idx-1;
+      if (prev_index >= 0 && prev_index < ary.length){
+        var prev_value = ary[prev_index].cumsum;
+        msg.cumsum = prev_value + msg.value;
+      } else{
+        msg.cumsum = msg.value;
+      }
+      return msg;
+    }
+}
+
+
+module.exports = {
+    count: count,
+    cumsum: cumsum
+}
+
+},{}],22:[function(require,module,exports){
 "use strict";
 
 var extract_pickbans = function(blanks, working_set){
@@ -25169,7 +25298,58 @@ module.exports = {
   extract_pickbans: extract_pickbans
 };
 
-},{}],19:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
+'use strict';
+
+var pms_merge = function(data, pmses){
+  return data.map(function (d){
+
+    var pms = pmses.filter(
+        function(p){
+            return p.hero.internal_name === d[0].unit;
+        }
+    )[0];
+
+    return {
+        icon: pms,
+        values: d
+    };
+  });
+};
+
+var sides = function(data){
+
+  var foo =  ['Radiant', 'Dire'].map(function(side){
+
+      var side_data = data.filter(function(d){
+        return d.icon.side === side;
+      }).reduce(function(a, b){
+        return a.concat(b.values);
+      }, []);
+
+      return {
+        icon: {
+            name: side
+        },
+        values: side_data.sort(function(a,b){
+            return a.offset_time - b.offset_time;
+        })
+      }
+  });
+  return foo;
+};
+
+var noop = function(data){
+    return data;
+};
+
+module.exports = {
+    pms_merge: pms_merge,
+    sides: sides,
+    noop: noop,
+}
+
+},{}],24:[function(require,module,exports){
 function square_svg(destination, width, height){
   if (width === undefined){
     width = $(destination).width();
@@ -25187,7 +25367,7 @@ module.exports = {
   square_svg: square_svg,
 }
 
-},{}],20:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -30047,7 +30227,7 @@ module.exports = ret;
 },{"./es5.js":14}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":21}],21:[function(require,module,exports){
+},{"_process":26}],26:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -30139,7 +30319,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],22:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 // d3.tip
 // Copyright (c) 2013 Justin Palmer
 //
@@ -30445,5 +30625,5 @@ process.umask = function() { return 0; };
 
 }));
 
-},{}]},{},[10])(10)
+},{}]},{},[12])(12)
 });

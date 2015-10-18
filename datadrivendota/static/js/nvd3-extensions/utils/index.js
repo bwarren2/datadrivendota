@@ -3,6 +3,9 @@
 var svg = require('./svg.js');
 var blanks = require('./blanks.js');
 var reduce = require('./reduce.js');
+var map = require('./map.js');
+var reshape = require('./reshape.js');
+var filter = require('./filter.js');
 
 var getSet = function(value){
     var val = value;
@@ -78,6 +81,9 @@ module.exports = {
     svg: svg,
     blanks: blanks,
     reduce: reduce,
+    map: map,
+    reshape: reshape,
+    filter: filter,
     getSet: getSet,
     getSetFunctor: getSetFunctor,
     initOptions: initOptions,

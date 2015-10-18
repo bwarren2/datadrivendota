@@ -8,57 +8,92 @@ var nv = window.nv;
 var d3 = window.d3;
 var tooltips = require("./tooltips.js");
 
-var shard_lineup = function(destination, params){
-  Promise.join(
+var shard_lineup = function(
+  pms_ids,
+  msg_filter,
+  msg_map,
+  msg_reshape,
+  x_data,
+  y_data,
+  destination
+){
+
+  var url ='http://127.0.0.1:8000/rest-api/player-match-summary/?ids=['+pms_ids.toString()+']';
+  var pmses;
+
+  // Get the PMS info
+  Promise.resolve(
     AjaxCache.get({
-        url: "https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_1_parse_shard.json.gz",
-        dataType: "json",
-    }),
-    AjaxCache.get({
-        url: "https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_130_parse_shard.json.gz",
-        dataType: "json",
+      url: url,
+      dataType: "json"
     })
 
   ).then(function(data){
-    console.log(data);
+
+    pmses = data;
+
+    // Get their replays
+    return Promise.all(
+      data.map(function(pms){
+        return Promise.resolve(
+          $.ajax({
+            url: pms.replay_shard,
+            dataType: "json",
+          })
+        );
+      })
+    )
+  }).then(function(data){
+
+    // Clear the div
     $(destination).empty();
-    var plot_data = data.map(function(d){
-      var cumsum = 0;
+
+    data = utils.reshape.pms_merge(data, pmses);
+
+    data = data.map(function(d){
       return {
-        "key": toTitleCase(d[0].unit),
-        "values": d.filter(function(m){
-          return m.type == "gold_reasons";
-        }).map(function(m){
-          m.cumsum = cumsum + m.value;
-          cumsum += m.value;
-          return m;
-        })
+        icon: d.icon,
+        values: d.values.filter(msg_filter(d.icon))
       };
     });
-    var chart;
-    var chart_data;
-    var svg = utils.svg.square_svg(destination);
 
-    var xlab = "Time";
-    var ylab = "Gold";
+    // Reshape into something else if needed.
+    data = msg_reshape(data);
+
+
+    var key_fn = function(d){
+      return d.name;
+    };
+
+    // Filter, map, cast data into plotting format
+    var plot_data = data.map(function(d){
+      return {
+        "key": key_fn(d.icon),
+        "values": d.values.map(msg_map(d.icon))
+      };
+    });
+
+    var svg = utils.svg.square_svg(destination);
 
     nv.addGraph(
 
       function(){
-        chart = nv.models.lineChart()
+        var chart = nv.models.lineChart()
           .margin({
             left: 45,
             bottom: 45,
           })
-          .x(function(d){return d.offset_time;})
-          .y(function(d){return d.cumsum;})
+          .x(x_data.access)
+          .y(y_data.access)
           .showLegend(false)
-          .interpolate('step-after');
+          .interpolate('step-after')
+          .forceY(0)
+          .forceX(0);
 
-        chart.xAxis.axisLabel(xlab);
-        chart.yAxis.axisLabel(ylab).axisLabelDistance(-20);
+        chart.xAxis.axisLabel(x_data.label);
+        chart.yAxis.axisLabel(y_data.label).axisLabelDistance(-20);
 
-        chart_data = svg.datum(plot_data);
+        var chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
         return chart;
       }
@@ -69,25 +104,6 @@ var shard_lineup = function(destination, params){
   });
 };
 
-var hack = function(destination, params){
-    Promise.resolve(
-        AjaxCache.get({
-            url: 'https://s3.amazonaws.com/datadrivendota/raw_replay_parse/1843672837_raw_parse.json',
-            dataType: 'json'
-        })
-    ).then(function(data){
-        console.log(data)
-    }).catch(function(jqXhr, err, errStr){
-        // console.log('Error :(');
-        // console.log(jqXhr);
-        // console.log(jqXhr.responseText);
-        // console.log(jqXhr.status);
-        // console.log(jqXhr.statusText);
-        // console.log(jqXhr.statusCode());
-    })
-};
-
 module.exports = {
   shard_lineup: shard_lineup,
-  hack: hack,
 };
