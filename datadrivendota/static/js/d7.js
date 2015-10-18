@@ -22906,6 +22906,30 @@ nv.models.sunburstChart = function() {
 nv.version = "1.8.1-dev";
 })();
 },{}],3:[function(require,module,exports){
+"use strict";
+
+var Promise = require("bluebird");
+
+
+function AjaxCache() {
+    this.cache = {};
+}
+
+AjaxCache.prototype.get = function (path) {
+    var self = this;  // Just in case the Promise.resolve call screws with `this`.
+    if (self.cache.hasOwnProperty(path)) {
+        return Promise.resolve(self.cache[path]);
+    } else {
+        self.cache[path] = $.ajax(path);
+        return self.cache[path];
+    }
+}
+
+var aj = new AjaxCache();
+
+module.exports = aj;
+
+},{"bluebird":20}],4:[function(require,module,exports){
 module.exports = {
   classDiscreteBarChart: function(destination, plot_data){
 
@@ -22934,10 +22958,11 @@ module.exports = {
   }
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 var utils = require("../utils");
 var Promise = require("bluebird");
+var AjaxCache = require("../ajax_cache");
 var models = require("../models");
 var $ = window.$;
 var nv = window.nv;
@@ -22989,10 +23014,10 @@ var pickban_scatter = function(destination, params, display_final_product){
   var blanks;
 
   Promise.join(
-    $.ajax(
+    AjaxCache.get(
       "/rest-api/match-pickban/?" + $.param(params)
     ),
-    $.ajax(
+    AjaxCache.get(
       "/rest-api/hero-dossiers/"
     )
   ).then(function(data){
@@ -23269,7 +23294,7 @@ module.exports = {
   quality_barchart: quality_barchart,
 };
 
-},{"../models":12,"../utils":16,"./tooltips.js":8,"bluebird":19}],5:[function(require,module,exports){
+},{"../ajax_cache":3,"../models":13,"../utils":17,"./tooltips.js":9,"bluebird":20}],6:[function(require,module,exports){
 module.exports = {
     heroes: require('./heroes.js'),
     matches: require('./matches.js'),
@@ -23277,11 +23302,12 @@ module.exports = {
     pms_shards: require('./pms_replay_shards.js'),
 }
 
-},{"./bar.js":3,"./heroes.js":4,"./matches.js":6,"./pms_replay_shards.js":7}],6:[function(require,module,exports){
+},{"./bar.js":4,"./heroes.js":5,"./matches.js":7,"./pms_replay_shards.js":8}],7:[function(require,module,exports){
 "use strict";
 var utils = require("../utils");
 var Promise = require("bluebird");
 var models = require("../models");
+var AjaxCache = require("../ajax_cache");
 var $ = window.$;
 var nv = window.nv;
 var d3 = window.d3;
@@ -23292,7 +23318,7 @@ var tooltips = require("./tooltips.js");
 var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
 
   Promise.resolve(
-    $.ajax(
+    AjaxCache.get(
       "/rest-api/player-match-summary/?" + $.param(params)
     )
   ).then(function(pmses){
@@ -23369,7 +23395,7 @@ var lh_denies_scatter = function(destination, params){
 
 var ability_lines = function(destination, params){
     Promise.resolve(
-    $.ajax(
+    AjaxCache.get(
       "/rest-api/player-match-summary/?" + $.param(params)
     )
   ).then(function(pmses){
@@ -23417,7 +23443,7 @@ var ability_lines = function(destination, params){
 
 var pms_bar_chart = function(destination, params, y_var, y_lab){
     Promise.resolve(
-    $.ajax(
+    AjaxCache.get(
       "/rest-api/player-match-summary/?" + $.param(params)
     )
   ).then(function(pmses){
@@ -23496,10 +23522,11 @@ module.exports = {
   tower_dmg_barchart: tower_dmg_barchart,
 };
 
-},{"../models":12,"../utils":16,"./tooltips.js":8,"bluebird":19}],7:[function(require,module,exports){
+},{"../ajax_cache":3,"../models":13,"../utils":17,"./tooltips.js":9,"bluebird":20}],8:[function(require,module,exports){
 "use strict";
 var utils = require("../utils");
 var Promise = require("bluebird");
+var AjaxCache = require("../ajax_cache");
 var models = require("../models");
 var $ = window.$;
 var nv = window.nv;
@@ -23508,11 +23535,11 @@ var tooltips = require("./tooltips.js");
 
 var shard_lineup = function(destination, params){
   Promise.join(
-    $.ajax({
+    AjaxCache.get({
         url: "https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_1_parse_shard.json.gz",
         dataType: "json",
     }),
-    $.ajax({
+    AjaxCache.get({
         url: "https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_130_parse_shard.json.gz",
         dataType: "json",
     })
@@ -23569,7 +23596,7 @@ var shard_lineup = function(destination, params){
 
 var hack = function(destination, params){
     Promise.resolve(
-        $.ajax({
+        AjaxCache.get({
             url: 'https://s3.amazonaws.com/datadrivendota/raw_replay_parse/1843672837_raw_parse.json',
             dataType: 'json'
         })
@@ -23590,7 +23617,7 @@ module.exports = {
   hack: hack,
 };
 
-},{"../models":12,"../utils":16,"./tooltips.js":8,"bluebird":19}],8:[function(require,module,exports){
+},{"../ajax_cache":3,"../models":13,"../utils":17,"./tooltips.js":9,"bluebird":20}],9:[function(require,module,exports){
 "use strict"
 var d3 = window.d3;
 
@@ -23684,7 +23711,7 @@ module.exports = {
     hero_tooltip: heroContentGenerator
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 var d3 = require('../../bower_components/d3/d3.js');
@@ -23699,7 +23726,7 @@ nvd3.extensions.models = require('./models')
 
 module.exports = nvd3;
 
-},{"../../bower_components/d3/d3.js":1,"../../bower_components/nvd3/build/nv.d3.js":2,"./charts":5,"./models":12,"./utils":16}],10:[function(require,module,exports){
+},{"../../bower_components/d3/d3.js":1,"../../bower_components/nvd3/build/nv.d3.js":2,"./charts":6,"./models":13,"./utils":17}],11:[function(require,module,exports){
 //TODO: consider deprecating by adding necessary features to multiBar model
 var discreteBar = function() {
     "use strict";
@@ -23957,7 +23984,7 @@ module.exports = {
     discrete_bar: discreteBar
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 
 var discreteBarChart = function() {
     "use strict";
@@ -24212,7 +24239,7 @@ module.exports = {
     discrete_bar_chart: discreteBarChart
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 var scatter = require('./scatter.js').scatter;
 var scatter_chart = require('./scatter_chart.js').scatter_chart;
@@ -24226,7 +24253,7 @@ module.exports = {
     discrete_bar_chart: discrete_bar_chart,
 };
 
-},{"./discrete_bar.js":10,"./discrete_bar_chart.js":11,"./scatter.js":13,"./scatter_chart.js":14}],13:[function(require,module,exports){
+},{"./discrete_bar.js":11,"./discrete_bar_chart.js":12,"./scatter.js":14,"./scatter_chart.js":15}],14:[function(require,module,exports){
 'use strict';
 var d3 = window.d3;
 var utils = require('../utils');
@@ -24660,7 +24687,7 @@ module.exports = {
     scatter: scatter
 }
 
-},{"../utils":16}],14:[function(require,module,exports){
+},{"../utils":17}],15:[function(require,module,exports){
 "use strict";
 var models = require("./scatter.js");
 var d3 = window.d3;
@@ -24980,7 +25007,7 @@ module.exports = {
     scatter_chart: scatter_chart
 }
 
-},{"./scatter.js":13,"d3-tip":21}],15:[function(require,module,exports){
+},{"./scatter.js":14,"d3-tip":22}],16:[function(require,module,exports){
 var blank_hero_pickbans = function(dossiers){
     var return_obj = {};
     var values_ary = [];
@@ -25003,7 +25030,7 @@ module.exports = {
     blank_hero_pickbans: blank_hero_pickbans
 }
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 var svg = require('./svg.js');
@@ -25089,7 +25116,7 @@ module.exports = {
     initOptions: initOptions,
 }
 
-},{"./blanks.js":15,"./reduce.js":17,"./svg.js":18}],17:[function(require,module,exports){
+},{"./blanks.js":16,"./reduce.js":18,"./svg.js":19}],18:[function(require,module,exports){
 "use strict";
 
 var extract_pickbans = function(blanks, working_set){
@@ -25142,7 +25169,7 @@ module.exports = {
   extract_pickbans: extract_pickbans
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 function square_svg(destination, width, height){
   if (width === undefined){
     width = $(destination).width();
@@ -25160,7 +25187,7 @@ module.exports = {
   square_svg: square_svg,
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -30020,7 +30047,7 @@ module.exports = ret;
 },{"./es5.js":14}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":20}],20:[function(require,module,exports){
+},{"_process":21}],21:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -30112,7 +30139,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 // d3.tip
 // Copyright (c) 2013 Justin Palmer
 //
@@ -30418,5 +30445,5 @@ process.umask = function() { return 0; };
 
 }));
 
-},{}]},{},[9])(9)
+},{}]},{},[10])(10)
 });

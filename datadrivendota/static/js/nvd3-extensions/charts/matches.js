@@ -2,6 +2,7 @@
 var utils = require("../utils");
 var Promise = require("bluebird");
 var models = require("../models");
+var AjaxCache = require("../ajax_cache");
 var $ = window.$;
 var nv = window.nv;
 var d3 = window.d3;
@@ -12,7 +13,7 @@ var tooltips = require("./tooltips.js");
 var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
 
   Promise.resolve(
-    $.ajax(
+    AjaxCache.get(
       "/rest-api/player-match-summary/?" + $.param(params)
     )
   ).then(function(pmses){
@@ -89,7 +90,7 @@ var lh_denies_scatter = function(destination, params){
 
 var ability_lines = function(destination, params){
     Promise.resolve(
-    $.ajax(
+    AjaxCache.get(
       "/rest-api/player-match-summary/?" + $.param(params)
     )
   ).then(function(pmses){
@@ -137,7 +138,7 @@ var ability_lines = function(destination, params){
 
 var pms_bar_chart = function(destination, params, y_var, y_lab){
     Promise.resolve(
-    $.ajax(
+    AjaxCache.get(
       "/rest-api/player-match-summary/?" + $.param(params)
     )
   ).then(function(pmses){

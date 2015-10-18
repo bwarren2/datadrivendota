@@ -1,6 +1,7 @@
 "use strict";
 var utils = require("../utils");
 var Promise = require("bluebird");
+var AjaxCache = require("../ajax_cache");
 var models = require("../models");
 var $ = window.$;
 var nv = window.nv;
@@ -9,11 +10,11 @@ var tooltips = require("./tooltips.js");
 
 var shard_lineup = function(destination, params){
   Promise.join(
-    $.ajax({
+    AjaxCache.get({
         url: "https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_1_parse_shard.json.gz",
         dataType: "json",
     }),
-    $.ajax({
+    AjaxCache.get({
         url: "https://s3.amazonaws.com/datadrivendota/media/playermatchsummaries/replays/1837060998_130_parse_shard.json.gz",
         dataType: "json",
     })
@@ -70,7 +71,7 @@ var shard_lineup = function(destination, params){
 
 var hack = function(destination, params){
     Promise.resolve(
-        $.ajax({
+        AjaxCache.get({
             url: 'https://s3.amazonaws.com/datadrivendota/raw_replay_parse/1843672837_raw_parse.json',
             dataType: 'json'
         })
