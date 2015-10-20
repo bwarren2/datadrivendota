@@ -62,7 +62,6 @@ class MirrorMatches(Task):
             c.matches_desired = 1
             c.refresh_records = True
             c.match_id = match
-            c.refresh_records = True
             vac = ValveApiCall()
             um = UpdateMatch()
             c = chain(vac.s(api_context=c, mode='GetMatchDetails'), um.s())
@@ -149,22 +148,18 @@ class UpdateMatch(ApiFollower):
             except KeyError:
                 pass
 
-            update = False
             try:
                 match = Match.objects.get(steam_id=data['match_id'])
-                if self.api_context.refresh_records:
-                    for key, value in kwargs.iteritems():
-                        setattr(match, key, value)
-                    match.save()
-                    upload_match_summary(
-                        players=data['players'],
-                        parent_match=match,
-                        refresh_records=self.api_context.refresh_records
-                    )
-                    update = True
+                for key, value in kwargs.iteritems():
+                    setattr(match, key, value)
+                match.save()
+                upload_match_summary(
+                    players=data['players'],
+                    parent_match=match,
+                    refresh_records=self.api_context.refresh_records
+                )
 
             except Match.DoesNotExist:
-                update = True
                 match = Match.objects.create(**kwargs)
                 match.save()
                 upload_match_summary(
@@ -173,7 +168,7 @@ class UpdateMatch(ApiFollower):
                     refresh_records=self.api_context.refresh_records
                 )
 
-            if 'picks_bans' in data.keys() and update:
+            if 'picks_bans' in data.keys():
                 for pickban in data['picks_bans']:
                     datadict = {
                         'match': match,
@@ -192,13 +187,13 @@ class UpdateMatch(ApiFollower):
                     )[0]
                     pb.save()
 
-            if 'series_id' in data.keys() and update:
+            if 'series_id' in data.keys():
                 match.series_id = data['series_id']
 
-            if 'series_type' in data.keys() and update:
+            if 'series_type' in data.keys():
                 match.series_type = data['series_type']
 
-            if 'radiant_guild_id' in data.keys() and update:
+            if 'radiant_guild_id' in data.keys():
                 datadict = {
                     'steam_id': data["radiant_guild_id"],
                     'name': data["radiant_guild_name"],
@@ -210,7 +205,7 @@ class UpdateMatch(ApiFollower):
                 )[0]
                 match.radiant_guild = g
 
-            if 'dire_guild_id' in data.keys() and update:
+            if 'dire_guild_id' in data.keys():
                 datadict = {
                     'steam_id': data["dire_guild_id"],
                     'name': data["dire_guild_name"],
@@ -222,7 +217,7 @@ class UpdateMatch(ApiFollower):
                 )[0]
                 match.dire_guild = g
 
-            if 'radiant_team_id' in data.keys() and update:
+            if 'radiant_team_id' in data.keys():
                 radiant_team = Team.objects.get_or_create(
                     steam_id=data['radiant_team_id']
                 )[0]
@@ -230,7 +225,7 @@ class UpdateMatch(ApiFollower):
                 match.radiant_team_complete = True \
                     if data['radiant_team_id'] == 1 else False
 
-            if 'dire_team_id' in data.keys() and update:
+            if 'dire_team_id' in data.keys():
                 dire_team = Team.objects.get_or_create(
                     steam_id=data['dire_team_id']
                 )[0]
