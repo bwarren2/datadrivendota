@@ -106,9 +106,11 @@ class UpdateMatch(ApiFollower):
             )
             logging.error(self.api_context)
             try:
-                LiveMatch.objects.get(
+                lm = LiveMatch.objects.get(
                     steam_id=self.api_context.match_id
-                ).update(failed=True)
+                )
+                lm.failed = True
+                lm.save()
             except:
                 logging.error(
                     'No live match to fail. ({0})'.format(
@@ -674,10 +676,10 @@ class UpdatePmsReplays(Task):
             pms.replay_shard.save(filename, File(buff))
             pms.set_encoding()
 
-        MatchRequest.objects.get(match_id=match_id).update(
-            raw_parse_url=filename,
-            status=MatchRequest.PARSED
-        )
+        mr = MatchRequest.objects.get(match_id=match_id)
+        mr.raw_parse_url = filename,
+        mr.status = MatchRequest.PARSED
+        mr.save()
 
 
 def filter_msgs(pms, msg):
