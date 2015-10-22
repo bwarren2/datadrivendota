@@ -1,35 +1,41 @@
-var count = function(icon){
-    var icon = icon;
+'use strict';
 
+var count = function(){
     return function(msg, idx, ary){
       var prev_index = idx-1;
       if (prev_index >= 0 && prev_index < ary.length){
-        var prev_value = ary[prev_index].cumsum;
-        msg.cumsum = prev_value + 1;
+        var prev_value = ary[prev_index].sum;
+        msg.sum = prev_value + 1;
       } else{
-        msg.cumsum = 1;
+        msg.sum = 1;
       }
       return msg;
-    }
-}
+    };
+};
 
-var cumsum = function(icon){
-    var icon = icon;
+var sum = function(){
 
     return function(msg, idx, ary){
+
       var prev_index = idx-1;
-      if (prev_index >= 0 && prev_index < ary.length){
-        var prev_value = ary[prev_index].cumsum;
-        msg.cumsum = prev_value + msg.value;
+
+      var adder;
+      if (msg.hasOwnProperty('value')){
+        adder = msg.value;
       } else{
-        msg.cumsum = msg.value;
+        adder = 1;
+      }
+      if (prev_index >= 0 && prev_index < ary.length){
+        var prev_value = ary[prev_index].sum;
+        msg.sum = prev_value + adder;
+      } else{
+        msg.sum = adder;
       }
       return msg;
-    }
-}
-
+    };
+};
 
 module.exports = {
     count: count,
-    cumsum: cumsum
-}
+    sum: sum,
+};

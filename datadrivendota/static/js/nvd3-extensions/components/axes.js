@@ -5,12 +5,12 @@ var offset_time = {
     }
 };
 
-var cumsum = {
+var sum = {
   label: "Total",
-  access: function(d){return d.cumsum;}
+  access: function(d){return d.sum;}
 };
 
 module.exports = {
-    cumsum: cumsum,
+    sum: sum,
     offset_time: offset_time,
 }
