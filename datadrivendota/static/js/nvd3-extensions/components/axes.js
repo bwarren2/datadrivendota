@@ -1,6 +1,8 @@
 var offset_time = {
-  label: "Time",
-  access: function(d){return d.offset_time;}
+    label: "Minutes from Horn",
+    access: function(d){
+        return d.offset_time;
+    }
 };
 
 var cumsum = {

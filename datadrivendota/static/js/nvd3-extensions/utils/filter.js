@@ -1,7 +1,6 @@
 "use strict";
 
 var kills = function(icon){
-    var icon = icon;
 
     return function(msg){
       return msg.type === "kills" &&
@@ -13,22 +12,26 @@ var kills = function(icon){
     };
 };
 
-var gold = function(icon){
-    var icon = icon;
+var all_gold = function(icon){
     return function(msg){
       return msg.type === "gold_reasons";
     };
 };
 
+var earned_gold = function(icon){
+    return function(msg){
+      return msg.type === "gold_reasons" && msg.key !=="6";
+    };
+};
+
+
 var xp = function(icon){
-    var icon = icon;
     return function(msg){
       return msg.type === "xp_reasons";
     };
 };
 
 var healing = function(icon){
-    var icon = icon;
     return function(msg){
       return msg.type === "healing";
     };
@@ -37,7 +40,8 @@ var healing = function(icon){
 
 module.exports = {
     kills: kills,
-    gold: gold,
+    all_gold: all_gold,
     xp: xp,
     healing: healing,
+    earned_gold: earned_gold,
 }

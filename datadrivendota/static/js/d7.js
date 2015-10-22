@@ -23543,7 +23543,7 @@ var shard_lineup = function(
   destination
 ){
 
-  var url ='http://127.0.0.1:8000/rest-api/player-match-summary/?ids=['+pms_ids.toString()+']';
+  var url ="http://127.0.0.1:8000/rest-api/player-match-summary/?ids=["+pms_ids.toString()+"]";
   var pmses;
 
   // Get the PMS info
@@ -23587,9 +23587,8 @@ var shard_lineup = function(
 
 
     var key_fn = function(d){
-      return d.name;
+      return d.hero.name;
     };
-
     // Filter, map, cast data into plotting format
     var plot_data = data.map(function(d){
       return {
@@ -23599,7 +23598,6 @@ var shard_lineup = function(
     });
 
     var svg = utils.svg.square_svg(destination);
-
     nv.addGraph(
 
       function(){
@@ -23611,12 +23609,22 @@ var shard_lineup = function(
           .x(x_data.access)
           .y(y_data.access)
           .showLegend(false)
-          .interpolate('step-after')
+          .interpolate("step-after")
           .forceY(0)
           .forceX(0);
 
-        chart.xAxis.axisLabel(x_data.label);
-        chart.yAxis.axisLabel(y_data.label).axisLabelDistance(-20);
+        chart.xAxis.axisLabel(x_data.label).tickFormat(
+          function(d){
+            return moment.duration(d*1000).asMinutes().toFixed(2)
+          }
+        );
+        chart.yAxis.axisLabel(y_data.label).axisLabelDistance(-20).tickFormat(
+          function(d){
+            if(d>1000000){return (d/1000000).toFixed(0) + "M";}
+            else if(d>1000){return (d/1000).toFixed(0) + "K";}
+            else { return d; }
+          }
+        );
 
         var chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
@@ -23729,8 +23737,10 @@ module.exports = {
 
 },{}],10:[function(require,module,exports){
 var offset_time = {
-  label: "Time",
-  access: function(d){return d.offset_time;}
+    label: "Minutes from Horn",
+    access: function(d){
+        return d.offset_time;
+    }
 };
 
 var cumsum = {
@@ -25075,7 +25085,6 @@ module.exports = {
 "use strict";
 
 var kills = function(icon){
-    var icon = icon;
 
     return function(msg){
       return msg.type === "kills" &&
@@ -25087,22 +25096,26 @@ var kills = function(icon){
     };
 };
 
-var gold = function(icon){
-    var icon = icon;
+var all_gold = function(icon){
     return function(msg){
       return msg.type === "gold_reasons";
     };
 };
 
+var earned_gold = function(icon){
+    return function(msg){
+      return msg.type === "gold_reasons" && msg.key !=="6";
+    };
+};
+
+
 var xp = function(icon){
-    var icon = icon;
     return function(msg){
       return msg.type === "xp_reasons";
     };
 };
 
 var healing = function(icon){
-    var icon = icon;
     return function(msg){
       return msg.type === "healing";
     };
@@ -25111,9 +25124,10 @@ var healing = function(icon){
 
 module.exports = {
     kills: kills,
-    gold: gold,
+    all_gold: all_gold,
     xp: xp,
     healing: healing,
+    earned_gold: earned_gold,
 }
 
 },{}],20:[function(require,module,exports){
