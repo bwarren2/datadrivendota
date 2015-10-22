@@ -18,7 +18,7 @@ var shard_lineup = function(
   destination
 ){
 
-  var url ="http://127.0.0.1:8000/rest-api/player-match-summary/?ids=["+pms_ids.toString()+"]";
+  var url ="/rest-api/player-match-summary/?ids=["+pms_ids.toString()+"]";
   var pmses;
 
   // Get the PMS info
