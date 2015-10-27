@@ -169,6 +169,24 @@ var xp = function(icon){
     };
 };
 
+var hero_xp = function(icon){
+    return function(msg){
+      return msg.type === 'xp_reasons' && msg.key === '1';
+    };
+};
+
+var creep_xp = function(icon){
+    return function(msg){
+      return msg.type === 'xp_reasons' && msg.key === '2';
+    };
+};
+
+var roshan_xp = function(icon){
+    return function(msg){
+      return msg.type === 'xp_reasons' && msg.key === '3';
+    };
+};
+
 var healing = function(icon){
     return function(msg){
       return msg.type === 'healing';
@@ -197,4 +215,7 @@ module.exports = {
     death_expense: death_expense,
     hero_kill_income: hero_kill_income,
     roshan_kill_income: roshan_kill_income,
+    hero_xp: hero_xp,
+    creep_xp: creep_xp,
+    roshan_xp: roshan_xp,
 }

@@ -23758,6 +23758,9 @@ var special_shard_lineup = function(destination){
             death_expense: utils.filter.death_expense,
             hero_kill_income: utils.filter.hero_kill_income,
             roshan_kill_income: utils.filter.roshan_kill_income,
+            hero_xp: utils.filter.hero_xp,
+            creep_xp: utils.filter.creep_xp,
+            roshan_xp: utils.filter.roshan_xp,
         };
 
         var data_fn = data_map[$("select#data ").val()];
@@ -23784,7 +23787,6 @@ var special_shard_lineup = function(destination){
             var id = $(this).attr("value");
             selected_data.push(data[parseInt(id)])
         });
-        console.log(selected_data);
         plot_shard_lineup(
           selected_data,
           [
@@ -25426,6 +25428,24 @@ var xp = function(icon){
     };
 };
 
+var hero_xp = function(icon){
+    return function(msg){
+      return msg.type === 'xp_reasons' && msg.key === '1';
+    };
+};
+
+var creep_xp = function(icon){
+    return function(msg){
+      return msg.type === 'xp_reasons' && msg.key === '2';
+    };
+};
+
+var roshan_xp = function(icon){
+    return function(msg){
+      return msg.type === 'xp_reasons' && msg.key === '3';
+    };
+};
+
 var healing = function(icon){
     return function(msg){
       return msg.type === 'healing';
@@ -25454,6 +25474,9 @@ module.exports = {
     death_expense: death_expense,
     hero_kill_income: hero_kill_income,
     roshan_kill_income: roshan_kill_income,
+    hero_xp: hero_xp,
+    creep_xp: creep_xp,
+    roshan_xp: roshan_xp,
 }
 
 },{}],20:[function(require,module,exports){

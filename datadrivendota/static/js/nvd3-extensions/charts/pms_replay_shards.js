@@ -233,6 +233,9 @@ var special_shard_lineup = function(destination){
             death_expense: utils.filter.death_expense,
             hero_kill_income: utils.filter.hero_kill_income,
             roshan_kill_income: utils.filter.roshan_kill_income,
+            hero_xp: utils.filter.hero_xp,
+            creep_xp: utils.filter.creep_xp,
+            roshan_xp: utils.filter.roshan_xp,
         };
 
         var data_fn = data_map[$("select#data ").val()];
@@ -259,7 +262,6 @@ var special_shard_lineup = function(destination){
             var id = $(this).attr("value");
             selected_data.push(data[parseInt(id)])
         });
-        console.log(selected_data);
         plot_shard_lineup(
           selected_data,
           [
