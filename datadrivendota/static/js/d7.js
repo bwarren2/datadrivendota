@@ -23703,8 +23703,7 @@ var shard_lineup = function(
 // Used for the ESL 1 blog feature.
 var special_shard_lineup = function(destination){
 
-  var pms_ids = [8819, 8820, 8821, 8822, 8823, 8824, 8825, 8826, 8827, 8828];
-  var url ="/rest-api/player-match-summary/?ids=["+pms_ids.toString()+"]";
+  var url ="/rest-api/player-match-summary/?match_id=1843672837";
   var pmses;
 
   // Get the PMS info
@@ -23783,9 +23782,9 @@ var special_shard_lineup = function(destination){
         var selected_data = [];
         $("form input:checked").each(function() {
             var id = $(this).attr("value");
-            selected_data.push(data[pms_ids.indexOf(parseInt(id))])
+            selected_data.push(data[parseInt(id)])
         });
-
+        console.log(selected_data);
         plot_shard_lineup(
           selected_data,
           [
