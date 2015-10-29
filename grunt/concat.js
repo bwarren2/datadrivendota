@@ -29,6 +29,7 @@ module.exports = {
             "bower_components/sprintf/dist/sprintf.min.js",
             "bower_components/select2/dist/js/select2.js",
             "bower_components/moment/min/moment.min.js",
+            "bower_components/lodash/lodash.min.js",
             "js/charting.js",
             "js/parse.js",
             "js/project.js",

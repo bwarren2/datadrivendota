@@ -56,7 +56,7 @@ var plot_shard_lineup = function(
   $(destination).empty();
 
   data = utils.reshape.pms_merge(data, pmses);
-
+  console.log(data, destination, 'Post merge');
 
   data = data.map(function(d){
 
@@ -73,9 +73,11 @@ var plot_shard_lineup = function(
       values: data_values
     };
   });
+  console.log(data, destination, 'Post filter');
 
   // Reshape into something else if needed.
   data = msg_reshape(data);
+  console.log(data, destination, 'Post reshape');
 
 
   // Filter, map, cast data into plotting format
@@ -202,7 +204,7 @@ var special_shard_lineup = function(destination){
           })
         );
       })
-    )
+    );
   }).then(function(data){
 
     $("button#draw").on("click", function(){
@@ -285,8 +287,8 @@ var special_shard_lineup = function(destination){
   });
 };
 
-
 module.exports = {
   shard_lineup: shard_lineup,
   special_shard_lineup: special_shard_lineup,
+  plot_shard_lineup: plot_shard_lineup,
 };

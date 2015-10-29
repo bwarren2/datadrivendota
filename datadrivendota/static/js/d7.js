@@ -23581,7 +23581,7 @@ var plot_shard_lineup = function(
   $(destination).empty();
 
   data = utils.reshape.pms_merge(data, pmses);
-
+  console.log(data, destination, 'Post merge');
 
   data = data.map(function(d){
 
@@ -23598,9 +23598,11 @@ var plot_shard_lineup = function(
       values: data_values
     };
   });
+  console.log(data, destination, 'Post filter');
 
   // Reshape into something else if needed.
   data = msg_reshape(data);
+  console.log(data, destination, 'Post reshape');
 
 
   // Filter, map, cast data into plotting format
@@ -23727,7 +23729,7 @@ var special_shard_lineup = function(destination){
           })
         );
       })
-    )
+    );
   }).then(function(data){
 
     $("button#draw").on("click", function(){
@@ -23810,10 +23812,10 @@ var special_shard_lineup = function(destination){
   });
 };
 
-
 module.exports = {
   shard_lineup: shard_lineup,
   special_shard_lineup: special_shard_lineup,
+  plot_shard_lineup: plot_shard_lineup,
 };
 
 },{"../ajax_cache":3,"../components":11,"../models":15,"../utils":20,"./tooltips.js":9,"bluebird":25}],9:[function(require,module,exports){
@@ -25700,10 +25702,10 @@ var sides = function(data){
         icon: {
             key_name: side
         },
-        values: side_data.sort(function(a,b){
+        values: side_data.sort(function(a, b){
             return a.offset_time - b.offset_time;
         })
-      }
+      };
   });
   return foo;
 };

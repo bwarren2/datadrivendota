@@ -30,10 +30,10 @@ var sides = function(data){
         icon: {
             key_name: side
         },
-        values: side_data.sort(function(a,b){
+        values: side_data.sort(function(a, b){
             return a.offset_time - b.offset_time;
         })
-      }
+      };
   });
   return foo;
 };
