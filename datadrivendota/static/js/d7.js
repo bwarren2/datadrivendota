@@ -23574,14 +23574,14 @@ var plot_shard_lineup = function(
     x_data,
     y_data,
     destination,
-    pmses
+    pmses,
+    params
   ){
 
   // Clear the div
   $(destination).empty();
 
   data = utils.reshape.pms_merge(data, pmses);
-  console.log(data, destination, 'Post merge');
 
   data = data.map(function(d){
 
@@ -23598,11 +23598,9 @@ var plot_shard_lineup = function(
       values: data_values
     };
   });
-  console.log(data, destination, 'Post filter');
 
   // Reshape into something else if needed.
   data = msg_reshape(data);
-  console.log(data, destination, 'Post reshape');
 
 
   // Filter, map, cast data into plotting format
@@ -23627,7 +23625,14 @@ var plot_shard_lineup = function(
         .y(y_data.access)
         .showLegend(false)
         .interpolate("step-after")
-        .forceY(0)
+        .forceY(0);
+
+      if(params.height!==undefined){
+        chart.height(params.height);
+      }
+      if(params.width!==undefined){
+        chart.width(params.width);
+      }
 
       chart.xAxis.axisLabel(x_data.label).tickFormat(
         function(d){
