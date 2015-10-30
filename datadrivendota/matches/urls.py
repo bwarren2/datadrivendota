@@ -30,7 +30,7 @@ urlpatterns = patterns(
         name="detail_abilities"
     ),
     url(
-        r'^replicate/$',
+        r'^special/esl-1-finals/$',
         views.ReplicateDetail.as_view(),
         name="replicate"
     ),

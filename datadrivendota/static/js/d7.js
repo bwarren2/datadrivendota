@@ -23525,6 +23525,7 @@ module.exports = {
 },{"../ajax_cache":3,"../models":15,"../utils":20,"./tooltips.js":9,"bluebird":25}],8:[function(require,module,exports){
 "use strict";
 var utils = require("../utils");
+var components = require("../components");
 var Promise = require("bluebird");
 var AjaxCache = require("../ajax_cache");
 var models = require("../models");
@@ -23533,9 +23534,125 @@ var nv = window.nv;
 var d3 = window.d3;
 var tooltips = require("./tooltips.js");
 
+var endcap = function(data){
+  var min_time = d3.min(data, function(data_obj){
+    return d3.min(data_obj.values, function(datum){
+      return datum.offset_time;
+    });
+  });
+  var max_time = d3.max(data, function(data_obj){
+    return d3.max(data_obj.values, function(datum){
+      return datum.offset_time;
+    });
+  });
+
+  data.forEach(function(d){
+    if(d.values.length>0){
+      var left_msg = {
+        offset_time: min_time,
+        sum: 0,
+      };
+      var right_msg = {
+        offset_time: max_time,
+        sum: undefined,
+      };
+
+      right_msg.sum = d.values[d.values.length-1].sum;
+
+      d.values.push(right_msg);
+      d.values.unshift(left_msg);
+    }
+  });
+  return data;
+};
+
+var plot_shard_lineup = function(
+    data,
+    msg_filters,
+    msg_map,
+    msg_reshape,
+    x_data,
+    y_data,
+    destination,
+    pmses
+  ){
+
+  // Clear the div
+  $(destination).empty();
+
+  data = utils.reshape.pms_merge(data, pmses);
+  console.log(data, destination, 'Post merge');
+
+  data = data.map(function(d){
+
+    var data_values = d.values;
+
+    for (var i = 0; i < msg_filters.length; i++){
+      data_values = data_values.filter(
+        msg_filters[i](d.icon)
+      );
+    };
+
+    return {
+      icon: d.icon,
+      values: data_values
+    };
+  });
+  console.log(data, destination, 'Post filter');
+
+  // Reshape into something else if needed.
+  data = msg_reshape(data);
+  console.log(data, destination, 'Post reshape');
+
+
+  // Filter, map, cast data into plotting format
+  var plot_data = data.map(function(d){
+    return {
+      "key": d.icon.key_name,
+      "values": d.values.map(msg_map(d.icon))
+    };
+  });
+  plot_data = endcap(plot_data);
+
+  var svg = utils.svg.square_svg(destination);
+  nv.addGraph(
+
+    function(){
+      var chart = nv.models.lineChart()
+        .margin({
+          left: 45,
+          bottom: 45,
+        })
+        .x(x_data.access)
+        .y(y_data.access)
+        .showLegend(false)
+        .interpolate("step-after")
+        .forceY(0)
+
+      chart.xAxis.axisLabel(x_data.label).tickFormat(
+        function(d){
+          return moment.duration(d*1000).asMinutes().toFixed(2)
+        }
+      );
+      chart.yAxis.axisLabel(y_data.label).axisLabelDistance(-20).tickFormat(
+        function(d){
+          if(d>1000000){return (d/1000000).toFixed(0) + "M";}
+          else if(d>1000){return (d/1000).toFixed(0) + "K";}
+          else { return d; }
+        }
+      );
+
+      var chart_data = svg.datum(plot_data);
+      chart_data.transition().duration(500).call(chart);
+      return chart;
+    }
+  );
+
+}
+
 var shard_lineup = function(
   pms_ids,
-  msg_filter,
+  msg_filters,
   msg_map,
   msg_reshape,
   x_data,
@@ -23567,70 +23684,128 @@ var shard_lineup = function(
           })
         );
       })
-    )
+    );
   }).then(function(data){
 
-    // Clear the div
-    $(destination).empty();
-
-    data = utils.reshape.pms_merge(data, pmses);
-
-    data = data.map(function(d){
-      return {
-        icon: d.icon,
-        values: d.values.filter(msg_filter(d.icon))
-      };
-    });
-
-    // Reshape into something else if needed.
-    data = msg_reshape(data);
-
-
-    var key_fn = function(d){
-      return d.hero.name;
-    };
-    // Filter, map, cast data into plotting format
-    var plot_data = data.map(function(d){
-      return {
-        "key": key_fn(d.icon),
-        "values": d.values.map(msg_map(d.icon))
-      };
-    });
-
-    var svg = utils.svg.square_svg(destination);
-    nv.addGraph(
-
-      function(){
-        var chart = nv.models.lineChart()
-          .margin({
-            left: 45,
-            bottom: 45,
-          })
-          .x(x_data.access)
-          .y(y_data.access)
-          .showLegend(false)
-          .interpolate("step-after")
-          .forceY(0)
-          .forceX(0);
-
-        chart.xAxis.axisLabel(x_data.label).tickFormat(
-          function(d){
-            return moment.duration(d*1000).asMinutes().toFixed(2)
-          }
-        );
-        chart.yAxis.axisLabel(y_data.label).axisLabelDistance(-20).tickFormat(
-          function(d){
-            if(d>1000000){return (d/1000000).toFixed(0) + "M";}
-            else if(d>1000){return (d/1000).toFixed(0) + "K";}
-            else { return d; }
-          }
-        );
-
-        var chart_data = svg.datum(plot_data);
-        chart_data.transition().duration(500).call(chart);
-        return chart;
-      }
+    plot_shard_lineup(
+      data,
+      msg_filters,
+      msg_map,
+      msg_reshape,
+      x_data,
+      y_data,
+      destination,
+      pmses
     );
+  }).catch(function(e){
+    console.log(e);
+  });
+};
+
+// Used for the ESL 1 blog feature.
+var special_shard_lineup = function(destination){
+
+  var url ="/rest-api/player-match-summary/?match_id=1843672837";
+  var pmses;
+
+  // Get the PMS info
+  Promise.resolve(
+    AjaxCache.get({
+      url: url,
+      dataType: "json"
+    })
+
+  ).then(function(data){
+
+    pmses = data;
+
+    // Get their replays
+    return Promise.all(
+      data.map(function(pms){
+        return Promise.resolve(
+          $.ajax({
+            url: pms.replay_shard,
+            dataType: "json",
+          })
+        );
+      })
+    );
+  }).then(function(data){
+
+    $("button#draw").on("click", function(){
+
+        var rollup_map = {
+            players: utils.reshape.noop,
+            sides: utils.reshape.sides,
+            match: utils.reshape.matches,
+        };
+        var rollup_fn = rollup_map[$("select#rollup ").val()];
+
+        var data_map = {
+            kills: utils.filter.kills,
+            deaths: utils.filter.deaths,
+            last_hits: utils.filter.last_hits,
+            hero_dmg_dealt: utils.filter.hero_dmg_dealt,
+            hero_dmg_taken: utils.filter.hero_dmg_taken,
+            other_dmg_dealt: utils.filter.other_dmg_dealt,
+            other_dmg_taken: utils.filter.other_dmg_taken,
+            earned_gold: utils.filter.earned_gold,
+            all_gold: utils.filter.all_gold,
+            xp: utils.filter.xp,
+            healing: utils.filter.healing,
+            building_income: utils.filter.building_income,
+            buyback_expense: utils.filter.buyback_expense,
+            courier_kill_income: utils.filter.courier_kill_income,
+            creep_kill_income: utils.filter.creep_kill_income,
+            death_expense: utils.filter.death_expense,
+            hero_kill_income: utils.filter.hero_kill_income,
+            roshan_kill_income: utils.filter.roshan_kill_income,
+            hero_xp: utils.filter.hero_xp,
+            creep_xp: utils.filter.creep_xp,
+            roshan_xp: utils.filter.roshan_xp,
+        };
+
+        var data_fn = data_map[$("select#data ").val()];
+        var start_time = $("#start_time").val();
+        var end_time = $("#end_time").val();
+        var timeToSecs = function(time){
+            return parseInt(time.split(":")[0])*60+parseInt(time.split(":")[1]);
+        };
+
+        if(start_time!==""){
+            start_time = timeToSecs(start_time);
+        } else{
+            start_time = -10000;
+        }
+
+        if(end_time!==""){
+            end_time = timeToSecs(end_time);
+        } else{
+            end_time = 100000;
+        }
+
+        var selected_data = [];
+        $("form input:checked").each(function() {
+            var id = $(this).attr("value");
+            selected_data.push(data[parseInt(id)])
+        });
+        plot_shard_lineup(
+          selected_data,
+          [
+            data_fn,
+            utils.filter.time_gte(start_time),
+            utils.filter.time_lte(end_time),
+          ],
+          utils.map.sum,
+          rollup_fn,
+          components.axes.offset_time,
+          components.axes.sum,
+          destination,
+          pmses
+        );
+
+    });
+
 
   }).catch(function(e){
     console.log(e);
@@ -23639,9 +23814,11 @@ var shard_lineup = function(
 
 module.exports = {
   shard_lineup: shard_lineup,
+  special_shard_lineup: special_shard_lineup,
+  plot_shard_lineup: plot_shard_lineup,
 };
 
-},{"../ajax_cache":3,"../models":15,"../utils":20,"./tooltips.js":9,"bluebird":25}],9:[function(require,module,exports){
+},{"../ajax_cache":3,"../components":11,"../models":15,"../utils":20,"./tooltips.js":9,"bluebird":25}],9:[function(require,module,exports){
 "use strict"
 var d3 = window.d3;
 
@@ -23743,13 +23920,13 @@ var offset_time = {
     }
 };
 
-var cumsum = {
+var sum = {
   label: "Total",
-  access: function(d){return d.cumsum;}
+  access: function(d){return d.sum;}
 };
 
 module.exports = {
-    cumsum: cumsum,
+    sum: sum,
     offset_time: offset_time,
 }
 
@@ -25082,12 +25259,50 @@ module.exports = {
 }
 
 },{}],19:[function(require,module,exports){
-"use strict";
+'use strict';
+
+
+// These are getting weird, ie three functions deep, because they are special.
+// These are called in template to curry a function with the time value.
+// Then the fn is called in the shard_charting general-purpose fn as normal.
+
+var time_gte = function(time){
+
+  return function(icon){
+    return function(msg){
+      return msg.offset_time >= time;
+    };
+  };
+
+};
+
+var time_lte = function(time){
+
+  return function(icon){
+    return function(msg){
+      return msg.offset_time <= time;
+    };
+  };
+
+};
+
+// End weird fns
+
+var last_hits = function(icon){
+
+    return function(msg){
+      return msg.type === 'kills' &&
+      msg.unit === icon.hero.internal_name && // Is hero
+      msg.key.substring(0,14) !== 'npc_dota_hero_' && // Kills hero
+      msg.side !== icon.side;
+    };
+};
+
 
 var kills = function(icon){
 
     return function(msg){
-      return msg.type === "kills" &&
+      return msg.type === 'kills' &&
       msg.unit === icon.hero.internal_name && // Is hero
       msg.key.substring(0,14) === 'npc_dota_hero_' && // Kills hero
       msg.target_illusion === false &&
@@ -25096,38 +25311,174 @@ var kills = function(icon){
     };
 };
 
+var deaths = function(icon){
+
+    return function(msg){
+      return msg.type === 'kills' &&
+      msg.key === icon.hero.internal_name && // Is hero
+      msg.unit.substring(0,14) === 'npc_dota_hero_' && // Kills hero
+      msg.target_illusion === false &&
+      msg.target_hero === true &&
+      msg.side !== icon.side;
+    };
+};
+
+
+var hero_dmg_dealt = function(icon){
+
+    return function(msg){
+      return msg.type === 'damage' &&
+      msg.unit === icon.hero.internal_name && // Is hero
+      msg.key.substring(0,14) === 'npc_dota_hero_' && // Kills hero
+      msg.target_illusion === false &&
+      msg.target_hero === true &&
+      msg.side !== icon.side;
+    };
+};
+
+var hero_dmg_taken = function(icon){
+
+    return function(msg){
+      return msg.type === 'damage' &&
+      msg.key === icon.hero.internal_name && // Is hero
+      msg.unit.substring(0,14) === 'npc_dota_hero_' && // Kills hero
+      msg.target_illusion === false &&
+      msg.target_hero === true &&
+      msg.side !== icon.side;
+    };
+};
+
+var other_dmg_dealt = function(icon){
+
+    return function(msg){
+      return msg.type === 'damage' &&
+      msg.unit === icon.hero.internal_name && // Is hero
+      msg.key.substring(0,14) !== 'npc_dota_hero_' && // Kills hero
+      msg.side !== icon.side;
+    };
+};
+
+var other_dmg_taken = function(icon){
+
+    return function(msg){
+      return msg.type === 'damage' &&
+      msg.key !== icon.hero.internal_name && // Is hero
+      msg.unit.substring(0,14) === 'npc_dota_hero_' && // Kills hero
+      msg.side !== icon.side;
+    };
+};
+
+
 var all_gold = function(icon){
     return function(msg){
-      return msg.type === "gold_reasons";
+      return msg.type === 'gold_reasons';
     };
 };
 
 var earned_gold = function(icon){
     return function(msg){
-      return msg.type === "gold_reasons" && msg.key !=="6";
+      return msg.type === 'gold_reasons' && msg.key !=='6';
+    };
+};
+
+var death_expense = function(icon){
+    return function(msg){
+      return msg.type === 'gold_reasons' && msg.key === '1';
+    };
+};
+
+var buyback_expense = function(icon){
+    return function(msg){
+      return msg.type === 'gold_reasons' && msg.key === '2';
+    };
+};
+
+var building_income = function(icon){
+    return function(msg){
+      return msg.type === 'gold_reasons' && msg.key === '11';
+    };
+};
+
+var hero_kill_income = function(icon){
+    return function(msg){
+      return msg.type === 'gold_reasons' && msg.key === '12';
+    };
+};
+
+var creep_kill_income = function(icon){
+    return function(msg){
+      return msg.type === 'gold_reasons' && msg.key === '13';
+    };
+};
+
+var roshan_kill_income = function(icon){
+    return function(msg){
+      return msg.type === 'gold_reasons' && msg.key === '14';
+    };
+};
+
+var courier_kill_income = function(icon){
+    return function(msg){
+      return msg.type === 'gold_reasons' && msg.key === '15';
     };
 };
 
 
 var xp = function(icon){
     return function(msg){
-      return msg.type === "xp_reasons";
+      return msg.type === 'xp_reasons';
+    };
+};
+
+var hero_xp = function(icon){
+    return function(msg){
+      return msg.type === 'xp_reasons' && msg.key === '1';
+    };
+};
+
+var creep_xp = function(icon){
+    return function(msg){
+      return msg.type === 'xp_reasons' && msg.key === '2';
+    };
+};
+
+var roshan_xp = function(icon){
+    return function(msg){
+      return msg.type === 'xp_reasons' && msg.key === '3';
     };
 };
 
 var healing = function(icon){
     return function(msg){
-      return msg.type === "healing";
+      return msg.type === 'healing';
     };
 };
 
 
 module.exports = {
     kills: kills,
+    deaths: deaths,
     all_gold: all_gold,
     xp: xp,
     healing: healing,
     earned_gold: earned_gold,
+    hero_dmg_taken: hero_dmg_taken,
+    hero_dmg_dealt: hero_dmg_dealt,
+    other_dmg_taken: other_dmg_taken,
+    other_dmg_dealt: other_dmg_dealt,
+    time_gte: time_gte,
+    time_lte: time_lte,
+    last_hits: last_hits,
+    building_income: building_income,
+    buyback_expense: buyback_expense,
+    courier_kill_income: courier_kill_income,
+    creep_kill_income: creep_kill_income,
+    death_expense: death_expense,
+    hero_kill_income: hero_kill_income,
+    roshan_kill_income: roshan_kill_income,
+    hero_xp: hero_xp,
+    creep_xp: creep_xp,
+    roshan_xp: roshan_xp,
 }
 
 },{}],20:[function(require,module,exports){
@@ -25223,41 +25574,47 @@ module.exports = {
 }
 
 },{"./blanks.js":18,"./filter.js":19,"./map.js":21,"./reduce.js":22,"./reshape.js":23,"./svg.js":24}],21:[function(require,module,exports){
-var count = function(icon){
-    var icon = icon;
+'use strict';
 
+var count = function(){
     return function(msg, idx, ary){
       var prev_index = idx-1;
       if (prev_index >= 0 && prev_index < ary.length){
-        var prev_value = ary[prev_index].cumsum;
-        msg.cumsum = prev_value + 1;
+        var prev_value = ary[prev_index].sum;
+        msg.sum = prev_value + 1;
       } else{
-        msg.cumsum = 1;
+        msg.sum = 1;
       }
       return msg;
-    }
-}
+    };
+};
 
-var cumsum = function(icon){
-    var icon = icon;
+var sum = function(){
 
     return function(msg, idx, ary){
+
       var prev_index = idx-1;
-      if (prev_index >= 0 && prev_index < ary.length){
-        var prev_value = ary[prev_index].cumsum;
-        msg.cumsum = prev_value + msg.value;
+
+      var adder;
+      if (msg.hasOwnProperty('value')){
+        adder = msg.value;
       } else{
-        msg.cumsum = msg.value;
+        adder = 1;
+      }
+      if (prev_index >= 0 && prev_index < ary.length){
+        var prev_value = ary[prev_index].sum;
+        msg.sum = prev_value + adder;
+      } else{
+        msg.sum = adder;
       }
       return msg;
-    }
-}
-
+    };
+};
 
 module.exports = {
     count: count,
-    cumsum: cumsum
-}
+    sum: sum,
+};
 
 },{}],22:[function(require,module,exports){
 "use strict";
@@ -25323,7 +25680,7 @@ var pms_merge = function(data, pmses){
             return p.hero.internal_name === d[0].unit;
         }
     )[0];
-
+    pms.key_name = pms.hero.name;
     return {
         icon: pms,
         values: d
@@ -25343,24 +25700,67 @@ var sides = function(data){
 
       return {
         icon: {
-            name: side
+            key_name: side
         },
-        values: side_data.sort(function(a,b){
+        values: side_data.sort(function(a, b){
             return a.offset_time - b.offset_time;
         })
-      }
+      };
   });
   return foo;
 };
 
+var matches = function(data){
+
+  var match_id_list = unique(
+    data.map(function(d){
+      return d.icon.match.steam_id;
+    })
+  );
+
+  var foo = match_id_list.map(function(steam_id){
+
+      var match_data = data.filter(function(d){
+        return d.icon.match.steam_id === steam_id;
+      }).reduce(function(a, b){
+        return a.concat(b.values);
+      }, []);
+
+      return {
+        icon: {
+            key_name: 'Match #'+steam_id
+        },
+        values: match_data.sort(function(a,b){
+            return a.offset_time - b.offset_time;
+        })
+      }
+  });
+
+  return foo;
+
+};
+
+
 var noop = function(data){
     return data;
+};
+
+var unique = function(arr) {
+    var u = {}, a = [];
+    for(var i = 0, l = arr.length; i < l; ++i){
+        if(!u.hasOwnProperty(arr[i])) {
+            a.push(arr[i]);
+            u[arr[i]] = 1;
+        }
+    }
+    return a;
 };
 
 module.exports = {
     pms_merge: pms_merge,
     sides: sides,
     noop: noop,
+    matches: matches,
 }
 
 },{}],24:[function(require,module,exports){

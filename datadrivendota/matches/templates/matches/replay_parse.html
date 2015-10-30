@@ -42,11 +42,6 @@ $(function(){
     ).then(function(data){
         console.log("{{match.compressed_replay.url}}")
         replay = data;
-        window.ParseCharts.cumsum_chart(
-            replay, 'gold_reasons', '#charts', 'Time', 'Net Worth');
-        window.ParseCharts.cumsum_chart(
-            replay, 'xp_reasons', '#charts', 'Time', 'XP'
-        );
     }).catch(function(jqXhr, err, errStr){
         // console.log('Error :(');
         // console.log(jqXhr);
