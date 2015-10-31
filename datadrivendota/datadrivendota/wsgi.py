@@ -18,6 +18,9 @@ from os.path import abspath, dirname
 from sys import path
 from django.core.wsgi import get_wsgi_application
 from whitenoise.django import DjangoWhiteNoise
+# Fix django closing connection to MemCachier after every request (#11331)
+from django.core.cache.backends.memcached import BaseMemcachedCache
+BaseMemcachedCache.close = lambda self, **kwargs: None
 
 SITE_ROOT = dirname(dirname(abspath(__file__)))
 path.append(SITE_ROOT)

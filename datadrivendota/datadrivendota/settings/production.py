@@ -60,12 +60,47 @@ ALLOWED_HOSTS = (
 
 ########## CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
+environ['MEMCACHE_SERVERS'] = environ.get(
+    'MEMCACHIER_SERVERS',
+    ''
+).replace(',', ';')
+environ['MEMCACHE_USERNAME'] = environ.get('MEMCACHIER_USERNAME', '')
+environ['MEMCACHE_PASSWORD'] = environ.get('MEMCACHIER_PASSWORD', '')
+
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+        'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
+        # Use binary memcache protocol (needed for authentication)
+        'BINARY': True,
+
+        # TIMEOUT is not the connection timeout! It's the default expiration
+        # timeout that should be applied to keys! Setting it to `None`
+        # disables expiration.
+        'TIMEOUT': None,
+
+        'OPTIONS': {
+            # Enable faster IO
+            'no_block': True,
+            'tcp_nodelay': True,
+
+            # Keep connection alive
+            'tcp_keepalive': True,
+
+            # Timeout for set/get requests
+            '_poll_timeout': 2000,
+
+            # Use consistent hashing for failover
+            'ketama': True,
+
+            # Configure failover timings
+            'connect_timeout': 2000,
+            'remove_failed': 4,
+            'retry_timeout': 2,
+            'dead_timeout': 10
+        }
     }
 }
+
 ########## END CACHE CONFIGURATION
 
 # Static Files
