@@ -21,8 +21,8 @@ django-storages==1.1.8
 django-stripe-payments==2.0.0
 django-tagging==0.3.4
 django-xmlrpc==0.1.5
-Django==1.8
-djangorestframework==3.1.1
+Django==1.8.5
+djangorestframework==3.3.0
 docutils==0.12
 ecdsa==0.13
 Fabric==1.10.1
@@ -59,3 +59,5 @@ pika==0.9.14
 opbeat==3.0.2
 django-pipeline==1.5.0
 django-basic-blog==0.10
+python-memcached==1.57
+drf-extensions==0.2.8

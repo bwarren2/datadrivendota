@@ -1,6 +1,7 @@
 from django.db.models import When, Case, Value, IntegerField, Sum
 
 from rest_framework import viewsets, filters
+from rest_framework_extensions.cache.decorators import cache_response
 
 from matches.models import PlayerMatchSummary, PickBan
 
@@ -109,3 +110,7 @@ class HeroDossierViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = HeroDossier.objects.all()
     paginate_by = None
     serializer_class = HeroDossierSerializer
+
+    @cache_response()
+    def retrieve(self, *args, **kwargs):
+        return super(HeroDossierViewSet, self).retrieve(*args, **kwargs)

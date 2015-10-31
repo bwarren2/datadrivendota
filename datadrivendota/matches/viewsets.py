@@ -1,4 +1,6 @@
 from rest_framework import viewsets, filters
+from rest_framework_extensions.cache.decorators import cache_response
+
 
 from .models import Match, PlayerMatchSummary, PickBan, SkillBuild, GameMode
 
@@ -43,6 +45,10 @@ class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
     page_size_query_param = 'page_size'
     serializer_class = FastMatchPickBansSerializer
     max_page_size = 200
+
+    @cache_response()
+    def retrieve(self, *args, **kwargs):
+        return super(MatchPickBanViewSet, self).retrieve(*args, **kwargs)
 
     def _get_matches(self):
         matches = Match.objects.filter(
@@ -127,6 +133,10 @@ class PlayerMatchSummaryViewSet(viewsets.ReadOnlyModelViewSet):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 1000
+
+    @cache_response()
+    def retrieve(self, *args, **kwargs):
+        return super(PlayerMatchSummaryViewSet, self).retrieve(*args, **kwargs)
 
     def get_queryset(self):
         queryset = PlayerMatchSummary.objects.given(self.request)
