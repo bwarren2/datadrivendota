@@ -59,5 +59,6 @@ pika==0.9.14
 opbeat==3.0.2
 django-pipeline==1.5.0
 django-basic-blog==0.10
-python-memcached==1.57
 drf-extensions==0.2.8
+pylibmc==1.5.0
+django-pylibmc==0.6.0
