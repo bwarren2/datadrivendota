@@ -68,4 +68,8 @@ CACHES = {
 }
 ########## END CACHE CONFIGURATION
 
+# Static Files
+STATIC_HOST = environ.get('DJANGO_STATIC_HOST', '')
+STATIC_URL = STATIC_HOST + '/assets/'
+
 SITE_ID = 2
