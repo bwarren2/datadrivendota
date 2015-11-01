@@ -23627,11 +23627,14 @@ var plot_shard_lineup = function(
         .interpolate("step-after")
         .forceY(0);
 
-      if(params.height!==undefined){
-        chart.height(params.height);
-      }
-      if(params.width!==undefined){
-        chart.width(params.width);
+      if(params !== undefined){
+
+        if(params.height!==undefined){
+          chart.height(params.height);
+        }
+        if(params.width!==undefined){
+          chart.width(params.width);
+        }
       }
 
       chart.xAxis.axisLabel(x_data.label).tickFormat(
