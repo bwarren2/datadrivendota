@@ -244,7 +244,7 @@ var winrate_scatter = function(destination, params, display_final_product){
   });
 };
 
-var quality_barchart = function(destination, params){
+var quality_barchart = function(destination, params, display_final_product){
 
   var winrate_data;
   var dossiers;
@@ -262,7 +262,16 @@ var quality_barchart = function(destination, params){
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);
     $(destination).empty();
-    return winrate_data.slice(0, 0);
+
+    var idx;
+    if (display_final_product !== undefined){
+      idx = winrate_data.length;
+    } else {
+      idx = 0;
+    }
+
+    return winrate_data.slice(0, idx);
+
   })
   .then(function(working_set){
     var plot_data = d7.extensions.utils.reduce.extract_pickbans(
