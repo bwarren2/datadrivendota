@@ -147,6 +147,8 @@ class FilteredQuerySet(models.QuerySet):
             self.filter_skill,
             self.filter_validity,
             self.filter_match,
+            self.filter_start_time_lte,
+            self.filter_start_time_gte,
         ]
 
     def given(self, request):
@@ -204,6 +206,26 @@ class FilteredQuerySet(models.QuerySet):
         if match is not None:
             queryset = queryset.filter(
                 steam_id=match
+            )
+
+        return queryset
+
+    def filter_start_time_gte(self, queryset):
+
+        cutoff = self.request.query_params.get('start_time_gte')
+        if cutoff is not None:
+            queryset = queryset.filter(
+                start_time__gte=cutoff
+            )
+
+        return queryset
+
+    def filter_start_time_lte(self, queryset):
+
+        cutoff = self.request.query_params.get('start_time_lte')
+        if cutoff is not None:
+            queryset = queryset.filter(
+                start_time__lte=cutoff
             )
 
         return queryset

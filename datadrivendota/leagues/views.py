@@ -1,7 +1,9 @@
+from time import time
 from django.views.generic import ListView, DetailView, TemplateView
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.conf import settings
+from django.db.models import Max
 
 from utils.pagination import SmarterPaginator
 from datadrivendota.views import JsonApiView
@@ -96,7 +98,17 @@ class LeagueDetail(DetailView):
         )
         match_list = paginator.current_page
 
+        try:
+
+            max_match_time = League.objects.filter(
+                steam_id=self.kwargs.get('steam_id')
+            ).annotate(Max('match__start_time'))[0].match__start_time__max
+        except League.DoesNotExist:
+            max_match_time = time()
+
+        kwargs['max_match_time'] = max_match_time
         kwargs['match_list'] = match_list
+        kwargs['show_date_control_bar'] = True
         return super(LeagueDetail, self).get_context_data(**kwargs)
 
 
