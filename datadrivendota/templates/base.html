@@ -160,6 +160,13 @@
     </div>
     {% endif %}
 
+    {% if show_date_control_bar %}
+    <div id="control_bar_margin"></div>
+    <div id="control_bar">
+    {% include "matches/_date_combobox_card.html" %}
+    </div>
+    {% endif %}
+
     <div id='footer'>
       <div class="container">
         <p>Copyright 2013 Deep Dive Data LLC. Dota 2 is a registered trademark of

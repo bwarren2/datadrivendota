@@ -70,22 +70,6 @@ class SearchView(DjangoFormView):
         search_str = form.cleaned_data['search_string']
 
         context = {
-            'heroes': Hero.public.filter(
-                name__icontains=(search_str)
-            )[:10],
-            'players': Player.objects.filter(
-                persona_name__icontains=(search_str)
-            )[:10],
-            'pros': Player.objects.filter(
-                pro_name__icontains=(search_str)
-            )[:10],
-            'teams': Team.objects.filter(
-                Q(name__icontains=(search_str)) |
-                Q(tag__icontains=(search_str))
-            )[:10],
-            'items': Item.objects.filter(
-                name__icontains=(search_str)
-            )[:10],
             'leagues': League.objects.filter(
                 name__icontains=(search_str)
             )[:10],

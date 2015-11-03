@@ -23012,7 +23012,7 @@ var pickban_scatter = function(destination, params, display_final_product){
   var winrate_data;
   var dossiers;
   var blanks;
-
+  console.log("/rest-api/match-pickban/?" + $.param(params));
   Promise.join(
     AjaxCache.get(
       "/rest-api/match-pickban/?" + $.param(params)
@@ -25176,7 +25176,6 @@ var scatter_chart = function() {
             points
                 .on("mouseenter", function(d, i){
                     tip.show(d, i);
-                    setTimeout(tip.hide, 3000);
                 })
                 .on("mouseleave", tip.hide);
 

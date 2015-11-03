@@ -10,9 +10,10 @@
 {% block content %}
 
 
- <nav>
+  <nav>
     <ul class="nav nav-pills">
-      <li role="presentation" class="active"><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
+      <li role="presentation"><a href="{% url 'leagues:detail' steam_id=league.steam_id %}">Detail</a></li>
+      <li role="presentation" class='active'><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
     </ul>
   </nav>
 

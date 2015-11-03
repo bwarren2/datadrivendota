@@ -1,0 +1,47 @@
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4 text-left">
+            <span id='combobox'>
+                <label>Filter: </label>
+                <select id="combo-select"></select>
+                <button
+                    type='button'
+                    class='btn btn-small btn-primary click-selector'
+                    id='combo-button'>
+                    Select
+                </button>
+            </span>
+        </div>
+        <div class="col-sm-3 text-right">
+             <p class='date-card-shim'>
+                <label>Start: </label><input type="text" id="start-date">
+             </p>
+        </div>
+        <div class="col-sm-3 text-center">
+             <p class='date-card-shim'><label>End: </label><input type="text" id="end-date"></p>
+        </div>
+        <div class="col-sm-1 text-left">
+            <div class="btn-group" role="group">
+                <button
+                    id='chart'
+                    type="button"
+                    class="btn btn-primary btn-lg animation-button">
+                    Redraw Charts
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style type="text/css">
+    .date-card-shim {
+        margin-bottom:0px;
+        margin-top:10px;
+    }
+
+    .date-card-shim input {
+        color:black;
+        width:100px;
+    }
+</style>

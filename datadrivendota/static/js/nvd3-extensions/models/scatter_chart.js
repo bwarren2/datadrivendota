@@ -241,7 +241,6 @@ var scatter_chart = function() {
             points
                 .on("mouseenter", function(d, i){
                     tip.show(d, i);
-                    setTimeout(tip.hide, 3000);
                 })
                 .on("mouseleave", tip.hide);
 
