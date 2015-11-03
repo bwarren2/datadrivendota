@@ -93,7 +93,9 @@ CACHES = {
             'ketama': True,
 
             # Configure failover timings
-            'connect_timeout': environ.get('CACHE_MIDDLEWARE_SECONDS', 2000),
+            'connect_timeout': int(
+                environ.get('CACHE_MIDDLEWARE_SECONDS', 2000)
+            ),
             'remove_failed': 4,
             'retry_timeout': 2,
             'dead_timeout': 10
