@@ -33,6 +33,14 @@ class HeroWinrateViewSet(viewsets.ReadOnlyModelViewSet):
     paginate_by = None
     serializer_class = HeroWinrateSerializer
 
+    @cache_response()
+    def retrieve(self, *args, **kwargs):
+        return super(HeroWinrateViewSet, self).retrieve(*args, **kwargs)
+
+    @cache_response()
+    def list(self, *args, **kwargs):
+        return super(HeroWinrateViewSet, self).list(*args, **kwargs)
+
     def get_queryset(self):
 
         data_queryset = PlayerMatchSummary.objects.given(self.request)
@@ -71,6 +79,14 @@ class HeroPickBanViewSet(viewsets.ReadOnlyModelViewSet):
 
     paginate_by = None
     serializer_class = HeroPickBanSerializer
+
+    @cache_response()
+    def retrieve(self, *args, **kwargs):
+        return super(HeroPickBanViewSet, self).retrieve(*args, **kwargs)
+
+    @cache_response()
+    def list(self, *args, **kwargs):
+        return super(HeroPickBanViewSet, self).list(*args, **kwargs)
 
     def get_queryset(self):
 
@@ -114,3 +130,7 @@ class HeroDossierViewSet(viewsets.ReadOnlyModelViewSet):
     @cache_response()
     def retrieve(self, *args, **kwargs):
         return super(HeroDossierViewSet, self).retrieve(*args, **kwargs)
+
+    @cache_response()
+    def list(self, *args, **kwargs):
+        return super(HeroDossierViewSet, self).list(*args, **kwargs)

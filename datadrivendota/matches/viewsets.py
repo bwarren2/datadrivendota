@@ -50,6 +50,10 @@ class MatchPickBanViewSet(viewsets.ReadOnlyModelViewSet):
     def retrieve(self, *args, **kwargs):
         return super(MatchPickBanViewSet, self).retrieve(*args, **kwargs)
 
+    @cache_response()
+    def list(self, *args, **kwargs):
+        return super(MatchPickBanViewSet, self).list(*args, **kwargs)
+
     def _get_matches(self):
         matches = Match.objects.filter(
             game_mode__in=GameMode.objects.filter(
@@ -137,6 +141,10 @@ class PlayerMatchSummaryViewSet(viewsets.ReadOnlyModelViewSet):
     @cache_response()
     def retrieve(self, *args, **kwargs):
         return super(PlayerMatchSummaryViewSet, self).retrieve(*args, **kwargs)
+
+    @cache_response()
+    def list(self, *args, **kwargs):
+        return super(PlayerMatchSummaryViewSet, self).list(*args, **kwargs)
 
     def get_queryset(self):
         queryset = PlayerMatchSummary.objects.given(self.request)
