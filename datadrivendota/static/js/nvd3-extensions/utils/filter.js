@@ -28,11 +28,11 @@ var time_lte = function(time){
 // End weird fns
 
 var last_hits = function(icon){
-
+    var name_length = icon.hero.internal_name.length;
     return function(msg){
       return msg.type === 'kills' &&
-      msg.unit === icon.hero.internal_name && // Is hero
-      msg.key.substring(0,14) !== 'npc_dota_hero_' && // Kills hero
+      msg.unit.slice(0, name_length) === icon.hero.internal_name && // Is hero
+      msg.key.substring(0,14) !== 'npc_dota_hero_' && // Doesn't kill hero
       msg.side !== icon.side;
     };
 };

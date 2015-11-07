@@ -667,6 +667,7 @@ class UpdatePmsReplays(Task):
             hero_msgs = [
                 offset_msg(x, offset) for x in replay if filter_msgs(pms, x)
             ]
+
             buff = BytesIO(gzip_str(json.dumps(hero_msgs)))
             _ = buff.seek(0)  # NOQA
             filename = '{0}_{1}_parse_shard.json.gz'.format(
@@ -688,6 +689,8 @@ def filter_msgs(pms, msg):
     target_source = msg.get('target_source', None)   # Kill/smg
     slot = msg.get('slot', None)   # Buyback
 
+    hero_name_length = len(hero_name)
+
     if (
         target_source == hero_name
         or unit == hero_name
@@ -695,7 +698,15 @@ def filter_msgs(pms, msg):
     ):
         return True
     else:
-        return False
+        try:
+            # Hero Illusions are "{hero_name} (illusion)"
+            substring_name = unit[0:hero_name_length]
+            if substring_name == hero_name:
+                return True
+            else:
+                return False
+        except TypeError:
+            return False
 
 
 def offset_msg(msg, offset):

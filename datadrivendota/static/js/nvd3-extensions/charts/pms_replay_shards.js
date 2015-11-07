@@ -86,7 +86,6 @@ var plot_shard_lineup = function(
     };
   });
   plot_data = endcap(plot_data);
-
   var svg = utils.svg.square_svg(destination);
   nv.addGraph(
 
