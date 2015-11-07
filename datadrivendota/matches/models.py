@@ -247,6 +247,30 @@ class PlayerMatchSummary(models.Model):
             return 'Dire'
 
     @property
+    def slot_sequence(self):
+        if self.side == 'Radiant':
+            return self.player_slot
+
+        elif self.side == 'Dire':
+            return self.player_slot - 123
+            # Dire slots start at 128, but we want to return 5-9
+
+        else:
+            raise ValueError(
+                'What kind of side is {0} for pms {1}'.format(
+                    self.side, self.id
+                )
+            )
+
+    @property
+    def is_radiant(self):
+        return self.side == 'Radiant'
+
+    @property
+    def is_dire(self):
+        return self.side == 'Dire'
+
+    @property
     def display_date(self):
         return str(
             datetime.fromtimestamp(

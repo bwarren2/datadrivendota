@@ -5,39 +5,55 @@
 {% block page_title %}{% endblock page_title %}
 
 {% block sections %}
-
 <div id='home'>
 
   <div class='section'>
     <div class="container">
       <div class="row">
 
-        {# Django has a messaging framework, so lets use it. #}
-        {% block messages %}
-          <div class='messages'>
-            {% if messages %}
-              {% for message in messages %}
-                <div class='alert alert-{{message.tags}}'>
-                  <button type='button' class='close' data-dismiss="alert"></button>
-                  {{message|safe}}
-                </div>
-              {% endfor %}
-            {% endif %}
-          </div>
-        {% endblock messages %}
+      {% include "mixins/_messages.html" %}
 
-        <div class='col-md-12'>
+        {% comment %}
           <div class='jumbotron'>
-            <span id='intro'><h1>Welcome to DataDrivenDota</h1></span>
-                <p>We think a chart is worth a thousand stats, and are building the framework to prove it.</p>
-                <p>We are building better charts, deeper analytics, and more features to help you improve.  Check back soon, or follow our <a href="{% url 'blog:index' %}">blog</a> and <a href="https://twitter.com/datadrivendota">twitter</a>!</p>
+            <span id='intro'><h1>DataDrivenDota</h1></span>
+                <p>
+                  We think a chart is worth a thousand stats, and are building the framework to prove it.
+                </p>
+                <p>
+                  We are building better charts, deeper analytics, and more features to help you improve.  Check back soon, or follow our <a href="{% url 'blog:index' %}">blog</a> and <a href="https://twitter.com/datadrivendota">twitter</a>!
+                </p>
           </div>
+
+        {% endcomment %}
+        <div class='col-md-12'>
+
+          <div class='jumbotron'>
+            <div id='foo'>
+            <div class='row'>
+              <div class='col-md-7'>
+                <h1>DataDrivenDota</h1>
+                <h2> Better Data ➜ Better Decisions</h2>
+                 {# <p> Make better decisions with better data</p> #}
+              </div>
+
+              <div class='col-md-5'>
+                <h5>Hero Damage Dealt, Nanyang Finals Game 1</h5>
+                <div id='gold_chart' class='chart toggling'>
+                  <img class='ajax-loader' src="/assets/images/loading.gif">
+                </div>
+              </div>
+
+            </div>
+            </div>
+          </div>
+
         </div>
+
 
         <div class='col-md-6'>
           <div class='big-d-stats'>
             <div class='page-header'>
-              <h2>Stats are useful...</h2>
+              <h1>Stats are useful...</h1>
             </div>
             <table class='table'>
               <thead>
@@ -70,9 +86,54 @@
 
         <div class='col-md-6'>
           <div class='page-header'>
-            <h2>...but miss the big picture</h2>
+            <h1>...but miss the big picture</h1>
           </div>
-          <div class='big-d centered'></div>
+          <div class='vert-md-3 big-d text-center'></div>
+        </div>
+
+
+        <div class='col-md-12 text-center'>
+          <div class='page-header'>
+            <h1>We believe in:</h1>
+          </div>
+          <div class='row'>
+            <div class='col-md-4'>
+              <i class="fa fa-database fa-5x triple-token"></i>
+              <h2>Data</h2>
+              <p>
+                We work with pure data, not aggregates or averages, to see details that matter.
+              </p>
+            </div>
+            <div class='col-md-4'>
+              <i class="fa fa-line-chart fa-5x triple-token"></i>
+              <h2>Analytics</h2>
+              <p>
+                Visual, granular presentation is the most accessible and informative.
+              </p>
+            </div>
+            <div class='col-md-4'>
+              <i class="fa fa-refresh fa-5x triple-token"></i>
+              <h2>Iteration</h2>
+              <p>
+                Don't be content with disconnected numbers; discover, test, and improve.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class='col-md-12 text-center'>
+
+          <div class='page-header'>
+            <h1>Want to see more?</h1>
+          </div>
+          <div class='row'>
+            <div class='col-md-6'>
+              <h2>Read sample analysis <a >here.</a></h2>
+            </div>
+            <div class='col-md-6 text-left'>
+              {% include "accounts/mixins/_ping_request.html" %}
+            </div>
+          </div>
         </div>
 
       </div>
@@ -84,7 +145,9 @@
       <div class="container">
         <div class="row">
           <div class='col-md-12'>
-              <h4>Currently on the blog:</h4>
+            <div class='page-header'>
+              <h2>Currently on the blog:</h2>
+            </div>
               <h2>
                  <a href="{{blog_entry.get_absolute_url}}">{{blog_entry.title}} <small>{{blog_entry.description}}</small></a>
               </h2>
@@ -105,11 +168,66 @@
     window.splash_gimmick();
   })
   </script>
+  <script type="text/javascript">
+    $(function(){
 
+
+        pingSetup('{{csrf_token}}')
+
+        var match_id = 1906861533;
+        var url ="/rest-api/player-match-summary/?match_id="+match_id;
+
+        // Get the PMS info
+        Promise.resolve(
+            $.ajax({
+              url: url,
+              dataType: "json"
+            })
+        ).then(function(data){
+
+            pmses = data;
+
+            return Promise.all(
+              data.map(function(pms){
+
+                return Promise.resolve(
+                  $.ajax({
+                    url: pms.replay_shard,
+                    dataType: "json"
+                  })
+                )
+              })
+            );
+
+        })
+        .then(function(data){
+
+            d7.extensions.charts.pms_shards.plot_shard_lineup(
+              data.slice(0, 10),
+              [
+                d7.extensions.utils.filter.hero_dmg_dealt,
+              ],
+              d7.extensions.utils.map.sum,
+              d7.extensions.utils.reshape.noop,
+              d7.extensions.components.axes.offset_time,
+              d7.extensions.components.axes.sum,
+              '#gold_chart',
+              pmses.slice(0,10),
+              {height:325, width:325}
+            );
+
+            d7.extensions.utils.visuals.toggle_sides();
+
+        })
+        .catch(function(e){
+            console.log(e);
+        });
+    });
+  </script>
 {% endblock extra_js %}
 
 {% block extra_css %}
-  <style type="text/css">
+<style type="text/css">
 
   .group-a{
     fill:#882d61;
@@ -123,17 +241,29 @@
     fill:#2d862d;
     color:#2d862d;
   }
-  .section{
-    padding:15px;
-  }
-  #intro{
-    text-align: center;
-  }
-  .centered{
-    text-align: center;
-  }
+
   td{
     font-size: 18px;
   }
-  </style>
+
+  #home{
+    background-image: linear-gradient(to top, #000, #222 50%, #000 )
+  }
+  .triple-token{
+    font-size: 100px;
+  }
+
+  #gold_chart{
+    height:325px;
+  }
+  #gold_chart svg{
+    background-color: #4A4A4A;
+  }
+
+  .brand-segment{
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+
+</style>
 {% endblock extra_css %}

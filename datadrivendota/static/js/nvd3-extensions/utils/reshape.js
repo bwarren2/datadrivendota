@@ -26,9 +26,13 @@ var sides = function(data){
         return a.concat(b.values);
       }, []);
 
+      // var new_icon = d.icon;
+      // new_icon.key_name = side;
+
       return {
         icon: {
-            key_name: side
+          side: side,
+          key_name: side,
         },
         values: side_data.sort(function(a, b){
             return a.offset_time - b.offset_time;
