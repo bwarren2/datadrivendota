@@ -24,6 +24,10 @@ CACHES = {
         'LOCATION': '127.0.0.1:11211',
     }
 }
+
+CACHE_ENABLED = getenv('CACHE_ENABLED', False) == 'True'
+if not CACHE_ENABLED:
+    CACHES['default']['backend'] = 'django.core.cache.backends.dummy.DummyCache'
 #   END CACHE CONFIGURATION
 
 
