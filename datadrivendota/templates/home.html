@@ -13,32 +13,21 @@
 
       {% include "mixins/_messages.html" %}
 
-        {% comment %}
-          <div class='jumbotron'>
-            <span id='intro'><h1>DataDrivenDota</h1></span>
-                <p>
-                  We think a chart is worth a thousand stats, and are building the framework to prove it.
-                </p>
-                <p>
-                  We are building better charts, deeper analytics, and more features to help you improve.  Check back soon, or follow our <a href="{% url 'blog:index' %}">blog</a> and <a href="https://twitter.com/datadrivendota">twitter</a>!
-                </p>
-          </div>
-
-        {% endcomment %}
         <div class='col-md-12'>
 
           <div class='jumbotron'>
             <div id='foo'>
             <div class='row'>
-              <div class='col-md-7'>
+              <div class='col-md-12 text-center'>
                 <h1>DataDrivenDota</h1>
-                <h2> Better Data ➜ Better Decisions</h2>
-                 {# <p> Make better decisions with better data</p> #}
+                <p>
+                Better Data ➜ Better Analysis ➜ Better Decisions
+                </p>
               </div>
 
-              <div class='col-md-5'>
+              <div class='col-md-12'>
                 <h5>Hero Damage Dealt, Nanyang Finals Game 1</h5>
-                <div id='gold_chart' class='chart toggling'>
+                <div id='gold_chart' class='chart toggling vert-md-6'>
                   <img class='ajax-loader' src="/assets/images/loading.gif">
                 </div>
               </div>
@@ -128,7 +117,7 @@
           </div>
           <div class='row'>
             <div class='col-md-6'>
-              <h2>Read sample analysis <a >here.</a></h2>
+              <h2>Read sample analysis <a href='https://www.datadrivendota.com/blog/entry/10/'>here.</a></h2>
             </div>
             <div class='col-md-6 text-left'>
               {% include "accounts/mixins/_ping_request.html" %}
@@ -213,7 +202,7 @@
               d7.extensions.components.axes.sum,
               '#gold_chart',
               pmses.slice(0,10),
-              {height:325, width:325}
+              {height:470, width:820}
             );
 
             d7.extensions.utils.visuals.toggle_sides();
@@ -253,9 +242,6 @@
     font-size: 100px;
   }
 
-  #gold_chart{
-    height:325px;
-  }
   #gold_chart svg{
     background-color: #4A4A4A;
   }
