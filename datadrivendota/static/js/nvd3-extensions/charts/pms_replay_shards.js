@@ -7,6 +7,7 @@ var models = require("../models");
 var $ = window.$;
 var nv = window.nv;
 var d3 = window.d3;
+var _ = window._;
 var tooltips = require("./tooltips.js");
 
 var endcap = function(data){
@@ -66,7 +67,7 @@ var plot_shard_lineup = function(
       data_values = data_values.filter(
         msg_filters[i](d.icon)
       );
-    };
+    }
 
     return {
       icon: d.icon,
@@ -77,6 +78,7 @@ var plot_shard_lineup = function(
   // Reshape into something else if needed.
   data = msg_reshape(data);
 
+  data = _.cloneDeep(data);
 
   // Filter, map, cast data into plotting format
   var plot_data = data.map(function(d){
@@ -86,7 +88,39 @@ var plot_shard_lineup = function(
     };
   });
   plot_data = endcap(plot_data);
-  var svg = utils.svg.square_svg(destination);
+
+  render_data(
+    destination,
+    plot_data,
+    x_data,
+    y_data,
+    params
+  );
+
+};
+
+var render_data = function(
+    destination,
+    plot_data,
+    x_data,
+    y_data,
+    params
+  ){
+  $(destination).empty();
+
+  var width;
+  var height;
+
+  if(params!==undefined){
+    if(params.height!==undefined){
+      height = params.height;
+    }
+    if(params.width!==undefined){
+      width = params.width;
+    }
+  }
+
+  var svg = utils.svg.square_svg(destination, width, height);
   nv.addGraph(
 
     function(){
@@ -109,14 +143,24 @@ var plot_shard_lineup = function(
         if(params.width!==undefined){
           chart.width(params.width);
         }
+        if(params.forceY!==undefined){
+          chart.forceY(params.forceY);
+        }
+        if(params.forceX!==undefined){
+          chart.forceX(params.forceX);
+        }
+        if(params.contentGenerator!==undefined){
+          chart.tooltip.contentGenerator(params.contentGenerator);
+        }
       }
+
 
       chart.xAxis.axisLabel(x_data.label).tickFormat(
         function(d){
-          return moment.duration(d*1000).asMinutes().toFixed(2)
+          return String(d).toHHMMSS();
         }
       );
-      chart.yAxis.axisLabel(y_data.label).axisLabelDistance(-20).tickFormat(
+      chart.yAxis.axisLabel(y_data.label).axisLabelDistance(-18).tickFormat(
         function(d){
           if(d>1000000){return (d/1000000).toFixed(0) + "M";}
           else if(d>1000){return (d/1000).toFixed(0) + "K";}
@@ -185,9 +229,9 @@ var shard_lineup = function(
 };
 
 // Used for the ESL 1 blog feature.
-var special_shard_lineup = function(destination){
+var special_shard_lineup = function(match_id){
 
-  var url ="/rest-api/player-match-summary/?match_id=1843672837";
+  var url ="/rest-api/player-match-summary/?match_id="+match_id;
   var pmses;
 
   // Get the PMS info
@@ -217,11 +261,16 @@ var special_shard_lineup = function(destination){
     $("button#draw").on("click", function(){
 
         var rollup_map = {
-            players: utils.reshape.noop,
-            sides: utils.reshape.sides,
+            player: utils.reshape.noop,
+            side: utils.reshape.sides,
             match: utils.reshape.matches,
         };
         var rollup_fn = rollup_map[$("select#rollup ").val()];
+        var chart_destination = "#"+$("select#destination").val()+" .chart";
+
+        var label_destination = "#"+$("select#destination").val()+" label";
+        var label = $("select#data option:selected ").html()+' by '+$("select#rollup option:selected ").html();
+        $(label_destination).html(label);
 
         var data_map = {
             kills: utils.filter.kills,
@@ -269,8 +318,9 @@ var special_shard_lineup = function(destination){
         var selected_data = [];
         $("form input:checked").each(function() {
             var id = $(this).attr("value");
-            selected_data.push(data[parseInt(id)])
+            selected_data.push(data[parseInt(id)]);
         });
+
         plot_shard_lineup(
           selected_data,
           [
@@ -282,7 +332,7 @@ var special_shard_lineup = function(destination){
           rollup_fn,
           components.axes.offset_time,
           components.axes.sum,
-          destination,
+          chart_destination,
           pmses
         );
 
@@ -298,4 +348,5 @@ module.exports = {
   shard_lineup: shard_lineup,
   special_shard_lineup: special_shard_lineup,
   plot_shard_lineup: plot_shard_lineup,
+  render_data: render_data,
 };

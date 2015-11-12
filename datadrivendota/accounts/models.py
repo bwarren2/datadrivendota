@@ -71,9 +71,6 @@ class MatchRequest(models.Model):
     creation = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 
-    def save(self, *args, **kwargs):
-        super(MatchRequest, self).save(*args, **kwargs)
-
     @staticmethod
     def create_for_user(user, match_id):
         try:
@@ -109,3 +106,22 @@ class MatchRequest(models.Model):
             "https://s3.amazonaws.com/datadrivendota/"
             "raw_replay_parse/{0}"
         ).format(self.raw_parse_url)
+
+
+class PingRequest(models.Model):
+
+    email = models.EmailField()
+    recurring = models.BooleanField()
+    created = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __unicode__(self):
+        if self.recurring:
+            return "{0} at {1}, recurring".format(
+                unicode(self.email),
+                unicode(self.created)
+            )
+        else:
+            return "{0} at {1}".format(
+                unicode(self.email),
+                unicode(self.created)
+            )

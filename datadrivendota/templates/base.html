@@ -21,6 +21,8 @@
     <link href="//fonts.googleapis.com/css?family=Cinzel+Decorative" rel="stylesheet" type="text/css">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif" rel="stylesheet" type="text/css">
     <link href="//fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
     {% block extra_css %}{% endblock extra_css %}
 
     {% comment %}
@@ -167,12 +169,12 @@
     </div>
     {% endif %}
 
-    <div id='footer'>
-      <div class="container">
-        <p>Copyright 2013 Deep Dive Data LLC. Dota 2 is a registered trademark of
-        Valve Corporation.</p>  <p><a href="http://steampowered.com">Powered By
-        Steam</a>, <a href="https://github.com/skadistats/clarity">Powered by clarity</a>.  Privacy stuff <a href="{% url 'privacy' %}">here</a>.  Email us at contact@datadrivendota.com.</p>
-      </div>
+  </div>
+  <div id='footer'>
+    <div class="container">
+      <p>Copyright 2013 Deep Dive Data LLC. Dota 2 is a registered trademark of
+      Valve Corporation.</p>  <p><a href="http://steampowered.com">Powered By
+      Steam</a>, <a href="https://github.com/skadistats/clarity">Powered by clarity</a>.  Privacy stuff <a href="{% url 'privacy' %}">here</a>.  Email us at contact@datadrivendota.com.</p>
     </div>
   </div>
     <!-- Le javascript
@@ -181,9 +183,9 @@
     {% comment %}
 
     {% endcomment %}
+
     <script type="text/javascript" src='{% static "dist/built.js" %}'></script>
     <script type="text/javascript" src='{% static "js/d7.js" %}'></script>
-
     {% block extra_js %}
     {% endblock extra_js %}
 

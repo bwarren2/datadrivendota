@@ -242,7 +242,7 @@ window.Chartreuse.scatter = scatter;
 
 var splash_gimmick = function(){
   var mydiv = d3.select('div.big-d');
-  var width = 293;
+  var width = 220;
   var height = width;
   var delay = 1000;
   var interval = 1500;

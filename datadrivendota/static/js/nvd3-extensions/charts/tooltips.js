@@ -87,6 +87,124 @@ var heroContentGenerator = function(getX, getY, xlab, ylab){
   return return_fn;
 };
 
+var bldg_tooltip = function(d, x, y, z){
+      if (d === null) {return "";}
+      d = d.point;
+      var table = d3.select(document.createElement("table"));
+
+      var clean = function(str){
+        if (str.slice(0,12)=="npc_dota_bad") {
+            return str.replace("\_"," ").slice(17,99);
+        } else {
+            return str.replace("\_"," ").slice(18,99);
+        }
+      }
+
+      // Make a body
+      var tbodyEnter = table
+          .selectAll("tbody")
+          .data([d])
+          .enter()
+          .append("tbody");
+
+      var trowEnter1 = tbodyEnter
+          .append("tr");
+
+      trowEnter1
+          .append("td")
+          .html("Bldg: ");
+
+      trowEnter1.append("td")
+          .classed("value", true)
+          .html(function(x){
+            return clean(x.key);
+        });
+
+      var trowEnter2 = tbodyEnter
+          .append("tr");
+
+      trowEnter2
+          .append("td")
+          .html("Time: ");
+
+      trowEnter2.append("td")
+          .classed("value", true)
+          .html(function(x){return String(x.offset_time).toHHMMSS()});
+
+      var trowEnter3 = tbodyEnter
+          .append("tr");
+
+      trowEnter3
+          .append("td")
+          .html("Killer: ");
+
+      trowEnter3.append("td")
+          .classed("value", true)
+          .html(function(x){return x.unit.replace('npc_dota_hero_','').replace("_"," ");});
+
+
+      var html = table.node().outerHTML;
+      return html;
+
+};
+
+var item_tooltip = function(d, x, y, z){
+      if (d === null) {return "";}
+      d = d.point;
+      var table = d3.select(document.createElement("table"));
+
+      // Make a body
+      var tbodyEnter = table
+          .selectAll("tbody")
+          .data([d])
+          .enter()
+          .append("tbody");
+
+      var trowEnter1 = tbodyEnter
+          .append("tr");
+
+      trowEnter1
+          .append("td")
+          .html("Item: ");
+
+      trowEnter1.append("td")
+          .classed("value", true)
+          .html(function(x){
+            return x.key;
+        });
+
+      var trowEnter2 = tbodyEnter
+          .append("tr");
+
+      trowEnter2
+          .append("td")
+          .html("Time: ");
+
+      trowEnter2.append("td")
+          .classed("value", true)
+          .html(function(x){return String(x.offset_time).toHHMMSS()});
+
+      var trowEnter3 = tbodyEnter
+          .append("tr");
+
+      trowEnter3
+          .append("td")
+          .html("Hero: ");
+
+      trowEnter3.append("td")
+          .classed("value", true)
+          .html(function(x){
+            return x.unit.replace('npc_dota_hero_','').replace("_"," ");
+          });
+
+
+      var html = table.node().outerHTML;
+      return html;
+
+};
+
 module.exports = {
-    hero_tooltip: heroContentGenerator
+    hero_tooltip: heroContentGenerator,
+    bldg_tooltip: bldg_tooltip,
+    item_tooltip: item_tooltip,
 };

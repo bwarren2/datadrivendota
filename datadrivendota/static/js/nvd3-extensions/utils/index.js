@@ -6,6 +6,7 @@ var reduce = require('./reduce.js');
 var map = require('./map.js');
 var reshape = require('./reshape.js');
 var filter = require('./filter.js');
+var visuals = require('./visuals.js');
 
 var getSet = function(value){
     var val = value;
@@ -78,6 +79,7 @@ var initOptions = function(chart) {
 };
 
 module.exports = {
+    visuals: visuals,
     svg: svg,
     blanks: blanks,
     reduce: reduce,

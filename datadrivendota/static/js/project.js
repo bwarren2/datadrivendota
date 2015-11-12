@@ -205,8 +205,46 @@ $(function () {
     $('#forward-animation').click(function() {
         $(window).trigger('forward');
     });
+
 });
 
 Number.prototype.mod = function(n) {
     return (( this % n) + n) % n;
+}
+
+String.prototype.toHHMMSS = function () {
+    var sec_num = parseInt(this, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    var time    = hours+':'+minutes+':'+seconds;
+    return time;
+}
+
+var pingSetup = function(csrf){
+    $('form#ping-request').submit(function(event){
+        event.preventDefault();
+
+        var formData = {
+            'csrfmiddlewaretoken' : csrf,
+            'email'               : $('input#email').val(),
+            'recurring'      : $('input#recurring').prop('checked')
+        };
+        console.log(formData);
+        $.ajax({
+          'type': 'POST',
+          'url': '/rest-api/ping-requests/',
+          'data': formData,
+          'dataType': 'json',
+          'encode': true,
+        }).success(function(data){
+          $('div#feedback').html('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Submission successful!</div>')
+        }).error(function(data, a, b){
+          $('div#feedback').html('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+JSON.parse(data.responseText).email+'</div>')
+        });
+    });
 }

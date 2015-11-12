@@ -62,6 +62,36 @@ var deaths = function(icon){
     };
 };
 
+var key_bldg_dmg_dealt = function(icon){
+    return function(msg){
+      // console.log(msg.side);
+      if (icon.side === 'Radiant'){
+        return msg.type === 'damage' &&
+        msg.unit === icon.hero.internal_name && // Is hero
+        dire_key_buildings.indexOf(msg.key) !== -1; // Kills building
+      } else {
+        return msg.type === 'damage' &&
+        msg.unit === icon.hero.internal_name && // Is hero
+        radiant_key_buildings.indexOf(msg.key) !== -1; // Kills building
+
+      }
+    };
+};
+
+var key_bldg_kills = function(icon){
+    return function(msg){
+      // console.log(msg.side);
+      if (icon.side === 'Radiant'){
+        return msg.type === 'kills' &&
+        dire_key_buildings.indexOf(msg.key) !== -1; // Kills building
+      } else {
+        return msg.type === 'kills' &&
+        radiant_key_buildings.indexOf(msg.key) !== -1; // Kills building
+
+      }
+    };
+};
+
 
 var hero_dmg_dealt = function(icon){
 
@@ -193,6 +223,48 @@ var healing = function(icon){
     };
 };
 
+var item_buys = function(icon){
+    return function(msg){
+      return msg.type === 'purchase';
+    };
+};
+
+
+var radiant_key_buildings = [
+     'npc_dota_goodguys_fort',
+     'npc_dota_goodguys_melee_rax_bot',
+     'npc_dota_goodguys_melee_rax_mid',
+     'npc_dota_goodguys_range_rax_bot',
+     'npc_dota_goodguys_range_rax_mid',
+     'npc_dota_goodguys_tower1_bot',
+     'npc_dota_goodguys_tower1_mid',
+     'npc_dota_goodguys_tower1_top',
+     'npc_dota_goodguys_tower2_bot',
+     'npc_dota_goodguys_tower2_mid',
+     'npc_dota_goodguys_tower2_top',
+     'npc_dota_goodguys_tower3_bot',
+     'npc_dota_goodguys_tower3_mid',
+     'npc_dota_goodguys_tower3_top',
+     'npc_dota_goodguys_tower4',
+]
+
+var dire_key_buildings = [
+     'npc_dota_badguys_fort',
+     'npc_dota_badguys_melee_rax_bot',
+     'npc_dota_badguys_melee_rax_mid',
+     'npc_dota_badguys_range_rax_bot',
+     'npc_dota_badguys_range_rax_mid',
+     'npc_dota_badguys_tower1_bot',
+     'npc_dota_badguys_tower1_mid',
+     'npc_dota_badguys_tower1_top',
+     'npc_dota_badguys_tower2_bot',
+     'npc_dota_badguys_tower2_mid',
+     'npc_dota_badguys_tower2_top',
+     'npc_dota_badguys_tower3_bot',
+     'npc_dota_badguys_tower3_mid',
+     'npc_dota_badguys_tower3_top',
+     'npc_dota_badguys_tower4',
+]
 
 module.exports = {
     kills: kills,
@@ -218,4 +290,7 @@ module.exports = {
     hero_xp: hero_xp,
     creep_xp: creep_xp,
     roshan_xp: roshan_xp,
+    key_bldg_dmg_dealt: key_bldg_dmg_dealt,
+    key_bldg_kills: key_bldg_kills,
+    item_buys: item_buys,
 }

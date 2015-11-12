@@ -1,5 +1,4 @@
-from django.views.generic import DetailView, ListView, TemplateView
-
+from django.views.generic import DetailView, ListView
 from utils.views import ability_infodict
 
 from .models import Match, PlayerMatchSummary, PickBan
@@ -74,14 +73,6 @@ class MatchDetailAbilities(DetailView):
             match=self.object
         ).select_related().order_by('player_slot')
 
-        for summary in summaries:
-            summary.kda = summary.kills - summary.deaths + .5 * summary.assists
-
-            if summary.side == 'Radiant':
-                summary.is_radiant = True
-            else:
-                summary.is_dire = True
-
         radiant_summaries = [
             summary for summary in summaries if summary.side == 'Radiant'
         ]
@@ -113,27 +104,15 @@ class MatchDetailScorecard(DetailView):
             match=self.object
         ).select_related().order_by('player_slot')
 
-        for summary in summaries:
-            summary.kda = summary.kills - summary.deaths + .5 * summary.assists
-
-            if summary.side == 'Radiant':
-                summary.is_radiant = True
-            else:
-                summary.is_dire = True
-
         kwargs['summaries'] = summaries
         return super(MatchDetailScorecard, self).get_context_data(**kwargs)
 
 
-class MatchReplayDetail(DetailView):
+class ReplicateDetail(DetailView):
+    template_name = 'matches/replicate.html'
     model = Match
     slug_url_kwarg = 'match_id'
     slug_field = 'steam_id'
-    template_name = 'matches/replay_parse.html'
-
-
-class ReplicateDetail(TemplateView):
-    template_name = 'matches/replicate.html'
 
 
 class MatchListView(ListView):
@@ -148,14 +127,6 @@ def get_context_data(self, **kwargs):
     summaries = PlayerMatchSummary.objects.filter(
         match=self.object
     ).select_related().order_by('player_slot')
-
-    for summary in summaries:
-        summary.kda = summary.kills - summary.deaths + .5 * summary.assists
-
-        if summary.side == 'Radiant':
-            summary.is_radiant = True
-        else:
-            summary.is_dire = True
 
     kwargs['summaries'] = summaries
 

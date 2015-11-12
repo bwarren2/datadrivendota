@@ -4,11 +4,19 @@
 {% block sections %}
     <div class='container'>
         {% block match_nav %}
+
         <nav>
             <ul class="nav nav-pills">
               <li role="presentation" class="{% active 'matches:detail' %}">
                 <a href="{% url "matches:detail" match_id=match.steam_id %}">Overview</a>
               </li>
+              {% if match.replay %}
+                <li role="presentation" class="{% active 'matches:replicate' %}">
+                  <a href="{% url "matches:replicate" match_id=match.steam_id %}">Replicate
+                  <span class="fa fa-line-chart">
+                  </a>
+                </li>
+              {% endif %}
               <li role="presentation" class="{% active 'matches:detail_abilities' %}">
                 <a href="{% url "matches:detail_abilities" match_id=match.steam_id %}">Skillbuilds</a>
               </li>
@@ -23,11 +31,6 @@
         {% endblock match_nav %}
 
         <div class='row'>
-            {% if match.replay %}
-            <div class="alert alert-success" role="alert">
-                Parsed replay exists!  See it <a href="{% url "matches:replay_parse" match_id=match.steam_id %}">here.</a>
-            </div>
-            {% endif %}
 
             {% block match_content %}
             {% endblock match_content %}

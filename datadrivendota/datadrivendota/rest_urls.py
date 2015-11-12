@@ -16,7 +16,7 @@ from items.viewsets import ItemViewSet
 from teams.viewsets import TeamViewSet
 from leagues.viewsets import LeagueViewSet
 from players.viewsets import PlayerViewSet, PlayerWinrateViewSet
-from accounts.viewsets import MatchRequestViewSet
+from accounts.viewsets import MatchRequestViewSet, PingRequestViewSet
 
 
 # DRF is great
@@ -60,3 +60,4 @@ router.register(
     base_name='skillbuild'
 )
 router.register('players', PlayerViewSet)
+router.register('ping-requests', PingRequestViewSet)
