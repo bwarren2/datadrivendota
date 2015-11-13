@@ -3165,7 +3165,6 @@ var toggle_sides = function(){
   };
 
   var recur;
-  $('#stop-fade').toggle();
 
   $('#start-fade').click(function(){
     $('#stop-fade, #start-fade').toggle();
