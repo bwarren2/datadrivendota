@@ -3169,11 +3169,11 @@ var toggle_sides = function(){
   $('#start-fade').click(function(){
     $('#stop-fade, #start-fade').toggle();
     switching();
-    recur = setInterval(switching, 3000);
+    recur = setTimeout(switching, 3000);
   });
   $('#stop-fade').click(function(){
     $('#stop-fade, #start-fade').toggle();
-    clearInterval(recur);
+    clearTimeout(recur);
   });
 
   $('#start-fade').click();
