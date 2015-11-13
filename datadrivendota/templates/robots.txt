@@ -2,6 +2,7 @@
 
 User-agent: *
 Disallow: /api/
+Disallow: /rest-api/
 Disallow: /heroes/api/
 Disallow: /matches/api/
 Disallow: /players/api/
