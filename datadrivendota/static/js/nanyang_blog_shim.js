@@ -161,7 +161,6 @@ $(function(){
 
           var chart_data = svg.datum(building_data);
           chart_data.transition().duration(500).call(chart);
-          console.log(10)
           return chart;
     });
 
