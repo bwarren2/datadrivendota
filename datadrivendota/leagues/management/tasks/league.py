@@ -58,7 +58,7 @@ class UpdateLeagues(Task):
 
         league = League.objects.get_or_create(steam_id=league_id)[0]
         league.name = data['name']
-        league.description = data.get('item_description'], None)
+        league.description = data.get('item_description', None)
         league.tournament_url = data.get('tournament_url', None)
         league.item_def = data['itemdef']
 
