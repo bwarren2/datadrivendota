@@ -49,7 +49,7 @@ class UpdateLeagues(Task):
                 self.game_update(league_id, matches)
             except KeyError:
                 logger.warning(
-                    "Can't update {0}.  Not found in schema.".format(league_id)
+                    "Can't update {0}.".format(league_id), exc_info=True
                 )
 
     def create(self, league_id):
