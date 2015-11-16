@@ -6,6 +6,14 @@ div.hero-card{
 
 }
 
+div.match-card{
+  margin-top:5px;
+  margin-bottom:5px;
+}
+  .match-card-header{
+    font-size: 25px;
+  }
+
 div.buttons{
   h1 { padding: 0 30px; }
   .col-md-2 { width: 18.6667%; }
@@ -17,166 +25,6 @@ div.buttons{
   .user-details { text-align: center; font-size: 16px; font-weight: bold; }
   .disconnect-form { padding: 0; margin: 0px 10px; }
   .disconnect-form > a { display: block; margin: 5px 0 !important; }
-
-}
-
-div#animation-controls{
-  .make-row();
-  background-color: @main_block_background;
-  div#animation-buttons{
-    div#stop-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#start-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#forward-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#back-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#autoplay-button{
-      .make-md-column(2);
-      .make-xs-column(3);
-    }
-    div#timer{
-      .make-md-column(2);
-      .make-xs-column(4);
-    }
-  }
-}
-
-div#games{
-  .make-row();
-  div.game-card{
-    .make-md-column(12);
-    .make-xs-column(12);
-    padding:10px;
-    position:relative;
-    div.sections{
-      .make-row();
-      div.league-card{
-        .make-md-column(3);
-        .make-xs-column(3);
-      }
-      div.match-card{
-        .make-md-column(9);
-        .make-xs-column(9);
-        div.side-row{
-          .make-row();
-          margin-left: 0px;
-          margin-right: 0px;
-          div.hero-thumb{
-            .make-md-column(2);
-            .make-xs-column(2);
-            padding-left: 0px;
-            padding-right: 0px;
-          }
-          div.team-thumb{
-            .make-md-column(2);
-            .make-xs-column(2);
-            padding-left: 0px;
-            padding-right: 0px;
-          }
-        }
-      }
-    }
-  }
-}
-
-
-div#bans{
-  .make-row();
-
-  div#radiant-bans, div#dire-bans, div#radiant-picks, div#dire-picks{
-    .make-md-column(6);
-    .make-xs-column(12);
-
-    div.hero-slot{
-      .make-md-column(2);
-      .make-xs-column(4);
-
-      img.hero-face{
-        .img-responsive;
-        .thumbnail;
-      }
-      img.hero-face.ban{
-        .ban;
-      }
-
-    }
-  }
-}
-
-div#scoreboard{
-  .make-row();
-
-  div#radiant, div#dire{
-    .make-md-column(6);
-    .make-xs-column(12);
-
-    div.players{
-      img.table-face{
-        .thumbnail
-      }
-    }
-  }
-}
-
-div#charts{
-  .make-row();
-
-  div#gpm-xpm-chart{
-    .make-md-column(4);
-    .make-xs-column(12);
-
-  }
-  div#kill-death-chart{
-    .make-md-column(4);
-    .make-xs-column(12);
-
-  }
-  div#last-hit-levels{
-    .make-md-column(4);
-    .make-xs-column(12);
-
-  }
-}
-
-div#state{
-  .make-row();
-  div#map{
-    .make-md-column(6);
-    .make-xs-column(12);
-  }
-  div#matchup{
-    .make-md-column(6);
-    .make-xs-column(12);
-    div#logo-lineup{
-      .make-row();
-      div#radiant-logo{
-        .make-md-column(6);
-        .make-xs-column(12);
-      }
-      div#dire-logo{
-        .make-md-column(6);
-        .make-xs-column(12);
-      }
-      div#league-logo{
-        .make-md-column(12);
-        .make-xs-column(12);
-      }
-      div#game-facts{
-        .make-md-column(12);
-        .make-xs-column(12);
-      }
-    }
-  }
 
 }
 

@@ -75,6 +75,15 @@
             </li>
           {% endif %}
 
+          {% if SHOW_MATCHES %}
+            <li class="dropdown {% active 'matches' main_nav %}">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Matches <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li class="{% active 'matches:index' %}"><a href="{% url 'matches:index' %}">Index</a></li>
+                <li role="presentation" class="divider"></li>
+              </ul>
+            </li>
+          {% endif %}
 
           {% if SHOW_PLAYERS %}
             <li class="dropdown {% active 'players' main_nav %}">

@@ -3,13 +3,9 @@
 {% block page_title %}Match List{% endblock page_title %}
 {% block content %}
     {% for match in match_list %}
-        {% comment %}
-            inline does not wrap block, but this is what I want.
-            @todo: make it work.
-        {% endcomment %}
         <a href="/matches/{{match.steam_id}}">
             <div class='col-md-12' style='margin-bottom:20px'>
-                    {% include "matches/_match_card.html" %}
+                {% include "matches/_match_card.html" %}
             </div>
         </a>
     {% endfor %}

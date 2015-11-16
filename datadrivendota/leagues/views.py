@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.conf import settings
-from django.db.models import Max
+from django.db.models import Max, Count
 
 from utils.pagination import SmarterPaginator
 from datadrivendota.views import JsonApiView
@@ -24,17 +24,18 @@ class LeagueOverview(TemplateView):
     """ The leagues with recent games by category. """
 
     template_name = 'leagues/league_overview.html'
+    item_count = 3
 
     def get_context_data(self, **kwargs):
         kwargs['premium_list'] = League.recency.filter(
             tier=League.PREMIUM
-        ).select_related()[:settings.OVERVIEW_LEAGUE_COUNT]
+        ).select_related()[:self.item_count]
         kwargs['pro_list'] = League.recency.filter(
             tier=League.PRO
-        ).select_related()[:settings.OVERVIEW_LEAGUE_COUNT]
+        ).select_related()[:self.item_count]
         kwargs['am_list'] = League.recency.filter(
             tier=League.AMATEUR
-        ).select_related()[:settings.OVERVIEW_LEAGUE_COUNT]
+        ).select_related()[:self.item_count]
         return super(LeagueOverview, self).get_context_data(**kwargs)
 
 
@@ -80,7 +81,7 @@ class LeagueDetail(DetailView):
     """ Focusing on a particular league. """
 
     def get_object(self):
-        return get_object_or_404(League, steam_id=self.kwargs.get('steam_id'))
+        return get_object_or_404(League.recency, steam_id=self.kwargs.get('steam_id'))
 
     def get_context_data(self, **kwargs):
         match_list = Match.objects.filter(
@@ -98,14 +99,23 @@ class LeagueDetail(DetailView):
         )
         match_list = paginator.current_page
 
-        try:
+        validity_metrics = Match.objects.filter(league__steam_id=2733)\
+            .values('validity')\
+            .annotate(total=Count('validity'))\
+            .order_by()
 
+
+        for itm in validity_metrics:
+            itm['name'] = dict(Match.VALIDITY_CHOICES)[itm['validity']]
+
+        try:
             max_match_time = League.objects.filter(
                 steam_id=self.kwargs.get('steam_id')
             ).annotate(Max('match__start_time'))[0].match__start_time__max
         except League.DoesNotExist:
             max_match_time = time()
 
+        kwargs['validity_metrics'] = validity_metrics
         kwargs['max_match_time'] = max_match_time
         kwargs['match_list'] = match_list
         kwargs['show_date_control_bar'] = True

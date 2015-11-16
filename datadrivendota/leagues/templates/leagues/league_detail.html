@@ -27,10 +27,22 @@
         </div>
     </div>
     <div class="league-infobox col-md-4">
-        <img class='thumbnail' style='margin-top:10px' src="{{ league.image }}">
-        <h2>{{ league.display_name }}
-        </h2>
-
+        {% include "leagues/_league_card.html" %}
+        {# {{league.tier}} #}
+        {% if validity_metrics and user.is_superuser %}
+          <table class='table table-bordered'>
+            <thead>
+              <td>Validity</td>
+              <td>MatchCount</td>
+            </thead>
+          {% for row in validity_metrics %}
+            <tr>
+              <td>{{row.name}}</td>
+              <td>{{row.total}}</td>
+            </tr>
+          {% endfor %}
+          </table>
+        {% endif %}
     </div>
   </div>
  <div class='row'>

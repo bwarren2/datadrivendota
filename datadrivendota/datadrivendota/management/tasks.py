@@ -115,7 +115,7 @@ class ApiContext(object):
             ]
             return self.dict_vars(valve_url_vars)
         else:
-            logger.error("I did not understand mode: " + mode)
+            logger.warning("I did not understand mode: " + mode)
 
     def dict_vars(self, url_vars):
         return_dict = {}
@@ -275,16 +275,18 @@ class ValveApiCall(BaseTask):
             try:
                 url = mode_dict[mode]
             except KeyError:
-                logger.info("Keyerrors on API call!")
+                logger.warning("Keyerrors on API call!")
                 raise
+
             URL = url + '?' + urlencode(self.api_context.to_url_dict(mode))
-            logger.info("URL: " + URL)
+            logger.info("Hitting valve API for URL: " + URL)
+
             # Exception handling for the URL opening.
             try:
                 pageaccess = urllib2.urlopen(URL, timeout=5)
             except urllib2.HTTPError, err:
                 if err.code == 104:
-                    logger.error(
+                    logger.warning(
                         "Got error 104 (connection reset by peer) for mode "
                         + str(mode)
                         + self.api_context.to_url_dict()
@@ -292,41 +294,41 @@ class ValveApiCall(BaseTask):
                     )
                     self.retry(mode=mode)
                 elif err.code == 111:
-                    logger.error(
+                    logger.warning(
                         "Connection Refused! "
                         + URL
                         + ".  Retrying."
                     )
                     self.retry(mode=mode)
                 elif err.code == 404:
-                    logger.error("Page not found! " + URL + ".  Retrying.")
+                    logger.warning("Page not found! " + URL + ".  Retrying.")
                     self.retry(mode=mode)
                 elif err.code == 403:
-                    logger.error(
+                    logger.warning(
                         "Your access was denied. "
                         + URL
                         + ".  Retrying."
                     )
                     self.retry(mode=mode)
                 elif err.code == 401:
-                    logger.error(
+                    logger.warning(
                         "Unauth'd! "
                         + URL
                         + ".  Retrying."
                     )
                     self.retry(mode=mode)
                 elif err.code == 500:
-                    logger.error("Server Error! " + URL + ".  Retrying.")
+                    logger.warning("Server Error! " + URL + ".  Retrying.")
                     self.retry(mode=mode)
                 elif err.code == 503:
-                    logger.error(
+                    logger.warning(
                         "Server busy or limit exceeded "
                         + URL
                         + ".  Retrying."
                     )
                     self.retry(mode=mode)
                 else:
-                    logger.error(
+                    logger.warning(
                         "Got error "
                         + str(err)
                         + " with URL "
@@ -335,7 +337,7 @@ class ValveApiCall(BaseTask):
                     )
                     self.retry(mode=mode)
             except BadStatusLine:
-                logger.error(
+                logger.warning(
                     "Bad status line for url %s" % URL
                     + ".  Retrying."
                 )
@@ -344,7 +346,7 @@ class ValveApiCall(BaseTask):
                 self.retry(mode=mode)
             except (ssl.SSLError, socket.timeout) as err:
                 err = "Connection timeout for {url}. Error: {e}  Retrying."
-                logger.error(
+                logger.warning(
                     err.format(
                         url=URL,
                         e=err

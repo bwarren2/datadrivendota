@@ -1,9 +1,20 @@
-{% load staticfiles player_extras %}
+{% load staticfiles player_extras human_seconds %}
 
 <div class='container'>
 
-  <h2>
+  <h2 class='match-card-header'>
     <a href="/matches/{{match.steam_id}}">Match: {{match.steam_id}}</a>
+    <small>
+      {% if match.radiant_team.name and match.dire_team.name %}
+        {{match.radiant_team.name}} vs {{match.dire_team.name}}
+      {% endif %}
+      {% if match.league.name %}
+        at {{match.league.name}}
+      {% endif %}
+        {{match.start_time|seconds_to_date|date:'m-d-y H:m'}}
+
+    </small>
+
   </h2>
 
   <div class="row">
