@@ -48,9 +48,12 @@ class UpdateLeagues(Task):
                 self.logo_update(league_id)
                 self.game_update(league_id, matches)
             except KeyError:
-                logger.error("Can't find {0} in schema.  :(".format(league_id))
+                logger.warning(
+                    "Can't update {0}.  Not found in schema.".format(league_id)
+                )
 
     def create(self, league_id):
+        logger.info('Creating {0} as part of leagueupdate'.format(league_id))
         data = self.schema[league_id]
 
         league = League.objects.get_or_create(steam_id=league_id)[0]
@@ -111,6 +114,10 @@ class UpdateLeagues(Task):
         c.league_id = league_id
         iconname = data['image_inventory'].split('/')[-1]
         c.iconname = iconname
+        logger.info(
+            'Updating logo for {0} as part of leagueupdate'.format(league_id)
+        )
+
         chain(
             vac.s(mode='GetItemIconPath', api_context=c),
             ul.s()
@@ -125,6 +132,11 @@ class UpdateLeagues(Task):
         c.skill = 4
         vac = ValveApiCall()
         rpr = CycleApiCall()
+        logger.info(
+            'Getting matches {1} for {0} as part of leagueupdate'.format(
+                league_id, matches
+            )
+        )
         ch = chain(
             vac.s(api_context=c, mode='GetMatchHistory'),
             rpr.s()
@@ -152,8 +164,10 @@ class UpdateLeagueLogo(ApiFollower):
                 league.stored_image.save(filename, File(buff))
             league.save()
         except:
-            err = sys.exc_info()[0]
-            print "No image for %s!  Error %s" % (league.steam_id, err)
+            logging.warning("No image for {0}!".format(
+                league.steam_id
+                ), exc_info=True
+            )
 
 
 class MirrorRecentLeagues(Task):
