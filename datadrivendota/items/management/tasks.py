@@ -41,4 +41,6 @@ class UpdateItemSchema(ApiFollower):
         response = requests.get(url)
         data = vdf.loads(response.text)
         json_data = json.dumps(data)
+        logger.info("Setting item schema in redis (url: {0})".format(url))
         redis.set(settings.ITEM_SCHEMA_KEY, json_data)
+        logger.info("Item schema set in redis (url: {0})".format(url))
