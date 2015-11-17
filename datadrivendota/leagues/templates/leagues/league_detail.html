@@ -1,18 +1,22 @@
 {% extends "row_base.html" %}
 
 {% load staticfiles player_extras %}
+
 {% block title %}
     {{league.display_name}}
 {% endblock title %}
+
 {% block content %}
 
-  <nav>
-    <ul class="nav nav-pills">
-      <li role="presentation" class='active'><a href="{% url 'leagues:detail' steam_id=league.steam_id %}">Detail</a></li>
-      <li role="presentation"><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
-    </ul>
-  </nav>
+<nav class='app-nav'>
+  <ul class="nav nav-pills">
+    <li role="presentation" class='active'><a href="{% url 'leagues:detail' steam_id=league.steam_id %}">Detail</a></li>
+    <li role="presentation"><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
+    <li role="presentation"><a href="{% url 'matches:index'%}?league_id={{league.steam_id}}">Matches</a></li>
+  </ul>
+</nav>
 
+<section class='app-section'>
   <div class='row'>
     <div class='col-md-4'>
         <h4>Hero Pick/Ban Rate</h4>
@@ -27,8 +31,10 @@
         </div>
     </div>
     <div class="league-infobox col-md-4">
+        <h4>Overview</h4>
+        <div>
         {% include "leagues/_league_card.html" %}
-        {# {{league.tier}} #}
+        </div>
         {% if validity_metrics and user.is_superuser %}
           <table class='table table-bordered'>
             <thead>
@@ -45,7 +51,7 @@
         {% endif %}
     </div>
   </div>
- <div class='row'>
+  <div class='row'>
     <div class='col-md-8'>
         <h4>Relative Hero Strength</h4>
         <div id='strength_bars' class='vert-md-4 chart'>
@@ -55,8 +61,15 @@
     <div class="col-md-4">
       <p>Charts are capped at 300 matches for now until we optimize performance.  Some leagues include their qualifiers in the same tournament due to a Valve convention, which we are working on splitting out.</p>
     </div>
+    <div class='col-md-12'>
+      <h4>Match Timeline</h4>
+      <div id='match_timeline' class='vert-md-1 chart'>
+        <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+      </div>
+    </div>
   </div>
 
+</section>
 {% endblock content %}
 
 {% block extra_js %}
@@ -75,7 +88,6 @@ $(function(){
       var start_unix = moment($('#start-date').val(), "MM/DD/YYYY").unix();
       var end_unix = moment($('#end-date').val(), "MM/DD/YYYY").unix();
 
-      console.log(start_unix, end_unix);
       d7.extensions.charts.heroes.pickban_scatter(
         '#pick_ban',
         {
@@ -102,7 +114,17 @@ $(function(){
           page_size:300
         }, true
       );
+
+      d7.extensions.charts.matches.match_timeline(
+        '#match_timeline',
+        {
+          league_id:{{league.steam_id}},
+          page_size:10
+        }
+      );
     });
+
+
     $('button#chart').click();
 
 })

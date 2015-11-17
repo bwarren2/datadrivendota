@@ -113,13 +113,15 @@ class Match(models.Model):
 
     @property
     def radiant(self):
-        return self.playermatchsummary_set.\
-            filter(player_slot__lt=5).select_related().order_by('player_slot')
+        return self.pmses.filter(
+            player_slot__lt=5
+        ).select_related().order_by('player_slot')
 
     @property
     def dire(self):
-        return self.playermatchsummary_set.\
-            filter(player_slot__gte=5).select_related().order_by('player_slot')
+        return self.pmses.filter(
+            player_slot__gte=5
+        ).select_related().order_by('player_slot')
 
 
 class GameMode(models.Model):
@@ -158,7 +160,7 @@ class LobbyType(models.Model):
 
 
 class PlayerMatchSummary(models.Model):
-    match = models.ForeignKey('Match')
+    match = models.ForeignKey('Match', related_name='pmses')
     player = models.ForeignKey('players.Player')
     hero = models.ForeignKey('heroes.Hero')
     player_slot = models.IntegerField()

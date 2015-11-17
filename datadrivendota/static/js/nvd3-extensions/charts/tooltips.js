@@ -203,8 +203,66 @@ var item_tooltip = function(d, x, y, z){
 
 };
 
+var match_tooltip = function(d, x, y, z){
+      if (d === null) {return "";}
+      d = d[0];
+
+      var table = d3.select(document.createElement("table"));
+
+      // Make a body
+      var tbodyEnter = table
+          .selectAll("tbody")
+          .data([d])
+          .enter()
+          .append("tbody");
+
+      var trowEnter1 = tbodyEnter
+          .append("tr");
+
+      trowEnter1
+          .append("td")
+          .html("Match ID: ");
+
+      trowEnter1.append("td")
+          .html(function(x){
+            return x.steam_id;
+        });
+
+      var trowEnter2 = tbodyEnter
+          .append("tr");
+
+
+      trowEnter2.append("td")
+          .html('Teams');
+
+      trowEnter2.append("td")
+          .html(function(x){
+            return x.radiant_team + ' vs. ' + x.dire_team
+          });
+
+      // var trowEnter3 = tbodyEnter
+      //     .append("tr");
+
+      // trowEnter3
+      //     .append("td")
+      //     .html("Hero: ");
+
+      // trowEnter3.append("td")
+      //     .classed("value", true)
+      //     .html(function(x){
+      //       return x.unit.replace('npc_dota_hero_','').replace("_"," ");
+      //     });
+
+
+      var html = table.node().outerHTML;
+      return html;
+
+};
+
+
 module.exports = {
     hero_tooltip: heroContentGenerator,
     bldg_tooltip: bldg_tooltip,
     item_tooltip: item_tooltip,
+    match_tooltip: match_tooltip,
 };

@@ -51,7 +51,6 @@ var pickban_scatter = function(destination, params, display_final_product){
   var winrate_data;
   var dossiers;
   var blanks;
-  console.log("/rest-api/match-pickban/?" + $.param(params));
   Promise.join(
     AjaxCache.get(
       "/rest-api/match-pickban/?" + $.param(params)

@@ -3,6 +3,8 @@ from utils.views import ability_infodict
 
 from .models import Match, PlayerMatchSummary, PickBan
 from leagues.models import League
+from utils.pagination import SmarterPaginator
+
 
 class MatchDetail(DetailView):
     model = Match
@@ -120,7 +122,42 @@ class MatchListView(ListView):
     queryset = Match.objects.filter(
         validity=Match.LEGIT,
         league__tier=League.PREMIUM
-    ).select_related()[:20]
+    ).select_related(
+        'radiant_team',
+        'dire_team',
+        'league'
+    ).prefetch_related(
+        'pmses',
+    )
+    paginate_by = 10
+
+    def get_queryset(self):
+        filter_league = self.request.GET.get('league_id', None)
+
+        if filter_league:
+            matches = Match.objects.filter(
+                league__steam_id=filter_league,
+                validity=Match.LEGIT
+            ).select_related(
+                'radiant_team',
+                'dire_team',
+                'league'
+            ).prefetch_related(
+                'pmses',
+            )
+            return matches
+        else:
+            return super(MatchListView, self).get_queryset()
+
+    def paginate_queryset(self, queryset, page_size):
+        page = self.request.GET.get('page')
+        paginator = SmarterPaginator(
+            object_list=queryset,
+            per_page=page_size,
+            current_page=page
+        )
+        objs = paginator.current_page
+        return (paginator, page, objs, True)
 
 
 def get_context_data(self, **kwargs):

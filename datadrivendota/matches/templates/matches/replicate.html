@@ -4,7 +4,6 @@
 
 {% block title %}Match #{{match.steam_id}}{% endblock title %}
 
-{% block page_title %}{% endblock page_title %}
 
 {% block content %}
   <div class='col-md-6'>
@@ -14,7 +13,7 @@
           <div class='col-md-3'>
               <label id='radiant'>Radiant</label>
               <div class="form-group" id='radiant'>
-                  {% for pms in match.playermatchsummary_set.all %}
+                  {% for pms in match.pmses.all %}
                     {% if pms.is_radiant %}
 
                       <div class="checkbox">
@@ -28,7 +27,7 @@
           <div class='col-md-3'>
               <label id='dire'>Dire</label>
               <div class="form-group" id='dire'>
-                  {% for pms in match.playermatchsummary_set.all %}
+                  {% for pms in match.pmses.all %}
                     {% if pms.is_dire %}
 
                       <div class="checkbox">

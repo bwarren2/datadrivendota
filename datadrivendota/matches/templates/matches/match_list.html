@@ -1,7 +1,8 @@
 {% extends "row_base.html" %}
 {% block title %}Match List{% endblock title %}
-{% block page_title %}Match List{% endblock page_title %}
+
 {% block content %}
+    <h1>Match List</h1>
     {% for match in match_list %}
         <a href="/matches/{{match.steam_id}}">
             <div class='col-md-12' style='margin-bottom:20px'>
@@ -9,4 +10,7 @@
             </div>
         </a>
     {% endfor %}
+
+    {% include "_pagination.html" with pages_list=page_obj page_links_to_display=object_list.paginator.page_range_with_ellipses %}
+
 {% endblock content %}
