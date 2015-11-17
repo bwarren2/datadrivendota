@@ -101,10 +101,24 @@ class UpdateMatch(ApiFollower):
         """
         data = self.result
         if 'error' in data:
-            logging.error("{0}, {1}".format(
-                data['error'], self.api_context.match_id)
-            )
-            logging.error(self.api_context)
+
+            if data['error'] == 'Match ID not found':
+                logger.warning(
+                    'Match ID {0} not found'.format(self.api_context.match_id)
+                )
+            elif data['error'] == 'Practice matches are not available via GetMatchDetails':
+                logger.warning(
+                    'Match ID {0} was a practice match, not recorded'.format(
+                        self.api_context.match_id
+                    )
+                )
+            else:
+                logging.error("{0}.  Context:{1}".format(
+                    data['error'], self.api_context)
+                )
+
+
+            # Do logging on associated livematch
             try:
                 lm = LiveMatch.objects.get(
                     steam_id=self.api_context.match_id
@@ -112,11 +126,12 @@ class UpdateMatch(ApiFollower):
                 lm.failed = True
                 lm.save()
             except:
-                logging.error(
+                logging.warning(
                     'No live match to fail. ({0})'.format(
                         self.api_context.match_id
                     )
                 )
+
         else:
             kwargs = {
                 'radiant_win': data['radiant_win'],
@@ -498,6 +513,20 @@ class CheckMatchIntegrity(Task):
                 'Database alert!',
                 'We have denormalization for dire players and iswin=True'
             )
+        league_tier_badness = League.objects.filter(tier=None).count();
+        if len(league_tier_badness) != 0:
+            (
+                'Database alert!',
+                'There are leagues with no tier, which should not happen.'
+            )
+        league_image_badness = League.objects.filter(
+            stored_image=None
+        ).count();
+        if len(league_image_badness) != 0:
+            (
+                'Database alert!',
+                'There are leagues with no image, which should not happen.'
+            )
 
 
 class CycleApiCall(ApiFollower):
@@ -513,7 +542,7 @@ class CycleApiCall(ApiFollower):
         """ Ping the valve API to get match data & spawns new tasks. """
         # Validate
         if self.result['status'] == 15:
-            logger.error(
+            logger.warning(
                 "Could not pull data. "
                 + str(self.api_context.account_id)
                 + " disallowed it. "
@@ -540,7 +569,11 @@ class CycleApiCall(ApiFollower):
                 self.cleanup()
             return True
         else:
-            logger.error("Unhandled status: " + str(self.result['status']))
+            logger.error(
+                "Unhandled status: {0}".format(
+                    str(self.result['status'])
+                )
+            )
             return True
 
     def spawn_detail_calls(self):
@@ -658,7 +691,7 @@ class UpdatePmsReplays(Task):
             offset = states[0]['time']
         except IndexError:
             offset = 0
-            logger.error(
+            logger.warning(
                 'Failed to get an offset with match {0}'.format(match_id)
             )
 

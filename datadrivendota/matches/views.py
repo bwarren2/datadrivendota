@@ -2,7 +2,7 @@ from django.views.generic import DetailView, ListView
 from utils.views import ability_infodict
 
 from .models import Match, PlayerMatchSummary, PickBan
-
+from leagues.models import League
 
 class MatchDetail(DetailView):
     model = Match
@@ -119,6 +119,7 @@ class MatchListView(ListView):
     model = Match
     queryset = Match.objects.filter(
         validity=Match.LEGIT,
+        league__tier=League.PREMIUM
     ).select_related()[:20]
 
 

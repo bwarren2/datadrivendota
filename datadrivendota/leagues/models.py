@@ -51,6 +51,13 @@ class League(models.Model):
             return static('blank_league.png')
 
     @property
+    def tier_name(self):
+        try:
+            return dict(self.LEAGUE_TYPES)[self.tier]
+        except ValueError:
+            return None
+
+    @property
     def display_name(self):
         if self.name is not None:
             str = self.name.replace('#DOTA_Item_League_', '')
@@ -141,3 +148,6 @@ class LiveMatch(models.Model):
         return self.created_at < timezone.now() - timedelta(
             days=settings.FAILED_LIVEMATCH_KEEP_DAYS
         )
+
+    class Meta:
+        unique_together = ('league_id', 'steam_id')
