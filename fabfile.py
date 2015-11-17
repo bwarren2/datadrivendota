@@ -54,7 +54,7 @@ def deploy():
     local('git push origin master')
     cs()
     local('git push heroku master')
-    local('heroku run python datadrivendota/manage migrate')
+    local('heroku run python datadrivendota/manage.py migrate')
 
 
 def rabbit_reset():
