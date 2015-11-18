@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from datadrivendota import views
-from accounts.views import LoginView
+from accounts.views import LoginView, LogoutView
 
 
 # REST
@@ -32,6 +32,9 @@ urlpatterns = patterns(
         TemplateView.as_view(template_name='privacy.html',),
         name='privacy'
     ),
+    # Even if we don't want users to login, SUs need to be able to log out.
+    url(r'^logout/$', LogoutView.as_view(), name='logout'),
+
     url(
         r'^api/combobox_tags/$',
         views.ComboboxAjaxView.as_view(),

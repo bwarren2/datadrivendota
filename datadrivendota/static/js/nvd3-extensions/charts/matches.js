@@ -6,6 +6,7 @@ var AjaxCache = require("../ajax_cache");
 var $ = window.$;
 var nv = window.nv;
 var d3 = window.d3;
+var moment = window.moment;
 var tooltips = require("./tooltips.js");
 
 
@@ -153,7 +154,6 @@ var pms_bar_chart = function(destination, params, y_var, y_lab){
         })
       }]
     ;
-    console.log(plot_data);
 
     var chart;
     var chart_data;
@@ -204,6 +204,69 @@ var tower_dmg_barchart = function(destination, params){
 };
 
 
+var match_timeline = function(destination, params){
+
+  Promise.resolve(
+    AjaxCache.get(
+      "/rest-api/matches/?" + $.param(params)
+    )
+  ).then(function(data){
+    $(destination).empty();
+
+    var data = [{
+      key: "Matches",
+      values: data
+    }];
+
+    var chart;
+    var chart_data;
+    var svg = utils.svg.square_svg(destination);
+    nv.addGraph(
+      function(){
+
+        chart = models.scatter_chart()
+          .margin({
+            left: 60,
+            right: 60,
+            bottom: 45,
+          })
+          .x(function(d){return d.start_time;})
+          .y(1)
+          .showLegend(false)
+          .showYAxis(false);
+
+
+        chart.xAxis.axisLabel("")
+          .tickFormat(function(d){
+            return moment.unix(d).format("MM/DD/YYYY");
+           })
+          .ticks(5);
+          chart.xAxis.showMaxMin(false);
+
+        chart.yAxis.axisLabel("");
+
+
+        chart.contentGenerator(
+          tooltips.match_tooltip
+        );
+
+
+        chart_data = svg.datum(data);
+        chart_data
+          .transition()
+          .duration(500)
+          .call(chart);
+
+        return chart;
+      }
+
+    );
+
+
+
+  });
+};
+
 
 module.exports = {
   pms_scatter: pms_scatter,
@@ -215,4 +278,5 @@ module.exports = {
   lh_barchart: lh_barchart,
   kda2_barchart: kda2_barchart,
   tower_dmg_barchart: tower_dmg_barchart,
+  match_timeline: match_timeline,
 };

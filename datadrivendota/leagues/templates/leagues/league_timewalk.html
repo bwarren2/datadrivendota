@@ -4,20 +4,17 @@
 {% block title %}
     {{league.display_name}}
 {% endblock title %}
-{% block page_title %}
-    {{league.display_name}}
-{% endblock page_title %}
 {% block content %}
 
 
-  <nav>
-    <ul class="nav nav-pills">
-      <li role="presentation"><a href="{% url 'leagues:detail' steam_id=league.steam_id %}">Detail</a></li>
-      <li role="presentation" class='active'><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
-    </ul>
-  </nav>
+<nav class='app-nav'>
+  <ul class="nav nav-pills">
+    <li role="presentation"><a href="{% url 'leagues:detail' steam_id=league.steam_id %}">Detail</a></li>
+    <li role="presentation" class='active'><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
+  </ul>
+</nav>
 
-
+<section class='app-section'>
   <div class='row'>
     <div class='col-md-4'>
         <h4>Hero Picks &amp; Bans</h4>
@@ -70,7 +67,7 @@
       <p>This metric tries to condense wins &amp; losses for each hero down to a single number.  Is a hero that went 5-2 better or worse than one that went 3-0?  This tries to answer.  More is better. </p>
     </div>
   </div>
-
+</section>
 
 {% endblock content %}
 
