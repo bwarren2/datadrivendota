@@ -513,16 +513,16 @@ class CheckMatchIntegrity(Task):
                 'Database alert!',
                 'We have denormalization for dire players and iswin=True'
             )
-        league_tier_badness = League.objects.filter(tier=None).count();
-        if len(league_tier_badness) != 0:
+        league_tier_badness = League.objects.filter(tier=None).count()
+        if league_tier_badness != 0:
             (
                 'Database alert!',
                 'There are leagues with no tier, which should not happen.'
             )
         league_image_badness = League.objects.filter(
             stored_image=None
-        ).count();
-        if len(league_image_badness) != 0:
+        ).count()
+        if league_image_badness != 0:
             (
                 'Database alert!',
                 'There are leagues with no image, which should not happen.'
