@@ -3283,13 +3283,13 @@ var toggle_sides = function(){
       $(' div.toggling g.nv-series-5, div.toggling g.nv-series-6, div.toggling g.nv-series-7, div.toggling g.nv-series-8, div.toggling g.nv-series-9').fadeIn();
     }
     idx = (idx + 1)%3;
+    recur = setTimeout(switching, 3000);
   };
 
   var recur;
 
   $('#start-fade').click(function(){
     $('#stop-fade, #start-fade').toggle();
-    switching();
     recur = setTimeout(switching, 3000);
   });
   $('#stop-fade').click(function(){
