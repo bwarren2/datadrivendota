@@ -113,7 +113,6 @@ class Match(models.Model):
 
     @property
     def radiant(self):
-        print self
         return self.playermatchsummary_set.filter(
             player_slot__lt=5
         ).order_by('player_slot')
