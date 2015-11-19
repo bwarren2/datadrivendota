@@ -125,9 +125,7 @@ class MatchListView(ListView):
     ).select_related(
         'radiant_team',
         'dire_team',
-        'league'
-    ).prefetch_related(
-        'pmses',
+        'league',
     )
     paginate_by = 10
 
@@ -142,8 +140,6 @@ class MatchListView(ListView):
                 'radiant_team',
                 'dire_team',
                 'league'
-            ).prefetch_related(
-                'pmses',
             )
             return matches
         else:
