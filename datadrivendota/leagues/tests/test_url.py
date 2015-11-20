@@ -7,7 +7,10 @@ class TestUrlconf(TestCase):
     @classmethod
     def setUpClass(cls):
         super(TestUrlconf, cls).setUpClass()
-        cls.league = mommy.make_recipe('leagues.league')
+        cls.league = mommy.make_recipe(
+            'leagues.league',
+            steam_id=100
+        )
 
     def test_urls_ok(self):
         c = Client()
@@ -15,7 +18,8 @@ class TestUrlconf(TestCase):
         resp = c.get('/leagues/')
         self.assertEqual(resp.status_code, 200)
 
-        resp = c.get('/leagues/{0}/'.format(self.league.steam_id))
+        url = '/leagues/{0}/'.format(self.league.steam_id)
+        resp = c.get(url)
         self.assertEqual(resp.status_code, 200)
 
         # The -1 represents a team that does not exist,

@@ -84,20 +84,26 @@ class UpdateLiveGames(ApiFollower):
         set_games(urldata)
 
     def make_record(self, formatted_game):
-        LiveMatch.objects.get_or_create(
-            league_id=formatted_game['game']['league_id'],
-            steam_id=formatted_game['game']['match_id'],
-            radiant_team=formatted_game.get('radiant', {}).get(
-                'team_id', None
-            ),
-            dire_team=formatted_game.get('dire', {}).get('team_id', None),
-            radiant_logo_ugc=formatted_game.get('radiant', {}).get(
-                'team_logo', None
-            ),
-            dire_logo_ugc=formatted_game.get('dire', {}).get(
-                'team_logo', None
-            ),
-        )
+        match_id = formatted_game['game']['match_id']
+
+        if match_id == 0:
+            logger.error('Why does this have match_id 0?')
+            logger.error(formatted_game)
+        else:
+            LiveMatch.objects.get_or_create(
+                league_id=formatted_game['game']['league_id'],
+                steam_id=formatted_game['game']['match_id'],
+                radiant_team=formatted_game.get('radiant', {}).get(
+                    'team_id', None
+                ),
+                dire_team=formatted_game.get('dire', {}).get('team_id', None),
+                radiant_logo_ugc=formatted_game.get('radiant', {}).get(
+                    'team_logo', None
+                ),
+                dire_logo_ugc=formatted_game.get('dire', {}).get(
+                    'team_logo', None
+                ),
+            )
 
     def _store_data(self, game_snapshot):
         # Store slice

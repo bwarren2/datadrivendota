@@ -27,11 +27,11 @@ class TestModelMethods(TestCase):
 
         self.league = fake_image(self.league)
         self.league.update_time = timezone.now() - timedelta(weeks=10)
-        self.assertEqual(self.league.is_outdated, True)
+        self.assertEqual(self.league.is_outdated, False)
 
         self.league.update_time = timezone.now()
         self.league.stored_image = None
-        self.assertEqual(self.league.is_outdated, True)
+        self.assertEqual(self.league.is_outdated, False)
 
         self.league.update_time = timezone.now()
         self.league = fake_image(self.league)
