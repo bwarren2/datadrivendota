@@ -1,5 +1,5 @@
 # This file is here because many Platforms as a Service look for
 #	requirements.txt in the root directory of a project.
-django-pylibmc==0.6.0
 pylibmc==1.5.0
+django-pylibmc==0.6.0
 -r requirements/production.txt
