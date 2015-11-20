@@ -7,3 +7,4 @@ model-mommy==1.2.4
 selenium==2.45.0
 splinter==0.7.2
 yanc==0.3.3
+pylibmc==1.5.0
