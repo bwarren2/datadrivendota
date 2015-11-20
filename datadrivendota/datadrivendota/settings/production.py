@@ -102,6 +102,11 @@ CACHES = {
     }
 }
 
+REST_FRAMEWORK_EXTENSIONS = {
+    'DEFAULT_CACHE_KEY_FUNC':
+    'datadrivendota.caching_keys.rest_key_constructor'
+}
+
 #          END CACHE CONFIGURATION
 
 # Static Files
