@@ -8,7 +8,7 @@ from base import *
 # into your settings, but ImproperlyConfigured is an exception.
 from django.core.exceptions import ImproperlyConfigured
 
-########## DEBUG CONFIGURATION
+#          DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = False
 
@@ -25,7 +25,7 @@ MIDDLEWARE_CLASSES += (
     "datadrivendota.middleware.ForceHttps",
 )
 
-########## EMAIL CONFIGURATION
+#          EMAIL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -49,16 +49,16 @@ EMAIL_USE_TLS = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = EMAIL_HOST_USER
-########## END EMAIL CONFIGURATION
+#          END EMAIL CONFIGURATION
 
-###Setting allowed hosts for security.  Only needed when debug = false
+#    Setting allowed hosts for security.  Only needed when debug = false
 ALLOWED_HOSTS = (
     'datadrivendota.herokuapp.com',
     'datadrivendota.com',
     'www.datadrivendota.com',
 )
 
-########## CACHE CONFIGURATION
+#          CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
 environ['MEMCACHE_SERVERS'] = environ.get(
     'MEMCACHIER_SERVERS',
@@ -66,6 +66,7 @@ environ['MEMCACHE_SERVERS'] = environ.get(
 ).replace(',', ';')
 environ['MEMCACHE_USERNAME'] = environ.get('MEMCACHIER_USERNAME', '')
 environ['MEMCACHE_PASSWORD'] = environ.get('MEMCACHIER_PASSWORD', '')
+
 
 CACHES = {
     'default': {
@@ -76,8 +77,8 @@ CACHES = {
         # TIMEOUT is not the connection timeout! It's the default expiration
         # timeout that should be applied to keys! Setting it to `None`
         # disables expiration.
-        'TIMEOUT': None,
-
+        'TIMEOUT': environ.get('CACHE_MIDDLEWARE_SECONDS', None),
+        # None is keep forever, 0 is expire immediately, else = seconds
         'OPTIONS': {
             # Enable faster IO
             'no_block': True,
@@ -93,9 +94,7 @@ CACHES = {
             'ketama': True,
 
             # Configure failover timings
-            'connect_timeout': int(
-                environ.get('CACHE_MIDDLEWARE_SECONDS', 2000)
-            ),
+            'connect_timeout': 2000,
             'remove_failed': 4,
             'retry_timeout': 2,
             'dead_timeout': 10
@@ -103,7 +102,7 @@ CACHES = {
     }
 }
 
-########## END CACHE CONFIGURATION
+#          END CACHE CONFIGURATION
 
 # Static Files
 STATIC_HOST = environ.get('DJANGO_STATIC_HOST', '')
