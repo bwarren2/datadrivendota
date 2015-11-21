@@ -87,8 +87,14 @@ class UpdateLiveGames(ApiFollower):
         match_id = formatted_game['game']['match_id']
 
         if match_id == 0:
-            logger.error('Why does this have match_id 0?')
-            logger.error(formatted_game)
+            logger.info(
+                (
+                    'Disregarding this live match because it has no id.  '
+                    'This appears to happen with games '
+                    'before both teams join.  '
+                    'Data: {0}'
+                ).format(formatted_game)
+            )
         else:
             LiveMatch.objects.get_or_create(
                 league_id=formatted_game['game']['league_id'],

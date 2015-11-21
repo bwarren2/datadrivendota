@@ -11,6 +11,10 @@ class TestUrlconf(TestCase):
             'leagues.league',
             steam_id=100
         )
+        mommy.make_recipe(
+            'matches.match',
+            league=cls.league
+        )
 
     def test_urls_ok(self):
         c = Client()
