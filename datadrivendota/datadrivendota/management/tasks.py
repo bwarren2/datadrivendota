@@ -287,7 +287,7 @@ class ValveApiCall(BaseTask):
             except urllib2.HTTPError, err:
                 if err.code == 104:
                     logger.warning(
-                        "Got error 104 (connection reset by peer) for mode "
+                        "Connection reset by peer for mode "
                         + str(mode)
                         + self.api_context.to_url_dict()
                         + ".  Retrying."
@@ -318,7 +318,7 @@ class ValveApiCall(BaseTask):
                     )
                     self.retry(mode=mode)
                 elif err.code == 500:
-                    logger.warning("Server Error! " + URL + ".  Retrying.")
+                    logger.warning("Server Issue! " + URL + ".  Retrying.")
                     self.retry(mode=mode)
                 elif err.code == 503:
                     logger.warning(
@@ -329,7 +329,7 @@ class ValveApiCall(BaseTask):
                     self.retry(mode=mode)
                 else:
                     logger.warning(
-                        "Got error "
+                        "Got problem "
                         + str(err)
                         + " with URL "
                         + URL
@@ -345,7 +345,7 @@ class ValveApiCall(BaseTask):
             except urllib2.URLError as err:
                 self.retry(mode=mode)
             except (ssl.SSLError, socket.timeout) as err:
-                err = "Connection timeout for {url}. Error: {e}  Retrying."
+                err = "Connection timeout for {url}. Issue: {e}  Retrying."
                 logger.warning(
                     err.format(
                         url=URL,
