@@ -13,6 +13,7 @@ def inferred_annotations(tsk):
         'acks_late': True,
         'max_retries': 7,
         'trail': False,
+        'default_retry_delay': 600,
     }
     tsk_annotations = tsk.get('annotations', {})
     if 'standalone' in tsk_annotations.keys():
