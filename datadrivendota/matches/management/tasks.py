@@ -117,7 +117,6 @@ class UpdateMatch(ApiFollower):
                     data['error'], self.api_context)
                 )
 
-
             # Do logging on associated livematch
             try:
                 lm = LiveMatch.objects.get(
@@ -134,7 +133,7 @@ class UpdateMatch(ApiFollower):
 
         else:
             kwargs = {
-                'radiant_win': data['radiant_win'],
+                'radiant_win': data.get('radiant_win', None),
                 'duration': data['duration'],
                 'start_time': data['start_time'],
                 'steam_id': data['match_id'],

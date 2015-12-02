@@ -16,7 +16,7 @@ class Match(models.Model):
     start_time = models.IntegerField(help_text='Start time in UTC seconds')
     duration = models.IntegerField()
 
-    radiant_win = models.BooleanField()
+    radiant_win = models.NullBooleanField()
     tower_status_radiant = models.IntegerField()
     tower_status_dire = models.IntegerField()
     barracks_status_radiant = models.IntegerField()
