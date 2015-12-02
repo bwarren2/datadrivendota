@@ -4,12 +4,26 @@ from datadrivendota.mixins import SuperuserRequiredMixin
 from matches.models import Match, PlayerMatchSummary
 from players.models import Player
 from heroes.models import Hero
+from datetime import timedelta
+from django.utils import timezone
+import time
 
 
 class HealthIndexView(SuperuserRequiredMixin, TemplateView):
     template_name = 'health_index.html'
 
     def get_context_data(self, **kwargs):
+
+        kwargs['winnerless_matches_week'] = Match.objects.filter(
+            radiant_win=None,
+            start_time__gte=time.mktime(
+                (timezone.now()-timedelta(weeks=1)).timetuple()
+            )
+        ).count()
+        kwargs['winnerless_matches_alltime'] = Match.objects.filter(
+            radiant_win=None
+        ).count()
+
         kwargs['read_key'] = settings.KEEN_READ_KEY
         kwargs['project_id'] = settings.KEEN_PROJECT_ID
         return super(HealthIndexView, self).get_context_data(**kwargs)
