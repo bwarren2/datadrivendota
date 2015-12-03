@@ -393,7 +393,7 @@ class Config(object):
             'schedule': timedelta(days=1),
         },
         'reflect-league-schedule-daily': {
-            'task': 'leagues.management.tasks.league.MirrorLeagueSchedule',
+            'task': 'leagues.management.tasks.MirrorLeagueSchedule',
             'schedule': timedelta(days=1),
         },
         'reflect-item-schema-daily': {
