@@ -1,14 +1,15 @@
 from django.test import TestCase
+from django.db.models import Q
 from model_mommy import mommy
 from .models import MatchRequest
 from .management.tasks import KickoffMatchRequests, CreateMatchParse
 
 
-class TestUpdateRequestTask(TestCase):
+class TestKickoffRequestTask(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestUpdateRequestTask, cls).setUpClass()
+        super(TestKickoffRequestTask, cls).setUpClass()
         mommy.make(
             'accounts.MatchRequest',
             status=MatchRequest.SUBMITTED,
@@ -18,17 +19,43 @@ class TestUpdateRequestTask(TestCase):
             'accounts.MatchRequest',
             status=MatchRequest.FINDING_MATCH,
         )
+        mommy.make(
+            'accounts.MatchRequest',
+            status=MatchRequest.MATCH_FOUND,
+        )
+        mommy.make(
+            'accounts.MatchRequest',
+            status=MatchRequest.MATCH_FOUND,
+        )
+        mommy.make(
+            'accounts.MatchRequest',
+            status=MatchRequest.COMPLETE,
+        )
 
     def test_get_requests(self):
+
+        # Test only pushing submitted requests
         self.assertQuerysetEqual(
             MatchRequest.objects.filter(
                 status=MatchRequest.SUBMITTED
             ).order_by('id'),
-            map(repr, KickoffMatchRequests().get_requests().order_by('id'))
+            map(repr, KickoffMatchRequests().get_requests(True).order_by('id'))
+        )
+
+        # Test when we want to force along everything, not just submitted
+        self.assertQuerysetEqual(
+            MatchRequest.objects.filter(
+                Q(status=MatchRequest.SUBMITTED) |
+                Q(status=MatchRequest.FINDING_MATCH) |
+                Q(status=MatchRequest.MATCH_FOUND)
+            ).order_by('id'),
+            map(repr, KickoffMatchRequests().get_requests(
+                False
+            ).order_by('id'))
         )
 
     def test_marked(self):
-        requests = KickoffMatchRequests().get_requests()
+        requests = KickoffMatchRequests().get_requests(True)
         for request in requests:
             KickoffMatchRequests().mark_finding(request)
             self.assertEqual(request.status, MatchRequest.FINDING_MATCH)

@@ -10,6 +10,7 @@ from celery import Task, chain
 
 from django.core.files import File
 from django.conf import settings
+from django.db.models import Q
 
 from accounts.models import MatchRequest
 from datadrivendota.management.tasks import ValveApiCall, ApiContext
@@ -22,14 +23,22 @@ logger = logging.getLogger(__name__)
 
 class KickoffMatchRequests(Task):
 
-    def run(self):
-        requests = self.get_requests()
-        for request in requests:
+    def run(self, only_use_submitted=True):
+        match_requests = self.get_requests(only_use_submitted)
+        logging.info('Got these match requests: {0}'.format(match_requests))
+        for request in match_requests:
             self.chain_updates(request)
             self.mark_finding(request)
 
-    def get_requests(self):
-        return MatchRequest.objects.filter(status=MatchRequest.SUBMITTED)
+    def get_requests(self, only_use_submitted):
+        if only_use_submitted:
+            return MatchRequest.objects.filter(status=MatchRequest.SUBMITTED)
+        else:
+            return MatchRequest.objects.filter(
+                Q(status=MatchRequest.SUBMITTED) |
+                Q(status=MatchRequest.FINDING_MATCH) |
+                Q(status=MatchRequest.MATCH_FOUND)
+            )
 
     def chain_updates(self, request):
         c = ApiContext()
