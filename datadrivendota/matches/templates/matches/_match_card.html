@@ -19,8 +19,10 @@
 
   <div class="row">
 
-    {% for summary in match.radiant %}
-          {% include "matches/_pms_card.html" %}
+    {% for summary in match.playermatchsummary_set.all %}
+          {% if summary.side == 'Radiant' %}
+            {% include "matches/_pms_card.html" %}
+          {% endif %}
     {% endfor %}
 
     {% if match.radiant_team %}
@@ -33,8 +35,10 @@
 
   <div class="row">
 
-    {% for summary in match.dire %}
-          {% include "matches/_pms_card.html" %}
+    {% for summary in match.playermatchsummary_set.all %}
+          {% if summary.side == 'Dire' %}
+            {% include "matches/_pms_card.html" %}
+          {% endif %}
     {% endfor %}
 
     {% if match.dire_team %}

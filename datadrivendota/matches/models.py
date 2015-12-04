@@ -113,12 +113,14 @@ class Match(models.Model):
 
     @property
     def radiant(self):
+        # These cause new querysets; be careful
         return self.playermatchsummary_set.filter(
             player_slot__lt=5
         ).order_by('player_slot')
 
     @property
     def dire(self):
+        # These cause new querysets; be careful
         return self.playermatchsummary_set.filter(
             player_slot__gte=5
         ).order_by('player_slot')

@@ -119,14 +119,6 @@ class ReplicateDetail(DetailView):
 
 class MatchListView(ListView):
     model = Match
-    queryset = Match.objects.filter(
-        validity=Match.LEGIT,
-        league__tier=League.PREMIUM
-    ).select_related(
-        'radiant_team',
-        'dire_team',
-        'league',
-    )
     paginate_by = 10
 
     def get_queryset(self):
@@ -136,14 +128,23 @@ class MatchListView(ListView):
             matches = Match.objects.filter(
                 league__steam_id=filter_league,
                 validity=Match.LEGIT
-            ).select_related(
+            )
+        else:
+            matches = Match.objects.filter(
+                validity=Match.LEGIT
+            )
+
+        matches = matches.select_related(
                 'radiant_team',
                 'dire_team',
-                'league'
+                'league',
+            ).prefetch_related(
+                'playermatchsummary_set',
+                'playermatchsummary_set__hero',
+                'playermatchsummary_set__player',
+                'playermatchsummary_set__leaver',
             )
-            return matches
-        else:
-            return super(MatchListView, self).get_queryset()
+        return matches
 
     def paginate_queryset(self, queryset, page_size):
         page = self.request.GET.get('page')
