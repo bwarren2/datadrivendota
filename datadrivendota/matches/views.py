@@ -1,8 +1,7 @@
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, TemplateView
 from utils.views import ability_infodict
 
 from .models import Match, PlayerMatchSummary, PickBan
-from leagues.models import League
 from utils.pagination import SmarterPaginator
 
 
@@ -115,6 +114,10 @@ class ReplicateDetail(DetailView):
     model = Match
     slug_url_kwarg = 'match_id'
     slug_field = 'steam_id'
+
+
+class TimeLapseDetail(TemplateView):
+    template_name = 'matches/time_lapse.html'
 
 
 class MatchListView(ListView):

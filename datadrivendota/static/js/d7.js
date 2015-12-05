@@ -863,7 +863,6 @@ var render_data = function(
       return chart;
     }
   );
-
 }
 
 var shard_lineup = function(
@@ -1034,9 +1033,144 @@ var special_shard_lineup = function(match_id){
   });
 };
 
+
+var state_lineup = function(pms_ids, facet, destination, start_time, end_time, params){
+
+  var url_base ="/rest-api/statelog/?pms_id=";
+  var pmses;
+  // Get the PMS info
+  Promise.all(
+    pms_ids.map(function(pms_id){
+      var url = url_base+pms_id;
+      console.log(pms_id, url);
+      return $.getJSON(url);
+    })
+  ).then(function(data){
+    pmses = data.map(function(d){
+      return d[0].playermatchsummary;
+    });
+
+    Promise.all(
+      data.map(function(pms){
+        var location = pms[0][facet];
+        return $.getJSON(location);
+      })
+    ).then(function(facets){
+
+      var plot_data = facets.map(function(d, i){
+        return {
+          key: pmses[i].hero.name,
+          values: d,
+        }
+      });
+
+      $(destination).empty();
+
+      var width;
+      var height;
+
+      var make_axis = function(name){
+        return {
+          access: function(d){
+            return d[name];
+          },
+          label: name
+        }
+      };
+
+      var x_data = make_axis("offset_time");
+      var y_data = make_axis(facet);
+
+      if(params!==undefined){
+        if(params.height!==undefined){
+          height = params.height;
+        }
+        if(params.width!==undefined){
+          width = params.width;
+        }
+      }
+
+      var svg = utils.svg.square_svg(destination, width, height);
+      nv.addGraph(
+
+        function(){
+          var chart = nv.models.lineChart()
+            .margin({
+              left: 45,
+              bottom: 45,
+            })
+            .x(x_data.access)
+            .y(y_data.access)
+            .showLegend(false)
+            .interpolate("step-after")
+            .forceY(0);
+
+          if(params !== undefined){
+
+            if(params.height!==undefined){
+              chart.height(params.height);
+            }
+            if(params.width!==undefined){
+              chart.width(params.width);
+            }
+            if(params.forceY!==undefined){
+              chart.forceY(params.forceY);
+            }
+            if(params.forceX!==undefined){
+              chart.forceX(params.forceX);
+            }
+            if(params.contentGenerator!==undefined){
+              chart.tooltip.contentGenerator(params.contentGenerator);
+            }
+          }
+
+
+          chart.xAxis.axisLabel(x_data.label).tickFormat(
+            function(d){
+              return String(d).toHHMMSS();
+            }
+          );
+
+          chart.yAxis.axisLabel(y_data.label).axisLabelDistance(-18).tickFormat(
+            function(d){
+              if(d>1000000){return (d/1000000).toFixed(0) + "M";}
+              else if(d>1000){return (d/1000).toFixed(0) + "K";}
+              else { return d; }
+            }
+          );
+
+          var chart_data = svg.datum(plot_data);
+          chart_data.transition().duration(500).call(chart);
+          return chart;
+        }
+      );
+
+
+    });
+  });
+  //       var timeToSecs = function(time){
+  //           return parseInt(time.split(":")[0])*60+parseInt(time.split(":")[1]);
+  //       };
+
+  //       if(start_time!==""){
+  //           start_time = timeToSecs(start_time);
+  //       } else{
+  //           start_time = -10000;
+  //       }
+
+  //       if(end_time!==""){
+  //           end_time = timeToSecs(end_time);
+  //       } else{
+  //           end_time = 100000;
+  //       }
+
+};
+
+
 module.exports = {
   shard_lineup: shard_lineup,
   special_shard_lineup: special_shard_lineup,
+  state_lineup: state_lineup,
   plot_shard_lineup: plot_shard_lineup,
   render_data: render_data,
 };

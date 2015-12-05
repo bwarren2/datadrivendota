@@ -7,7 +7,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 
 from django.core.files import File
-from utils import gzip_str
+from utils import gzip_str, gunzip_str
 from io import BytesIO
 from django.utils import timezone
 from django.db.models import Min, Max, Count
@@ -31,12 +31,16 @@ from items.models import Item
 from leagues.models import League, LiveMatch
 from guilds.models import Guild
 from teams.models import Team
+from matches.models import CombatLog, StateLog
 from datadrivendota.management.tasks import (
     ValveApiCall,
     ApiFollower,
     ApiContext
 )
-from utils import gunzip_str
+
+from .combat_log_filters import combatlog_filter_map
+from .state_log_filters import entitystate_filter_map
+from utils.file_management import set_encoding
 
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os
@@ -674,73 +678,144 @@ class CycleApiCall(ApiFollower):
 
 class UpdatePmsReplays(Task):
 
+    time_limit = 240
+    soft_time_limit = 235
+
     def run(self, match_id):
         logger.info('Sharding replay for {0}'.format(match_id))
 
         pmses = PlayerMatchSummary.objects.filter(
             match__steam_id=match_id
         ).select_related('hero')
+
         match = Match.objects.get(steam_id=match_id)
 
         replay = json.loads(gunzip_str(match.compressed_replay.read()))
+
+        offset = self.get_offset(replay, match_id)
+        replay = self.convert_times(replay, offset)
+        replay = self.convert_stringtables(replay)
+
+        for pms in pmses:
+            self.shard(replay, pms, offset, match.steam_id)
+
+        self.cleanup(match.steam_id)
+
+    def convert_stringtables(self, replay):
+
+        item_map = {
+            msg['idx']: msg['value']
+            for msg in replay['stl']
+        }
+        tags = ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5']
+
+        for msg in replay['states']:
+            for item_tag in tags:
+                if item_tag in msg:
+                    msg[item_tag] = item_map[msg[item_tag]]
+                else:
+                    msg[item_tag] = None
+
+        return replay
+
+    def convert_times(self, replay, offset):
+        for msg in replay['es']:
+            msg['offset_time'] = msg['time'] - offset
+        for msg in replay['states']:
+            msg['offset_time'] = msg['tick_time'] - offset
+        return replay
+
+    def get_offset(self, replay, match_id):
         states = [
-            x for x in replay if x['type'] == 'state' and x['key'] == 'PLAYING'
+            x for x in replay['es']
+            if x['type'] == 'state' and x['key'] == 'PLAYING'
         ]
         try:
             offset = states[0]['time']
         except IndexError:
             offset = 0
-            logger.warning(
+            logger.error(
                 'Failed to get an offset with match {0}'.format(match_id)
             )
 
-        for pms in pmses:
+        return offset
 
-            hero_msgs = [
-                offset_msg(x, offset) for x in replay if filter_msgs(pms, x)
-            ]
+    def shard(self, replay, pms, offset, match_id):
 
-            buff = BytesIO(gzip_str(json.dumps(hero_msgs)))
-            _ = buff.seek(0)  # NOQA
-            filename = '{0}_{1}_parse_shard.json.gz'.format(
-                match.steam_id,
-                pms.player_slot
+        enemies = pms.enemies
+        allies = pms.allies
+        logging.info("Sharding for {0} in match {1}".format(
+            pms.hero.name, pms.match.steam_id
             )
-            pms.replay_shard.save(filename, File(buff))
-            pms.set_encoding()
+        )
+        pms_combat = {}
+        for field, filter_fn in combatlog_filter_map.iteritems():
+            logging.info("Handling field {0} for {1} (M# {2})".format(
+                field,
+                pms.hero.name,
+                pms.match.steam_id,
+            ))
+            data = filter_fn(replay['es'], pms, enemies, allies)
+            self.save_msgstream(pms, data, field, match_id, 'combatlog')
+            pms_combat[field] = data
 
+        for field, filter_fn in entitystate_filter_map.iteritems():
+            logging.info("Handling field {0} for {1} (M# {2})".format(
+                field,
+                pms.hero.name,
+                pms.match.steam_id,
+            ))
+            data = filter_fn(replay['states'], pms)
+            self.save_msgstream(pms, data, field, match_id, 'statelog')
+
+        # Save states to pms
+        state_list = [
+            msg for msg in
+            replay['states'] if msg['hero_id'] == pms.hero.steam_id
+        ]
+        self.save_msgstream(pms, state_list, 'all', match_id, 'statelog')
+
+        # Save combat to pms
+        self.save_msgstream(pms, pms_combat, 'all', match_id, 'combatlog')
+
+    def cleanup(self, match_id):
         mr = MatchRequest.objects.get(match_id=match_id)
-        mr.raw_parse_url = filename,
         mr.status = MatchRequest.PARSED
         mr.save()
 
+    def save_msgstream(self, pms, msgs, fieldname, match_id, aspect):
+        buff = BytesIO(json.dumps(msgs))
+        buff.seek(0)
 
-def filter_msgs(pms, msg):
-    hero_name = pms.hero.internal_name
-    unit = msg.get('unit', None)  # Most messages
-    target_source = msg.get('target_source', None)   # Kill/smg
-    slot = msg.get('slot', None)   # Buyback
+        if fieldname == 'all':
+            filename = '{0}_{1}_{2}_parse_fragment_{3}.json.gz'.format(
+                match_id,
+                pms.player_slot,
+                fieldname,
+                aspect
+            )
+            pms.all_data.save(filename, File(buff))
 
-    hero_name_length = len(hero_name)
+        else:
+            filename = '{0}_{1}_{2}_parse_fragment_{3}.json.gz'.format(
+                match_id,
+                pms.player_slot,
+                fieldname,
+                aspect
+            )
 
-    if (
-        target_source == hero_name
-        or unit == hero_name
-        or slot == pms.player_slot
-    ):
-        return True
-    else:
-        try:
-            # Hero Illusions are "{hero_name} (illusion)"
-            substring_name = unit[0:hero_name_length]
-            if substring_name == hero_name:
-                return True
+            if aspect == 'combatlog':
+                datalog = CombatLog.objects.get_or_create(
+                    playermatchsummary=pms
+                )[0]
+
+            elif aspect == 'statelog':
+                datalog = StateLog.objects.get_or_create(
+                    playermatchsummary=pms
+                )[0]
+
             else:
-                return False
-        except TypeError:
-            return False
+                raise ValueError
 
-
-def offset_msg(msg, offset):
-    msg['offset_time'] = msg['time'] - offset
-    return msg
+            getattr(datalog, fieldname).save(filename, File(buff))
+        # set_encoding(getattr(datalog, fieldname).url)

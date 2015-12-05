@@ -1,0 +1,295 @@
+{% extends "row_base.html" %}
+
+{% load staticfiles player_extras %}
+
+{% block title %}Time Lapse{% endblock title %}
+
+
+{% block content %}
+  <div class='col-md-6'>
+      <h4>Controls</h4>
+      <form>
+      <div class='row'>
+          <div class='col-md-6'>
+            <div class="form-group">
+              <label>Player-Match Pairs</label>
+              <select id='pmses' multiple='multiple' style='width:200px'></select>
+            </div>
+          </div>
+          <div class='col-md-6'>
+              <div class='row'>
+                <div class='col-md-12'>
+                  <div class="form-group">
+                    <label>Data</label>
+                    <select class="form-control" id='data'>
+                      <option value='agility'>
+                              Agility
+                      </option>
+                      <option value='agility_total'>
+                              Agility Total
+                      </option>
+                      <option value='strength'>
+                              Strength
+                      </option>
+                      <option value='strength_total'>
+                              Strength Total
+                      </option>
+                      <option value='intelligence'>
+                              Intelligence
+                      </option>
+                      <option value='intelligence_total'>
+                              Intelligence Total
+                      </option>
+                      <option value='damage'>
+                              Damage
+                      </option>
+                      <option value='damage_taken'>
+                              Damage Taken
+                      </option>
+                      <option value='healing'>
+                              Healing
+                      </option>
+                      <option value='health'>
+                              Health
+                      </option>
+                      <option value='mana'>
+                              Mana
+                      </option>
+                      <option value='kills'>
+                              Kills
+                      </option>
+                      <option value='deaths'>
+                              Deaths
+                      </option>
+                      <option value='assists'>
+                              Assists
+                      </option>
+                      <option value='items'>
+                              Items
+                      </option>
+                      <option value='last_hits'>
+                              Last Hits
+                      </option>
+                      <option value='denies'>
+                              Denies
+                      </option>
+                      <option value='misses'>
+                              Misses
+                      </option>
+                      <option value='lifestate'>
+                              Lifestate
+                      </option>
+                      <option value='magic_resist_pct'>
+                              Magic Resist Pct
+                      </option>
+                      <option value='armor'>
+                              Armor
+                      </option>
+                      <option value='recent_damage'>
+                              Recent Damage
+                      </option>
+                      <option value='respawn_time'>
+                              Respawn Time
+                      </option>
+                      <option value='roshan_kills'>
+                              Roshan Kills
+                      </option>
+                      <option value='nearby_creep_deaths'>
+                              Nearby Creep Deaths
+                      </option>
+                      <option value='shared_gold'>
+                              Shared Gold
+                      </option>
+                      <option value='reliable_gold'>
+                              Reliable Gold
+                      </option>
+                      <option value='total_earned_gold'>
+                              Total Earned Gold
+                      </option>
+                      <option value='unreliable_gold'>
+                              Unreliable Gold
+                      </option>
+                      <option value='creep_kill_gold'>
+                              Creep Kill Gold
+                      </option>
+                      <option value='hero_kill_gold'>
+                              Hero Kill Gold
+                      </option>
+                      <option value='income_gold'>
+                              Income Gold
+                      </option>
+                      <option value='tower_kills'>
+                              Tower Kills
+                      </option>
+                      <option value='xp'>
+                              Xp
+                      </option>
+                      <option value='position'>
+                              Position
+                      </option>
+
+                    </select>
+                  </div>
+                </div>
+
+                <div class='col-md-12'>
+                  <div class="form-group">
+                    <label >Start Time</label>
+                    <input type="textarea" class="form-control" id="start_time" placeholder="Start Time (eg 12:41)">
+                  </div>
+                </div>
+
+                <div class='col-md-12'>
+                  <div class="form-group">
+                    <label >End Time</label>
+                    <input type="textarea" text='7' class="form-control" id="end_time" placeholder="End Time (eg 23:10)">
+                  </div>
+                </div>
+
+                <div class='col-md-12'>
+                  <div class="form-group">
+                    <label >Chart Position</label>
+                    <select class="form-control" id='destination'>
+                      <option value='top'>Top</option>
+                      <option value='middle'>Middle</option>
+                      <option value='bottom'>Bottom</option>
+                    </select>
+                  </div>
+                </div>
+
+            </div>
+        </div>
+      </div>
+      <div class='col-md-12' style='margin-top:10px'>
+          <div class="btn-group btn-group-justified" role="group">
+            <div class="btn-group" role="group">
+              <button id='chart-button' type="button" class="btn btn-default">
+                Chart! <i class="fa fa-line-chart"></i>
+              </button>
+            </div>
+          </div>
+      </div>
+  </form>
+  </div>
+
+  <div class='col-md-6'>
+    <div id='top'>
+      <label></label>
+      <div id='top' class='vert-md-6 chart toggling'></div>
+    </div>
+
+    <div id='middle'>
+      <label></label>
+      <div class='vert-md-3 chart toggling'></div>
+    </div>
+
+    <div id='bottom'>
+      <label></label>
+      <div class='vert-md-3 chart toggling'></div>
+    </div>
+  </div>
+
+<div class='col-md-12'>
+<h2>Want to see your data here?</h2>
+  {% include "accounts/mixins/_ping_request.html" %}
+</div>
+
+<style type="text/css">
+  .select2-result-pms__avatar{
+    height:36px;
+    width:64px;
+  }
+</style>
+{% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+$(function(){
+
+
+    function formatPms (log) {
+      if (log.loading) return "";
+
+      var markup = "<div class='select2-result-log clearfix'>" +
+        // "<div class='select2-result-pms__avatar'><img src='" + pms.hero.image_url + "' /></div>" +
+        "<div class='select2-result-pms__meta'>" +
+          "<div class='select2-result-pms__title'>" + log.playermatchsummary.hero.name + "</div>"+
+          "</div></div>";
+
+      return markup;
+    }
+
+    function formatPmsSelection (log) {
+      return log.playermatchsummary.hero.name;
+    }
+
+
+    $("#pmses").select2({
+      ajax: {
+        url: "/rest-api/statelog/",
+        dataType: 'json',
+        delay: 250,
+        multiple: true,
+        data: function (params) {
+          return {
+            match_id: params.term, // search term
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          params.page = params.page || 1;
+
+          return {
+            // If you don't provide an id, the select is disabled by default.
+            results: data.map(function(d){
+              // console.log(d);
+              d.id = d.playermatchsummary.id;
+              return d;
+            }),
+            pagination: {
+              more: (params.page * 30) < data.total_count
+            }
+          };
+        },
+        cache: true
+      },
+      escapeMarkup: function (markup) { return markup; },
+      minimumInputLength: 6,
+      templateResult: formatPms,
+      templateSelection: formatPmsSelection
+
+    });
+    $('#chart-button').click(function(){
+
+      // Why does this return an object?
+      var selected_ids = $("#pmses option").map(function(){
+          // log the value and text of each option
+          return $(this).val();
+      });
+
+      // Turn this object business into an array
+      var pms_ids = []
+      for (var i = selected_ids.length - 1; i >= 0; i--) {
+        pms_ids.push(parseInt(selected_ids[i]))
+      };
+
+      var destination = '#'+$('#destination :selected').val();
+      var facet = $('#data :selected').val();
+      var start_time = $('#start_time').val();
+      var end_time = $('#end_time').val();
+
+      d7.extensions.charts.pms_shards.state_lineup(
+        pms_ids, facet, destination, start_time, end_time
+      );
+    })
+    // d7.extensions.utils.visuals.toggle_sides()
+
+});
+
+
+</script>
+{% endblock extra_js %}
+
+{% block extra_css %}
+{% endblock extra_css %}
+

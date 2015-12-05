@@ -1,11 +1,8 @@
-import boto
-from boto.s3.key import Key
-
-from django.conf import settings
 from datetime import datetime, timedelta
 from django.db import models
 
 from .querysets import PMSQuerySet, MatchFilteredQuerySet, FilteredQuerySet
+from .model_fields import ReplayFragmentField
 
 
 class Match(models.Model):
@@ -142,7 +139,7 @@ class GameMode(models.Model):
         ordering = ['steam_id']
 
     def __unicode__(self):
-        return self.description + ', (' + str(self.steam_id) + ')'
+        return u"{0}, ({1})".format(self.description, str(self.steam_id))
 
 
 class LobbyType(models.Model):
@@ -158,7 +155,7 @@ class LobbyType(models.Model):
         ordering = ['steam_id']
 
     def __unicode__(self):
-        return self.description + ', (' + str(self.steam_id) + ')'
+        return u"{0}, ({1})".format(self.description, str(self.steam_id))
 
 
 class PlayerMatchSummary(models.Model):
@@ -194,6 +191,8 @@ class PlayerMatchSummary(models.Model):
         blank=True,
     )
 
+    all_data = ReplayFragmentField()
+
     objects = PMSQuerySet.as_manager()
 
     class Meta:
@@ -219,11 +218,8 @@ class PlayerMatchSummary(models.Model):
         return False
 
     def __unicode__(self):
-        return unicode(
-            "Match "
-            + str(self.match.steam_id)
-            + ", User "
-            + str(self.player.steam_id)
+        return u'Match: {0}, User {1}'.format(
+            str(self.match.steam_id), str(self.player.steam_id)
         )
 
     @property
@@ -290,27 +286,133 @@ class PlayerMatchSummary(models.Model):
             )
         )
 
-    def set_encoding(self):
-        if self.replay_shard.url is None:
-            return
-        else:
-            url = self.replay_shard.url
+    @property
+    def enemies(self):
+        if self.side == 'Radiant':
+            return sorted([
+                pms.hero.internal_name
+                for pms in PlayerMatchSummary.objects.filter(
+                    match__steam_id=self.match.steam_id,
+                    player_slot__gte=6
+                )
+            ])
+        elif self.side == 'Dire':
+            return sorted([
+                pms.hero.internal_name
+                for pms in PlayerMatchSummary.objects.filter(
+                    match__steam_id=self.match.steam_id,
+                    player_slot__lte=6
+                )
+            ])
 
-            conn = boto.connect_s3(
-                settings.AWS_ACCESS_KEY_ID,
-                settings.AWS_SECRET_ACCESS_KEY
-            )
-            bucket = conn.get_bucket(settings.AWS_STORAGE_BUCKET_NAME)
-            path = url.split('.com/')[-1]  # drop domain
-            k = Key(bucket)
-            k.key = path
-            md = k.metadata
-            md.update({
-                'Content-Type': 'application/json',
-                'Content-Encoding': 'gzip',
-            })
-            k = k.copy(k.bucket.name, k.name, md, preserve_acl=True)
-            # Infer the key and set encoding here
+    @property
+    def allies(self):
+        if self.side == 'Radiant':
+            return sorted([
+                pms.hero.internal_name
+                for pms in PlayerMatchSummary.objects.filter(
+                    match__steam_id=self.match.steam_id,
+                    player_slot__lte=6
+                )
+            ])
+        elif self.side == 'Dire':
+            return sorted([
+                pms.hero.internal_name
+                for pms in PlayerMatchSummary.objects.filter(
+                    match__steam_id=self.match.steam_id,
+                    player_slot__gte=6
+                )
+            ])
+
+
+class CombatLog(models.Model):
+
+    playermatchsummary = models.OneToOneField(
+        'PlayerMatchSummary', null=True, blank=True
+    )
+
+    kills = ReplayFragmentField()
+    deaths = ReplayFragmentField()
+    last_hits = ReplayFragmentField()
+    xp = ReplayFragmentField()
+    healing = ReplayFragmentField()
+
+    hero_dmg_taken = ReplayFragmentField()
+    hero_dmg_dealt = ReplayFragmentField()
+    other_dmg_taken = ReplayFragmentField()
+    other_dmg_dealt = ReplayFragmentField()
+
+    all_income = ReplayFragmentField()
+    earned_income = ReplayFragmentField()
+    building_income = ReplayFragmentField()
+    courier_kill_income = ReplayFragmentField()
+    creep_kill_income = ReplayFragmentField()
+    hero_kill_income = ReplayFragmentField()
+    roshan_kill_income = ReplayFragmentField()
+
+    buyback_expense = ReplayFragmentField()
+    death_expense = ReplayFragmentField()
+
+    hero_xp = ReplayFragmentField()
+    creep_xp = ReplayFragmentField()
+    roshan_xp = ReplayFragmentField()
+
+    key_bldg_dmg_dealt = ReplayFragmentField()
+    key_bldg_kills = ReplayFragmentField()
+
+    item_buys = ReplayFragmentField()
+
+
+class StateLog(models.Model):
+
+    playermatchsummary = models.OneToOneField(
+        'PlayerMatchSummary', null=True, blank=True
+    )
+
+    agility = ReplayFragmentField()
+    agility_total = ReplayFragmentField()
+    strength = ReplayFragmentField()
+    strength_total = ReplayFragmentField()
+    intelligence = ReplayFragmentField()
+    intelligence_total = ReplayFragmentField()
+
+    damage = ReplayFragmentField()
+    damage_taken = ReplayFragmentField()
+
+    healing = ReplayFragmentField()
+
+    health = ReplayFragmentField()
+    mana = ReplayFragmentField()
+
+    kills = ReplayFragmentField()
+    deaths = ReplayFragmentField()
+    assists = ReplayFragmentField()
+
+    items = ReplayFragmentField()
+
+    last_hits = ReplayFragmentField()
+    denies = ReplayFragmentField()
+    misses = ReplayFragmentField()
+
+    lifestate = ReplayFragmentField()
+    magic_resist_pct = ReplayFragmentField()
+    armor = ReplayFragmentField()
+    recent_damage = ReplayFragmentField()
+    respawn_time = ReplayFragmentField()
+    roshan_kills = ReplayFragmentField()
+    nearby_creep_deaths = ReplayFragmentField()
+
+    shared_gold = ReplayFragmentField()
+    reliable_gold = ReplayFragmentField()
+    total_earned_gold = ReplayFragmentField()
+    unreliable_gold = ReplayFragmentField()
+    creep_kill_gold = ReplayFragmentField()
+    hero_kill_gold = ReplayFragmentField()
+    income_gold = ReplayFragmentField()
+
+    tower_kills = ReplayFragmentField()
+    xp = ReplayFragmentField()
+    position = ReplayFragmentField()
 
 
 class AdditionalUnit(models.Model):
@@ -347,7 +449,7 @@ class LeaverStatus(models.Model):
         ordering = ['steam_id']
 
     def __unicode__(self):
-        return self.description + ', (' + str(self.steam_id) + ')'
+        return u"{0}, ({1})".format(self.description, str(self.steam_id))
 
 
 class SkillBuild(models.Model):
@@ -360,5 +462,7 @@ class SkillBuild(models.Model):
         ordering = ['player_match_summary', 'level']
 
     def __unicode__(self):
-        return str(self.player_match_summary.id) + ', ' + str(self.level)
-        pass
+        return u"{0}, ({1})".format(
+            str(self.player_match_summary.id),
+            str(self.level)
+        )

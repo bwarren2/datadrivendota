@@ -5,6 +5,11 @@ urlpatterns = patterns(
     '',
     url(r'^$', views.MatchListView.as_view(), name='index'),
     url(
+        r'^time-lapse/$',
+        views.TimeLapseDetail.as_view(),
+        name="time_lapse"
+    ),
+    url(
         r'^(?P<match_id>[0-9\-]*)/$',
         views.MatchDetail.as_view(),
         name="detail"

@@ -5,6 +5,8 @@ from matches.viewsets import (
     SkillBuildViewSet,
     MatchPickBanViewSet,
     PickBanViewSet,
+    CombatLogViewSet,
+    StateLogViewSet,
 )
 from heroes.viewsets import (
     HeroViewSet,
@@ -26,6 +28,8 @@ router.register('teams', TeamViewSet)
 router.register('leagues', LeagueViewSet)
 router.register('heroes', HeroViewSet)
 router.register('pickbans', PickBanViewSet)
+router.register('combatlog', CombatLogViewSet)
+router.register('statelog', StateLogViewSet)
 router.register(
     'match-pickban',
     MatchPickBanViewSet,

@@ -5,7 +5,6 @@ from django.core.urlresolvers import reverse
 from matches.viewsets import MatchPickBanViewSet
 from matches.mommy_recipes import make_league_match
 from matches.models import Match
-from matches.management.tasks import filter_msgs
 
 
 class TestUrlconf(TestCase):
@@ -111,122 +110,50 @@ class TestTrickyViewsets(TestCase):
         )
 
 
-class TestReplayFiltration(TestCase):
+class TestModelMethods(TestCase):
 
-    def test_filter_fn(self):
-        antimage_pms = mommy.make_recipe(
+    def test_adversaries(self):
+        match = mommy.make_recipe(
+            'matches.match',
+        )
+
+        mommy.make_recipe(
             'matches.playermatchsummary',
             hero__internal_name='npc_dota_hero_antimage',
-            player_slot=1
+            player_slot=1,
+            match=match
         )
-        rubick_pms = mommy.make_recipe(
+        axe_pms = mommy.make_recipe(
+            'matches.playermatchsummary',
+            hero__internal_name='npc_dota_hero_axe',
+            player_slot=2,
+            match=match
+        )
+        mommy.make_recipe(
             'matches.playermatchsummary',
             hero__internal_name='npc_dota_hero_rubick',
-            player_slot=2
+            player_slot=128,
+            match=match
         )
-        sample = {
-            u'ability_uses': {
-                u'key': u'rubick_fade_bolt',
-                u'time': 2974,
-                u'type': u'ability_uses',
-                u'unit': u'npc_dota_hero_rubick'
-            },
-            u'buyback_log': {
-                u'slot': 1, u'time': 2948, u'type': u'buyback_log'
-            },
-            u'damage': {
-                u'key': u'npc_dota_hero_antimage (illusion)',
-                u'target_hero': True,
-                u'target_illusion': True,
-                u'target_source': u'npc_dota_hero_antimage',
-                u'time': 2978,
-                u'type': u'damage',
-                u'unit': u'npc_dota_creep_goodguys_ranged',
-                u'value': 27},
-            u'gold_reasons': {
-                u'key': u'13',
-                u'time': 2976,
-                u'type': u'gold_reasons',
-                u'unit': u'npc_dota_hero_lina',
-                u'value': 14},
-            u'healing': {
-                u'key': u'npc_dota_hero_storm_spirit',
-                u'time': 2979,
-                u'type': u'healing',
-                u'unit': u'npc_dota_hero_storm_spirit',
-                u'value': 54
-            },
-            u'item_uses': {
-                u'key': u'item_black_king_bar',
-                u'time': 2977,
-                u'type': u'item_uses',
-                u'unit': u'npc_dota_hero_antimage'
-            },
-            u'kill_streaks': {
-                u'key': u'6',
-                u'time': 0,
-                u'type': u'kill_streaks',
-                u'unit': u'npc_dota_hero_lina'
-            },
-            u'kills': {
-                u'key': u'npc_dota_neutral_mud_golem_split',
-                u'target_hero': False,
-                u'target_illusion': False,
-                u'target_source': u'npc_dota_neutral_mud_golem_split',
-                u'time': 2976,
-                u'type': u'kills',
-                u'unit': u'npc_dota_hero_lina'
-            },
-            u'modifier_applied': {
-                u'key': u'modifier_invisible',
-                u'time': 2981,
-                u'type': u'modifier_applied',
-                u'unit': u'npc_dota_hero_lina'
-            },
-            u'multi_kills': {
-                u'key': u'3',
-                u'time': 0,
-                u'type': u'multi_kills',
-                u'unit': u'npc_dota_hero_antimage'
-            },
-            u'purchase': {
-                u'key': u'item_tpscroll',
-                u'time': 2966,
-                u'type': u'purchase',
-                u'unit': u'npc_dota_hero_rubick'
-            },
-            u'state': {
-                u'key': u'6', u'time': 3068, u'type': u'state', u'value': 3068
-            },
-            u'xp_reasons': {
-                u'key': u'2',
-                u'time': 2977,
-                u'type': u'xp_reasons',
-                u'unit': u'npc_dota_hero_rubick',
-                u'value': 12
-            }
-        }
-        self.assertEqual(
-            filter_msgs(rubick_pms, sample['xp_reasons']),
-            True
+        juggernaut_pms = mommy.make_recipe(
+            'matches.playermatchsummary',
+            hero__internal_name='npc_dota_hero_juggernaut',
+            player_slot=129,
+            match=match
         )
         self.assertEqual(
-            filter_msgs(antimage_pms, sample['xp_reasons']),
-            False
+            juggernaut_pms.allies,
+            [u'npc_dota_hero_juggernaut', u'npc_dota_hero_rubick']
         )
         self.assertEqual(
-            filter_msgs(rubick_pms, sample['buyback_log']),
-            False
+            axe_pms.allies,
+            [u'npc_dota_hero_antimage', u'npc_dota_hero_axe']
         )
         self.assertEqual(
-            filter_msgs(antimage_pms, sample['buyback_log']),
-            True
+            juggernaut_pms.enemies,
+            [u'npc_dota_hero_antimage', u'npc_dota_hero_axe']
         )
         self.assertEqual(
-            filter_msgs(antimage_pms, sample['damage']),
-            True
-        )
-        self.assertEqual(
-            filter_msgs(rubick_pms, sample['damage']),
-            False
+            axe_pms.enemies,
+            [u'npc_dota_hero_juggernaut', u'npc_dota_hero_rubick']
         )
