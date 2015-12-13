@@ -2,29 +2,7 @@ from smtplib import SMTP
 from django.core.mail import send_mail
 import StringIO
 import gzip
-from utils.exceptions import NoDataFound
-from time import mktime
-import datetime
 from django.conf import settings
-
-
-def utcize(min_date, max_date):
-    if max_date is None:
-        max_date_utc = mktime(datetime.datetime.now().timetuple())
-    else:
-        max_date_utc = mktime(max_date.timetuple())
-
-    max_date_utc += 24 * 60 * 60 - 1  # Look at end of day.
-
-    if min_date is None:
-        min_date_utc = mktime(datetime.date(2009, 1, 1).timetuple())
-    else:
-        min_date_utc = mktime(min_date.timetuple())
-
-    if min_date_utc > max_date_utc:
-        raise NoDataFound
-
-    return min_date_utc, max_date_utc
 
 
 def safen(str):
