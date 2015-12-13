@@ -13,7 +13,7 @@ from datadrivendota.forms import MatchRequestForm
 from matches.management.tasks import MirrorMatches
 
 from datadrivendota.views import LoginRequiredView
-from utils.exceptions import DataCapReached, ValidationException
+from accounts.exceptions import DataCapReached, ValidationException
 
 
 class MatchRequestView(LoginRequiredView, FormView):
