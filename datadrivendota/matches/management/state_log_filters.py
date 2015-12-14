@@ -1,9 +1,17 @@
+from matches.decorators import mapping_construct
+
 # Things that come from entity states
 # player_slot
 # tick_time
 # hero_id
 
 
+# Rather than explictly code a map of name to function (used in parsing),
+# we decorate those functions with a dict to be modified
+entitystate_filter_map = {}
+
+
+@mapping_construct(entitystate_filter_map)
 def damage(msgs, pms):
     return sorted(
         [
@@ -24,6 +32,7 @@ def damage(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def health(msgs, pms):
     return sorted(
         [
@@ -42,6 +51,7 @@ def health(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def mana(msgs, pms):
     return sorted(
         [
@@ -59,6 +69,7 @@ def mana(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def items(msgs, pms):
     return sorted(
         [
@@ -78,6 +89,7 @@ def items(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def position(msgs, pms):
     return sorted(
         [
@@ -95,6 +107,7 @@ def position(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def agility(msgs, pms):
     return sorted(
         [
@@ -110,6 +123,7 @@ def agility(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def agility_total(msgs, pms):
     return sorted(
         [
@@ -125,6 +139,7 @@ def agility_total(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def strength(msgs, pms):
     return sorted(
         [
@@ -140,6 +155,7 @@ def strength(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def strength_total(msgs, pms):
     return sorted(
         [
@@ -155,6 +171,7 @@ def strength_total(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def intelligence(msgs, pms):
     return sorted(
         [
@@ -170,6 +187,7 @@ def intelligence(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def intelligence_total(msgs, pms):
     return sorted(
         [
@@ -185,6 +203,7 @@ def intelligence_total(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def damage_taken(msgs, pms):
     return sorted(
         [
@@ -200,6 +219,7 @@ def damage_taken(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def healing(msgs, pms):
     return sorted(
         [
@@ -215,6 +235,7 @@ def healing(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def kills(msgs, pms):
     return sorted(
         [
@@ -230,6 +251,7 @@ def kills(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def deaths(msgs, pms):
     return sorted(
         [
@@ -245,6 +267,7 @@ def deaths(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def assists(msgs, pms):
     return sorted(
         [
@@ -260,6 +283,7 @@ def assists(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def last_hits(msgs, pms):
     return sorted(
         [
@@ -275,6 +299,7 @@ def last_hits(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def denies(msgs, pms):
     return sorted(
         [
@@ -290,6 +315,7 @@ def denies(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def misses(msgs, pms):
     return sorted(
         [
@@ -305,6 +331,7 @@ def misses(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def lifestate(msgs, pms):
     return sorted(
         [
@@ -320,6 +347,7 @@ def lifestate(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def magic_resist_pct(msgs, pms):
     return sorted(
         [
@@ -335,6 +363,7 @@ def magic_resist_pct(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def armor(msgs, pms):
     return sorted(
         [
@@ -350,6 +379,7 @@ def armor(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def recent_damage(msgs, pms):
     return sorted(
         [
@@ -365,6 +395,7 @@ def recent_damage(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def respawn_time(msgs, pms):
     return sorted(
         [
@@ -380,6 +411,7 @@ def respawn_time(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def roshan_kills(msgs, pms):
     return sorted(
         [
@@ -395,6 +427,7 @@ def roshan_kills(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def nearby_creep_deaths(msgs, pms):
     return sorted(
         [
@@ -410,6 +443,7 @@ def nearby_creep_deaths(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def shared_gold(msgs, pms):
     return sorted(
         [
@@ -425,6 +459,7 @@ def shared_gold(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def reliable_gold(msgs, pms):
     return sorted(
         [
@@ -440,6 +475,7 @@ def reliable_gold(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def total_earned_gold(msgs, pms):
     return sorted(
         [
@@ -455,6 +491,7 @@ def total_earned_gold(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def unreliable_gold(msgs, pms):
     return sorted(
         [
@@ -470,6 +507,7 @@ def unreliable_gold(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def creep_kill_gold(msgs, pms):
     return sorted(
         [
@@ -485,6 +523,7 @@ def creep_kill_gold(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def hero_kill_gold(msgs, pms):
     return sorted(
         [
@@ -500,6 +539,7 @@ def hero_kill_gold(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def income_gold(msgs, pms):
     return sorted(
         [
@@ -515,6 +555,7 @@ def income_gold(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def tower_kills(msgs, pms):
     return sorted(
         [
@@ -530,6 +571,7 @@ def tower_kills(msgs, pms):
     )
 
 
+@mapping_construct(entitystate_filter_map)
 def xp(msgs, pms):
     return sorted(
         [
@@ -544,40 +586,40 @@ def xp(msgs, pms):
         key=lambda x: x['offset_time']
     )
 
-entitystate_filter_map = {
-    'agility': agility,
-    'agility_total': agility_total,
-    'strength': strength,
-    'strength_total': strength_total,
-    'intelligence': intelligence,
-    'intelligence_total': intelligence_total,
-    'damage': damage,
-    'damage_taken': damage_taken,
-    'healing': healing,
-    'health': health,
-    'mana': mana,
-    'kills': kills,
-    'deaths': deaths,
-    'assists': assists,
-    'items': items,
-    'last_hits': last_hits,
-    'denies': denies,
-    'misses': misses,
-    'lifestate': lifestate,
-    'magic_resist_pct': magic_resist_pct,
-    'armor': armor,
-    'recent_damage': recent_damage,
-    'respawn_time': respawn_time,
-    'roshan_kills': roshan_kills,
-    'nearby_creep_deaths': nearby_creep_deaths,
-    'shared_gold': shared_gold,
-    'reliable_gold': reliable_gold,
-    'total_earned_gold': total_earned_gold,
-    'unreliable_gold': unreliable_gold,
-    'creep_kill_gold': creep_kill_gold,
-    'hero_kill_gold': hero_kill_gold,
-    'income_gold': income_gold,
-    'tower_kills': tower_kills,
-    'xp': xp,
-    'position': position,
-}
+# entitystate_filter_map = {
+#     'agility': agility,
+#     'agility_total': agility_total,
+#     'strength': strength,
+#     'strength_total': strength_total,
+#     'intelligence': intelligence,
+#     'intelligence_total': intelligence_total,
+#     'damage': damage,
+#     'damage_taken': damage_taken,
+#     'healing': healing,
+#     'health': health,
+#     'mana': mana,
+#     'kills': kills,
+#     'deaths': deaths,
+#     'assists': assists,
+#     'items': items,
+#     'last_hits': last_hits,
+#     'denies': denies,
+#     'misses': misses,
+#     'lifestate': lifestate,
+#     'magic_resist_pct': magic_resist_pct,
+#     'armor': armor,
+#     'recent_damage': recent_damage,
+#     'respawn_time': respawn_time,
+#     'roshan_kills': roshan_kills,
+#     'nearby_creep_deaths': nearby_creep_deaths,
+#     'shared_gold': shared_gold,
+#     'reliable_gold': reliable_gold,
+#     'total_earned_gold': total_earned_gold,
+#     'unreliable_gold': unreliable_gold,
+#     'creep_kill_gold': creep_kill_gold,
+#     'hero_kill_gold': hero_kill_gold,
+#     'income_gold': income_gold,
+#     'tower_kills': tower_kills,
+#     'xp': xp,
+#     'position': position,
+# }

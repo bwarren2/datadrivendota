@@ -1,7 +1,14 @@
+from matches.decorators import mapping_construct
+
+
 # Helpers
 def targets_hero(msg):
     return msg['target_hero'] is True and msg['target_illusion'] is False
 
+
+# Rather than explictly code a map of name to function (used in parsing),
+# we decorate those functions with a dict to be modified
+combatlog_filter_map = {}
 
 radiant_key_buildings = [
      'npc_dota_goodguys_fort',
@@ -40,6 +47,7 @@ dire_key_buildings = [
 ]
 
 
+@mapping_construct(combatlog_filter_map)
 def kills(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -50,6 +58,7 @@ def kills(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def deaths(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -60,6 +69,7 @@ def deaths(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def last_hits(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -71,6 +81,7 @@ def last_hits(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def xp(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -79,6 +90,7 @@ def xp(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def healing(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -88,6 +100,7 @@ def healing(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def hero_dmg_taken(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -98,6 +111,7 @@ def hero_dmg_taken(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def hero_dmg_dealt(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -108,6 +122,7 @@ def hero_dmg_dealt(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def other_dmg_taken(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -118,6 +133,7 @@ def other_dmg_taken(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def other_dmg_dealt(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -130,6 +146,7 @@ def other_dmg_dealt(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def all_income(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -139,6 +156,7 @@ def all_income(msgs, pms, enemies, allies):
     pass
 
 
+@mapping_construct(combatlog_filter_map)
 def earned_income(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -148,6 +166,7 @@ def earned_income(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def building_income(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -157,6 +176,7 @@ def building_income(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def courier_kill_income(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -166,6 +186,7 @@ def courier_kill_income(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def creep_kill_income(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -175,6 +196,7 @@ def creep_kill_income(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def hero_kill_income(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -184,6 +206,7 @@ def hero_kill_income(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def roshan_kill_income(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -193,6 +216,7 @@ def roshan_kill_income(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def buyback_expense(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -202,6 +226,7 @@ def buyback_expense(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def death_expense(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -211,6 +236,7 @@ def death_expense(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def hero_xp(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -220,6 +246,7 @@ def hero_xp(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def creep_xp(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -229,6 +256,7 @@ def creep_xp(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def roshan_xp(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -238,6 +266,7 @@ def roshan_xp(msgs, pms, enemies, allies):
     ]
 
 
+@mapping_construct(combatlog_filter_map)
 def key_bldg_dmg_dealt(msgs, pms, enemies, allies):
     if pms.side == 'Radiant':
         return [
@@ -255,6 +284,7 @@ def key_bldg_dmg_dealt(msgs, pms, enemies, allies):
         ]
 
 
+@mapping_construct(combatlog_filter_map)
 def key_bldg_kills(msgs, pms, enemies, allies):
     if pms.side == 'Radiant':
         return [
@@ -272,6 +302,7 @@ def key_bldg_kills(msgs, pms, enemies, allies):
         ]
 
 
+@mapping_construct(combatlog_filter_map)
 def item_buys(msgs, pms, enemies, allies):
     return [
         msg for msg in msgs
@@ -280,29 +311,29 @@ def item_buys(msgs, pms, enemies, allies):
     ]
 
 
-combatlog_filter_map = {
-    'kills': kills,
-    'deaths': deaths,
-    'last_hits': last_hits,
-    'xp': xp,
-    'healing': healing,
-    'hero_dmg_taken': hero_dmg_taken,
-    'hero_dmg_dealt': hero_dmg_dealt,
-    'other_dmg_taken': other_dmg_taken,
-    'other_dmg_dealt': other_dmg_dealt,
-    'all_income': all_income,
-    'earned_income': earned_income,
-    'building_income': building_income,
-    'courier_kill_income': courier_kill_income,
-    'creep_kill_income': creep_kill_income,
-    'hero_kill_income': hero_kill_income,
-    'roshan_kill_income': roshan_kill_income,
-    'buyback_expense': buyback_expense,
-    'death_expense': death_expense,
-    'hero_xp': hero_xp,
-    'creep_xp': creep_xp,
-    'roshan_xp': roshan_xp,
-    'key_bldg_dmg_dealt': key_bldg_dmg_dealt,
-    'key_bldg_kills': key_bldg_kills,
-    'item_buys': item_buys,
-}
+# combatlog_filter_map = {
+#     'kills': kills,
+#     'deaths': deaths,
+#     'last_hits': last_hits,
+#     'xp': xp,
+#     'healing': healing,
+#     'hero_dmg_taken': hero_dmg_taken,
+#     'hero_dmg_dealt': hero_dmg_dealt,
+#     'other_dmg_taken': other_dmg_taken,
+#     'other_dmg_dealt': other_dmg_dealt,
+#     'all_income': all_income,
+#     'earned_income': earned_income,
+#     'building_income': building_income,
+#     'courier_kill_income': courier_kill_income,
+#     'creep_kill_income': creep_kill_income,
+#     'hero_kill_income': hero_kill_income,
+#     'roshan_kill_income': roshan_kill_income,
+#     'buyback_expense': buyback_expense,
+#     'death_expense': death_expense,
+#     'hero_xp': hero_xp,
+#     'creep_xp': creep_xp,
+#     'roshan_xp': roshan_xp,
+#     'key_bldg_dmg_dealt': key_bldg_dmg_dealt,
+#     'key_bldg_kills': key_bldg_kills,
+#     'item_buys': item_buys,
+# }
