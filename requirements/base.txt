@@ -31,7 +31,7 @@ futures==3.0.1
 httplib2==0.9.1
 Jinja2==2.7.3
 keen==0.3.12
-kombu==3.0.26
+kombu==3.0.30
 logutils==0.3.3
 oauth2==1.5.211
 oauthlib==0.7.2

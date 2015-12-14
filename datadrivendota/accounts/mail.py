@@ -1,6 +1,8 @@
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
+from django.template import RequestContext
+from django.template.loader import get_template
 
 
 def send_validation(strategy, backend, code):
@@ -9,5 +11,25 @@ def send_validation(strategy, backend, code):
         code.code
     )
     url = strategy.request.build_absolute_uri(url)
-    send_mail('Validate your account', 'Validate your account {0}'.format(url),
-              settings.EMAIL_FROM, [code.email], fail_silently=False)
+
+    context = RequestContext(
+        strategy.request,
+        {
+            'verify_url': url,
+        }
+    )
+
+    subject = get_template(
+        'accounts/confirmation_subject.txt'
+    ).render(context).strip()
+    from_email = settings.EMAIL_FROM
+    to = code.email
+    text_content = get_template(
+        'accounts/confirmation_body.txt'
+    ).render(context)
+    html_content = get_template(
+        'accounts/confirmation_body.html'
+    ).render(context)
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
