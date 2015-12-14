@@ -309,31 +309,3 @@ def item_buys(msgs, pms, enemies, allies):
         if msg.get('type', None) == 'purchase' and
         msg.get('target', None) == pms.hero.internal_name
     ]
-
-
-# combatlog_filter_map = {
-#     'kills': kills,
-#     'deaths': deaths,
-#     'last_hits': last_hits,
-#     'xp': xp,
-#     'healing': healing,
-#     'hero_dmg_taken': hero_dmg_taken,
-#     'hero_dmg_dealt': hero_dmg_dealt,
-#     'other_dmg_taken': other_dmg_taken,
-#     'other_dmg_dealt': other_dmg_dealt,
-#     'all_income': all_income,
-#     'earned_income': earned_income,
-#     'building_income': building_income,
-#     'courier_kill_income': courier_kill_income,
-#     'creep_kill_income': creep_kill_income,
-#     'hero_kill_income': hero_kill_income,
-#     'roshan_kill_income': roshan_kill_income,
-#     'buyback_expense': buyback_expense,
-#     'death_expense': death_expense,
-#     'hero_xp': hero_xp,
-#     'creep_xp': creep_xp,
-#     'roshan_xp': roshan_xp,
-#     'key_bldg_dmg_dealt': key_bldg_dmg_dealt,
-#     'key_bldg_kills': key_bldg_kills,
-#     'item_buys': item_buys,
-# }
