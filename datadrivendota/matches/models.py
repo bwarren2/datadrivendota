@@ -139,7 +139,7 @@ class GameMode(models.Model):
         ordering = ['steam_id']
 
     def __unicode__(self):
-        return u"{0}, ({1})".format(self.description, str(self.steam_id))
+        return u"{0}, ({1})".format(self.description, self.steam_id)
 
 
 class LobbyType(models.Model):
@@ -155,7 +155,7 @@ class LobbyType(models.Model):
         ordering = ['steam_id']
 
     def __unicode__(self):
-        return u"{0}, ({1})".format(self.description, str(self.steam_id))
+        return u"{0}, ({1})".format(self.description, self.steam_id)
 
 
 class PlayerMatchSummary(models.Model):
@@ -219,7 +219,7 @@ class PlayerMatchSummary(models.Model):
 
     def __unicode__(self):
         return u'Match: {0}, User {1}'.format(
-            str(self.match.steam_id), str(self.player.steam_id)
+            self.match.steam_id, self.player.steam_id
         )
 
     @property
@@ -272,18 +272,14 @@ class PlayerMatchSummary(models.Model):
 
     @property
     def display_date(self):
-        return str(
-            datetime.fromtimestamp(
-                self.match.start_time
-            ).strftime('%Y-%m-%d')
-        )
+        return datetime.fromtimestamp(
+            self.match.start_time
+        ).strftime('%Y-%m-%d')
 
     @property
     def display_duration(self):
-        return str(
-            timedelta(
-                seconds=self.match.duration
-            )
+        return timedelta(
+            seconds=self.match.duration
         )
 
     @property
@@ -449,7 +445,7 @@ class LeaverStatus(models.Model):
         ordering = ['steam_id']
 
     def __unicode__(self):
-        return u"{0}, ({1})".format(self.description, str(self.steam_id))
+        return u"{0}, ({1})".format(self.description, self.steam_id)
 
 
 class SkillBuild(models.Model):
@@ -463,6 +459,6 @@ class SkillBuild(models.Model):
 
     def __unicode__(self):
         return u"{0}, ({1})".format(
-            str(self.player_match_summary.id),
-            str(self.level)
+            self.player_match_summary.id,
+            self.level
         )
