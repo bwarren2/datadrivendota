@@ -7,7 +7,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 
 from django.core.files import File
-from utils import gzip_str, gunzip_str
+from utils import gunzip_str
 from io import BytesIO
 from django.utils import timezone
 from django.db.models import Min, Max, Count
@@ -40,7 +40,6 @@ from datadrivendota.management.tasks import (
 
 from .combat_log_filters import combatlog_filter_map
 from .state_log_filters import entitystate_filter_map
-from utils.file_management import set_encoding
 
 # Patch for <urlopen error [Errno -2] Name or service not known in urllib2
 import os

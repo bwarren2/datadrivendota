@@ -34,25 +34,3 @@ def fake_image(l):
     filename = slugify(l.steam_id) + '_full.png'
     l.stored_image.save(filename, File(buff))
     return l
-
-
-def set_encoding(url):
-    """
-    In order to serve files with the right metadata, objects on s3 need to be
-    updated with the right information.  I am not sure if it is possible to
-    do this on first save?
-    """
-    conn = boto.connect_s3(
-        settings.AWS_ACCESS_KEY_ID,
-        settings.AWS_SECRET_ACCESS_KEY
-    )
-    bucket = conn.get_bucket(settings.AWS_STORAGE_BUCKET_NAME)
-    path = url.split('.com/')[-1]  # drop domain
-    k = Key(bucket)
-    k.key = path
-    md = k.metadata
-    md.update({
-        'Content-Type': 'application/json',
-        'Content-Encoding': 'gzip',
-    })
-    k = k.copy(k.bucket.name, k.name, md, preserve_acl=True)
