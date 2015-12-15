@@ -142,6 +142,7 @@ class FilteredQuerySet(models.QuerySet):
     def __init__(self, *args, **kwargs):
         super(FilteredQuerySet, self).__init__(*args, **kwargs)
         self.filter_pipeline = [
+            self.filter_ids,
             self.filter_league,
             self.filter_team,
             self.filter_skill,
@@ -229,3 +230,15 @@ class FilteredQuerySet(models.QuerySet):
             )
 
         return queryset
+
+    def filter_ids(self, queryset):
+        try:
+            ids = json.loads(self.request.query_params.get('ids'))
+            print ids
+            if ids is not None:
+                queryset = queryset.filter(id__in=ids)
+            return queryset
+
+        except TypeError:
+            # no parameter named ids
+            return queryset

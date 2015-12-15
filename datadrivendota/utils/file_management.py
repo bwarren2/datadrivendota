@@ -1,3 +1,7 @@
+import boto
+from boto.s3.key import Key
+
+from django.conf import settings
 from io import BytesIO
 from django.utils.text import slugify
 from django.core.files import File

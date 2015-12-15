@@ -64,8 +64,7 @@ class MatchRequest(models.Model):
 
     # Intermediate step fields if we want em.
     valve_replay_url = models.URLField(blank=True, null=True)
-    raw_parse_url = models.URLField(blank=True, null=True)
-    replay_file_url = models.URLField(blank=True, null=True)
+    raw_parse_url = models.TextField(blank=True, null=True)
 
     # Tracking fields, doing their own thing
     creation = models.DateTimeField(auto_now_add=True)

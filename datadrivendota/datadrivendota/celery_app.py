@@ -308,6 +308,10 @@ class Config(object):
             'routes': {
                 'exchange': 'integrity',
                 'routing_key': 'integrity'
+            },
+            'annotations': {
+                "time_limit": 240,
+                "soft_time_limit": 235,
             }
         },
         'players.management.tasks.MirrorClientMatches': {
