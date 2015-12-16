@@ -1034,7 +1034,7 @@ var special_shard_lineup = function(match_id){
 };
 
 
-var state_lineup = function(pms_ids, facet, destination, start_time, end_time, params){
+var state_lineup = function(pms_ids, facet, destination, params){
 
   var url_base ="/rest-api/statelog/?pms_id=";
   var pmses;
@@ -1042,7 +1042,6 @@ var state_lineup = function(pms_ids, facet, destination, start_time, end_time, p
   Promise.all(
     pms_ids.map(function(pms_id){
       var url = url_base+pms_id;
-      console.log(pms_id, url);
       return $.getJSON(url);
     })
   ).then(function(data){
@@ -1057,38 +1056,74 @@ var state_lineup = function(pms_ids, facet, destination, start_time, end_time, p
       })
     ).then(function(facets){
 
+      // Structure the fancy filtering we are about to do.
+
+      var timeToSecs = function(time){
+          return parseInt(time.split(":")[0])*60+parseInt(time.split(":")[1]);
+      };
+
+      var width;
+      var height;
+      var start_time;
+      var end_time;
+      var interpolation;
+      var granularity;
+      if(params!==undefined){
+
+        if(params.start_time!==undefined&params.start_time!==""){
+          start_time = timeToSecs(params.start_time);
+        } else {
+          start_time = -10000;
+        }
+
+        if(params.end_time!==undefined&params.end_time!==""){
+          end_time = timeToSecs(params.end_time);
+        } else {
+          end_time = 10000;
+        }
+
+        if(params.interpolation!==undefined){
+          interpolation = params.interpolation;
+        } else {
+          interpolation = "step-after";
+        }
+
+        if(params.granularity!==undefined){
+          granularity = params.granularity;
+        } else {
+          granularity = 10;
+        }
+
+      }
+
+
+
       var plot_data = facets.map(function(d, i){
+        var filtered_dataset = d.filter(function(x){
+          return x.offset_time <= end_time & x.offset_time >= start_time;
+        }).filter(function(x){
+          return x.offset_time.mod(granularity) === 0;
+        });
         return {
           key: pmses[i].hero.name,
-          values: d,
+          values: filtered_dataset,
         }
       });
 
       $(destination).empty();
-
-      var width;
-      var height;
 
       var make_axis = function(name){
         return {
           access: function(d){
             return d[name];
           },
-          label: name
+          label: toTitleCase(name.replace(/\_/g, " "))
         }
       };
 
       var x_data = make_axis("offset_time");
       var y_data = make_axis(facet);
 
-      if(params!==undefined){
-        if(params.height!==undefined){
-          height = params.height;
-        }
-        if(params.width!==undefined){
-          width = params.width;
-        }
-      }
 
       var svg = utils.svg.square_svg(destination, width, height);
       nv.addGraph(
@@ -1102,7 +1137,7 @@ var state_lineup = function(pms_ids, facet, destination, start_time, end_time, p
             .x(x_data.access)
             .y(y_data.access)
             .showLegend(false)
-            .interpolate("step-after")
+            .interpolate(interpolation)
             .forceY(0);
 
           if(params !== undefined){
@@ -1148,21 +1183,6 @@ var state_lineup = function(pms_ids, facet, destination, start_time, end_time, p
 
     });
   });
-  //       var timeToSecs = function(time){
-  //           return parseInt(time.split(":")[0])*60+parseInt(time.split(":")[1]);
-  //       };
-
-  //       if(start_time!==""){
-  //           start_time = timeToSecs(start_time);
-  //       } else{
-  //           start_time = -10000;
-  //       }
-
-  //       if(end_time!==""){
-  //           end_time = timeToSecs(end_time);
-  //       } else{
-  //           end_time = 100000;
-  //       }
 
 };
 
