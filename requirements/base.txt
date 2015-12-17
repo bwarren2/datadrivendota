@@ -18,7 +18,7 @@ django-jsonfield==0.9.13
 django-model-utils==2.2
 django-mptt==0.7.1
 django-storages==1.1.8
-django-stripe-payments==2.0.0
+pinax-stripe
 django-tagging==0.3.4
 django-xmlrpc==0.1.5
 Django==1.8.5
@@ -52,7 +52,6 @@ requests==2.6.0
 six==1.9.0
 sqlparse==0.1.15
 steamodd==4.18
-stripe==1.22.2
 wsgiref==0.1.2
 whitenoise==1.0.6
 pika==0.9.14

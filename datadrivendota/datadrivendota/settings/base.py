@@ -261,6 +261,7 @@ THIRD_PARTY_APPS = (
     'tagging',
     'mptt',
     'rest_framework',
+    'pinax.stripe',
 )
 
 # Apps specific for this project go here.
@@ -417,8 +418,10 @@ PLAYER_10 = [
 ]
 
 # START STRIPE CONFIGURATION
-STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
 STRIPE_PUBLIC_KEY = getenv('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
+PINAX_STRIPE_PUBLIC_KEY = STRIPE_PUBLIC_KEY
+PINAX_STRIPE_PRIVATE_KEY = STRIPE_SECRET_KEY
 
 PAYMENTS_PLANS = {
     "monthly": {
@@ -438,6 +441,8 @@ PAYMENTS_PLANS = {
         "currency": "usd"
     }
 }
+
+PINAX_STRIPE_DEFAULT_PLAN = getenv('STRIPE_DEFAULT_PLAN', 'ddd-month')
 
 SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = [
     'heroes:index',
@@ -470,8 +475,11 @@ HERO_SKILL_MATCH_COUNT = 3  # How many matches to add per hero skill level
 CLIENT_MATCH_COUNT = 3  # How many client matches to get each pull
 VALVE_CDN_PATH = 'http://cdn.dota2.com/apps/570/'
 UPDATE_LAG_UTC = 60 * 60 * 24 * 3  # 3 Days
-LIVE_MATCH_LOOKBACK_MINUTES = 90  # We store live matches.  Wait this many minutes after storage before expecting Valve to have them.
-FAILED_LIVEMATCH_KEEP_DAYS = 2  # If a match fails and gets to 2 days old, delete it anyway.
+# We store live matches.  Wait this many minutes after storage before expecting
+# Valve to have them.
+LIVE_MATCH_LOOKBACK_MINUTES = 90
+# If a match fails and gets to 2 days old, delete it anyway.
+FAILED_LIVEMATCH_KEEP_DAYS = 2
 # End project specific constants used in tasks
 JAVA_QUEUE_DURABILITY = getenv('JAVA_QUEUE_DURABILITY' == 'True', False)
 
