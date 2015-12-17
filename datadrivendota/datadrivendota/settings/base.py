@@ -338,13 +338,13 @@ ANONYMOUS_ID = 4294967295
 # Min length for a match to count in seconds.
 MIN_MATCH_LENGTH = 600
 
-
 # SOCIAL AUTH
 SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.social_details',
     'social.pipeline.social_auth.social_uid',
     'social.pipeline.social_auth.auth_allowed',
     'social.pipeline.social_auth.social_user',
+    'social.pipeline.social_auth.associate_by_email',
     'social.pipeline.user.get_username',
     'accounts.pipeline.require_email',
     'social.pipeline.mail.mail_validation',
@@ -355,7 +355,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.user.user_details',
 )
 
-
+USERNAME_IS_FULL_EMAIL = True
 SOCIAL_AUTH_STEAM_API_KEY = STEAM_API_KEY
 VALID_KEY_DAYS = 7
 # END LOGIN CONFIGURATION

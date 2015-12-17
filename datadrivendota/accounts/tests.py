@@ -108,8 +108,8 @@ class TestAuth(TestCase):
 
     def test_login_flow(self):
 
-        username = "baz"
-        email = "{0}@gmail".format(username)
+        email = "baz@gmail"
+        username = email
         password = "bar"
 
         c = Client()
