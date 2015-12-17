@@ -324,7 +324,6 @@ WSGI_APPLICATION = 'wsgi.application'
 LOGIN_URL = '/login/'
 
 AUTHENTICATION_BACKENDS = (
-    'social.backends.steam.SteamOpenId',
     'social.backends.email.EmailAuth',
     'django.contrib.auth.backends.ModelBackend',
 )
