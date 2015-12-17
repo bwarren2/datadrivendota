@@ -212,7 +212,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'payments.middleware.ActiveSubscriptionMiddleware',
+    # 'payments.middleware.ActiveSubscriptionMiddleware',
 )
 # END MIDDLEWARE CONFIGURATION
 
@@ -326,7 +326,6 @@ LOGIN_URL = '/login/'
 AUTHENTICATION_BACKENDS = (
     'social.backends.steam.SteamOpenId',
     'social.backends.email.EmailAuth',
-    'social.backends.username.UsernameAuth',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -355,9 +354,6 @@ SOCIAL_AUTH_PIPELINE = (
     'accounts.pipeline.user_password',
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details',
-    'social.pipeline.debug.debug',
-    'social.pipeline.debug.debug',
-    # 'players.pipeline.create_player',
 )
 
 
@@ -441,6 +437,7 @@ PAYMENTS_PLANS = {
 
 SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = [
     'heroes:index',
+    'accounts:home',
     'payments_subscribe',
 ]
 

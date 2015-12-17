@@ -1,6 +1,13 @@
-from django.test import TestCase
+import re
+
+from django.test import TestCase, Client
 from django.db.models import Q
+from django.core.urlresolvers import reverse
+from django.core import mail
+from django.contrib.auth.models import User
+
 from model_mommy import mommy
+
 from .models import MatchRequest
 from .management.tasks import KickoffMatchRequests, CreateMatchParse
 
@@ -90,3 +97,81 @@ class TestParserTask(TestCase):
         task.get_replay_url(self.match.steam_id, match_req)
         mr = MatchRequest.objects.get(match_id=self.match_id)
         self.assertNotEqual(mr.valve_replay_url, None)
+
+
+class TestAuth(TestCase):
+
+    def test_login_200(self):
+        c = Client()
+        resp = c.get('/accounts/login/')
+        self.assertEqual(resp.status_code, 200)
+
+    def test_login_flow(self):
+
+        username = "baz"
+        email = "{0}@gmail".format(username)
+        password = "bar"
+
+        c = Client()
+        login_url = reverse("social:complete", args={"email"})
+
+        # Post to the "log me in plz" address
+        resp = c.post(login_url, {'email': email, 'password': password})
+        self.assertEqual(resp.status_code, 302)
+
+        # Social auth should try to send an email
+        psa_email = mail.outbox[0]
+
+        regex = re.compile(r'http://.*')
+        verification_url = regex.search(psa_email.body).group()
+
+        # Hit the verification address
+        resp = c.get(verification_url, follow=True)
+
+        # Expect to be logged in
+        self.assertEqual(
+            resp.context['request'].user.username,
+            username
+        )
+
+        resp = c.get(reverse('logout'), follow=True)
+
+        # Expect to be logged out
+        self.assertEqual(
+            resp.context['request'].user.is_anonymous(),
+            True
+        )
+
+        # Try to log back in
+        resp = c.post(
+            login_url,
+            {'email': email, 'password': password},
+            follow=True
+        )
+
+        # Expect to log in without needing to reconfirm
+        self.assertEqual(
+            resp.context['request'].user.username,
+            username
+        )
+
+        # Logout to set up next step.
+        resp = c.get(reverse('logout'), follow=True)
+
+        # Someone else tries to log into that account
+        resp = c.post(
+            login_url,
+            {'email': email, 'password': 'wrongpassword'},
+            follow=True
+        )
+
+        # Expect to fail b/c password.
+        # Should probably test for the "Wrong pass" msg.
+        self.assertEqual(
+            resp.context['request'].user.is_anonymous(),
+            True
+        )
+        self.assertEqual(
+            resp.request['PATH_INFO'],
+            '/login/'
+        )

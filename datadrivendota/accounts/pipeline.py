@@ -29,14 +29,16 @@ def user_password(
 ):
     if backend.name != 'email':
         return
-    password = strategy.request_data()['password']
 
-    check = user.check_password(password)
     if is_new:
+        password = kwargs['response']['password'][0]
         user.set_password(password)
         user.save()
-    elif not check:
-        messages.add_message(
-            strategy.request, messages.WARNING, 'Incorrect password :/'
-        )
-        return redirect('login')
+    else:
+        password = strategy.request_data()['password']
+        check = user.check_password(password)
+        if not check:
+            messages.add_message(
+                strategy.request, messages.WARNING, 'Incorrect password :/'
+            )
+            return redirect('login')

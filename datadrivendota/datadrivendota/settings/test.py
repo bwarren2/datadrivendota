@@ -30,7 +30,6 @@ STATICFILES_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 #  END STORAGE
 
-
 SHOW_ACCOUNTS = True
 SHOW_AUTH = True
 SHOW_BLOG = True

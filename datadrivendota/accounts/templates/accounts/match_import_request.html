@@ -19,36 +19,4 @@
 {% endblock content %}
 
 {% block extra_js %}
-{% comment %}
-<script>
-
-// $( "#request-button" ).click(function( event ) {
-//       Messenger().post({
-//         message: "Testing",
-//         type: 'success'
-//       });
-//     event.preventDefault();
-// });
-// $('.purgeButton').click(function(){
-//   $.ajax({
-//     type: "POST",
-//     url: "{% url 'accounts:drop_follow' %}",
-//     data: {
-//       'slug': $(this).attr('name'),
-//       'csrfmiddlewaretoken': '{{ csrf_token }}'
-//     },
-//     dataType: "text",
-//     success: function(response) {
-//       $("tr#" + response).remove();
-//     },
-//     error: function(rs, e) {
-//       Messenger().post({
-//         message: rs.responseText,
-//         type: 'error'
-//       });
-//     }
-//   });
-// });
-</script>
-{% endcomment %}
 {% endblock extra_js %}
