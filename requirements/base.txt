@@ -84,4 +84,3 @@ tornado==4.3
 wcwidth==0.1.5
 wheel==0.26.0
 whitenoise==2.0.6
--e git+git://github.com/django-pylibmc/django-pylibmc#egg=django-pylibmc
