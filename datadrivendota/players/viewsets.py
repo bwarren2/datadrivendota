@@ -1,5 +1,4 @@
 from rest_framework import viewsets, filters
-
 from django.db.models import When, Case, Value, IntegerField, Sum
 
 from .serializers import PlayerWinrateSerializer, PlayerSerializer
@@ -8,16 +7,18 @@ from .models import Player
 from matches.models import PlayerMatchSummary
 
 
-class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
+# class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
 
-    """ DRF viewset for player objects."""
+#     """ DRF viewset for player objects."""
 
-    queryset = Player.objects.all()
-    serializer_class = PlayerSerializer
-    lookup_field = 'steam_id'
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('persona_name',)
-    paginate_by = 10
+#     queryset = Player.objects.all()
+#     serializer_class = PlayerSerializer
+#     lookup_field = 'steam_id'
+#     filter_backends = (filters.SearchFilter,)
+#     search_fields = ('persona_name',)
+#     paginate_by = 10
+#     paginate_by_param = 'page_size'
+#     max_paginate_by = 10
 
 
 class PlayerWinrateViewSet(viewsets.ReadOnlyModelViewSet):

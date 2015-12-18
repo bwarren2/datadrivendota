@@ -17,7 +17,8 @@ from heroes.viewsets import (
 from items.viewsets import ItemViewSet
 from teams.viewsets import TeamViewSet
 from leagues.viewsets import LeagueViewSet
-from players.viewsets import PlayerViewSet, PlayerWinrateViewSet
+# from players.viewsets import PlayerViewSet
+from players.viewsets import PlayerWinrateViewSet
 from accounts.viewsets import MatchRequestViewSet, PingRequestViewSet
 
 
@@ -63,5 +64,5 @@ router.register(
     SkillBuildViewSet,
     base_name='skillbuild'
 )
-router.register('players', PlayerViewSet)
+# router.register('players', PlayerViewSet)
 router.register('ping-requests', PingRequestViewSet)
