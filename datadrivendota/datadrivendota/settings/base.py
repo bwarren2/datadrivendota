@@ -256,10 +256,9 @@ THIRD_PARTY_APPS = (
     'storages',
     'bootstrapform',
     'corsheaders',
-    'payments',
     'django_forms_bootstrap',
-    'tagging',
-    'mptt',
+    # 'tagging',
+    # 'mptt',
     'rest_framework',
     'pinax.stripe',
 )

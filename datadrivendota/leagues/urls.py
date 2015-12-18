@@ -1,8 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from leagues import views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^$', views.LeagueOverview.as_view(), name='overview'),
     url(
         r'^(?P<tier>pro|am|premium)/$',
@@ -54,4 +53,4 @@ urlpatterns = patterns(
         views.ApiLiveGameSlice.as_view(),
         name='api_live_game_slice'
     ),
-)
+]

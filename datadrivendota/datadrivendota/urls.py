@@ -1,5 +1,5 @@
 """The core urlconf."""
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -14,10 +14,8 @@ from .rest_urls import router
 admin.autodiscover()
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^$', views.LandingView.as_view(), name='landing'),
-
 
     # Internals URLS
     url(r'^admin/', include(admin.site.urls)),
@@ -47,56 +45,46 @@ urlpatterns = patterns(
             content_type='text/plain'
         )
     ),
-) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.SHOW_LEAGUES:
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         url(r'^leagues/', include('leagues.urls', namespace='leagues')),
-    )
+    ]
 if settings.SHOW_HEROES:
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         url(r'^heroes/', include('heroes.urls', namespace='heroes')),
-    )
+    ]
 if settings.SHOW_ITEMS:
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         url(r'^items/', include('items.urls', namespace='items')),
-    )
+    ]
 if settings.SHOW_MATCHES:
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         url(r'^matches/', include('matches.urls', namespace='matches')),
-    )
+    ]
 if settings.SHOW_PLAYERS:
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         url(r'^players/', include('players.urls', namespace='players')),
-    )
+    ]
 if settings.SHOW_TEAMS:
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         url(r'^teams/', include('teams.urls', namespace='teams')),
-    )
+    ]
 if settings.SHOW_ACCOUNTS:
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         url(r'^accounts/', include('accounts.urls', namespace='accounts')),
-    )
+    ]
 if settings.SHOW_PAYMENTS:
-    urlpatterns += patterns(
-        '',
-        url(r'^payments/', include("payments.urls")),
-    )
+    urlpatterns += [
+        url(r"^payments/", include("pinax.stripe.urls")),
+    ]
 if settings.SHOW_SEARCH:
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         url(r'^search/$', views.SearchView.as_view(), name='search'),
-    )
+    ]
 if settings.SHOW_AUTH:
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         # When django wants a login, redir to social login
         url(r'^login/(?P<method>[^/]+)/$', LoginView.as_view(), name='login'),
         url(r'^login/$', LoginView.as_view(), name='login'),
@@ -105,17 +93,16 @@ if settings.SHOW_AUTH:
         # Docs recommend it :/
         # https://python-social-auth.readthedocs.org/en/latest/configuration/django.html
         # Is there a better option?  --ben 2015-04-19
-    )
+    ]
 
 
 if settings.DEBUG:
     # static files (images, css, javascript, etc.)
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         (
             r'^media/(?P<path>.*)$', 'django.views.static.serve',
             {
                 'document_root': settings.MEDIA_ROOT
             }
         )
-    )
+    ]
