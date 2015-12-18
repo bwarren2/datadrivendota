@@ -40,7 +40,7 @@ class SmarterPaginatorTestCase(TestCase):
             if x is not None
         ]
 
-        return tuple(page_range.__getslice__(*s) for s in slices)
+        return tuple(list(page_range).__getslice__(*s) for s in slices)
 
     def validate(self, rng, current, expected):
         error = "Saw {}, expected {}".format(

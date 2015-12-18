@@ -45,8 +45,7 @@ class SmarterPaginator(Paginator):
             [top_range, middle_range, bottom_range]
             if x is not None
         ]
-        return slices
-        # return tuple(page_range.__getslice__(*s) for s in slices)
+        return tuple(list(page_range).__getslice__(*s) for s in slices)
 
     def page_range_with_ellipses(self):
         return self._page_range_with_ellipses(
