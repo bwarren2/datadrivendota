@@ -37,7 +37,7 @@ if not CACHE_ENABLED:
 INSTALLED_APPS += (
     'debug_toolbar',
     'devserver',
-    'template_timings_panel',
+    # 'template_timings_panel',
     'debug_toolbar_line_profiler',
     'template_profiler_panel',
 )
@@ -94,6 +94,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.redirects.RedirectsPanel',
     'debug_toolbar_line_profiler.panel.ProfilingPanel',
-    'template_timings_panel.panels.TemplateTimings.TemplateTimings',
+    # 'template_timings_panel.panels.TemplateTimings.TemplateTimings',
     'template_profiler_panel.panels.template.TemplateProfilerPanel',
 )

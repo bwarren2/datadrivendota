@@ -99,7 +99,7 @@ if settings.SHOW_AUTH:
 if settings.DEBUG:
     # static files (images, css, javascript, etc.)
     urlpatterns += [
-        (
+        url(
             r'^media/(?P<path>.*)$', 'django.views.static.serve',
             {
                 'document_root': settings.MEDIA_ROOT
