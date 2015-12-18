@@ -370,45 +370,6 @@ ITEM_SCHEMA_KEY = 'valve_item_schema_json'
 #     '--with-coverage',
 # ]
 
-
-# Magic Colors
-DIRE_RED = '#BA3B15'
-RADIANT_GREEN = '#7CD51B'
-WON_COLOR = '#FFD700'
-LOST_COLOR = '#C0C0C0'
-STRENGTH_COLOR = '#CC5240'
-AGILITY_COLOR = '#4BAA49'
-INTELLIGENCE_COLOR = '#618ABE'
-SKILL1_COLOR = '#CC0000'
-SKILL2_COLOR = '#CCAF00'
-SKILL3_COLOR = '#3ACC00'
-SKILLPLAYER_COLOR = '#00CC75'
-SKILLTOURNAMENT_COLOR = '#AA37CA'
-CONTRASTING_10 = [
-    '#1f77b4',
-    '#7EF6C6',
-    '#2ca02c',
-    '#d62728',
-    '#9467bd',
-    '#8c564b',
-    '#e377c2',
-    '#7f7f7f',
-    '#bcbd22',
-    '#17becf',
-]
-PLAYER_10 = [
-    '#1f77b4',
-    '#7EF6C6',
-    '#9A1D9B',
-    '#ECF14C',
-    '#DB7226',
-    '#E890BA',
-    '#99B15F',
-    '#75D1E1',
-    '#147335',
-    '#906A2B',
-]
-
 # START STRIPE CONFIGURATION
 STRIPE_PUBLIC_KEY = getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
