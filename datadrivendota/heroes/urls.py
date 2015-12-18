@@ -1,8 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from heroes import views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^vitals/$', views.VitalsView.as_view(), name='vitals'),
     url(r'^lineups/$', views.LineupView.as_view(), name='lineup'),
@@ -16,4 +15,4 @@ urlpatterns = patterns(
         views.HeroDetailView.as_view(),
         name="detail"
     ),
-)
+]

@@ -1,8 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from players import views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^$', views.ProIndexView.as_view(), name='pro_index'),
     url(
         r'^(?P<player_id>[0-9]*)/$',
@@ -15,4 +14,4 @@ urlpatterns = patterns(
         name='followed_index'
     ),
     url(r'^all-players/$', views.PlayerIndexView.as_view(), name='index'),
-)
+]

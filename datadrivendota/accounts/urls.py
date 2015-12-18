@@ -1,8 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from accounts import views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^match-request/$',
         views.MatchRequestView.as_view(),
@@ -19,4 +18,4 @@ urlpatterns = patterns(
     ),
     url(r'^email-sent/', views.ValidationView.as_view(), name='email-sent'),
     url(r'^email/$', views.EmailRequiredView.as_view(), name='require_email'),
-)
+]

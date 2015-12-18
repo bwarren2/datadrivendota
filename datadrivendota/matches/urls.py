@@ -1,8 +1,7 @@
-from django.conf.urls import url, patterns
+from django.conf.urls import url
 from matches import views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^$', views.MatchListView.as_view(), name='index'),
     url(
         r'^time-lapse/$',
@@ -34,4 +33,4 @@ urlpatterns = patterns(
         views.ReplicateDetail.as_view(),
         name="replicate"
     ),
-)
+]
