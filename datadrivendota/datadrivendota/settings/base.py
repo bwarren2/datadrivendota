@@ -257,8 +257,6 @@ THIRD_PARTY_APPS = (
     'bootstrapform',
     'corsheaders',
     'django_forms_bootstrap',
-    # 'tagging',
-    # 'mptt',
     'rest_framework',
     'pinax.stripe',
 )
