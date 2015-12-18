@@ -1,4 +1,5 @@
-
+from django.views.decorators.cache import never_cache
+from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView
 from django.views.generic import TemplateView
 from django.core.urlresolvers import reverse
@@ -64,6 +65,7 @@ class MatchRequestView(LoginRequiredView, FormView):
         return reverse('players:management')
 
 
+@method_decorator(never_cache, name='dispatch')
 class LoginView(TemplateView):
     template_name = 'accounts/login.html'
 
@@ -75,6 +77,7 @@ class LoginView(TemplateView):
         return kwargs
 
 
+@method_decorator(never_cache, name='dispatch')
 class LogoutView(TemplateView):
     template_name = 'accounts/logout.html'
 
@@ -83,6 +86,7 @@ class LogoutView(TemplateView):
         return super(LogoutView, self).get(self, request, *args, **kwargs)
 
 
+@method_decorator(never_cache, name='dispatch')
 class CompleteView(TemplateView):
     template_name = 'accounts/home.html'
 
@@ -93,10 +97,12 @@ class CompleteView(TemplateView):
         return kwargs
 
 
+@method_decorator(never_cache, name='dispatch')
 class AccountsHome(TemplateView):
     template_name = 'accounts/home.html'
 
 
+@method_decorator(never_cache, name='dispatch')
 class ValidationView(TemplateView):
     template_name = 'accounts/login.html'
 
@@ -107,6 +113,7 @@ class ValidationView(TemplateView):
         return kwargs
 
 
+@method_decorator(never_cache, name='dispatch')
 class EmailRequiredView(TemplateView):
     template_name = 'accounts/login.html'
 
