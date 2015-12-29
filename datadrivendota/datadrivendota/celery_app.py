@@ -48,10 +48,13 @@ class Config(object):
         "items.management.tasks",
         "heroes.management.tasks",
         "players.management.tasks",
-        "leagues.management.tasks",
         "teams.management.tasks",
         "accounts.management.tasks",
         "datadrivendota.management.tasks",
+        # Importing from the module causes name conflicts in the scheduler
+        "leagues.management.tasks.league",
+        "leagues.management.tasks.league_schedule",
+        "leagues.management.tasks.live_game",
     )
 
     # What happens if we do not use redis?.
@@ -199,13 +202,7 @@ class Config(object):
                 'routing_key': 'db'
             }
         },
-        'leagues.management.tasks.CreateLeagues': {
-            'routes': {
-                'exchange': 'db',
-                'routing_key': 'db'
-            }
-        },
-        'leagues.management.tasks.MirrorLeagueSchedule': {
+        'leagues.management.tasks.league_schedule.MirrorLeagueSchedule': {
             'routes': {
                 'exchange': 'integrity',
                 'routing_key': 'integrity'
@@ -214,13 +211,7 @@ class Config(object):
                 "rate_limit": VALVE_RATE,
             }
         },
-        'leagues.management.tasks.MirrorLeagues': {
-            'routes': {
-                'exchange': 'integrity',
-                'routing_key': 'integrity'
-            }
-        },
-        'leagues.management.tasks.MirrorLiveGames': {
+        'leagues.management.tasks.live_game.MirrorLiveGames': {
             'routes': {
                 'exchange': 'integrity',
                 'routing_key': 'integrity'
@@ -229,13 +220,13 @@ class Config(object):
                 'max_retries': 0,
             }
         },
-        'leagues.management.tasks.MirrorRecentLeagues': {
+        'leagues.management.tasks.league.MirrorRecentLeagues': {
             'routes': {
                 'exchange': 'integrity',
                 'routing_key': 'integrity'
             }
         },
-        'leagues.management.tasks.UpdateLeagueLogos': {
+        'leagues.management.tasks.league.UpdateLeagueLogo': {
             'routes': {
                 'exchange': 'valve_api',
                 'routing_key': 'valve_api_call'
@@ -244,7 +235,7 @@ class Config(object):
                 "rate_limit": VALVE_RATE,
             }
         },
-        'leagues.management.tasks.UpdateLeagueSchedule': {
+        'leagues.management.tasks.league_schedule.UpdateLeagueSchedule': {
             'routes': {
                 'exchange': 'db',
                 'routing_key': 'db'
@@ -253,20 +244,11 @@ class Config(object):
                 "rate_limit": VALVE_RATE,
             }
         },
-        'leagues.management.live_game.UpdateLiveMatches': {
+        'leagues.management.tasks.live_game.UpdateLiveMatches': {
             'routes': {
                 'exchange': 'integrity',
                 'routing_key': 'integrity'
             },
-        },
-        'leagues.management.tasks.deprecated.MirrorTI5': {
-            'routes': {
-                'exchange': 'integrity',
-                'routing_key': 'integrity'
-            },
-            'annotations': {
-                'max_retries': 0,
-            }
         },
         'matches.management.tasks.CheckMatchIntegrity': {
             'routes': {
@@ -397,7 +379,7 @@ class Config(object):
             'schedule': timedelta(days=1),
         },
         'reflect-league-schedule-daily': {
-            'task': 'leagues.management.tasks.MirrorLeagueSchedule',
+            'task': 'leagues.management.tasks.league_schedule.MirrorLeagueSchedule',
             'schedule': timedelta(days=1),
         },
         'reflect-item-schema-daily': {
@@ -409,7 +391,7 @@ class Config(object):
             'schedule': timedelta(days=1),
         },
         'reflect-recent-leagues-daily': {
-            'task': 'leagues.management.tasks.MirrorRecentLeagues',
+            'task': 'leagues.management.tasks.league.MirrorRecentLeagues',
             'schedule': timedelta(days=1),
         },
         # Fast

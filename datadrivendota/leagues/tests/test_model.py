@@ -47,3 +47,8 @@ class TestModelMethods(TestCase):
         l = fake_image(l)
         self.assertNotEqual(l.image, static('blank_league.png'))
         l.delete()
+
+        l = mommy.make('leagues.league', stored_image=None, image_failed=True)
+        l = fake_image(l)
+        self.assertEqual(l.image, static('blank_league.png'))
+        l.delete()

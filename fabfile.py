@@ -11,9 +11,15 @@ def test(suite="all"):
         local(
             'python datadrivendota/manage.py test '
             'accounts blog guilds health heroes items leagues matches players'
-            ' teams utils --settings=datadrivendota.settings.test'
+            ' teams utils datadrivendota.tests'
+            ' --settings=datadrivendota.settings.test'
         )
-
+    # To ensure discovery of only project tests
+    elif suite == 'datadrivendota':
+        local(
+            'python datadrivendota/manage.py test datadrivendota.tests'
+            ' --settings=datadrivendota.settings.test'
+        )
     else:
         local(
             (
