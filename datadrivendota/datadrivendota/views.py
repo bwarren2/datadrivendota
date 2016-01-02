@@ -1,21 +1,20 @@
 from json import dumps
 
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render
 from django.views.generic import View, TemplateView
 from django.views.generic.edit import FormView as DjangoFormView
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import SuspiciousOperation
-from django.db.models import Q
 
 from .forms import SearchForm
-from players.models import Player
 from heroes.models import Hero
-from items.models import Item
-from teams.models import Team
 from leagues.models import League
 from blog.models import Entry
+from accounts.models import MatchRequest
+from accounts.management.tasks import KickoffMatchRequests, ReadParseResults
 
 
 class LandingView(TemplateView):
@@ -35,6 +34,59 @@ class LoginRequiredView(View):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(LoginRequiredView, self).dispatch(*args, **kwargs)
+
+
+class ParserManagementView(TemplateView):
+    template_name = 'parser_management.html'
+
+    @method_decorator(staff_member_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ParserManagementView, self).dispatch(*args, **kwargs)
+
+
+class ParserTasksView(View):
+
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax() and request.user.is_superuser:
+
+            response_data = {}
+            match_id = request.POST['match_id']
+            task = request.POST['task']
+
+            if task == 'create':
+                mr, created = MatchRequest.objects.get_or_create(
+                    requester=request.user,
+                    match_id=match_id,
+                    status=MatchRequest.SUBMITTED
+                )
+                if created:
+                    response_data['result'] = 'Match Request Created'
+                    response_data['type'] = 'success'
+                else:
+                    response_data['result'] = 'Match Request Already Exists'
+                    response_data['type'] = 'warning'
+
+            elif task == 'kickoff_submitted':
+                KickoffMatchRequests().delay()
+                response_data['result'] = 'Kicked off Submitted'
+                response_data['type'] = 'success'
+
+            elif task == 'kickoff_all':
+                KickoffMatchRequests().delay(only_use_submitted=False)
+                response_data['result'] = 'Kicked off aggressively'
+                response_data['type'] = 'success'
+
+            elif task == 'parse':
+                ReadParseResults().delay()
+                response_data['result'] = 'Reading results'
+                response_data['type'] = 'success'
+
+            return HttpResponse(
+                dumps(response_data),
+                content_type="application/json"
+            )
+        else:
+            raise Http404
 
 
 class JsonApiView(TemplateView):
