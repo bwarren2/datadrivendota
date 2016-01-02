@@ -150,24 +150,35 @@ class UpdateLeagueLogo(ApiFollower):
 
     def run(self, urldata):
         league = League.objects.get(steam_id=self.api_context.league_id)
-        url = '{0}{1}'.format(
-            settings.VALVE_CDN_PATH,
-            urldata['result']['path']
-        )
-        logging.info('Getting league logo at {0}'.format(url))
-        try:
-            resp = requests.get(url)
-            if resp.status_code == 200:
-                buff = BytesIO(resp.content)
-                _ = buff.seek(0)  # NOQA
-                filename = slugify(league.steam_id) + '_full.png'
-                league.stored_image.save(filename, File(buff))
-            league.save()
-        except:
-            logging.warning("No image for {0}!".format(
-                league.steam_id
-                ), exc_info=True
+
+        # It seems this is the error for a bad ugc id, based on hand test
+        if urldata['status']['code'] == 9:
+            self.fake_league_image(league)
+        else:
+            url = '{0}{1}'.format(
+                settings.VALVE_CDN_PATH,
+                urldata['result']['path']
             )
+            logging.info('Getting league logo at {0}'.format(url))
+            try:
+                resp = requests.get(url)
+                if resp.status_code == 200:
+
+                    # Saving an image to db from a file buffer.
+                    buff = BytesIO(resp.content)
+                    _ = buff.seek(0)  # NOQA
+                    filename = slugify(league.steam_id) + '_full.png'
+                    league.stored_image.save(filename, File(buff))
+                league.save()
+            except:
+                logging.error("No image for {0}!".format(
+                    league.steam_id
+                    ), exc_info=True
+                )
+
+    def fake_league_image(self, league):
+        league.image_failed = True
+        league.save()
 
 
 class MirrorRecentLeagues(Task):

@@ -109,7 +109,9 @@ class UpdateMatch(ApiFollower):
                 logger.warning(
                     'Match ID {0} not found'.format(self.api_context.match_id)
                 )
-            elif data['error'] == 'Practice matches are not available via GetMatchDetails':
+            elif data['error'] == (
+                'Practice matches are not available via GetMatchDetails'
+            ):
                 logger.warning(
                     'Match ID {0} was a practice match, not recorded'.format(
                         self.api_context.match_id
@@ -545,9 +547,9 @@ class CycleApiCall(ApiFollower):
         # Validate
         if self.result['status'] == 15:
             logger.warning(
-                "Could not pull data. "
-                + str(self.api_context.account_id)
-                + " disallowed it. "
+                "Could not pull data. {0}  disallowed it.".format(
+                    self.api_context.account_id
+                )
             )
             p = Player.objects.get(steam_id=self.api_context.account_id)
             p.updated = False

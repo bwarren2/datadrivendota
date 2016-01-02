@@ -41,14 +41,18 @@ class League(models.Model):
     update_time = models.DateTimeField(default=timezone.now)
 
     stored_image = models.ImageField(null=True, upload_to='leagues/img/')
+    image_failed = models.BooleanField(default=False)
     image_ugc = models.BigIntegerField(null=True)  # Through live league games
 
     @property
     def image(self):
-        try:
-            return self.stored_image.url
-        except ValueError:
+        if self.image_failed is True:
             return static('blank_league.png')
+        else:
+            try:
+                return self.stored_image.url
+            except ValueError:
+                return static('blank_league.png')
 
     @property
     def tier_name(self):

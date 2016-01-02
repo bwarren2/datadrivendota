@@ -1,27 +1,15 @@
-from httplib import BadStatusLine
 import gc
-import urllib2
-import json
-import socket
-import ssl
+import requests
 from time import time as now
 from urllib import urlencode
 from celery import Task
 from celery.exceptions import (
     SoftTimeLimitExceeded,
-    MaxRetriesExceededError,
     TimeLimitExceeded,
     WorkerLostError,
 )
 from datadrivendota.settings.base import STEAM_API_KEY
 import logging
-from utils import send_error_email
-
-# Patch for <urlopen error [Errno -2] Name or service not known in urllib2
-import os
-os.environ['http_proxy'] = ''
-# End Patch
-
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +19,9 @@ class ApiContext(object):
     """
     A box of configuration for interacting with Valve's API.
 
-    Keeps track of things like the steam API key, what the parameter names valve recognizes are, and sane default options.
+    Keeps track of things like the steam API key,
+    what the parameter names valve recognizes are,
+    and sane default options.
     """
 
     account_id = None
@@ -65,6 +55,10 @@ class ApiContext(object):
         super(ApiContext, self).__init__(*args, **kwargs)
 
     def to_url_dict(self, mode):
+        """
+        These are hardcoded per the valve spec.  Annoying.
+        """
+
         if mode == 'GetPlayerSummaries':
             valve_url_vars = ['steamids', 'key']
             return self.dict_vars(valve_url_vars)
@@ -124,25 +118,99 @@ class ApiContext(object):
                 return_dict[var] = getattr(self, var)
         return return_dict
 
-    def __str__(self):
+    def url_for(self, mode):
+        mode_dict = {
+            'GetMatchHistory': (
+                'https://api.steampowered.com'
+                '/IDOTA2Match_570/GetMatchHistory/v001/'
+            ),
+            'GetMatchDetails': (
+                'https://api.steampowered.com'
+                '/IDOTA2Match_570/GetMatchDetails/v001/'
+            ),
+            'GetHeroes': (
+                'https://api.steampowered.com/IEconDOTA2_570/'
+                'GetHeroes/v0001/'
+            ),
+            'GetPlayerSummaries': (
+                'https://api.steampowered.com'
+                '/ISteamUser/GetPlayerSummaries/v0002/'
+            ),
+            'EconomySchema': (
+                'https://api.steampowered.com/IEconItems_570/'
+                'GetSchema/v0001/'
+            ),
+            'GetLeagueListing': (
+                'https://api.steampowered.com'
+                '/IDOTA2Match_570/GetLeagueListing/v0001/'
+            ),
+            'GetLiveLeagueGames': (
+                'https://api.steampowered.com'
+                '/IDOTA2Match_570/GetLiveLeagueGames/v0001/'
+            ),
+            'GetMatchHistoryBySequenceNum': (
+                'https://api.steampowered.com'
+                '/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v0001/'
+            ),
+            'GetTeamInfoByTeamID': (
+                'https://api.steampowered.com'
+                '/IDOTA2Match_570/GetTeamInfoByTeamID/v001/'
+            ),
+            'GetSchema': (
+                'https://api.steampowered.com'
+                '/IEconItems_570/GetSchema/v0001/'
+            ),
+            'GetSchemaURL': (
+                'https://api.steampowered.com'
+                '/IEconItems_570/GetSchemaURL/v1/'
+            ),
+            'GetItemIconPath': (
+                'https://api.steampowered.com/IEconDOTA2_570/'
+                'GetItemIconPath/v1/'
+            ),
+            'GetPlayerOfficialInfo': (
+                'https://api.steampowered.com/IDOTA2Fantasy_570/'
+                'GetPlayerOfficialInfo/v1/'
+            ),
+            'GetUGCFileDetails': (
+                'http://api.steampowered.com/ISteamRemoteStorage/'
+                'GetUGCFileDetails/v1/'
+            ),
+            'GetTournamentPlayerStats': (
+                'http://api.steampowered.com/IDOTA2Match_570/'
+                'GetTournamentPlayerStats/v1/'
+            ),
+            'GetScheduledLeagueGames': (
+                'http://api.steampowered.com/IDOTA2Match_570/'
+                'GetScheduledLeagueGames/V001/'
+            ),
 
+        }
+        try:
+            return mode_dict[mode]
+        except KeyError:
+            logger.error("What is this mode? {0}".format(mode))
+            raise
+
+    def __str__(self):
+        """
+        APIContexts get printed in error strings, so make them pretty.
+        """
         strng = ''
         for field in [
             'account_id',
+            'iconname',
             'matches_requested',
             'skill',
             'date_max',
             'date_min',
             'start_at_match_id',
-            'key',
             'match_id',
             'league_id',
             'hero_id',
-            'start_scrape_time',
             'matches_desired'
             'skill_levels',
             'deepcopy',
-            'last_scrape_time',
             'steamids',
             'processed',
             'refresh_records',
@@ -150,7 +218,9 @@ class ApiContext(object):
             'tournament_games_only',
         ]:
             if hasattr(self, field):
-                if getattr(self, field) is not None:
+                value = getattr(self, field, None)
+                default_value = getattr(self.__class__, field, None)
+                if value is not None and value != default_value:
                     strng += "{0}: {1} \n".format(field, getattr(self, field))
 
         return strng
@@ -197,179 +267,61 @@ class ValveApiCall(BaseTask):
         """
         Ping the valve API for downloading results.
 
-        Only enumeratd modes are acceptable; check the code.  There is a natural rate limit here at 1/s per valve specifications.  There should be a monthly one too.  For lots more docs, see http://dev.dota2.com/showthread.php?t=58317
+        We do have exactly one task that interacts with valve's api to enable
+        rate limiting.  Check celery config/env for that metering.
+
+        For lots more docs, see http://dev.dota2.com/showthread.php?t=58317
         """
         try:
 
-            # The steam API accepts a limited set of URLs, and requires a key
-            mode_dict = {
-                'GetMatchHistory': (
-                    'https://api.steampowered.com'
-                    '/IDOTA2Match_570/GetMatchHistory/v001/'
-                ),
-                'GetMatchDetails': (
-                    'https://api.steampowered.com'
-                    '/IDOTA2Match_570/GetMatchDetails/v001/'
-                ),
-                'GetHeroes': (
-                    'https://api.steampowered.com/IEconDOTA2_570/'
-                    'GetHeroes/v0001/'
-                ),
-                'GetPlayerSummaries': (
-                    'https://api.steampowered.com'
-                    '/ISteamUser/GetPlayerSummaries/v0002/'
-                ),
-                'EconomySchema': (
-                    'https://api.steampowered.com/IEconItems_570/'
-                    'GetSchema/v0001/'
-                ),
-                'GetLeagueListing': (
-                    'https://api.steampowered.com'
-                    '/IDOTA2Match_570/GetLeagueListing/v0001/'
-                ),
-                'GetLiveLeagueGames': (
-                    'https://api.steampowered.com'
-                    '/IDOTA2Match_570/GetLiveLeagueGames/v0001/'
-                ),
-                'GetMatchHistoryBySequenceNum': (
-                    'https://api.steampowered.com'
-                    '/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v0001/'
-                ),
-                'GetTeamInfoByTeamID': (
-                    'https://api.steampowered.com'
-                    '/IDOTA2Match_570/GetTeamInfoByTeamID/v001/'
-                ),
-                'GetSchema': (
-                    'https://api.steampowered.com'
-                    '/IEconItems_570/GetSchema/v0001/'
-                ),
-                'GetSchemaURL': (
-                    'https://api.steampowered.com'
-                    '/IEconItems_570/GetSchemaURL/v1/'
-                ),
-                'GetItemIconPath': (
-                    'https://api.steampowered.com/IEconDOTA2_570/'
-                    'GetItemIconPath/v1/'
-                ),
-                'GetPlayerOfficialInfo': (
-                    'https://api.steampowered.com/IDOTA2Fantasy_570/'
-                    'GetPlayerOfficialInfo/v1/'
-                ),
-                'GetUGCFileDetails': (
-                    'http://api.steampowered.com/ISteamRemoteStorage/'
-                    'GetUGCFileDetails/v1/'
-                ),
-                'GetTournamentPlayerStats': (
-                    'http://api.steampowered.com/IDOTA2Match_570/'
-                    'GetTournamentPlayerStats/v1/'
-                ),
-                'GetScheduledLeagueGames': (
-                    'http://api.steampowered.com/IDOTA2Match_570/'
-                    'GetScheduledLeagueGames/V001/'
-                ),
+            url = self.api_context.url_for(mode)
 
-            }
-
-            # If you attempt to access a URL I do not think valve supports, I
-            # complain.
-            try:
-                url = mode_dict[mode]
-            except KeyError:
-                logger.warning("Keyerrors on API call!")
-                raise
-
+            # We could use payload, but this is easier to log.
             URL = url + '?' + urlencode(self.api_context.to_url_dict(mode))
             logger.info("Hitting valve API for URL: " + URL)
 
             # Exception handling for the URL opening.
             try:
-                pageaccess = urllib2.urlopen(URL, timeout=5)
-            except urllib2.HTTPError, err:
-                if err.code == 104:
-                    logger.warning(
-                        "Connection reset by peer for mode "
-                        + str(mode)
-                        + self.api_context.to_url_dict()
-                        + ".  Retrying."
-                    )
-                    self.retry(mode=mode)
-                elif err.code == 111:
-                    logger.warning(
-                        "Connection Refused! "
-                        + URL
-                        + ".  Retrying."
-                    )
-                    self.retry(mode=mode)
-                elif err.code == 404:
-                    logger.warning("Page not found! " + URL + ".  Retrying.")
-                    self.retry(mode=mode)
-                elif err.code == 403:
-                    logger.warning(
-                        "Your access was denied. "
-                        + URL
-                        + ".  Retrying."
-                    )
-                    self.retry(mode=mode)
-                elif err.code == 401:
-                    logger.warning(
-                        "Unauth'd! "
-                        + URL
-                        + ".  Retrying."
-                    )
-                    self.retry(mode=mode)
-                elif err.code == 500:
-                    logger.warning("Server Issue! " + URL + ".  Retrying.")
-                    self.retry(mode=mode)
-                elif err.code == 503:
-                    logger.warning(
-                        "Server busy or limit exceeded "
-                        + URL
-                        + ".  Retrying."
-                    )
-                    self.retry(mode=mode)
-                else:
-                    logger.warning(
-                        "Got problem "
-                        + str(err)
-                        + " with URL "
-                        + URL
-                        + ".  Retrying."
-                    )
-                    self.retry(mode=mode)
-            except BadStatusLine:
-                logger.warning(
-                    "Bad status line for url %s" % URL
-                    + ".  Retrying."
-                )
-                self.retry(mode=mode)
-            except urllib2.URLError as err:
-                self.retry(mode=mode)
-            except (ssl.SSLError, socket.timeout) as err:
-                err = "Connection timeout for {url}. Issue: {e}  Retrying."
-                logger.warning(
-                    err.format(
-                        url=URL,
-                        e=err
-                    )
-                )
+                response = requests.get(URL, timeout=5)
+                if response.status_code != 200:
+                    if response.status_code in [104, 111]:
+                        logger.warning(
+                            "Got error code {0} for {1}.  Retrying. ".format(
+                                response.status_code, URL
+                            )
+                        )
+                        self.retry(mode=mode)
+
+                    elif 400 <= response.status_code < 500:
+                        logger.error(
+                            "Got a 4XX code for {0}.  Not Retrying.".format(
+                                URL
+                            )
+                        )
+                    elif 500 <= response.status_code < 600:
+                        logger.error(
+                            "Got a 5XX code for {0}.  Not Retrying.".format(
+                                URL
+                            )
+                        )
+                    else:
+                        response.raise_for_status()
+
+            except requests.exceptions.Timeout:
+                logger.warning("Timed out for {0}.  Retrying.".format(URL))
                 self.retry(mode=mode)
 
             # If everything is kosher, import the result and return it.
-            data = json.loads(pageaccess.read())
+            data = response.json()
             data['api_context'] = self.api_context
             return data
 
-        except (
-            SoftTimeLimitExceeded,
-            WorkerLostError,
-            TimeLimitExceeded,
-        ) as exc:
-            try:
-                self.retry(mode=mode, exc=exc, countdown=180)
-
-            except MaxRetriesExceededError:
-                send_error_email(self.api_context.__str__())
-                raise
-        except ValueError:
-                send_error_email(self.api_context.__str__())
-                raise
+        except SoftTimeLimitExceeded as exc:
+            logger.warning("Soft timeout for {0}.  Retrying.".format(URL))
+            self.retry(mode=mode, exc=exc)
+        except WorkerLostError as exc:
+            logger.warning("Worker lost for {0}.  Retrying.".format(URL))
+            self.retry(mode=mode, exc=exc)
+        except TimeLimitExceeded as exc:
+            logger.warning("Time exceeded for {0}.  Retrying.".format(URL))
+            self.retry(mode=mode, exc=exc)
