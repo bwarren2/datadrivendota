@@ -1,0 +1,89 @@
+{% extends "row_base.html" %}
+
+
+{% block content %}
+    <form id='task-form' class='form-horizontal' method='post'>
+        <div class='form-group'>
+            <label class='control-label col-md-2'>Match ID</label>
+            <div class='col-md-10'>
+            <input type='number' id='match_id' class='form-control'>
+            </div>
+        </div>
+        <div class='form-group'>
+            <label class='control-label col-md-2'>Task Type</label>
+            <div class='col-md-10'>
+            <select type='text' id='task' class='form-control'>
+                <option value='create'>Create Match Request</option>
+                <option value='kickoff_submitted'>
+                    Kickoff Submitted Requests
+                </option>
+                <option value='kickoff_all'>Kickoff All Requests</option>
+                <option value='read_java'>Read Parse Results</option>
+                <option value='parse'>Parse Shards</option>
+            </select>
+            </div>
+        </div>
+        {% csrf_token %}
+        <div class='form-group'>
+            <div class='col-md-offset-2'>
+            <button id='go' class='btn btn-primary' type='submit'>Go!</button>
+            </div>
+        </div>
+
+    </form>
+{% endblock content %}
+{% block extra_js %}
+<script type="text/javascript">
+    $(function(){
+        $('#task-form').submit(function(event){
+            event.preventDefault();
+
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            var csrftoken = getCookie('csrftoken');
+            var match_id = $('#match_id').val();
+            var task = $('#task :selected').val();
+            var data = {
+                csrfmiddlewaretoken: csrftoken,
+                task: task,
+                match_id: match_id,
+            };
+            var resp = $.ajax({
+                    url: '/parser-tasks/',
+                    method: "POST",
+                    data: data,
+            })
+            .success(function(data){
+                console.log(data);
+                Messenger().post({
+                  message: data.result,
+                  type: data.type,
+                  hideAfter: 5
+                });
+            })
+            .fail(function(){
+                Messenger().post({
+                  message: "FAILURE",
+                  type: "error",
+                  hideAfter: 10
+                });
+
+            })
+            console.log(resp);
+        });
+    });
+</script>
+{% endblock extra_js %}

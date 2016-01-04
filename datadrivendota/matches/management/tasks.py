@@ -12,6 +12,7 @@ from io import BytesIO
 from django.utils import timezone
 from django.db.models import Min, Max, Count
 from django.conf import settings
+
 from matches.models import (
     Match,
     LobbyType,
@@ -779,6 +780,10 @@ class UpdatePmsReplays(Task):
         # Save combat to pms
         self.save_msgstream(pms, pms_combat, 'all', match_id, 'combatlog')
 
+        # Annotate the PMS.  Useful for backfixing on parser upgrades
+        pms.parsed_with = settings.PARSER_VERSION
+        pms.save()
+
     def cleanup(self, match_id):
         mr = MatchRequest.objects.get(match_id=match_id)
         mr.status = MatchRequest.PARSED
@@ -789,20 +794,23 @@ class UpdatePmsReplays(Task):
         buff.seek(0)
 
         if fieldname == 'all':
-            filename = '{0}_{1}_{2}_parse_fragment_{3}.json.gz'.format(
+            filename = '{0}_{1}_{2}_parse_fragment_{3}_v{4}.json.gz'.format(
                 match_id,
                 pms.player_slot,
                 fieldname,
-                aspect
+                aspect,
+                settings.PARSER_VERSION
             )
             pms.all_data.save(filename, File(buff))
 
         else:
-            filename = '{0}_{1}_{2}_parse_fragment_{3}.json.gz'.format(
+            filename = '{0}_{1}_{2}_parse_fragment_{3}_v{4}.json.gz'.format(
                 match_id,
                 pms.player_slot,
                 fieldname,
-                aspect
+                aspect,
+                settings.PARSER_VERSION
+
             )
 
             if aspect == 'combatlog':
@@ -819,4 +827,3 @@ class UpdatePmsReplays(Task):
                 raise ValueError
 
             getattr(datalog, fieldname).save(filename, File(buff))
-        # set_encoding(getattr(datalog, fieldname).url)

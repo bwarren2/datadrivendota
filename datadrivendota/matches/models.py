@@ -185,10 +185,15 @@ class PlayerMatchSummary(models.Model):
     level = models.IntegerField()
     is_win = models.BooleanField()
 
+    # Scheduled for deprecation 1-1-2016
     replay_shard = models.FileField(
         upload_to='playermatchsummaries/replays/',
         null=True,
         blank=True,
+    )
+
+    parsed_with = models.CharField(
+        max_length=50
     )
 
     all_data = ReplayFragmentField()

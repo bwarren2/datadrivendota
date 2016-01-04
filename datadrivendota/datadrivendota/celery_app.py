@@ -128,7 +128,7 @@ class Config(object):
         Queue(
             'python_parse',
             Exchange('python_parse'),
-            routing_key='python_parse'
+            routing_key='python_parse',
         ),
 
     )

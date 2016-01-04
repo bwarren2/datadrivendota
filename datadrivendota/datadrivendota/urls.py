@@ -30,6 +30,17 @@ urlpatterns = [
         TemplateView.as_view(template_name='privacy.html',),
         name='privacy'
     ),
+    url(
+        r'^parser-management/$',
+        views.ParserManagementView.as_view(),
+        name='parsing'
+    ),
+    url(
+        r'^parser-tasks/$',
+        views.ParserTasksView.as_view(),
+        name='parser_tasks'
+    ),
+
     # Even if we don't want users to login, SUs need to be able to log out.
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
 

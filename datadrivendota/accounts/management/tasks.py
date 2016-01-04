@@ -131,7 +131,7 @@ class CreateMatchParse(Task):
         channel = connection.channel()
         queue_name = 'java_parse'
         channel.exchange_declare(exchange=queue_name, type='direct')
-        logger.info(
+        logger.warning(
             'Creating match requests.  Queue durability is {0}'.format(
                 settings.JAVA_QUEUE_DURABILITY
             )
@@ -185,7 +185,6 @@ class ReadParseResults(Task):
 
             method_frame, header_frame, body = channel.basic_get(queue_name)
             if not method_frame:
-
                 return None
             else:
                 MergeMatchRequestReplay().s().delay(json_data=json.loads(body))

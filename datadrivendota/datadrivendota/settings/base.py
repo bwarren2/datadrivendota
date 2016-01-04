@@ -435,7 +435,7 @@ LIVE_MATCH_LOOKBACK_MINUTES = 90
 # If a match fails and gets to 2 days old, delete it anyway.
 FAILED_LIVEMATCH_KEEP_DAYS = 2
 # End project specific constants used in tasks
-JAVA_QUEUE_DURABILITY = getenv('JAVA_QUEUE_DURABILITY' == 'True', False)
+JAVA_QUEUE_DURABILITY = True
 
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accounts/done/'
@@ -484,3 +484,5 @@ FEATURE_FLAGS = [
     'SHOW_SEARCH',
     'SHOW_TEAMS',
 ]
+
+PARSER_VERSION = '1.0'
