@@ -61,8 +61,11 @@ class RetrieveHiddenGameResults(ApiFollower):
 
     """Deprecated.  A stupid hack to get 'secret' TI4 games."""
 
-    def run(self, urldata):
-        matches = [match['match_id'] for match in urldata['result']['matches']]
+    def run(self, api_context, json_data, response_code, url):
+        matches = [
+            match['match_id']
+            for match in json_data['result']['matches']
+        ]
         am = MirrorMatches()
         am.delay(matches=matches, skill=4)
 
@@ -91,9 +94,9 @@ class CreateLeagues(ApiFollower):
 
     """ Takes all the results from a league list call and inserts them. """
 
-    def run(self, urldata):
+    def run(self, api_context, json_data, response_code, url):
         league_list = []
-        for league in self.result['leagues']:
+        for league in json_data['leagues']:
             League.objects.update_or_create(
                 steam_id=league['leagueid'],
                 defaults={

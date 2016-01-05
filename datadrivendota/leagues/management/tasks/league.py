@@ -148,16 +148,16 @@ class UpdateLeagueLogo(ApiFollower):
 
     """ Takes an Item Icon URL ping and saves it to a league logo. """
 
-    def run(self, urldata):
-        league = League.objects.get(steam_id=self.api_context.league_id)
+    def run(self, api_context, json_data, response_code, url):
+        league = League.objects.get(steam_id=api_context.league_id)
 
         # It seems this is the error for a bad ugc id, based on hand test
-        if urldata['status']['code'] == 9:
+        if json_data['status']['code'] == 9:
             self.fake_league_image(league)
         else:
             url = '{0}{1}'.format(
                 settings.VALVE_CDN_PATH,
-                urldata['result']['path']
+                json_data['result']['path']
             )
             logging.info('Getting league logo at {0}'.format(url))
             try:
@@ -166,7 +166,7 @@ class UpdateLeagueLogo(ApiFollower):
 
                     # Saving an image to db from a file buffer.
                     buff = BytesIO(resp.content)
-                    _ = buff.seek(0)  # NOQA
+                    buff.seek(0)
                     filename = slugify(league.steam_id) + '_full.png'
                     league.stored_image.save(filename, File(buff))
                 league.save()

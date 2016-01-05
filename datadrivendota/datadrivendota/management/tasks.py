@@ -3,7 +3,7 @@ import requests
 from time import time as now
 from urllib import urlencode
 
-from simplejson.scanner import JSONDecodeError
+from simplejson import JSONDecodeError
 
 from celery import Task
 from celery.exceptions import (

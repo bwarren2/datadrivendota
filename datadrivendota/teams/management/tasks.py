@@ -84,14 +84,14 @@ class UpdateTeam(ApiFollower):
 
     """ Merge the data for a team into the DB. """
 
-    def run(self, urldata):
+    def run(self, api_context, json_data, response_code, url):
 
-        for team_data in self.result['teams']:
+        for team_data in json_data['teams']:
             team, created = Team.objects.get_or_create(
                 steam_id=team_data['team_id']
             )
             try:
-                if self.api_context.refresh_records:
+                if api_context.refresh_records:
                     mapping_dict = {
                         'name': 'name',
                         'tag': 'tag',
@@ -157,22 +157,22 @@ class UpdateTeamLogo(ApiFollower):
 
     """ Merge a logo into the db. """
 
-    def run(self, urldata):
+    def run(self, api_context, json_data, response_code, url):
 
-        team = Team.objects.get(steam_id=self.api_context.team_id)
-        url = urldata['data']['url']
+        team = Team.objects.get(steam_id=api_context.team_id)
+        url = json_data['data']['url']
         try:
-            if self.api_context.logo_type == 'team':
+            if api_context.logo_type == 'team':
                 try:
                     resp = requests.get(url)
                     if resp.status_code == 200:
+
+                        # Shove data into an imagefile
                         buff = BytesIO(resp.content)
-
-                        # Stops printing of the index
-                        _ = buff.seek(0)  # NOQA
-
+                        buff.seek(0)
                         filename = slugify(team.steam_id) + '_full.png'
                         team.stored_image.save(filename, File(buff))
+
                     team.save()
                     logger.debug(url)
                 except:

@@ -40,9 +40,9 @@ class UpdateLeagueSchedule(ApiFollower):
 
     """ Reflect current schedule in matches. """
 
-    def run(self, urldata):
+    def run(self, api_context, json_data, response_code, url):
         logger.info("Saving the schedule")
-        data = self.clean_urldata(urldata)
+        data = self.clean_urldata(json_data)
         self.delete_unscheduled_games(data)
         self.create_scheduled_games(data)
 
