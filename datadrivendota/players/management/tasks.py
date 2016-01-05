@@ -63,18 +63,18 @@ class MirrorClientPersonas(Task):
 
 class UpdateClientPersonas(ApiFollower):
 
-    def run(self, urldata):
+    def run(self, api_context, json_data, response_code, url):
         """Make the avatar and persona facts of a profile match current."""
         # This options is present in the return code, but not needed here.
         # valveOpts = urldata['valveOpts']
-        response = urldata['response']
+        response = json_data['response']
 
         for pulled_player in response['players']:
             logger.info(
-                "Updating "
-                + pulled_player['personaname']
-                + ","
-                + str(pulled_player['steamid'])
+                "Updating {0}, {1}".format(
+                    pulled_player['personaname'],
+                    pulled_player['steamid']
+                )
             )
             # The PlayerSummaries call returns 64 bit ids.  It is super
             # annoying.
@@ -99,27 +99,29 @@ class MirrorPlayerData(BaseTask):
     @todo: refactor this with accounts refactor.
     """
 
-    def run(self):
-        if self.api_context.account_id is None:
+    def run(self, api_context):
+        if api_context.account_id is None:
             logger.error("Needed an account id, had none, failed.")
         player = Player.objects.get_or_create(
-            steam_id=self.api_context.account_id
+            steam_id=api_context.account_id
         )[0]
         player.updated = True
         player.save()
-        if self.api_context.matches_requested is None:
-            self.api_context.matches_requested = 500
-        self.api_context.start_scrape_time = now()
-        self.api_context.last_scrape_time = player.last_scrape_time
-        self.api_context.deepycopy = True
-        if self.api_context.matches_desired is None:
-            self.api_context.matches_desired = 500
-        for skill in self.api_context.skill_levels:
-            self.api_context.skill = skill
+        if api_context.matches_requested is None:
+            api_context.matches_requested = 500
+
+        api_context.start_scrape_time = now()
+        api_context.last_scrape_time = player.last_scrape_time
+        api_context.deepycopy = True
+
+        if api_context.matches_desired is None:
+            api_context.matches_desired = 500
+        for skill in api_context.skill_levels:
+            api_context.skill = skill
 
             vac = ValveApiCall()
             rpr = CycleApiCall()
-            pass_context = deepcopy(self.api_context)
+            pass_context = deepcopy(api_context)
             chain(vac.s(
                 mode='GetMatchHistory',
                 api_context=pass_context
@@ -157,16 +159,16 @@ class UpdateProNames(ApiFollower):
 
     """ Takes a ping to the official player database and update pro name. """
 
-    def run(self, urldata):
+    def run(self, api_context, json_data, response_code, url):
         player = Player.objects.get_or_create(
-            steam_id=self.api_context.AccountID
+            steam_id=api_context.AccountID
         )[0]
-        if self.result['Name'] == '':
+        if json_data['Name'] == '':
             player.pro_name = None
             player.save()
         else:
-            tag = self.result['TeamTag']
-            name = self.result['Name']
+            tag = json_data['TeamTag']
+            name = json_data['Name']
             player.pro_name = '[' + tag + '] ' + name
             player.save()
 
