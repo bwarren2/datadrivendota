@@ -92,7 +92,7 @@ class UpdateMatch(ApiFollower):
 
     """ Reflect the match detail response in our database. """
 
-    def run(self, data):
+    def run(self, api_context, json_data, response_code, url):
         """
         Upload a match given the return of an API call.
 
@@ -103,37 +103,37 @@ class UpdateMatch(ApiFollower):
         needed; if urldata['status'] == 1: right now this just trawls for
         overall match data.
         """
-        data = self.result
+        data = json_data
         if 'error' in data:
 
             if data['error'] == 'Match ID not found':
                 logger.warning(
-                    'Match ID {0} not found'.format(self.api_context.match_id)
+                    'Match ID {0} not found'.format(api_context.match_id)
                 )
             elif data['error'] == (
                 'Practice matches are not available via GetMatchDetails'
             ):
                 logger.warning(
                     'Match ID {0} was a practice match, not recorded'.format(
-                        self.api_context.match_id
+                        api_context.match_id
                     )
                 )
             else:
                 logging.error("{0}.  Context:{1}".format(
-                    data['error'], self.api_context)
+                    data['error'], api_context)
                 )
 
             # Do logging on associated livematch
             try:
                 lm = LiveMatch.objects.get(
-                    steam_id=self.api_context.match_id
+                    steam_id=api_context.match_id
                 )
                 lm.failed = True
                 lm.save()
             except:
                 logging.warning(
                     'No live match to fail. ({0})'.format(
-                        self.api_context.match_id
+                        api_context.match_id
                     )
                 )
 
@@ -159,7 +159,7 @@ class UpdateMatch(ApiFollower):
                 'game_mode': GameMode.objects.get_or_create(
                     steam_id=data['game_mode']
                 )[0],
-                'skill': self.api_context.skill,
+                'skill': api_context.skill,
             }
             try:
 
@@ -178,7 +178,7 @@ class UpdateMatch(ApiFollower):
                 upload_match_summary(
                     players=data['players'],
                     parent_match=match,
-                    refresh_records=self.api_context.refresh_records
+                    refresh_records=api_context.refresh_records
                 )
 
             except Match.DoesNotExist:
@@ -187,7 +187,7 @@ class UpdateMatch(ApiFollower):
                 upload_match_summary(
                     players=data['players'],
                     parent_match=match,
-                    refresh_records=self.api_context.refresh_records
+                    refresh_records=api_context.refresh_records
                 )
 
             if 'picks_bans' in data.keys():
@@ -256,7 +256,7 @@ class UpdateMatch(ApiFollower):
                     if data['dire_team_id'] == 1 else False
             match.save()
 
-            return self.api_context
+            return api_context
 
 
 def upload_match_summary(players, parent_match, refresh_records):
@@ -543,30 +543,30 @@ class CycleApiCall(ApiFollower):
     but that is the only API that really leans on repeated calls.
     """
 
-    def run(self, urldata):
+    def run(self, api_context, json_data, response_code, url):
         """ Ping the valve API to get match data & spawns new tasks. """
         # Validate
-        if self.result['status'] == 15:
+        if json_data['status'] == 15:
             logger.warning(
                 "Could not pull data. {0}  disallowed it.".format(
-                    self.api_context.account_id
+                    api_context.account_id
                 )
             )
-            p = Player.objects.get(steam_id=self.api_context.account_id)
+            p = Player.objects.get(steam_id=api_context.account_id)
             p.updated = False
             p.save()
             return True
 
-        elif self.result['status'] == 1:
+        elif json_data['status'] == 1:
             # Spawn a bunch of match detail queries
 
             logger.info("Spawning")
 
-            self.spawn_detail_calls()
+            self.spawn_detail_calls(json_data, api_context)
 
             logger.info("Checking for more results")
-            if self.more_results_left():
-                self.rebound()
+            if self.more_results_left(json_data, api_context):
+                self.rebound(json_data, api_context)
 
             # Successful closeout
             else:
@@ -576,52 +576,52 @@ class CycleApiCall(ApiFollower):
         else:
             logger.error(
                 "Unhandled status: {0}".format(
-                    str(self.result['status'])
+                    json_data['status']
                 )
             )
             return True
 
-    def spawn_detail_calls(self):
+    def spawn_detail_calls(self, json_data, api_context):
         """ Make match detail calls for each match. """
-        for result in self.result['matches']:
-            self.api_context.processed += 1
-            if self.api_context.processed <= self.api_context.matches_desired:
+        for result in json_data['matches']:
+            api_context.processed += 1
+            if api_context.processed <= api_context.matches_desired:
 
                 logger.info(
                     "{0}: {1} done, {2} wanted, doing: {3}".format(
-                        self.api_context.account_id,
-                        self.api_context.processed,
-                        self.api_context.matches_desired,
-                        self.api_context.processed <=
-                        self.api_context.matches_desired
+                        api_context.account_id,
+                        api_context.processed,
+                        api_context.matches_desired,
+                        api_context.processed <=
+                        api_context.matches_desired
                     )
                 )
 
                 vac = ValveApiCall()
                 um = UpdateMatch()
-                self.api_context.match_id = result['match_id']
-                pass_context = deepcopy(self.api_context)
+                api_context.match_id = result['match_id']
+                pass_context = deepcopy(api_context)
                 chain(vac.s(
                     mode='GetMatchDetails',
                     api_context=pass_context
                 ), um.s()).delay()
 
-    def more_results_left(self):
+    def more_results_left(self, json_data, api_context):
         """ Evaluate if more matches need to be queried. """
-        if (self.result['results_remaining'] != 0) \
-                and self.api_context.processed < \
-                self.api_context.matches_desired:
+        if (json_data['results_remaining'] != 0) \
+                and api_context.processed < \
+                api_context.matches_desired:
 
             logger.info(
                 (
                     "Did {0} of {1} for {2}. {3} left.  \n "
                     "Logic: remaining: {4}, "
                 ).format(
-                    self.api_context.processed,
-                    self.api_context.matches_desired,
-                    self.api_context.account_id,
-                    self.result['results_remaining'],
-                    not (self.result['results_remaining'] == 0),
+                    api_context.processed,
+                    api_context.matches_desired,
+                    api_context.account_id,
+                    json_data['results_remaining'],
+                    not (json_data['results_remaining'] == 0),
 
                 )
             )
@@ -631,41 +631,41 @@ class CycleApiCall(ApiFollower):
 
             logger.info(
                 "Did {0} of {1} for {2}. {3} left.  Done.".format(
-                    self.api_context.processed,
-                    self.api_context.matches_desired,
-                    self.api_context.account_id,
-                    self.result['results_remaining']
+                    api_context.processed,
+                    api_context.matches_desired,
+                    api_context.account_id,
+                    json_data['results_remaining']
                 )
             )
 
             return False
 
     # Until the date_max problem is fixed, date_max cannot work.
-    def rebound(self):
+    def rebound(self, json_data, api_context):
         """ Re-hit the match history list for remaining matches. """
         logger.info("Rebounding")
-        self.api_context.start_at_match_id = self.result[
+        api_context.start_at_match_id = json_data[
             'matches'
         ][-1]['match_id']
-        self.api_context.date_max = None
+        api_context.date_max = None
 
         vac = ValveApiCall()
         rpr = CycleApiCall()
-        pass_context = deepcopy(self.api_context)
+        pass_context = deepcopy(api_context)
         chain(vac.s(
             mode='GetMatchHistory',
             api_context=pass_context
         ), rpr.s()).delay()
 
-    def cleanup(self):
+    def cleanup(self, api_context):
         """ Do maintenance for if we were focusing on a player. """
-        if self.api_context.account_id is not None:
+        if api_context.account_id is not None:
             try:
                 player = Player.objects.get(
-                    steam_id=self.api_context.account_id
+                    steam_id=api_context.account_id
                 )
-                if self.api_context.start_scrape_time:
-                    new_last_scrape = self.api_context.start_scrape_time
+                if api_context.start_scrape_time:
+                    new_last_scrape = api_context.start_scrape_time
                 else:
                     new_last_scrape = now()
                 player.last_scrape_time = new_last_scrape
@@ -673,7 +673,7 @@ class CycleApiCall(ApiFollower):
             except Player.DoesNotExist:
                 logger.error(
                     "ERROR! Player does not exist {0}".format(
-                        self.api_context.account_id
+                        api_context.account_id
                     )
                 )
 
