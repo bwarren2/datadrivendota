@@ -86,6 +86,7 @@ class UpdateTeam(ApiFollower):
 
     def run(self, api_context, json_data, response_code, url):
 
+        json_data = json_data['result']
         for team_data in json_data['teams']:
             team, created = Team.objects.get_or_create(
                 steam_id=team_data['team_id']
@@ -160,35 +161,54 @@ class UpdateTeamLogo(ApiFollower):
     def run(self, api_context, json_data, response_code, url):
 
         team = Team.objects.get(steam_id=api_context.team_id)
-        url = json_data['data']['url']
-        try:
-            if api_context.logo_type == 'team':
-                try:
-                    resp = requests.get(url)
-                    if resp.status_code == 200:
-
-                        # Shove data into an imagefile
-                        buff = BytesIO(resp.content)
-                        buff.seek(0)
-                        filename = slugify(team.steam_id) + '_full.png'
-                        team.stored_image.save(filename, File(buff))
-
-                    team.save()
-                    logger.debug(url)
-                except:
-                    err = sys.exc_info()[0]
-                    print("No image for %s!  Error %s" % (team.steam_id, err))
-
-            else:
-                logging.error(
-                    'How did we get a non-team image for team {0}'.format(
-                        team.steam_id
-                    )
+        if response_code != 200:
+            logger.warning(
+                "Couldn't get an image from {0}, {1}, {2}, {3}".format(
+                    url,
+                    api_context,
+                    json_data,
+                    response_code,
                 )
+            )
+
+            team.image_failed = True
             team.save()
 
-        except:
-            logging.error('No image for team {0}!'.format(team.steam_id))
+        else:
+            url = json_data['data']['url']
+            try:
+                if api_context.logo_type == 'team':
+                    try:
+                        resp = requests.get(url)
+                        if resp.status_code == 200:
+
+                            # Shove data into an imagefile
+                            buff = BytesIO(resp.content)
+                            buff.seek(0)
+                            filename = slugify(team.steam_id) + '_full.png'
+                            team.stored_image.save(filename, File(buff))
+
+                        team.save()
+                        logger.debug(url)
+                    except:
+                        err = sys.exc_info()[0]
+                        print(
+                            "No image for {0}!  Error {1}".format(
+                                team.steam_id,
+                                err
+                            )
+                        )
+
+                else:
+                    logging.error(
+                        'How did we get a non-team image for team {0}'.format(
+                            team.steam_id
+                        )
+                    )
+                team.save()
+
+            except:
+                logging.error('No image for team {0}!'.format(team.steam_id))
 
 
 def map_team_players(team, team_data):

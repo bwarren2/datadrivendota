@@ -151,13 +151,15 @@ class UpdateLeagueLogo(ApiFollower):
     def run(self, api_context, json_data, response_code, url):
         league = League.objects.get(steam_id=api_context.league_id)
 
+        json_data = json_data['result']
+
         # It seems this is the error for a bad ugc id, based on hand test
-        if json_data['status']['code'] == 9:
+        if json_data.get('status', {}).get('code', {}) == 9:
             self.fake_league_image(league)
         else:
             url = '{0}{1}'.format(
                 settings.VALVE_CDN_PATH,
-                json_data['result']['path']
+                json_data['path']
             )
             logging.info('Getting league logo at {0}'.format(url))
             try:

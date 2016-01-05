@@ -266,7 +266,7 @@ class ApiFollower(BaseTask):
 
 # Descendants
 class ValveApiCall(BaseTask):
-    def run(self, mode, **kwargs):
+    def run(self, mode, api_context, **kwargs):
         """
         Ping the valve API for downloading results.
 
@@ -277,20 +277,20 @@ class ValveApiCall(BaseTask):
         """
         try:
 
-            url = self.api_context.url_for(mode)
+            url = api_context.url_for(mode)
 
             # We could use payload, but this is easier to log.
-            URL = url + '?' + urlencode(self.api_context.to_url_dict(mode))
+            URL = url + '?' + urlencode(api_context.to_url_dict(mode))
             logger.info("Hitting valve API for URL: " + URL)
 
             # Exception handling for the URL opening.
             response = self.get_response(URL, mode)
 
             # If everything is kosher, import the result and return it.
-            json_data = self.get_json(response)
+            json_data = self.get_json(response, URL)
 
             return {
-                'api_context': self.api_context,
+                'api_context': api_context,
                 'response_code': response.status_code,
                 'json_data': json_data,
                 'url': URL,
