@@ -1,15 +1,51 @@
 import re
+from datetime import timedelta
 
 from django.test import TestCase, Client
 from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core import mail
-from django.contrib.auth.models import User
+from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 from model_mommy import mommy
 
-from .models import MatchRequest
+from .models import (
+    MatchRequest,
+    get_active_users,
+    get_inactive_users,
+)
 from .management.tasks import KickoffMatchRequests, CreateMatchParse
+User = get_user_model()
+
+
+class TestActiveAccounts(TestCase):
+    def test_active_and_inactive(self):
+        now = timezone.now()
+        then = now - timedelta(days=15)
+        inactive_user = mommy.make(
+            User,
+            last_login=then,
+            username="inactive",
+        )
+        active_user = mommy.make(
+            User,
+            last_login=now,
+            username="active",
+        )
+        mommy.make(
+            User,
+            last_login=None,
+            username="null",
+        )
+        self.assertEqual(
+            [inactive_user],
+            list(get_inactive_users())
+        )
+        self.assertEqual(
+            [active_user],
+            list(get_active_users())
+        )
 
 
 class TestKickoffRequestTask(TestCase):

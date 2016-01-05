@@ -1,7 +1,29 @@
 from uuid import uuid4
+from datetime import timedelta
+
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+
 from accounts.exceptions import DataCapReached, ValidationException
+
+
+def get_active_users():
+    two_weeks_ago = timezone.now() - timedelta(days=14)
+    return User.objects.filter(
+        last_login__gte=two_weeks_ago
+    ).exclude(
+        last_login__isnull=True
+    )
+
+
+def get_inactive_users():
+    two_weeks_ago = timezone.now() - timedelta(days=14)
+    return User.objects.exclude(
+        last_login__gt=two_weeks_ago
+    ).exclude(
+        last_login__isnull=True
+    )
 
 
 def get_code():
