@@ -166,7 +166,11 @@ class ReadParseResults(Task):
         )
         channel = connection.channel()
         queue_name = 'python_parse'
-        channel.exchange_declare(exchange=queue_name, type='direct')
+        channel.exchange_declare(
+            exchange=queue_name,
+            type='direct',
+            durable=True
+        )
         result = channel.queue_declare(
             queue=queue_name,
             durable=settings.JAVA_QUEUE_DURABILITY,
