@@ -108,7 +108,9 @@ class UpdateMatch(ApiFollower):
         else:
             data = json_data['result']
             if 'error' in data:
-                self.error_match(api_context, data, response_code, url)
+                self.error_match(
+                    api_context, data['error'], response_code, url
+                )
             else:
                 self.update_match(api_context, data, response_code, url)
 
@@ -117,14 +119,17 @@ class UpdateMatch(ApiFollower):
             api_context, json_data, response_code, url
         ))
 
-    def error_match(self, api_context, data, response_code, url):
-        if data['error'] == 'Match ID not found':
+    def error_match(self, api_context, error, response_code, url):
+        not_found = error == 'Match ID not found'
+        is_practice = error == (
+            'Practice matches are not available via GetMatchDetails'
+        )
+
+        if not_found:
             logger.warning(
                 'Match ID {0} not found'.format(api_context.match_id)
             )
-        elif data['error'] == (
-            'Practice matches are not available via GetMatchDetails'
-        ):
+        elif is_practice:
             logger.warning(
                 'Match ID {0} was a practice match, not recorded'.format(
                     api_context.match_id
@@ -132,7 +137,7 @@ class UpdateMatch(ApiFollower):
             )
         else:
             logging.error("{0}.  Context:{1}".format(
-                data['error'], api_context)
+                error, api_context)
             )
 
         # Do logging on associated livematch
@@ -142,7 +147,7 @@ class UpdateMatch(ApiFollower):
             )
             lm.failed = True
             lm.save()
-        except:
+        except LiveMatch.DoesNotExist:
             logging.warning(
                 'No live match to fail. ({0})'.format(
                     api_context.match_id
@@ -150,6 +155,118 @@ class UpdateMatch(ApiFollower):
             )
 
     def update_match(self, api_context, data, response_code, url):
+
+        match = self.create_match(data, api_context)
+
+        self.create_pickbans(data, match)
+
+        match = self.merge_series(data, match)
+
+        self.create_guilds(data, match)
+        match = self.merge_guilds(data, match)
+
+        self.create_teams(data, match)
+        match = self.merge_teams(data, match)
+
+        match.save()
+
+    def create_pickbans(self, data, match):
+        if 'picks_bans' in data.keys():
+            for pickban in data['picks_bans']:
+                datadict = {
+                    'match': match,
+                    'is_pick': pickban['is_pick'],
+                    'hero': Hero.objects.get_or_create(
+                        steam_id=pickban['hero_id']
+                    )[0],
+                    'team': pickban['team'],
+                    'order': pickban['order'],
+
+                }
+                pb = PickBan.objects.get_or_create(
+                    match=match,
+                    order=pickban['order'],
+                    defaults=datadict
+                )[0]
+                pb.save()
+
+    def merge_series(self, data, match):
+        if 'series_id' in data.keys():
+            match.series_id = data['series_id']
+
+        if 'series_type' in data.keys():
+            match.series_type = data['series_type']
+
+        return match
+
+    def create_guilds(self, data, match):
+        if 'radiant_guild_id' in data.keys():
+            datadict = {
+                'steam_id': data["radiant_guild_id"],
+                'name': data["radiant_guild_name"],
+                'logo': data["radiant_guild_logo"],
+            }
+            Guild.objects.get_or_create(
+                steam_id=data["radiant_guild_id"],
+                defaults=datadict
+            )[0]
+
+        if 'dire_guild_id' in data.keys():
+            datadict = {
+                'steam_id': data["dire_guild_id"],
+                'name': data["dire_guild_name"],
+                'logo': data["dire_guild_logo"],
+            }
+            Guild.objects.get_or_create(
+                steam_id=data["dire_guild_id"],
+                defaults=datadict
+            )[0]
+
+    def merge_guilds(self, data, match):
+        if 'radiant_guild_id' in data.keys():
+            g = Guild.objects.get(
+                steam_id=data["radiant_guild_id"],
+            )
+            match.radiant_guild = g
+
+        if 'dire_guild_id' in data.keys():
+            g = Guild.objects.get(
+                steam_id=data["dire_guild_id"],
+            )
+            match.dire_guild = g
+
+        return match
+
+    def create_teams(self, data, match):
+        if 'radiant_team_id' in data.keys():
+            Team.objects.get_or_create(
+                steam_id=data['radiant_team_id']
+            )[0]
+
+        if 'dire_team_id' in data.keys():
+            Team.objects.get_or_create(
+                steam_id=data['dire_team_id']
+            )[0]
+
+    def merge_teams(self, data, match):
+
+        if 'radiant_team_id' in data.keys():
+            radiant_team = Team.objects.get(
+                steam_id=data['radiant_team_id']
+            )
+            match.radiant_team = radiant_team
+            match.radiant_team_complete = data['radiant_team_complete'] == 1
+
+        if 'dire_team_id' in data.keys():
+            dire_team = Team.objects.get(
+                steam_id=data['dire_team_id']
+            )
+            match.dire_team = dire_team
+            match.dire_team_complete = data['dire_team_complete'] == 1
+
+        return match
+
+    def create_match(self, data, api_context):
         kwargs = {
             'radiant_win': data.get('radiant_win', None),
             'duration': data['duration'],
@@ -173,14 +290,6 @@ class UpdateMatch(ApiFollower):
             )[0],
             'skill': api_context.skill,
         }
-        try:
-
-            league = League.objects.get_or_create(
-                steam_id=data['leagueid']
-            )[0]
-            kwargs.update({'league': league})
-        except KeyError:
-            pass
 
         try:
             match = Match.objects.get(steam_id=data['match_id'])
@@ -202,73 +311,7 @@ class UpdateMatch(ApiFollower):
                 refresh_records=api_context.refresh_records
             )
 
-        if 'picks_bans' in data.keys():
-            for pickban in data['picks_bans']:
-                datadict = {
-                    'match': match,
-                    'is_pick': pickban['is_pick'],
-                    'hero': Hero.objects.get_or_create(
-                        steam_id=pickban['hero_id']
-                    )[0],
-                    'team': pickban['team'],
-                    'order': pickban['order'],
-
-                }
-                pb = PickBan.objects.get_or_create(
-                    match=match,
-                    order=pickban['order'],
-                    defaults=datadict
-                )[0]
-                pb.save()
-
-        if 'series_id' in data.keys():
-            match.series_id = data['series_id']
-
-        if 'series_type' in data.keys():
-            match.series_type = data['series_type']
-
-        if 'radiant_guild_id' in data.keys():
-            datadict = {
-                'steam_id': data["radiant_guild_id"],
-                'name': data["radiant_guild_name"],
-                'logo': data["radiant_guild_logo"],
-            }
-            g = Guild.objects.get_or_create(
-                steam_id=data["radiant_guild_id"],
-                defaults=datadict
-            )[0]
-            match.radiant_guild = g
-
-        if 'dire_guild_id' in data.keys():
-            datadict = {
-                'steam_id': data["dire_guild_id"],
-                'name': data["dire_guild_name"],
-                'logo': data["dire_guild_logo"],
-            }
-            g = Guild.objects.get_or_create(
-                steam_id=data["dire_guild_id"],
-                defaults=datadict
-            )[0]
-            match.dire_guild = g
-
-        if 'radiant_team_id' in data.keys():
-            radiant_team = Team.objects.get_or_create(
-                steam_id=data['radiant_team_id']
-            )[0]
-            match.radiant_team = radiant_team
-            match.radiant_team_complete = True \
-                if data['radiant_team_id'] == 1 else False
-
-        if 'dire_team_id' in data.keys():
-            dire_team = Team.objects.get_or_create(
-                steam_id=data['dire_team_id']
-            )[0]
-            match.dire_team = dire_team
-            match.dire_team_complete = True \
-                if data['dire_team_id'] == 1 else False
-        match.save()
-
-        return api_context
+        return match
 
 
 def upload_match_summary(players, parent_match, refresh_records):

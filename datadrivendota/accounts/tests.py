@@ -1,12 +1,15 @@
 import re
 from datetime import timedelta
 
+import responses
+
 from django.test import TestCase, Client
 from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core import mail
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.utils.decorators import method_decorator
 
 from model_mommy import mommy
 
@@ -127,7 +130,17 @@ class TestParserTask(TestCase):
             self.match_request
         )
 
+    @method_decorator(responses.activate)
     def test_get_url(self):
+        responses.add(
+            responses.GET,
+            'https://replayurls.herokuapp.com/tools/matchurls?match_id=1615448703',
+             body='{"replay_url": "http://replay121.valve.net/570/1615448703_975041684.dem.bz2"}',
+            status=200,
+            content_type='application/json',
+            match_querystring=True,
+        )
+
         task = CreateMatchParse()
         match_req = task.have_match(self.match.steam_id)
         task.get_replay_url(self.match.steam_id, match_req)
