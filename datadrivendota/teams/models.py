@@ -42,7 +42,9 @@ class Team(models.Model):
         null=True, help_text='Steam cdn image url'
     )
     image_ugc = models.BigIntegerField(null=True)  # Through live league games
+    image_failed = models.BooleanField(default=False)
     stored_image = models.ImageField(null=True, upload_to='teams/img/')
+
     update_time = models.DateTimeField(default=timezone.now)
 
     objects = models.Manager()
@@ -51,16 +53,19 @@ class Team(models.Model):
 
     @property
     def image(self):
-        try:
-            return self.stored_image.url
-        except ValueError:
+        if self.image_failed is True:
             return static('blank_team.png')
+        else:
+            try:
+                return self.stored_image.url
+            except ValueError:
+                return static('blank_team.png')
 
     @property
     def is_outdated(self):
         if (
-            self.image == static('blank_team.png')
-            and self.update_time < (
+            self.image == static('blank_team.png') and
+            self.update_time < (
                 timezone.now() - timedelta(
                     seconds=settings.UPDATE_LAG_UTC
                 )

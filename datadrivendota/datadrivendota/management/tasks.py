@@ -1,16 +1,18 @@
 import gc
 import requests
 from time import time as now
-from urllib import urlencode
+from purl import URL
+
 from celery import Task
 from celery.exceptions import (
     SoftTimeLimitExceeded,
     TimeLimitExceeded,
     WorkerLostError,
 )
-from datadrivendota.settings.base import STEAM_API_KEY
-import logging
 
+from datadrivendota.settings.base import STEAM_API_KEY
+
+import logging
 logger = logging.getLogger(__name__)
 
 
@@ -187,7 +189,13 @@ class ApiContext(object):
 
         }
         try:
-            return mode_dict[mode]
+
+            url = URL.from_string(mode_dict[mode])
+            for k, v in self.to_url_dict(mode).iteritems():
+                url = url.query_param(k, v)
+
+            return url.as_string()
+
         except KeyError:
             logger.error("What is this mode? {0}".format(mode))
             raise
@@ -232,15 +240,9 @@ class ApiContext(object):
 # Parents
 class BaseTask(Task):
 
-    """A subcase of celery tasks with a api context and garbage collection. """
+    """A subcase of celery tasks with garbage collection. """
 
     abstract = True
-
-    def __call__(self, *args, **kwargs):
-        """ Expect an ApiContext instance in calling. """
-        self.api_context = kwargs['api_context']
-        del kwargs['api_context']
-        return super(BaseTask, self).__call__(*args, **kwargs)
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         # Optimization hack in heroku instances.
@@ -249,79 +251,100 @@ class BaseTask(Task):
     # There are also hooks for retry, fail, and success actions.
 
 
-class ApiFollower(Task):
+class ApiFollower(BaseTask):
 
-    """ Expect an api context and a result. """
+    """
 
+    Expect run() called with:
+        an api context, a result, a status code, and a url.
+    """
     abstract = True
 
     def __call__(self, *args, **kwargs):
-        self.result = args[0].get('result', {})
-        self.api_context = args[0].get('api_context', {})
+        # We can only return 1 thing in a chain,
+        # but want to pass 4 to api-following run() calls.
+        if len(args) == 1 and isinstance(args[0], dict):
+            kwargs.update(args[0])
+            args = ()
         return super(ApiFollower, self).__call__(*args, **kwargs)
 
 
 # Descendants
 class ValveApiCall(BaseTask):
-    def run(self, mode, **kwargs):
+    def run(self, mode, api_context, **kwargs):
         """
         Ping the valve API for downloading results.
 
-        We do have exactly one task that interacts with valve's api to enable
-        rate limiting.  Check celery config/env for that metering.
+        We have exactly one task that interacts with valve's api to enable rate limiting.  Check celery config/env for that metering.  This task primarily does dumb passthrough; downstream tasks are responsible for interpreting the (various) ways things can fail.
 
         For lots more docs, see http://dev.dota2.com/showthread.php?t=58317
         """
         try:
 
-            url = self.api_context.url_for(mode)
+            api_url = api_context.url_for(mode)
+            logger.info("Hitting valve API for URL: " + api_url)
 
-            # We could use payload, but this is easier to log.
-            URL = url + '?' + urlencode(self.api_context.to_url_dict(mode))
-            logger.info("Hitting valve API for URL: " + URL)
+            response = self.get_response(api_url, mode)
 
-            # Exception handling for the URL opening.
-            try:
-                response = requests.get(URL, timeout=5)
-                if response.status_code != 200:
-                    if response.status_code in [104, 111]:
-                        logger.warning(
-                            "Got error code {0} for {1}.  Retrying. ".format(
-                                response.status_code, URL
-                            )
-                        )
-                        self.retry(mode=mode)
+            json_data = self.get_json(response, api_url)
 
-                    elif 400 <= response.status_code < 500:
-                        logger.error(
-                            "Got a 4XX code for {0}.  Not Retrying.".format(
-                                URL
-                            )
-                        )
-                    elif 500 <= response.status_code < 600:
-                        logger.error(
-                            "Got a 5XX code for {0}.  Not Retrying.".format(
-                                URL
-                            )
-                        )
-                    else:
-                        response.raise_for_status()
-
-            except requests.exceptions.Timeout:
-                logger.warning("Timed out for {0}.  Retrying.".format(URL))
-                self.retry(mode=mode)
-
-            # If everything is kosher, import the result and return it.
-            data = response.json()
-            data['api_context'] = self.api_context
-            return data
+            return {
+                'api_context': api_context,
+                'response_code': response.status_code,
+                'json_data': json_data,
+                'url': api_url,
+            }
 
         except SoftTimeLimitExceeded as exc:
-            logger.warning("Soft timeout for {0}.  Retrying.".format(URL))
+            logger.warning("Soft timeout for {0}.  Retrying.".format(api_url))
             self.retry(mode=mode, exc=exc)
         except WorkerLostError as exc:
-            logger.warning("Worker lost for {0}.  Retrying.".format(URL))
+            logger.warning("Worker lost for {0}.  Retrying.".format(api_url))
             self.retry(mode=mode, exc=exc)
         except TimeLimitExceeded as exc:
-            logger.warning("Time exceeded for {0}.  Retrying.".format(URL))
+            logger.warning("Time exceeded for {0}.  Retrying.".format(api_url))
             self.retry(mode=mode, exc=exc)
+
+    def get_response(self, api_url, mode):
+        try:
+            response = requests.get(api_url, timeout=5)
+            if response.status_code != 200:
+                if response.status_code in [104, 111]:
+                    logger.warning(
+                        "Got error code {0} for {1}.  Retrying. ".format(
+                            response.status_code, api_url
+                        )
+                    )
+                    self.retry(mode=mode)
+
+                elif 400 <= response.status_code < 500:
+                    logger.warning(
+                        "Got a 4XX code for {0}.  Not Retrying.".format(
+                            api_url
+                        )
+                    )
+                elif 500 <= response.status_code < 600:
+                    logger.warning(
+                        "Got a 5XX code for {0}.  Not Retrying.".format(
+                            api_url
+                        )
+                    )
+                else:
+                    response.raise_for_status()
+
+        except requests.exceptions.Timeout:
+            logger.warning("Timed out for {0}.  Retrying.".format(api_url))
+            self.retry(mode=mode)
+
+        return response
+
+    def get_json(self, response, api_url):
+        try:
+            json_data = response.json()
+        except ValueError:
+            # Technically this is not the thrown error, but read
+            # http://stackoverflow.com/questions/8381193/python-handle-json-decode-error-when-nothing-returned
+            logger.exception('JSON decode error for url '.format(api_url))
+            json_data = {}
+
+        return json_data

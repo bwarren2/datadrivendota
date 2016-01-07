@@ -365,10 +365,13 @@ ITEM_SCHEMA_KEY = 'valve_item_schema_json'
 # END REDIS CONFIGURATION
 
 # Tests
-# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-# NOSE_ARGS = [
-#     '--with-coverage',
-# ]
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--with-coverage',
+    #techdebt: duplicate listing here and in fabfile
+    '--cover-package=accounts,guilds,health,heroes,items,leagues,matches,players,teams,utils,datadrivendota',
+]
+
 
 # START STRIPE CONFIGURATION
 STRIPE_PUBLIC_KEY = getenv('STRIPE_PUBLIC_KEY')

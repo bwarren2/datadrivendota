@@ -89,8 +89,8 @@ class League(models.Model):
     @property
     def is_outdated(self):
         if (
-            self.image == static('blank_league.png')
-            and self.update_time < (
+            self.image == static('blank_league.png') and
+            self.update_time < (
                 timezone.now() - timedelta(
                     seconds=settings.UPDATE_LAG_UTC
                 )

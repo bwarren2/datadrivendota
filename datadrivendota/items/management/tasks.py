@@ -35,12 +35,16 @@ class UpdateItemSchema(ApiFollower):
     """
     Sets the redis store of the item json after parsing from vdf
     """
-    def run(self, urldata):
-        url = urldata['result']['items_game_url']
+    def run(self, api_context, json_data, response_code, url):
+
+        url = json_data['result']['items_game_url']
+
         logger.info("Item schema url: {0}".format(url))
         response = requests.get(url)
         data = vdf.loads(response.text)
         json_data = json.dumps(data)
+
         logger.info("Setting item schema in redis (url: {0})".format(url))
+
         redis.set(settings.ITEM_SCHEMA_KEY, json_data)
         logger.info("Item schema set in redis (url: {0})".format(url))

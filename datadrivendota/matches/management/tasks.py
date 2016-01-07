@@ -92,7 +92,7 @@ class UpdateMatch(ApiFollower):
 
     """ Reflect the match detail response in our database. """
 
-    def run(self, data):
+    def run(self, api_context, json_data, response_code, url):
         """
         Upload a match given the return of an API call.
 
@@ -103,160 +103,215 @@ class UpdateMatch(ApiFollower):
         needed; if urldata['status'] == 1: right now this just trawls for
         overall match data.
         """
-        data = self.result
-        if 'error' in data:
-
-            if data['error'] == 'Match ID not found':
-                logger.warning(
-                    'Match ID {0} not found'.format(self.api_context.match_id)
-                )
-            elif data['error'] == (
-                'Practice matches are not available via GetMatchDetails'
-            ):
-                logger.warning(
-                    'Match ID {0} was a practice match, not recorded'.format(
-                        self.api_context.match_id
-                    )
+        if 'result' not in json_data:
+            self.fail_match(api_context, json_data, response_code, url)
+        else:
+            data = json_data['result']
+            if 'error' in data:
+                self.error_match(
+                    api_context, data['error'], response_code, url
                 )
             else:
-                logging.error("{0}.  Context:{1}".format(
-                    data['error'], self.api_context)
-                )
+                self.update_match(api_context, data, response_code, url)
 
-            # Do logging on associated livematch
-            try:
-                lm = LiveMatch.objects.get(
-                    steam_id=self.api_context.match_id
-                )
-                lm.failed = True
-                lm.save()
-            except:
-                logging.warning(
-                    'No live match to fail. ({0})'.format(
-                        self.api_context.match_id
-                    )
-                )
+    def fail_match(self, api_context, json_data, response_code, url):
+        logger.warning("Got fake data: {0}, {1}, {2}, {3}".format(
+            api_context, json_data, response_code, url
+        ))
 
+    def error_match(self, api_context, error, response_code, url):
+        not_found = error == 'Match ID not found'
+        is_practice = error == (
+            'Practice matches are not available via GetMatchDetails'
+        )
+
+        if not_found:
+            logger.warning(
+                'Match ID {0} not found'.format(api_context.match_id)
+            )
+        elif is_practice:
+            logger.warning(
+                'Match ID {0} was a practice match, not recorded'.format(
+                    api_context.match_id
+                )
+            )
         else:
-            kwargs = {
-                'radiant_win': data.get('radiant_win', None),
-                'duration': data['duration'],
-                'start_time': data['start_time'],
-                'steam_id': data['match_id'],
-                'match_seq_num': data['match_seq_num'],
-                'tower_status_radiant': data['tower_status_radiant'],
-                'tower_status_dire': data['tower_status_dire'],
-                'barracks_status_radiant': data['barracks_status_radiant'],
-                'barracks_status_dire': data['barracks_status_dire'],
-                'cluster': data['cluster'],
-                'first_blood_time': data['first_blood_time'],
-                'lobby_type': LobbyType.objects.get_or_create(
-                    steam_id=data['lobby_type']
-                )[0],
-                'human_players': data['human_players'],
-                'positive_votes': data['positive_votes'],
-                'negative_votes': data['negative_votes'],
-                'game_mode': GameMode.objects.get_or_create(
-                    steam_id=data['game_mode']
-                )[0],
-                'skill': self.api_context.skill,
+            logging.error("{0}.  Context:{1}".format(
+                error, api_context)
+            )
+
+        # Do logging on associated livematch
+        try:
+            lm = LiveMatch.objects.get(
+                steam_id=api_context.match_id
+            )
+            lm.failed = True
+            lm.save()
+        except LiveMatch.DoesNotExist:
+            logging.warning(
+                'No live match to fail. ({0})'.format(
+                    api_context.match_id
+                )
+            )
+
+    def update_match(self, api_context, data, response_code, url):
+
+        match = self.create_match(data, api_context)
+
+        self.create_pickbans(data, match)
+
+        match = self.merge_series(data, match)
+
+        self.create_guilds(data, match)
+        match = self.merge_guilds(data, match)
+
+        self.create_teams(data, match)
+        match = self.merge_teams(data, match)
+
+        match.save()
+
+    def create_pickbans(self, data, match):
+        if 'picks_bans' in data.keys():
+            for pickban in data['picks_bans']:
+                datadict = {
+                    'match': match,
+                    'is_pick': pickban['is_pick'],
+                    'hero': Hero.objects.get_or_create(
+                        steam_id=pickban['hero_id']
+                    )[0],
+                    'team': pickban['team'],
+                    'order': pickban['order'],
+
+                }
+                pb = PickBan.objects.get_or_create(
+                    match=match,
+                    order=pickban['order'],
+                    defaults=datadict
+                )[0]
+                pb.save()
+
+    def merge_series(self, data, match):
+        if 'series_id' in data.keys():
+            match.series_id = data['series_id']
+
+        if 'series_type' in data.keys():
+            match.series_type = data['series_type']
+
+        return match
+
+    def create_guilds(self, data, match):
+        if 'radiant_guild_id' in data.keys():
+            datadict = {
+                'steam_id': data["radiant_guild_id"],
+                'name': data["radiant_guild_name"],
+                'logo': data["radiant_guild_logo"],
             }
-            try:
+            Guild.objects.get_or_create(
+                steam_id=data["radiant_guild_id"],
+                defaults=datadict
+            )[0]
 
-                league = League.objects.get_or_create(
-                    steam_id=data['leagueid']
-                )[0]
-                kwargs.update({'league': league})
-            except KeyError:
-                pass
+        if 'dire_guild_id' in data.keys():
+            datadict = {
+                'steam_id': data["dire_guild_id"],
+                'name': data["dire_guild_name"],
+                'logo': data["dire_guild_logo"],
+            }
+            Guild.objects.get_or_create(
+                steam_id=data["dire_guild_id"],
+                defaults=datadict
+            )[0]
 
-            try:
-                match = Match.objects.get(steam_id=data['match_id'])
-                for key, value in kwargs.iteritems():
-                    setattr(match, key, value)
-                match.save()
-                upload_match_summary(
-                    players=data['players'],
-                    parent_match=match,
-                    refresh_records=self.api_context.refresh_records
-                )
+    def merge_guilds(self, data, match):
+        if 'radiant_guild_id' in data.keys():
+            g = Guild.objects.get(
+                steam_id=data["radiant_guild_id"],
+            )
+            match.radiant_guild = g
 
-            except Match.DoesNotExist:
-                match = Match.objects.create(**kwargs)
-                match.save()
-                upload_match_summary(
-                    players=data['players'],
-                    parent_match=match,
-                    refresh_records=self.api_context.refresh_records
-                )
+        if 'dire_guild_id' in data.keys():
+            g = Guild.objects.get(
+                steam_id=data["dire_guild_id"],
+            )
+            match.dire_guild = g
 
-            if 'picks_bans' in data.keys():
-                for pickban in data['picks_bans']:
-                    datadict = {
-                        'match': match,
-                        'is_pick': pickban['is_pick'],
-                        'hero': Hero.objects.get_or_create(
-                            steam_id=pickban['hero_id']
-                        )[0],
-                        'team': pickban['team'],
-                        'order': pickban['order'],
+        return match
 
-                    }
-                    pb = PickBan.objects.get_or_create(
-                        match=match,
-                        order=pickban['order'],
-                        defaults=datadict
-                    )[0]
-                    pb.save()
+    def create_teams(self, data, match):
+        if 'radiant_team_id' in data.keys():
+            Team.objects.get_or_create(
+                steam_id=data['radiant_team_id']
+            )[0]
 
-            if 'series_id' in data.keys():
-                match.series_id = data['series_id']
+        if 'dire_team_id' in data.keys():
+            Team.objects.get_or_create(
+                steam_id=data['dire_team_id']
+            )[0]
 
-            if 'series_type' in data.keys():
-                match.series_type = data['series_type']
+    def merge_teams(self, data, match):
 
-            if 'radiant_guild_id' in data.keys():
-                datadict = {
-                    'steam_id': data["radiant_guild_id"],
-                    'name': data["radiant_guild_name"],
-                    'logo': data["radiant_guild_logo"],
-                }
-                g = Guild.objects.get_or_create(
-                    steam_id=data["radiant_guild_id"],
-                    defaults=datadict
-                )[0]
-                match.radiant_guild = g
+        if 'radiant_team_id' in data.keys():
+            radiant_team = Team.objects.get(
+                steam_id=data['radiant_team_id']
+            )
+            match.radiant_team = radiant_team
+            match.radiant_team_complete = data['radiant_team_complete'] == 1
 
-            if 'dire_guild_id' in data.keys():
-                datadict = {
-                    'steam_id': data["dire_guild_id"],
-                    'name': data["dire_guild_name"],
-                    'logo': data["dire_guild_logo"],
-                }
-                g = Guild.objects.get_or_create(
-                    steam_id=data["dire_guild_id"],
-                    defaults=datadict
-                )[0]
-                match.dire_guild = g
+        if 'dire_team_id' in data.keys():
+            dire_team = Team.objects.get(
+                steam_id=data['dire_team_id']
+            )
+            match.dire_team = dire_team
+            match.dire_team_complete = data['dire_team_complete'] == 1
 
-            if 'radiant_team_id' in data.keys():
-                radiant_team = Team.objects.get_or_create(
-                    steam_id=data['radiant_team_id']
-                )[0]
-                match.radiant_team = radiant_team
-                match.radiant_team_complete = True \
-                    if data['radiant_team_id'] == 1 else False
+        return match
 
-            if 'dire_team_id' in data.keys():
-                dire_team = Team.objects.get_or_create(
-                    steam_id=data['dire_team_id']
-                )[0]
-                match.dire_team = dire_team
-                match.dire_team_complete = True \
-                    if data['dire_team_id'] == 1 else False
+    def create_match(self, data, api_context):
+        kwargs = {
+            'radiant_win': data.get('radiant_win', None),
+            'duration': data['duration'],
+            'start_time': data['start_time'],
+            'steam_id': data['match_id'],
+            'match_seq_num': data['match_seq_num'],
+            'tower_status_radiant': data['tower_status_radiant'],
+            'tower_status_dire': data['tower_status_dire'],
+            'barracks_status_radiant': data['barracks_status_radiant'],
+            'barracks_status_dire': data['barracks_status_dire'],
+            'cluster': data['cluster'],
+            'first_blood_time': data['first_blood_time'],
+            'lobby_type': LobbyType.objects.get_or_create(
+                steam_id=data['lobby_type']
+            )[0],
+            'human_players': data['human_players'],
+            'positive_votes': data['positive_votes'],
+            'negative_votes': data['negative_votes'],
+            'game_mode': GameMode.objects.get_or_create(
+                steam_id=data['game_mode']
+            )[0],
+            'skill': api_context.skill,
+        }
+
+        try:
+            match = Match.objects.get(steam_id=data['match_id'])
+            for key, value in kwargs.iteritems():
+                setattr(match, key, value)
             match.save()
+            upload_match_summary(
+                players=data['players'],
+                parent_match=match,
+                refresh_records=api_context.refresh_records
+            )
 
-            return self.api_context
+        except Match.DoesNotExist:
+            match = Match.objects.create(**kwargs)
+            match.save()
+            upload_match_summary(
+                players=data['players'],
+                parent_match=match,
+                refresh_records=api_context.refresh_records
+            )
+
+        return match
 
 
 def upload_match_summary(players, parent_match, refresh_records):
@@ -543,85 +598,86 @@ class CycleApiCall(ApiFollower):
     but that is the only API that really leans on repeated calls.
     """
 
-    def run(self, urldata):
+    def run(self, api_context, json_data, response_code, url):
         """ Ping the valve API to get match data & spawns new tasks. """
         # Validate
-        if self.result['status'] == 15:
+        json_data = json_data['result']
+        if json_data['status'] == 15:
             logger.warning(
                 "Could not pull data. {0}  disallowed it.".format(
-                    self.api_context.account_id
+                    api_context.account_id
                 )
             )
-            p = Player.objects.get(steam_id=self.api_context.account_id)
+            p = Player.objects.get(steam_id=api_context.account_id)
             p.updated = False
             p.save()
             return True
 
-        elif self.result['status'] == 1:
+        elif json_data['status'] == 1:
             # Spawn a bunch of match detail queries
 
             logger.info("Spawning")
 
-            self.spawn_detail_calls()
+            self.spawn_detail_calls(json_data, api_context)
 
             logger.info("Checking for more results")
-            if self.more_results_left():
-                self.rebound()
+            if self.more_results_left(json_data, api_context):
+                self.rebound(json_data, api_context)
 
             # Successful closeout
             else:
                 logger.info("Cleaning up")
-                self.cleanup()
+                self.cleanup(api_context)
             return True
         else:
             logger.error(
                 "Unhandled status: {0}".format(
-                    str(self.result['status'])
+                    json_data['status']
                 )
             )
             return True
 
-    def spawn_detail_calls(self):
+    def spawn_detail_calls(self, json_data, api_context):
         """ Make match detail calls for each match. """
-        for result in self.result['matches']:
-            self.api_context.processed += 1
-            if self.api_context.processed <= self.api_context.matches_desired:
+        for result in json_data['matches']:
+            api_context.processed += 1
+            if api_context.processed <= api_context.matches_desired:
 
                 logger.info(
                     "{0}: {1} done, {2} wanted, doing: {3}".format(
-                        self.api_context.account_id,
-                        self.api_context.processed,
-                        self.api_context.matches_desired,
-                        self.api_context.processed <=
-                        self.api_context.matches_desired
+                        api_context.account_id,
+                        api_context.processed,
+                        api_context.matches_desired,
+                        api_context.processed <=
+                        api_context.matches_desired
                     )
                 )
 
                 vac = ValveApiCall()
                 um = UpdateMatch()
-                self.api_context.match_id = result['match_id']
-                pass_context = deepcopy(self.api_context)
+                api_context.match_id = result['match_id']
+                pass_context = deepcopy(api_context)
                 chain(vac.s(
                     mode='GetMatchDetails',
                     api_context=pass_context
                 ), um.s()).delay()
 
-    def more_results_left(self):
+    def more_results_left(self, json_data, api_context):
         """ Evaluate if more matches need to be queried. """
-        if (self.result['results_remaining'] != 0) \
-                and self.api_context.processed < \
-                self.api_context.matches_desired:
+        if (json_data['results_remaining'] != 0) \
+                and api_context.processed < \
+                api_context.matches_desired:
 
             logger.info(
                 (
                     "Did {0} of {1} for {2}. {3} left.  \n "
                     "Logic: remaining: {4}, "
                 ).format(
-                    self.api_context.processed,
-                    self.api_context.matches_desired,
-                    self.api_context.account_id,
-                    self.result['results_remaining'],
-                    not (self.result['results_remaining'] == 0),
+                    api_context.processed,
+                    api_context.matches_desired,
+                    api_context.account_id,
+                    json_data['results_remaining'],
+                    not (json_data['results_remaining'] == 0),
 
                 )
             )
@@ -631,41 +687,41 @@ class CycleApiCall(ApiFollower):
 
             logger.info(
                 "Did {0} of {1} for {2}. {3} left.  Done.".format(
-                    self.api_context.processed,
-                    self.api_context.matches_desired,
-                    self.api_context.account_id,
-                    self.result['results_remaining']
+                    api_context.processed,
+                    api_context.matches_desired,
+                    api_context.account_id,
+                    json_data['results_remaining']
                 )
             )
 
             return False
 
     # Until the date_max problem is fixed, date_max cannot work.
-    def rebound(self):
+    def rebound(self, json_data, api_context):
         """ Re-hit the match history list for remaining matches. """
         logger.info("Rebounding")
-        self.api_context.start_at_match_id = self.result[
+        api_context.start_at_match_id = json_data[
             'matches'
         ][-1]['match_id']
-        self.api_context.date_max = None
+        api_context.date_max = None
 
         vac = ValveApiCall()
         rpr = CycleApiCall()
-        pass_context = deepcopy(self.api_context)
+        pass_context = deepcopy(api_context)
         chain(vac.s(
             mode='GetMatchHistory',
             api_context=pass_context
         ), rpr.s()).delay()
 
-    def cleanup(self):
+    def cleanup(self, api_context):
         """ Do maintenance for if we were focusing on a player. """
-        if self.api_context.account_id is not None:
+        if api_context.account_id is not None:
             try:
                 player = Player.objects.get(
-                    steam_id=self.api_context.account_id
+                    steam_id=api_context.account_id
                 )
-                if self.api_context.start_scrape_time:
-                    new_last_scrape = self.api_context.start_scrape_time
+                if api_context.start_scrape_time:
+                    new_last_scrape = api_context.start_scrape_time
                 else:
                     new_last_scrape = now()
                 player.last_scrape_time = new_last_scrape
@@ -673,7 +729,7 @@ class CycleApiCall(ApiFollower):
             except Player.DoesNotExist:
                 logger.error(
                     "ERROR! Player does not exist {0}".format(
-                        self.api_context.account_id
+                        api_context.account_id
                     )
                 )
 

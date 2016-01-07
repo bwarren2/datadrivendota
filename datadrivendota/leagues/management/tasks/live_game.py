@@ -61,8 +61,8 @@ class UpdateLiveGames(ApiFollower):
 
     """ Sets the redis store of live json to the retrieved result. """
 
-    def run(self, urldata):
-        urldata = self._setup(urldata)
+    def run(self, api_context, json_data, response_code, url):
+        urldata = self._setup(json_data)
 
         # Do this all at once to group leagues and teams in one pass
         urldata = self._merge_logos(urldata)

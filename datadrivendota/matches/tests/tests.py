@@ -2,9 +2,17 @@ from django.test import TestCase, Client
 from model_mommy import mommy
 from django.core.urlresolvers import reverse
 
+from datadrivendota.management.tasks import ApiContext
+
 from matches.viewsets import MatchPickBanViewSet
 from matches.mommy_recipes import make_league_match
-from matches.models import Match
+from matches.models import Match, PickBan, PlayerMatchSummary
+
+from matches.tests import json_samples
+from matches.management.tasks import UpdateMatch
+
+from players.models import Player
+from items.models import Item
 
 
 class TestUrlconf(TestCase):
@@ -157,3 +165,55 @@ class TestModelMethods(TestCase):
             axe_pms.enemies,
             [u'npc_dota_hero_juggernaut', u'npc_dota_hero_rubick']
         )
+
+
+class TestMatchUpload(TestCase):
+
+    def test_run(self):
+        api_context = ApiContext()
+        api_context.match_id = 1906861533
+
+        UpdateMatch().run(
+            api_context,
+            json_samples.valid_match,
+            200,
+            "test"
+        )
+
+        self.assertEqual(Match.objects.all().count(), 1)
+        self.assertEqual(PickBan.objects.all().count(), 20)
+        self.assertEqual(Player.objects.all().count(), 11)
+        self.assertEqual(Item.objects.all().count(), 35)
+        self.assertEqual(PlayerMatchSummary.objects.all().count(), 10)
+
+
+class TestMatchNotFound(TestCase):
+
+    def test_run(self):
+        api_context = ApiContext()
+        api_context.match_id = 1795416549
+
+        UpdateMatch().run(
+            api_context,
+            json_samples.not_found_match,
+            200,
+            "test"
+        )
+
+        self.assertEqual(Match.objects.all().count(), 0)
+
+
+class TestEmptyMatch(TestCase):
+
+    def test_run(self):
+        api_context = ApiContext()
+        api_context.match_id = 1795416549
+
+        UpdateMatch().run(
+            api_context,
+            json_samples.empty_match,
+            200,
+            "test"
+        )
+
+        self.assertEqual(Match.objects.all().count(), 0)
