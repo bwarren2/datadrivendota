@@ -1,6 +1,6 @@
 import logging
 from copy import deepcopy
-from time import time as now
+from time import time
 from celery import Task, chain
 
 from django.conf import settings
@@ -15,10 +15,7 @@ from datadrivendota.management.tasks import (
     ApiContext,
 )
 from matches.management.tasks import CycleApiCall
-# Patch for <urlopen error [Errno -2] Name or service not known in urllib2
-import os
-os.environ['http_proxy'] = ''
-# End Patch
+
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +107,7 @@ class MirrorPlayerData(BaseTask):
         if api_context.matches_requested is None:
             api_context.matches_requested = 500
 
-        api_context.start_scrape_time = now()
+        api_context.start_scrape_time = time()
         api_context.last_scrape_time = player.last_scrape_time
         api_context.deepycopy = True
 
@@ -192,7 +189,7 @@ class MirrorClientMatches(Task):
             context.matches_requested = settings.CLIENT_MATCH_COUNT
             context.matches_desired = settings.CLIENT_MATCH_COUNT
             context.deepcopy = True
-            context.start_scrape_time = now()
+            context.start_scrape_time = time()
             context.last_scrape_time = user.last_scrape_time
 
             vac = ValveApiCall()
