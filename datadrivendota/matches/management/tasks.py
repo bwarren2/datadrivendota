@@ -105,6 +105,7 @@ class UpdateMatch(ApiFollower):
         """
         if 'result' not in json_data:
             self.fail_match(api_context, json_data, response_code, url)
+
         else:
             data = json_data['result']
             if 'error' in data:
@@ -113,6 +114,9 @@ class UpdateMatch(ApiFollower):
                 )
             else:
                 self.update_match(api_context, data, response_code, url)
+
+        # The downstream parsing tasks use this.
+        return api_context
 
     def fail_match(self, api_context, json_data, response_code, url):
         logger.warning("Got fake data: {0}, {1}, {2}, {3}".format(
