@@ -76,6 +76,11 @@ class ParserTasksView(View):
                 response_data['result'] = 'Kicked off aggressively'
                 response_data['type'] = 'success'
 
+            elif task == 'read_java':
+                ReadParseResults().delay()
+                response_data['result'] = 'Reading results'
+                response_data['type'] = 'success'
+
             elif task == 'parse':
                 ReadParseResults().delay()
                 response_data['result'] = 'Reading results'
