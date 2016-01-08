@@ -16,6 +16,8 @@ from blog.models import Entry
 from accounts.models import MatchRequest
 from accounts.management.tasks import KickoffMatchRequests, ReadParseResults
 
+from matches.management.tasks import UpdatePmsReplays
+
 
 class LandingView(TemplateView):
     template_name = 'home.html'
@@ -82,7 +84,7 @@ class ParserTasksView(View):
                 response_data['type'] = 'success'
 
             elif task == 'parse':
-                ReadParseResults().delay()
+                UpdatePmsReplays().delay(match_id=match_id)
                 response_data['result'] = 'Reading results'
                 response_data['type'] = 'success'
 

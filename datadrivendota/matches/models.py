@@ -196,7 +196,7 @@ class PlayerMatchSummary(models.Model):
         max_length=50
     )
 
-    all_data = ReplayFragmentField()
+    all_data = ReplayFragmentField(max_length=250)
 
     objects = PMSQuerySet.as_manager()
 
@@ -332,36 +332,36 @@ class CombatLog(models.Model):
         'PlayerMatchSummary', null=True, blank=True
     )
 
-    kills = ReplayFragmentField()
-    deaths = ReplayFragmentField()
-    last_hits = ReplayFragmentField()
-    xp = ReplayFragmentField()
-    healing = ReplayFragmentField()
+    kills = ReplayFragmentField(max_length=250)
+    deaths = ReplayFragmentField(max_length=250)
+    last_hits = ReplayFragmentField(max_length=250)
+    xp = ReplayFragmentField(max_length=250)
+    healing = ReplayFragmentField(max_length=250)
 
-    hero_dmg_taken = ReplayFragmentField()
-    hero_dmg_dealt = ReplayFragmentField()
-    other_dmg_taken = ReplayFragmentField()
-    other_dmg_dealt = ReplayFragmentField()
+    hero_dmg_taken = ReplayFragmentField(max_length=250)
+    hero_dmg_dealt = ReplayFragmentField(max_length=250)
+    other_dmg_taken = ReplayFragmentField(max_length=250)
+    other_dmg_dealt = ReplayFragmentField(max_length=250)
 
-    all_income = ReplayFragmentField()
-    earned_income = ReplayFragmentField()
-    building_income = ReplayFragmentField()
-    courier_kill_income = ReplayFragmentField()
-    creep_kill_income = ReplayFragmentField()
-    hero_kill_income = ReplayFragmentField()
-    roshan_kill_income = ReplayFragmentField()
+    all_income = ReplayFragmentField(max_length=250)
+    earned_income = ReplayFragmentField(max_length=250)
+    building_income = ReplayFragmentField(max_length=250)
+    courier_kill_income = ReplayFragmentField(max_length=250)
+    creep_kill_income = ReplayFragmentField(max_length=250)
+    hero_kill_income = ReplayFragmentField(max_length=250)
+    roshan_kill_income = ReplayFragmentField(max_length=250)
 
-    buyback_expense = ReplayFragmentField()
-    death_expense = ReplayFragmentField()
+    buyback_expense = ReplayFragmentField(max_length=250)
+    death_expense = ReplayFragmentField(max_length=250)
 
-    hero_xp = ReplayFragmentField()
-    creep_xp = ReplayFragmentField()
-    roshan_xp = ReplayFragmentField()
+    hero_xp = ReplayFragmentField(max_length=250)
+    creep_xp = ReplayFragmentField(max_length=250)
+    roshan_xp = ReplayFragmentField(max_length=250)
 
-    key_bldg_dmg_dealt = ReplayFragmentField()
-    key_bldg_kills = ReplayFragmentField()
+    key_bldg_dmg_dealt = ReplayFragmentField(max_length=250)
+    key_bldg_kills = ReplayFragmentField(max_length=250)
 
-    item_buys = ReplayFragmentField()
+    item_buys = ReplayFragmentField(max_length=250)
 
 
 class StateLog(models.Model):
@@ -370,50 +370,50 @@ class StateLog(models.Model):
         'PlayerMatchSummary', null=True, blank=True
     )
 
-    agility = ReplayFragmentField()
-    agility_total = ReplayFragmentField()
-    strength = ReplayFragmentField()
-    strength_total = ReplayFragmentField()
-    intelligence = ReplayFragmentField()
-    intelligence_total = ReplayFragmentField()
+    agility = ReplayFragmentField(max_length=250)
+    agility_total = ReplayFragmentField(max_length=250)
+    strength = ReplayFragmentField(max_length=250)
+    strength_total = ReplayFragmentField(max_length=250)
+    intelligence = ReplayFragmentField(max_length=250)
+    intelligence_total = ReplayFragmentField(max_length=250)
 
-    damage = ReplayFragmentField()
-    damage_taken = ReplayFragmentField()
+    damage = ReplayFragmentField(max_length=250)
+    damage_taken = ReplayFragmentField(max_length=250)
 
-    healing = ReplayFragmentField()
+    healing = ReplayFragmentField(max_length=250)
 
-    health = ReplayFragmentField()
-    mana = ReplayFragmentField()
+    health = ReplayFragmentField(max_length=250)
+    mana = ReplayFragmentField(max_length=250)
 
-    kills = ReplayFragmentField()
-    deaths = ReplayFragmentField()
-    assists = ReplayFragmentField()
+    kills = ReplayFragmentField(max_length=250)
+    deaths = ReplayFragmentField(max_length=250)
+    assists = ReplayFragmentField(max_length=250)
 
-    items = ReplayFragmentField()
+    items = ReplayFragmentField(max_length=250)
 
-    last_hits = ReplayFragmentField()
-    denies = ReplayFragmentField()
-    misses = ReplayFragmentField()
+    last_hits = ReplayFragmentField(max_length=250)
+    denies = ReplayFragmentField(max_length=250)
+    misses = ReplayFragmentField(max_length=250)
 
-    lifestate = ReplayFragmentField()
-    magic_resist_pct = ReplayFragmentField()
-    armor = ReplayFragmentField()
-    recent_damage = ReplayFragmentField()
-    respawn_time = ReplayFragmentField()
-    roshan_kills = ReplayFragmentField()
-    nearby_creep_deaths = ReplayFragmentField()
+    lifestate = ReplayFragmentField(max_length=250)
+    magic_resist_pct = ReplayFragmentField(max_length=250)
+    armor = ReplayFragmentField(max_length=250)
+    recent_damage = ReplayFragmentField(max_length=250)
+    respawn_time = ReplayFragmentField(max_length=250)
+    roshan_kills = ReplayFragmentField(max_length=250)
+    nearby_creep_deaths = ReplayFragmentField(max_length=250)
 
-    shared_gold = ReplayFragmentField()
-    reliable_gold = ReplayFragmentField()
-    total_earned_gold = ReplayFragmentField()
-    unreliable_gold = ReplayFragmentField()
-    creep_kill_gold = ReplayFragmentField()
-    hero_kill_gold = ReplayFragmentField()
-    income_gold = ReplayFragmentField()
+    shared_gold = ReplayFragmentField(max_length=250)
+    reliable_gold = ReplayFragmentField(max_length=250)
+    total_earned_gold = ReplayFragmentField(max_length=250)
+    unreliable_gold = ReplayFragmentField(max_length=250)
+    creep_kill_gold = ReplayFragmentField(max_length=250)
+    hero_kill_gold = ReplayFragmentField(max_length=250)
+    income_gold = ReplayFragmentField(max_length=250)
 
-    tower_kills = ReplayFragmentField()
-    xp = ReplayFragmentField()
-    position = ReplayFragmentField()
+    tower_kills = ReplayFragmentField(max_length=250)
+    xp = ReplayFragmentField(max_length=250)
+    position = ReplayFragmentField(max_length=250)
 
 
 class AdditionalUnit(models.Model):
