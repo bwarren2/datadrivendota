@@ -835,10 +835,12 @@ class UpdatePmsReplays(Task):
             msg for msg in
             replay['states'] if msg['hero_id'] == pms.hero.steam_id
         ]
-        self.save_msgstream(pms, state_list, 'all', match_id, 'statelog')
+        all_data = {
+            'states': state_list,
+            'combat': pms_combat,
+        }
 
-        # Save combat to pms
-        self.save_msgstream(pms, pms_combat, 'all', match_id, 'combatlog')
+        self.save_msgstream(pms, all_data, 'all', match_id, 'all')
 
         # Annotate the PMS.  Useful for backfixing on parser upgrades
         pms.parsed_with = settings.PARSER_VERSION
