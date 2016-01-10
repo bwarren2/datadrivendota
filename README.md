@@ -466,3 +466,11 @@ Here is a sample of what the output looks like, minus some deprecation warnings.
       Applying leagues.0002_auto_20150419_1128... OK
       Applying matches.0001_initial... OK
       Applying sessions.0001_initial... OK
+
+
+Api resource list:
+
+http://api.steampowered.com/ISteamWebAPIUtil/GetSupportedAPIList/v0001/?key=09A6226940EB67F6D844B7D7E3A54186
+
+Other person's example:
+http://dotadb.azurewebsites.net/heroes/32/riki#
