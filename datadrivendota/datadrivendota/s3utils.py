@@ -11,8 +11,7 @@ from pipeline.storage import PipelineMixin
 
 StaticRootS3BotoStorage = lambda: S3BotoStorage(location='static')
 MediaRootS3BotoStorage = lambda: S3BotoStorage(location='media')
-ParseS3BotoStorage = lambda: S3BotoStorage(location='processed_replay_parse')
-# ,headers={'Content-Type': 'application/json', 'Content-Encoding': 'gzip'}
+ParseS3BotoStorage = lambda: S3BotoStorage(location='processed_replay_parse',headers={'Content-Type': 'application/json', 'Content-Encoding': 'gzip'}, gzip_content_types=['application/json'], gzip=True)
 
 # # CachedFilesMixin doesn't play well with Boto and S3. It over-quotes things,
 # # causing erratic failures. So we subclass.
