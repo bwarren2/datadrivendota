@@ -225,17 +225,23 @@ class MergeMatchRequestReplay(Task):
         match = Match.objects.get(steam_id=match_id)
         mr = MatchRequest.objects.get(match_id=match_id)
         url = mr.file_url
+        logging.info("Got file url {0}".format(url))
         try:
             r = requests.get(url)
             if r.status_code == 200:
                 holder = BytesIO(r.content)
-                _ = holder.seek(0)  # NOQA
+                holder.seek(0)
                 filename = "{0}_parse.json".format(match_id)
                 match.replay.save(filename, File(holder))
 
                 holder = BytesIO(gzip_str(r.content))
-                _ = holder.seek(0)  # NOQA
+                holder.seek(0)
                 filename = "{0}_parse.json.gz".format(match_id)
+                logging.info(
+                    'Saved compressed replay raw parse {0}'.format(
+                        filename
+                    )
+                )
                 match.compressed_replay.save(filename, File(holder))
 
             else:
