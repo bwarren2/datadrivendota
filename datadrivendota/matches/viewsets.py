@@ -1,10 +1,7 @@
 from rest_framework import viewsets, filters
 from rest_framework_extensions.cache.decorators import cache_response
 
-from .models import (
-    Match, PlayerMatchSummary, PickBan,
-    SkillBuild, GameMode, CombatLog, StateLog
-)
+from .models import Match, PlayerMatchSummary, PickBan, SkillBuild, GameMode
 
 from .serializers import (
     MatchSerializer,
@@ -12,8 +9,6 @@ from .serializers import (
     SkillBuildSerializer,
     FastMatchPickBansSerializer,
     PickbanSerializer,
-    CombatLogSerializer,
-    StateLogSerializer,
 )
 
 
@@ -187,52 +182,5 @@ class SkillBuildViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset[:result_limit]
         else:
             queryset = queryset[:self.page_size]
-
-        return queryset
-
-
-class CombatLogViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = CombatLog.objects.all()
-    page_size = 10
-    serializer_class = CombatLogSerializer
-
-    def get_queryset(self):
-        queryset = CombatLog.objects.all()
-
-        match_id = self.request.query_params.get('match_id')
-        if match_id is not None:
-            queryset = queryset.filter(
-                playermatchsummary__match__steam_id=match_id
-            )
-        pms_id = self.request.query_params.get('pms_id')
-        if pms_id is not None:
-            queryset = queryset.filter(
-                playermatchsummary__id=pms_id
-            )
-
-        queryset = queryset[:self.page_size]
-        return queryset
-
-
-class StateLogViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = StateLog.objects.all()
-    page_size = 10
-    serializer_class = StateLogSerializer
-
-    def get_queryset(self):
-        queryset = StateLog.objects.all()
-
-        match_id = self.request.query_params.get('match_id')
-        if match_id is not None:
-            queryset = queryset.filter(
-                playermatchsummary__match__steam_id=match_id
-            )
-        pms_id = self.request.query_params.get('pms_id')
-        if pms_id is not None:
-            queryset = queryset.filter(
-                playermatchsummary__id=pms_id
-            )
-
-        queryset = queryset[:self.page_size]
 
         return queryset
