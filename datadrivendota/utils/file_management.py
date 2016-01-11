@@ -9,13 +9,8 @@ from datadrivendota.s3utils import ParseS3BotoStorage
 def s3_parse(myfile, filename):
     """ Move a file to s3. """
 
-    # Try making a new file and sending that to s3
-    # s3_file = ParseS3BotoStorage().open(filename, 'w')
-
     with closing(ParseS3BotoStorage().open(filename, 'wb')) as f:
         f.write(myfile.read())
-        # f._storage.headers['Content-Type'] = 'application/json'
-        # f._storage.headers['Content-Encoding'] = 'gzip'
 
 
 def fake_image(l):

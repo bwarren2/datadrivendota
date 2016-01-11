@@ -6,7 +6,6 @@ from time import time as now
 from copy import deepcopy
 from datetime import datetime, timedelta
 
-from django.core.files import File
 from utils import gunzip_str
 from io import BytesIO
 from django.utils import timezone
@@ -24,7 +23,7 @@ from matches.models import (
     PickBan,
 )
 from accounts.models import MatchRequest
-
+from utils.file_management import s3_parse
 from datadrivendota.utilities import error_email
 from players.models import Player
 from heroes.models import Ability, Hero
@@ -32,7 +31,6 @@ from items.models import Item
 from leagues.models import League, LiveMatch
 from guilds.models import Guild
 from teams.models import Team
-from matches.models import CombatLog, StateLog
 from datadrivendota.management.tasks import (
     ValveApiCall,
     ApiFollower,
@@ -41,12 +39,6 @@ from datadrivendota.management.tasks import (
 
 from .combat_log_filters import combatlog_filter_map
 from .state_log_filters import entitystate_filter_map
-
-# Patch for <urlopen error [Errno -2] Name or service not known in urllib2
-import os
-os.environ['http_proxy'] = ''
-# End Patch
-
 
 logger = logging.getLogger(__name__)
 
@@ -862,21 +854,23 @@ class UpdatePmsReplays(Task):
             aspect,
             settings.PARSER_VERSION
         )
-        if fieldname == 'all':
-            pms.all_data.save(filename, File(buff))
+        s3_parse(buff, filename)
 
-        else:
-            if aspect == 'combatlog':
-                datalog = CombatLog.objects.get_or_create(
-                    playermatchsummary=pms
-                )[0]
+        # if fieldname == 'all':
+        #     pms.all_data.save(filename, File(buff))
 
-            elif aspect == 'statelog':
-                datalog = StateLog.objects.get_or_create(
-                    playermatchsummary=pms
-                )[0]
+        # else:
+        #     if aspect == 'combatlog':
+        #         datalog = CombatLog.objects.get_or_create(
+        #             playermatchsummary=pms
+        #         )[0]
 
-            else:
-                raise ValueError
+        #     elif aspect == 'statelog':
+        #         datalog = StateLog.objects.get_or_create(
+        #             playermatchsummary=pms
+        #         )[0]
 
-            getattr(datalog, fieldname).save(filename, File(buff))
+        #     else:
+        #         raise ValueError
+
+        #     getattr(datalog, fieldname).save(filename, File(buff))
