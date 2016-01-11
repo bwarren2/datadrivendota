@@ -6,11 +6,11 @@ from contextlib import closing
 from datadrivendota.s3utils import ParseS3BotoStorage
 
 
-def s3_parse(myfile, filename):
+def s3_parse(buff, filename):
     """ Move a file to s3. """
 
     with closing(ParseS3BotoStorage().open(filename, 'wb')) as f:
-        f.write(myfile.read())
+        f.write(buff.read())
 
 
 def fake_image(l):

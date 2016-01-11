@@ -854,23 +854,5 @@ class UpdatePmsReplays(Task):
             aspect,
             settings.PARSER_VERSION
         )
+        logger.info("Saving {0}".format(filename))
         s3_parse(buff, filename)
-
-        # if fieldname == 'all':
-        #     pms.all_data.save(filename, File(buff))
-
-        # else:
-        #     if aspect == 'combatlog':
-        #         datalog = CombatLog.objects.get_or_create(
-        #             playermatchsummary=pms
-        #         )[0]
-
-        #     elif aspect == 'statelog':
-        #         datalog = StateLog.objects.get_or_create(
-        #             playermatchsummary=pms
-        #         )[0]
-
-        #     else:
-        #         raise ValueError
-
-        #     getattr(datalog, fieldname).save(filename, File(buff))
