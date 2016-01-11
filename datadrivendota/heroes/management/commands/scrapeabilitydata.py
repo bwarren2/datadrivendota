@@ -1,13 +1,12 @@
 import io
 import requests
 from django.core.management.base import BaseCommand
-from uuid import uuid4
 from django.utils.text import slugify
 from django.core.files import File
 from BeautifulSoup import BeautifulSoup
 
 from json import loads
-from urllib2 import urlopen, HTTPError
+from urllib2 import HTTPError
 from heroes.models import (
     Ability,
     AbilitySpecialValues,
@@ -27,26 +26,30 @@ class Command(BaseCommand):
         number_dict = get_number_dict()
         abilities = assemble_data(lore_dict, number_dict)
 
+        # Abilities that are not really supported by valve and fail.
+        # Usually legacy of old holiday events.
+        banlist = ['throw_snowball']
         # Core ability attributes
         for ability, data_dict in abilities.iteritems():
 
-            # Make a thing.
-            ab = make_ability(ability, data_dict)
+            if ability not in banlist:
+                # Make a thing.
+                ab = make_ability(ability, data_dict)
 
-            # Map in values with tricky names
-            merge_mapped_values(ab, data_dict)
+                # Map in values with tricky names
+                merge_mapped_values(ab, data_dict)
 
-            # Map in text
-            merge_text(ab, data_dict)
+                # Map in text
+                merge_text(ab, data_dict)
 
-            # Get some images
-            merge_image(ab, ability, data_dict)
+                # Get some images
+                merge_image(ab, ability, data_dict)
 
-            ab.save()
+                ab.save()
 
-            # If there are special values, map them in.
-            # This is a best-effort service; lots of passing
-            merge_special_values(ab, data_dict)
+                # If there are special values, map them in.
+                # This is a best-effort service; lots of passing
+                merge_special_values(ab, data_dict)
 
 
 def assemble_data(lore_dict, number_dict):

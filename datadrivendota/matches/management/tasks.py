@@ -855,26 +855,17 @@ class UpdatePmsReplays(Task):
         buff = BytesIO(json.dumps(msgs))
         buff.seek(0)
 
+        filename = '{0}_{1}_{2}_parse_fragment_{3}_v{4}.json.gz'.format(
+            match_id,
+            pms.player_slot,
+            fieldname,
+            aspect,
+            settings.PARSER_VERSION
+        )
         if fieldname == 'all':
-            filename = '{0}_{1}_{2}_parse_fragment_{3}_v{4}.json.gz'.format(
-                match_id,
-                pms.player_slot,
-                fieldname,
-                aspect,
-                settings.PARSER_VERSION
-            )
             pms.all_data.save(filename, File(buff))
 
         else:
-            filename = '{0}_{1}_{2}_parse_fragment_{3}_v{4}.json.gz'.format(
-                match_id,
-                pms.player_slot,
-                fieldname,
-                aspect,
-                settings.PARSER_VERSION
-
-            )
-
             if aspect == 'combatlog':
                 datalog = CombatLog.objects.get_or_create(
                     playermatchsummary=pms

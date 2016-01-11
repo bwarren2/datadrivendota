@@ -344,7 +344,7 @@ class ValveApiCall(BaseTask):
         except ValueError:
             # Technically this is not the thrown error, but read
             # http://stackoverflow.com/questions/8381193/python-handle-json-decode-error-when-nothing-returned
-            logger.exception('JSON decode error for url {0]'.format(api_url))
+            logger.exception('JSON decode error for url {0}'.format(api_url))
             json_data = {}
 
         return json_data
