@@ -1,18 +1,8 @@
-from .serializers import MatchRequestSerializer, PingRequestSerializer
+from .serializers import PingRequestSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from accounts.models import MatchRequest, PingRequest
-
-
-class MatchRequestViewSet(viewsets.ModelViewSet):
-    queryset = MatchRequest.objects.all()
-    paginate_by = 10
-    serializer_class = MatchRequestSerializer
-
-    def perform_create(self, serializer):
-        user = self.request.user
-        serializer.save(requester=user)
+from accounts.models import PingRequest
 
 
 class PingRequestViewSet(viewsets.ModelViewSet):

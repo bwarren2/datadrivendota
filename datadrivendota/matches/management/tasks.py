@@ -1,13 +1,10 @@
 """ Tasks to manage match-related data. """
-import json
 import logging
 from celery import Task, chain
 from time import time as now
 from copy import deepcopy
 from datetime import datetime, timedelta
 
-from utils import gunzip_str
-from io import BytesIO
 from django.utils import timezone
 from django.db.models import Min, Max, Count
 from django.conf import settings
@@ -22,8 +19,6 @@ from matches.models import (
     AdditionalUnit,
     PickBan,
 )
-from accounts.models import MatchRequest
-from utils.file_management import s3_parse
 from datadrivendota.utilities import error_email
 from players.models import Player
 from heroes.models import Ability, Hero
@@ -36,9 +31,6 @@ from datadrivendota.management.tasks import (
     ApiFollower,
     ApiContext
 )
-
-from .combat_log_filters import combatlog_filter_map
-from .state_log_filters import entitystate_filter_map
 
 logger = logging.getLogger(__name__)
 
@@ -728,131 +720,3 @@ class CycleApiCall(ApiFollower):
                         api_context.account_id
                     )
                 )
-
-
-class UpdatePmsReplays(Task):
-
-    time_limit = 240
-    soft_time_limit = 235
-
-    def run(self, match_id):
-        logger.info('Sharding replay for {0}'.format(match_id))
-
-        pmses = PlayerMatchSummary.objects.filter(
-            match__steam_id=match_id
-        ).select_related('hero')
-
-        match = Match.objects.get(steam_id=match_id)
-
-        replay = json.loads(gunzip_str(match.compressed_replay.read()))
-
-        offset = self.get_offset(replay, match_id)
-        replay = self.convert_times(replay, offset)
-        replay = self.convert_stringtables(replay)
-
-        for pms in pmses:
-            self.shard(replay, pms, offset, match.steam_id)
-
-        self.cleanup(match.steam_id)
-
-    def convert_stringtables(self, replay):
-
-        item_map = {
-            msg['idx']: msg['value']
-            for msg in replay['stl']
-        }
-        tags = ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5']
-
-        for msg in replay['states']:
-            for item_tag in tags:
-                if item_tag in msg:
-                    msg[item_tag] = item_map[msg[item_tag]]
-                else:
-                    msg[item_tag] = None
-
-        return replay
-
-    def convert_times(self, replay, offset):
-        for msg in replay['es']:
-            msg['offset_time'] = msg['time'] - offset
-        for msg in replay['states']:
-            msg['offset_time'] = msg['tick_time'] - offset
-        return replay
-
-    def get_offset(self, replay, match_id):
-        states = [
-            x for x in replay['es']
-            if x['type'] == 'state' and x['key'] == 'PLAYING'
-        ]
-        try:
-            offset = states[0]['time']
-        except IndexError:
-            offset = 0
-            logger.error(
-                'Failed to get an offset with match {0}'.format(match_id)
-            )
-
-        return offset
-
-    def shard(self, replay, pms, offset, match_id):
-
-        enemies = pms.enemies
-        allies = pms.allies
-        logging.info("Sharding for {0} in match {1}".format(
-            pms.hero.name, pms.match.steam_id
-            )
-        )
-        pms_combat = {}
-        for field, filter_fn in combatlog_filter_map.iteritems():
-            logging.info("Handling field {0} for {1} (M# {2})".format(
-                field,
-                pms.hero.name,
-                pms.match.steam_id,
-            ))
-            data = filter_fn(replay['es'], pms, enemies, allies)
-            self.save_msgstream(pms, data, field, match_id, 'combatlog')
-            pms_combat[field] = data
-
-        for field, filter_fn in entitystate_filter_map.iteritems():
-            logging.info("Handling field {0} for {1} (M# {2})".format(
-                field,
-                pms.hero.name,
-                pms.match.steam_id,
-            ))
-            data = filter_fn(replay['states'], pms)
-            self.save_msgstream(pms, data, field, match_id, 'statelog')
-
-        # Save states to pms
-        state_list = [
-            msg for msg in
-            replay['states'] if msg['hero_id'] == pms.hero.steam_id
-        ]
-        all_data = {
-            'states': state_list,
-            'combat': pms_combat,
-        }
-
-        self.save_msgstream(pms, all_data, 'all', match_id, 'all')
-
-        # Annotate the PMS.  Useful for backfixing on parser upgrades
-        pms.parsed_with = settings.PARSER_VERSION
-        pms.save()
-
-    def cleanup(self, match_id):
-        mr = MatchRequest.objects.get(match_id=match_id)
-        mr.status = MatchRequest.PARSED
-        mr.save()
-
-    def save_msgstream(self, pms, msgs, fieldname, match_id, aspect):
-        buff = BytesIO(json.dumps(msgs))
-        buff.seek(0)
-
-        filename = '{0}_{1}_{2}_parse_fragment_{3}_v{4}.json.gz'.format(
-            match_id,
-            pms.player_slot,
-            fieldname,
-            aspect,
-            settings.PARSER_VERSION
-        )
-        logger.info("Saving {0}".format(filename))
-        s3_parse(buff, filename)

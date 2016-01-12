@@ -19,7 +19,8 @@
                 </option>
                 <option value='kickoff_all'>Kickoff All Requests</option>
                 <option value='read_java'>Read Parse Results</option>
-                <option value='parse'>Parse Shards</option>
+                <option value='fanout'>Fan out parsing of results</option>
+                {# <option value='parse'>Parse Shards</option> #}
             </select>
             </div>
         </div>
@@ -62,7 +63,7 @@
                 match_id: match_id,
             };
             var resp = $.ajax({
-                    url: '/parser-tasks/',
+                    url: '/parserpipe/tasks/',
                     method: "POST",
                     data: data,
             })
