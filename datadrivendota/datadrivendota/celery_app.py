@@ -125,11 +125,6 @@ class Config(object):
             routing_key='rpr'
         ),
         # This handles the callbacks of the java parser.  Unknown speed.
-        Queue(
-            'python_parse',
-            Exchange('python_parse'),
-            routing_key='python_parse',
-        ),
 
     )
     TASKS = {
