@@ -224,3 +224,18 @@ class TestAuth(TestCase):
             resp.request['PATH_INFO'],
             '/login/'
         )
+
+
+class TestParserGUI(TestCase):
+
+    def test_staff_required(self):
+
+        c = Client()
+        resp = c.get(reverse("parsing"))
+        self.assertRedirects(
+            resp,
+            '/admin/login/?next=/parser-management/'
+        )
+
+        resp = c.get(reverse("parser_tasks"))
+        self.assertEqual(resp.status_code, 405)

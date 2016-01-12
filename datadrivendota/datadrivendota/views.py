@@ -49,7 +49,7 @@ class ParserManagementView(TemplateView):
 class ParserTasksView(View):
 
     def post(self, request, *args, **kwargs):
-        if request.is_ajax() and request.user.is_superuser:
+        if request.is_ajax() and request.user.is_staff:
 
             response_data = {}
             match_id = request.POST['match_id']
