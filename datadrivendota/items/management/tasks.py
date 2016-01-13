@@ -41,14 +41,16 @@ class UpdateItemSchema(ApiFollower):
 
         logger.info("Item schema url: {0}".format(url))
         response = requests.get(url)
+        logger.info("Got item schema")
         data = vdf.loads(response.text)
-        json_data = json.dumps(data)
-        raw_data = self.strip_wrapper(json_data)
-        data = self.get_leagues(raw_data)
+        logger.info("Item schema made json")
+        raw_data = self.strip_wrapper(data)
+        logger.info("Item schema stripped")
+        trimmed_data = self.get_leagues(raw_data)
+        logger.info("Item schema refactored")
 
         logger.info("Setting item schema in redis (url: {0})".format(url))
-
-        redis.set(settings.ITEM_SCHEMA_KEY, data)
+        redis.set(settings.ITEM_SCHEMA_KEY, json.dumps(trimmed_data))
         logger.info("Item schema set in redis (url: {0})".format(url))
 
     def strip_wrapper(self, json_data):

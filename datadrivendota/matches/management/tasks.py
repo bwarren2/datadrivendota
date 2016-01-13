@@ -156,6 +156,9 @@ class UpdateMatch(ApiFollower):
         self.create_teams(data, match)
         match = self.merge_teams(data, match)
 
+        self.create_league(data, match)
+        match = self.merge_league(data, match)
+
         match.save()
 
     def create_pickbans(self, data, match):
@@ -251,6 +254,22 @@ class UpdateMatch(ApiFollower):
             )
             match.dire_team = dire_team
             match.dire_team_complete = data['dire_team_complete'] == 1
+
+        return match
+
+    def create_league(self, data, match):
+        if 'leagueid' in data.keys():
+            League.objects.get_or_create(
+                steam_id=data['leagueid']
+            )[0]
+
+    def merge_league(self, data, match):
+
+        if 'leagueid' in data.keys():
+            league = League.objects.get(
+                steam_id=data['leagueid']
+            )
+            match.league = league
 
         return match
 
