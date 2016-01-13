@@ -305,7 +305,7 @@ class UpdatePmsReplays(Task):
 
         else:
             raise ValueError('What is this dataslice? {0}'.format(data_slice))
-            return False
+            return None
 
     def convert_stringtables(self, replay):
 
