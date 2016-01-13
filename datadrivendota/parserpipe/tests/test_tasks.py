@@ -7,9 +7,9 @@ from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 
-from .management.tasks import KickoffMatchRequests, CreateMatchParse
+from parserpipe.management.tasks import KickoffMatchRequests, CreateMatchParse
 
-from .models import MatchRequest
+from parserpipe.models import MatchRequest
 
 
 class TestParserTask(TestCase):
@@ -23,7 +23,7 @@ class TestParserTask(TestCase):
             steam_id=cls.match_id
         )
         cls.match_request = mommy.make(
-            'accounts.MatchRequest',
+            'parserpipe.MatchRequest',
             match_id=cls.match_id,
             status=MatchRequest.FINDING_MATCH
         )
@@ -53,45 +53,30 @@ class TestParserTask(TestCase):
         self.assertNotEqual(mr.valve_replay_url, None)
 
 
-class TestParserGUI(TestCase):
-
-    def test_staff_required(self):
-
-        c = Client()
-        resp = c.get(reverse("parserpipe:dash"))
-        self.assertRedirects(
-            resp,
-            '/admin/login/?next=/parser-management/'
-        )
-
-        resp = c.get(reverse("parserpipe:tasks"))
-        self.assertEqual(resp.status_code, 405)
-
-
 class TestKickoffRequestTask(TestCase):
 
     @classmethod
     def setUpClass(cls):
         super(TestKickoffRequestTask, cls).setUpClass()
         mommy.make(
-            'accounts.MatchRequest',
+            'parserpipe.MatchRequest',
             status=MatchRequest.SUBMITTED,
             _quantity=2
         )
         mommy.make(
-            'accounts.MatchRequest',
+            'parserpipe.MatchRequest',
             status=MatchRequest.FINDING_MATCH,
         )
         mommy.make(
-            'accounts.MatchRequest',
+            'parserpipe.MatchRequest',
             status=MatchRequest.MATCH_FOUND,
         )
         mommy.make(
-            'accounts.MatchRequest',
+            'parserpipe.MatchRequest',
             status=MatchRequest.MATCH_FOUND,
         )
         mommy.make(
-            'accounts.MatchRequest',
+            'parserpipe.MatchRequest',
             status=MatchRequest.COMPLETE,
         )
 

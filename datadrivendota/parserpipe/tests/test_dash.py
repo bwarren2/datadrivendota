@@ -10,7 +10,7 @@ class TestParserDash(TestCase):
         resp = c.get(reverse("parserpipe:dash"))
         self.assertRedirects(
             resp,
-            '/admin/login/?next=/parser-management/'
+            '/admin/login/?next=/parserpipe/dash/'
         )
 
         resp = c.get(reverse("parserpipe:tasks"))
