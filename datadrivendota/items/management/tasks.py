@@ -43,8 +43,26 @@ class UpdateItemSchema(ApiFollower):
         response = requests.get(url)
         data = vdf.loads(response.text)
         json_data = json.dumps(data)
+        raw_data = self.strip_wrapper(json_data)
+        data = self.get_leagues(raw_data)
 
         logger.info("Setting item schema in redis (url: {0})".format(url))
 
-        redis.set(settings.ITEM_SCHEMA_KEY, json_data)
+        redis.set(settings.ITEM_SCHEMA_KEY, data)
         logger.info("Item schema set in redis (url: {0})".format(url))
+
+    def strip_wrapper(self, json_data):
+        return json_data['items_game']['items']
+
+    def get_leagues(self, json_data):
+        return_dct = {}
+        for key, val in json_data.iteritems():
+            if (
+                val.get('prefab', None) == 'league' and
+                val.get('tool', {}).get('usage', {}).get('league_id', None)
+                    is not None
+               ):
+                    league_id = int(val['tool']['usage']['league_id'])
+                    return_dct[league_id] = val
+                    return_dct[league_id]['itemdef'] = key
+        return return_dct
