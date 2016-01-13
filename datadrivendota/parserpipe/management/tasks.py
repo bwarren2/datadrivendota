@@ -267,7 +267,7 @@ class MergeMatchRequestReplay(Task):
         match_request.save()
 
     def fan_parsing(self, match_id):
-        callback = UpdateParseEnd().s()
+        callback = UpdateParseEnd().s(match_id=match_id)
         slices = Match.PLAYER_SLOTS
 
         header = [
@@ -279,8 +279,8 @@ class MergeMatchRequestReplay(Task):
 
 class UpdatePmsReplays(Task):
     ignore_result = False
-    time_limit = 240
-    soft_time_limit = 235
+    time_limit = 75
+    soft_time_limit = 80
 
     def run(self, match_id, data_slice):
         logger.info('Sharding replay for {0} {1}'.format(match_id, data_slice))
@@ -294,16 +294,18 @@ class UpdatePmsReplays(Task):
         replay = self.convert_stringtables(replay)
 
         if data_slice in Match.PLAYER_SLOTS:
-            pms = PlayerMatchSummary.objects.filter(
+            pms_qs = PlayerMatchSummary.objects.filter(
                 match__steam_id=match_id,
                 player_slot=data_slice
             ).select_related('hero')
-            self.shard(replay, pms[0], offset, match.steam_id)
+            pms = pms_qs[0]
+
+            self.shard(replay, pms, offset, match.steam_id)
+            return pms.id
+
         else:
             raise ValueError('What is this dataslice? {0}'.format(data_slice))
-        self.cleanup(match.steam_id)
-
-        return True
+            return False
 
     def convert_stringtables(self, replay):
 
@@ -384,10 +386,6 @@ class UpdatePmsReplays(Task):
 
         self.save_msgstream(pms, all_data, 'all', match_id, 'all')
 
-        # Annotate the PMS.  Useful for backfixing on parser upgrades
-        pms.parsed_with = settings.PARSER_VERSION
-        pms.save()
-
     def save_msgstream(self, pms, msgs, fieldname, match_id, aspect):
         buff = BytesIO(json.dumps(msgs))
         buff.seek(0)
@@ -406,4 +404,19 @@ class UpdatePmsReplays(Task):
 class UpdateParseEnd(Task):
 
     def run(self, *args, **kwargs):
-        print args, kwargs
+        #  Expects a bunch of pms ids on all success, some False on any failure
+
+        pms_ids = args[0]
+        match_id = kwargs['match_id']
+
+        if all(pms_ids):
+
+            mr = MatchRequest.objects.get(match_id=match_id)
+            mr.status = MatchRequest.PARSED
+            mr.save()
+
+            pmses = PlayerMatchSummary.objects.filter(id__in=pms_ids)
+            pmses.update(parsed_with=settings.PARSER_VERSION)
+            logger.info('Parse Success!')
+        else:
+            raise ValueError("Something failed in the parse chord")
