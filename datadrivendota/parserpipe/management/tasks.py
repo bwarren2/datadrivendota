@@ -354,6 +354,7 @@ class UpdatePmsReplays(Task):
             pms.hero.name, pms.match.steam_id
             )
         )
+
         pms_combat = {}
         for field, filter_fn in combatlog_filter_map.iteritems():
             logging.info("Handling field {0} for {1} (M# {2})".format(
@@ -362,7 +363,9 @@ class UpdatePmsReplays(Task):
                 pms.match.steam_id,
             ))
             data = filter_fn(replay['es'], pms, enemies, allies)
-            self.save_msgstream(pms, data, field, match_id, 'combatlog')
+            self.save_msgstream(
+                match_id, pms.player_slot, data, field, 'combatlog'
+            )
             pms_combat[field] = data
 
         for field, filter_fn in entitystate_filter_map.iteritems():
@@ -372,7 +375,9 @@ class UpdatePmsReplays(Task):
                 pms.match.steam_id,
             ))
             data = filter_fn(replay['states'], pms)
-            self.save_msgstream(pms, data, field, match_id, 'statelog')
+            self.save_msgstream(
+                match_id, pms.player_slot, data, field, 'statelog'
+            )
 
         # Save states to pms
         state_list = [
@@ -384,17 +389,17 @@ class UpdatePmsReplays(Task):
             'combat': pms_combat,
         }
 
-        self.save_msgstream(pms, all_data, 'all', match_id, 'all')
+        self.save_msgstream(match_id, pms.player_slot, all_data, 'all', 'both')
 
-    def save_msgstream(self, pms, msgs, fieldname, match_id, aspect):
+    def save_msgstream(self, match_id, dataslice, msgs, facet, msgs_type):
         buff = BytesIO(json.dumps(msgs))
         buff.seek(0)
 
         filename = '{0}_{1}_{2}_{3}_v{4}.json.gz'.format(
             match_id,
-            pms.player_slot,
-            fieldname,
-            aspect,
+            dataslice,
+            msgs_type,
+            facet,
             settings.PARSER_VERSION
         )
         logger.info("Saving {0}".format(filename))
