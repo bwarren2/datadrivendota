@@ -54,17 +54,17 @@ class Team(models.Model):
     @property
     def image(self):
         if self.image_failed is True:
-            return static('blank_team.png')
+            return static('blanks/blank_team.png')
         else:
             try:
                 return self.stored_image.url
             except ValueError:
-                return static('blank_team.png')
+                return static('blanks/blank_team.png')
 
     @property
     def is_outdated(self):
         if (
-            self.image == static('blank_team.png') and
+            self.image == static('blanks/blank_team.png') and
             self.update_time < (
                 timezone.now() - timedelta(
                     seconds=settings.UPDATE_LAG_UTC

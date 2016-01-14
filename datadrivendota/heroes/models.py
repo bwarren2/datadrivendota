@@ -42,7 +42,7 @@ class Role(models.Model):
         try:
             return self.thumbshot.url
         except ValueError:
-            return static('blank_role.png')
+            return static('blanks/blank_role.png')
 
     @property
     def url(self):
@@ -96,14 +96,14 @@ class Hero(models.Model):
         try:
             return self.thumbshot.url
         except ValueError:
-            return static('blank_hero_thumb.png')
+            return static('blanks/blank_hero_thumb.png')
 
     @property
     def mugshot_url(self):
         try:
             return self.mugshot.url
         except ValueError:
-            return static('blank_hero_mugshot.png')
+            return static('blanks/blank_hero_mugshot.png')
 
     @property
     def css_id(self):
@@ -219,6 +219,13 @@ class Ability(models.Model):
             self.internal_name,
             str(self.steam_id)
         )
+
+    @property
+    def image_url(self):
+        try:
+            return self.picture.url
+        except ValueError:
+            return static('blanks/blank_ability.png')
 
     def save(self, *args, **kwargs):
         self.machine_name = slugify(self.internal_name)

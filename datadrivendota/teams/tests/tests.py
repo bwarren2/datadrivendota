@@ -60,11 +60,11 @@ class TestUrlconf(TestCase):
     def test_image(self):
 
         t = mommy.make('teams.team', stored_image=None)
-        self.assertEqual(t.image, static('blank_team.png'))
+        self.assertEqual(t.image, static('blanks/blank_team.png'))
         t.delete()
 
         t = mommy.make('teams.team')
         t = fake_image(t)
 
-        self.assertNotEqual(t.image, static('blank_team.png'))
+        self.assertNotEqual(t.image, static('blanks/blank_team.png'))
         t.delete()

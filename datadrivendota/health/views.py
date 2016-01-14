@@ -1,12 +1,16 @@
+import time
+from datetime import timedelta
+
 from django.views.generic import TemplateView
 from django.conf import settings
+from django.db.models import Q
+from django.utils import timezone
+
 from datadrivendota.mixins import SuperuserRequiredMixin
 from matches.models import Match, PlayerMatchSummary
 from players.models import Player
 from heroes.models import Hero
-from datetime import timedelta
-from django.utils import timezone
-import time
+from leagues.models import League
 
 
 class HealthIndexView(SuperuserRequiredMixin, TemplateView):
@@ -20,9 +24,15 @@ class HealthIndexView(SuperuserRequiredMixin, TemplateView):
                 (timezone.now()-timedelta(weeks=1)).timetuple()
             )
         ).count()
+
         kwargs['winnerless_matches_alltime'] = Match.objects.filter(
             radiant_win=None
         ).count()
+
+        kwargs['unnamed_unfailed_leagues'] = League.objects.filter(
+            Q(name=None) |
+            Q(name="")
+        ).exclude(image_failed=True).count()
 
         kwargs['read_key'] = settings.KEEN_READ_KEY
         kwargs['project_id'] = settings.KEEN_PROJECT_ID
