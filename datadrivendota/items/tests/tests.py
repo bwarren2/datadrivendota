@@ -1,7 +1,9 @@
+from collections import defaultdict
 from django.templatetags.static import static
 from django.test import TestCase, Client
 from model_mommy import mommy
 from items.management.commands.scrapeitemdata import Command as itemCommand
+from items.management.tasks import UpdateItemSchema
 
 
 class TestUrlconf(TestCase):
@@ -92,19 +94,120 @@ class TestModel(TestCase):
     def test_mugshot(self):
 
         i = mommy.make('items.item', mugshot=None)
-        self.assertEqual(i.mugshot_url, static('blank_item.png'))
+        self.assertEqual(i.mugshot_url, static('blanks/blank_item.png'))
         i.delete()
 
         i = mommy.make('items.item')
-        self.assertNotEqual(i.mugshot_url, static('blank_item.png'))
+        self.assertNotEqual(i.mugshot_url, static('blanks/blank_item.png'))
         i.delete()
 
     def test_thumbshot(self):
 
         i = mommy.make('items.item', thumbshot=None)
-        self.assertEqual(i.thumbshot_url, static('blank_item_small.png'))
+        self.assertEqual(
+            i.thumbshot_url,
+            static('blanks/blank_item_small.png')
+        )
         i.delete()
 
         i = mommy.make('items.item')
-        self.assertNotEqual(i.thumbshot_url, static('blank_item_small.png'))
+        self.assertNotEqual(
+            i.thumbshot_url,
+            static('blanks/blank_item_small.png')
+        )
         i.delete()
+
+
+class TestJsonStorage(TestCase):
+
+    def test_strip(self):
+        wrapped_data = {
+            'items_game': {
+                'items': {}
+            }
+        }
+        test_data = {
+                    u'creation_date': u'2015-12-02',
+                    u'event_id': u'EVENT_ID_NONE',
+                    u'image_banner':
+                    u'econ/leagues/subscriptions_winter_major_2016_ingame',
+                    u'image_inventory':
+                    u'econ/leagues/subscriptions_winter_major_2016',
+                    u'item_description': u'#DOTA_Item_Desc_Shanghai_Major',
+                    u'item_name': u'#DOTA_Item_Shanghai_Major',
+                    u'item_rarity': u'mythical',
+                    u'item_type_name': u'#DOTA_WearableType_Ticket',
+                    u'name': u'Shanghai Major',
+                    u'prefab': u'league',
+                    u'tool': {
+                        u'type': u'league_view_pass',
+                        u'usage': {
+                            u'end_date': u'1457251200',
+                            u'free_to_spectate': u'1',
+                            u'league_id': u'4266',
+                            u'order': u'3708',
+                            u'start_date': u'1456905600',
+                            u'tier': u'premium'
+                        },
+                        u'use_string': u'#ConsumeItem'},
+                    u'tournament_url': u'http://www.dota2.com'
+                    }
+        wrapped_data['items_game']['items']['16807'] = test_data
+        task = UpdateItemSchema()
+
+        self.assertEqual(
+            {'16807': test_data}, task.strip_wrapper(wrapped_data)
+        )
+
+    def test_filter(self):
+        test_data = {
+                    '16807': {
+                        u'creation_date': u'2015-12-02',
+                        u'event_id': u'EVENT_ID_NONE',
+                        u'image_banner':
+                        u'econ/leagues/subscriptions_winter_major_2016_ingame',
+                        u'image_inventory':
+                        u'econ/leagues/subscriptions_winter_major_2016',
+                        u'item_description': u'#DOTA_Item_Desc_Shanghai_Major',
+                        u'item_name': u'#DOTA_Item_Shanghai_Major',
+                        u'item_rarity': u'mythical',
+                        u'item_type_name': u'#DOTA_WearableType_Ticket',
+                        u'name': u'Shanghai Major',
+                        u'prefab': u'league',
+                        u'tool': {
+                            u'type': u'league_view_pass',
+                            u'usage': {
+                                u'end_date': u'1457251200',
+                                u'free_to_spectate': u'1',
+                                u'league_id': u'4266',
+                                u'order': u'3708',
+                                u'start_date': u'1456905600',
+                                u'tier': u'premium'
+                            },
+                            u'use_string': u'#ConsumeItem'},
+                        u'tournament_url': u'http://www.dota2.com'
+                        },
+                    '2': {
+                        u'creation_date': u'2015-12-02',
+                        u'event_id': u'EVENT_ID_NONE',
+                        u'image_banner':
+                        u'econ/leagues/subscriptions_winter_major_2016_ingame',
+                        u'image_inventory':
+                        u'econ/leagues/subscriptions_winter_major_2016',
+                        u'item_description': u'#DOTA_Item_Desc_Shanghai_Major',
+                        u'item_name': u'#DOTA_Item_Shanghai_Major',
+                        u'item_rarity': u'mythical',
+                        u'item_type_name': u'#DOTA_WearableType_Ticket',
+                        u'name': u'Shanghai Major',
+                        u'prefab': u'league',
+                        u'tool': {
+                            u'type': u'league_view_pass',
+                            u'use_string': u'#ConsumeItem'},
+                        u'tournament_url': u'http://www.dota2.com'
+                        }
+                }
+        task = UpdateItemSchema()
+        self.assertEqual(
+            task.get_leagues(test_data),
+            {4266: test_data['16807']}
+        )

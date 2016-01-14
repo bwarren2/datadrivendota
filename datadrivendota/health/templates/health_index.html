@@ -24,6 +24,10 @@
                     <td>Games with no winner (all time)</td>
                     <td>{{winnerless_matches_alltime}}</td>
                 </tr>
+                <tr>
+                    <td>Leagues without a name that aren't failed</td>
+                    <td>{{unnamed_unfailed_leagues}}</td>
+                </tr>
             </tbody>
         </table>
         </div>
@@ -127,9 +131,7 @@ var client = new Keen({
   readKey: "{{read_key}}"
 });
 
-console.log('Foo')
 Keen.ready(function(){
-    console.log('bar')
 
 
     // ===============================

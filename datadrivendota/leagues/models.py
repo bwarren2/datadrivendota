@@ -47,12 +47,12 @@ class League(models.Model):
     @property
     def image(self):
         if self.image_failed is True:
-            return static('blank_league.png')
+            return static('blanks/blank_league.png')
         else:
             try:
                 return self.stored_image.url
             except ValueError:
-                return static('blank_league.png')
+                return static('blanks/blank_league.png')
 
     @property
     def tier_name(self):
@@ -89,7 +89,7 @@ class League(models.Model):
     @property
     def is_outdated(self):
         if (
-            self.image == static('blank_league.png') and
+            self.image == static('blanks/blank_league.png') and
             self.update_time < (
                 timezone.now() - timedelta(
                     seconds=settings.UPDATE_LAG_UTC

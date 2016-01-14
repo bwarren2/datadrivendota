@@ -40,15 +40,15 @@ class TestModelMethods(TestCase):
     def test_image(self):
 
         l = mommy.make('leagues.league', stored_image=None)
-        self.assertEqual(l.image, static('blank_league.png'))
+        self.assertEqual(l.image, static('blanks/blank_league.png'))
         l.delete()
 
         l = mommy.make('leagues.league')
         l = fake_image(l)
-        self.assertNotEqual(l.image, static('blank_league.png'))
+        self.assertNotEqual(l.image, static('blanks/blank_league.png'))
         l.delete()
 
         l = mommy.make('leagues.league', stored_image=None, image_failed=True)
         l = fake_image(l)
-        self.assertEqual(l.image, static('blank_league.png'))
+        self.assertEqual(l.image, static('blanks/blank_league.png'))
         l.delete()

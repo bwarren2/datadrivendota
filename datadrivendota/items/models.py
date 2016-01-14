@@ -35,14 +35,14 @@ class Item(models.Model):
         try:
             return self.thumbshot.url
         except ValueError:
-            return static('blank_item_small.png')
+            return static('blanks/blank_item_small.png')
 
     @property
     def mugshot_url(self):
         try:
             return self.mugshot.url
         except ValueError:
-            return static('blank_item.png')
+            return static('blanks/blank_item.png')
 
     def __unicode__(self):
         return self.internal_name

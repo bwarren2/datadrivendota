@@ -25,21 +25,33 @@ class TestHeroes(TestCase):
     def test_mugshot(self):
 
         h = mommy.make('heroes.hero', mugshot=None)
-        self.assertEqual(h.mugshot_url, static('blank_hero_mugshot.png'))
+        self.assertEqual(
+            h.mugshot_url,
+            static('blanks/blank_hero_mugshot.png')
+        )
         h.delete()
 
         h = mommy.make('heroes.hero')
-        self.assertNotEqual(h.mugshot_url, static('blank_hero_mugshot.png'))
+        self.assertNotEqual(
+            h.mugshot_url,
+            static('blanks/blank_hero_mugshot.png')
+        )
         h.delete()
 
     def test_thumbshot(self):
 
         h = mommy.make('heroes.hero', thumbshot=None)
-        self.assertEqual(h.thumbshot_url, static('blank_hero_thumb.png'))
+        self.assertEqual(
+            h.thumbshot_url,
+            static('blanks/blank_hero_thumb.png')
+        )
         h.delete()
 
         h = mommy.make('heroes.hero')
-        self.assertNotEqual(h.thumbshot_url, static('blank_hero_thumb.png'))
+        self.assertNotEqual(
+            h.thumbshot_url,
+            static('blanks/blank_hero_thumb.png')
+        )
         h.delete()
 
     def test_has_image(self):
@@ -169,9 +181,27 @@ class TestRoles(TestCase):
     def test_thumbshot(self):
 
         h = mommy.make('heroes.role', thumbshot=None)
-        self.assertEqual(h.thumbshot_url, static('blank_role.png'))
+        self.assertEqual(
+            h.thumbshot_url,
+            static('blanks/blank_role.png')
+        )
         h.delete()
 
         h = mommy.make('heroes.role', thumbshot='hi.png')
-        self.assertNotEqual(h.thumbshot_url, static('blank_role.png'))
+        self.assertNotEqual(
+            h.thumbshot_url,
+            static('blanks/blank_role.png')
+        )
         h.delete()
+
+
+class TestAbility(TestCase):
+
+    def test_thumbshot(self):
+
+        ability = mommy.make('heroes.ability', picture=None)
+        self.assertEqual(
+            ability.image_url,
+            static('blanks/blank_ability.png')
+        )
+        ability.delete()
