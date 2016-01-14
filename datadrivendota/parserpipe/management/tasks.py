@@ -285,8 +285,8 @@ class MergeMatchRequestReplay(Task):
 
 class UpdatePmsReplays(Task):
     ignore_result = False
-    time_limit = 90
-    soft_time_limit = 95
+    soft_time_limit = 120
+    time_limit = 125
 
     def run(self, match_id, data_slice):
         logger.info('Sharding replay for {0} {1}'.format(match_id, data_slice))
