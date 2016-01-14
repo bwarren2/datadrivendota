@@ -46,7 +46,10 @@ class UpdateLeagues(Task):
             try:
                 self.create(league_id)
                 self.logo_update(league_id)
-                self.game_update(league_id, matches)
+
+                if matches > 0:
+                    self.game_update(league_id, matches)
+
             except KeyError:
                 logger.warning(
                     "Can't update {0}.".format(league_id), exc_info=True
