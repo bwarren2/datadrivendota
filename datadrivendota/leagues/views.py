@@ -81,7 +81,9 @@ class LeagueDetail(DetailView):
     """ Focusing on a particular league. """
 
     def get_object(self):
-        return get_object_or_404(League.recency, steam_id=self.kwargs.get('steam_id'))
+        return get_object_or_404(
+            League.recency, steam_id=self.kwargs.get('steam_id')
+        )
 
     def get_context_data(self, **kwargs):
         match_list = Match.objects.filter(
@@ -99,11 +101,11 @@ class LeagueDetail(DetailView):
         )
         match_list = paginator.current_page
 
-        validity_metrics = Match.objects.filter(league__steam_id=2733)\
-            .values('validity')\
+        validity_metrics = Match.objects.filter(
+                league__steam_id=self.kwargs.get('steam_id')
+            ).values('validity')\
             .annotate(total=Count('validity'))\
             .order_by()
-
 
         for itm in validity_metrics:
             itm['name'] = dict(Match.VALIDITY_CHOICES)[itm['validity']]
