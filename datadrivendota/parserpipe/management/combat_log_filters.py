@@ -1,4 +1,4 @@
-from matches.decorators import mapping_construct
+from parserpipe.decorators import mapping_construct
 
 
 # Helpers

@@ -6,17 +6,22 @@ import json
 import requests
 from io import BytesIO
 
-from celery import Task, chain
+from celery import Task, chain, chord
 
 from django.core.files import File
 from django.conf import settings
 from django.db.models import Q
 
-from accounts.models import MatchRequest
+from utils import gzip_str, gunzip_str
+from utils.file_management import s3_parse
+from parserpipe.models import MatchRequest
 from datadrivendota.management.tasks import ValveApiCall, ApiContext
-from matches.management.tasks import UpdateMatch, UpdatePmsReplays
-from matches.models import Match
-from utils import gzip_str
+from matches.management.tasks import UpdateMatch
+from matches.models import Match, PlayerMatchSummary
+
+
+from .combat_log_filters import combatlog_filter_map
+from .state_log_filters import entitystate_filter_map
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +196,7 @@ class ReadParseResults(Task):
             if not method_frame:
                 return None
             else:
-                MergeMatchRequestReplay().s().delay(json_data=json.loads(body))
+                MergeMatchRequestReplay().delay(json_data=json.loads(body))
                 channel.basic_ack(method_frame.delivery_tag)
 
             return None
@@ -214,12 +219,18 @@ class MergeMatchRequestReplay(Task):
         match_id = json_data['match_id']
         filename = json_data['filename']
 
+        logger.info(json_data)
         logger.info('Merging {0}'.format(match_id))
 
         mr = MatchRequest.objects.get(match_id=match_id)
+        logger.info('Merging {0} to request'.format(match_id))
         self.merge_to_request(mr, filename)
+
+        logger.info('Merging {0} to match'.format(match_id))
         self.merge_to_match(mr, match_id)
-        UpdatePmsReplays().delay(match_id=match_id)  # Queue for postprocessing
+
+        logger.info('Fanning out {0}'.format(match_id))
+        self.fan_parsing(match_id)
 
     def merge_to_match(self, mr, match_id):
         match = Match.objects.get(steam_id=match_id)
@@ -245,7 +256,7 @@ class MergeMatchRequestReplay(Task):
                 match.compressed_replay.save(filename, File(holder))
 
             else:
-                logger.info(
+                raise ValueError(
                     "Could not get the replay {0}!  Error code {1}".format(
                         url, r.status_code
                     )
@@ -260,3 +271,161 @@ class MergeMatchRequestReplay(Task):
         match_request.raw_parse_url = filename
         match_request.status = MatchRequest.PARSED
         match_request.save()
+
+    def fan_parsing(self, match_id):
+        callback = UpdateParseEnd().s(match_id=match_id)
+        slices = Match.PLAYER_SLOTS
+
+        header = [
+            UpdatePmsReplays().s(match_id=match_id, data_slice=x)
+            for x in slices
+        ]
+        chord(header)(callback)  # Queue for postprocessing
+
+
+class UpdatePmsReplays(Task):
+    ignore_result = False
+    time_limit = 75
+    soft_time_limit = 80
+
+    def run(self, match_id, data_slice):
+        logger.info('Sharding replay for {0} {1}'.format(match_id, data_slice))
+
+        match = Match.objects.get(steam_id=match_id)
+
+        replay = json.loads(gunzip_str(match.compressed_replay.read()))
+
+        offset = self.get_offset(replay, match_id)
+        replay = self.convert_times(replay, offset)
+        replay = self.convert_stringtables(replay)
+
+        if data_slice in Match.PLAYER_SLOTS:
+            pms_qs = PlayerMatchSummary.objects.filter(
+                match__steam_id=match_id,
+                player_slot=data_slice
+            ).select_related('hero')
+            pms = pms_qs[0]
+
+            self.shard(replay, pms, offset, match.steam_id)
+            return pms.id
+
+        else:
+            raise ValueError('What is this dataslice? {0}'.format(data_slice))
+            return None
+
+    def convert_stringtables(self, replay):
+
+        item_map = {
+            msg['idx']: msg['value']
+            for msg in replay['stl']
+        }
+        tags = ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5']
+
+        for msg in replay['states']:
+            for item_tag in tags:
+                if item_tag in msg:
+                    msg[item_tag] = item_map[msg[item_tag]]
+                else:
+                    msg[item_tag] = None
+
+        return replay
+
+    def convert_times(self, replay, offset):
+        for msg in replay['es']:
+            msg['offset_time'] = msg['time'] - offset
+        for msg in replay['states']:
+            msg['offset_time'] = msg['tick_time'] - offset
+        return replay
+
+    def get_offset(self, replay, match_id):
+        states = [
+            x for x in replay['es']
+            if x['type'] == 'state' and x['key'] == 'PLAYING'
+        ]
+        try:
+            offset = states[0]['time']
+        except IndexError:
+            offset = 0
+            logger.error(
+                'Failed to get an offset with match {0}'.format(match_id)
+            )
+
+        return offset
+
+    def shard(self, replay, pms, offset, match_id):
+
+        enemies = pms.enemies
+        allies = pms.allies
+        logging.info("Sharding for {0} in match {1}".format(
+            pms.hero.name, pms.match.steam_id
+            )
+        )
+
+        pms_combat = {}
+        for field, filter_fn in combatlog_filter_map.iteritems():
+            logging.info("Handling field {0} for {1} (M# {2})".format(
+                field,
+                pms.hero.name,
+                pms.match.steam_id,
+            ))
+            data = filter_fn(replay['es'], pms, enemies, allies)
+            self.save_msgstream(
+                match_id, pms.player_slot, data, field, 'combatlog'
+            )
+            pms_combat[field] = data
+
+        for field, filter_fn in entitystate_filter_map.iteritems():
+            logging.info("Handling field {0} for {1} (M# {2})".format(
+                field,
+                pms.hero.name,
+                pms.match.steam_id,
+            ))
+            data = filter_fn(replay['states'], pms)
+            self.save_msgstream(
+                match_id, pms.player_slot, data, field, 'statelog'
+            )
+
+        # Save states to pms
+        state_list = [
+            msg for msg in
+            replay['states'] if msg['hero_id'] == pms.hero.steam_id
+        ]
+        all_data = {
+            'states': state_list,
+            'combat': pms_combat,
+        }
+
+        self.save_msgstream(match_id, pms.player_slot, all_data, 'all', 'both')
+
+    def save_msgstream(self, match_id, dataslice, msgs, facet, msgs_type):
+        buff = BytesIO(json.dumps(msgs))
+        buff.seek(0)
+
+        filename = '{0}_{1}_{2}_{3}_v{4}.json.gz'.format(
+            match_id,
+            dataslice,
+            msgs_type,
+            facet,
+            settings.PARSER_VERSION
+        )
+        logger.info("Saving {0}".format(filename))
+        s3_parse(buff, filename)
+
+
+class UpdateParseEnd(Task):
+
+    def run(self, finished_shards, match_id):
+        #  Expects a bunch of pms ids on all success, some False on any failure
+
+        if all(finished_shards):
+
+            mr = MatchRequest.objects.get(match_id=match_id)
+            mr.status = MatchRequest.PARSED
+            mr.save()
+
+            pms_ids = finished_shards
+            pmses = PlayerMatchSummary.objects.filter(id__in=pms_ids)
+            pmses.update(parsed_with=settings.PARSER_VERSION)
+            logger.info('Parse Success!')
+        else:
+            raise ValueError("Something failed in the parse chord")

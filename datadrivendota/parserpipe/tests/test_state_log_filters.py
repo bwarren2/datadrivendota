@@ -1,4 +1,4 @@
-from matches.management import state_log_filters
+from parserpipe.management import state_log_filters
 from unittest import TestCase
 import json
 from model_mommy import mommy

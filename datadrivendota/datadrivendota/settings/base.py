@@ -263,6 +263,7 @@ THIRD_PARTY_APPS = (
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'utils',
+    'parserpipe',
     'heroes',
     'items',
     'players',
@@ -368,7 +369,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--with-coverage',
     #techdebt: duplicate listing here and in fabfile
-    '--cover-package=accounts,guilds,health,heroes,items,leagues,matches,players,teams,utils,datadrivendota',
+    '--cover-package=parserpipe,accounts,guilds,health,heroes,items,leagues,matches,players,teams,utils,datadrivendota',
 ]
 
 

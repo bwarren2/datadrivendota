@@ -17,12 +17,11 @@ from teams.viewsets import TeamViewSet
 from leagues.viewsets import LeagueViewSet
 # from players.viewsets import PlayerViewSet
 from players.viewsets import PlayerWinrateViewSet
-from accounts.viewsets import MatchRequestViewSet, PingRequestViewSet
+from accounts.viewsets import PingRequestViewSet
 
 
 # DRF is great
 router = DefaultRouter()
-router.register('match-request', MatchRequestViewSet)
 router.register('teams', TeamViewSet)
 router.register('leagues', LeagueViewSet)
 router.register('heroes', HeroViewSet)

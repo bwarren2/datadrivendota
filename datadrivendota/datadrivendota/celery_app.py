@@ -49,7 +49,7 @@ class Config(object):
         "heroes.management.tasks",
         "players.management.tasks",
         "teams.management.tasks",
-        "accounts.management.tasks",
+        "parserpipe.management.tasks",
         "datadrivendota.management.tasks",
         # Importing from the module causes name conflicts in the scheduler
         "leagues.management.tasks.league",
@@ -128,7 +128,7 @@ class Config(object):
 
     )
     TASKS = {
-        'accounts.management.tasks.CreateMatchParse': {
+        'parserpipe.management.tasks.CreateMatchParse': {
             'routes': {
                 'exchange': 'integrity',
                 'routing_key': 'integrity'
@@ -137,7 +137,7 @@ class Config(object):
                 'max_retries': 0,
             }
         },
-        'accounts.management.tasks.KickoffMatchRequests': {
+        'parserpipe.management.tasks.KickoffMatchRequests': {
             'routes': {
                 'exchange': 'integrity',
                 'routing_key': 'integrity'
@@ -146,7 +146,7 @@ class Config(object):
                 'max_retries': 0,
             }
         },
-        'accounts.management.tasks.MergeMatchRequestReplay': {
+        'parserpipe.management.tasks.MergeMatchRequestReplay': {
             'routes': {
                 'exchange': 'integrity',
                 'routing_key': 'integrity'
@@ -155,13 +155,33 @@ class Config(object):
                 'max_retries': 0,
             }
         },
-        'accounts.management.tasks.ReadParseResults': {
+        'parserpipe.management.tasks.ReadParseResults': {
             'routes': {
                 'exchange': 'integrity',
                 'routing_key': 'integrity'
             },
             'annotations': {
                 'max_retries': 0,
+            }
+        },
+        'parserpipe.management.tasks.UpdatePmsReplays': {
+            'routes': {
+                'exchange': 'integrity',
+                'routing_key': 'integrity'
+            },
+            'annotations': {
+                "time_limit": 240,
+                "soft_time_limit": 235,
+            }
+        },
+        'parserpipe.management.tasks.UpdateParseEnd': {
+            'routes': {
+                'exchange': 'integrity',
+                'routing_key': 'integrity'
+            },
+            'annotations': {
+                "time_limit": 240,
+                "soft_time_limit": 235,
             }
         },
         'datadrivendota.management.tasks.ValveApiCall': {
@@ -279,16 +299,6 @@ class Config(object):
             'routes': {
                 'exchange': 'integrity',
                 'routing_key': 'integrity'
-            }
-        },
-        'matches.management.tasks.UpdatePmsReplays': {
-            'routes': {
-                'exchange': 'integrity',
-                'routing_key': 'integrity'
-            },
-            'annotations': {
-                "time_limit": 240,
-                "soft_time_limit": 235,
             }
         },
         'players.management.tasks.MirrorClientMatches': {

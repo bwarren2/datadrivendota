@@ -2,11 +2,6 @@ from django.conf.urls import url
 from accounts import views
 
 urlpatterns = [
-    url(
-        r'^match-request/$',
-        views.MatchRequestView.as_view(),
-        name="match_request"
-    ),
 
     url(r'^$', views.AccountsHome.as_view(), name='home'),
     url(r'^login/$', views.LoginView.as_view(), name='login'),
