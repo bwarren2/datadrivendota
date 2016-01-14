@@ -10,6 +10,12 @@
             </div>
         </div>
         <div class='form-group'>
+            <label class='control-label col-md-2'>Filename</label>
+            <div class='col-md-10'>
+            <input type='text' id='filename' class='form-control'>
+            </div>
+        </div>
+        <div class='form-group'>
             <label class='control-label col-md-2'>Task Type</label>
             <div class='col-md-10'>
             <select type='text' id='task' class='form-control'>
@@ -19,6 +25,7 @@
                 </option>
                 <option value='kickoff_all'>Kickoff All Requests</option>
                 <option value='read_java'>Read Parse Results</option>
+                <option value='merge_results'>Merge Results</option>
                 <option value='fanout'>Fan out parsing of results</option>
                 {# <option value='parse'>Parse Shards</option> #}
             </select>
@@ -56,12 +63,15 @@
             }
             var csrftoken = getCookie('csrftoken');
             var match_id = $('#match_id').val();
+            var filename = $('#filename').val();
             var task = $('#task :selected').val();
             var data = {
                 csrfmiddlewaretoken: csrftoken,
                 task: task,
                 match_id: match_id,
+                filename: filename
             };
+            console.log(data);
             var resp = $.ajax({
                     url: '/parserpipe/tasks/',
                     method: "POST",

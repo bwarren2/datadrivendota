@@ -219,11 +219,17 @@ class MergeMatchRequestReplay(Task):
         match_id = json_data['match_id']
         filename = json_data['filename']
 
+        logger.info(json_data)
         logger.info('Merging {0}'.format(match_id))
 
         mr = MatchRequest.objects.get(match_id=match_id)
+        logger.info('Merging {0} to request'.format(match_id))
         self.merge_to_request(mr, filename)
+
+        logger.info('Merging {0} to match'.format(match_id))
         self.merge_to_match(mr, match_id)
+
+        logger.info('Fanning out {0}'.format(match_id))
         self.fan_parsing(match_id)
 
     def merge_to_match(self, mr, match_id):
@@ -250,7 +256,7 @@ class MergeMatchRequestReplay(Task):
                 match.compressed_replay.save(filename, File(holder))
 
             else:
-                logger.info(
+                raise ValueError(
                     "Could not get the replay {0}!  Error code {1}".format(
                         url, r.status_code
                     )
@@ -408,18 +414,16 @@ class UpdatePmsReplays(Task):
 
 class UpdateParseEnd(Task):
 
-    def run(self, *args, **kwargs):
+    def run(self, finished_shards, match_id):
         #  Expects a bunch of pms ids on all success, some False on any failure
 
-        pms_ids = args[0]
-        match_id = kwargs['match_id']
-
-        if all(pms_ids):
+        if all(finished_shards):
 
             mr = MatchRequest.objects.get(match_id=match_id)
             mr.status = MatchRequest.PARSED
             mr.save()
 
+            pms_ids = finished_shards
             pmses = PlayerMatchSummary.objects.filter(id__in=pms_ids)
             pmses.update(parsed_with=settings.PARSER_VERSION)
             logger.info('Parse Success!')

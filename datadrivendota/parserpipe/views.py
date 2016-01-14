@@ -37,7 +37,9 @@ class TasksView(View):
         if request.is_ajax() and request.user.is_staff:
 
             response_data = {}
+            print request.POST
             match_id = request.POST['match_id']
+            filename = request.POST['filename']
             task = request.POST['task']
 
             if task == 'create':
@@ -66,6 +68,15 @@ class TasksView(View):
             elif task == 'read_java':
                 ReadParseResults().delay()
                 response_data['result'] = 'Reading results'
+                response_data['type'] = 'success'
+
+            elif task == 'merge_results':
+                json_data = {
+                    'match_id': match_id,
+                    'filename': filename,
+                }
+                MergeMatchRequestReplay().delay(json_data)
+                response_data['result'] = 'Merging results'
                 response_data['type'] = 'success'
 
             elif task == 'fanout':
