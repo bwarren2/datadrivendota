@@ -110,6 +110,11 @@ class Config(object):
             Exchange('valve_api'),
             routing_key='valve_api_call'
         ),
+        Queue(
+            'parsing',
+            Exchange('parsing'),
+            routing_key='parsing'
+        ),
         # This is a slower queue for tasks that hit our database or redis.
         # Scaling to keep this moving quickly is allowed, based on conn caps.
         Queue(
@@ -130,8 +135,8 @@ class Config(object):
     TASKS = {
         'parserpipe.management.tasks.CreateMatchParse': {
             'routes': {
-                'exchange': 'integrity',
-                'routing_key': 'integrity'
+                'exchange': 'parsing',
+                'routing_key': 'parsing'
             },
             'annotations': {
                 'max_retries': 0,
@@ -139,8 +144,8 @@ class Config(object):
         },
         'parserpipe.management.tasks.KickoffMatchRequests': {
             'routes': {
-                'exchange': 'integrity',
-                'routing_key': 'integrity'
+                'exchange': 'parsing',
+                'routing_key': 'parsing'
             },
             'annotations': {
                 'max_retries': 0,
@@ -148,8 +153,8 @@ class Config(object):
         },
         'parserpipe.management.tasks.MergeMatchRequestReplay': {
             'routes': {
-                'exchange': 'integrity',
-                'routing_key': 'integrity'
+                'exchange': 'parsing',
+                'routing_key': 'parsing'
             },
             'annotations': {
                 'max_retries': 0,
@@ -157,8 +162,8 @@ class Config(object):
         },
         'parserpipe.management.tasks.ReadParseResults': {
             'routes': {
-                'exchange': 'integrity',
-                'routing_key': 'integrity'
+                'exchange': 'parsing',
+                'routing_key': 'parsing'
             },
             'annotations': {
                 'max_retries': 0,
@@ -166,8 +171,8 @@ class Config(object):
         },
         'parserpipe.management.tasks.UpdatePmsReplays': {
             'routes': {
-                'exchange': 'integrity',
-                'routing_key': 'integrity'
+                'exchange': 'parsing',
+                'routing_key': 'parsing'
             },
             'annotations': {
                 "time_limit": 240,
@@ -176,8 +181,8 @@ class Config(object):
         },
         'parserpipe.management.tasks.UpdateParseEnd': {
             'routes': {
-                'exchange': 'integrity',
-                'routing_key': 'integrity'
+                'exchange': 'parsing',
+                'routing_key': 'parsing'
             },
             'annotations': {
                 "time_limit": 240,
