@@ -223,6 +223,9 @@
     height:36px;
     width:64px;
   }
+  .select2-result-pms__title{
+    color: black;
+  }
 </style>
 {% endblock content %}
 
@@ -237,7 +240,7 @@ $(function(){
       var markup = "<div class='select2-result-log clearfix'>" +
         // "<div class='select2-result-pms__avatar'><img src='" + pms.hero.image_url + "' /></div>" +
         "<div class='select2-result-pms__meta'>" +
-          "<div class='select2-result-pms__title'>" + log.hero.name + "</div>"+
+          "<div class='select2-result-pms__title'>" + log.hero.name+", M#"+log.match.steam_id + "</div>"+
           "</div></div>";
 
       return markup;
