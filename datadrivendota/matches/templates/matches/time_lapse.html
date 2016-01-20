@@ -223,6 +223,9 @@
     height:36px;
     width:64px;
   }
+  .select2-result-pms__title{
+    color: black;
+  }
 </style>
 {% endblock content %}
 
@@ -237,20 +240,20 @@ $(function(){
       var markup = "<div class='select2-result-log clearfix'>" +
         // "<div class='select2-result-pms__avatar'><img src='" + pms.hero.image_url + "' /></div>" +
         "<div class='select2-result-pms__meta'>" +
-          "<div class='select2-result-pms__title'>" + log.playermatchsummary.hero.name + "</div>"+
+          "<div class='select2-result-pms__title'>" + log.hero.name+", M#"+log.match.steam_id + "</div>"+
           "</div></div>";
 
       return markup;
     }
 
     function formatPmsSelection (log) {
-      return log.playermatchsummary.hero.name;
+      return log.hero.name;
     }
 
-
+    var pms_cache = {};
     $("#pmses").select2({
       ajax: {
-        url: "/rest-api/statelog/",
+        url: "/rest-api/player-match-summary/",
         dataType: 'json',
         delay: 250,
         multiple: true,
@@ -266,8 +269,8 @@ $(function(){
           return {
             // If you don't provide an id, the select is disabled by default.
             results: data.map(function(d){
-              // console.log(d);
-              d.id = d.playermatchsummary.id;
+              d.id = d.lookup_pair;
+              pms_cache[d.id] = d;
               return d;
             }),
             pagination: {
@@ -292,9 +295,9 @@ $(function(){
       });
 
       // Turn this object business into an array
-      var pms_ids = []
+      var pmses = []
       for (var i = selected_ids.length - 1; i >= 0; i--) {
-        pms_ids.push(parseInt(selected_ids[i]))
+        pmses.push(pms_cache[selected_ids[i]]);
       };
 
       var destination = '#'+$('#destination :selected').val();
@@ -307,11 +310,10 @@ $(function(){
         interpolation: $('#interpolation :selected').val(),
       };
 
-      d7.extensions.charts.pms_shards.state_lineup(
-        pms_ids, facet, destination, params
+      d7.extensions.charts.replays.state_lineup(
+        pmses, facet, destination, params
       );
     })
-    // d7.extensions.utils.visuals.toggle_sides()
 
 });
 

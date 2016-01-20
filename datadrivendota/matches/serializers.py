@@ -57,11 +57,15 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
     hero = HeroSerializer()
     match = MatchSerializer()
     skillbuild = serializers.SerializerMethodField()
+    lookup_pair = serializers.SerializerMethodField()
 
     def get_skillbuild(self, obj):
         return [
             SkillBuildSerializer(x).data for x in obj.skillbuild_set.all()
         ]
+
+    def get_lookup_pair(self, obj):
+        return obj.lookup_pair
 
     class Meta:
         model = PlayerMatchSummary
@@ -89,6 +93,7 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
             'match',
             'skillbuild',
             'replay_shard',
+            'lookup_pair',
         )
 
 

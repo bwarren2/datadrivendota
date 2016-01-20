@@ -4,6 +4,7 @@ var svg = require('./svg.js');
 var blanks = require('./blanks.js');
 var reduce = require('./reduce.js');
 var map = require('./map.js');
+var parse_urls = require('./parse_urls.js');
 var reshape = require('./reshape.js');
 var filter = require('./filter.js');
 var visuals = require('./visuals.js');
@@ -83,6 +84,7 @@ module.exports = {
     svg: svg,
     blanks: blanks,
     reduce: reduce,
+    parse_urls: parse_urls,
     map: map,
     reshape: reshape,
     filter: filter,

@@ -231,6 +231,11 @@ class PlayerMatchSummary(models.Model):
         )
 
     @property
+    def lookup_pair(self):
+        """ Uniqueness prefix from the parsed output hash function. """
+        return "{0}_{1}".format(self.match.steam_id, self.player_slot)
+
+    @property
     def kda2(self):
         return self.kills - self.deaths + self.assists / 2.0
 

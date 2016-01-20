@@ -3,4 +3,5 @@ module.exports = {
     matches: require('./matches.js'),
     bar: require('./bar.js'),
     pms_shards: require('./pms_replay_shards.js'),
+    replays: require('./replays.js'),
 }
