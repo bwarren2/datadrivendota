@@ -22,7 +22,7 @@ var aj = new AjaxCache();
 
 module.exports = aj;
 
-},{"bluebird":24}],2:[function(require,module,exports){
+},{"bluebird":26}],2:[function(require,module,exports){
 module.exports = {
   classDiscreteBarChart: function(destination, plot_data){
 
@@ -395,15 +395,16 @@ module.exports = {
   quality_barchart: quality_barchart,
 };
 
-},{"../ajax_cache":1,"../models":13,"../utils":18,"./tooltips.js":7,"bluebird":24}],4:[function(require,module,exports){
+},{"../ajax_cache":1,"../models":14,"../utils":19,"./tooltips.js":8,"bluebird":26}],4:[function(require,module,exports){
 module.exports = {
     heroes: require('./heroes.js'),
     matches: require('./matches.js'),
     bar: require('./bar.js'),
     pms_shards: require('./pms_replay_shards.js'),
+    replays: require('./replays.js'),
 }
 
-},{"./bar.js":2,"./heroes.js":3,"./matches.js":5,"./pms_replay_shards.js":6}],5:[function(require,module,exports){
+},{"./bar.js":2,"./heroes.js":3,"./matches.js":5,"./pms_replay_shards.js":6,"./replays.js":7}],5:[function(require,module,exports){
 "use strict";
 var utils = require("../utils");
 var Promise = require("bluebird");
@@ -687,7 +688,7 @@ module.exports = {
   match_timeline: match_timeline,
 };
 
-},{"../ajax_cache":1,"../models":13,"../utils":18,"./tooltips.js":7,"bluebird":24}],6:[function(require,module,exports){
+},{"../ajax_cache":1,"../models":14,"../utils":19,"./tooltips.js":8,"bluebird":26}],6:[function(require,module,exports){
 "use strict";
 var utils = require("../utils");
 var components = require("../components");
@@ -1195,7 +1196,157 @@ module.exports = {
   render_data: render_data,
 };
 
-},{"../ajax_cache":1,"../components":9,"../models":13,"../utils":18,"./tooltips.js":7,"bluebird":24}],7:[function(require,module,exports){
+},{"../ajax_cache":1,"../components":10,"../models":14,"../utils":19,"./tooltips.js":8,"bluebird":26}],7:[function(require,module,exports){
+"use strict";
+var utils = require("../utils");
+var Promise = require("bluebird");
+var $ = window.$;
+var nv = window.nv;
+var _ = window._;
+
+
+// Things uses in the pmses:
+// d.hero.name (for labeling)
+// d.lookup_pair (for hitting s3)
+// Using radiant or dire numbers should fake those members.
+
+var state_lineup = function(pmses, facet, destination, params){
+
+  // Get the replay parse info
+  Promise.all(
+    pmses.map(function(pms){
+      var location = utils.parse_urls.url_for(pms, facet);
+      return $.getJSON(location);
+    })
+  ).then(function(facets){
+
+    // Structure the fancy filtering we are about to do.
+
+    var timeToSecs = function(time){
+        return parseInt(time.split(":")[0])*60+parseInt(time.split(":")[1]);
+    };
+
+    var width;
+    var height;
+    var start;
+    var stop;
+    var interpolation;
+    var stride;
+    var chart_destination = destination+" .chart";
+    var label_destination = destination+" label";
+    var x_label = toTitleCase("offset time".replace(/\_/g, " "));
+    var y_label = toTitleCase(facet.replace(/\_/g, " "));
+
+    if(params!==undefined){
+
+      if(params.start_time!==undefined&params.start_time!==""){
+        start = timeToSecs(params.start_time);
+      } else {
+        start = -10000;
+      }
+
+      if(params.end_time!==undefined&params.end_time!==""){
+        stop = timeToSecs(params.end_time);
+      } else {
+        stop = 10000;
+      }
+
+      if(params.interpolation!==undefined){
+        interpolation = params.interpolation;
+      } else {
+        interpolation = "step-after";
+      }
+
+      if(params.granularity!==undefined){
+        stride = params.granularity;
+      } else {
+        stride = 10;
+      }
+
+    }
+
+    var plot_data = facets.map(function(d, i){
+      var filtered_dataset = d.filter(function(x){
+        return x.offset_time <= stop & x.offset_time >= start;
+      }).filter(function(x){
+        return x.offset_time.mod(stride) === 0;
+      });
+      return {
+        key: pmses[i].hero.name,
+        values: filtered_dataset,
+      };
+    });
+
+    $(chart_destination).empty();
+    $(label_destination).html(y_label);
+
+    var svg = utils.svg.square_svg(chart_destination, width, height);
+    nv.addGraph(
+
+      function(){
+        var chart = nv.models.lineChart()
+          .margin({
+            left: 45,
+            bottom: 45,
+          })
+          .x(function(d){
+            return d.offset_time;
+          })
+          .y(function(d){
+            return d[facet];
+          })
+          .showLegend(false)
+          .interpolate(interpolation)
+          .forceY(0);
+
+        if(params !== undefined){
+
+          if(params.height!==undefined){
+            chart.height(params.height);
+          }
+          if(params.width!==undefined){
+            chart.width(params.width);
+          }
+          if(params.forceY!==undefined){
+            chart.forceY(params.forceY);
+          }
+          if(params.forceX!==undefined){
+            chart.forceX(params.forceX);
+          }
+          if(params.contentGenerator!==undefined){
+            chart.tooltip.contentGenerator(params.contentGenerator);
+          }
+        }
+
+
+        chart.xAxis.axisLabel(x_label).tickFormat(
+          function(d){
+            return String(d).toHHMMSS();
+          }
+        );
+
+        chart.yAxis.axisLabel(y_label).axisLabelDistance(-18)
+          .tickFormat(
+              function(d){
+                if(d>1000000){return (d/1000000).toFixed(0) + "M";}
+                else if(d>1000){return (d/1000).toFixed(0) + "K";}
+                else { return d; }
+              }
+            );
+
+        var chart_data = svg.datum(plot_data);
+        chart_data.transition().duration(500).call(chart);
+        return chart;
+      }
+    );
+  });
+};
+
+module.exports = {
+  state_lineup: state_lineup,
+};
+
+},{"../utils":19,"bluebird":26}],8:[function(require,module,exports){
 "use strict"
 var d3 = window.d3;
 
@@ -1465,7 +1616,7 @@ module.exports = {
     match_tooltip: match_tooltip,
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var offset_time = {
     label: "Minutes from Horn",
     access: function(d){
@@ -1483,7 +1634,7 @@ module.exports = {
     offset_time: offset_time,
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 var axes = require('./axes.js');
 
@@ -1491,7 +1642,7 @@ module.exports = {
     axes: axes,
 };
 
-},{"./axes.js":8}],10:[function(require,module,exports){
+},{"./axes.js":9}],11:[function(require,module,exports){
 'use strict';
 
 var nvd3 = window.nv;
@@ -1505,7 +1656,7 @@ nvd3.extensions.components = require('./components');
 
 module.exports = nvd3;
 
-},{"./charts":4,"./components":9,"./models":13,"./utils":18}],11:[function(require,module,exports){
+},{"./charts":4,"./components":10,"./models":14,"./utils":19}],12:[function(require,module,exports){
 //TODO: consider deprecating by adding necessary features to multiBar model
 var discreteBar = function() {
     "use strict";
@@ -1763,7 +1914,7 @@ module.exports = {
     discrete_bar: discreteBar
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 
 var discreteBarChart = function() {
     "use strict";
@@ -2018,7 +2169,7 @@ module.exports = {
     discrete_bar_chart: discreteBarChart
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 var scatter = require('./scatter.js').scatter;
 var scatter_chart = require('./scatter_chart.js').scatter_chart;
@@ -2032,7 +2183,7 @@ module.exports = {
     discrete_bar_chart: discrete_bar_chart,
 };
 
-},{"./discrete_bar.js":11,"./discrete_bar_chart.js":12,"./scatter.js":14,"./scatter_chart.js":15}],14:[function(require,module,exports){
+},{"./discrete_bar.js":12,"./discrete_bar_chart.js":13,"./scatter.js":15,"./scatter_chart.js":16}],15:[function(require,module,exports){
 'use strict';
 var d3 = window.d3;
 var utils = require('../utils');
@@ -2466,7 +2617,7 @@ module.exports = {
     scatter: scatter
 }
 
-},{"../utils":18}],15:[function(require,module,exports){
+},{"../utils":19}],16:[function(require,module,exports){
 "use strict";
 var models = require("./scatter.js");
 var d3 = window.d3;
@@ -2785,7 +2936,7 @@ module.exports = {
     scatter_chart: scatter_chart
 }
 
-},{"./scatter.js":14,"d3-tip":26}],16:[function(require,module,exports){
+},{"./scatter.js":15,"d3-tip":28}],17:[function(require,module,exports){
 var blank_hero_pickbans = function(dossiers){
     var return_obj = {};
     var values_ary = [];
@@ -2808,7 +2959,7 @@ module.exports = {
     blank_hero_pickbans: blank_hero_pickbans
 }
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 
@@ -3106,13 +3257,14 @@ module.exports = {
     item_buys: item_buys,
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 var svg = require('./svg.js');
 var blanks = require('./blanks.js');
 var reduce = require('./reduce.js');
 var map = require('./map.js');
+var parse_urls = require('./parse_urls.js');
 var reshape = require('./reshape.js');
 var filter = require('./filter.js');
 var visuals = require('./visuals.js');
@@ -3192,6 +3344,7 @@ module.exports = {
     svg: svg,
     blanks: blanks,
     reduce: reduce,
+    parse_urls: parse_urls,
     map: map,
     reshape: reshape,
     filter: filter,
@@ -3200,7 +3353,7 @@ module.exports = {
     initOptions: initOptions,
 }
 
-},{"./blanks.js":16,"./filter.js":17,"./map.js":19,"./reduce.js":20,"./reshape.js":21,"./svg.js":22,"./visuals.js":23}],19:[function(require,module,exports){
+},{"./blanks.js":17,"./filter.js":18,"./map.js":20,"./parse_urls.js":21,"./reduce.js":22,"./reshape.js":23,"./svg.js":24,"./visuals.js":25}],20:[function(require,module,exports){
 'use strict';
 
 var count = function(){
@@ -3243,7 +3396,33 @@ module.exports = {
     sum: sum,
 };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
+"use strict";
+
+
+if (!String.prototype.format) {
+  String.prototype.format = function() {
+    var args = arguments;
+    return this.replace(/{(\d+)}/g, function(match, number) {
+      return typeof args[number] != "undefined" ? args[number] : match;
+    });
+  };
+};
+
+var version = 1;
+var parse_url = "https://s3.amazonaws.com/datadrivendota/processed_replay_parse/";
+
+var url_for = function(pms, facet){
+    return parse_url+"{0}_statelog_{1}_v{2}.json.gz".format(
+        pms.lookup_pair, facet, version
+    );
+};
+
+module.exports = {
+    url_for: url_for,
+}
+
+},{}],22:[function(require,module,exports){
 "use strict";
 
 var extract_pickbans = function(blanks, working_set){
@@ -3296,7 +3475,7 @@ module.exports = {
   extract_pickbans: extract_pickbans
 };
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 var pms_merge = function(data, pmses){
@@ -3394,7 +3573,7 @@ module.exports = {
     matches: matches,
 }
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 function square_svg(destination, width, height){
   if (width === undefined){
     width = $(destination).width();
@@ -3412,7 +3591,7 @@ module.exports = {
   square_svg: square_svg,
 }
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 var $ = window.$;
@@ -3458,7 +3637,7 @@ module.exports = {
     toggle_sides: toggle_sides
 }
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -8318,7 +8497,7 @@ module.exports = ret;
 },{"./es5.js":14}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":25}],25:[function(require,module,exports){
+},{"_process":27}],27:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -8410,7 +8589,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 // d3.tip
 // Copyright (c) 2013 Justin Palmer
 //
@@ -8716,5 +8895,5 @@ process.umask = function() { return 0; };
 
 }));
 
-},{}]},{},[10])(10)
+},{}]},{},[11])(11)
 });
