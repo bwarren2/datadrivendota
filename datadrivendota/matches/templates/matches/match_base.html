@@ -10,13 +10,6 @@
               <li role="presentation" class="{% active 'matches:detail' %}">
                 <a href="{% url "matches:detail" match_id=match.steam_id %}">Overview</a>
               </li>
-              {% if match.replay %}
-                <li role="presentation" class="{% active 'matches:replicate' %}">
-                  <a href="{% url "matches:replicate" match_id=match.steam_id %}">Replicate
-                  <span class="fa fa-line-chart">
-                  </a>
-                </li>
-              {% endif %}
               <li role="presentation" class="{% active 'matches:detail_abilities' %}">
                 <a href="{% url "matches:detail_abilities" match_id=match.steam_id %}">Skillbuilds</a>
               </li>
