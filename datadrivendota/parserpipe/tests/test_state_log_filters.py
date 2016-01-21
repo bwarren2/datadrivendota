@@ -78,22 +78,51 @@ class TestStateLogFilters(TestCase):
             {'offset_time': 1166, "intelligence_total": 44.199997}
         ])
 
-    def test_state_log_damage(self):
-        data = state_log_filters.damage(
+    def test_state_log_base_damage(self):
+        data = state_log_filters.base_damage(
             self.msgs, self.antimage_pms
         )
         self.assertEqual(len(data), 2)
         self.assertEqual(data, [
             {
-                'base_damage': 56,
-                'bonus_damage': 0,
-                'offset_time': 276,
-                'total_damage': 56},
+              'base_damage': 56,
+              'offset_time': 276,
+            },
             {
-                'base_damage': 72,
-                'bonus_damage': 0,
-                'offset_time': 1166,
-                'total_damage': 72
+              'base_damage': 72,
+              'offset_time': 1166,
+            }
+          ])
+
+    def test_state_log_bonus_damage(self):
+        data = state_log_filters.bonus_damage(
+            self.msgs, self.antimage_pms
+        )
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data, [
+            {
+              'bonus_damage': 0,
+              'offset_time': 276,
+            },
+            {
+              'bonus_damage': 0,
+              'offset_time': 1166,
+            }
+          ])
+
+    def test_state_log_total_damage(self):
+        data = state_log_filters.total_damage(
+            self.msgs, self.antimage_pms
+        )
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data, [
+            {
+              'offset_time': 276,
+              'total_damage': 56
+            },
+            {
+              'offset_time': 1166,
+              'total_damage': 72
             }
           ])
 
@@ -126,12 +155,42 @@ class TestStateLogFilters(TestCase):
             {
                 'offset_time': 276,
                 "health": 549,
-                "max_health": 549
             },
             {
                 'offset_time': 1166,
                 "health": 834,
+            }
+        ])
+
+    def test_state_log_max_health(self):
+        data = state_log_filters.max_health(
+            self.msgs, self.antimage_pms
+        )
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data, [
+            {
+                'offset_time': 276,
+                "max_health": 549
+            },
+            {
+                'offset_time': 1166,
                 "max_health": 834,
+            }
+        ])
+
+    def test_state_log_pct_health(self):
+        data = state_log_filters.pct_health(
+            self.msgs, self.antimage_pms
+        )
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data, [
+            {
+                'offset_time': 276,
+                "pct_health": 1
+            },
+            {
+                'offset_time': 1166,
+                "pct_health": 1,
             }
         ])
 
@@ -144,12 +203,42 @@ class TestStateLogFilters(TestCase):
             {
                 'offset_time': 276,
                 "mana": 206.0002,
-                "max_mana": 363.93784
             },
             {
                 'offset_time': 1166,
                 "mana": 771.87573,
+            }
+        ])
+
+    def test_state_log_max_mana(self):
+        data = state_log_filters.max_mana(
+            self.msgs, self.antimage_pms
+        )
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data, [
+            {
+                'offset_time': 276,
+                "max_mana": 363.93784
+            },
+            {
+                'offset_time': 1166,
                 "max_mana": 821.9383,
+            }
+        ])
+
+    def test_state_log_pct_mana(self):
+        data = state_log_filters.pct_mana(
+            self.msgs, self.antimage_pms
+        )
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data, [
+            {
+                'offset_time': 276,
+                "pct_mana": 206.0002/363.93784
+            },
+            {
+                'offset_time': 1166,
+                "pct_mana": 771.87573/821.9383,
             }
         ])
 
@@ -407,6 +496,26 @@ class TestStateLogFilters(TestCase):
         self.assertEqual(data, [
             {'offset_time': 276, "x": 132, "y": 132},
             {'offset_time': 1166, "x": 154, "y": 154}
+        ])
+
+    def test_state_log_x_position(self):
+        data = state_log_filters.x_position(
+            self.msgs, self.antimage_pms
+        )
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data, [
+            {'offset_time': 276, "x_position": 132},
+            {'offset_time': 1166, "x_position": 154}
+        ])
+
+    def test_state_log_y_position(self):
+        data = state_log_filters.y_position(
+            self.msgs, self.antimage_pms
+        )
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data, [
+            {'offset_time': 276, "y_position": 132},
+            {'offset_time': 1166, "y_position": 154}
         ])
 
 

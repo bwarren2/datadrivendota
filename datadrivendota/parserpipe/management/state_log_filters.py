@@ -12,64 +12,6 @@ entitystate_filter_map = {}
 
 
 @mapping_construct(entitystate_filter_map)
-def damage(msgs, pms):
-    return sorted(
-        [
-            {
-                'offset_time': msg['offset_time'],
-                'base_damage': (msg['damage_max'] + msg['damage_min'])/2,
-                'bonus_damage': msg['damage_bonus'],
-                'total_damage': (msg['damage_max'] + msg['damage_min'])/2 +
-                msg['damage_bonus']
-            }
-            for msg in msgs
-            if 'damage_max' in msg and
-            'damage_min' in msg and
-            'damage_bonus' in msg and
-            msg['hero_id'] == pms.hero.steam_id
-        ],
-        key=lambda x: x['offset_time']
-    )
-
-
-@mapping_construct(entitystate_filter_map)
-def health(msgs, pms):
-    return sorted(
-        [
-            {
-                'offset_time': msg['offset_time'],
-                'health': msg['health'],
-                'max_health': msg['max_health']
-            }
-            for msg in msgs
-            if 'health' in msg and
-            'max_health' in msg and
-            msg['hero_id'] == pms.hero.steam_id
-
-        ],
-        key=lambda x: x['offset_time']
-    )
-
-
-@mapping_construct(entitystate_filter_map)
-def mana(msgs, pms):
-    return sorted(
-        [
-            {
-                'offset_time': msg['offset_time'],
-                'mana': msg['mana'],
-                'max_mana': msg['max_mana']
-            }
-            for msg in msgs
-            if 'mana' in msg and
-            'max_mana' in msg and
-            msg['hero_id'] == pms.hero.steam_id
-        ],
-        key=lambda x: x['offset_time']
-    )
-
-
-@mapping_construct(entitystate_filter_map)
 def items(msgs, pms):
     return sorted(
         [
@@ -101,6 +43,190 @@ def position(msgs, pms):
             for msg in msgs
             if 'x' in msg and
             'y' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def x_position(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'x_position': msg['x'],
+            }
+            for msg in msgs
+            if 'x' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def y_position(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'y_position': msg['y'],
+            }
+            for msg in msgs
+            if 'y' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def base_damage(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'base_damage': (msg['damage_max'] + msg['damage_min'])/2,
+            }
+            for msg in msgs
+            if 'damage_max' in msg and 'damage_min' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def bonus_damage(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'bonus_damage': msg['damage_bonus'],
+            }
+            for msg in msgs
+            if 'damage_bonus' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def total_damage(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'total_damage': (msg['damage_max'] + msg['damage_min'])/2 +
+                msg['damage_bonus']
+            }
+            for msg in msgs
+            if 'damage_max' in msg and
+            'damage_min' in msg and
+            'damage_bonus' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def health(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'health': msg['health'],
+            }
+            for msg in msgs
+            if 'health' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def max_health(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'max_health': msg['max_health']
+            }
+            for msg in msgs
+            if 'max_health' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def pct_health(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'pct_health': msg['health']/float(msg['max_health']),
+            }
+            for msg in msgs
+            if 'health' in msg and
+            'max_health' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def mana(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'mana': msg['mana'],
+            }
+            for msg in msgs
+            if 'mana' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def max_mana(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'max_mana': msg['max_mana']
+            }
+            for msg in msgs
+            if 'max_mana' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+@mapping_construct(entitystate_filter_map)
+def pct_mana(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'pct_mana': msg['mana']/float(msg['max_mana']),
+            }
+            for msg in msgs
+            if 'mana' in msg and
+            'max_mana' in msg and
             msg['hero_id'] == pms.hero.steam_id
         ],
         key=lambda x: x['offset_time']
