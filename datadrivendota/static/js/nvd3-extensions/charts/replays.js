@@ -73,7 +73,7 @@ var state_lineup = function(pmses, facet, destination, params){
         return x.offset_time.mod(stride) === 0;
       });
       return {
-        key: pmses[i].hero.name,
+        key: "{0}, M#{1}".format(pmses[i].hero.name, pmses[i].match.steam_id),
         values: filtered_dataset,
       };
     });
