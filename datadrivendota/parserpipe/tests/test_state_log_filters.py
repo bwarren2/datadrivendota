@@ -354,8 +354,8 @@ class TestStateLogFilters(TestCase):
         )
         self.assertEqual(len(data), 2)
         self.assertEqual(data, [
-            {'offset_time': 276, "armor": -1.0},
-            {'offset_time': 1166, "armor": -1.0}
+            {'offset_time': 276, "armor": -1.0+20.8/7},
+            {'offset_time': 1166, "armor": -1.0+30.799997/7}
         ])
 
     def test_state_log_recent_damage(self):

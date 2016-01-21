@@ -330,22 +330,6 @@ def intelligence_total(msgs, pms):
 
 
 @mapping_construct(entitystate_filter_map)
-def damage_taken(msgs, pms):
-    return sorted(
-        [
-            {
-                'offset_time': msg['offset_time'],
-                'damage_taken': msg['damage_taken']
-            }
-            for msg in msgs
-            if 'damage_taken' in msg and
-            msg['hero_id'] == pms.hero.steam_id
-        ],
-        key=lambda x: x['offset_time']
-    )
-
-
-@mapping_construct(entitystate_filter_map)
 def healing(msgs, pms):
     return sorted(
         [
@@ -467,54 +451,6 @@ def lifestate(msgs, pms):
             }
             for msg in msgs
             if 'lifestate' in msg and
-            msg['hero_id'] == pms.hero.steam_id
-        ],
-        key=lambda x: x['offset_time']
-    )
-
-
-@mapping_construct(entitystate_filter_map)
-def magic_resist_pct(msgs, pms):
-    return sorted(
-        [
-            {
-                'offset_time': msg['offset_time'],
-                'magic_resist_pct': msg['magic_resist_pct']
-            }
-            for msg in msgs
-            if 'magic_resist_pct' in msg and
-            msg['hero_id'] == pms.hero.steam_id
-        ],
-        key=lambda x: x['offset_time']
-    )
-
-
-@mapping_construct(entitystate_filter_map)
-def armor(msgs, pms):
-    return sorted(
-        [
-            {
-                'offset_time': msg['offset_time'],
-                'armor': msg['armor']
-            }
-            for msg in msgs
-            if 'armor' in msg and
-            msg['hero_id'] == pms.hero.steam_id
-        ],
-        key=lambda x: x['offset_time']
-    )
-
-
-@mapping_construct(entitystate_filter_map)
-def recent_damage(msgs, pms):
-    return sorted(
-        [
-            {
-                'offset_time': msg['offset_time'],
-                'recent_damage': msg['recent_damage']
-            }
-            for msg in msgs
-            if 'recent_damage' in msg and
             msg['hero_id'] == pms.hero.steam_id
         ],
         key=lambda x: x['offset_time']
@@ -711,3 +647,75 @@ def xp(msgs, pms):
         ],
         key=lambda x: x['offset_time']
     )
+
+
+# Needs to add on agility / 7
+@mapping_construct(entitystate_filter_map)
+def armor(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'armor': msg['armor'] + msg['agility_total'] / 7.0
+            }
+            for msg in msgs
+            if 'armor' in msg and
+            'agility_total' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+# Dubious from here out
+
+
+# Needs to add on items.  Probably worth ignoring.
+@mapping_construct(entitystate_filter_map)
+def magic_resist_pct(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'magic_resist_pct': msg['magic_resist_pct']
+            }
+            for msg in msgs
+            if 'magic_resist_pct' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+# What is this even?
+@mapping_construct(entitystate_filter_map)
+def recent_damage(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'recent_damage': msg['recent_damage']
+            }
+            for msg in msgs
+            if 'recent_damage' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
+
+# Is this even valid?   Doesn't seem to return nonzero
+@mapping_construct(entitystate_filter_map)
+def damage_taken(msgs, pms):
+    return sorted(
+        [
+            {
+                'offset_time': msg['offset_time'],
+                'damage_taken': msg['damage_taken']
+            }
+            for msg in msgs
+            if 'damage_taken' in msg and
+            msg['hero_id'] == pms.hero.steam_id
+        ],
+        key=lambda x: x['offset_time']
+    )
+
