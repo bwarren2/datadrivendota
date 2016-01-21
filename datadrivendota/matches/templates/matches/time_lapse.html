@@ -28,112 +28,116 @@
                   <div class="form-group">
                     <label>Data</label>
                     <select class="form-control" id='data'>
-                      <option value='agility'>
-                              Agility
-                      </option>
-                      <option value='agility_total'>
-                              Agility Total
-                      </option>
-                      <option value='strength'>
-                              Strength
-                      </option>
-                      <option value='strength_total'>
-                              Strength Total
-                      </option>
-                      <option value='intelligence'>
-                              Intelligence
-                      </option>
-                      <option value='intelligence_total'>
-                              Intelligence Total
-                      </option>
-                      <option value='damage'>
-                              Damage
-                      </option>
-                      <option value='damage_taken'>
-                              Damage Taken
-                      </option>
-                      <option value='healing'>
-                              Healing
-                      </option>
-                      <option value='health'>
-                              Health
-                      </option>
-                      <option value='mana'>
-                              Mana
-                      </option>
-                      <option value='kills'>
-                              Kills
-                      </option>
-                      <option value='deaths'>
-                              Deaths
-                      </option>
-                      <option value='assists'>
-                              Assists
-                      </option>
-                      <option value='items'>
-                              Items
-                      </option>
-                      <option value='last_hits'>
-                              Last Hits
-                      </option>
-                      <option value='denies'>
-                              Denies
-                      </option>
-                      <option value='misses'>
-                              Misses
-                      </option>
-                      <option value='lifestate'>
-                              Lifestate
-                      </option>
-                      <option value='magic_resist_pct'>
-                              Magic Resist Pct
-                      </option>
-                      <option value='armor'>
-                              Armor
-                      </option>
-                      <option value='recent_damage'>
-                              Recent Damage
-                      </option>
-                      <option value='respawn_time'>
-                              Respawn Time
-                      </option>
-                      <option value='roshan_kills'>
-                              Roshan Kills
-                      </option>
-                      <option value='nearby_creep_deaths'>
-                              Nearby Creep Deaths
-                      </option>
-                      <option value='shared_gold'>
-                              Shared Gold
-                      </option>
-                      <option value='reliable_gold'>
-                              Reliable Gold
-                      </option>
-                      <option value='total_earned_gold'>
-                              Total Earned Gold
-                      </option>
-                      <option value='unreliable_gold'>
-                              Unreliable Gold
-                      </option>
-                      <option value='creep_kill_gold'>
-                              Creep Kill Gold
-                      </option>
-                      <option value='hero_kill_gold'>
-                              Hero Kill Gold
-                      </option>
-                      <option value='income_gold'>
-                              Income Gold
-                      </option>
-                      <option value='tower_kills'>
-                              Tower Kills
-                      </option>
-                      <option value='xp'>
-                              Xp
-                      </option>
-                      <option value='position'>
-                              Position
-                      </option>
-
+                      <optgroup label='Hero Attributes'>
+                        <option value='agility'>
+                                Agility
+                        </option>
+                        <option value='agility_total'>
+                                Agility Total
+                        </option>
+                        <option value='strength'>
+                                Strength
+                        </option>
+                        <option value='strength_total'>
+                                Strength Total
+                        </option>
+                        <option value='intelligence'>
+                                Intelligence
+                        </option>
+                        <option value='intelligence_total'>
+                                Intelligence Total
+                        </option>
+                        <option value='armor'>
+                                Armor
+                        </option>
+                        <option value='base_damage'>
+                                Base Damage
+                        </option>
+                        <option value='bonus_damage'>
+                                Bonus Damage
+                        </option>
+                        <option value='total_damage'>
+                                Total Damage
+                        </option>
+                        <option value='health'>
+                                Health
+                        </option>
+                        <option value='max_health'>
+                                Max Health
+                        </option>
+                        <option value='pct_health'>
+                                Percent Health
+                        </option>
+                        <option value='mana'>
+                                Mana
+                        </option>
+                        <option value='max_mana'>
+                                Max Mana
+                        </option>
+                        <option value='pct_mana'>
+                                Percent Mana
+                        </option>
+                      </optgroup>
+                      <optgroup label='Combat'>
+                        <option value='kills'>
+                                Kills
+                        </option>
+                        <option value='deaths'>
+                                Deaths
+                        </option>
+                        <option value='assists'>
+                                Assists
+                        </option>
+                        <option value='last_hits'>
+                                Last Hits
+                        </option>
+                        <option value='denies'>
+                                Denies
+                        </option>
+                        <option value='misses'>
+                                Misses
+                        </option>
+                                Nearby Creep Deaths
+                        </option>
+                        <option value='healing'>
+                                Healing
+                        </option>
+                        <option value='roshan_kills'>
+                                Roshan Kills
+                        </option>
+                        <option value='nearby_creep_deaths'>
+                                Nearby Creep Deaths
+                        </option>
+                        <option value='tower_kills'>
+                                Tower Kills
+                        </option>
+                      </optgroup>
+                      <optgroup label='Gold and XP'>
+                        <option value='shared_gold'>
+                                Shared Gold
+                        </option>
+                        <option value='reliable_gold'>
+                                Reliable Gold
+                        </option>
+                        <option value='total_earned_gold'>
+                                Total Earned Gold
+                        </option>
+                        <option value='unreliable_gold'>
+                                Unreliable Gold
+                        </option>
+                        <option value='creep_kill_gold'>
+                                Creep Kill Gold
+                        </option>
+                        <option value='hero_kill_gold'>
+                                Hero Kill Gold
+                        </option>
+                        <option value='income_gold'>
+                                Income Gold
+                        </option>
+                        <option value='xp'>
+                                Xp
+                        </option>
+                      </optgroup>
                     </select>
                   </div>
                 </div>
@@ -286,20 +290,11 @@ $(function(){
       templateSelection: formatPmsSelection
 
     });
+
     $('#chart-button').click(function(){
 
       // Why does this return an object?
-      var selected_ids = $("#pmses option").map(function(){
-          // log the value and text of each option
-          return $(this).val();
-      });
-
-      // Turn this object business into an array
-      var pmses = []
-      for (var i = selected_ids.length - 1; i >= 0; i--) {
-        pmses.push(pms_cache[selected_ids[i]]);
-      };
-
+      var pmses = $('#pmses').select2('data');
       var destination = '#'+$('#destination :selected').val();
       var facet = $('#data :selected').val();
 
