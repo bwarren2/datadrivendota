@@ -470,7 +470,7 @@ class UpdatePmsReplays(Task):
 class UpdateParseEnd(Task):
 
     def run(self, finished_shards, match_id):
-        #  Expects a bunch of pms ids on all success, some False on any failure
+        #  Expects a bunch of pms ids on all success, some falsy on any failure
 
         if all(finished_shards):
 
