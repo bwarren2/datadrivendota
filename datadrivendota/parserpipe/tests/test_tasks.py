@@ -2,14 +2,17 @@
 import responses
 from model_mommy import mommy
 
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.db.models import Q
 from django.utils.decorators import method_decorator
-from django.core.urlresolvers import reverse
 
-from parserpipe.management.tasks import KickoffMatchRequests, CreateMatchParse
+from parserpipe.management.tasks import (
+    KickoffMatchRequests, CreateMatchParse, UpdatePmsReplays
+)
 
 from parserpipe.models import MatchRequest
+
+from .json_samples import all_income
 
 
 class TestParserTask(TestCase):
@@ -107,3 +110,24 @@ class TestKickoffRequestTask(TestCase):
         for request in requests:
             KickoffMatchRequests().mark_finding(request)
             self.assertEqual(request.status, MatchRequest.FINDING_MATCH)
+
+
+class TestShardMunging(TestCase):
+
+    def test_timeseries(self):
+
+        t = UpdatePmsReplays()
+        output = t.timeseries_combat(
+            {'all_income': all_income}, 234, 236, 235
+        )
+        self.assertEqual(
+            output,
+            {
+                'all_income':
+                [
+                    {'all_income': 625, 'offset_time': -1, 'time': 234},
+                    {'all_income': 625, 'offset_time': 0, 'time': 235},
+                    {'all_income': 965, 'offset_time': 1, 'time': 236}
+                ]
+            }
+        )

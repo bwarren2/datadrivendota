@@ -1,0 +1,58 @@
+[
+  {
+    "type": "gold_reasons",
+    "target": "npc_dota_hero_abaddon",
+    "target_illusion": false,
+    "attacker_hero": false,
+    "target_hero": false,
+    "value": 625,
+    "attacker_illusion": false,
+    "key": "0",
+    "time": 234,
+    "y": -6496.004,
+    "x": -6976.0,
+    "offset_time": -1
+  },
+  {
+    "type": "gold_reasons",
+    "target": "npc_dota_hero_abaddon",
+    "target_illusion": false,
+    "attacker_hero": false,
+    "target_hero": false,
+    "value": 100,
+    "attacker_illusion": false,
+    "key": "0",
+    "time": 236,
+    "y": -2229.8735,
+    "x": 2796.4688,
+    "offset_time": 1
+  },
+  {
+    "type": "gold_reasons",
+    "target": "npc_dota_hero_abaddon",
+    "target_illusion": false,
+    "attacker_hero": false,
+    "target_hero": false,
+    "value": 200,
+    "attacker_illusion": false,
+    "key": "0",
+    "time": 236,
+    "y": -2229.8735,
+    "x": 2796.4688,
+    "offset_time": 1
+  },
+  {
+    "type": "gold_reasons",
+    "target": "npc_dota_hero_abaddon",
+    "target_illusion": false,
+    "attacker_hero": false,
+    "target_hero": false,
+    "value": 40,
+    "attacker_illusion": false,
+    "key": "13",
+    "time": 236,
+    "y": -3859.2837,
+    "x": 6179.17,
+    "offset_time": 2
+  }
+]
