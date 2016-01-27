@@ -109,13 +109,6 @@ class MatchDetailScorecard(DetailView):
         return super(MatchDetailScorecard, self).get_context_data(**kwargs)
 
 
-class ReplicateDetail(DetailView):
-    template_name = 'matches/replicate.html'
-    model = Match
-    slug_url_kwarg = 'match_id'
-    slug_field = 'steam_id'
-
-
 class TimeLapseDetail(TemplateView):
     template_name = 'matches/time_lapse.html'
 

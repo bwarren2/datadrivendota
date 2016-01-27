@@ -28,9 +28,4 @@ urlpatterns = [
         views.MatchDetailAbilities.as_view(),
         name="detail_abilities"
     ),
-    url(
-        r'^(?P<match_id>[0-9\-]*)/replicate/$',
-        views.ReplicateDetail.as_view(),
-        name="replicate"
-    ),
 ]
