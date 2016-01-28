@@ -33,6 +33,7 @@ module.exports = {
             "js/charting.js",
             "js/parse.js",
             "js/project.js",
+            "js/frontend.js",
             "js/build/nvd3-extensions.js",
         ].map(function(file){ return "datadrivendota/static/"+file;}),
       dest: "datadrivendota/static/dist/built.js",
