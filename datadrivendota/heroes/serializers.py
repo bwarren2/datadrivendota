@@ -2,6 +2,25 @@ from rest_framework import serializers, filters
 from heroes.models import Hero, HeroDossier
 
 
+class AbilitySerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, obj):
+        try:
+            return obj.picture.url
+        except ValueError:
+            return ''
+
+    class Meta:
+        model = Hero
+        fields = (
+            'steam_id',
+            'machine_name',
+            'name',
+            'image_url',
+        )
+
+
 class HeroSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
 
@@ -92,3 +111,4 @@ class HeroStubSerializer(serializers.ModelSerializer):
 
 class FastHeroStubSerializer(serializers.Serializer):
     steam_id = serializers.IntegerField()
+
