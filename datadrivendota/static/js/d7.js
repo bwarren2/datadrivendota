@@ -1277,7 +1277,6 @@ var state_lineup = function(pmses, facet, destination, params){
       };
     });
 
-    console.log(plot_data);
     $(chart_destination).empty();
     $(label_destination).html(y_label);
 

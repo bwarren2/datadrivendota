@@ -285,8 +285,8 @@ class MergeMatchRequestReplay(Task):
 
 class UpdatePmsReplays(Task):
     ignore_result = False
-    soft_time_limit = 120
-    time_limit = 125
+    soft_time_limit = 180
+    time_limit = 185
 
     def run(self, match_id, data_slice):
         logger.info('Sharding replay for {0} {1}'.format(match_id, data_slice))
@@ -374,12 +374,12 @@ class UpdatePmsReplays(Task):
         ]
 
         # Get the timing information to make the combat timeseries match states
-        min_time = min(x['time'] for x in state_list)
-        max_time = max(x['time'] for x in state_list)
+        min_time = min(x['tick_time'] for x in state_list)
+        max_time = max(x['tick_time'] for x in state_list)
         timeseries_log = self.timeseries_combat(
             pms_combat, min_time, max_time, offset
         )
-        self.save_timeseries(pms, match_id, pms, timeseries_log)
+        self.save_timeseries(match_id, pms, timeseries_log)
 
         all_data = {
             'states': state_list,
@@ -447,7 +447,7 @@ class UpdatePmsReplays(Task):
         return combat_timeseries
 
     def save_timeseries(self, match_id, pms, timeseries_log):
-        for field, data in timeseries_log:
+        for field, data in timeseries_log.iteritems():
             self.save_msgstream(
                 match_id, pms.player_slot, data, field, 'combatseries'
             )

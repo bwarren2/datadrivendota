@@ -157,9 +157,11 @@ class UpdateProNames(ApiFollower):
     """ Takes a ping to the official player database and update pro name. """
 
     def run(self, api_context, json_data, response_code, url):
+        json_data = json_data['result']
         player = Player.objects.get_or_create(
             steam_id=api_context.AccountID
         )[0]
+
         if json_data['Name'] == '':
             player.pro_name = None
             player.save()

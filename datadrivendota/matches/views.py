@@ -109,8 +109,12 @@ class MatchDetailScorecard(DetailView):
         return super(MatchDetailScorecard, self).get_context_data(**kwargs)
 
 
-class TimeLapseDetail(TemplateView):
+class TimeLapseView(TemplateView):
     template_name = 'matches/time_lapse.html'
+
+
+class DuelView(TemplateView):
+    template_name = 'matches/duel.html'
 
 
 class MatchListView(ListView):

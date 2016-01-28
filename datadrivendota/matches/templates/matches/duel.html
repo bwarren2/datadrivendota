@@ -1,0 +1,144 @@
+{% extends "row_base.html" %}
+
+{% load staticfiles player_extras %}
+
+{% block title %}A Duel!{% endblock title %}
+
+
+{% block content %}
+
+    <div class='col-md-12'>
+        <div class="alert alert-info" role="alert">
+        <p style='color:#333'> For the fastest charts, consider less granularity for longer periods.  We have tons of data, and your browser may slow if you try to see every second of an hour long match with multiple people at once :) .</p>
+        </div>
+    </div>
+    <div class='col-md-12'>
+      <h4>Controls</h4>
+      <form>
+      <div class='row'>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Player-Match #1</label>
+                <select id='pms_1' style='width:200px'></select>
+            </div>
+        </div>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Player-Match #1 Label</label>
+                <input type="textarea" class="form-control" id="label_1" placeholder="(ex 'My Jungle Legion')">
+            </div>
+        </div>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Player-Match #2</label>
+                <select id='pms_2' style='width:200px'></select>
+            </div>
+        </div>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Player-Match #2 Label</label>
+                <input type="textarea" class="form-control" id="label_1" placeholder="(ex 'Dendi Pudge')">
+            </div>
+        </div>
+        <div class='col-md-2'>
+          <div class="form-group">
+            <label >Start Time</label>
+            <input type="textarea" class="form-control" id="start_time" placeholder="Start Time (eg 12:41)">
+          </div>
+        </div>
+
+        <div class='col-md-2'>
+          <div class="form-group">
+            <label >End Time</label>
+            <input type="textarea" class="form-control" id="end_time" placeholder="End Time (eg 23:10)">
+          </div>
+        </div>
+
+        <div class='col-md-2'>
+          <div class="form-group">
+            <label >Sample Freq (s)</label>
+            <input type="textarea" class="form-control" id="granularity" placeholder="Sample rate (eg 10)" value="10">
+          </div>
+        </div>
+
+        <div class='col-md-2'>
+          <div class="form-group">
+            <label >Interpolation</label>
+            <select class="form-control" id='interpolation'>
+              <option value='step-after'>Stepwise</option>
+              <option value='linear'>Linear</option>
+            </select>
+          </div>
+        </div>
+
+        <div class='col-md-3' style='margin-top:10px'>
+          <div class="btn-group btn-group-justified" role="group">
+            <div class="btn-group" role="group">
+              <button id='chart-button' type="button" class="btn btn-primary">
+                Chart! <i class="fa fa-line-chart"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    </div>
+
+    <div id='dashboard' class='col-md-12' height='900px'>
+    <div class='row'>
+        <div class='col-md-6' id='abilities'></div>
+        <div class='col-md-6' id='items'></div>
+        <div class='col-md-6' id='gold'></div>
+        <div class='col-md-6' id='kda'></div>
+    </div>
+    </div>
+
+    <div class='col-md-12'>
+    <h2>Want to see your data here?</h2>
+      {% include "accounts/mixins/_ping_request.html" %}
+    </div>
+
+<style type="text/css">
+  .select2-result-pms__avatar{
+    height:36px;
+    width:64px;
+  }
+  .select2-result-pms__title{
+    color: black;
+  }
+</style>
+{% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+$(function(){
+
+  inputs.pms_select2('#pms_1', false);
+  inputs.pms_select2('#pms_2', false);
+
+    $('#chart-button').click(function(){
+
+      var pms_1 = $('#pms_1').select2('data')[0];
+      var pms_2 = $('#pms_2').select2('data')[0];
+
+      var destination = '#'+$('#destination :selected').val();
+      var facet = $('#data :selected').val();
+
+      var params = {
+        granularity: parseInt($('#granularity').val()),
+        end_time: $('#end_time').val(),
+        start_time: $('#start_time').val(),
+        interpolation: $('#interpolation :selected').val(),
+      };
+
+    })
+
+});
+
+
+</script>
+{% endblock extra_js %}
+
+{% block extra_css %}
+{% endblock extra_css %}
+

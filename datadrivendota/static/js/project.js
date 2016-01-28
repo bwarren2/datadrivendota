@@ -135,6 +135,62 @@ $(function () {
         });
     }
 
+
+    function formatPms (log) {
+      if (log.loading) return "";
+
+      var markup = "<div class='select2-result-log clearfix'>" +
+        // "<div class='select2-result-pms__avatar'><img src='" + pms.hero.image_url + "' /></div>" +
+        "<div class='select2-result-pms__meta'>" +
+          "<div class='select2-result-pms__title'>" + log.hero.name+", M#"+log.match.steam_id + "</div>"+
+          "</div></div>";
+
+      return markup;
+    }
+
+    function formatPmsSelection (log) {
+      return log.hero.name+', M#'+log.match.steam_id;
+    }
+
+
+    var pms_select2 = function(selector, multiple){
+
+        $(selector).select2({
+          ajax: {
+            url: "/rest-api/player-match-summary/",
+            dataType: 'json',
+            delay: 250,
+            multiple: multiple,
+            data: function (params) {
+              return {
+                match_id: params.term, // search term
+                page: params.page
+              };
+            },
+            processResults: function (data, params) {
+              params.page = params.page || 1;
+
+              return {
+                // If you don't provide an id, the select is disabled by default.
+                results: data,
+                pagination: {
+                  more: (params.page * 30) < data.total_count
+                }
+              };
+            },
+            cache: true
+          },
+          escapeMarkup: function (markup) { return markup; },
+          minimumInputLength: 6,
+          templateResult: formatPms,
+          templateSelection: formatPmsSelection
+
+        });
+    }
+
+    window.inputs = {};
+    window.inputs.pms_select2 = pms_select2;
+
     window.comboBox = comboBox;
 
     window.comboBox();
