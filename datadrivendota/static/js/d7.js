@@ -1505,8 +1505,26 @@ var scatterline = function(pmses, destination, params, attr, logtype){
 
 
     var time_color = d3.scale.linear()
-        .domain([time_min, time_max])
-        .range(["red", "green"]);
+        .domain([
+          -120, -1,
+          0, 599,
+          600, 1199,
+          1200, 1799,
+          1800, 2399,
+          2400, 2999,
+          3000, 3599,
+          3600, 4199,
+        ])
+        .range([
+          d3.rgb("black").brighter(.2), d3.rgb("black").darker(1.3),
+          d3.rgb("red").brighter(.2), d3.rgb("red").darker(1.3),
+          d3.rgb("orange").brighter(.2), d3.rgb("orange").darker(1.3),
+          d3.rgb("yellow").brighter(.2), d3.rgb("yellow").darker(1.3),
+          d3.rgb("green").brighter(.2), d3.rgb("green").darker(1.3),
+          d3.rgb("blue").brighter(.2), d3.rgb("blue").darker(1.3),
+          d3.rgb("violet").brighter(.2), d3.rgb("violet").darker(1.3),
+          d3.rgb("gray").brighter(.2), d3.rgb("gray").darker(1.3),
+        ]);
 
     var svg = utils.svg.square_svg(chart_destination, width, height);
     nv.addGraph(
@@ -1559,10 +1577,6 @@ var scatterline = function(pmses, destination, params, attr, logtype){
         return chart;
       },
       function(){
-
-    var time_color = d3.scale.linear()
-        .domain([time_min, time_max])
-        .range(["gold", "green"]);
 
         d3.selectAll('.nv-point')
             .style("fill", function (d) {
