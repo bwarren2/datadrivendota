@@ -37,7 +37,7 @@
         <div class='col-md-3'>
             <div class="form-group">
             <label>Player-Match #2 Label</label>
-                <input type="textarea" class="form-control" id="label_1" placeholder="(ex 'Dendi Pudge')">
+                <input type="textarea" class="form-control" id="label_2" placeholder="(ex 'Dendi Pudge')">
             </div>
         </div>
         <div class='col-md-2'>
@@ -61,15 +61,6 @@
           </div>
         </div>
 
-        <div class='col-md-2'>
-          <div class="form-group">
-            <label >Interpolation</label>
-            <select class="form-control" id='interpolation'>
-              <option value='step-after'>Stepwise</option>
-              <option value='linear'>Linear</option>
-            </select>
-          </div>
-        </div>
 
         <div class='col-md-3' style='margin-top:10px'>
           <div class="btn-group btn-group-justified" role="group">
@@ -86,11 +77,91 @@
 
     <div id='dashboard' class='col-md-12' height='900px'>
     <div class='row'>
-        <div class='col-md-6' id='abilities'></div>
-        <div class='col-md-6' id='items'></div>
-        <div class='col-md-6' id='gold'></div>
-        <div class='col-md-6' id='kda'></div>
+
+        <div class='page-header'>
+          <h2>KDA</h2>
+        </div>
+
+        <div class='col-md-4' id='kills'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='deaths'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='assists'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
     </div>
+    <div class='row'>
+
+        <div class='page-header'>
+          <h2>Income</h2>
+        </div>
+
+        <div class='col-md-4' id='gold'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='hero_kill_income'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='creep_kill_income'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='building_income'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='roshan_kill_income'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='death_expense'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+    </div>
+
+
+    <div class='row'>
+
+        <div class='page-header'>
+          <h2>Damage</h2>
+        </div>
+
+        <div class='col-md-3' id='hero_dmg_dealt'>
+          <label></label>
+          <div class='vert-md-3 chart toggling'></div>
+        </div>
+        <div class='col-md-3' id='other_dmg_dealt'>
+          <label></label>
+          <div class='vert-md-3 chart toggling'></div>
+        </div>
+        <div class='col-md-3' id='hero_dmg_taken'>
+          <label></label>
+          <div class='vert-md-3 chart toggling'></div>
+        </div>
+        <div class='col-md-3' id='building_dmg_dealt'>
+          <label></label>
+          <div class='vert-md-3 chart toggling'></div>
+        </div>
+
+    </div>
+
     </div>
 
     <div class='col-md-12'>
@@ -106,30 +177,88 @@
   .select2-result-pms__title{
     color: black;
   }
-</style>
+/*  .col-md-2, .col-md-3, .col-md-4{
+    border: red solid 5px;
+  }
+*/</style>
 {% endblock content %}
 
 {% block extra_js %}
 <script type="text/javascript">
 $(function(){
 
-  inputs.pms_select2('#pms_1', false);
-  inputs.pms_select2('#pms_2', false);
+    inputs.pms_select2('#pms_1', false);
+    inputs.pms_select2('#pms_2', false);
 
     $('#chart-button').click(function(){
 
       var pms_1 = $('#pms_1').select2('data')[0];
       var pms_2 = $('#pms_2').select2('data')[0];
 
-      var destination = '#'+$('#destination :selected').val();
-      var facet = $('#data :selected').val();
+      var destination = '#gold';
 
       var params = {
         granularity: parseInt($('#granularity').val()),
         end_time: $('#end_time').val(),
         start_time: $('#start_time').val(),
-        interpolation: $('#interpolation :selected').val(),
+        x_label: $('#label_1').val(),
+        y_label: $('#label_2').val()
       };
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#kills', params, 'kills', 'statelog'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#deaths', params, 'deaths', 'statelog'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#assists', params, 'assists', 'statelog'
+      );
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], destination, params, 'all_income', 'combatseries'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#hero_kill_income',
+        params, 'hero_kill_income', 'combatseries'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#creep_kill_income',
+        params, 'creep_kill_income', 'combatseries'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#death_expense',
+        params, 'death_expense', 'combatseries'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#building_income',
+        params, 'building_income', 'combatseries'
+      );
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#roshan_kill_income',
+        params, 'roshan_kill_income', 'combatseries'
+      );
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#hero_dmg_taken',
+        params, 'hero_dmg_taken', 'combatseries'
+      );
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#hero_dmg_dealt',
+        params, 'hero_dmg_dealt', 'combatseries'
+      );
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#other_dmg_dealt',
+        params, 'other_dmg_dealt', 'combatseries'
+      );
+
+     d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#building_dmg_dealt',
+        params, 'key_bldg_dmg_dealt', 'combatseries'
+      );
 
     })
 
