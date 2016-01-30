@@ -269,7 +269,19 @@ var scatterline = function(pmses, destination, params, attr, logtype){
       return filtered_dataset;
     });
 
-    var values = scatterline_merge(trimmed_data, attr, stride);
+    var values = scatterline_merge(trimmed_data, attr, stride)
+
+    // NVD3 freaks out and breaks tooltips if voronoi is false or dots overlap.
+    var dumbhash = function(d){return d.x+"@@"+d.y}
+    var dumbhashes = [];
+    values = values.filter(function(a){
+        if(dumbhashes.indexOf(dumbhash(a))<0){
+          dumbhashes.push(dumbhash(a));
+          return true;
+        } else{
+          return false;
+        }
+      });
 
     var plot_data = [{
       key: toTitleCase(attr),
