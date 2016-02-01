@@ -330,7 +330,7 @@ var duel_item_tooltip_generator = function(x_name, y_name){
 
           trowEnter0.append("td")
               .html(function(x){
-                return x.item;
+                return toTitleCase(x.item.substring(5));
             });
 
           var trowEnter2 = tbodyEnter
@@ -353,6 +353,17 @@ var duel_item_tooltip_generator = function(x_name, y_name){
           trowEnter3.append("td")
               .html(function(x){
                 return String(x.y).toHHMMSS()
+              });
+
+          var trowEnter3 = tbodyEnter
+              .append("tr");
+
+          trowEnter3.append("td")
+              .html('(Cost)');
+
+          trowEnter3.append("td")
+              .html(function(x){
+                return String(x.cost)
               });
 
 

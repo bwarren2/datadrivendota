@@ -357,7 +357,6 @@ var scatterline = function(pmses, destination, params, attr, logtype){
           .showLegend(false)
           .forceX([true_min, true_max])
           .forceY([true_min, true_max]);
-          // .useVoronoi(false)
 
         if(params !== undefined){
 
@@ -450,9 +449,8 @@ var combat_merge = function(data, hasher, null_time){
 
       if(y_index===undefined) console.log('Freak');
 
-      y_data = winnow(y_data, y_index);
       return_obj['y'] = y_data[y_index].offset_time;
-
+      y_data = winnow(y_data, y_index);
       y_counter[hash]-=1;
     }else{
       return_obj['y'] = null_time;
@@ -478,12 +476,15 @@ var combat_merge = function(data, hasher, null_time){
 
 var item_scatter = function(pmses, destination, params){
 
-  // Get the replay parse info
-  Promise.all(
-    pmses.map(function(pms){
+  var urls = pmses.map(function(pms){
       var location = utils.parse_urls.url_for(pms, 'item_buys', 'combatlog');
       return $.getJSON(location);
     })
+    urls.push($.getJSON('/rest-api/items/'))
+
+  // Get the replay parse info
+  Promise.all(
+    urls
   ).then(function(data){
     // Structure the fancy filtering we are about to do.
     var width;
@@ -537,6 +538,10 @@ var item_scatter = function(pmses, destination, params){
 
     }
 
+    var cost_data = data.pop();
+    var costs = cost_data.reduce(function(accu, item){
+      accu[item.internal_name] = item.cost; return accu;
+    }, {});
     // Trim down our data sets.
     var trimmed_data = data.map(function(d, i){
       var filtered_dataset = d.filter(function(x){
@@ -545,7 +550,6 @@ var item_scatter = function(pmses, destination, params){
       return filtered_dataset;
     });
 
-    console.log(trimmed_data);
     var null_time = -300
     var values = combat_merge(
       trimmed_data, function(d){return d.key}, null_time
@@ -567,6 +571,73 @@ var item_scatter = function(pmses, destination, params){
       key: 'Item Buys',
       values: values
     }];
+
+
+    var cost_radius = d3.scale.linear()
+        .domain([
+          0,
+          500,
+          1000,
+          2000,
+          3500,
+          5000,
+          6000,
+          6999,
+        ])
+        .range([
+          1,
+          1.25,
+          1.75,
+          2,
+          2.5,
+          3,
+          3.5,
+          4,
+        ]);
+
+
+    values.map(function(d){
+      var match = costs[d.item.substring(5)]
+      console.log(d, match);
+      if(match){
+        d.cost = match;
+      } else{
+        d.cost = 0;
+      }
+      d.size = cost_radius(d.cost);
+      return d
+    })
+
+    var cost_extent = d3.extent(plot_data[0].values, function(d){
+      return d.cost;
+    })
+
+    var cost_color = d3.scale.linear()
+        .domain([
+          0, 499,
+          500, 999,
+          1000, 1999,
+          2000, 3499,
+          3500, 4999,
+          5000, 5999,
+          6000, 6999,
+        ])
+        .range([
+          d3.rgb("black").brighter(.2), d3.rgb("black").darker(1.3),
+          d3.rgb("red").brighter(.2), d3.rgb("red").darker(1.3),
+          d3.rgb("orange").brighter(.2), d3.rgb("orange").darker(1.3),
+          d3.rgb("yellow").brighter(.2), d3.rgb("yellow").darker(1.3),
+          d3.rgb("green").brighter(.2), d3.rgb("green").darker(1.3),
+          d3.rgb("blue").brighter(.2), d3.rgb("blue").darker(1.3),
+          d3.rgb("violet").brighter(.2), d3.rgb("violet").darker(1.3),
+        ]);
+
+
+
+
+    console.log(cost_extent);
+    console.log(costs, 'Costs');
+    console.log(values, 'Values');
 
     $(chart_destination).empty();
     $(label_destination).html('Item Buys');
@@ -625,6 +696,15 @@ var item_scatter = function(pmses, destination, params){
         var chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
         return chart;
+      },
+      function(){
+          d3.selectAll(destination+' .nv-point')
+            .style("fill", function(d){return cost_color(d[0].cost)})
+            .style('stroke', function(d){return cost_color(d[0].cost)})
+            .style('stroke', function(d){return cost_color(d[0].cost)})
+            .attr('r', function(d){return cost_radius(d[0].cost)})
+            // .style('fill-opacity', 1)
+
       });
   });
 };
