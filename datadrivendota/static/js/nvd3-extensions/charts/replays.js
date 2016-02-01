@@ -732,6 +732,7 @@ var item_inventory = function(pmses, destination, label_1, label_2){
       return series.length;
     });
 
+
     var table = '<table class="table">';
     for (var time_idx=0; time_idx<max_length; time_idx++) {
       for(var series_idx = 0; series_idx<trimmed_data.length; series_idx++){
