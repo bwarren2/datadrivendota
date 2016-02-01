@@ -87,6 +87,11 @@
           <div class='vert-md-6 chart toggling'></div>
         </div>
 
+        <div class='col-md-6' id='inventory'>
+          <label></label>
+          <div class='vert-md-6 chart toggling'></div>
+        </div>
+
 
     </div>
     <div class='row'>
@@ -209,17 +214,19 @@ $(function(){
       var pms_2 = $('#pms_2').select2('data')[0];
 
       var destination = '#gold';
+      var label_1 = $('#label_1').val();
+      var label_2 = $('#label_2').val();
 
       var params = {
         granularity: parseInt($('#granularity').val()),
         end_time: $('#end_time').val(),
         start_time: $('#start_time').val(),
-        x_label: $('#label_1').val(),
-        y_label: $('#label_2').val()
+        x_label: label_1,
+        y_label: label_2
       };
 
       d7.extensions.charts.replays.item_inventory(
-        [pms_1, pms_2], '#inventory', params
+        [pms_1, pms_2], '#inventory', label_1, label_2
       );
      //  d7.extensions.charts.replays.item_scatter(
      //    [pms_1, pms_2], '#item_buys', params

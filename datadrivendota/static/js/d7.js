@@ -1900,13 +1900,13 @@ var item_scatter = function(pmses, destination, params){
 };
 
 
-var item_inventory = function(pmses, destination, params){
+var item_inventory = function(pmses, destination, label_1, label_2){
 
   var urls = pmses.map(function(pms){
-      var location = utils.parse_urls.url_for(pms, 'items', 'statelog');
-      return $.getJSON(location);
-    })
-    urls.push($.getJSON('/rest-api/items/'))
+    var location = utils.parse_urls.url_for(pms, 'items', 'statelog');
+    return $.getJSON(location);
+  })
+  urls.push($.getJSON('/rest-api/items/'))
 
   // Get the replay parse info
   Promise.all(
@@ -1919,7 +1919,64 @@ var item_inventory = function(pmses, destination, params){
       accu[item.internal_name] = item.cost; return accu;
     }, {});
     // Trim down our data sets.
-    console.log(data);
+
+    var trimmed_data = data.map(function(d, i){
+      var filtered_dataset = d.filter(function(x){
+        return x.offset_time.mod(600) === 0;
+      });
+      return filtered_dataset;
+    });
+
+    var max_length = d3.max(trimmed_data, function(series){
+      return series.length;
+    });
+
+    var table = '<table class="able">';
+    for (var time_idx=0; time_idx<max_length; time_idx++) {
+      for(var series_idx = 0; series_idx<trimmed_data.length; series_idx++){
+
+        table += '<tr>';
+        if (series_idx===0) {
+          table += '<td>'+label_1+'</td>';
+        }else{
+          table += '<td>'+label_2+'</td>';
+        }
+        if (trimmed_data[series_idx][time_idx]) {
+
+          table += '<td>'+String(trimmed_data[series_idx][time_idx].offset_time).toHHMMSS()+'</td>';
+        }else{
+
+          table += '<td></td>';
+        }
+        var item_str = "";
+
+        [
+          'item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'
+        ].map(function(slot){
+          var item;
+
+          if (trimmed_data[series_idx][time_idx]) {
+            item = trimmed_data[series_idx][time_idx][slot];
+          }else{
+            item = undefined;
+          }
+
+          if (item) {
+            item_str+="<span><i class='d2items "+item.substring(5)+"'></i></span>"
+          }else{
+            item_str+="";
+          }
+        });
+
+        table += '<td>'+item_str+'</td>';
+
+
+        table += '</tr>';
+      }
+    }
+    table += '</table>';
+    $(destination).empty();
+    $(destination).append(table);
 
   });
 };
