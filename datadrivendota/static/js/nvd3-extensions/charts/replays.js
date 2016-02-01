@@ -777,8 +777,9 @@ var item_inventory = function(pmses, destination, label_1, label_2){
       }
     }
     table += '</table>';
-    $(destination).empty();
-    $(destination).append(table);
+    $(destination+' #target').empty();
+    $(destination+' #target').append(table);
+    $(destination+' label').html('Inventory timings');
 
   });
 };
