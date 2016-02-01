@@ -1797,7 +1797,6 @@ var item_scatter = function(pmses, destination, params){
 
     values.map(function(d){
       var match = costs[d.item.substring(5)]
-      console.log(d, match);
       if(match){
         d.cost = match;
       } else{
@@ -1830,13 +1829,6 @@ var item_scatter = function(pmses, destination, params){
           d3.rgb("blue").brighter(.2), d3.rgb("blue").darker(1.3),
           d3.rgb("violet").brighter(.2), d3.rgb("violet").darker(1.3),
         ]);
-
-
-
-
-    console.log(cost_extent);
-    console.log(costs, 'Costs');
-    console.log(values, 'Values');
 
     $(chart_destination).empty();
     $(label_destination).html('Item Buys');
@@ -1902,9 +1894,33 @@ var item_scatter = function(pmses, destination, params){
             .style('stroke', function(d){return cost_color(d[0].cost)})
             .style('stroke', function(d){return cost_color(d[0].cost)})
             .attr('r', function(d){return cost_radius(d[0].cost)})
-            // .style('fill-opacity', 1)
 
       });
+  });
+};
+
+
+var item_inventory = function(pmses, destination, params){
+
+  var urls = pmses.map(function(pms){
+      var location = utils.parse_urls.url_for(pms, 'items', 'statelog');
+      return $.getJSON(location);
+    })
+    urls.push($.getJSON('/rest-api/items/'))
+
+  // Get the replay parse info
+  Promise.all(
+    urls
+  ).then(function(data){
+    // Structure the fancy filtering we are about to do.
+
+    var cost_data = data.pop();
+    var costs = cost_data.reduce(function(accu, item){
+      accu[item.internal_name] = item.cost; return accu;
+    }, {});
+    // Trim down our data sets.
+    console.log(data);
+
   });
 };
 
@@ -1913,7 +1929,9 @@ module.exports = {
   state_lineup: state_lineup,
   scatterline: scatterline,
   item_scatter: item_scatter,
+  item_inventory: item_inventory,
 };
+
 
 },{"../utils":20,"./tooltips":8,"bluebird":27}],8:[function(require,module,exports){
 "use strict"
