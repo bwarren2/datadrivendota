@@ -703,7 +703,6 @@ var item_scatter = function(pmses, destination, params){
             .style('stroke', function(d){return cost_color(d[0].cost)})
             .style('stroke', function(d){return cost_color(d[0].cost)})
             .attr('r', function(d){return cost_radius(d[0].cost)})
-            // .style('fill-opacity', 1)
 
       });
   });
