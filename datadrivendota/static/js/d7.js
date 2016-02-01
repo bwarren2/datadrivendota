@@ -1591,10 +1591,8 @@ var scatterline = function(pmses, destination, params, attr, logtype){
       function(){
 
         d3.selectAll('.nv-point')
-            .style("fill", function (d) {
-                return time_color(d[0].offset_time)
-            })
-            .style('stroke', function (d) { return time_color(d[0].offset_time) })
+            .style("fill", function(d){return time_color(d[0].offset_time)})
+            .style('stroke', function(d){return time_color(d[0].offset_time)})
             .style('fill-opacity', 1)
       }
     );
@@ -1602,9 +1600,239 @@ var scatterline = function(pmses, destination, params, attr, logtype){
 };
 
 
+var counter = function(data, hasher){
+    return data.map(hasher).reduce(function(prev, curr){
+        if (!prev.hasOwnProperty(curr)) {
+            prev[curr]=1;
+        }
+        else{
+            prev[curr]+=1;
+        }
+        return prev;
+    }, {});
+}
+
+var winnow = function(data, index){
+  data[index] = data[data.length-1];
+  data.pop();
+  return data;
+}
+
+/**
+ * Merges two event series.
+ * @param {array} data - The array of event series.
+ * @param {string} hasher - Function for what to merge on.  Ex 'key' for items
+ * @param {integer} null_time - Default to use lacking match
+ */
+var combat_merge = function(data, hasher, null_time){
+
+  var x_data = data[0];
+  var y_data = data[1];
+
+
+  // Make the hashmaps for fast lookups.
+  var x_counter = counter(x_data, hasher);
+  var y_counter = counter(y_data, hasher);
+
+  var return_lst = [];
+  x_data.forEach(function(x){
+    var hash = hasher(x);
+    var return_obj = {
+      'item': hash,
+      'x': x.offset_time
+    };
+    if (y_counter[hash]>0) {
+      var y_index = y_data.findIndex(function(y_item){
+        var this_hash = hasher(y_item);
+        return this_hash===hash;
+      });
+
+      if(y_index===undefined) console.log('Freak');
+
+      y_data = winnow(y_data, y_index);
+      return_obj['y'] = y_data[y_index].offset_time;
+
+      y_counter[hash]-=1;
+    }else{
+      return_obj['y'] = null_time;
+    }
+
+    return_lst.push(return_obj);
+  })
+
+  // None of these are in x
+  y_data.forEach(function(y){
+    var hash = hasher(y);
+    var return_obj = {
+      'item': hash,
+      'y': y.offset_time,
+      'x': null_time,
+    };
+
+    return_lst.push(return_obj);
+  })
+
+  return return_lst;
+}
+
+var item_scatter = function(pmses, destination, params){
+
+  // Get the replay parse info
+  Promise.all(
+    pmses.map(function(pms){
+      var location = utils.parse_urls.url_for(pms, 'item_buys', 'combatlog');
+      return $.getJSON(location);
+    })
+  ).then(function(data){
+    // Structure the fancy filtering we are about to do.
+    var width;
+    var height;
+    var start;
+    var stop;
+    var interpolation;
+    var stride;
+    var chart_destination = destination+" .chart";
+    var label_destination = destination+" label";
+    var x_label;
+    var y_label;
+
+    if(params!==undefined){
+
+      if(params.start_time!==undefined&&params.start_time!==""){
+        start = timeToSecs(params.start_time);
+      } else {
+        start = -10000;
+      }
+
+      if(params.end_time!==undefined&&params.end_time!==""){
+        stop = timeToSecs(params.end_time);
+      } else {
+        stop = 10000;
+      }
+
+      if(params.x_label!==undefined){
+        x_label = params.x_label;
+      } else {
+        x_label = 'X';
+      }
+
+      if(params.y_label!==undefined){
+        y_label = params.y_label;
+      } else {
+        y_label = 'Y';
+      }
+
+      if(params.interpolation!==undefined){
+        interpolation = params.interpolation;
+      } else {
+        interpolation = "step-after";
+      }
+
+      if(params.granularity!==undefined){
+        stride = params.granularity;
+      } else {
+        stride = 10;
+      }
+
+    }
+
+    // Trim down our data sets.
+    var trimmed_data = data.map(function(d, i){
+      var filtered_dataset = d.filter(function(x){
+        return x.offset_time <= stop && x.offset_time >= start
+      });
+      return filtered_dataset;
+    });
+
+    console.log(trimmed_data);
+    var null_time = -300
+    var values = combat_merge(
+      trimmed_data, function(d){return d.key}, null_time
+    );
+
+    // NVD3 freaks out and breaks tooltips if voronoi is false or dots overlap.
+    var dumbhash = function(d){return d.x+"@@"+d.y+"@@"+d.item}
+    var dumbhashes = [];
+    values = values.filter(function(a){
+        if(dumbhashes.indexOf(dumbhash(a))<0){
+          dumbhashes.push(dumbhash(a));
+          return true;
+        } else{
+          return false;
+        }
+      });
+
+    var plot_data = [{
+      key: 'Item Buys',
+      values: values
+    }];
+
+    $(chart_destination).empty();
+    $(label_destination).html('Item Buys');
+
+    var time_max = d3.max(trimmed_data, function(series){
+      return d3.max(series, function(nested){
+        return nested.offset_time;
+      })
+    });
+
+    var svg = utils.svg.square_svg(chart_destination, width, height);
+    nv.addGraph(
+
+      function(){
+        var chart = nv.models.scatterChart()
+          .margin({
+            left: 50,
+            bottom: 50,
+          })
+          .x(function(d){
+            return d.x;
+          })
+          .y(function(d){
+            return d.y;
+          })
+          .showLegend(false)
+          .forceX([null_time, time_max])
+          .forceY([null_time, time_max]);
+
+        if(params !== undefined){
+
+          if(params.height!==undefined){
+            chart.height(params.height);
+          }
+          if(params.width!==undefined){
+            chart.width(params.width);
+          }
+          if(params.forceY!==undefined){
+            chart.forceY(params.forceY);
+          }
+          if(params.forceX!==undefined){
+            chart.forceX(params.forceX);
+          }
+        }
+        chart.tooltip.contentGenerator(
+          tooltips.duel_item_tooltip_generator(x_label, y_label)
+        );
+
+
+        chart.xAxis.axisLabel(x_label)
+          .tickFormat(utils.axis_format.pretty_times);
+
+        chart.yAxis.axisLabel(y_label).axisLabelDistance(-15)
+          .tickFormat(utils.axis_format.pretty_times);
+
+        var chart_data = svg.datum(plot_data);
+        chart_data.transition().duration(500).call(chart);
+        return chart;
+      });
+  });
+};
+
+
 module.exports = {
   state_lineup: state_lineup,
   scatterline: scatterline,
+  item_scatter: item_scatter,
 };
 
 },{"../utils":20,"./tooltips":8,"bluebird":27}],8:[function(require,module,exports){
@@ -1916,12 +2144,73 @@ return duel_tooltip;
 };
 
 
+var duel_item_tooltip_generator = function(x_name, y_name){
+
+    var duel_tooltip = function(d, x, y, z){
+          if (d === null) {return "";}
+          d = d.point;
+
+          var table = d3.select(document.createElement("table"));
+
+          // Make a body
+          var tbodyEnter = table
+              .selectAll("tbody")
+              .data([d])
+              .enter()
+              .append("tbody");
+
+          var trowEnter0 = tbodyEnter
+              .append("tr");
+
+          trowEnter0
+              .append("td")
+              .html("Item: ");
+
+          trowEnter0.append("td")
+              .html(function(x){
+                return x.item;
+            });
+
+          var trowEnter2 = tbodyEnter
+              .append("tr");
+
+          trowEnter2.append("td")
+              .html(x_name);
+
+          trowEnter2.append("td")
+              .html(function(x){
+                return String(x.x).toHHMMSS()
+              });
+
+          var trowEnter3 = tbodyEnter
+              .append("tr");
+
+          trowEnter3.append("td")
+              .html(y_name);
+
+          trowEnter3.append("td")
+              .html(function(x){
+                return String(x.y).toHHMMSS()
+              });
+
+
+          var html = table.node().outerHTML;
+          return html;
+
+    };
+
+return duel_tooltip;
+
+};
+
+
 module.exports = {
     hero_tooltip: heroContentGenerator,
     bldg_tooltip: bldg_tooltip,
     item_tooltip: item_tooltip,
     match_tooltip: match_tooltip,
     duel_tooltip_generator: duel_tooltip_generator,
+    duel_item_tooltip_generator: duel_item_tooltip_generator,
 };
 
 },{}],9:[function(require,module,exports){

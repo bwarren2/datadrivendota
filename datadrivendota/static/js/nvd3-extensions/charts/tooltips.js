@@ -306,10 +306,71 @@ return duel_tooltip;
 };
 
 
+var duel_item_tooltip_generator = function(x_name, y_name){
+
+    var duel_tooltip = function(d, x, y, z){
+          if (d === null) {return "";}
+          d = d.point;
+
+          var table = d3.select(document.createElement("table"));
+
+          // Make a body
+          var tbodyEnter = table
+              .selectAll("tbody")
+              .data([d])
+              .enter()
+              .append("tbody");
+
+          var trowEnter0 = tbodyEnter
+              .append("tr");
+
+          trowEnter0
+              .append("td")
+              .html("Item: ");
+
+          trowEnter0.append("td")
+              .html(function(x){
+                return x.item;
+            });
+
+          var trowEnter2 = tbodyEnter
+              .append("tr");
+
+          trowEnter2.append("td")
+              .html(x_name);
+
+          trowEnter2.append("td")
+              .html(function(x){
+                return String(x.x).toHHMMSS()
+              });
+
+          var trowEnter3 = tbodyEnter
+              .append("tr");
+
+          trowEnter3.append("td")
+              .html(y_name);
+
+          trowEnter3.append("td")
+              .html(function(x){
+                return String(x.y).toHHMMSS()
+              });
+
+
+          var html = table.node().outerHTML;
+          return html;
+
+    };
+
+return duel_tooltip;
+
+};
+
+
 module.exports = {
     hero_tooltip: heroContentGenerator,
     bldg_tooltip: bldg_tooltip,
     item_tooltip: item_tooltip,
     match_tooltip: match_tooltip,
     duel_tooltip_generator: duel_tooltip_generator,
+    duel_item_tooltip_generator: duel_item_tooltip_generator,
 };

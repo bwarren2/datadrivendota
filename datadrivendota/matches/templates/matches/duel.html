@@ -76,6 +76,19 @@
     </div>
 
     <div id='dashboard' class='col-md-12' height='900px'>
+   <div class='row'>
+
+        <div class='page-header'>
+          <h2>Items</h2>
+        </div>
+
+        <div class='col-md-6' id='item_buys'>
+          <label></label>
+          <div class='vert-md-6 chart toggling'></div>
+        </div>
+
+
+    </div>
     <div class='row'>
 
         <div class='page-header'>
@@ -204,6 +217,10 @@ $(function(){
         x_label: $('#label_1').val(),
         y_label: $('#label_2').val()
       };
+
+      d7.extensions.charts.replays.item_scatter(
+        [pms_1, pms_2], '#item_buys', params
+      );
 
       d7.extensions.charts.replays.scatterline(
         [pms_1, pms_2], '#kills', params, 'kills', 'statelog'
