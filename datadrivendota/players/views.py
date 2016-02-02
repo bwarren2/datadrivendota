@@ -2,8 +2,6 @@
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 
-from datadrivendota.mixins import SubscriberRequiredMixin
-
 from .models import Player
 
 
@@ -13,17 +11,6 @@ class PlayerIndexView(ListView):
 
     paginate_by = 30
     queryset = Player.objects.filter(updated=True)
-
-
-class FollowedPlayerIndexView(SubscriberRequiredMixin, ListView):
-
-    """If the user is logged in, show the people they follow."""
-
-    paginate_by = 30
-
-    def get_queryset(self):
-        """ Get the list of players to display."""
-        return self.request.user.userprofile.following.all()
 
 
 class ProIndexView(ListView):
