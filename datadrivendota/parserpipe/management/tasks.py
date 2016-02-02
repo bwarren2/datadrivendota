@@ -111,10 +111,37 @@ class CreateMatchParse(Task):
         logger.info('Hitting {1} with {0}'.format(payload, url))
         if r.status_code == 200:
             logger.info(r.content)
-            replay_url = r.json()['replay_url']
-            self._save_url(replay_url, match_req)
+            try:
+                response_json = r.json()
 
-            return replay_url
+                if 'error' in response_json:
+                    errorcode = response_json['error']
+                    if errorcode == 'invalid':
+                        raise LookupError(
+                            'Got this json for match_id {1}: {0}'.format(
+                                response_json,
+                                match_id,
+                            )
+                        )
+                    if errorcode == 'notready' or errorcode == 'timeout':
+                        self.retry(countdown=5)
+
+                elif 'replay_url' in response_json:
+                    replay_url = response_json['replay_url']
+                    self._save_url(replay_url, match_req)
+                    return replay_url
+                else:
+                    raise LookupError(
+                        'What is this json? {0}'.format(response_json)
+                    )
+            except ValueError as e:
+                # Usually from jsondecodeerror in simplejson from requests
+                logger.error(
+                    "Exception: {0} for content: {1}".format(
+                        type(e).__name__,
+                        r.content
+                    )
+                )
 
         else:
             raise Exception("Got status {0} for MR match_id {1}".format(
