@@ -737,10 +737,13 @@ var item_inventory = function(pmses, destination, label_1, label_2){
     for (var time_idx=0; time_idx<max_length; time_idx++) {
       for(var series_idx = 0; series_idx<trimmed_data.length; series_idx++){
 
-        table += '<tr>';
+
+
         if (series_idx===0) {
+          table += '<tr>';
           table += '<td>'+label_1+'</td>';
         }else{
+          table += '<tr class="spacingrow">';
           table += '<td>'+label_2+'</td>';
         }
         if (trimmed_data[series_idx][time_idx]) {
