@@ -229,7 +229,7 @@ class ApiContext(object):
                 value = getattr(self, field, None)
                 default_value = getattr(self.__class__, field, None)
                 if value is not None and value != default_value:
-                    strng += "{0}: {1} \n".format(field, getattr(self, field))
+                    strng += "{0}: {1}, ".format(field, getattr(self, field))
 
         return strng
 
