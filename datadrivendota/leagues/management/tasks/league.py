@@ -204,7 +204,7 @@ class MirrorRecentLeagues(Task):
                 bad_leagues
             )
         )
-        leagues.extend(bad_leagues)
+        leagues.update(bad_leagues)
 
         ul = UpdateLeagues()
         ul.s().delay(leagues=leagues)
@@ -215,7 +215,7 @@ class MirrorRecentLeagues(Task):
             Q(name="")
         ).exclude(image_failed=True)
 
-        return [x.steam_id for x in problems]
+        return set([x.steam_id for x in problems])
 
     def find_leagues(self):
         """
