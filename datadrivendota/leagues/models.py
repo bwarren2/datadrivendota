@@ -133,7 +133,7 @@ class ScheduledMatch(models.Model):
 
 class LiveMatch(models.Model):
     league_id = models.PositiveIntegerField()
-    steam_id = models.PositiveIntegerField()
+    steam_id = models.PositiveIntegerField(unique=True)
     radiant_team = models.PositiveIntegerField(null=True, blank=True)
     dire_team = models.PositiveIntegerField(null=True, blank=True)
     radiant_logo_ugc = models.BigIntegerField(null=True, blank=True)
