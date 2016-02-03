@@ -111,10 +111,37 @@ class CreateMatchParse(Task):
         logger.info('Hitting {1} with {0}'.format(payload, url))
         if r.status_code == 200:
             logger.info(r.content)
-            replay_url = r.json()['replay_url']
-            self._save_url(replay_url, match_req)
+            try:
+                response_json = r.json()
 
-            return replay_url
+                if 'error' in response_json:
+                    errorcode = response_json['error']
+                    if errorcode == 'invalid':
+                        raise LookupError(
+                            'Got this json for match_id {1}: {0}'.format(
+                                response_json,
+                                match_id,
+                            )
+                        )
+                    if errorcode == 'notready' or errorcode == 'timeout':
+                        self.retry(countdown=5)
+
+                elif 'replay_url' in response_json:
+                    replay_url = response_json['replay_url']
+                    self._save_url(replay_url, match_req)
+                    return replay_url
+                else:
+                    raise LookupError(
+                        'What is this json? {0}'.format(response_json)
+                    )
+            except ValueError as e:
+                # Usually from jsondecodeerror in simplejson from requests
+                logger.error(
+                    "Exception: {0} for content: {1}".format(
+                        type(e).__name__,
+                        r.content
+                    )
+                )
 
         else:
             raise Exception("Got status {0} for MR match_id {1}".format(
@@ -285,8 +312,8 @@ class MergeMatchRequestReplay(Task):
 
 class UpdatePmsReplays(Task):
     ignore_result = False
-    soft_time_limit = 120
-    time_limit = 125
+    soft_time_limit = 180
+    time_limit = 185
 
     def run(self, match_id, data_slice):
         logger.info('Sharding replay for {0} {1}'.format(match_id, data_slice))
@@ -361,7 +388,47 @@ class UpdatePmsReplays(Task):
             )
         )
 
+        # Save event-oriented combatlog
+        pms_combat = self.save_combat(pms, match_id, replay, enemies, allies)
+
+        # Save timeseries-oriented statelog
+        self.save_states(pms, match_id, replay)
+
+        # Aggregate all the state info
+        state_list = [
+            msg for msg in
+            replay['states'] if msg['hero_id'] == pms.hero.steam_id
+        ]
+
+        # Get the timing information to make the combat timeseries match states
+        min_time = min(x['tick_time'] for x in state_list)
+        max_time = max(x['tick_time'] for x in state_list)
+        timeseries_log = self.timeseries_combat(
+            pms_combat, min_time, max_time, offset
+        )
+        self.save_timeseries(match_id, pms, timeseries_log)
+
+        all_data = {
+            'states': state_list,
+            'combat': pms_combat,
+        }
+        self.save_msgstream(match_id, pms.player_slot, all_data, 'all', 'both')
+
+    def save_states(self, pms, match_id, replay):
+        for field, filter_fn in entitystate_filter_map.iteritems():
+            logging.info("Handling field {0} for {1} (M# {2})".format(
+                field,
+                pms.hero.name,
+                pms.match.steam_id,
+            ))
+            data = filter_fn(replay['states'], pms)
+            self.save_msgstream(
+                match_id, pms.player_slot, data, field, 'statelog'
+            )
+
+    def save_combat(self, pms, match_id, replay, enemies, allies):
         pms_combat = {}
+
         for field, filter_fn in combatlog_filter_map.iteritems():
             logging.info("Handling field {0} for {1} (M# {2})".format(
                 field,
@@ -374,28 +441,43 @@ class UpdatePmsReplays(Task):
             )
             pms_combat[field] = data
 
-        for field, filter_fn in entitystate_filter_map.iteritems():
-            logging.info("Handling field {0} for {1} (M# {2})".format(
-                field,
-                pms.hero.name,
-                pms.match.steam_id,
-            ))
-            data = filter_fn(replay['states'], pms)
+        return pms_combat
+
+    def timeseries_combat(self, pms_combat, min_time, max_time, offset):
+        """
+        Change combat log events into sum of values or msg-count time series.
+        """
+
+        combat_timeseries = {}
+        for field, data in pms_combat.iteritems():
+            indicies = {n: 0 for n in range(min_time, max_time+1)}
+
+            # Sum up the messages occurring at the same time
+            for msg in data:
+                indicies[msg['time']] += msg.get('value', 1)
+
+            # Make them cumulative
+            for idx in indicies.iterkeys():
+                indicies[idx] += indicies.get(idx-1, 0)
+
+            # Add in the timing info
+            timeseries = [
+                {
+                    'time': idx,
+                    'offset_time': idx - offset,
+                    field: indicies[idx],
+                } for idx in indicies.keys()
+            ]
+
+            combat_timeseries[field] = timeseries
+
+        return combat_timeseries
+
+    def save_timeseries(self, match_id, pms, timeseries_log):
+        for field, data in timeseries_log.iteritems():
             self.save_msgstream(
-                match_id, pms.player_slot, data, field, 'statelog'
+                match_id, pms.player_slot, data, field, 'combatseries'
             )
-
-        # Save states to pms
-        state_list = [
-            msg for msg in
-            replay['states'] if msg['hero_id'] == pms.hero.steam_id
-        ]
-        all_data = {
-            'states': state_list,
-            'combat': pms_combat,
-        }
-
-        self.save_msgstream(match_id, pms.player_slot, all_data, 'all', 'both')
 
     def save_msgstream(self, match_id, dataslice, msgs, facet, msgs_type):
         buff = BytesIO(json.dumps(msgs))
@@ -415,7 +497,7 @@ class UpdatePmsReplays(Task):
 class UpdateParseEnd(Task):
 
     def run(self, finished_shards, match_id):
-        #  Expects a bunch of pms ids on all success, some False on any failure
+        #  Expects a bunch of pms ids on all success, some falsy on any failure
 
         if all(finished_shards):
 

@@ -240,22 +240,139 @@ var match_tooltip = function(d, x, y, z){
             return x.radiant_team + ' vs. ' + x.dire_team
           });
 
-      // var trowEnter3 = tbodyEnter
-      //     .append("tr");
-
-      // trowEnter3
-      //     .append("td")
-      //     .html("Hero: ");
-
-      // trowEnter3.append("td")
-      //     .classed("value", true)
-      //     .html(function(x){
-      //       return x.unit.replace('npc_dota_hero_','').replace("_"," ");
-      //     });
-
 
       var html = table.node().outerHTML;
       return html;
+
+};
+
+var duel_tooltip_generator = function(x_name, y_name){
+
+    var duel_tooltip = function(d, x, y, z){
+          if (d === null) {return "";}
+          d = d.point;
+
+          var table = d3.select(document.createElement("table"));
+
+          // Make a body
+          var tbodyEnter = table
+              .selectAll("tbody")
+              .data([d])
+              .enter()
+              .append("tbody");
+
+          var trowEnter1 = tbodyEnter
+              .append("tr");
+
+          trowEnter1
+              .append("td")
+              .html("Match Time: ");
+
+          trowEnter1.append("td")
+              .html(function(x){
+                return String(x.offset_time).toHHMMSS();
+            });
+
+          var trowEnter2 = tbodyEnter
+              .append("tr");
+
+          trowEnter2.append("td")
+              .html(x_name);
+
+          trowEnter2.append("td")
+              .html(function(x){
+                return x.x
+              });
+
+          var trowEnter3 = tbodyEnter
+              .append("tr");
+
+          trowEnter3.append("td")
+              .html(y_name);
+
+          trowEnter3.append("td")
+              .html(function(x){
+                return x.y
+              });
+
+
+          var html = table.node().outerHTML;
+          return html;
+
+    };
+
+return duel_tooltip;
+
+};
+
+
+var duel_item_tooltip_generator = function(x_name, y_name){
+
+    var duel_tooltip = function(d, x, y, z){
+          if (d === null) {return "";}
+          d = d.point;
+
+          var table = d3.select(document.createElement("table"));
+
+          // Make a body
+          var tbodyEnter = table
+              .selectAll("tbody")
+              .data([d])
+              .enter()
+              .append("tbody");
+
+          var trowEnter0 = tbodyEnter
+              .append("tr");
+
+          trowEnter0
+              .append("td")
+              .html("Item: ");
+
+          trowEnter0.append("td")
+              .html(function(x){
+                return toTitleCase(x.item.substring(5));
+            });
+
+          var trowEnter2 = tbodyEnter
+              .append("tr");
+
+          trowEnter2.append("td")
+              .html(x_name);
+
+          trowEnter2.append("td")
+              .html(function(x){
+                return String(x.x).toHHMMSS()
+              });
+
+          var trowEnter3 = tbodyEnter
+              .append("tr");
+
+          trowEnter3.append("td")
+              .html(y_name);
+
+          trowEnter3.append("td")
+              .html(function(x){
+                return String(x.y).toHHMMSS()
+              });
+
+          var trowEnter3 = tbodyEnter
+              .append("tr");
+
+          trowEnter3.append("td")
+              .html('(Cost)');
+
+          trowEnter3.append("td")
+              .html(function(x){
+                return String(x.cost)
+              });
+
+
+          var html = table.node().outerHTML;
+          return html;
+
+    };
+
+return duel_tooltip;
 
 };
 
@@ -265,4 +382,6 @@ module.exports = {
     bldg_tooltip: bldg_tooltip,
     item_tooltip: item_tooltip,
     match_tooltip: match_tooltip,
+    duel_tooltip_generator: duel_tooltip_generator,
+    duel_item_tooltip_generator: duel_item_tooltip_generator,
 };

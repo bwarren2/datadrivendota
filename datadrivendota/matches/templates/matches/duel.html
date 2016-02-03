@@ -1,0 +1,301 @@
+{% extends "row_base.html" %}
+
+{% load staticfiles player_extras %}
+
+{% block title %}A Duel!{% endblock title %}
+
+
+{% block content %}
+
+    <div class='col-md-12'>
+        <div class="alert alert-info" role="alert">
+        <p style='color:#333'> For the fastest charts, consider less granularity for longer periods.  We have tons of data, and your browser may slow if you try to see every second of an hour long match with multiple people at once :) .</p>
+        </div>
+    </div>
+    <div class='col-md-12'>
+      <h4>Controls</h4>
+      <form>
+      <div class='row'>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Player-Match #1</label>
+                <select id='pms_1' style='width:200px'></select>
+            </div>
+        </div>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Player-Match #1 Label</label>
+                <input type="textarea" class="form-control" id="label_1" placeholder="(ex 'My Jungle Legion')">
+            </div>
+        </div>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Player-Match #2</label>
+                <select id='pms_2' style='width:200px'></select>
+            </div>
+        </div>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Player-Match #2 Label</label>
+                <input type="textarea" class="form-control" id="label_2" placeholder="(ex 'Dendi Pudge')">
+            </div>
+        </div>
+        <div class='col-md-2'>
+          <div class="form-group">
+            <label >Start Time</label>
+            <input type="textarea" class="form-control" id="start_time" placeholder="Start Time (eg 12:41)">
+          </div>
+        </div>
+
+        <div class='col-md-2'>
+          <div class="form-group">
+            <label >End Time</label>
+            <input type="textarea" class="form-control" id="end_time" placeholder="End Time (eg 23:10)">
+          </div>
+        </div>
+
+        <div class='col-md-2'>
+          <div class="form-group">
+            <label >Sample Freq (s)</label>
+            <input type="textarea" class="form-control" id="granularity" placeholder="Sample rate (eg 10)" value="10">
+          </div>
+        </div>
+
+
+        <div class='col-md-3' style='margin-top:10px'>
+          <div class="btn-group btn-group-justified" role="group">
+            <div class="btn-group" role="group">
+              <button id='chart-button' type="button" class="btn btn-primary">
+                Chart! <i class="fa fa-line-chart"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    </div>
+
+    <div id='dashboard' class='col-md-12' height='900px'>
+   <div class='row'>
+
+        <div class='page-header'>
+          <h2>Items</h2>
+        </div>
+
+        <div class='col-md-6' id='item_buys'>
+          <label></label>
+          <div class='vert-md-6 chart toggling'></div>
+        </div>
+
+        <div class='col-md-6' id='inventory'>
+          <label></label>
+          <div id='target'></div>
+        </div>
+
+
+    </div>
+    <div class='row'>
+
+        <div class='page-header'>
+          <h2>KDA</h2>
+        </div>
+
+        <div class='col-md-4' id='kills'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='deaths'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='assists'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+    </div>
+    <div class='row'>
+
+        <div class='page-header'>
+          <h2>Income</h2>
+        </div>
+
+        <div class='col-md-4' id='gold'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='hero_kill_income'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='creep_kill_income'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='building_income'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='roshan_kill_income'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+        <div class='col-md-4' id='death_expense'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+
+    </div>
+
+
+    <div class='row'>
+
+        <div class='page-header'>
+          <h2>Damage</h2>
+        </div>
+
+        <div class='col-md-3' id='hero_dmg_dealt'>
+          <label></label>
+          <div class='vert-md-3 chart toggling'></div>
+        </div>
+        <div class='col-md-3' id='other_dmg_dealt'>
+          <label></label>
+          <div class='vert-md-3 chart toggling'></div>
+        </div>
+        <div class='col-md-3' id='hero_dmg_taken'>
+          <label></label>
+          <div class='vert-md-3 chart toggling'></div>
+        </div>
+        <div class='col-md-3' id='building_dmg_dealt'>
+          <label></label>
+          <div class='vert-md-3 chart toggling'></div>
+        </div>
+
+    </div>
+
+    </div>
+
+    <div class='col-md-12'>
+    <h2>Want to see your data here?</h2>
+      {% include "accounts/mixins/_ping_request.html" %}
+    </div>
+
+<style type="text/css">
+  .select2-result-pms__avatar{
+    height:36px;
+    width:64px;
+  }
+  .select2-result-pms__title{
+    color: black;
+  }
+/*  .col-md-2, .col-md-3, .col-md-4{
+    border: red solid 5px;
+  }
+*/</style>
+{% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+$(function(){
+
+    inputs.pms_select2('#pms_1', false);
+    inputs.pms_select2('#pms_2', false);
+
+    $('#chart-button').click(function(){
+
+      var pms_1 = $('#pms_1').select2('data')[0];
+      var pms_2 = $('#pms_2').select2('data')[0];
+
+      var destination = '#gold';
+      var label_1 = $('#label_1').val();
+      var label_2 = $('#label_2').val();
+
+      var params = {
+        granularity: parseInt($('#granularity').val()),
+        end_time: $('#end_time').val(),
+        start_time: $('#start_time').val(),
+        x_label: label_1,
+        y_label: label_2
+      };
+
+      d7.extensions.charts.replays.item_inventory(
+        [pms_1, pms_2], '#inventory', label_1, label_2
+      );
+      d7.extensions.charts.replays.item_scatter(
+        [pms_1, pms_2], '#item_buys', params
+      );
+
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#kills', params, 'kills', 'statelog'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#deaths', params, 'deaths', 'statelog'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#assists', params, 'assists', 'statelog'
+      );
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], destination, params, 'all_income', 'combatseries'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#hero_kill_income',
+        params, 'hero_kill_income', 'combatseries'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#creep_kill_income',
+        params, 'creep_kill_income', 'combatseries'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#death_expense',
+        params, 'death_expense', 'combatseries'
+      );
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#building_income',
+        params, 'building_income', 'combatseries'
+      );
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#roshan_kill_income',
+        params, 'roshan_kill_income', 'combatseries'
+      );
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#hero_dmg_taken',
+        params, 'hero_dmg_taken', 'combatseries'
+      );
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#hero_dmg_dealt',
+        params, 'hero_dmg_dealt', 'combatseries'
+      );
+
+      d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#other_dmg_dealt',
+        params, 'other_dmg_dealt', 'combatseries'
+      );
+
+     d7.extensions.charts.replays.scatterline(
+        [pms_1, pms_2], '#building_dmg_dealt',
+        params, 'key_bldg_dmg_dealt', 'combatseries'
+      );
+
+    })
+
+});
+
+
+</script>
+{% endblock extra_js %}
+
+{% block extra_css %}
+{% endblock extra_css %}
+

@@ -5,8 +5,13 @@ urlpatterns = [
     url(r'^$', views.MatchListView.as_view(), name='index'),
     url(
         r'^time-lapse/$',
-        views.TimeLapseDetail.as_view(),
+        views.TimeLapseView.as_view(),
         name="time_lapse"
+    ),
+    url(
+        r'^duel/$',
+        views.DuelView.as_view(),
+        name="duel"
     ),
     url(
         r'^(?P<match_id>[0-9\-]*)/$',
@@ -27,10 +32,5 @@ urlpatterns = [
         r'^(?P<match_id>[0-9\-]*)/abilities/$',
         views.MatchDetailAbilities.as_view(),
         name="detail_abilities"
-    ),
-    url(
-        r'^(?P<match_id>[0-9\-]*)/replicate/$',
-        views.ReplicateDetail.as_view(),
-        name="replicate"
     ),
 ]

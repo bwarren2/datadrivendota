@@ -1,6 +1,7 @@
 'use strict';
 
 var svg = require('./svg.js');
+var axis_format = require('./axis_format.js');
 var blanks = require('./blanks.js');
 var reduce = require('./reduce.js');
 var map = require('./map.js');
@@ -83,6 +84,7 @@ module.exports = {
     visuals: visuals,
     svg: svg,
     blanks: blanks,
+    axis_format: axis_format,
     reduce: reduce,
     parse_urls: parse_urls,
     map: map,

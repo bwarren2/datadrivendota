@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from matches.models import Match, PlayerMatchSummary, SkillBuild, PickBan
 from players.serializers import PlayerSerializer
-from heroes.serializers import HeroSerializer
+from heroes.serializers import HeroSerializer, AbilitySerializer
 import six
 from rest_framework.relations import RelatedField
 
@@ -42,6 +42,7 @@ class MatchSerializer(serializers.ModelSerializer):
 
 
 class SkillBuildSerializer(serializers.ModelSerializer):
+    ability = AbilitySerializer()
 
     class Meta:
         model = SkillBuild
