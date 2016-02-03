@@ -1,5 +1,4 @@
 """ Tasks to manage leagues. """
-import sys
 import os
 import logging
 import requests
@@ -8,6 +7,7 @@ from time import mktime
 from datetime import datetime, timedelta
 from celery import Task, chain
 
+from django.db.models import Q
 from django.utils.text import slugify
 from django.core.files import File
 from django.conf import settings
@@ -197,8 +197,25 @@ class MirrorRecentLeagues(Task):
     def run(self):
         leagues = self.find_leagues()
         logger.info("Mirroring these leagues: {0}".format(leagues))
+
+        bad_leagues = self.find_fixworthy_leagues()
+        logger.info(
+            "And attempting to fix these bad leagues: {0}".format(
+                bad_leagues
+            )
+        )
+        leagues.extend(bad_leagues)
+
         ul = UpdateLeagues()
         ul.s().delay(leagues=leagues)
+
+    def find_fixworthy_leagues(self):
+        problems = League.objects.filter(
+            Q(name=None) |
+            Q(name="")
+        ).exclude(image_failed=True)
+
+        return [x.steam_id for x in problems]
 
     def find_leagues(self):
         """
