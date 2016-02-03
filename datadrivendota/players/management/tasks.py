@@ -190,7 +190,6 @@ class MirrorClientMatches(Task):
             context.account_id = user.steam_id
             context.matches_requested = settings.CLIENT_MATCH_COUNT
             context.matches_desired = settings.CLIENT_MATCH_COUNT
-            context.deepcopy = True
             context.start_scrape_time = time()
             context.last_scrape_time = user.last_scrape_time
 

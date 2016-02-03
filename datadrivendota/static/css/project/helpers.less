@@ -17,9 +17,9 @@
 .overlayer {
   .rounded-corners;
   background-color: #000000;
-  bottom: -4px;
+  bottom: 4px;
   color: @text-color; /* @text-color */
-  left: 4px;
+  left: 11px;
   opacity: 0.7;
   padding-left: 4px;
   padding-right: 4px;
@@ -30,9 +30,9 @@
 .overlayer-top-right {
   .rounded-corners;
   background-color: #000000;
-  top: 4px;
+  top: 1px;
   color: @text-color; /* @text-color */
-  right: 4px;
+  right: 17px;
   opacity: 0.7;
   padding-left: 4px;
   padding-right: 4px;
@@ -52,6 +52,20 @@
   position: absolute;
   z-index: 100;
 }
+
+.overlayer-bottom-right {
+  .rounded-corners;
+  top: 110px;
+  color: @brand-primary; /* @text-color */
+  right: 4px;
+  opacity: 0.7;
+  padding-left: 4px;
+  padding-right: 4px;
+  position: absolute;
+  z-index: 100;
+  font-size: 20px;
+}
+
 
 .brand-primary {
   color: @brand-primary !important;

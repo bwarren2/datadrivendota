@@ -428,8 +428,8 @@ KEEN_WRITE_KEY = getenv('KEEN_WRITE_KEY')
 
 # Project specific constants used in tasks
 LOOKBACK_UPDATE_DAYS = 3  # The window we consider for re-checking things.
-HERO_SKILL_MATCH_COUNT = 3  # How many matches to add per hero skill level
-CLIENT_MATCH_COUNT = 3  # How many client matches to get each pull
+HERO_SKILL_MATCH_COUNT = 2  # How many matches to add per hero skill level
+CLIENT_MATCH_COUNT = 2  # How many client matches to get each pull
 VALVE_CDN_PATH = 'http://cdn.dota2.com/apps/570/'
 UPDATE_LAG_UTC = 60 * 60 * 24 * 3  # 3 Days
 # We store live matches.  Wait this many minutes after storage before expecting

@@ -389,7 +389,10 @@ class Config(object):
             'schedule': timedelta(days=1),
         },
         'reflect-league-schedule-daily': {
-            'task': 'leagues.management.tasks.league_schedule.MirrorLeagueSchedule',
+            'task': (
+                'leagues.management.tasks.league_schedule.'
+                'MirrorLeagueSchedule'
+                ),
             'schedule': timedelta(days=1),
         },
         'reflect-item-schema-daily': {
@@ -413,9 +416,13 @@ class Config(object):
             'task': 'matches.management.tasks.MirrorRecentMatches',
             'schedule': timedelta(minutes=30),
         },
-        'check-match-validity-daily': {
+        'check-match-validity-fast': {
             'task': 'matches.management.tasks.UpdateMatchValidity',
             'schedule': timedelta(minutes=30),
+        },
+        'reflect-clients-fast': {
+            'task': 'players.management.tasks.MirrorClientMatches',
+            'schedule': timedelta(minutes=15),
         },
         'reflect-live-games-fast': {
             'task': 'leagues.management.tasks.live_game.MirrorLiveGames',

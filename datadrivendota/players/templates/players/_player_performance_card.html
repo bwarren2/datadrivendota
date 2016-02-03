@@ -8,18 +8,35 @@
         {% endif %}'
     {% endif %}
     >
+
   {% if pms.invalid %}
-  <div class='glyphicon glyphicon-remove-circle validity-glyph' title='Invalid Match (Probably Abandon)'></div>
+    <div class='glyphicon glyphicon-remove-circle validity-glyph' title='Invalid Match (Probably Abandon)'></div>
   {% elif pms.unprocessed %}
-  <div class='glyphicon glyphicon-ban-circle unprocessed-glyph' title='Unprocessed Match'></div>
+    <div class='glyphicon glyphicon-ban-circle unprocessed-glyph' title='Unprocessed Match'></div>
   {% endif %}
+
   {% if pms.is_win %}
-  <div class='glyphicon glyphicon-ok-circle card-win-pip win-glyph' title='Won'></div>
+    <div class='glyphicon glyphicon-ok-circle card-win-pip win-glyph' title='Won'></div>
   {% endif %}
 
   {% if pms.hero.mugshot %}
-  <img src="{{ pms.hero.mugshot_url }}" alt="{{ hero.name }}" class="player-match-portrait">
+    <img src="{{ pms.hero.mugshot_url }}" alt="{{ hero.name }}" class="player-match-portrait">
   {% endif %}
-  <p class='overlayer'>{{ pms.hero.name }}<span class='scorebar'><br />{{ pms.kills }}/{{ pms.deaths }}/{{ pms.assists }}/{{ pms.kda2 }}</span></p>
-  <p class='overlayer-top-right small-date'>{{pms.display_date}}, {{pms.display_duration}}</p>
+
+
+  <p class='overlayer'>
+    KDA2:
+    <span class='scorebar'>
+      {{ pms.kills }}/{{ pms.deaths }}/{{ pms.assists }}/{{ pms.kda2 }}
+    </span>
+  </p>
+  <p class='overlayer-top-right small-date'>
+    {{pms.display_date}}, {{pms.display_duration}}
+  </p>
+
+  {% if pms.parsed_with %}
+    <div class='glyphicon glyphicon-stats overlayer-bottom-right' title='Match Parsed!'></div>
+
+  {% endif %}
+
 </a>
