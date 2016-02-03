@@ -12,7 +12,7 @@
   <div class="row">
     {% for player in player_list %}
       {% if player.avatar %}
-        <div class="col-md-2">
+        <div class="col-md-3">
           <a href="{% url 'players:id_detail' player_id=player.steam_id %}" class="thumbnail">
             <img src="{{player.avatar_full}}" alt="{{player.display_name}}" class="player-portrait">
             <p class='overlayer'>{{player.display_name}}</p>
