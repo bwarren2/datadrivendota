@@ -1,5 +1,7 @@
 from django import template
 from django.core.urlresolvers import reverse
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -21,6 +23,8 @@ def player_link(player):
             'players:id_detail',
             kwargs={'player_id': player.steam_id}
         )
-        return "<a href='{}'>{}</a>".format(link, text)
+        return mark_safe("<a href='{}'>{}</a>".format(link, escape(text)))
     except:
         return text
+
+player_link.is_safe = True
