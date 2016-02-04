@@ -90,9 +90,7 @@
             <li class="dropdown {% active 'players' main_nav %}">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Players <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li class="{% active 'players:pro_index' %}"><a href="{% url 'players:pro_index' %}">Pro Index</a></li>
-                <li role="presentation" class="divider"></li>
-                <li class="{% active 'players:index' %}"><a href="{% url 'players:index' %}">All Players</a></li>
+                <li class="{% active 'players:index' %}"><a href="{% url 'players:index' %}">Autoupdated Players</a></li>
               </ul>
             </li>
           {% endif %}

@@ -12,13 +12,18 @@
 
     <div class='row'>
       <div class='col-md-3'>
-        <img class="img-responsive" src="{{ player.avatar_full }}">
+      {% if player.avatar_full %}
+          <img class="img-responsive" src="{{ player.avatar_full }}">
+      {% endif %}
       </div>
       <div class='col-md-6'>
         <h1>
           {{ player.display_name }}
           {% if player.pro_name %}
             <small>AKA: {{ player.pro_name }}</small>
+          {% endif %}
+          {% if player.updated %}
+            <small class="text-primary"> - Subscribed</small>
           {% endif %}
         </h1>
       </div>
@@ -42,6 +47,9 @@
     }
     .playerstat{
       font-size:20px;
+    }
+    .autoupdate{
+        font-size: 50px;
     }
   </style>
 {% endblock extra_css %}
