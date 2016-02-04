@@ -17,24 +17,25 @@
 
   </h2>
 
-  <div class="row">
+    <div class="row">
 
-    {% for summary in match.playermatchsummary_set.all %}
-          {% if summary.side == 'Radiant' %}
-            {% include "matches/_pms_card.html" %}
-          {% endif %}
-    {% endfor %}
+      {% for summary in match.playermatchsummary_set.all %}
+            {% if summary.side == 'Radiant' %}
+              {% include "matches/_pms_card.html" %}
+            {% endif %}
+      {% endfor %}
 
-    {% if match.radiant_team %}
-      <div class="col-md-2">
-        <img class='thumbnail league-pip' src="{{match.radiant_team.image}}" alt='{{ match.radiant_team.name }}' title='{{match.radiant_team.name}}'>
-      </div>
-    {% endif %}
+      {% if match.radiant_team %}
+        <div class="col-md-2">
+          <img class='thumbnail league-pip'
+          src="{{match.radiant_team.image}}"
+          alt='{{ match.radiant_team.name }}'
+          title='{{match.radiant_team.name}}'>
+        </div>
+      {% endif %}
+    </div>
 
-  </div>
-
-  <div class="row">
-
+    <div class="row">
     {% for summary in match.playermatchsummary_set.all %}
           {% if summary.side == 'Dire' %}
             {% include "matches/_pms_card.html" %}
