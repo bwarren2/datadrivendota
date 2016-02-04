@@ -67,23 +67,33 @@ class UpdateClientPersonas(ApiFollower):
         response = json_data['response']
 
         for pulled_player in response['players']:
-            logger.info(
-                "Updating {0}, {1}".format(
-                    pulled_player['personaname'],
-                    pulled_player['steamid']
+            try:
+                logger.info(
+                    u"Updating {0}, {1}".format(
+                        pulled_player['personaname'],
+                        pulled_player['steamid']
+                    )
                 )
-            )
-            # The PlayerSummaries call returns 64 bit ids.  It is super
-            # annoying.
-            id_32bit = int(pulled_player['steamid']) % settings.ADDER_32_BIT
+                # The PlayerSummaries call returns 64 bit ids.  It is super
+                # annoying.
+                id_32bit = int(
+                    pulled_player['steamid']
+                ) % settings.ADDER_32_BIT
 
-            player, created = Player.objects.get_or_create(steam_id=id_32bit)
-            player.persona_name = pulled_player['personaname']
-            player.profile_url = pulled_player['profileurl']
-            player.avatar = pulled_player['avatar']
-            player.avatar_medium = pulled_player['avatarmedium']
-            player.avatar_full = pulled_player['avatarfull']
-            player.save()
+                player, created = Player.objects.get_or_create(
+                    steam_id=id_32bit
+                )
+                player.persona_name = pulled_player['personaname']
+                player.profile_url = pulled_player['profileurl']
+                player.avatar = pulled_player['avatar']
+                player.avatar_medium = pulled_player['avatarmedium']
+                player.avatar_full = pulled_player['avatarfull']
+                player.save()
+
+            except UnicodeEncodeError:
+                logger.error(
+                    "UnicodeEncodeError for {0}".format(pulled_player)
+                )
 
 
 class MirrorPlayerData(BaseTask):
