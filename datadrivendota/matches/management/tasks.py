@@ -608,41 +608,44 @@ class CycleApiCall(ApiFollower):
     def run(self, api_context, json_data, response_code, url):
         """ Ping the valve API to get match data & spawns new tasks. """
         # Validate
-        json_data = json_data['result']
-        if json_data['status'] == 15:
-            logger.warning(
-                "Could not pull data. {0}  disallowed it.".format(
-                    api_context.account_id
+        if json_data:
+            json_data = json_data['result']
+            if json_data['status'] == 15:
+                logger.warning(
+                    "Could not pull data. {0}  disallowed it.".format(
+                        api_context.account_id
+                    )
                 )
-            )
-            p = Player.objects.get(steam_id=api_context.account_id)
-            p.updated = False
-            p.save()
-            return True
+                p = Player.objects.get(steam_id=api_context.account_id)
+                p.updated = False
+                p.save()
+                return True
 
-        elif json_data['status'] == 1:
-            # Spawn a bunch of match detail queries
+            elif json_data['status'] == 1:
+                # Spawn a bunch of match detail queries
 
-            logger.info("Spawning")
+                logger.info("Spawning")
 
-            self.spawn_detail_calls(json_data, api_context)
+                self.spawn_detail_calls(json_data, api_context)
 
-            logger.info("Checking for more results")
-            if self.more_results_left(json_data, api_context):
-                self.rebound(json_data, api_context)
+                logger.info("Checking for more results")
+                if self.more_results_left(json_data, api_context):
+                    self.rebound(json_data, api_context)
 
-            # Successful closeout
+                # Successful closeout
+                else:
+                    logger.info("Cleaning up")
+                    self.cleanup(api_context)
+                return True
             else:
-                logger.info("Cleaning up")
-                self.cleanup(api_context)
-            return True
-        else:
-            logger.error(
-                "Unhandled status: {0}".format(
-                    json_data['status']
+                logger.error(
+                    "Unhandled status: {0}".format(
+                        json_data['status']
+                    )
                 )
-            )
-            return True
+                return True
+        else:
+            logger.warning("Empty json for {0}".format(url))
 
     def spawn_detail_calls(self, json_data, api_context):
         """ Make match detail calls for each match. """
