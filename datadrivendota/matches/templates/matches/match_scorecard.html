@@ -2,7 +2,7 @@
 
 {% load staticfiles player_extras %}
 
-{% block extra_css %}{{ form.media }}{% endblock extra_css %}
+{% block extra_css %}{% endblock extra_css %}
 
 {% block title %}Match #{{ match.steam_id }}{% endblock title %}
 
@@ -29,9 +29,7 @@
             <th title='Experience per minute'>XPM</th>
             <th title='Damage to heroes'>H Dmg</th>
             <th title='Damage to Towers'>T Dmg</th>
-            <th title='Heal to heroes'>Hero Heal</th>
-            <th title='Which side did they play for?'>Side</th>
-            <th title='Did they win?'>Win?</th>
+            <th title='Heal to heroes'>H Heal</th>
           </tr>
         </thead>
         <tbody>
@@ -147,15 +145,6 @@
               <td>{{ summary.hero_damage }}</td>
               <td>{{ summary.tower_damage }}</td>
               <td>{{ summary.hero_healing }}</td>
-              <td class="match-summary-images">
-                {% if summary.is_radiant %}
-                  <img src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.side }}'>
-                {% else %}
-                  <img src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.side }}'>
-                {% endif %}
-
-              </td>
-              <td>{% if summary.is_win %} <div class='glyphicon glyphicon-ok-circle win-glyph' title='Won' style='font-size:15px'></div>{% endif %}</td>
             </tr>
           {% endfor %}
         </tbody>
