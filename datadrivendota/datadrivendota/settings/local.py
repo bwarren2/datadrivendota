@@ -27,7 +27,10 @@ CACHES = {
 
 CACHE_ENABLED = getenv('CACHE_ENABLED', False) == 'True'
 if not CACHE_ENABLED:
-    CACHES['default']['backend'] = 'django.core.cache.backends.dummy.DummyCache'
+    CACHES['default']['backend'] = (
+        'django.core.cache.backends'
+        '.dummy.DummyCache'
+    )
 #   END CACHE CONFIGURATION
 
 
