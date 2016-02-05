@@ -247,17 +247,23 @@ class MergeMatchRequestReplay(Task):
         filename = json_data['filename']
 
         logger.info(json_data)
-        logger.info('Merging {0}'.format(match_id))
+        logger.info('Handling {0}'.format(match_id))
 
         mr = MatchRequest.objects.get(match_id=match_id)
-        logger.info('Merging {0} to request'.format(match_id))
-        self.merge_to_request(mr, filename)
 
-        logger.info('Merging {0} to match'.format(match_id))
-        self.merge_to_match(mr, match_id)
+        if filename == 'notfound':
+            mr.status = MatchRequest.REPLAY_NOT_AVAILABLE
+            mr.save()
 
-        logger.info('Fanning out {0}'.format(match_id))
-        self.fan_parsing(match_id)
+        else:
+            logger.info('Merging {0} to request'.format(match_id))
+            self.merge_to_request(mr, filename)
+
+            logger.info('Merging {0} to match'.format(match_id))
+            self.merge_to_match(mr, match_id)
+
+            logger.info('Fanning out {0}'.format(match_id))
+            self.fan_parsing(match_id)
 
     def merge_to_match(self, mr, match_id):
         match = Match.objects.get(steam_id=match_id)
