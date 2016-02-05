@@ -27,9 +27,13 @@ class MatchFilteredQuerySet(models.QuerySet):
         self.request = request
         queryset = self
 
-        for filter_fn in self.filter_pipeline:
-            queryset = filter_fn(queryset)
-        return queryset
+        try:
+            for filter_fn in self.filter_pipeline:
+                queryset = filter_fn(queryset)
+            return queryset
+
+        except ValueError:
+            return queryset.none()
 
     def filter_ids(self, queryset):
         try:
@@ -93,12 +97,15 @@ class MatchFilteredQuerySet(models.QuerySet):
     def filter_match(self, queryset):
 
         match = self.request.query_params.get('match_id')
-        if match is not None:
-            queryset = queryset.filter(
-                match__steam_id=match
-            )
+        if isinstance(match, int):
+            if match is not None:
+                queryset = queryset.filter(
+                    match__steam_id=match
+                )
 
-        return queryset
+            return queryset
+        else:
+            raise ValueError('What is this match id? {0}'.format(match))
 
     def filter_start_time_gte(self, queryset):
 
@@ -157,9 +164,13 @@ class FilteredQuerySet(models.QuerySet):
         self.request = request
         queryset = self
 
-        for filter_fn in self.filter_pipeline:
-            queryset = filter_fn(queryset)
-        return queryset
+        try:
+            for filter_fn in self.filter_pipeline:
+                queryset = filter_fn(queryset)
+            return queryset
+
+        except ValueError:
+            return queryset.none()
 
     def filter_validity(self, queryset):
         valid = self.request.query_params.get('validity')
@@ -204,12 +215,15 @@ class FilteredQuerySet(models.QuerySet):
     def filter_match(self, queryset):
 
         match = self.request.query_params.get('match_id')
-        if match is not None:
-            queryset = queryset.filter(
-                steam_id=match
-            )
+        if isinstance(match, int):
+            if match is not None:
+                queryset = queryset.filter(
+                    steam_id=match
+                )
 
-        return queryset
+            return queryset
+        else:
+            raise ValueError('What is this match id? {0}'.format(match))
 
     def filter_start_time_gte(self, queryset):
 
