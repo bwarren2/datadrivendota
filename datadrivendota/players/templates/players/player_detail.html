@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 
-{% block title %}Player Summary{% endblock title %}
+{% block title %}
+  {{ player.display_name }} - Summary - datadrivendota
+{% endblock title %}
 
 {% block page_title %}Player Summary <a href="{{compare_url}}"><button type='button' class='btn btn-primary'>{{compare_str}}</button></a>{% endblock page_title %}
 
