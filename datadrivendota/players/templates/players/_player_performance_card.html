@@ -20,7 +20,12 @@
   {% endif %}
 
   {% if pms.hero.mugshot %}
-    <img src="{{ pms.hero.mugshot_url }}" alt="{{ hero.name }}" class="player-match-portrait">
+    <img src="{{ pms.hero.mugshot_url }}" alt="{{ hero.name }}"
+      class="player-match-portrait
+      {% if pms.match.parsed_with %}
+        parsed-match
+      {% endif %}
+      ">
   {% endif %}
 
 
@@ -33,10 +38,5 @@
   <p class='overlayer-top-right small-date'>
     {{pms.display_date}}, {{pms.display_duration}}
   </p>
-
-  {% if pms.parsed_with %}
-    <div class='glyphicon glyphicon-stats overlayer-bottom-right' title='Match Parsed!'></div>
-
-  {% endif %}
 
 </a>

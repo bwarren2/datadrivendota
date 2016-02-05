@@ -78,6 +78,10 @@ class Match(models.Model):
         blank=True,
     )
 
+    parsed_with = models.CharField(
+        max_length=50, null=True, blank=True, default=None
+    )
+
     UNPROCESSED = 0
     LEGIT = 1
     UNCOUNTED = 2
@@ -193,10 +197,6 @@ class PlayerMatchSummary(models.Model):
         upload_to='playermatchsummaries/replays/',
         null=True,
         blank=True,
-    )
-
-    parsed_with = models.CharField(
-        max_length=50
     )
 
     all_data = ReplayFragmentField(max_length=250)

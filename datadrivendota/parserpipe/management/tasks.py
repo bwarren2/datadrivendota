@@ -513,14 +513,19 @@ class UpdateParseEnd(Task):
         #  Expects a bunch of pms ids on all success, some falsy on any failure
 
         if all(finished_shards):
-
-            mr = MatchRequest.objects.get(match_id=match_id)
-            mr.status = MatchRequest.PARSED
-            mr.save()
-
-            pms_ids = finished_shards
-            pmses = PlayerMatchSummary.objects.filter(id__in=pms_ids)
-            pmses.update(parsed_with=settings.PARSER_VERSION)
-            logger.info('Parse Success!')
+            self.aggregate_stats(match_id)
+            self.bookkeep(match_id)
         else:
             raise ValueError("Something failed in the parse chord")
+
+    def bookkeep(self, match_id):
+        mr = MatchRequest.objects.get(match_id=match_id)
+        mr.status = MatchRequest.PARSED
+        mr.save()
+
+        match = Match.objects.filter(id=match_id)
+        match.update(parsed_with=settings.PARSER_VERSION)
+        logger.info('Parse Success!')
+
+    def aggregate_shards(self, match_id):
+        pass
