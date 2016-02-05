@@ -96,8 +96,9 @@ class MatchFilteredQuerySet(models.QuerySet):
 
     def filter_match(self, queryset):
 
-        match = int(self.request.query_params.get('match_id'))
+        match = self.request.query_params.get('match_id')
         if match is not None:
+            match = int(match)
             queryset = queryset.filter(
                 match__steam_id=match
             )
@@ -211,8 +212,9 @@ class FilteredQuerySet(models.QuerySet):
 
     def filter_match(self, queryset):
 
-        match = int(self.request.query_params.get('match_id'))
+        match = self.request.query_params.get('match_id')
         if match is not None:
+            match = int(match)
             queryset = queryset.filter(
                 steam_id=match
             )
