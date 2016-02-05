@@ -76,21 +76,14 @@
           {% endif %}
 
           {% if SHOW_MATCHES %}
-            <li class="dropdown {% active 'matches' main_nav %}">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Matches <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li class="{% active 'matches:index' %}"><a href="{% url 'matches:index' %}">Index</a></li>
-                <li role="presentation" class="divider"></li>
-              </ul>
+            <li class="{% active 'matches' main_nav %}">
+              <a href="{% url 'matches:index' %}">Matches</a>
             </li>
           {% endif %}
 
           {% if SHOW_PLAYERS %}
-            <li class="dropdown {% active 'players' main_nav %}">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Players <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li class="{% active 'players:index' %}"><a href="{% url 'players:index' %}">Autoupdated Players</a></li>
-              </ul>
+            <li class="{% active 'players:index' %}">
+              <a href="{% url 'players:index' %}">Players</a>
             </li>
           {% endif %}
 
@@ -104,11 +97,8 @@
           {% endif %}
 
           {% if SHOW_LEAGUES %}
-            <li class="dropdown {% active 'leagues' main_nav %}">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Leagues<b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li class="{% active 'leagues:overview' %}"><a href="{% url 'leagues:overview' %}">Leagues Overview</a></li>
-              </ul>
+            <li class="{% active 'leagues:overview' %}">
+              <a href="{% url 'leagues:overview' %}">Leagues</a>
             </li>
           {% endif %}
 
