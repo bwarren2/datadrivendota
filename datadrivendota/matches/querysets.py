@@ -96,16 +96,13 @@ class MatchFilteredQuerySet(models.QuerySet):
 
     def filter_match(self, queryset):
 
-        match = self.request.query_params.get('match_id')
-        if isinstance(match, int):
-            if match is not None:
-                queryset = queryset.filter(
-                    match__steam_id=match
-                )
+        match = int(self.request.query_params.get('match_id'))
+        if match is not None:
+            queryset = queryset.filter(
+                match__steam_id=match
+            )
 
-            return queryset
-        else:
-            raise ValueError('What is this match id? {0}'.format(match))
+        return queryset
 
     def filter_start_time_gte(self, queryset):
 
@@ -214,16 +211,13 @@ class FilteredQuerySet(models.QuerySet):
 
     def filter_match(self, queryset):
 
-        match = self.request.query_params.get('match_id')
-        if isinstance(match, int):
-            if match is not None:
-                queryset = queryset.filter(
-                    steam_id=match
-                )
+        match = int(self.request.query_params.get('match_id'))
+        if match is not None:
+            queryset = queryset.filter(
+                steam_id=match
+            )
 
-            return queryset
-        else:
-            raise ValueError('What is this match id? {0}'.format(match))
+        return queryset
 
     def filter_start_time_gte(self, queryset):
 
