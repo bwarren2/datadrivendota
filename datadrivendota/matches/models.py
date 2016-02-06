@@ -205,6 +205,7 @@ class PlayerMatchSummary(models.Model):
 
     class Meta:
         ordering = ['match', 'player_slot']
+        unique_together = ("match", "player_slot")
 
     def save(self, *args, **kwargs):
         self.is_win = self.determine_win()
