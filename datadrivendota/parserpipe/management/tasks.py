@@ -528,4 +528,15 @@ class UpdateParseEnd(Task):
         logger.info('Parse Success!')
 
     def aggregate_shards(self, match_id):
-        pass
+
+        for field in combatlog_filter_map.keys():
+            # Diff all the combatseries
+            # Radiant
+            # Dire
+            # Diff
+            pass
+        for field in entitystate_filter_map.keys():
+            # Radiant
+            # Dire
+            # Diff
+            pass
