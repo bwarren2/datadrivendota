@@ -1,0 +1,16 @@
+{% extends "row_base.html" %}
+{% load bootstrap_tags %}
+
+{% block content %}
+<h1>Import Matches</h1>
+
+<p>
+  Here are some instructions on how to get a match ID, and submit a request.
+</p>
+
+<form method="post" action=".">
+  {% csrf_token %}
+  {{ form|as_bootstrap }}
+  <input type="submit" class="btn btn-primary" value="submit">
+</form>
+{% endblock content %}

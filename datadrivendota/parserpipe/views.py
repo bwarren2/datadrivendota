@@ -99,7 +99,7 @@ class TasksView(View):
 
 class MatchRequestView(LoginRequiredView, FormView):
     form_class = MatchRequestForm
-    template_name = 'accounts/match_import_request.html'
+    template_name = 'parserpipe/match_import_request.html'
     initial = {}
 
     def form_valid(self, form):
