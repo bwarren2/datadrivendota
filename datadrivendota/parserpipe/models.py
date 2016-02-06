@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from accounts.exceptions import DataCapReached, ValidationException
 from accounts.models import UserProfile
@@ -51,22 +52,34 @@ class MatchRequest(models.Model):
             profile = UserProfile.objects.get(user=user)
 
             # Is the user allowed to do this?
-            if profile.requested is None \
-                    or profile.request_limit > profile.requested.count():
-                if MatchRequest.objects.filter(
-                    match_id=match_id
-                ).count() == 0:
+            start_of_this_calendar_month = timezone.now().replace(
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
+            allowed_to_request = (
+                profile.requested is not None and
+                profile.request_limit > profile.requested.filter(
+                    created__gte=start_of_this_calendar_month,
+                ).count()
+            )
+            if allowed_to_request:
+                if not MatchRequest.objects.filter(match_id=match_id).exists():
                     obj = MatchRequest.objects.create(match_id=match_id)
                     profile.requested.add(obj)
                     return obj
                 else:
-                    msg = "We already have that, no request needed."
-                    raise ValidationException(msg)
+                    raise ValidationException(
+                        "We already have that, no request needed.",
+                    )
             else:
                 raise DataCapReached
         except UserProfile.DoesNotExist:
-            msg = "You don't seem to be logged in, which is required."
-            raise ValidationException(msg)
+            raise ValidationException(
+                "You don't seem to be logged in, which is required.",
+            )
 
     def __unicode__(self):
         choices = self.STATUS_CHOICES
