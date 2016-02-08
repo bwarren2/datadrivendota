@@ -5,6 +5,7 @@ import sys
 import json
 import requests
 from io import BytesIO
+from collections import Counter
 
 from celery import Task, chain, chord
 
@@ -492,17 +493,11 @@ class UpdatePmsReplays(Task):
                 match_id, pms.player_slot, data, field, 'combatseries'
             )
 
-    def save_msgstream(self, match_id, dataslice, msgs, facet, msgs_type):
+    def save_msgstream(self, match_id, dataslice, msgs, facet, log_type):
         buff = BytesIO(json.dumps(msgs))
         buff.seek(0)
 
-        filename = '{0}_{1}_{2}_{3}_v{4}.json.gz'.format(
-            match_id,
-            dataslice,
-            msgs_type,
-            facet,
-            settings.PARSER_VERSION
-        )
+        filename = shard_filename(match_id, dataslice, facet, log_type)
         logger.info("Saving {0}".format(filename))
         s3_parse(buff, filename)
 
@@ -519,7 +514,7 @@ class UpdateParseEnd(Task):
             raise ValueError("Something failed in the parse chord")
 
     def bookkeep(self, match_id):
-        mr = MatchRequest.objects.get(match_id=match_id)
+        mr = MatchRequest.objects.get_or_create(match_id=match_id)[0]
         mr.status = MatchRequest.PARSED
         mr.save()
 
@@ -530,13 +525,127 @@ class UpdateParseEnd(Task):
     def aggregate_shards(self, match_id):
 
         for field in combatlog_filter_map.keys():
-            # Diff all the combatseries
-            # Radiant
-            # Dire
-            # Diff
-            pass
+
+            logtype = 'combatseries'
+
+            radiant = self.get_files(
+                match_id, Match.RADIANT_SLOTS, field, logtype
+            )
+            dire = self.get_files(match_id, Match.DIRE_SLOTS, field, logtype)
+
+            radiant_sum = self.rollup_dataseries(radiant, 'sum')
+            dire_sum = self.rollup_dataseries(dire, 'sum')
+            diff = self.rollup_dataseries([radiant, dire], 'diff')
+
+            self.save_data(radiant_sum)
+            self.save_data(dire_sum)
+            self.save_data(diff)
+
         for field in entitystate_filter_map.keys():
             # Radiant
             # Dire
             # Diff
             pass
+
+    def get_files(self, match_id, dataslices, field, logtype):
+        """
+        Get the files for shards on s3.
+
+        :param match_id: steam_id for match
+        :param dataslices: a list of player_slots
+        :param field: the name of a filter fn from that msg type
+        :param log_type: {combatlog/statelog/combatseries}
+        :returns: a list of lists of dicts, pulled from s3
+        """
+        return [
+            requests.get(
+                shard_url(match_id, x, field, logtype)
+            ).json()
+            for x in dataslices
+        ]
+
+    def rollup_dataseries(self, data, field, operation):
+        """
+        Reduce the lists of files into one series with continuous time keys.
+
+        :param match_id: a list of lists of objects.
+        :param operation: sum or diff.
+        """
+
+        data_dicts = self.rehash(data, field)
+        data_keys = self.extract_keys(data_dicts)
+
+        if operation == 'sum':
+            return [
+                {
+                    'offset_time': x,
+                    field: sum([subdict[x] for subdict in data_dicts])
+                }
+                for x in data_keys
+            ]
+        elif operation == 'diff':
+            if len(data) != 2:
+                raise ValueError(
+                    'Taking dicts of more than 2 series undefined.'
+                )
+            else:
+                return [
+                    {
+                        'offset_time': x,
+                        field: data_dicts[0][x] - data_dicts[1][x]
+                    }
+                    for x in data_keys
+                ]
+        else:
+            raise ValueError('What is this operation? {0}'.format(operation))
+
+    def rehash(self, data, field):
+        return [
+            {x['offset_time']: x[field] for x in dataseries}
+            for dataseries in data
+        ]
+
+    def extract_keys(self, data):
+        keys_list = [
+            x
+            for dataseries in data
+            for x in dataseries.keys()
+        ]
+        counts = Counter(keys_list)
+        datalength = len(data)
+        eligible_keys = [x for x, y in counts.iteritems() if y == datalength]
+
+        if len(eligible_keys) != max(eligible_keys) - min(eligible_keys) + 1:
+            raise ValueError('Why do we have an noncontinuous dataseries?')
+
+        return sorted(eligible_keys)
+
+
+def shard_filename(match_id, dataslice, facet, log_type):
+    """
+    Get the filename for shards on s3.
+
+    Because we are effectively using s3 as a great big key-value store,
+        we need a hashing fn.  This is it.
+
+    :param match_id: steam_id for match
+    :param dataslice: player_slot of {radiant/dire/diff}
+    :param log_type: {combatlog/statelog/combatseries}
+    :param facet: the name of a filter fn from that msg type
+    :returns: formatted string
+    """
+    filename = '{0}_{1}_{2}_{3}_v{4}.json.gz'.format(
+        match_id,
+        dataslice,
+        log_type,
+        facet,
+        settings.PARSER_VERSION
+    )
+
+    return filename
+
+
+def shard_url(match_id, dataslice, facet, log_type):
+    return settings.SHARD_URL_BASE+shard_filename(
+        match_id, dataslice, facet, log_type
+        )
