@@ -114,11 +114,11 @@ class UpdateMatch(ApiFollower):
         )
 
         if not_found:
-            logger.warning(
+            logger.info(
                 'Match ID {0} not found'.format(api_context.match_id)
             )
         elif is_practice:
-            logger.warning(
+            logger.info(
                 'Match ID {0} was a practice match, not recorded'.format(
                     api_context.match_id
                 )
