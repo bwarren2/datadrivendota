@@ -495,12 +495,32 @@ class UpdatePmsReplays(Task):
 
 
 class UpdateParseEnd(Task):
+    soft_time_limit = 600
+    time_limit = 605
 
     def run(self, finished_shards, match_id):
         #  Expects a bunch of pms ids on all success, some falsy on any failure
 
         if all(finished_shards):
-            self.aggregate_stats(match_id)
+
+            ct = 0
+            for field in entitystate_filter_map.keys():
+
+                # these are not summable
+                if field not in [
+                    'items', 'position', 'x_position', 'y_position'
+                ]:
+                    logger.info('Doing M#{0}, {1}, {2}.  {3} done.'.format(
+                        match_id, field, 'statelog', ct
+                        )
+                    )
+                    ct += 1
+
+                    self.aggregate_shards(match_id, field, 'statelog')
+
+            for field in combatlog_filter_map.keys():
+                self.aggregate_shards(match_id, field, 'combatseries')
+
             self.bookkeep(match_id)
         else:
             raise ValueError("Something failed in the parse chord")
@@ -514,30 +534,20 @@ class UpdateParseEnd(Task):
         match.update(parsed_with=settings.PARSER_VERSION)
         logger.info('Parse Success!')
 
-    def aggregate_shards(self, match_id):
+    def aggregate_shards(self, match_id, field, logtype):
 
-        for field in combatlog_filter_map.keys():
+        radiant = self.get_files(
+            match_id, Match.RADIANT_SLOTS, field, logtype
+        )
+        dire = self.get_files(match_id, Match.DIRE_SLOTS, field, logtype)
 
-            logtype = 'combatseries'
+        radiant_sum = self.rollup_dataseries(radiant, field,  'sum')
+        dire_sum = self.rollup_dataseries(dire, field, 'sum')
+        diff = self.rollup_dataseries([radiant_sum, dire_sum], field, 'diff')
 
-            radiant = self.get_files(
-                match_id, Match.RADIANT_SLOTS, field, logtype
-            )
-            dire = self.get_files(match_id, Match.DIRE_SLOTS, field, logtype)
-
-            radiant_sum = self.rollup_dataseries(radiant, 'sum')
-            dire_sum = self.rollup_dataseries(dire, 'sum')
-            diff = self.rollup_dataseries([radiant, dire], 'diff')
-
-            self.save_data(radiant_sum)
-            self.save_data(dire_sum)
-            self.save_data(diff)
-
-        # for field in entitystate_filter_map.keys():
-        #     # Radiant
-        #     # Dire
-        #     # Diff
-        #     pass
+        save_msgstream(match_id, 'radiant', radiant_sum, field, logtype)
+        save_msgstream(match_id, 'dire', dire_sum, field, logtype)
+        save_msgstream(match_id, 'diff', diff, field, logtype)
 
     def get_files(self, match_id, dataslices, field, logtype):
         """
@@ -651,5 +661,4 @@ def save_msgstream(match_id, dataslice, msgs, facet, log_type):
     buff.seek(0)
 
     filename = shard_filename(match_id, dataslice, facet, log_type)
-    logger.info("Saving {0}".format(filename))
     s3_parse(buff, filename)
