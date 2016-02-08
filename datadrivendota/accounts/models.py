@@ -6,21 +6,21 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 
-def get_active_users():
-    two_weeks_ago = timezone.now() - timedelta(days=14)
+def get_active_users(since=timedelta(days=14)):
+    then = timezone.now() - since
     return User.objects.filter(
-        last_login__gte=two_weeks_ago
+        last_login__gte=then,
     ).exclude(
-        last_login__isnull=True
+        last_login__isnull=True,
     )
 
 
-def get_inactive_users():
-    two_weeks_ago = timezone.now() - timedelta(days=14)
+def get_inactive_users(since=timedelta(days=14)):
+    then = timezone.now() - since
     return User.objects.exclude(
-        last_login__gt=two_weeks_ago
+        last_login__gt=then,
     ).exclude(
-        last_login__isnull=True
+        last_login__isnull=True,
     )
 
 

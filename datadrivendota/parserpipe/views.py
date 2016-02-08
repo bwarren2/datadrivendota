@@ -99,18 +99,15 @@ class TasksView(View):
 
 class MatchRequestView(LoginRequiredView, FormView):
     form_class = MatchRequestForm
-    template_name = 'accounts/match_import_request.html'
+    template_name = 'parserpipe/match_import_request.html'
     initial = {}
 
-    def form_invalid(self, form):
-        super(MatchRequestView, self).form_invalid(form)
-
     def form_valid(self, form):
-
         match_id = form.cleaned_data['match_id']
         try:
             match_request = MatchRequest.create_for_user(
-                self.request.user, match_id
+                self.request.user,
+                match_id,
             )
 
             msg = (
@@ -121,7 +118,8 @@ class MatchRequestView(LoginRequiredView, FormView):
                 reverse(
                     'matches:detail',
                     kwargs={'match_id': match_request.match_id}
-                ))
+                )
+            )
             task = MirrorMatches()
             task.delay(matches=[match_request.match_id])
             messages.add_message(self.request, messages.SUCCESS, msg)
@@ -130,8 +128,10 @@ class MatchRequestView(LoginRequiredView, FormView):
             msg = err.strerror
             messages.add_message(self.request, messages.WARNING, msg)
         except DataCapReached:
-            msg = ("You have reached your import cap.",
-                   "  We are working at increasing this.")
+            msg = (
+                "You have reached your import cap. "
+                "We are working at increasing this."
+            )
             messages.add_message(self.request, messages.WARNING, msg)
         return render(
             self.request,
