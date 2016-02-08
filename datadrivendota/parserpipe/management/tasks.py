@@ -426,7 +426,7 @@ class UpdatePmsReplays(Task):
             'states': state_list,
             'combat': pms_combat,
         }
-        self.save_msgstream(match_id, pms.player_slot, all_data, 'all', 'both')
+        save_msgstream(match_id, pms.player_slot, all_data, 'all', 'both')
 
     def save_states(self, pms, match_id, replay):
         for field, filter_fn in entitystate_filter_map.iteritems():
@@ -436,7 +436,7 @@ class UpdatePmsReplays(Task):
                 pms.match.steam_id,
             ))
             data = filter_fn(replay['states'], pms)
-            self.save_msgstream(
+            save_msgstream(
                 match_id, pms.player_slot, data, field, 'statelog'
             )
 
@@ -450,7 +450,7 @@ class UpdatePmsReplays(Task):
                 pms.match.steam_id,
             ))
             data = filter_fn(replay['es'], pms, enemies, allies)
-            self.save_msgstream(
+            save_msgstream(
                 match_id, pms.player_slot, data, field, 'combatlog'
             )
             pms_combat[field] = data
@@ -489,17 +489,9 @@ class UpdatePmsReplays(Task):
 
     def save_timeseries(self, match_id, pms, timeseries_log):
         for field, data in timeseries_log.iteritems():
-            self.save_msgstream(
+            save_msgstream(
                 match_id, pms.player_slot, data, field, 'combatseries'
             )
-
-    def save_msgstream(self, match_id, dataslice, msgs, facet, log_type):
-        buff = BytesIO(json.dumps(msgs))
-        buff.seek(0)
-
-        filename = shard_filename(match_id, dataslice, facet, log_type)
-        logger.info("Saving {0}".format(filename))
-        s3_parse(buff, filename)
 
 
 class UpdateParseEnd(Task):
@@ -541,11 +533,11 @@ class UpdateParseEnd(Task):
             self.save_data(dire_sum)
             self.save_data(diff)
 
-        for field in entitystate_filter_map.keys():
-            # Radiant
-            # Dire
-            # Diff
-            pass
+        # for field in entitystate_filter_map.keys():
+        #     # Radiant
+        #     # Dire
+        #     # Diff
+        #     pass
 
     def get_files(self, match_id, dataslices, field, logtype):
         """
@@ -620,6 +612,9 @@ class UpdateParseEnd(Task):
 
         return sorted(eligible_keys)
 
+    def save_data(self):
+        pass
+
 
 def shard_filename(match_id, dataslice, facet, log_type):
     """
@@ -649,3 +644,12 @@ def shard_url(match_id, dataslice, facet, log_type):
     return settings.SHARD_URL_BASE+shard_filename(
         match_id, dataslice, facet, log_type
         )
+
+
+def save_msgstream(match_id, dataslice, msgs, facet, log_type):
+    buff = BytesIO(json.dumps(msgs))
+    buff.seek(0)
+
+    filename = shard_filename(match_id, dataslice, facet, log_type)
+    logger.info("Saving {0}".format(filename))
+    s3_parse(buff, filename)
