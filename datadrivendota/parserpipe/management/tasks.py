@@ -503,22 +503,27 @@ class UpdateParseEnd(Task):
 
         if all(finished_shards):
 
-            ct = 0
-            for field in entitystate_filter_map.keys():
+            for ct, field in enumerate(entitystate_filter_map.keys()):
 
                 # these are not summable
-                if field not in [
+                if field in [
                     'items', 'position', 'x_position', 'y_position'
                 ]:
-                    logger.info('Doing M#{0}, {1}, {2}.  {3} done.'.format(
-                        match_id, field, 'statelog', ct
-                        )
+                    continue
+
+                logger.info('Doing M#{0}, {1}, {2}.  {3} done.'.format(
+                    match_id, field, 'statelog', ct
                     )
-                    ct += 1
+                )
 
-                    self.aggregate_shards(match_id, field, 'statelog')
+                self.aggregate_shards(match_id, field, 'statelog')
 
-            for field in combatlog_filter_map.keys():
+            for ct, field in enumerate(combatlog_filter_map.keys()):
+                logger.info('Doing M#{0}, {1}, {2}.  {3} done.'.format(
+                    match_id, field, 'statelog', ct
+                    )
+                )
+
                 self.aggregate_shards(match_id, field, 'combatseries')
 
             self.bookkeep(match_id)
