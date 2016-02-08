@@ -3,9 +3,12 @@
 
 {% block content %}
     <h1>Match List</h1>
+
+    {% if request.user.is_authenticated %}
     <p class="">
       <em>Don't see the match you're looking for? <a href="{% url "parserpipe:import" %}">Import</a> it!</em>
     </p>
+    {% endif %}
     {% for match in match_list %}
         <a href="/matches/{{match.steam_id}}">
             <div class='col-md-12' style='margin-bottom:20px'>
