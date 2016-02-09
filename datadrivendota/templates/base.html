@@ -18,6 +18,12 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
+
+
+
+
+
+
     <link href="//fonts.googleapis.com/css?family=Cinzel+Decorative" rel="stylesheet" type="text/css">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif" rel="stylesheet" type="text/css">
     <link href="//fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
@@ -183,6 +189,10 @@
 
     <script type="text/javascript" src='{% static "dist/built.js" %}'></script>
     <script type="text/javascript" src='{% static "js/d7.js" %}'></script>
+
+    {# For djstripe #}
+    {% block javascript %}{% endblock %}
+
     {% block extra_js %}
     {% endblock extra_js %}
 
