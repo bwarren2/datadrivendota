@@ -627,9 +627,6 @@ class UpdateParseEnd(Task):
 
         return sorted(eligible_keys)
 
-    def save_data(self):
-        pass
-
 
 def shard_filename(match_id, dataslice, facet, log_type):
     """
