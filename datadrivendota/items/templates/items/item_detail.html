@@ -4,7 +4,7 @@
 
 {% block page_title %}{{ item.name }}{% endblock page_title %}
 
-{% block content %}
+{% block aligned_content %}
 
 <div class="ability-card thumbnail">
   <div class="aligner">
@@ -22,5 +22,5 @@
   {% if item.lore %}
     <blockquote class="lore">{{ item.lore }}</blockquote>
   {% endif %}
-{% endblock content %}
+{% endblock aligned_content %}
 </div>

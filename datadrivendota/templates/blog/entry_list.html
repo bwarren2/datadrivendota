@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block sections %}
+{% block content %}
     <div class='container'>
         <div class='row' id='entry-list'>
             {% if object_list %}
@@ -23,4 +23,4 @@
     {% include "accounts/mixins/_ping_request.html" %}
 </div>
 </div>
-{% endblock sections %}
+{% endblock content %}

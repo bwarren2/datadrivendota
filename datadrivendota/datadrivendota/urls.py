@@ -78,7 +78,7 @@ if settings.SHOW_ACCOUNTS:
     ]
 if settings.SHOW_PAYMENTS:
     urlpatterns += [
-        url(r"^payments/", include("pinax.stripe.urls")),
+        url(r'^payments/', include('djstripe.urls', namespace="djstripe")),
     ]
 if settings.SHOW_SEARCH:
     urlpatterns += [
@@ -95,7 +95,6 @@ if settings.SHOW_AUTH:
         # https://python-social-auth.readthedocs.org/en/latest/configuration/django.html
         # Is there a better option?  --ben 2015-04-19
     ]
-
 
 if settings.DEBUG:
     # static files (images, css, javascript, etc.)

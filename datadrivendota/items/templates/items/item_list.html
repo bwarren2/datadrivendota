@@ -4,7 +4,7 @@
 
 {% block page_title %}Item Index{% endblock page_title %}
 
-{% block content %}
+{% block aligned_content %}
   <div class="row">
     {% for item in object_list %}
       {% if item.mugshot and item.name %}
@@ -17,5 +17,5 @@
       {% endif %}
     {% endfor %}
   </div>
-{% endblock content %}
+{% endblock aligned_content %}
 

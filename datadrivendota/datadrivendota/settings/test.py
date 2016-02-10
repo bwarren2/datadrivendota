@@ -2,7 +2,6 @@ from base import *
 
 #   TEST SETTINGS
 DEBUG = False
-TEMPLATE_DEBUG = False
 SOUTH_TESTS_MIGRATE = False
 
 INSTALLED_APPS += (
