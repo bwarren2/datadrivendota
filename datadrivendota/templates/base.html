@@ -146,6 +146,9 @@
     </div>
 
 
+
+
+    <div class='container'>
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}
@@ -153,10 +156,9 @@
         {% endfor %}
     </ul>
     {% endif %}
-
-
-    {% block sections %}
-    {% endblock sections %}
+    {% block content %}
+    {% endblock content %}
+    </div>
 
     {% if show_control_bar %}
     <div id="control_bar_margin"></div>

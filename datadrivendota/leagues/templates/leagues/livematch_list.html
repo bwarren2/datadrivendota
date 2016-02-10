@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block sections %}
+{% block content %}
 <div class='container'>
     <h3> Overall:
         <span class='complete'>{{complete_matches|length}}</span>
@@ -41,7 +41,7 @@
         {% endfor %}
     </div>
 </div>
-{% endblock sections %}
+{% endblock content %}
 
 
 {% block extra_css %}
