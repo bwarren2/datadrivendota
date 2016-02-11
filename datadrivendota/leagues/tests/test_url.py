@@ -9,7 +9,8 @@ class TestUrlconf(TestCase):
         super(TestUrlconf, cls).setUpClass()
         cls.league = mommy.make_recipe(
             'leagues.league',
-            steam_id=100
+            steam_id=100,
+            tier=0
         )
         mommy.make_recipe(
             'matches.match',

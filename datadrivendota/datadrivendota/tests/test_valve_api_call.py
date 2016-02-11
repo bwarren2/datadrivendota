@@ -32,7 +32,7 @@ class TestApiContext(TestCase):
     def test_repr(self):
         c = ApiContext()
         c.account_id = 5
-        self.assertEqual(c.__repr__(), 'account_id: 5 \n')
+        self.assertEqual(c.__repr__(), 'account_id: 5, ')
 
     def test_url_get(self):
         url = ApiContext().url_for('GetMatchHistory')

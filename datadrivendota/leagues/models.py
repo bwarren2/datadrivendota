@@ -154,4 +154,6 @@ class LiveMatch(models.Model):
         )
 
     class Meta:
-        unique_together = ('league_id', 'steam_id')
+        unique_together = (
+            'league_id', 'steam_id', 'radiant_team', 'dire_team'
+        )
