@@ -345,6 +345,9 @@ class AdditionalUnit(models.Model):
     item_4 = models.ForeignKey('items.Item', related_name='additem4')
     item_5 = models.ForeignKey('items.Item', related_name='additem5')
 
+    class Meta:
+        unique_together = ("player_match_summary", "unit_name")
+
 
 class PickBan(models.Model):
     match = models.ForeignKey('Match')
@@ -357,6 +360,7 @@ class PickBan(models.Model):
 
     class Meta:
         ordering = ['match', 'order']
+        unique_together = ("match", "order")
 
 
 class LeaverStatus(models.Model):
@@ -374,12 +378,13 @@ class LeaverStatus(models.Model):
 
 class SkillBuild(models.Model):
     player_match_summary = models.ForeignKey('PlayerMatchSummary')
+    level = models.IntegerField()
     ability = models.ForeignKey('heroes.Ability')
     time = models.IntegerField()
-    level = models.IntegerField()
 
     class Meta:
         ordering = ['player_match_summary', 'level']
+        unique_together = ("player_match_summary", "level")
 
     def __unicode__(self):
         return u"{0}, ({1})".format(
