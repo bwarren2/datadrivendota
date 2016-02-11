@@ -106,6 +106,10 @@ class Match(models.Model):
         return unicode(self.steam_id)
 
     @property
+    def is_parsed(self):
+        return self.parsed_with is not None
+
+    @property
     def hms_duration(self):
         return timedelta(seconds=self.duration)
 
