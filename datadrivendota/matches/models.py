@@ -138,8 +138,11 @@ class GameMode(models.Model):
     )
     description = models.CharField(help_text='Game mode, ie. captains',
                                    max_length=50)
-    is_competitive = models.BooleanField(help_text="""Whether charts should
-        show this mode by default""", default=False)
+    is_competitive = models.BooleanField(
+        help_text="""Whether charts should
+        show this mode by default""",
+        default=False
+    )
     visible = models.BooleanField(default=False)
 
     class Meta:
@@ -147,6 +150,11 @@ class GameMode(models.Model):
 
     def __unicode__(self):
         return u"{0}, ({1})".format(self.description, self.steam_id)
+
+    @property
+    def has_bans(self):
+        # Magic numbers per valve's def of capt, reverse capt
+        return self.steam_id in [2, 8]
 
 
 class LobbyType(models.Model):
