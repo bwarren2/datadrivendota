@@ -136,7 +136,7 @@ class UpdateMatch(ApiFollower):
             lm.failed = True
             lm.save()
         except LiveMatch.DoesNotExist:
-            logging.warning(
+            logging.info(
                 'No live match to fail. ({0})'.format(
                     api_context.match_id
                 )
