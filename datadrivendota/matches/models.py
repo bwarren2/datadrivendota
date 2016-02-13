@@ -10,7 +10,9 @@ class Match(models.Model):
     # Magic numbers given by Valve
     PLAYER_SLOTS = [0, 1, 2, 3, 4, 128, 129, 130, 131, 132]
 
-    steam_id = models.IntegerField(help_text="Valve's id field", unique=True)
+    steam_id = models.BigIntegerField(
+        help_text="Valve's id field", unique=True
+    )
     match_seq_num = models.IntegerField(help_text="ID valve's play sequence")
     cluster = models.IntegerField()
     start_time = models.IntegerField(help_text='Start time in UTC seconds')
