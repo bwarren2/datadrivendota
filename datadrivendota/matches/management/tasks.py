@@ -358,7 +358,7 @@ def upload_match_summary(players, parent_match, refresh_records):
             'kills': player['kills'],
             'deaths': player['deaths'],
             'assists': player['assists'],
-            'gold': player['gold'],
+            'gold': player.get('gold', None),
             'last_hits': player['last_hits'],
             'denies': player['denies'],
             'gold_per_min': player['gold_per_min'],

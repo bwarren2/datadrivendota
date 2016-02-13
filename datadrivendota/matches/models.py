@@ -194,7 +194,7 @@ class PlayerMatchSummary(models.Model):
     kills = models.IntegerField()
     deaths = models.IntegerField()
     assists = models.IntegerField()
-    gold = models.IntegerField()
+    gold = models.IntegerField(null=True)
     last_hits = models.IntegerField()
     denies = models.IntegerField()
     gold_per_min = models.IntegerField()
