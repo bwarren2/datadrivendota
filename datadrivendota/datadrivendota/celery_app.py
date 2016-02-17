@@ -58,7 +58,7 @@ class Config(object):
     )
 
     # What happens if we do not use redis?.
-    CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')
+    CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')+'?new_join=1'
 
     # What happens if we do not use redis?.
     CELERY_TIMEZONE = settings.TIME_ZONE
