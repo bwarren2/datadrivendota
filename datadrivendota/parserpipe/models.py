@@ -35,7 +35,7 @@ class MatchRequest(models.Model):
     status = models.PositiveIntegerField(
         choices=STATUS_CHOICES, default=SUBMITTED
     )
-    match_id = models.PositiveIntegerField(unique=True)
+    match_id = models.BigIntegerField(unique=True)
     requester = models.ForeignKey(User)
 
     # Intermediate step fields if we want em.
