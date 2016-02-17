@@ -473,4 +473,8 @@ FEATURE_FLAGS = [
     'SHOW_TEAMS',
 ]
 
+SHARD_URL_BASE = (
+    "https://s3.amazonaws.com/datadrivendota"
+    "/processed_replay_parse/"
+)
 PARSER_VERSION = '1'

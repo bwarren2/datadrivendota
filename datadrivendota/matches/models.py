@@ -9,6 +9,8 @@ class Match(models.Model):
 
     # Magic numbers given by Valve
     PLAYER_SLOTS = [0, 1, 2, 3, 4, 128, 129, 130, 131, 132]
+    RADIANT_SLOTS = [0, 1, 2, 3, 4]
+    DIRE_SLOTS = [128, 129, 130, 131, 132]
 
     steam_id = models.BigIntegerField(
         help_text="Valve's id field", unique=True

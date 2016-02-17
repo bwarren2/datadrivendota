@@ -83,7 +83,7 @@ class MatchRequest(models.Model):
 
     def __unicode__(self):
         choices = self.STATUS_CHOICES
-        return "Match Request: match#: {0}, status: {1}".format(
+        return "Match#: {0}, status: {1}".format(
             self.match_id, dict(choices).get(self.status)
         )
 

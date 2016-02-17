@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.utils.decorators import method_decorator
 
 from parserpipe.management.tasks import (
-    KickoffMatchRequests, CreateMatchParse, UpdatePmsReplays
+    KickoffMatchRequests, CreateMatchParse, UpdatePmsReplays, UpdateParseEnd
 )
 
 from parserpipe.models import MatchRequest
@@ -130,4 +130,91 @@ class TestShardMunging(TestCase):
                     {'all_income': 965, 'offset_time': 1, 'time': 236}
                 ]
             }
+        )
+
+
+class TestAggregateDataseries(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.test_shards = [
+            [
+                {'all_income': 625, 'offset_time': -1, 'time': 234},
+                {'all_income': 625, 'offset_time': 0, 'time': 235},
+                {'all_income': 965, 'offset_time': 1, 'time': 236}
+            ],
+            [
+                {'all_income': 1, 'offset_time': -1, 'time': 234},
+                {'all_income': 2, 'offset_time': 0, 'time': 235},
+                {'all_income': 3, 'offset_time': 1, 'time': 236}
+            ],
+        ]
+        cls.test_hashed = [
+            {
+                -1: 625,
+                0: 625,
+                1: 965
+            },
+            {
+                -1: 1,
+                0: 2,
+                1: 3
+            },
+        ]
+        super(TestAggregateDataseries, cls).setUpClass()
+
+    def test_hashing(self):
+        t = UpdateParseEnd()
+        actual = t.rehash(self.test_shards, 'all_income')
+        expect = self.test_hashed
+        self.assertEqual(actual, expect)
+
+    def test_counting(self):
+        t = UpdateParseEnd()
+
+        inputs = self.test_hashed
+        actual = t.extract_keys(inputs)
+        expect = [-1, 0, 1]
+
+        self.assertEqual(actual, expect)
+
+    def test_counting_discontinuous(self):
+        t = UpdateParseEnd()
+
+        inputs = [
+            {
+                -1: 625,
+                1: 965
+            },
+            {
+                -1: 1,
+                1: 3
+            },
+        ]
+
+        with self.assertRaises(ValueError):
+            t.extract_keys(inputs)
+
+    def test_sum_aggregate(self):
+        t = UpdateParseEnd()
+        data_sum = t.rollup_dataseries(self.test_shards, 'all_income', 'sum')
+        self.assertEqual(
+            data_sum,
+            [
+                {'all_income': 626, 'offset_time': -1},
+                {'all_income': 627, 'offset_time': 0},
+                {'all_income': 968, 'offset_time': 1}
+            ]
+        )
+
+    def test_diff_aggregate(self):
+        t = UpdateParseEnd()
+        data_sum = t.rollup_dataseries(self.test_shards, 'all_income', 'diff')
+        self.assertEqual(
+            data_sum,
+            [
+                {'all_income': 624, 'offset_time': -1},
+                {'all_income': 623, 'offset_time': 0},
+                {'all_income': 962, 'offset_time': 1}
+            ]
         )
