@@ -468,7 +468,12 @@ class UpdatePmsReplays(Task):
 
             # Sum up the messages occurring at the same time
             for msg in data:
-                indicies[msg['time']] += msg.get('value', 1)
+
+                # How are there combatmessages without state messages?
+                #  Discarding for now.
+
+                if msg['time'] in indicies:
+                    indicies[msg['time']] += msg.get('value', 1)
 
             # Make them cumulative
             for idx in indicies.iterkeys():
