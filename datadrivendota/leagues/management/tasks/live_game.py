@@ -103,12 +103,16 @@ class UpdateLiveGames(ApiFollower):
                     'team_id', None
                 ),
                 dire_team=formatted_game.get('dire', {}).get('team_id', None),
-                radiant_logo_ugc=formatted_game.get('radiant', {}).get(
-                    'team_logo', None
-                ),
-                dire_logo_ugc=formatted_game.get('dire', {}).get(
-                    'team_logo', None
-                ),
+                defaults={
+                    'radiant_logo_ugc':
+                        formatted_game.get('radiant', {}).get(
+                            'team_logo', None
+                        ),
+                    'dire_logo_ugc':
+                        formatted_game.get('dire', {}).get(
+                            'team_logo', None
+                        )
+                }
             )
 
     def _store_data(self, game_snapshot):

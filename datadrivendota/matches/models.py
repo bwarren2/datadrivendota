@@ -12,7 +12,9 @@ class Match(models.Model):
     RADIANT_SLOTS = [0, 1, 2, 3, 4]
     DIRE_SLOTS = [128, 129, 130, 131, 132]
 
-    steam_id = models.IntegerField(help_text="Valve's id field", unique=True)
+    steam_id = models.BigIntegerField(
+        help_text="Valve's id field", unique=True
+    )
     match_seq_num = models.IntegerField(help_text="ID valve's play sequence")
     cluster = models.IntegerField()
     start_time = models.IntegerField(help_text='Start time in UTC seconds')
@@ -108,6 +110,10 @@ class Match(models.Model):
         return unicode(self.steam_id)
 
     @property
+    def is_parsed(self):
+        return self.parsed_with is not None
+
+    @property
     def hms_duration(self):
         return timedelta(seconds=self.duration)
 
@@ -140,8 +146,11 @@ class GameMode(models.Model):
     )
     description = models.CharField(help_text='Game mode, ie. captains',
                                    max_length=50)
-    is_competitive = models.BooleanField(help_text="""Whether charts should
-        show this mode by default""", default=False)
+    is_competitive = models.BooleanField(
+        help_text="""Whether charts should
+        show this mode by default""",
+        default=False
+    )
     visible = models.BooleanField(default=False)
 
     class Meta:
@@ -149,6 +158,11 @@ class GameMode(models.Model):
 
     def __unicode__(self):
         return u"{0}, ({1})".format(self.description, self.steam_id)
+
+    @property
+    def has_bans(self):
+        # Magic numbers per valve's def of capt, reverse capt
+        return self.steam_id in [2, 8]
 
 
 class LobbyType(models.Model):
@@ -182,7 +196,7 @@ class PlayerMatchSummary(models.Model):
     kills = models.IntegerField()
     deaths = models.IntegerField()
     assists = models.IntegerField()
-    gold = models.IntegerField()
+    gold = models.IntegerField(null=True)
     last_hits = models.IntegerField()
     denies = models.IntegerField()
     gold_per_min = models.IntegerField()
@@ -347,6 +361,9 @@ class AdditionalUnit(models.Model):
     item_4 = models.ForeignKey('items.Item', related_name='additem4')
     item_5 = models.ForeignKey('items.Item', related_name='additem5')
 
+    class Meta:
+        unique_together = ("player_match_summary", "unit_name")
+
 
 class PickBan(models.Model):
     match = models.ForeignKey('Match')
@@ -359,6 +376,7 @@ class PickBan(models.Model):
 
     class Meta:
         ordering = ['match', 'order']
+        unique_together = ("match", "order")
 
 
 class LeaverStatus(models.Model):
@@ -376,12 +394,13 @@ class LeaverStatus(models.Model):
 
 class SkillBuild(models.Model):
     player_match_summary = models.ForeignKey('PlayerMatchSummary')
+    level = models.IntegerField()
     ability = models.ForeignKey('heroes.Ability')
     time = models.IntegerField()
-    level = models.IntegerField()
 
     class Meta:
         ordering = ['player_match_summary', 'level']
+        unique_together = ("player_match_summary", "level")
 
     def __unicode__(self):
         return u"{0}, ({1})".format(

@@ -1,7 +1,7 @@
 {% extends "row_base.html" %}
 {% block title %}Match List{% endblock title %}
 
-{% block content %}
+{% block aligned_content %}
     <h1>Match List</h1>
 
     {% if request.user.is_authenticated %}
@@ -19,4 +19,4 @@
 
     {% include "_pagination.html" with pages_list=page_obj page_links_to_display=object_list.paginator.page_range_with_ellipses %}
 
-{% endblock content %}
+{% endblock aligned_content %}

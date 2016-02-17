@@ -75,13 +75,16 @@ class TestLiveGames(TestCase):
             live_side_data
         )
 
-    def test_merge_logos(self):
-        urldata = self.task._setup(self.good_json)
+    # All of this code is ripe for purge as an abandoned feature,
+    # but no time for that code surgery now.
 
-        # Or else get an error from get_or_create w/ sqlite
-        data = self.task._merge_logos(urldata)
+    # def test_merge_logos(self):
+    #     urldata = self.task._setup(self.good_json)
 
-        self.assertEqual(data, live_merge_logos)
+    #     # Or else get an error from get_or_create w/ sqlite
+    #     data = self.task._merge_logos(urldata)
+
+    #     self.assertEqual(data, live_merge_logos)
 
     def test_get_states(self):
         urldata = self.task._setup(self.good_json)

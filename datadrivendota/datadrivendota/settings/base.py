@@ -44,10 +44,6 @@ path.append(DJANGO_ROOT)
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = getenv('DEBUG', False) == 'True'
 
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
-TEMPLATE_DEBUG = DEBUG
-# END DEBUG CONFIGURATION
-
 
 # MANAGER CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
@@ -176,6 +172,7 @@ TEMPLATES = [
         ],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
                 # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
                 # list if you haven't customized them:
@@ -257,7 +254,7 @@ THIRD_PARTY_APPS = (
     'corsheaders',
     'django_forms_bootstrap',
     'rest_framework',
-    'pinax.stripe',
+    'djstripe',
 )
 
 # Apps specific for this project go here.
@@ -376,37 +373,25 @@ NOSE_ARGS = [
 # START STRIPE CONFIGURATION
 STRIPE_PUBLIC_KEY = getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
-PINAX_STRIPE_PUBLIC_KEY = STRIPE_PUBLIC_KEY
-PINAX_STRIPE_PRIVATE_KEY = STRIPE_SECRET_KEY
 
-PAYMENTS_PLANS = {
+DJSTRIPE_PLANS = {
     "monthly": {
         "stripe_plan_id": "ddd-month",
         "name": "DDD Pro ($3/month)",
         "description": "The monthly subscription plan to DataDrivenDota",
-        "price": 3,
+        "price": 300,
         "interval": "month",
         "currency": "usd"
     },
-    "annually": {
+    "yearly": {
         "stripe_plan_id": "ddd-year",
-        "name": "DDD Pro ($30/year)",
+        "name": "DDD Pro ($18/year)",
         "description": "The annual subscription plan to DataDrivenDota",
-        "price": 30,
+        "price": 1800,
         "interval": "year",
         "currency": "usd"
     }
 }
-
-PINAX_STRIPE_DEFAULT_PLAN = getenv('STRIPE_DEFAULT_PLAN', 'ddd-month')
-
-SUBSCRIPTION_REQUIRED_EXCEPTION_URLS = [
-    'heroes:index',
-    'accounts:home',
-    'payments_subscribe',
-]
-
-SUBSCRIPTION_REQUIRED_REDIRECT = 'payments_subscribe'
 # END STRIPE CONFIGURATION
 
 # START REST CONFIGURATION

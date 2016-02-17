@@ -22,7 +22,7 @@
   {% if pms.hero.mugshot %}
     <img src="{{ pms.hero.mugshot_url }}" alt="{{ hero.name }}"
       class="player-match-portrait
-      {% if pms.match.parsed_with %}
+      {% if pms.match.is_parsed %}
         parsed-match
       {% endif %}
       ">

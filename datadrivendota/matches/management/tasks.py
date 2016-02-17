@@ -136,7 +136,7 @@ class UpdateMatch(ApiFollower):
             lm.failed = True
             lm.save()
         except LiveMatch.DoesNotExist:
-            logging.warning(
+            logging.info(
                 'No live match to fail. ({0})'.format(
                     api_context.match_id
                 )
@@ -358,7 +358,7 @@ def upload_match_summary(players, parent_match, refresh_records):
             'kills': player['kills'],
             'deaths': player['deaths'],
             'assists': player['assists'],
-            'gold': player['gold'],
+            'gold': player.get('gold', None),
             'last_hits': player['last_hits'],
             'denies': player['denies'],
             'gold_per_min': player['gold_per_min'],

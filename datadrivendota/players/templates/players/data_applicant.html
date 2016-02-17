@@ -5,7 +5,7 @@
 
 {% block page_title %}Data Import Request{% endblock page_title %}
 
-{% block content %}
+{% block aligned_content %}
     {% if success %}
         <div class = 'alert alert-success'>Congrats!  Your data has been added to the list.</div>
     {% elif preexisting%}
@@ -44,4 +44,4 @@
           </div>
       </div>
     </div>
-{% endblock content %}
+{% endblock aligned_content %}

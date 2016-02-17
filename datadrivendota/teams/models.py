@@ -10,7 +10,7 @@ class Team(models.Model):
 
     """ Pro team data. """
 
-    steam_id = models.IntegerField(unique=True)
+    steam_id = models.BigIntegerField(unique=True)
     name = models.CharField(max_length=200, null=True)
     tag = models.CharField(max_length=200, null=True)
     created = models.IntegerField(null=True)

@@ -4,16 +4,16 @@
 {% block title %}
     Leagues!
 {% endblock title %}
-{% block content %}
+{% block aligned_content %}
     <h3>{{tier}}</h3>
     {% for league in league_list %}
         <div class='col-md-4'>
             {% include "leagues/_league_card.html" %}
         </div>
     {% endfor %}
-{% endblock content %}
+{% endblock aligned_content %}
 
-{% block content_foot %}
+{% block aligned_content_foot %}
     {% include "_pagination.html" with pages_list=league_list page_links_to_display=league_list.paginator.page_range_with_ellipses %}
-{% endblock content_foot  %}
+{% endblock aligned_content_foot  %}
 
