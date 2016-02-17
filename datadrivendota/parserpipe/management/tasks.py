@@ -543,7 +543,7 @@ class UpdateParseEnd(Task):
 
     def bookkeep(self, match_id):
         mr = MatchRequest.objects.get_or_create(match_id=match_id)[0]
-        mr.status = MatchRequest.PARSED
+        mr.status = MatchRequest.COMPLETE
         mr.save()
 
         match = Match.objects.filter(steam_id=match_id)
