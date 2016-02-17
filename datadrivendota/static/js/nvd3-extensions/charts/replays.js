@@ -418,6 +418,15 @@ var winnow = function(data, index){
   return data;
 }
 
+function findById(source, target_hash, hasher) {
+  for (var i = 0; i < source.length; i++) {
+    if (hasher(source[i]) === target_hash) {
+      return i;
+    }
+  }
+  throw "Couldn't find object with id: " + id;
+}
+
 /**
  * Merges two event series.
  * @param {array} data - The array of event series.
@@ -442,15 +451,13 @@ var combat_merge = function(data, hasher, null_time){
       'x': x.offset_time
     };
     if (y_counter[hash]>0) {
-      var y_index = y_data.findIndex(function(y_item){
-        var this_hash = hasher(y_item);
-        return this_hash===hash;
-      });
+
+      var y_index = findById(y_data, hash, hasher);
 
       if(y_index===undefined) console.log('Freak');
 
       return_obj['y'] = y_data[y_index].offset_time;
-      y_data = winnow(y_data, y_index);
+      y_data.splice(y_index, 1);
       y_counter[hash]-=1;
     }else{
       return_obj['y'] = null_time;
