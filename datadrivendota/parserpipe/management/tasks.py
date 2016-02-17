@@ -535,7 +535,7 @@ class UpdateParseEnd(Task):
         mr.status = MatchRequest.PARSED
         mr.save()
 
-        match = Match.objects.filter(id=match_id)
+        match = Match.objects.filter(steam_id=match_id)
         match.update(parsed_with=settings.PARSER_VERSION)
         logger.info('Parse Success!')
 
