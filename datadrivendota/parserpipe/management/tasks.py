@@ -474,7 +474,13 @@ class UpdatePmsReplays(Task):
 
                 if msg['time'] in indicies:
                     indicies[msg['time']] += msg.get('value', 1)
-
+                else:
+                    logging.error("""
+                        For {0}, got msg time {1} not between {2} - {3}
+                    """.format(
+                            field, msg['time'], min_time, max_time
+                        )
+                    )
             # Make them cumulative
             for idx in indicies.iterkeys():
                 indicies[idx] += indicies.get(idx-1, 0)
