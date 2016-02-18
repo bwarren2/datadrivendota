@@ -162,8 +162,8 @@ class Config(object):
         },
         'parserpipe.management.tasks.ReadParseResults': {
             'routes': {
-                'exchange': 'parsing',
-                'routing_key': 'parsing'
+                'exchange': 'integrity',
+                'routing_key': 'integrity'
             },
             'annotations': {
                 'max_retries': 0,
