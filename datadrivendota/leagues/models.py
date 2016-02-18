@@ -152,8 +152,3 @@ class LiveMatch(models.Model):
         return self.created_at < timezone.now() - timedelta(
             days=settings.FAILED_LIVEMATCH_KEEP_DAYS
         )
-
-    class Meta:
-        unique_together = (
-            'league_id', 'steam_id', 'radiant_team', 'dire_team'
-        )

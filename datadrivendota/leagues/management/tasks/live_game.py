@@ -97,13 +97,15 @@ class UpdateLiveGames(ApiFollower):
             )
         else:
             LiveMatch.objects.get_or_create(
-                league_id=formatted_game['game']['league_id'],
                 steam_id=formatted_game['game']['match_id'],
-                radiant_team=formatted_game.get('radiant', {}).get(
-                    'team_id', None
-                ),
-                dire_team=formatted_game.get('dire', {}).get('team_id', None),
                 defaults={
+                    'radiant_team': formatted_game.get(
+                        'radiant', {}
+                    ).get('team_id', None),
+                    'dire_team': formatted_game.get(
+                        'dire', {}
+                    ).get('team_id', None),
+                    'league_id': formatted_game['game']['league_id'],
                     'radiant_logo_ugc':
                         formatted_game.get('radiant', {}).get(
                             'team_logo', None
