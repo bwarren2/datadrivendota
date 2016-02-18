@@ -424,6 +424,10 @@ class Config(object):
             'task': 'players.management.tasks.MirrorClientMatches',
             'schedule': timedelta(minutes=15),
         },
+        'check-parse-result-fast': {
+            'task': 'parserpipe.management.tasks.ReadParseResults',
+            'schedule': timedelta(minutes=10),
+        },
         'reflect-live-games-fast': {
             'task': 'leagues.management.tasks.live_game.MirrorLiveGames',
             'schedule': timedelta(minutes=5),
