@@ -4,6 +4,12 @@
 
   <h2 class='match-card-header'>
     <a href="/matches/{{match.steam_id}}">Match: {{match.steam_id}}</a>
+    <i
+      class="glyphicon glyphicon-copy clippable"
+      title='Copy match id'
+      data-clipboard-text="{{match.steam_id}}"
+    ></i>
+
     <small>
       {% if match.radiant_team.name and match.dire_team.name %}
         {{match.radiant_team.name}} vs {{match.dire_team.name}}

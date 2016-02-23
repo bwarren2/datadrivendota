@@ -6,6 +6,19 @@ $(function () {
         theme: 'future'
     };
 
+    var clippables = new Clipboard('.clippable');
+
+    clippables.on('success', function(e) {
+        e.clearSelection();
+        console.log('Copied!')
+        console.log(e);
+        Messenger().post({
+          message: 'Copied '+ e.text,
+          type: 'info',
+          hideAfter: 2
+        });
+
+    });
 
     $('#contact-link').click(function () {
         if ($('#IntercomDefaultWidget').length) {

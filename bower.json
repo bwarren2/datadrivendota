@@ -25,7 +25,8 @@
     "eldarion-ajax": "git+https://github.com/eldarion/eldarion-ajax#37a7fe46a2e0acbc2a98316a6f1ffc94c52782d5",
     "sprintf": "~1.0.2",
     "moment": "~2.10.6",
-    "lodash": "~3.10.1"
+    "lodash": "~3.10.1",
+    "clipboard": "~1.5.8"
   },
   "devDependencies": {
     "d3": "~3.5.6",
