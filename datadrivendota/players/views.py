@@ -11,8 +11,7 @@ class PlayerIndexView(ListView):
     """A list of active or paid users."""
 
     paginate_by = 30
-    queryset = Player.objects.all()
-    # queryset = Player.objects.filter(steam_id__in=get_relevant_player_ids())
+    queryset = Player.objects.filter(steam_id__in=get_relevant_player_ids())
 
 
 class ProIndexView(ListView):
