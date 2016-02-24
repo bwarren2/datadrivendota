@@ -42,13 +42,13 @@ def get_customer_player_ids():
 
 def get_active_user_player_ids(since=timedelta(days=14)):
     steam_ids = []
-#     for user in get_active_users():
-#         try:
-#             id = user.userprofile.steam_id
-#             if id is not None:
-#                 steam_ids.append(id)
-#         except AttributeError:
-#                 pass
+    for user in get_active_users():
+        try:
+            id = user.userprofile.steam_id
+            if id is not None:
+                steam_ids.append(id)
+        except AttributeError:
+                pass
     return steam_ids
 
 def get_relevant_player_ids():
