@@ -40,7 +40,7 @@ def get_customer_player_ids():
     # Tech debt: hardcode our testers as though they are subscribers.
     return ids
 
-# def get_active_user_player_ids(since=timedelta(days=14)):
+def get_active_user_player_ids(since=timedelta(days=14)):
 #     steam_ids = []
 #     for user in get_active_users():
 #         try:
@@ -50,7 +50,7 @@ def get_customer_player_ids():
 #         except AttributeError:
 #                 pass
 #     return steam_ids
-
+    pass
 
 def get_relevant_player_ids():
     lst = get_active_user_player_ids()
