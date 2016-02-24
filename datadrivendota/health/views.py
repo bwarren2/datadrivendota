@@ -48,7 +48,7 @@ class CardIndexView(SuperuserRequiredMixin, TemplateView):
             .order_by('-start_time')[0]
         kwargs['summary'] = PlayerMatchSummary.objects.all().select_related()\
             .order_by('-id')[0]
-        kwargs['player'] = Player.objects.filter(updated=True)\
+        kwargs['player'] = Player.objects.filter()\
             .select_related()[0]
         return super(CardIndexView, self).get_context_data(**kwargs)
 

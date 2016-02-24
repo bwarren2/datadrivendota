@@ -346,6 +346,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.user.create_user',
     'social.pipeline.social_auth.associate_user',
     'accounts.pipeline.user_password',
+    'accounts.pipeline.make_userprofile',
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details',
 )
@@ -414,7 +415,6 @@ KEEN_WRITE_KEY = getenv('KEEN_WRITE_KEY')
 # Project specific constants used in tasks
 LOOKBACK_UPDATE_DAYS = 3  # The window we consider for re-checking things.
 HERO_SKILL_MATCH_COUNT = 2  # How many matches to add per hero skill level
-CLIENT_MATCH_COUNT = 2  # How many client matches to get each pull
 VALVE_CDN_PATH = 'http://cdn.dota2.com/apps/570/'
 UPDATE_LAG_UTC = 60 * 60 * 24 * 3  # 3 Days
 # We store live matches.  Wait this many minutes after storage before expecting
@@ -424,6 +424,7 @@ LIVE_MATCH_LOOKBACK_MINUTES = 90
 FAILED_LIVEMATCH_KEEP_DAYS = 2
 # End project specific constants used in tasks
 JAVA_QUEUE_DURABILITY = True
+TESTERS = [103611462, 11029080, 66289584, 98193589, 85045426, 68083913]
 
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accounts/done/'

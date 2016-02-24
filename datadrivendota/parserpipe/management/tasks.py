@@ -19,6 +19,7 @@ from parserpipe.models import MatchRequest
 from datadrivendota.management.tasks import ValveApiCall, ApiContext
 from matches.management.tasks import UpdateMatch
 from matches.models import Match, PlayerMatchSummary
+from accounts.models import get_customer_player_ids
 
 
 from .combat_log_filters import combatlog_filter_map
@@ -675,3 +676,23 @@ def save_msgstream(match_id, dataslice, msgs, facet, log_type):
 
     filename = shard_filename(match_id, dataslice, facet, log_type)
     s3_parse(buff, filename)
+
+
+class CreateMatchRequests(Task):
+
+    def run(self):
+
+        client_ids = self.get_player_ids()
+        self.make_match_requests(client_ids)
+
+    def get_player_ids(self):
+        return get_customer_player_ids()
+
+    def make_match_requests(self, steam_ids):
+        matches = Match.unparsed.filter(
+            playermatchsummary__player__steam_id__in=steam_ids
+        )
+        for match in matches:
+            mr, created = MatchRequest.objects.get_or_create(match_id=match)
+            if created:
+                logger.info('MatchRequest created for {0}'.format(mr))

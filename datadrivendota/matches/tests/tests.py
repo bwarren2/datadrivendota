@@ -217,3 +217,31 @@ class TestEmptyMatch(TestCase):
         )
 
         self.assertEqual(Match.objects.all().count(), 0)
+
+
+class TestMatchManagers(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+
+        super(TestMatchManagers, cls).setUpClass()
+        cls.unparsed_match = mommy.make_recipe(
+            'matches.match', parsed_with=None
+        )
+        cls.parsed_match = mommy.make_recipe(
+            'matches.match', parsed_with='1.0'
+        )
+
+    def test_unparsed(self):
+
+        self.assertQuerysetEqual(
+            Match.unparsed.all(),
+            map(repr, Match.objects.filter(id=self.unparsed_match.id))
+        )  # Because aQsE compares reprs.
+
+    def test_parsed(self):
+
+        self.assertQuerysetEqual(
+            Match.parsed.all(),
+            map(repr, Match.objects.filter(id=self.parsed_match.id))
+        )  # Because aQsE compares reprs.

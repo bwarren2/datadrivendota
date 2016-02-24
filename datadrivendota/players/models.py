@@ -23,9 +23,6 @@ class Player(models.Model):
         help_text='If this is a pro, what are they known as?',
         null=True
     )
-    updated = models.BooleanField(
-        help_text='Do we update this person and scrape them?',
-        default=False)
     last_scrape_time = models.IntegerField(
         help_text='Unix time of last match scrape start',
         default=0

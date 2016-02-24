@@ -18,7 +18,7 @@ class TestUrlconf(TestCase):
         self.hero = mommy.make_recipe('heroes.hero', visible=True)
         self.match = mommy.make_recipe('matches.match')
         self.pms = mommy.make_recipe('matches.playermatchsummary')
-        self.player = mommy.make_recipe('players.player', updated=True)
+        self.player = mommy.make_recipe('players.player')
 
     def test_url_redirect(self):
 

@@ -4,9 +4,12 @@ from time import time
 from celery import Task, chain
 
 from django.conf import settings
+
 from players.models import Player
-from teams.models import Team
-from teams.models import assemble_pros
+from teams.models import Team, assemble_pros
+from accounts.models import (
+    get_active_users, get_customer_player_ids, get_active_user_player_ids
+)
 
 from datadrivendota.management.tasks import (
     BaseTask,
@@ -30,22 +33,21 @@ class MirrorClientPersonas(Task):
         of 50.  The profile update API actually supports up to 100
         """
         list_send_length = 50
-        users = Player.objects.filter(updated=True)
+        users = get_relevant_player_ids()
 
         teams = Team.objects.all()
         pros = assemble_pros(teams)
 
-        check_list = [user.steam_id for user in users]
-        check_list.extend(pros)
+        users.extend(pros)
 
         querylist = []
 
-        for counter, user in enumerate(check_list, start=1):
+        for counter, user in enumerate(users, start=1):
             id_64_bit = str(user + settings.ADDER_32_BIT)
             querylist.append(id_64_bit)
 
             # if our list is list_send_length long or we have reached the end
-            if counter % list_send_length == 0 or counter == len(check_list):
+            if counter % list_send_length == 0 or counter == len(users):
                 steamids = ",".join(querylist)
                 vac = ValveApiCall()
                 upp = UpdateClientPersonas()
@@ -111,9 +113,7 @@ class MirrorPlayerData(BaseTask):
             logger.error("Needed an account id, had none, failed.")
         player = Player.objects.get_or_create(
             steam_id=api_context.account_id
-        )[0]
-        player.updated = True
-        player.save()
+        )
         if api_context.matches_requested is None:
             api_context.matches_requested = 500
 
@@ -182,26 +182,22 @@ class UpdateProNames(ApiFollower):
             player.save()
 
 
-class MirrorClientMatches(Task):
+class MirrorSteamidMatches(Task):
+
+    MATCH_COUNT = 2
 
     def run(self):
-        """
-        Get matches for clients.
+        client_steam_ids = self.get_users()
+        self.make_shallow_requests(client_steam_ids)
 
-        Go through the users for whom update is True and pull match histories
-        since their last scrape time
-        """
-        users = Player.objects.filter(updated=True).select_related()
-        check_list = [user for user in users]
-
-        for counter, user in enumerate(check_list, start=1):
-
+    def make_shallow_requests(self, steam_ids):
+        logger.info('Doing a shallow pull for {0}'.format(steam_ids))
+        for steam_id in steam_ids:
             context = ApiContext()
-            context.account_id = user.steam_id
-            context.matches_requested = settings.CLIENT_MATCH_COUNT
-            context.matches_desired = settings.CLIENT_MATCH_COUNT
+            context.account_id = steam_id
+            context.matches_requested = self.MATCH_COUNT
+            context.matches_desired = self.MATCH_COUNT
             context.start_scrape_time = time()
-            context.last_scrape_time = user.last_scrape_time
 
             vac = ValveApiCall()
             rpr = CycleApiCall()
@@ -209,3 +205,19 @@ class MirrorClientMatches(Task):
                 mode='GetMatchHistory',
                 api_context=context
             ), rpr.s()).delay()
+
+
+class MirrorClientMatches(MirrorSteamidMatches):
+
+    MATCH_COUNT = 1
+
+    def get_users(self):
+        return get_customer_player_ids()
+
+
+class MirrorUserMatches(MirrorSteamidMatches):
+
+    MATCH_COUNT = 3
+
+    def get_users(self):
+        return get_active_user_player_ids()

@@ -36,7 +36,7 @@ class MatchRequest(models.Model):
         choices=STATUS_CHOICES, default=SUBMITTED
     )
     match_id = models.BigIntegerField(unique=True)
-    requester = models.ForeignKey(User)
+    requester = models.ForeignKey(User, null=True)
 
     # Intermediate step fields if we want em.
     valve_replay_url = models.URLField(blank=True, null=True)
