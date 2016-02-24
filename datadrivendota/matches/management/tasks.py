@@ -616,9 +616,6 @@ class CycleApiCall(ApiFollower):
                         api_context.account_id
                     )
                 )
-                p = Player.objects.get(steam_id=api_context.account_id)
-                p.updated = False
-                p.save()
                 return True
 
             elif json_data['status'] == 1:

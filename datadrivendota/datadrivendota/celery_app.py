@@ -312,6 +312,12 @@ class Config(object):
                 'routing_key': 'integrity'
             }
         },
+        'players.management.tasks.MirrorUserMatches': {
+            'routes': {
+                'exchange': 'integrity',
+                'routing_key': 'integrity'
+            }
+        },
         'players.management.tasks.MirrorClientPersonas': {
             'routes': {
                 'exchange': 'integrity',
@@ -340,6 +346,12 @@ class Config(object):
             'routes': {
                 'exchange': 'db',
                 'routing_key': 'db'
+            }
+        },
+        'parserpipe.management.tasks.CreateMatchRequests': {
+            'routes': {
+                'exchange': 'integrity',
+                'routing_key': 'integrity'
             }
         },
         'teams.management.tasks.MirrorRecentTeams': {
@@ -412,6 +424,10 @@ class Config(object):
             'task': 'matches.management.tasks.CheckMatchIntegrity',
             'schedule': timedelta(hours=1),
         },
+        'mirror-user-matches': {
+            'task': 'players.management.tasks.MirrorUserMatches',
+            'schedule': timedelta(minutes=60),
+        },
         'reflect-recent-matches-hourly': {
             'task': 'matches.management.tasks.MirrorRecentMatches',
             'schedule': timedelta(minutes=30),
@@ -420,9 +436,13 @@ class Config(object):
             'task': 'matches.management.tasks.UpdateMatchValidity',
             'schedule': timedelta(minutes=30),
         },
-        'reflect-clients-fast': {
+        'mirror-client-matches': {
             'task': 'players.management.tasks.MirrorClientMatches',
-            'schedule': timedelta(minutes=15),
+            'schedule': timedelta(minutes=3),
+        },
+        'create-match-requests': {
+            'task': 'parserpipe.management.tasks.CreateMatchRequests',
+            'schedule': timedelta(minutes=3),
         },
         'check-parse-result-fast': {
             'task': 'parserpipe.management.tasks.ReadParseResults',

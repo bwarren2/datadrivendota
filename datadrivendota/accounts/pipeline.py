@@ -1,6 +1,7 @@
 from django.shortcuts import redirect
 from django.contrib import messages
 from social.pipeline.partial import partial
+from .models import UserProfile
 
 
 @partial
@@ -42,3 +43,9 @@ def user_password(
                 strategy.request, messages.WARNING, 'Incorrect password :/'
             )
             return redirect('login')
+
+
+def make_userprofile(
+    request, strategy, backend, user, is_new=False, *args, **kwargs
+):
+    UserProfile.objects.get_or_create(user=user)

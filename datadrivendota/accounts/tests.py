@@ -12,6 +12,7 @@ from model_mommy import mommy
 from .models import (
     get_active_users,
     get_inactive_users,
+    UserProfile
 )
 User = get_user_model()
 
@@ -78,6 +79,14 @@ class TestAuth(TestCase):
         self.assertEqual(
             resp.context['request'].user.username,
             username
+        )
+
+        # Newly made users should get userprofiles
+        self.assertEqual(
+            UserProfile.objects.filter(
+                user=resp.context['request'].user
+            ).count(),
+            1
         )
 
         resp = c.get(reverse('logout'), follow=True)

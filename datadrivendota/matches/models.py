@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from django.db import models
 
 from .querysets import PMSQuerySet, MatchFilteredQuerySet, FilteredQuerySet
+from .managers import Unparsed, Parsed
 from .model_fields import ReplayFragmentField
 
 
@@ -101,6 +102,8 @@ class Match(models.Model):
     )
 
     objects = FilteredQuerySet.as_manager()
+    unparsed = Unparsed()
+    parsed = Parsed()
 
     class Meta:
         verbose_name_plural = 'matches'

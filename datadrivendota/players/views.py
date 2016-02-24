@@ -2,15 +2,17 @@
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 
+from accounts.models import get_relevant_player_ids
 from .models import Player
 
 
 class PlayerIndexView(ListView):
 
-    """A list of all updated players, aka clients."""
+    """A list of active or paid users."""
 
     paginate_by = 30
-    queryset = Player.objects.filter(updated=True)
+    # Player.objects.all()
+    queryset = Player.objects.filter(steam_id__in=get_relevant_player_ids())
 
 
 class ProIndexView(ListView):
