@@ -700,7 +700,13 @@ class CreateMatchRequests(Task):
         ).values_list('steam_id', flat=True)
 
     def make_match_requests(self, matches):
+
+        any_created = False
         for match in matches:
             mr, created = MatchRequest.objects.get_or_create(match_id=match)
             if created:
+                any_created = True
                 logger.info('MatchRequest created for {0}'.format(mr))
+
+        if any_created:
+            KickoffMatchRequests().delay()
