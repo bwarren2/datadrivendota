@@ -699,7 +699,7 @@ class CreateMatchRequests(Task):
             start_time__gte=since_time
         ).values_list('steam_id', flat=True)
 
-    def make_match_requests(self, match_ids):
+    def make_match_requests(self, matches):
         for match in matches:
             mr, created = MatchRequest.objects.get_or_create(match_id=match)
             if created:
