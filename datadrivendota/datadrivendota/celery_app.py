@@ -151,6 +151,15 @@ class Config(object):
                 'max_retries': 0,
             }
         },
+        'parserpipe.management.tasks.CreateMatchRequests': {
+            'routes': {
+                'exchange': 'parsing',
+                'routing_key': 'parsing'
+            },
+            'annotations': {
+                'max_retries': 0,
+            }
+        },
         'parserpipe.management.tasks.MergeMatchRequestReplay': {
             'routes': {
                 'exchange': 'parsing',
@@ -346,12 +355,6 @@ class Config(object):
             'routes': {
                 'exchange': 'db',
                 'routing_key': 'db'
-            }
-        },
-        'parserpipe.management.tasks.CreateMatchRequests': {
-            'routes': {
-                'exchange': 'integrity',
-                'routing_key': 'integrity'
             }
         },
         'teams.management.tasks.MirrorRecentTeams': {
