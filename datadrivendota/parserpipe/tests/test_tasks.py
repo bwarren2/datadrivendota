@@ -1,13 +1,20 @@
 
+import time
 import responses
 from model_mommy import mommy
+from datetime import timedelta
 
 from django.test import TestCase
 from django.db.models import Q
 from django.utils.decorators import method_decorator
+from django.utils import timezone
 
 from parserpipe.management.tasks import (
-    KickoffMatchRequests, CreateMatchParse, UpdatePmsReplays, UpdateParseEnd
+    KickoffMatchRequests,
+    CreateMatchParse,
+    UpdatePmsReplays,
+    UpdateParseEnd,
+    CreateMatchRequests
 )
 
 from parserpipe.models import MatchRequest
@@ -218,3 +225,66 @@ class TestAggregateDataseries(TestCase):
                 {'all_income': 962, 'offset_time': 1}
             ]
         )
+
+
+class TestMatchRequestCreation(TestCase):
+
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestMatchRequestCreation, cls).setUpClass()
+        cls.since = timezone.now() - timedelta(days=1)
+        cls.client_steam_id = 1000000
+        cls.non_client_steam_id = 999999
+        cls.client_ids = [cls.client_steam_id]
+        cls.client_player = mommy.make_recipe(
+            'players.player', steam_id=cls.client_steam_id
+        )
+        cls.non_client_player = mommy.make_recipe(
+            'players.player', steam_id=cls.non_client_steam_id
+        )
+
+        recent_start_time = time.mktime(timezone.now().timetuple())
+        cls.recent_match = mommy.make_recipe(
+            'matches.match',
+            steam_id=22,
+            parsed_with=None,
+            start_time=recent_start_time
+        )
+        cls.recent_pms = mommy.make_recipe(
+            'matches.playermatchsummary',
+            match=cls.recent_match,
+            player=cls.client_player
+        )
+
+        distant_dt = timezone.now()-timedelta(weeks=10)
+        distant_start_time = time.mktime(distant_dt.timetuple())
+        cls.distant_match = mommy.make_recipe(
+            'matches.match',
+            steam_id=11,
+            parsed_with=None,
+            start_time=distant_start_time
+        )
+        cls.recent_pms = mommy.make_recipe(
+            'matches.playermatchsummary',
+            match=cls.distant_match,
+            player=cls.client_player
+        )
+
+        cls.nonclient_match = mommy.make_recipe(
+            'matches.match',
+            steam_id=33,
+            parsed_with=None,
+            start_time=recent_start_time
+        )
+        cls.recent_pms = mommy.make_recipe(
+            'matches.playermatchsummary',
+            match=cls.nonclient_match,
+            player=cls.non_client_player
+        )
+
+
+    def test_match_discovery(self):
+        task = CreateMatchRequests()
+        found = task.get_match_ids(self.client_ids, self.since)
+        self.assertEqual(list(found), [22])

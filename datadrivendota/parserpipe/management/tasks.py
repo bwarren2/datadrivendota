@@ -3,15 +3,18 @@ import time
 import pika
 import sys
 import json
+import time
 import requests
 from io import BytesIO
 from collections import Counter
+from datetime import timedelta
 
 from celery import Task, chain, chord
 
 from django.core.files import File
 from django.conf import settings
 from django.db.models import Q
+from django.utils import timezone
 
 from utils import gzip_str, gunzip_str
 from utils.file_management import s3_parse
@@ -681,17 +684,22 @@ def save_msgstream(match_id, dataslice, msgs, facet, log_type):
 class CreateMatchRequests(Task):
 
     def run(self):
-
+        since = timezone.now() - timedelta(days=1)
         client_ids = self.get_player_ids()
-        self.make_match_requests(client_ids)
+        matches = self.get_match_ids(client_ids)
+        self.make_match_requests(matches, since)
 
     def get_player_ids(self):
         return get_customer_player_ids()
 
-    def make_match_requests(self, steam_ids):
-        matches = Match.unparsed.filter(
-            playermatchsummary__player__steam_id__in=steam_ids
-        )
+    def get_match_ids(self, client_ids, since):
+        since_time = time.mktime(since.timetuple())
+        return Match.unparsed.filter(
+            playermatchsummary__player__steam_id__in=client_ids,
+            start_time__gte=since_time
+        ).values_list('steam_id', flat=True)
+
+    def make_match_requests(self, match_ids, since):
         for match in matches:
             mr, created = MatchRequest.objects.get_or_create(match_id=match)
             if created:
