@@ -686,8 +686,8 @@ class CreateMatchRequests(Task):
     def run(self):
         since = timezone.now() - timedelta(days=1)
         client_ids = self.get_player_ids()
-        matches = self.get_match_ids(client_ids)
-        self.make_match_requests(matches, since)
+        matches = self.get_match_ids(client_ids, since)
+        self.make_match_requests(matches)
 
     def get_player_ids(self):
         return get_customer_player_ids()
@@ -699,7 +699,7 @@ class CreateMatchRequests(Task):
             start_time__gte=since_time
         ).values_list('steam_id', flat=True)
 
-    def make_match_requests(self, match_ids, since):
+    def make_match_requests(self, match_ids):
         for match in matches:
             mr, created = MatchRequest.objects.get_or_create(match_id=match)
             if created:
