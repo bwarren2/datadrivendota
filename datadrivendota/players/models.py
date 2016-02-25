@@ -3,6 +3,7 @@ from .validators import validate_32bit
 from settings.base import ADDER_32_BIT, ANONYMOUS_ID
 from django.utils.encoding import smart_str
 from matches.models import PlayerMatchSummary, Match
+from accounts.models import get_customer_player_ids
 
 from .managers import TI4Manager
 
@@ -82,6 +83,13 @@ class Player(models.Model):
         except IndexError:
             total = 0
         return total
+
+    @property
+    def is_subscribed(self):
+        if self.steam_id in get_customer_player_ids():
+            return True
+        else:
+            return False
 
     def summaries(self, count):
         return PlayerMatchSummary.objects.filter(
