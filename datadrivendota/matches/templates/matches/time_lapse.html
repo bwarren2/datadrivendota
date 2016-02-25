@@ -19,7 +19,7 @@
           <div class='col-md-6'>
             <div class="form-group">
               <label>Match IDs</label>
-              <select id='pmses' multiple='multiple' style='width:200px'></select>
+              <select id='shards' multiple='multiple' style='width:200px'></select>
             </div>
           </div>
           <div class='col-md-6'>
@@ -235,11 +235,11 @@
 <script type="text/javascript">
 $(function(){
 
-    inputs.pms_select2('#pmses', true);
+    inputs.pms_select2('#shards', true);
 
     $('#chart-button').click(function(){
 
-      var pmses = $('#pmses').select2('data');
+      var shards = $('#shards').select2('data');
       var destination = '#'+$('#destination :selected').val();
       var facet = $('#data :selected').val();
 
@@ -251,7 +251,7 @@ $(function(){
       };
 
       d7.extensions.charts.replays.state_lineup(
-        pmses, facet, destination, params
+        shards, facet, destination, params
       );
     })
 

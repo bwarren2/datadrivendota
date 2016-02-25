@@ -36336,16 +36336,15 @@ $(function () {
       if (log.loading) return "";
 
       var markup = "<div class='select2-result-log clearfix'>" +
-        // "<div class='select2-result-pms__avatar'><img src='" + pms.hero.image_url + "' /></div>" +
         "<div class='select2-result-pms__meta'>" +
-          "<div class='select2-result-pms__title'>" + log.hero.name+", M#"+log.match.steam_id + "</div>"+
+          "<div class='select2-result-pms__title'>" + log.name+", M#"+log.match_id + "</div>"+
           "</div></div>";
 
       return markup;
     }
 
     function formatPmsSelection (log) {
-      return log.hero.name+', M#'+log.match.steam_id;
+      return log.name+', M#'+log.match_id;
     }
 
 
@@ -36353,7 +36352,7 @@ $(function () {
 
         $(selector).select2({
           ajax: {
-            url: "/rest-api/player-match-summary/",
+            url: "/rest-api/parse-shards/",
             dataType: 'json',
             delay: 250,
             multiple: multiple,
@@ -36366,8 +36365,13 @@ $(function () {
             processResults: function (data, params) {
               params.page = params.page || 1;
 
+              // If you don't provide an id, the select is disabled by default.
+              data.map(function(d, i){
+                d.id = i+1;
+                return d;
+              })
+
               return {
-                // If you don't provide an id, the select is disabled by default.
                 results: data,
                 pagination: {
                   more: (params.page * 30) < data.total_count

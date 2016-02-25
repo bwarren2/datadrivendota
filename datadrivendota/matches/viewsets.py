@@ -1,7 +1,13 @@
-from rest_framework import viewsets, filters
+import json
+
+from rest_framework import viewsets, filters, views
 from rest_framework_extensions.cache.decorators import cache_response
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from rest_framework import status
 
 from .models import Match, PlayerMatchSummary, PickBan, SkillBuild, GameMode
+from .rest_models import ParseShard
 
 from .serializers import (
     MatchSerializer,
@@ -9,6 +15,7 @@ from .serializers import (
     SkillBuildSerializer,
     FastMatchPickBansSerializer,
     PickbanSerializer,
+    ParseShardSerializer,
 )
 
 
@@ -184,3 +191,56 @@ class SkillBuildViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset[:self.page_size]
 
         return queryset
+
+
+class ParseShardView(views.APIView):
+    serializer_class = ParseShardSerializer
+    page_size = 13
+    page_size_query_param = 'page_size'
+    max_page_size = 130
+
+    def get(self, request, *args, **kwargs):
+
+        try:
+            match_id = int(self.request.query_params.get('match_id', None))
+            match = Match.objects.get(steam_id=match_id)
+        except (ValueError, TypeError):
+            return Response(
+                JSONRenderer().render([]),
+                status=status.HTTP_404_NOT_FOUND,
+                content_type='application/json'
+            )
+
+        if match.is_parsed:
+            queryset = PlayerMatchSummary.objects.filter(
+                match__steam_id=match_id
+            )
+            data = self.jsonify_data(queryset, match_id)
+            return Response(
+                data,
+                status=status.HTTP_200_OK,
+                content_type='application/json'
+            )
+        else:
+            return Response(
+                JSONRenderer().render([]),
+                status=status.HTTP_404_NOT_FOUND,
+                content_type='application/json'
+            )
+
+
+    def jsonify_data(self, queryset, match_id):
+        data = []
+        for pms in queryset:
+            shard = ParseShard()
+            shard.merge_pms(pms)
+            data.append(ParseShardSerializer(shard).data)
+
+        radiant_shard = ParseShard('radiant', 'radiant', match_id, 'Radiant')
+        dire_shard = ParseShard('dire', 'dire', match_id, 'Dire')
+        diff_shard = ParseShard('diff', 'diff', match_id, 'Rad-Dire Diff')
+
+        for extra_shard in [radiant_shard, dire_shard, diff_shard]:
+            data.append(ParseShardSerializer(extra_shard).data)
+
+        return data

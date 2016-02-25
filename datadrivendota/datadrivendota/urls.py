@@ -7,7 +7,7 @@ from django.contrib import admin
 
 from datadrivendota import views
 from accounts.views import LoginView, LogoutView
-
+from matches.viewsets import ParseShardView
 
 # REST
 from .rest_urls import router
@@ -20,6 +20,11 @@ urlpatterns = [
     # Internals URLS
     url(r'^admin/', include(admin.site.urls)),
     url(r'^rest-api/', include(router.urls, namespace='rest-api')),
+    url(
+        r'^rest-api/parse-shards',
+        ParseShardView.as_view(),
+        name='parse-shards'
+    ),
     url(r'^health/', include('health.urls', namespace='health')),
 
     # One-off URLs

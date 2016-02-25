@@ -5,6 +5,7 @@ from matches.viewsets import (
     SkillBuildViewSet,
     MatchPickBanViewSet,
     PickBanViewSet,
+    ParseShardView,
 )
 from heroes.viewsets import (
     HeroViewSet,

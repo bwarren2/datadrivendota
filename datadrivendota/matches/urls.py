@@ -4,6 +4,11 @@ from matches import views
 urlpatterns = [
     url(r'^$', views.MatchListView.as_view(), name='index'),
     url(
+        r'^parsed/$',
+        views.ParsedMatchListView.as_view(),
+        name='parsed_index'
+    ),
+    url(
         r'^time-lapse/$',
         views.TimeLapseView.as_view(),
         name="time_lapse"
@@ -32,5 +37,10 @@ urlpatterns = [
         r'^(?P<match_id>[0-9\-]*)/abilities/$',
         views.MatchDetailAbilities.as_view(),
         name="detail_abilities"
+    ),
+    url(
+        r'^(?P<match_id>[0-9\-]*)/parsed-detail/$',
+        views.MatchParsedDetail.as_view(),
+        name="detail_parsed"
     ),
 ]

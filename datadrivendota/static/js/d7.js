@@ -1210,21 +1210,8 @@ var timeToSecs = function(time){
     return parseInt(time.split(":")[0])*60+parseInt(time.split(":")[1]);
 };
 
-// Things uses in the pmses:
-// d.hero.name (for labeling)
-// d.lookup_pair (for hitting s3)
-// Using radiant or dire numbers should fake those members.
-var state_lineup = function(pmses, facet, destination, params){
-
-  // Get the replay parse info
-  Promise.all(
-    pmses.map(function(pms){
-      var location = utils.parse_urls.url_for(pms, facet, 'statelog');
-      return $.getJSON(location);
-    })
-  ).then(function(facets){
-
-    // Structure the fancy filtering we are about to do.
+var replay_lines = function(dataset, facet, destination, params){
+      // Structure the fancy filtering we are about to do.
     var width;
     var height;
     var start;
@@ -1264,14 +1251,11 @@ var state_lineup = function(pmses, facet, destination, params){
 
     }
 
-    var plot_data = facets.map(function(d, i){
-      var filtered_dataset = d.filter(function(x){
-        return x.offset_time <= stop && x.offset_time >= start && x.offset_time.mod(stride) === 0
+    var plot_data = dataset.map(function(d, i){
+      d.values = d.values.filter(function(x){
+        return x.offset_time <= stop && x.offset_time >= start && x.offset_time.mod(stride) === 0;
       });
-      return {
-        key: "{0}, M#{1}".format(pmses[i].hero.name, pmses[i].match.steam_id),
-        values: filtered_dataset,
-      };
+      return d;
     });
 
     $(chart_destination).empty();
@@ -1336,6 +1320,61 @@ var state_lineup = function(pmses, facet, destination, params){
         return chart;
       }
     );
+}
+
+var state_lineup = function(shards, facet, destination, params){
+
+  // Get the replay parse info
+  Promise.all(
+    shards.map(function(shard){
+      var location = utils.parse_urls.url_for(shard, facet, 'statelog');
+      return $.getJSON(location);
+    })
+  ).then(function(facets){
+
+    var dataset = facets.map(function(dataseries, i){
+      var myobj =  {
+        'key': shards[i].name,
+        'css_classes': shards[i].css_classes,
+        'values': dataseries
+      };
+      return myobj;
+    });
+    replay_lines(dataset, facet, destination, params);
+  });
+};
+
+
+/**
+ * Merges two data series that have the same periodicity but uneven starts.
+ * @param {array} shardfacets - An array of 3-tuples: shard, facet, logtype.
+ * @param {string} destination - Where to draw.
+ * @param {integer} params - Adjustable stuffs.
+ */
+var multifacet_lineup = function(shardfacets, destination, params){
+
+  // Get the replay parse info
+  Promise.all(
+    shardfacets.map(function(lst){
+      var location = utils.parse_urls.url_for(lst[0], lst[1], lst[2]);
+      return $.getJSON(location);
+    })
+  ).then(function(facets){
+
+    var dataset = facets.map(function(dataseries, i){
+
+      var values = dataseries.map(function(d){
+          d.value = d[shardfacets[i][1]]
+          return d;
+        });
+      var myobj =  {
+        'key': shardfacets[i][0].name + ' ' + shardfacets[i][1],
+        'css_classes': shardfacets[i][0].css_classes,
+        'values': values
+      };
+      return myobj;
+    });
+    replay_lines(dataset, 'value', destination, params);
   });
 };
 
@@ -1343,10 +1382,10 @@ var state_lineup = function(pmses, facet, destination, params){
 /**
  * Merges two data series that have the same periodicity but uneven starts.
  * @param {array} data - The array of unevenly spaced series.
- * @param {string} attr - The named attribute of the data samples to use.
+ * @param {string} facet - The named stat of the data samples to use.
  * @param {integer} stride - The spacing of the series (ex -10, 0, 10...) = 10.
  */
-var scatterline_merge = function(data, attr, stride){
+var scatterline_merge = function(data, facet, stride){
 
   var x = data[0];
   var y = data[1];
@@ -1367,25 +1406,25 @@ var scatterline_merge = function(data, attr, stride){
 
     var x_val;
     if (i <= x0.offset_time) {
-      x_val = x0[attr];
+      x_val = x0[facet];
     }
     else if(i > x0.offset_time && i < x1.offset_time){
       // Ex 5, 10, 15, 20.  idx for 20 = (20-5)/5 = 3
       var series_idx = (i-x0.offset_time)/stride
-      x_val = x[series_idx][attr];
+      x_val = x[series_idx][facet];
     } else {
-      x_val = x1[attr];
+      x_val = x1[facet];
     }
 
     var y_val;
     if (i <= y0.offset_time) {
-      y_val = y0[attr];
+      y_val = y0[facet];
     }
     else if(i > y0.offset_time && i <= y1.offset_time){
       var series_idx = (i-y0.offset_time)/stride
-      y_val = y[series_idx][attr];
+      y_val = y[series_idx][facet];
     } else {
-      y_val = y1[attr];
+      y_val = y1[facet];
     }
 
     return_lst.push({
@@ -1398,16 +1437,15 @@ var scatterline_merge = function(data, attr, stride){
   return return_lst;
 }
 
-var scatterline = function(pmses, destination, params, attr, logtype){
+var scatterline = function(shards, facet, destination, params, logtype){
 
   // Get the replay parse info
   Promise.all(
-    pmses.map(function(pms){
-      var location = utils.parse_urls.url_for(pms, attr, logtype);
+    shards.map(function(shard){
+      var location = utils.parse_urls.url_for(shard, facet, logtype);
       return $.getJSON(location);
     })
   ).then(function(data){
-    // Structure the fancy filtering we are about to do.
 
     var width;
     var height;
@@ -1468,7 +1506,7 @@ var scatterline = function(pmses, destination, params, attr, logtype){
       return filtered_dataset;
     });
 
-    var values = scatterline_merge(trimmed_data, attr, stride)
+    var values = scatterline_merge(trimmed_data, facet, stride)
 
     // NVD3 freaks out and breaks tooltips if voronoi is false or dots overlap.
     var dumbhash = function(d){return d.x+"@@"+d.y}
@@ -1483,22 +1521,22 @@ var scatterline = function(pmses, destination, params, attr, logtype){
       });
 
     var plot_data = [{
-      key: toTitleCase(attr),
+      key: toTitleCase(facet),
       values: values
     }];
 
     $(chart_destination).empty();
-    $(label_destination).html(toTitleCase(attr));
+    $(label_destination).html(toTitleCase(facet));
 
     var true_min = d3.min(trimmed_data, function(series){
       return d3.min(series, function(nested){
-        return nested[attr];
+        return nested[facet];
       })
     });
 
     var true_max = d3.max(trimmed_data, function(series){
       return d3.max(series, function(nested){
-        return nested[attr];
+        return nested[facet];
       })
     });
 
@@ -1680,10 +1718,10 @@ var combat_merge = function(data, hasher, null_time){
   return return_lst;
 }
 
-var item_scatter = function(pmses, destination, params){
+var item_scatter = function(shards, destination, params){
 
-  var urls = pmses.map(function(pms){
-      var location = utils.parse_urls.url_for(pms, 'item_buys', 'combatlog');
+  var urls = shards.map(function(shard){
+      var location = utils.parse_urls.url_for(shard, 'item_buys', 'combatlog');
       return $.getJSON(location);
     })
     urls.push($.getJSON('/rest-api/items/'))
@@ -1907,10 +1945,10 @@ var item_scatter = function(pmses, destination, params){
 };
 
 
-var item_inventory = function(pmses, destination, label_1, label_2){
+var item_inventory = function(shards, destination, label_1, label_2){
 
-  var urls = pmses.map(function(pms){
-    var location = utils.parse_urls.url_for(pms, 'items', 'statelog');
+  var urls = shards.map(function(shard){
+    var location = utils.parse_urls.url_for(shard, 'items', 'statelog');
     return $.getJSON(location);
   })
   urls.push($.getJSON('/rest-api/items/'))
@@ -1999,6 +2037,7 @@ module.exports = {
   scatterline: scatterline,
   item_scatter: item_scatter,
   item_inventory: item_inventory,
+  multifacet_lineup: multifacet_lineup,
 };
 
 
@@ -4207,9 +4246,10 @@ if (!String.prototype.format) {
 var version = 1;
 var parse_url = "https://s3.amazonaws.com/datadrivendota/processed_replay_parse/";
 
-var url_for = function(pms, facet, logtype){
-    return parse_url+"{0}_{3}_{1}_v{2}.json.gz".format(
-        pms.lookup_pair, facet, version, logtype
+// https://s3.amazonaws.com/datadrivendota/processed_replay_parse/2107579100_130_combatlog_item_buys_v1.json.gz
+var url_for = function(shard, facet, logtype){
+    return parse_url+"{0}_{1}_{2}_{3}_v{4}.json.gz".format(
+        shard.match_id, shard.dataslice, logtype, facet, version
     );
 };
 

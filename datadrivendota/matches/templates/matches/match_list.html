@@ -2,7 +2,11 @@
 {% block title %}Match List{% endblock title %}
 
 {% block aligned_content %}
-    <h1>Match List</h1>
+    {% if parsed %}
+    <h1> Parsed Matches <small> | <a href="{% url 'matches:index' %}">All Matches</a></small></h1>
+    {% elif all %}
+    <h1> All Matches <small> | <a href="{% url 'matches:parsed_index' %}">Parsed Matches Only</a></small></h1>
+    {% endif %}
 
     {% if request.user.is_authenticated %}
     <p class="">

@@ -58,15 +58,11 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
     hero = HeroSerializer()
     match = MatchSerializer()
     skillbuild = serializers.SerializerMethodField()
-    lookup_pair = serializers.SerializerMethodField()
 
     def get_skillbuild(self, obj):
         return [
             SkillBuildSerializer(x).data for x in obj.skillbuild_set.all()
         ]
-
-    def get_lookup_pair(self, obj):
-        return obj.lookup_pair
 
     class Meta:
         model = PlayerMatchSummary
@@ -94,8 +90,20 @@ class PlayerMatchSummarySerializer(serializers.ModelSerializer):
             'match',
             'skillbuild',
             'replay_shard',
-            'lookup_pair',
         )
+
+
+class ParseShardSerializer(serializers.Serializer):
+    css_classes = serializers.CharField(max_length=200)
+    name = serializers.CharField(max_length=200)
+    dataslice = serializers.SerializerMethodField()
+    match_id = serializers.SerializerMethodField()
+
+    def get_match_id(self, obj):
+        return str(obj.match_id)
+
+    def get_dataslice(self, obj):
+        return str(obj.dataslice)
 
 
 class PickbanSerializer(serializers.ModelSerializer):

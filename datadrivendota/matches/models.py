@@ -353,6 +353,10 @@ class PlayerMatchSummary(models.Model):
                 )
             ])
 
+    @property
+    def css_classes(self):
+        return self.side.lower()
+
 
 class AdditionalUnit(models.Model):
     player_match_summary = models.OneToOneField('PlayerMatchSummary')

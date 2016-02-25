@@ -1,0 +1,90 @@
+{% extends "matches/match_base.html" %}
+
+{% load staticfiles player_extras %}
+
+{% block title %}Match #{{ match.steam_id }}{% endblock title %}
+
+
+{% block match_content %}
+
+  <div class="row">
+
+    <div class='col-md-6' id='kda'>
+      <h4>Kills and Assists</h4>
+      <div class='vert-md-12 chart toggling'></div>
+    </div>
+
+    <div class='col-md-6' id='goldxp'>
+      <h4>Gold and XP Difference</h4>
+      <div class='vert-md-12 chart toggling'></div>
+    </div>
+
+
+    <div id='matchup-charts' class='col-md-6'>
+      {% comment %}
+
+      <div class='row'>
+        <div class="col-md-6">
+          <h4>Kills vs Damage</h4>
+          <div id='kill_dmg' class='vert-md-3 chart'>
+            <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+          </div>
+        </div>
+      </div>
+      {% endcomment %}
+
+    </div>
+  </div>
+
+
+
+{% endblock match_content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+$(function(){
+
+var params = {
+  granularity: 60,
+  interpolation: 'stepwise',
+};
+
+$.getJSON('/rest-api/parse-shards/?match_id='+{{match.steam_id}})
+  .success(function(shards){
+    var diff = shards.filter(function(shard){
+      return shard.dataslice === 'diff';
+    })[0];
+    var radiant = shards.filter(function(shard){
+      return shard.dataslice === 'radiant';
+    })[0];
+    var dire = shards.filter(function(shard){
+      return shard.dataslice === 'dire';
+    })[0];
+
+    var shardfacets1 = [
+      [radiant, 'kills', 'statelog'],
+      [dire, 'kills', 'statelog'],
+      [radiant, 'assists', 'statelog'],
+      [dire, 'assists', 'statelog'],
+    ]
+    d7.extensions.charts.replays.multifacet_lineup(
+      shardfacets1, '#kda', params
+    );
+
+    var shardfacets2 = [
+      [diff, 'earned_income', 'combatseries'],
+      [diff, 'xp', 'combatseries']
+    ]
+    d7.extensions.charts.replays.multifacet_lineup(
+      shardfacets2, '#goldxp', params
+    );
+
+
+  });
+
+
+
+
+})
+</script>
+{% endblock extra_js %}

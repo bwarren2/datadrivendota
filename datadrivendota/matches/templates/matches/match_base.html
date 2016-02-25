@@ -22,6 +22,15 @@
               <li role="presentation" class="{% active 'matches:detail_scorecard' %}">
                 <a href="{% url "matches:detail_scorecard" match_id=match.steam_id %}">Endgame Scorecard</i></a>
               </li>
+
+              {% if match.is_parsed %}
+              <li
+                role="presentation"
+                class="{% active 'matches:detail_parsed' %}">
+                  <a href="{% url "matches:detail_parsed" match_id=match.steam_id %}">Parsed Charts</a>
+              </li>
+              {% endif %}
+
             </ul>
         </nav>
         {% endblock match_nav %}

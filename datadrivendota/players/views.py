@@ -1,4 +1,5 @@
 """Views primarily related to players, as a group or particularly."""
+from django.db.models import Max
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 
@@ -11,9 +12,14 @@ class PlayerIndexView(ListView):
     """A list of active or paid users."""
 
     paginate_by = 30
-    queryset = Player.objects.filter(
+    queryset = queryset = Player.objects.filter(
         steam_id__in=get_relevant_player_ids()
-    ).order_by('?')
+    ).annotate(
+        Max('playermatchsummary__match__start_time')
+    ).order_by(
+        '-playermatchsummary__match__start_time__max'
+    )
+
 
 
 class ProIndexView(ListView):
