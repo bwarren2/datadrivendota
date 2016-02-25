@@ -172,7 +172,7 @@ def pct_health(msgs, pms):
         [
             {
                 'offset_time': msg['offset_time'],
-                'pct_health': msg['health']/float(msg['max_health']),
+                'pct_health': safe_pct(msg['health'], msg['max_health']),
             }
             for msg in msgs
             if 'health' in msg and
@@ -222,7 +222,7 @@ def pct_mana(msgs, pms):
         [
             {
                 'offset_time': msg['offset_time'],
-                'pct_mana': msg['mana']/float(msg['max_mana']),
+                'pct_mana': safe_pct(msg['mana'], msg['max_mana']),
             }
             for msg in msgs
             if 'mana' in msg and
@@ -719,3 +719,9 @@ def damage_taken(msgs, pms):
         key=lambda x: x['offset_time']
     )
 
+
+def safe_pct(numerator, denominator):
+    if denominator == 0:
+        return 0
+    else:
+        return float(numerator)/denominator
