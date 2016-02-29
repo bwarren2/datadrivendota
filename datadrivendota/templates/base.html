@@ -111,6 +111,15 @@
             </li>
           {% endif %}
 
+          <li class="{% active 'time_lapse' main_nav %}">
+            <a class='brand-primary' href="{% url 'matches:time_lapse' %}">Time Lapse</a>
+          </li>
+
+          <li class="{% active 'duel' main_nav %}">
+            <a class='brand-primary' href="{% url 'matches:duel' %}">Duel</a>
+          </li>
+
+
           {% if SHOW_SEARCH %}
             <li class="{% active 'search' main_nav %}">
               <a href="{% url 'search' %}">Search</a>
