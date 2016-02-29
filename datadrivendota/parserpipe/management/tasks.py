@@ -694,10 +694,21 @@ class CreateMatchRequests(Task):
 
     def get_match_ids(self, client_ids, since):
         since_time = time.mktime(since.timetuple())
-        return Match.unparsed.filter(
+
+        unparsed_cleint_matches =  Match.unparsed.filter(
             playermatchsummary__player__steam_id__in=client_ids,
             start_time__gte=since_time
         ).values_list('steam_id', flat=True)
+
+        major_matches = Match.unparsed.filter(
+            league__steam_id__in=[4266],
+            start_time__gte=since_time
+        ).values_list('steam_id', flat=True)
+
+        return_matches = list(unparsed_cleint_matches)
+        return_matches.extend(list(major_matches))
+        return return_matches
+
 
     def make_match_requests(self, matches):
 
