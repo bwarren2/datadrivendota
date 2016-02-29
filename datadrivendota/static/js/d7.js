@@ -454,6 +454,7 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
 
     var chart;
     var chart_data;
+
     var svg = utils.svg.square_svg(destination);
     nv.addGraph(
       function(){
@@ -486,6 +487,7 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
         chart_data.transition().duration(500).call(chart);
         return chart;
       },
+
       function(){
         svg.select(destination + " .axis").selectAll("text").remove();
 
@@ -493,11 +495,42 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
             .data(plot_data)
             .append("svg:image")
             .attr("xlink:href", function (d) {
-              console.log(d);
               return d.img ;
             })
             .attr("width", 100)
             .attr("height", 100);
+
+        var width = $(destination).width()
+        var height = $(destination).height()
+
+        var face_data = plot_data[0].values.map(function(d){
+          d.faceclass='radiant-face-glow'
+          return d
+        })
+        .concat(
+          plot_data[1].values.map(function(d){
+          d.faceclass='dire-face-glow'
+          return d
+          })
+        )
+        var plot_faces = d3.select(destination).selectAll('i').data(
+            face_data
+          )
+          .enter()
+          .append('i')
+          .attr('class', function(d){
+            return 'd2mh ' + d.hero.internal_name + ' ' + d.faceclass
+          })
+          .style('left', function(d){
+            var px = chart.xAxis.scale()(d[x_var])+chart.margin().left-2
+            return px+'px';
+          })
+          .style('top', function(d){
+            var px = chart.yAxis.scale()(d[y_var])+50
+            return px+'px'
+          })
+          .style('position', 'absolute')
+
       }
 
     );
@@ -1246,7 +1279,7 @@ var timeToSecs = function(time){
 };
 
 var replay_lines = function(dataset, facet, destination, params){
-      // Structure the fancy filtering we are about to do.
+
     var width;
     var height;
     var start;
@@ -1284,6 +1317,9 @@ var replay_lines = function(dataset, facet, destination, params){
         stride = 10;
       }
 
+      if(params.y_label!==undefined){
+        y_label = params.y_label;
+      }
     }
 
     var plot_data = dataset.map(function(d, i){
@@ -1386,7 +1422,7 @@ var state_lineup = function(shards, facet, destination, params){
  * @param {string} destination - Where to draw.
  * @param {integer} params - Adjustable stuffs.
  */
-var multifacet_lineup = function(shardfacets, destination, params){
+var multifacet_lineup = function(shardfacets, destination, params, label){
 
   // Get the replay parse info
   Promise.all(
@@ -1409,6 +1445,9 @@ var multifacet_lineup = function(shardfacets, destination, params){
       };
       return myobj;
     });
+    if (typeof label != 'undefined') {
+      params.y_label = label;
+    }
     replay_lines(dataset, 'value', destination, params);
   });
 };
@@ -1765,7 +1804,7 @@ var item_scatter = function(shards, destination, params){
   Promise.all(
     urls
   ).then(function(data){
-    // Structure the fancy filtering we are about to do.
+
     var width;
     var height;
     var start;
@@ -1992,7 +2031,7 @@ var item_inventory = function(shards, destination, label_1, label_2){
   Promise.all(
     urls
   ).then(function(data){
-    // Structure the fancy filtering we are about to do.
+
 
     var cost_data = data.pop();
     var costs = cost_data.reduce(function(accu, item){
@@ -2066,6 +2105,86 @@ var item_inventory = function(shards, destination, label_1, label_2){
   });
 };
 
+var minimap = function(shards, destination, params){
+
+  var urls = shards.map(function(shard){
+    var location = utils.parse_urls.url_for(shard, 'position', 'statelog');
+    return $.getJSON(location);
+  })
+  // Get the replay parse info
+  Promise.all(urls).then(function(data){
+
+
+    var position_data =  data.map(function(series, series_idx){
+      return series.reduce(function(prev, d){
+        prev[String(d.offset_time)] = {
+          x: d.x,
+          y: d.y,
+          hero_name: shards[series_idx].hero_name
+        }
+        return prev;
+      }, {})
+    })
+    console.log(position_data[0][-30]);
+
+    var svg = utils.svg.square_svg(destination+' .chart');
+    var width = svg.attr('width');
+    var height = svg.attr('height');
+
+    var defs = svg.append('svg:defs');
+
+    defs.append("svg:pattern")
+        .attr("id", "minimap_img")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("patternUnits", "userSpaceOnUse")
+        .append("svg:image")
+        .attr("xlink:href", 'https://s3.amazonaws.com/datadrivendota/images/minimap.png')
+        .attr("width", width)
+        .attr("height", height)
+        .attr("x", 0)
+        .attr("y", 0);
+
+    var rect = svg.append('rect')
+      .attr('width', width)
+      .attr('height', height)
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr('fill', "url(#minimap_img)");
+
+    var fetch_data = position_data.map(function(d){
+      return d[-26]
+    });
+
+
+
+    var xscale = utils.axis_format.minimap_x(width, height);
+    var yscale = utils.axis_format.minimap_y(width, height);
+
+    var faces = d3.select(destination).selectAll('i').data(fetch_data)
+      .enter()
+      .append('i')
+      .attr('class', function(d){return 'd2mh ' + d.hero_name})
+      .style('left', function(d){return xscale(d.x)+'px'})
+      .style('bottom', function(d){return yscale(d.y)+'px'})
+      .style('position', 'absolute')
+
+    $(window).on('update', function(evt, arg){
+      var fetch_data = position_data.map(function(d){
+        return d[arg]
+      });
+
+      var faces = d3.select(destination).selectAll('i').data(fetch_data)
+        .transition()
+        .duration(100)
+        .style('left', function(d){return xscale(d.x)+'px'})
+        .style('bottom', function(d){return yscale(d.y)+'px'})
+
+      })
+
+  })
+};
+
 
 module.exports = {
   state_lineup: state_lineup,
@@ -2073,6 +2192,7 @@ module.exports = {
   item_scatter: item_scatter,
   item_inventory: item_inventory,
   multifacet_lineup: multifacet_lineup,
+  minimap: minimap
 };
 
 
@@ -3867,11 +3987,25 @@ var pretty_times = function(d){
     return String(d).toHHMMSS();
 }
 
+var minimap_x = function(width, height){
+    return d3.scale.linear().domain([68,186]).range([
+      .04*width, .96*width
+    ]);
+}
+
+var minimap_y = function(width, height){
+    return d3.scale.linear().domain([68,186]).range([
+        .04*height, .94*height
+    ]);
+}
+
 
 
 module.exports = {
     pretty_numbers: pretty_numbers,
     pretty_times: pretty_times,
+    minimap_x: minimap_x,
+    minimap_y: minimap_y,
 }
 
 },{}],18:[function(require,module,exports){

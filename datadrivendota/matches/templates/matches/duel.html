@@ -7,10 +7,19 @@
 
 {% block aligned_content %}
 
+  <div class='col-md-12'>
+    <div class='page-header'>
+      <h2>
+        Duel!
+      </h2>
+    </div>
+    <p>
+      Compare <span class='brand-primary'>parsed</span> performance from two players, even in different matches.  Measure up to your friends or steal the builds of your enemies!
+    </p>
+  </div>
+
     <div class='col-md-12'>
-        <div class="alert alert-info" role="alert">
-        <p style='color:#333'> For the fastest charts, consider less granularity for longer periods.  We have tons of data, and your browser may slow if you try to see every second of an hour long match with multiple people at once :) .</p>
-        </div>
+      {% include "matches/_density_advice.html" %}
     </div>
     <div class='col-md-12'>
       <h4>Controls</h4>

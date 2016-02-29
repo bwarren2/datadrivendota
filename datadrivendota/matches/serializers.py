@@ -98,6 +98,7 @@ class ParseShardSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=200)
     dataslice = serializers.SerializerMethodField()
     match_id = serializers.SerializerMethodField()
+    hero_name = serializers.CharField(max_length=200)
 
     def get_match_id(self, obj):
         return str(obj.match_id)

@@ -8,10 +8,18 @@
 {% block aligned_content %}
 
   <div class='col-md-12'>
-  <div class="alert alert-info" role="alert">
-    <p style='color:#333'> For the fastest charts, consider less granularity for longer periods.  We have tons of data, and your browser may slow if you try to see every second of an hour long match with multiple people at once :) .</p>
+    <div class='page-header'>
+      <h2>
+        Time Lapse
+      </h2>
+    </div>
+    <p>See data down to the second from <span class='brand-primary'>parsed</span> matches.</p>
   </div>
+
+  <div class='col-md-12'>
+    {% include "matches/_density_advice.html" %}
   </div>
+
   <div class='col-md-6'>
       <h4>Controls</h4>
       <form>
@@ -197,6 +205,7 @@
       </div>
   </form>
   </div>
+
 
   <div class='col-md-6'>
     <div id='top'>

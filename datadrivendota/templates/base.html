@@ -103,9 +103,6 @@
           {% endif %}
 
           {% if SHOW_BLOG %}
-            <li>
-              <a href="{% url 'blog:entry' entry_id=1 %}">About</a>
-            </li>
             <li class="{% active 'blog' main_nav %}">
               <a href="/blog/">Blog</a>
             </li>
@@ -152,16 +149,18 @@
 
 
     <div class='container'>
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+      {% if messages %}
+      <ul class="messages">
+          {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+
     {% block content %}
     {% endblock content %}
-    </div>
+
 
     {% if show_control_bar %}
     <div id="control_bar_margin"></div>

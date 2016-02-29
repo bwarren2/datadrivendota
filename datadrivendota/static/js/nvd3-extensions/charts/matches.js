@@ -47,6 +47,7 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
 
     var chart;
     var chart_data;
+
     var svg = utils.svg.square_svg(destination);
     nv.addGraph(
       function(){
@@ -79,6 +80,7 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
         chart_data.transition().duration(500).call(chart);
         return chart;
       },
+
       function(){
         svg.select(destination + " .axis").selectAll("text").remove();
 
@@ -86,11 +88,43 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
             .data(plot_data)
             .append("svg:image")
             .attr("xlink:href", function (d) {
-              console.log(d);
               return d.img ;
             })
             .attr("width", 100)
             .attr("height", 100);
+
+        var width = $(destination).width();
+        var height = $(destination).height();
+
+        var face_data = plot_data[0].values.map(function(d){
+          d.faceclass='radiant-face-glow'
+          return d
+        })
+        .concat(
+          plot_data[1].values.map(function(d){
+          d.faceclass='dire-face-glow'
+          return d
+          })
+        );
+
+        var plot_faces = d3.select(destination).selectAll('i').data(
+            face_data
+          )
+          .enter()
+          .append('i')
+          .attr('class', function(d){
+            return 'd2mh ' + d.hero.internal_name + ' ' + d.faceclass
+          })
+          .style('left', function(d){
+            var px = chart.xAxis.scale()(d[x_var])+chart.margin().left-2
+            return px+'px';
+          })
+          .style('top', function(d){
+            var px = chart.yAxis.scale()(d[y_var])+50
+            return px+'px'
+          })
+          .style('position', 'absolute')
+
       }
 
     );
