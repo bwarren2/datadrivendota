@@ -11,12 +11,16 @@
 
     <div class='col-md-6' id='kda'>
       <h4>Kills and Assists</h4>
-      <div class='vert-md-12 chart toggling'></div>
+      <div class='vert-md-12 chart'>
+        <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+      </div>
     </div>
 
     <div class='col-md-6' id='goldxp'>
       <h4>Gold and XP Difference</h4>
-      <div class='vert-md-12 chart toggling'></div>
+      <div class='vert-md-12 chart'>
+        <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+      </div>
     </div>
 
 
@@ -45,7 +49,7 @@
 $(function(){
 
 var params = {
-  granularity: 60,
+  granularity: 20,
   interpolation: 'stepwise',
 };
 

@@ -1,4 +1,5 @@
 "use strict";
+
 var utils = require("../utils");
 var Promise = require("bluebird");
 var models = require("../models");
@@ -9,8 +10,6 @@ var d3 = window.d3;
 var moment = window.moment;
 var tooltips = require("./tooltips.js");
 
-
-
 var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
 
   Promise.resolve(
@@ -19,17 +18,30 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
     )
   ).then(function(pmses){
     $(destination).empty();
+
     var plot_data = [
         {
-            "key": x_lab + " vs " + y_lab,
-            "values": pmses.map(
-            function(d){
-                var foo = {}
-                foo[x_var] = d[x_var]
-                foo[y_var] = d[y_var]
-                foo.hero = d.hero
-                return foo
-            })
+          "key": 'Radiant',
+          "values": pmses.filter(function(d){
+            return d.side === 'Radiant';
+          }).map(function(d){
+              var foo = {}
+              foo[x_var] = d[x_var]
+              foo[y_var] = d[y_var]
+              foo.hero = d.hero
+              return foo
+          })
+        },       {
+          "key": 'Dire',
+          "values": pmses.filter(function(d){
+            return d.side === 'Dire';
+          }).map(function(d){
+              var foo = {}
+              foo[x_var] = d[x_var]
+              foo[y_var] = d[y_var]
+              foo.hero = d.hero
+              return foo
+          })
         }
     ]
 
@@ -41,7 +53,7 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
 
         chart = models.scatter_chart()
           .margin({
-            left: 45,
+            left: 60,
             bottom: 45,
           })
           .x(function(d){return d[x_var];})
@@ -59,11 +71,26 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
         );
 
         chart.xAxis.axisLabel(x_lab);
-        chart.yAxis.axisLabel(y_lab).axisLabelDistance(-20);
+        chart.yAxis.axisLabel(y_lab).axisLabelDistance(-5).tickFormat(
+          utils.axis_format.pretty_numbers
+        );
 
         chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
         return chart;
+      },
+      function(){
+        svg.select(destination + " .axis").selectAll("text").remove();
+
+        var ticks = svg.select(".axis").selectAll(".tick")
+            .data(plot_data)
+            .append("svg:image")
+            .attr("xlink:href", function (d) {
+              console.log(d);
+              return d.img ;
+            })
+            .attr("width", 100)
+            .attr("height", 100);
       }
 
     );
@@ -114,15 +141,21 @@ var ability_lines = function(destination, params){
     nv.addGraph(
       function(){
 
-        chart = nv.models.lineChart()
+        chart = nv.models.lineWithFocusChart()
           .margin({
             left: 45,
             bottom: 45,
           })
           .showLegend(true);
 
-        chart.xAxis.axisLabel("Level");
-        chart.yAxis.axisLabel("Time");
+        chart.xAxis.axisLabel("Time").tickFormat(
+          utils.axis_format.pretty_times
+        );
+        chart.yAxis.axisLabel("Level");
+
+        chart.x2Axis.tickFormat(
+          utils.axis_format.pretty_times
+        );
 
         chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
@@ -168,7 +201,9 @@ var pms_bar_chart = function(destination, params, y_var, y_lab){
           });
 
         chart.xAxis.axisLabel();
-        chart.yAxis.axisLabel(y_lab);
+        chart.yAxis.axisLabel(y_lab).tickFormat(
+          utils.axis_format.pretty_numbers
+        );
 
         chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);

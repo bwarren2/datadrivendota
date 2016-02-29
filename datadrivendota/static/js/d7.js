@@ -406,6 +406,7 @@ module.exports = {
 
 },{"./bar.js":2,"./heroes.js":3,"./matches.js":5,"./pms_replay_shards.js":6,"./replays.js":7}],5:[function(require,module,exports){
 "use strict";
+
 var utils = require("../utils");
 var Promise = require("bluebird");
 var models = require("../models");
@@ -416,8 +417,6 @@ var d3 = window.d3;
 var moment = window.moment;
 var tooltips = require("./tooltips.js");
 
-
-
 var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
 
   Promise.resolve(
@@ -426,17 +425,30 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
     )
   ).then(function(pmses){
     $(destination).empty();
+
     var plot_data = [
         {
-            "key": x_lab + " vs " + y_lab,
-            "values": pmses.map(
-            function(d){
-                var foo = {}
-                foo[x_var] = d[x_var]
-                foo[y_var] = d[y_var]
-                foo.hero = d.hero
-                return foo
-            })
+          "key": 'Radiant',
+          "values": pmses.filter(function(d){
+            return d.side === 'Radiant';
+          }).map(function(d){
+              var foo = {}
+              foo[x_var] = d[x_var]
+              foo[y_var] = d[y_var]
+              foo.hero = d.hero
+              return foo
+          })
+        },       {
+          "key": 'Dire',
+          "values": pmses.filter(function(d){
+            return d.side === 'Dire';
+          }).map(function(d){
+              var foo = {}
+              foo[x_var] = d[x_var]
+              foo[y_var] = d[y_var]
+              foo.hero = d.hero
+              return foo
+          })
         }
     ]
 
@@ -448,7 +460,7 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
 
         chart = models.scatter_chart()
           .margin({
-            left: 45,
+            left: 60,
             bottom: 45,
           })
           .x(function(d){return d[x_var];})
@@ -466,11 +478,26 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
         );
 
         chart.xAxis.axisLabel(x_lab);
-        chart.yAxis.axisLabel(y_lab).axisLabelDistance(-20);
+        chart.yAxis.axisLabel(y_lab).axisLabelDistance(-5).tickFormat(
+          utils.axis_format.pretty_numbers
+        );
 
         chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
         return chart;
+      },
+      function(){
+        svg.select(destination + " .axis").selectAll("text").remove();
+
+        var ticks = svg.select(".axis").selectAll(".tick")
+            .data(plot_data)
+            .append("svg:image")
+            .attr("xlink:href", function (d) {
+              console.log(d);
+              return d.img ;
+            })
+            .attr("width", 100)
+            .attr("height", 100);
       }
 
     );
@@ -521,15 +548,21 @@ var ability_lines = function(destination, params){
     nv.addGraph(
       function(){
 
-        chart = nv.models.lineChart()
+        chart = nv.models.lineWithFocusChart()
           .margin({
             left: 45,
             bottom: 45,
           })
           .showLegend(true);
 
-        chart.xAxis.axisLabel("Level");
-        chart.yAxis.axisLabel("Time");
+        chart.xAxis.axisLabel("Time").tickFormat(
+          utils.axis_format.pretty_times
+        );
+        chart.yAxis.axisLabel("Level");
+
+        chart.x2Axis.tickFormat(
+          utils.axis_format.pretty_times
+        );
 
         chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
@@ -575,7 +608,9 @@ var pms_bar_chart = function(destination, params, y_var, y_lab){
           });
 
         chart.xAxis.axisLabel();
-        chart.yAxis.axisLabel(y_lab);
+        chart.yAxis.axisLabel(y_lab).tickFormat(
+          utils.axis_format.pretty_numbers
+        );
 
         chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
@@ -1265,7 +1300,7 @@ var replay_lines = function(dataset, facet, destination, params){
     nv.addGraph(
 
       function(){
-        var chart = nv.models.lineChart()
+        var chart = nv.models.lineWithFocusChart()
           .margin({
             left: 50,
             bottom: 50,
@@ -1279,6 +1314,10 @@ var replay_lines = function(dataset, facet, destination, params){
           .showLegend(false)
           .interpolate(interpolation)
           .forceY(0);
+
+        chart.tooltip.contentGenerator(
+          tooltips.noformat_tooltip('offset_time', facet)
+        );
 
         if(params !== undefined){
 
@@ -1299,21 +1338,17 @@ var replay_lines = function(dataset, facet, destination, params){
           }
         }
 
-
-        chart.xAxis.axisLabel(x_label).tickFormat(
-          function(d){
-            return String(d).toHHMMSS();
-          }
+        chart.x2Axis.tickFormat(
+          utils.axis_format.pretty_times
         );
 
-        chart.yAxis.axisLabel(y_label).axisLabelDistance(-18)
-          .tickFormat(
-              function(d){
-                if(d>1000000){return (d/1000000).toFixed(0) + "M";}
-                else if(d>1000){return (d/1000).toFixed(0) + "K";}
-                else { return d; }
-              }
-            );
+        chart.xAxis.axisLabel(x_label).tickFormat(
+          utils.axis_format.pretty_times
+        );
+
+        chart.yAxis.axisLabel(y_label).axisLabelDistance(-18).tickFormat(
+          utils.axis_format.pretty_numbers
+        );
 
         var chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
@@ -2045,6 +2080,76 @@ module.exports = {
 "use strict"
 var d3 = window.d3;
 
+var noformat_tooltip = function(x_var, y_var){
+  var return_fn = function(d, x, y, z){
+      if (d === null) {return "";}
+      var series = d.series[0];
+      d = d.point;
+      var table = d3.select(document.createElement("table"));
+
+      // Make a body
+      var tbodyEnter = table
+          .selectAll("tbody")
+          .data([d])
+          .enter()
+          .append("tbody");
+
+      var trowEnter0 = tbodyEnter
+          .append("tr");
+
+      trowEnter0.append("td")
+            .classed("legend-color-guide",true)
+            .append("div")
+            .style("background-color", series.color);
+
+      trowEnter0
+          .append("td")
+          .html(function(d){
+            return toTitleCase(series.key);
+          });
+
+
+      var trowEnter1 = tbodyEnter
+          .append("tr");
+
+      trowEnter1
+          .append("td")
+          .html(toTitleCase(y_var)+": ");
+
+      trowEnter1.append("td")
+          .classed("value", true)
+          .html(function(d){
+            return d[y_var];
+          });
+
+      var trowEnter2 = tbodyEnter
+          .append("tr");
+
+      trowEnter2
+          .append("td")
+          .html(toTitleCase(x_var)+": ");
+
+      if (x_var=='offset_time') {
+        trowEnter2.append("td")
+          .classed("value", true)
+          .html(function(d){return String(d.offset_time).toHHMMSS()});
+      }else{
+        trowEnter2.append("td")
+          .classed("value", true)
+          .html(function(d){
+            return d[y_var];
+          });
+      }
+
+
+
+      var html = table.node().outerHTML;
+      return html;
+  }
+  return return_fn;
+};
+
+
 
 var heroContentGenerator = function(getX, getY, xlab, ylab){
   var return_fn = function(d){
@@ -2091,7 +2196,7 @@ var heroContentGenerator = function(getX, getY, xlab, ylab){
 
       trowEnter2.append("td")
           .classed("value", true)
-          .html(function(p) {return getX(p);});
+          .html(function(p) {return getX(p)});
 
 
       var tBodyRowEnter = tbodyEnter.append("tr");
@@ -2428,6 +2533,7 @@ module.exports = {
     match_tooltip: match_tooltip,
     duel_tooltip_generator: duel_tooltip_generator,
     duel_item_tooltip_generator: duel_item_tooltip_generator,
+    noformat_tooltip: noformat_tooltip
 };
 
 },{}],9:[function(require,module,exports){
@@ -3753,8 +3859,8 @@ module.exports = {
 },{"./scatter.js":15,"d3-tip":29}],17:[function(require,module,exports){
 
 var pretty_numbers = function(d){
-    if(d>1000000){return (d/1000000).toFixed(0) + "M";}
-    else if(d>1000){return (d/1000).toFixed(0) + "K";}
+    if(Math.abs(d)>1000000){return (d/1000000).toFixed(0) + "M";}
+    else if(Math.abs(d)>1000){return (d/1000).toFixed(0) + "K";}
     else { return d; }
 }
 var pretty_times = function(d){

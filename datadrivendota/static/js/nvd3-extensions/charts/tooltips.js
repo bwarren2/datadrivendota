@@ -1,6 +1,76 @@
 "use strict"
 var d3 = window.d3;
 
+var noformat_tooltip = function(x_var, y_var){
+  var return_fn = function(d, x, y, z){
+      if (d === null) {return "";}
+      var series = d.series[0];
+      d = d.point;
+      var table = d3.select(document.createElement("table"));
+
+      // Make a body
+      var tbodyEnter = table
+          .selectAll("tbody")
+          .data([d])
+          .enter()
+          .append("tbody");
+
+      var trowEnter0 = tbodyEnter
+          .append("tr");
+
+      trowEnter0.append("td")
+            .classed("legend-color-guide",true)
+            .append("div")
+            .style("background-color", series.color);
+
+      trowEnter0
+          .append("td")
+          .html(function(d){
+            return toTitleCase(series.key);
+          });
+
+
+      var trowEnter1 = tbodyEnter
+          .append("tr");
+
+      trowEnter1
+          .append("td")
+          .html(toTitleCase(y_var)+": ");
+
+      trowEnter1.append("td")
+          .classed("value", true)
+          .html(function(d){
+            return d[y_var];
+          });
+
+      var trowEnter2 = tbodyEnter
+          .append("tr");
+
+      trowEnter2
+          .append("td")
+          .html(toTitleCase(x_var)+": ");
+
+      if (x_var=='offset_time') {
+        trowEnter2.append("td")
+          .classed("value", true)
+          .html(function(d){return String(d.offset_time).toHHMMSS()});
+      }else{
+        trowEnter2.append("td")
+          .classed("value", true)
+          .html(function(d){
+            return d[y_var];
+          });
+      }
+
+
+
+      var html = table.node().outerHTML;
+      return html;
+  }
+  return return_fn;
+};
+
+
 
 var heroContentGenerator = function(getX, getY, xlab, ylab){
   var return_fn = function(d){
@@ -47,7 +117,7 @@ var heroContentGenerator = function(getX, getY, xlab, ylab){
 
       trowEnter2.append("td")
           .classed("value", true)
-          .html(function(p) {return getX(p);});
+          .html(function(p) {return getX(p)});
 
 
       var tBodyRowEnter = tbodyEnter.append("tr");
@@ -384,4 +454,5 @@ module.exports = {
     match_tooltip: match_tooltip,
     duel_tooltip_generator: duel_tooltip_generator,
     duel_item_tooltip_generator: duel_item_tooltip_generator,
+    noformat_tooltip: noformat_tooltip
 };

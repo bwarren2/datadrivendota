@@ -66,7 +66,7 @@ var replay_lines = function(dataset, facet, destination, params){
     nv.addGraph(
 
       function(){
-        var chart = nv.models.lineChart()
+        var chart = nv.models.lineWithFocusChart()
           .margin({
             left: 50,
             bottom: 50,
@@ -80,6 +80,10 @@ var replay_lines = function(dataset, facet, destination, params){
           .showLegend(false)
           .interpolate(interpolation)
           .forceY(0);
+
+        chart.tooltip.contentGenerator(
+          tooltips.noformat_tooltip('offset_time', facet)
+        );
 
         if(params !== undefined){
 
@@ -100,21 +104,17 @@ var replay_lines = function(dataset, facet, destination, params){
           }
         }
 
-
-        chart.xAxis.axisLabel(x_label).tickFormat(
-          function(d){
-            return String(d).toHHMMSS();
-          }
+        chart.x2Axis.tickFormat(
+          utils.axis_format.pretty_times
         );
 
-        chart.yAxis.axisLabel(y_label).axisLabelDistance(-18)
-          .tickFormat(
-              function(d){
-                if(d>1000000){return (d/1000000).toFixed(0) + "M";}
-                else if(d>1000){return (d/1000).toFixed(0) + "K";}
-                else { return d; }
-              }
-            );
+        chart.xAxis.axisLabel(x_label).tickFormat(
+          utils.axis_format.pretty_times
+        );
+
+        chart.yAxis.axisLabel(y_label).axisLabelDistance(-18).tickFormat(
+          utils.axis_format.pretty_numbers
+        );
 
         var chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
