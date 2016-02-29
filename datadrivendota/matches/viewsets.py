@@ -204,7 +204,7 @@ class ParseShardView(views.APIView):
         try:
             match_id = int(self.request.query_params.get('match_id', None))
             match = Match.objects.get(steam_id=match_id)
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, Match.DoesNotExist):
             return Response(
                 JSONRenderer().render([]),
                 status=status.HTTP_404_NOT_FOUND,

@@ -12,7 +12,7 @@ var timeToSecs = function(time){
 };
 
 var replay_lines = function(dataset, facet, destination, params){
-      // Structure the fancy filtering we are about to do.
+
     var width;
     var height;
     var start;
@@ -531,7 +531,7 @@ var item_scatter = function(shards, destination, params){
   Promise.all(
     urls
   ).then(function(data){
-    // Structure the fancy filtering we are about to do.
+
     var width;
     var height;
     var start;
@@ -758,7 +758,7 @@ var item_inventory = function(shards, destination, label_1, label_2){
   Promise.all(
     urls
   ).then(function(data){
-    // Structure the fancy filtering we are about to do.
+
 
     var cost_data = data.pop();
     var costs = cost_data.reduce(function(accu, item){
