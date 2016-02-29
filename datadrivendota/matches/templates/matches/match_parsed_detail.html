@@ -11,14 +11,28 @@
 
     <div class='col-md-6' id='kda'>
       <h4>Kills and Assists</h4>
-      <div class='vert-md-12 chart'>
+      <div class='vert-md-6 chart'>
         <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
       </div>
     </div>
 
     <div class='col-md-6' id='goldxp'>
       <h4>Gold and XP Difference</h4>
-      <div class='vert-md-12 chart'>
+      <div class='vert-md-6 chart'>
+        <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+      </div>
+    </div>
+
+    <div class='col-md-6' id='hero-kills'>
+      <h4>Kills by Hero</h4>
+      <div class='vert-md-6 chart'>
+        <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+      </div>
+    </div>
+
+    <div class='col-md-6' id='hero-gold'>
+      <h4>Gold by Hero</h4>
+      <div class='vert-md-6 chart'>
         <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
       </div>
     </div>
@@ -65,6 +79,10 @@ $.getJSON('/rest-api/parse-shards/?match_id='+{{match.steam_id}})
       return shard.dataslice === 'dire';
     })[0];
 
+    var heroes = shards.filter(function(shard){
+      return shard.dataslice < 400;
+    });
+
     var shardfacets1 = [
       [radiant, 'kills', 'statelog'],
       [dire, 'kills', 'statelog'],
@@ -77,10 +95,22 @@ $.getJSON('/rest-api/parse-shards/?match_id='+{{match.steam_id}})
 
     var shardfacets2 = [
       [diff, 'earned_income', 'combatseries'],
-      [diff, 'xp', 'combatseries']
+      [diff, 'xp', 'statelog']
     ]
     d7.extensions.charts.replays.multifacet_lineup(
       shardfacets2, '#goldxp', params
+    );
+
+   d7.extensions.charts.replays.multifacet_lineup(
+      heroes.map(function(d){
+        return [d, 'kills', 'statelog']
+      }), '#hero-kills', params
+    );
+
+   d7.extensions.charts.replays.multifacet_lineup(
+      heroes.map(function(d){
+        return [d, 'earned_income', 'combatseries']
+      }), '#hero-gold', params
     );
 
 

@@ -43,7 +43,7 @@
           title='{{match.radiant_team.name}}'>
         </div>
       {% else %}
-        <div class="col-md-2 hidden-xs hidden-sm">
+        <div class="col-md-2">
           <img class='img-responsive side-icon' src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.side }}'>
         </div>
       {% endif %}
@@ -61,7 +61,7 @@
           <img class='thumbnail league-pip' src="{{match.dire_team.image}}" alt='{{ match.dire_team.name }}' title='{{match.dire_team.name}}'>
         </div>
       {% else %}
-        <div class="col-md-2 hidden-xs hidden-sm">
+        <div class="col-md-2">
           <img class='img-responsive side-icon'  src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.side }}'>
         </div>
       {% endif %}
