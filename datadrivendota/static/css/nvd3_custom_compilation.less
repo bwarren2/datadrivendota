@@ -208,7 +208,7 @@ svg.nvd3-svg {
 
 .nvd3 .nv-axis path {
   fill: none;
-  stroke: #000;
+  stroke: @label-color;
   stroke-opacity: .75;
   shape-rendering: crispEdges;
 }
@@ -279,11 +279,11 @@ svg.nvd3-svg {
 }
 
 .nvd3 .nv-bars text {
-  fill: rgba(0,0,0,0);
+  fill: @label-color;
 }
 
 .nvd3 .nv-bars .hover text {
-  fill: rgba(0,0,0,1);
+  fill: @label-color;
 }
 
 
@@ -650,9 +650,14 @@ Interactive Layer
 }
 
 .tick.zero line {
-  stroke: #000;
+  stroke: @label-color;
 }
 
 .nv-axis text {
+  color: @label-color;
   font-size: 16px;
+}
+
+g.nv-axis {
+  color: green;
 }
