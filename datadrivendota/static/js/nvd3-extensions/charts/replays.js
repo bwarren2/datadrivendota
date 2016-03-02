@@ -50,6 +50,9 @@ var replay_lines = function(dataset, facet, destination, params){
         stride = 10;
       }
 
+      if(params.y_label!==undefined){
+        y_label = params.y_label;
+      }
     }
 
     var plot_data = dataset.map(function(d, i){
@@ -152,7 +155,7 @@ var state_lineup = function(shards, facet, destination, params){
  * @param {string} destination - Where to draw.
  * @param {integer} params - Adjustable stuffs.
  */
-var multifacet_lineup = function(shardfacets, destination, params){
+var multifacet_lineup = function(shardfacets, destination, params, label){
 
   // Get the replay parse info
   Promise.all(
@@ -175,6 +178,9 @@ var multifacet_lineup = function(shardfacets, destination, params){
       };
       return myobj;
     });
+    if (typeof label != 'undefined') {
+      params.y_label = label;
+    }
     replay_lines(dataset, 'value', destination, params);
   });
 };
