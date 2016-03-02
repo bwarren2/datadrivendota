@@ -1,0 +1,153 @@
+{% extends "row_base.html" %}
+
+{% load staticfiles player_extras %}
+
+{% block title %}
+  Performance Summary!
+{% endblock title %}
+
+
+{% block aligned_content %}
+
+  <div class='col-md-12'>
+    {% include "matches/_density_advice.html" %}
+  </div>
+  <div class='col-md-12'>
+    <h4>Controls</h4>
+    <form>
+    <div class='row'>
+      <div class='col-md-3'>
+          <div class="form-group">
+          <label>Match IDs</label>
+              <select id='shards' style='width:200px'></select>
+          </div>
+      </div>
+      <div class='col-md-3'>
+          <div class="form-group">
+          <label>Labels (Comma separated)</label>
+              <input type="textarea" class="form-control" id="labels" placeholder="(ex 'My Pudge, Dendi Pudge, Friend Pudge')">
+          </div>
+      </div>
+      <div class='col-md-2'>
+        <div class="form-group">
+          <label >Start Time</label>
+          <input type="textarea" class="form-control" id="start_time" placeholder="Start Time (eg 12:41)">
+        </div>
+      </div>
+
+      <div class='col-md-2'>
+        <div class="form-group">
+          <label >End Time</label>
+          <input type="textarea" class="form-control" id="end_time" placeholder="End Time (eg 23:10)">
+        </div>
+      </div>
+
+      <div class='col-md-2'>
+        <div class="form-group">
+          <label >Sample Freq (s)</label>
+          <input type="textarea" class="form-control" id="granularity" placeholder="Sample rate (eg 10)" value="30">
+        </div>
+      </div>
+
+
+      <div class='col-md-3' style='margin-top:10px'>
+        <div class="btn-group btn-group-justified" role="group">
+          <div class="btn-group" role="group">
+            <button id='chart-button' type="button" class="btn btn-primary">
+              Chart! <i class="fa fa-line-chart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  </div>
+
+  <div id='dashboard' class='col-md-12' height='900px'>
+    <div class='row'>
+
+        <div class='page-header'>
+          <h2>Items</h2>
+        </div>
+
+        <div class='col-md-6' id='item_buys'>
+          <label></label>
+          <div class='vert-md-6 chart toggling'></div>
+        </div>
+
+        <div class='col-md-6' id='inventory'>
+          <label></label>
+          <div id='target'></div>
+        </div>
+    </div>
+
+    <div class='row'>
+        <div class='page-header'>
+          <h2>KDA</h2>
+        </div>
+
+        <div class='col-md-4' id='kda'>
+          <label></label>
+          <div class='vert-md-4 chart toggling'></div>
+        </div>
+    </div>
+
+  </div>
+
+  <div class='col-md-12'>
+  <h2>Want to see your data here?</h2>
+    {% include "accounts/mixins/_ping_request.html" %}
+  </div>
+
+<style type="text/css">
+  .select2-result-pms__avatar{
+    height:36px;
+    width:64px;
+  }
+  .select2-result-pms__title{
+    color: black;
+  }
+/*  .col-md-2, .col-md-3, .col-md-4{
+    border: red solid 5px;
+  }
+*/</style>
+{% endblock aligned_content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+$(function(){
+
+    inputs.pms_select2('#shards', true);
+
+    $('#chart-button').click(function(){
+
+      var shards = $('#shards').select2('data');
+      var labels = $('#labels').val();
+      console.log(shards, labels);
+      var params = {
+        granularity: parseInt($('#granularity').val()),
+        end_time: $('#end_time').val(),
+        start_time: $('#start_time').val(),
+        x_label: 'offset_time',
+        y_label: 'value'
+      };
+
+      d7.extensions.charts.replays.item_inventory(
+        [shard_1, shard_2], '#inventory', label_1, label_2
+      );
+      d7.extensions.charts.replays.item_scatter(
+        [shard_1, shard_2], '#item_buys', params
+      );
+
+
+    })
+
+});
+
+
+</script>
+{% endblock extra_js %}
+
+{% block extra_css %}
+{% endblock extra_css %}
+
