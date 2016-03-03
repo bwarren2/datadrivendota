@@ -891,12 +891,8 @@ var minimap = function(shards, destination, params){
 
 
 
-    var xscale = d3.scale.linear().domain([68,186]).range([
-      .04*width, .96*width
-    ]);
-    var yscale = d3.scale.linear().domain([68,186]).range([
-      .04*height, .94*height
-    ]);
+    var xscale = utils.axis_format.minimap_x(width, height);
+    var yscale = utils.axis_format.minimap_y(width, height);
 
     var faces = d3.select(destination).selectAll('i').data(fetch_data)
       .enter()
