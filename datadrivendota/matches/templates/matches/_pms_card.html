@@ -6,6 +6,7 @@
     <div class='{{summary.side}}'>
     {% endif %}
 
+    <a href="{% url 'matches:performance' %}?match_id={{summary.match.steam_id}}&pmses={{summary.player_slot}}">
         <img
         src="{{ summary.hero.mugshot_url }}"
         alt="{{ summary.hero.name }}"
@@ -29,5 +30,5 @@
         {% endif %}
 
     </div>
-
+    </a>
 </div>

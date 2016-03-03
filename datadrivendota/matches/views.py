@@ -124,6 +124,10 @@ class DuelView(TemplateView):
     template_name = 'matches/duel.html'
 
 
+class PerformanceView(TemplateView):
+    template_name = 'matches/performance.html'
+
+
 class MatchListView(ListView):
     queryset = Match.objects.all()
     paginate_by = 10

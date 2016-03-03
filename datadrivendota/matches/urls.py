@@ -19,6 +19,11 @@ urlpatterns = [
         name="duel"
     ),
     url(
+        r'^performance/$',
+        views.PerformanceView.as_view(),
+        name="performance"
+    ),
+    url(
         r'^(?P<match_id>[0-9\-]*)/$',
         views.MatchDetail.as_view(),
         name="detail"
