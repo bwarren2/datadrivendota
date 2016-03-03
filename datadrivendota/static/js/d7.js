@@ -489,8 +489,6 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
       },
 
       function(){
-        console.log(plot_data);
-        console.log(chart);
         svg.select(destination + " .axis").selectAll("text").remove();
 
         var ticks = svg.select(".axis").selectAll(".tick")
