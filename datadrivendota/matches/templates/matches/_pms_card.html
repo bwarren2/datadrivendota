@@ -6,7 +6,10 @@
     <div class='{{summary.side}}'>
     {% endif %}
 
-    <a href="{% url 'matches:performance' %}?match_id={{summary.match.steam_id}}&pmses={{summary.player_slot}}">
+    {% if summary.match.is_parsed %}
+        <a href="{% url 'matches:performance' %}?match_id={{summary.match.steam_id}}&pmses={{summary.player_slot}}">
+    {% endif %}
+
         <img
         src="{{ summary.hero.mugshot_url }}"
         alt="{{ summary.hero.name }}"
@@ -29,6 +32,10 @@
             >
         {% endif %}
 
+    {% if summary.match.is_parsed %}
+        </a>
+    {% endif %}
+
     </div>
-    </a>
+
 </div>

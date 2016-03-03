@@ -228,7 +228,6 @@ class ParseShardView(views.APIView):
                 content_type='application/json'
             )
 
-
     def jsonify_data(self, queryset, match_id):
         data = []
         for pms in queryset:
