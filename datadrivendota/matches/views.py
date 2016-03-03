@@ -123,6 +123,7 @@ class TimeLapseView(TemplateView):
 class DuelView(TemplateView):
     template_name = 'matches/duel.html'
 
+
 class PerformanceView(TemplateView):
     template_name = 'matches/performance.html'
 

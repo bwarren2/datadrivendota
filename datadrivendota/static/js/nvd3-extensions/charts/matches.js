@@ -108,8 +108,7 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
           return d
           })
         )
-        console.log(face_data);
-        var radiant_faces = d3.select(destination).selectAll('i').data(
+        var plot_faces = d3.select(destination).selectAll('i').data(
             face_data
           )
           .enter()
