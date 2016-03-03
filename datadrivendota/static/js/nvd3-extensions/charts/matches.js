@@ -93,8 +93,8 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
             .attr("width", 100)
             .attr("height", 100);
 
-        var width = $(destination).width()
-        var height = $(destination).height()
+        var width = $(destination).width();
+        var height = $(destination).height();
 
         var face_data = plot_data[0].values.map(function(d){
           d.faceclass='radiant-face-glow'
@@ -105,7 +105,8 @@ var pms_scatter = function(destination, params, x_var, y_var, x_lab, y_lab){
           d.faceclass='dire-face-glow'
           return d
           })
-        )
+        );
+
         var plot_faces = d3.select(destination).selectAll('i').data(
             face_data
           )
