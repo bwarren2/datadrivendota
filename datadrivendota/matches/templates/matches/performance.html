@@ -167,7 +167,7 @@ $(function(){
     var match_id = window.jsUtils.getParameterByName('match_id');
     if(match_id!==undefined){
 
-    $.getJSON('/rest-api/parse-shards/?match_id=2192542709')
+    $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
 
       .success(function(shards){
 
@@ -181,7 +181,7 @@ $(function(){
         var params = {
           granularity: 30,
         };
-
+        console.log(url_shards, slices, shards)
         draw(url_shards, params);
       })
     }
