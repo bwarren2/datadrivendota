@@ -63,6 +63,16 @@
   </form>
   </div>
 
+  <div id='kda-dash' class='col-md-12' height='900px'>
+
+    <div class='col-md-6 vert-md-6' id='minimap' style='position:relative'>
+      <label></label>
+      <div class='vert-md-4 chart toggling'></div>
+    </div>
+
+  </div>
+
+
   <div id='kda-dash' class='col-md-4' height='900px'>
 
     <div class='row'>
@@ -164,16 +174,45 @@ $(function(){
 
     inputs.pms_select2('#shards', true);
 
+$.getJSON('/rest-api/parse-shards/?match_id=2192542709')
+
+  .success(function(shards){
+
+    var diff = shards.filter(function(shard){
+      return shard.dataslice === 'diff';
+    })[0];
+    var radiant = shards.filter(function(shard){
+      return shard.dataslice === 'radiant';
+    })[0];
+    var dire = shards.filter(function(shard){
+      return shard.dataslice === 'dire';
+    })[0];
+
+    var heroes = shards.filter(function(shard){
+      return shard.dataslice < 400;
+    });
+    var params = {
+      granularity: parseInt($('#granularity').val()),
+      end_time: $('#end_time').val(),
+      start_time: $('#start_time').val()
+    };
+    d7.extensions.charts.replays.minimap(
+      heroes, '#minimap', params
+    );
+
+  })
+
     $('#chart-button').click(function(){
 
       var shards = $('#shards').select2('data');
       var labels = $('#labels').val();
-      console.log(shards, labels);
+
       var params = {
         granularity: parseInt($('#granularity').val()),
         end_time: $('#end_time').val(),
         start_time: $('#start_time').val()
       };
+
 
     // var shardfacets = shards.map(function(d){
     //   return [d, 'kills', 'statelog']

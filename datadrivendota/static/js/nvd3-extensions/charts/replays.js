@@ -838,6 +838,90 @@ var item_inventory = function(shards, destination, label_1, label_2){
   });
 };
 
+var minimap = function(shards, destination, params){
+
+  var urls = shards.map(function(shard){
+    var location = utils.parse_urls.url_for(shard, 'position', 'statelog');
+    return $.getJSON(location);
+  })
+  // Get the replay parse info
+  Promise.all(urls).then(function(data){
+
+
+    var position_data =  data.map(function(series, series_idx){
+      return series.reduce(function(prev, d){
+        prev[String(d.offset_time)] = {
+          x: d.x,
+          y: d.y,
+          hero_name: shards[series_idx].hero_name
+        }
+        return prev;
+      }, {})
+    })
+    console.log(position_data[0][-30]);
+
+    var svg = utils.svg.square_svg(destination+' .chart');
+    var width = svg.attr('width');
+    var height = svg.attr('height');
+
+    var defs = svg.append('svg:defs');
+
+    defs.append("svg:pattern")
+        .attr("id", "minimap_img")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("patternUnits", "userSpaceOnUse")
+        .append("svg:image")
+        .attr("xlink:href", 'https://s3.amazonaws.com/datadrivendota/images/minimap.png')
+        .attr("width", width)
+        .attr("height", height)
+        .attr("x", 0)
+        .attr("y", 0);
+
+    var rect = svg.append('rect')
+      .attr('width', width)
+      .attr('height', height)
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr('fill', "url(#minimap_img)");
+
+    var fetch_data = position_data.map(function(d){
+      return d[-26]
+    });
+
+
+
+    var xscale = d3.scale.linear().domain([68,186]).range([
+      .04*width, .96*width
+    ]);
+    var yscale = d3.scale.linear().domain([68,186]).range([
+      .04*height, .94*height
+    ]);
+
+    var faces = d3.select(destination).selectAll('i').data(fetch_data)
+      .enter()
+      .append('i')
+      .attr('class', function(d){return 'd2mh ' + d.hero_name})
+      .style('left', function(d){return xscale(d.x)+'px'})
+      .style('bottom', function(d){return yscale(d.y)+'px'})
+      .style('position', 'absolute')
+
+    $(window).on('update', function(evt, arg){
+      var fetch_data = position_data.map(function(d){
+        return d[arg]
+      });
+
+      var faces = d3.select(destination).selectAll('i').data(fetch_data)
+        .transition()
+        .duration(100)
+        .style('left', function(d){return xscale(d.x)+'px'})
+        .style('bottom', function(d){return yscale(d.y)+'px'})
+
+      })
+
+  })
+};
+
 
 module.exports = {
   state_lineup: state_lineup,
@@ -845,5 +929,6 @@ module.exports = {
   item_scatter: item_scatter,
   item_inventory: item_inventory,
   multifacet_lineup: multifacet_lineup,
+  minimap: minimap
 };
 
