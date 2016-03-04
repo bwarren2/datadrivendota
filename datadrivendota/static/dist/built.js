@@ -36884,7 +36884,6 @@ var pingSetup = function(csrf){
             'email'               : $('input#email').val(),
             'recurring'      : $('input#recurring').prop('checked')
         };
-        console.log(formData);
         $.ajax({
           'type': 'POST',
           'url': '/rest-api/ping-requests/',
