@@ -63,6 +63,20 @@
   </form>
   </div>
 
+  <div id='kda-dash' class='col-md-12' height='900px'>
+
+    <div class='page-header'>
+      <h2>Item inventory</h2>
+    </div>
+
+    <div id='inventory'>
+      <label></label>
+      <div id = 'target' class='chart'></div>
+    </div>
+
+
+  </div>
+
   <div id='kda-dash' class='col-md-4' height='900px'>
 
     <div class='row'>
@@ -72,17 +86,17 @@
 
         <div class='col-md-12' id='kills'>
           <label></label>
-          <div class='vert-md-4 chart toggling'></div>
+          <div class='vert-md-4 chart'></div>
         </div>
 
         <div class='col-md-12' id='deaths'>
           <label></label>
-          <div class='vert-md-4 chart toggling'></div>
+          <div class='vert-md-4 chart'></div>
         </div>
 
         <div class='col-md-12' id='assists'>
           <label></label>
-          <div class='vert-md-4 chart toggling'></div>
+          <div class='vert-md-4 chart'></div>
         </div>
     </div>
 
@@ -97,17 +111,17 @@
 
         <div class='col-md-12' id='earned_income'>
           <label></label>
-          <div class='vert-md-4 chart toggling'></div>
+          <div class='vert-md-4 chart'></div>
         </div>
 
         <div class='col-md-12' id='creep_kill_income'>
           <label></label>
-          <div class='vert-md-4 chart toggling'></div>
+          <div class='vert-md-4 chart'></div>
         </div>
 
         <div class='col-md-12' id='hero_kill_income'>
           <label></label>
-          <div class='vert-md-4 chart toggling'></div>
+          <div class='vert-md-4 chart'></div>
         </div>
     </div>
 
@@ -122,17 +136,17 @@
 
         <div class='col-md-12' id='health'>
           <label></label>
-          <div class='vert-md-4 chart toggling'></div>
+          <div class='vert-md-4 chart'></div>
         </div>
 
         <div class='col-md-12' id='mana'>
           <label></label>
-          <div class='vert-md-4 chart toggling'></div>
+          <div class='vert-md-4 chart'></div>
         </div>
 
         <div class='col-md-12' id='total_damage'>
           <label></label>
-          <div class='vert-md-4 chart toggling'></div>
+          <div class='vert-md-4 chart'></div>
         </div>
     </div>
 
@@ -264,6 +278,15 @@ $(function(){
       d7.extensions.charts.replays.multifacet_lineup(
         shardfacets, '#total_damage', params, 'Total Damage'
       );
+
+
+
+      d7.extensions.charts.replays.item_inventory(
+        shards, '#inventory', shards.map(function(d){
+          return d.name
+        })
+      );
+
 
     }
 

@@ -2050,14 +2050,13 @@ var item_scatter = function(shards, destination, params){
 };
 
 
-var item_inventory = function(shards, destination, label_1, label_2){
+var item_inventory = function(shards, destination, labels){
 
   var urls = shards.map(function(shard){
     var location = utils.parse_urls.url_for(shard, 'items', 'statelog');
     return $.getJSON(location);
   })
   urls.push($.getJSON('/rest-api/items/'))
-
   // Get the replay parse info
   Promise.all(
     urls
@@ -2088,13 +2087,8 @@ var item_inventory = function(shards, destination, label_1, label_2){
 
 
 
-        if (series_idx===0) {
-          table += '<tr>';
-          table += '<td>'+label_1+'</td>';
-        }else{
-          table += '<tr class="spacingrow">';
-          table += '<td>'+label_2+'</td>';
-        }
+        table += '<tr>';
+        table += '<td>'+labels[series_idx]+'</td>';
         if (trimmed_data[series_idx][time_idx]) {
 
           table += '<td>'+String(trimmed_data[series_idx][time_idx].offset_time).toHHMMSS()+'</td>';
@@ -2127,6 +2121,8 @@ var item_inventory = function(shards, destination, label_1, label_2){
 
         table += '</tr>';
       }
+      table += '<tr class="spacer"><td></td><td></td><td></td></tr>';
+
     }
     table += '</table>';
     $(destination+' #target').empty();

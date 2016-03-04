@@ -7,8 +7,11 @@ from django.conf import settings
 
 from players.models import Player
 from teams.models import Team, assemble_pros
+
 from accounts.models import (
-    get_active_users, get_customer_player_ids, get_active_user_player_ids
+    get_customer_player_ids,
+    get_active_user_player_ids,
+    get_relevant_player_ids
 )
 
 from datadrivendota.management.tasks import (
@@ -22,6 +25,7 @@ from matches.management.tasks import CycleApiCall
 
 logger = logging.getLogger(__name__)
 logging.getLogger("requests").setLevel(logging.WARNING)
+
 
 class MirrorClientPersonas(Task):
 
