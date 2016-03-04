@@ -172,11 +172,9 @@ $(function(){
       .success(function(shards){
 
         var slices = window.jsUtils.getParameterByName('pmses').split(',')
-        console.log(slices);
         var url_shards = shards.filter(function(shard){
           return slices.includes(shard.dataslice);
         })
-        console.log(url_shards);
 
         var params = {
           granularity: 30,
