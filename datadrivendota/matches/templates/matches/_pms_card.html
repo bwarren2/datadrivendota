@@ -1,5 +1,6 @@
 <div class='col-md-2 col-xs-6'>
 
+
     {% if summary.match.radiant_win == summary.is_radiant %}
     <div class='{{summary.side}} winning-side'>
     {% else %}
@@ -7,14 +8,14 @@
     {% endif %}
 
     {% if summary.match.is_parsed %}
-        <a href="{% url 'matches:performance' %}?match_id={{summary.match.steam_id}}&pmses={{summary.player_slot}}">
+        <a class='thumbnail' href="{% url 'matches:performance' %}?match_id={{summary.match.steam_id}}&pmses={{summary.player_slot}}">
     {% endif %}
 
         <img
         src="{{ summary.hero.mugshot_url }}"
         alt="{{ summary.hero.name }}"
         title="{{ summary.hero.name }}"
-        class="topbar-hero-mugshot thumbnail player-slot-{{summary.slot}}">
+        class="topbar-hero-mugshot player-slot-{{summary.slot}}">
 
         {% if summary.improper_player %}
             <div
@@ -37,5 +38,7 @@
     {% endif %}
 
     </div>
+
+
 
 </div>
