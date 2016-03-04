@@ -182,12 +182,6 @@ $(function () {
             processResults: function (data, params) {
               params.page = params.page || 1;
 
-              // If you don't provide an id, the select is disabled by default.
-              data.map(function(d, i){
-                d.id = i+1;
-                return d;
-              })
-
               return {
                 results: data,
                 pagination: {

@@ -29,5 +29,23 @@ class ParseShard(object):
         self.name = pms.hero.name
         self.hero_name = pms.hero.internal_name
 
+    @property
+    def id(self):
+        # We need unique ids to avoid collisions disabling select2.
+        # If you just use dataslice, frex, you cannot use two players
+        # in the first slot
+        return str(self.match_id)+'00000'+str(get_munged_slice(self.dataslice))
+
     def __repr__(self):
         return "<M#{0}, {1}>".format(self.match_id, self.dataslice)
+
+
+def get_munged_slice(dataslice):
+    if dataslice == 'radiant':
+        return 101
+    elif dataslice == 'dire':
+        return 202
+    elif dataslice == 'diff':
+        return 303
+    else:
+        return dataslice
