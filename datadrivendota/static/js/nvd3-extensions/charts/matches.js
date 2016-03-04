@@ -214,9 +214,17 @@ var pms_bar_chart = function(destination, params, y_var, y_lab){
     var plot_data = [{
         "key": y_lab,
         values: pmses.map(function(d){
+          console.log(d);
+          if (d.side=='Dire'){
+            var faceclass = 'dire-face-glow'
+          } else{
+            var faceclass = 'radiant-face-glow'
+          }
           return {
             y: d[y_var],
             x: d.hero.name,
+            hero: d.hero,
+            faceclass: faceclass
           };
         })
       }]
@@ -231,7 +239,7 @@ var pms_bar_chart = function(destination, params, y_var, y_lab){
         chart = nv.models.discreteBarChart()
           .margin({
             left: 45,
-            bottom: 105,
+            bottom: 45,
           });
 
         chart.xAxis.axisLabel();
@@ -241,15 +249,38 @@ var pms_bar_chart = function(destination, params, y_var, y_lab){
 
         chart_data = svg.datum(plot_data);
         chart_data.transition().duration(500).call(chart);
+
         return chart;
       },
       function(){
         d3.select(destination + " .nv-x.nv-axis > g :not(.nv-axislabel)")
           .selectAll("g")
           .selectAll("text")
-          .attr("transform", function(d, i, j) {
-            return "translate (-7, 65) rotate(-90 0,0)"
-          }) ;
+          .remove();
+
+        console.log(plot_data);
+        var face_data = plot_data[0].values;
+
+        var plot_faces = d3.select(destination).selectAll('i').data(
+            face_data
+          )
+          .enter()
+          .append('i')
+          .attr('class', function(d){
+            return 'd2mh ' + d.hero.internal_name + ' ' + d.faceclass
+          })
+          .style('left', function(d){
+            var px = chart.xScale()(d.x)+chart.margin().left+10
+            return px+'px';
+          })
+
+          .style('bottom', function(d){
+            var px = chart.margin().bottom-15
+            return px+'px';
+          })
+          .style('position', 'absolute')
+
+
       }
 
     );
@@ -303,7 +334,6 @@ var match_timeline = function(destination, params){
           .y(1)
           .showLegend(false)
           .showYAxis(false);
-
 
         chart.xAxis.axisLabel("")
           .tickFormat(function(d){
