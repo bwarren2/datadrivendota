@@ -9,6 +9,9 @@
 
     {% if summary.match.is_parsed %}
         <a class='thumbnail' href="{% url 'matches:performance' %}?match_id={{summary.match.steam_id}}&pmses={{summary.player_slot}}">
+    {% else %}
+    <div class='thumbnail'>
+
     {% endif %}
 
         <img
@@ -35,6 +38,8 @@
 
     {% if summary.match.is_parsed %}
         </a>
+    {% else %}
+    </div>
     {% endif %}
 
     </div>
