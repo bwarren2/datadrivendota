@@ -2216,6 +2216,8 @@ var position_heatmap = function(shards, destination, params){
   Promise.all(urls).then(function(raw_data){
 
     $(destination+' .chart').empty();
+    $(destination+' label').empty();
+    $(destination+' .legend').empty();
     var svg = make_map_background(destination)
     var width = svg.attr('width');
     var height = svg.attr('height');
@@ -2326,6 +2328,7 @@ var position_heatmap = function(shards, destination, params){
         return d.offset_time > min_time && d.offset_time <= max_time;
       });
       var updata = crosscount(test);
+      console.log(updata, shard);
       update_heat(updata, get_label(shard, min_time, max_time));
     })
 
