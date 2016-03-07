@@ -2236,11 +2236,8 @@ var position_heatmap = function(shards, destination, params){
       d3.rgb("red"),
       d3.rgb("red").brighter(1),
     ]);
-      // d3.rgb("blue").darker(1),
-      // d3.rgb("green").darker(1),
-      // d3.rgb("red").darker(1),
 
-    var update_heat = function(data){
+    var update_heat = function(data, label){
       var cards = svg.selectAll('.cell')
         .data(data,
           function(d) {return d.x+':'+d.y;}
@@ -2272,8 +2269,24 @@ var position_heatmap = function(shards, destination, params){
         .style("opacity", 0)
         .remove();
 
+      d3.select(destination+' label').html(label);
     }
-    update_heat(data);
+    var get_label = function(shard, min_time, max_time){
+      if (shard.label) {
+        var prefix = shard.label;
+      } else{
+        var prefix = shard.name;
+      }
+      if(min_time!==undefined){
+        return prefix+', '+String(min_time).toHHMMSS()+'-'+String(max_time).toHHMMSS()
+      }else{
+        return prefix+', all game'
+      }
+    }
+    update_heat(data, get_label(shards[0]));
+
+
+
 
     var legend_data = x_data;
     var legend_width = $(destination).width();
@@ -2303,13 +2316,17 @@ var position_heatmap = function(shards, destination, params){
       .attr("fill", 'black');
 
     $(window).on('shardfilter', function(evt, id, min_time, max_time){
+      var shard;
       var test = raw_data.filter(function(d, i){
-        return shards[i].id == id;
+        if (shards[i].id == id){
+          shard = shards[i];
+        }
+        return true;
       })[0].filter(function(d){
         return d.offset_time > min_time && d.offset_time <= max_time;
       });
       var updata = crosscount(test);
-      update_heat(updata);
+      update_heat(updata, get_label(shard, min_time, max_time));
     })
 
 
