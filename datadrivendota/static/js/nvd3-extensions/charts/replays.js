@@ -931,34 +931,51 @@ var position_heatmap = function(shards, destination, params){
     var colors = d3.scale.linear()
     .domain(x_data)
     .range([
-      d3.rgb("green").darker(1),
+      d3.rgb("green"),
       d3.rgb("green").brighter(1),
-      d3.rgb("yellow").darker(1),
-      d3.rgb("yellow").brighter(1),
-      d3.rgb("red").darker(1),
+      d3.rgb("orange"),
+      d3.rgb("orange").brighter(1),
+      d3.rgb("red"),
       d3.rgb("red").brighter(1),
     ]);
+      // d3.rgb("blue").darker(1),
+      // d3.rgb("green").darker(1),
+      // d3.rgb("red").darker(1),
 
-    var cards = svg.selectAll(destination)
-        .data(data, function(d) {return d.x+':'+d.y;});
+    var update_heat = function(data){
+      var cards = svg.selectAll('.cell')
+        .data(data,
+          function(d) {return d.x+':'+d.y;}
+        );
 
-    cards.append("title");
-    var size = xscale(10)-xscale(9);
-    cards.enter().append("rect")
-        .attr("x", function(d) { return xscale(d.x)})
-        .attr("y", function(d) { return height-yscale(d.y) })
-        .attr("class", "hour bordered")
-        .attr("ddd-ct", function(d) { return d.ct })
-        .attr("width", size+2)
-        .attr("height", size+2)
-        .style("fill", function(d){return colors(d.ct)});
+      cards.append("title");
+      cards.select("title").text(function(d) { return d.ct; });
 
-    cards.transition().duration(1000)
-        .style("fill", function(d) { return colors(d.ct); });
+      var size = xscale(10)-xscale(9);
 
-    cards.select("title").text(function(d) { return d.ct; });
+      cards.enter().append("rect")
+          .attr("x", function(d) { return xscale(d.x)})
+          .attr("y", function(d) { return height-yscale(d.y) })
+          .attr("class", "cell")
+          .attr("ddd-ct", function(d) { return d.ct })
+          .attr("width", size+2)
+          .attr("height", size+2)
+          .style("fill", function(d){return colors(d.ct)})
+          .style("stroke", function(d){return 'black'})
+          .style("stroke-width", '1px')
 
-    cards.exit().remove();
+      cards.transition().duration(1000)
+          .style("fill", function(d) { return colors(d.ct); });
+
+
+      cards.exit()
+        .transition()
+        .duration(1000)
+        .style("opacity", 0)
+        .remove();
+
+    }
+    update_heat(data);
 
     var legend_data = x_data;
     var legend_width = $(destination).width();
@@ -979,6 +996,7 @@ var position_heatmap = function(shards, destination, params){
       .attr("height", legendElementWidth)
       .style("fill", function(d, i) {return colors(d); });
 
+
     selection.append("text")
       .attr("class", "legendtext")
       .text(function(d) {return "≥ " + Math.round(d)+'s'; })
@@ -986,15 +1004,15 @@ var position_heatmap = function(shards, destination, params){
       .attr("y", legendElementWidth/2)
       .attr("fill", 'black');
 
-    // $(window).on('shardfilter', function(evt, id, min_time, max_time){
-    //   console.log(evt, id, min_time, max_time);
-    //   var test = raw_data.filter(function(d, i){
-    //       return shards[i].id == id;
-    //     });
-    //   console.log(test);
-    //   var updata = crosscount(test[0]);
-    //   console.log(updata);
-    // })
+    $(window).on('shardfilter', function(evt, id, min_time, max_time){
+      var test = raw_data.filter(function(d, i){
+        return shards[i].id == id;
+      })[0].filter(function(d){
+        return d.offset_time > min_time && d.offset_time <= max_time;
+      });
+      var updata = crosscount(test);
+      update_heat(updata);
+    })
 
 
   })
