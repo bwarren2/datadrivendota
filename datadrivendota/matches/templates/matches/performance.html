@@ -63,15 +63,26 @@
   </form>
   </div>
 
-  <div id='kda-dash' class='col-md-12' height='900px'>
+  <div id='overview' class='col-md-12' height='900px'>
 
-    <div class='page-header'>
-      <h2>Item inventory</h2>
-    </div>
 
-    <div id='inventory'>
-      <label></label>
-      <div id = 'target' class='chart'></div>
+    <div class='row'>
+
+      <div id='inventory' class='col-md-6'>
+        <div class='page-header'>
+          <h2>Item inventory</h2>
+        </div>
+        <label></label>
+        <div id='target' class='chart'></div>
+      </div>
+
+      <div id='position'  class='col-md-6'>
+        <div class='page-header'><h2>Position Heatmap</h2></div>
+        <label></label>
+        <div class='chart vert-md-6'></div>
+        <div class='legend'></div>
+      </div>
+
     </div>
 
 
@@ -166,6 +177,9 @@
   .select2-result-pms__title{
     color: black;
   }
+  .legendtext{
+    fill: black;
+  }
 /*  .col-md-2, .col-md-3, .col-md-4{
     border: red solid 5px;
   }
@@ -184,16 +198,13 @@ $(function(){
     $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
 
       .success(function(shards){
-
         var slices = window.jsUtils.getParameterByName('pmses').split(',')
         var url_shards = shards.filter(function(shard){
           return slices.includes(shard.dataslice);
         })
-
         var params = {
           granularity: 30,
         };
-
         draw(url_shards, params);
       })
     }
@@ -212,79 +223,81 @@ $(function(){
     })
 
     var draw = function(shards, params){
-      var shardfacets = shards.map(function(d){
-        return [d, 'kills', 'statelog']
-      });
-      d7.extensions.charts.replays.multifacet_lineup(
-        shardfacets, '#kills', params, 'Kills'
-      );
+      // var shardfacets = shards.map(function(d){
+      //   return [d, 'kills', 'statelog']
+      // });
+      // d7.extensions.charts.replays.multifacet_lineup(
+      //   shardfacets, '#kills', params, 'Kills'
+      // );
 
-      var shardfacets = shards.map(function(d){
-        return [d, 'deaths', 'statelog']
-      });
-      d7.extensions.charts.replays.multifacet_lineup(
-        shardfacets, '#deaths', params, 'Deaths'
-      );
+      // var shardfacets = shards.map(function(d){
+      //   return [d, 'deaths', 'statelog']
+      // });
+      // d7.extensions.charts.replays.multifacet_lineup(
+      //   shardfacets, '#deaths', params, 'Deaths'
+      // );
 
-      var shardfacets = shards.map(function(d){
-        return [d, 'assists', 'statelog']
-      });
-      d7.extensions.charts.replays.multifacet_lineup(
-        shardfacets, '#assists', params, 'Assists'
-      );
-
-
-
-      var shardfacets = shards.map(function(d){
-        return [d, 'earned_income', 'combatseries']
-      });
-      d7.extensions.charts.replays.multifacet_lineup(
-        shardfacets, '#earned_income', params, 'Earned Gold'
-      );
-
-      var shardfacets = shards.map(function(d){
-        return [d, 'creep_kill_income', 'combatseries']
-      });
-      d7.extensions.charts.replays.multifacet_lineup(
-        shardfacets, '#creep_kill_income', params, 'Creep Kill Gold'
-      );
-
-      var shardfacets = shards.map(function(d){
-        return [d, 'hero_kill_income', 'combatseries']
-      });
-      d7.extensions.charts.replays.multifacet_lineup(
-        shardfacets, '#hero_kill_income', params, 'Hero Kill Gold'
-      );
+      // var shardfacets = shards.map(function(d){
+      //   return [d, 'assists', 'statelog']
+      // });
+      // d7.extensions.charts.replays.multifacet_lineup(
+      //   shardfacets, '#assists', params, 'Assists'
+      // );
 
 
 
-      var shardfacets = shards.map(function(d){
-        return [d, 'health', 'statelog']
-      });
-      d7.extensions.charts.replays.multifacet_lineup(
-        shardfacets, '#health', params, 'Health'
-      );
+      // var shardfacets = shards.map(function(d){
+      //   return [d, 'earned_income', 'combatseries']
+      // });
+      // d7.extensions.charts.replays.multifacet_lineup(
+      //   shardfacets, '#earned_income', params, 'Earned Gold'
+      // );
 
-      var shardfacets = shards.map(function(d){
-        return [d, 'mana', 'statelog']
-      });
-      d7.extensions.charts.replays.multifacet_lineup(
-        shardfacets, '#mana', params, 'Mana'
-      );
+      // var shardfacets = shards.map(function(d){
+      //   return [d, 'creep_kill_income', 'combatseries']
+      // });
+      // d7.extensions.charts.replays.multifacet_lineup(
+      //   shardfacets, '#creep_kill_income', params, 'Creep Kill Gold'
+      // );
 
-      var shardfacets = shards.map(function(d){
-        return [d, 'total_damage', 'statelog']
-      });
-      d7.extensions.charts.replays.multifacet_lineup(
-        shardfacets, '#total_damage', params, 'Total Damage'
-      );
+      // var shardfacets = shards.map(function(d){
+      //   return [d, 'hero_kill_income', 'combatseries']
+      // });
+      // d7.extensions.charts.replays.multifacet_lineup(
+      //   shardfacets, '#hero_kill_income', params, 'Hero Kill Gold'
+      // );
 
 
+
+      // var shardfacets = shards.map(function(d){
+      //   return [d, 'health', 'statelog']
+      // });
+      // d7.extensions.charts.replays.multifacet_lineup(
+      //   shardfacets, '#health', params, 'Health'
+      // );
+
+      // var shardfacets = shards.map(function(d){
+      //   return [d, 'mana', 'statelog']
+      // });
+      // d7.extensions.charts.replays.multifacet_lineup(
+      //   shardfacets, '#mana', params, 'Mana'
+      // );
+
+      // var shardfacets = shards.map(function(d){
+      //   return [d, 'total_damage', 'statelog']
+      // });
+      // d7.extensions.charts.replays.multifacet_lineup(
+      //   shardfacets, '#total_damage', params, 'Total Damage'
+      // );
 
       d7.extensions.charts.replays.item_inventory(
         shards, '#inventory', shards.map(function(d){
           return d.name
         })
+      );
+
+      d7.extensions.charts.replays.position_heatmap(
+        shards, '#position', params
       );
 
 

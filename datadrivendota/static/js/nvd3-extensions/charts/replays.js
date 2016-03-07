@@ -771,9 +771,10 @@ var item_inventory = function(shards, destination, labels){
     }, {});
     // Trim down our data sets.
 
-    var trimmed_data = data.map(function(d, i){
-      var filtered_dataset = d.filter(function(x){
-        return x.offset_time.mod(600) === 0;
+    var trimmed_data = data.map(function(series, i){
+      var max = d3.max(series, function(d){return d.offset_time})
+      var filtered_dataset = series.filter(function(x){
+        return x.offset_time.mod(600) === 0 || x.offset_time == max;
       });
       return filtered_dataset;
     });
@@ -783,14 +784,21 @@ var item_inventory = function(shards, destination, labels){
     });
 
 
-    var table = '<table class="table">';
+    var prev_pms_time = -600;
+    var table = '<table class="table  table-hover">';
+
     for (var time_idx=0; time_idx<max_length; time_idx++) {
       for(var series_idx = 0; series_idx<trimmed_data.length; series_idx++){
 
 
+        var pms_label = labels[series_idx];
+        var shard_id = shards[series_idx].id;
+        var pms_time = trimmed_data[series_idx][time_idx].offset_time;
 
-        table += '<tr>';
-        table += '<td>'+labels[series_idx]+'</td>';
+        table += '<tr class="inforow" data-shard-id="'+shard_id+'" data-min-time="'+prev_pms_time+'" data-max-time="'+pms_time+'">';
+
+        table += '<td>'+pms_label+'</td>';
+
         if (trimmed_data[series_idx][time_idx]) {
 
           table += '<td>'+String(trimmed_data[series_idx][time_idx].offset_time).toHHMMSS()+'</td>';
@@ -825,11 +833,21 @@ var item_inventory = function(shards, destination, labels){
       }
       table += '<tr class="spacer"><td></td><td></td><td></td></tr>';
 
+      prev_pms_time = pms_time;
+
     }
     table += '</table>';
     $(destination+' #target').empty();
     $(destination+' #target').append(table);
     $(destination+' label').html('Inventory timings');
+    $('.inforow').on('mouseover', function(){
+
+      $(window).trigger('shardfilter', [
+        $(this).data('shard-id'),
+        $(this).data('min-time'),
+        $(this).data('max-time'),
+      ])
+    });
 
   });
 };
@@ -854,8 +872,136 @@ var minimap = function(shards, destination, params){
         return prev;
       }, {})
     })
-    console.log(position_data[0][-30]);
+    // console.log(position_data[0][-30]);
 
+    var svg = make_map_background(destination)
+    var width = svg.attr('width');
+    var height = svg.attr('height');
+
+    var fetch_data = position_data.map(function(d){
+      return d[0]
+    });
+
+    var xscale = utils.axis_format.minimap_x(width, height);
+    var yscale = utils.axis_format.minimap_y(width, height);
+
+    var faces = d3.select(destination).selectAll('i').data(fetch_data)
+      .enter()
+      .append('i')
+      .attr('class', function(d){return 'd2mh ' + d.hero_name})
+      .style('left', function(d){return xscale(d.x)+'px'})
+      .style('bottom', function(d){return yscale(d.y)+'px'})
+      .style('position', 'absolute')
+
+    $(window).on('update', function(evt, arg){
+      var fetch_data = position_data.map(function(d){
+        return d[arg]
+      });
+
+      var faces = d3.select(destination).selectAll('i').data(fetch_data)
+        .transition()
+        .duration(100)
+        .style('left', function(d){return xscale(d.x)+'px'})
+        .style('bottom', function(d){return yscale(d.y)+'px'})
+    })
+
+  })
+};
+
+
+var position_heatmap = function(shards, destination, params){
+  var urls = shards.map(function(shard){
+    var location = utils.parse_urls.url_for(shard, 'position', 'statelog');
+    return $.getJSON(location);
+  })
+  // Get the replay parse info
+  Promise.all(urls).then(function(raw_data){
+
+    $(destination+' .chart').empty();
+    var svg = make_map_background(destination)
+    var width = svg.attr('width');
+    var height = svg.attr('height');
+
+    var xscale = utils.axis_format.minimap_x(width, height);
+    var yscale = utils.axis_format.minimap_y(width, height);
+
+    var data = crosscount(raw_data[0]);
+
+    var x_data = [1,5,10,30,60,120];
+    var colors = d3.scale.linear()
+    .domain(x_data)
+    .range([
+      d3.rgb("green").darker(1),
+      d3.rgb("green").brighter(1),
+      d3.rgb("yellow").darker(1),
+      d3.rgb("yellow").brighter(1),
+      d3.rgb("red").darker(1),
+      d3.rgb("red").brighter(1),
+    ]);
+
+    var cards = svg.selectAll(destination)
+        .data(data, function(d) {return d.x+':'+d.y;});
+
+    cards.append("title");
+    var size = xscale(10)-xscale(9);
+    cards.enter().append("rect")
+        .attr("x", function(d) { return xscale(d.x)})
+        .attr("y", function(d) { return height-yscale(d.y) })
+        .attr("class", "hour bordered")
+        .attr("ddd-ct", function(d) { return d.ct })
+        .attr("width", size+2)
+        .attr("height", size+2)
+        .style("fill", function(d){return colors(d.ct)});
+
+    cards.transition().duration(1000)
+        .style("fill", function(d) { return colors(d.ct); });
+
+    cards.select("title").text(function(d) { return d.ct; });
+
+    cards.exit().remove();
+
+    var legend_data = x_data;
+    var legend_width = $(destination).width();
+    var legendElementWidth = legend_width/legend_data.length;
+    var legend_height = legendElementWidth;
+
+    var legend = d3.select(destination+' .legend')
+      .append("svg")
+      .attr("width", legend_width)
+      .attr("height", legend_height);
+
+    var selection = legend.selectAll('rect').data(legend_data).enter();
+
+    selection.append("rect")
+      .attr("x", function(d, i) { return legendElementWidth * i; })
+      .attr("y", 0)
+      .attr("width", legendElementWidth)
+      .attr("height", legendElementWidth)
+      .style("fill", function(d, i) {return colors(d); });
+
+    selection.append("text")
+      .attr("class", "legendtext")
+      .text(function(d) {return "≥ " + Math.round(d)+'s'; })
+      .attr("x", function(d, i) { return legendElementWidth * i+legendElementWidth/4; })
+      .attr("y", legendElementWidth/2)
+      .attr("fill", 'black');
+
+    // $(window).on('shardfilter', function(evt, id, min_time, max_time){
+    //   console.log(evt, id, min_time, max_time);
+    //   var test = raw_data.filter(function(d, i){
+    //       return shards[i].id == id;
+    //     });
+    //   console.log(test);
+    //   var updata = crosscount(test[0]);
+    //   console.log(updata);
+    // })
+
+
+  })
+
+}
+
+var make_map_background = function(destination){
     var svg = utils.svg.square_svg(destination+' .chart');
     var width = svg.attr('width');
     var height = svg.attr('height');
@@ -881,39 +1027,32 @@ var minimap = function(shards, destination, params){
       .attr("y", 0)
       .attr('fill', "url(#minimap_img)");
 
-    var fetch_data = position_data.map(function(d){
-      return d[-26]
+    return svg;
+}
+
+var crosscount = function(series){
+    var counts = {};
+    series.map(function(point){
+        if(!counts.hasOwnProperty(point.x)){
+            counts[point.x] = {};
+        }
+        if(!counts[point.x].hasOwnProperty(point.y)){
+            counts[point.x][point.y] = 0;
+        }
+        counts[point.x][point.y] += 1;
     });
-
-
-
-    var xscale = utils.axis_format.minimap_x(width, height);
-    var yscale = utils.axis_format.minimap_y(width, height);
-
-    var faces = d3.select(destination).selectAll('i').data(fetch_data)
-      .enter()
-      .append('i')
-      .attr('class', function(d){return 'd2mh ' + d.hero_name})
-      .style('left', function(d){return xscale(d.x)+'px'})
-      .style('bottom', function(d){return yscale(d.y)+'px'})
-      .style('position', 'absolute')
-
-    $(window).on('update', function(evt, arg){
-      var fetch_data = position_data.map(function(d){
-        return d[arg]
-      });
-
-      var faces = d3.select(destination).selectAll('i').data(fetch_data)
-        .transition()
-        .duration(100)
-        .style('left', function(d){return xscale(d.x)+'px'})
-        .style('bottom', function(d){return yscale(d.y)+'px'})
-
-      })
-
-  })
-};
-
+    var answers = [];
+    Object.getOwnPropertyNames(counts).map(function(idx){
+        Object.getOwnPropertyNames(counts[idx]).map(function(idy){
+            answers.push({
+                x: parseInt(idx),
+                y: parseInt(idy),
+                ct: counts[idx][idy]
+            });
+        });
+    });
+    return answers;
+}
 
 module.exports = {
   state_lineup: state_lineup,
@@ -921,6 +1060,8 @@ module.exports = {
   item_scatter: item_scatter,
   item_inventory: item_inventory,
   multifacet_lineup: multifacet_lineup,
-  minimap: minimap
+  minimap: minimap,
+  position_heatmap: position_heatmap,
 };
+
 
