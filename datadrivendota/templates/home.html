@@ -22,10 +22,14 @@
               </div>
 
               <div class='col-md-12'>
-                <h5>Hero Damage Dealt, Nanyang Finals Game 1</h5>
-                <div id='gold_chart' class='chart toggling vert-md-6'>
-                  <img class='ajax-loader' src="/assets/images/loading.gif">
+                <h5>Hero Health, Final Game of Shanghai Major, 10s intervals</h5>
+
+                <div id='major_chart' class='chart toggling vert-md-6'>
+                  <div class='vert-md-6 chart toggling'>
+                    <img class='ajax-loader' src="/assets/images/loading.gif">
+                  </div>
                 </div>
+
               </div>
 
             </div>
@@ -159,53 +163,23 @@
 
         pingSetup('{{csrf_token}}')
 
-        var match_id = 1906861533;
-        var url ="/rest-api/player-match-summary/?match_id="+match_id;
-
-        // Get the PMS info
-        Promise.resolve(
-            $.ajax({
-              url: url,
-              dataType: "json"
+        var match_id = 2201993554;
+        $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
+          .success(function(shards){
+            shards = shards.filter(function(d){
+              return d.dataslice < 150;
             })
-        ).then(function(data){
-
-            pmses = data;
-
-            return Promise.all(
-              data.map(function(pms){
-
-                return Promise.resolve(
-                  $.ajax({
-                    url: pms.replay_shard,
-                    dataType: "json"
-                  })
-                )
-              })
+            var params = {
+              granularity: 10,
+              interpolation: 'linear',
+              show_legend: true,
+            };
+            console.log(shards);
+            d7.extensions.charts.replays.stat_lineup(
+              shards, 'health', '#major_chart', params, 'statelog'
             );
+          })
 
-        })
-        .then(function(data){
-
-            d7.extensions.charts.pms_shards.plot_shard_lineup(
-              data.slice(0, 10),
-              [
-                d7.extensions.utils.filter.hero_dmg_dealt,
-              ],
-              d7.extensions.utils.map.sum,
-              d7.extensions.utils.reshape.noop,
-              d7.extensions.components.axes.offset_time,
-              d7.extensions.components.axes.sum,
-              '#gold_chart',
-              pmses.slice(0,10)
-            );
-
-            d7.extensions.utils.visuals.toggle_sides();
-
-        })
-        .catch(function(e){
-            console.log(e);
-        });
     });
   </script>
 {% endblock extra_js %}

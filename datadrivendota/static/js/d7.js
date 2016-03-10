@@ -1321,6 +1321,7 @@ var replay_lines = function(dataset, facet, destination, params){
     var label_destination = destination+" label";
     var x_label = toTitleCase("offset time");
     var y_label = toTitleCase(facet);
+    var show_legend = false;
 
     if(params!==undefined){
 
@@ -1351,6 +1352,9 @@ var replay_lines = function(dataset, facet, destination, params){
       if(params.y_label!==undefined){
         y_label = params.y_label;
       }
+      if(params.show_legend!==undefined){
+        show_legend = params.show_legend;
+      }
     }
 
     var plot_data = dataset.map(function(d, i){
@@ -1378,7 +1382,7 @@ var replay_lines = function(dataset, facet, destination, params){
           .y(function(d){
             return d[facet];
           })
-          .showLegend(false)
+          .showLegend(show_legend)
           .interpolate(interpolation)
           .forceY(0);
 
@@ -1424,16 +1428,21 @@ var replay_lines = function(dataset, facet, destination, params){
     );
 }
 
-var state_lineup = function(shards, facet, destination, params){
+var stat_lineup = function(shards, facet, destination, params, log){
 
+  console.log(log);
+  if (log===undefined){
+    log = 'statelog';
+  }
+  console.log(log);
   // Get the replay parse info
   Promise.all(
     shards.map(function(shard){
-      var location = utils.parse_urls.url_for(shard, facet, 'statelog');
+      var location = utils.parse_urls.url_for(shard, facet, log);
       return $.getJSON(location);
     })
   ).then(function(facets){
-
+    console.log(facets);
     var dataset = facets.map(function(dataseries, i){
       var myobj =  {
         'key': shards[i].name,
@@ -2328,7 +2337,7 @@ var position_heatmap = function(shards, destination, params){
         return d.offset_time > min_time && d.offset_time <= max_time;
       });
       var updata = crosscount(test);
-      console.log(updata, shard);
+      // console.log(updata, shard);
       update_heat(updata, get_label(shard, min_time, max_time));
     })
 
@@ -2391,7 +2400,7 @@ var crosscount = function(series){
 }
 
 module.exports = {
-  state_lineup: state_lineup,
+  stat_lineup: stat_lineup,
   scatterline: scatterline,
   item_scatter: item_scatter,
   item_inventory: item_inventory,
