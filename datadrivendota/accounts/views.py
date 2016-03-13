@@ -63,23 +63,17 @@ class ResetPasswordView(FormView):
         password = form.data['password']
         password_check = form.data['password_check']
         code = Code.get_code(self.kwargs['code'])
-        print
         if code is None:
             raise Http404('Missing token')
 
         if password == password_check:
             user = User.objects.get(email=code.email)
-            print user
             user.set_password(password)
             user.save()
             code.verify()
             messages.add_message(
                 self.request, messages.SUCCESS, 'Password updated!'
             )
-            print code
-            print 'Pass check:'
-            print user.check_password(password)
-            print ''
             return super(ResetPasswordView, self).form_valid(form)
 
         else:
