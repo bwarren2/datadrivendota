@@ -7,7 +7,6 @@
 
 
 {% block aligned_content %}
-    {% include "mixins/_messages.html" %}
 
     <div class="buttons">
       {% if user.is_authenticated %}
@@ -83,6 +82,11 @@
                 <label class="control-label" for="password">Password:</label>
                 <input class="form-control" id="password" type="password" name="password" value="" />
               </div>
+
+              <div class="form-group">
+                <a href='{% url "accounts:forgot_password" %}'>Forgot password?</a>
+              </div>
+
             </div>
 
             <div class="modal-footer">
