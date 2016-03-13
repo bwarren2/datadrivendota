@@ -36,7 +36,8 @@ def user_password(
         user.set_password(password)
         user.save()
     else:
-        password = strategy.request_data()['password']
+        password = request['password']
+
         check = user.check_password(password)
         if not check:
             messages.add_message(
