@@ -89,20 +89,6 @@ class ResetPasswordView(FormView):
             return super(ResetPasswordView, self).form_invalid(form)
 
 
-# def password_reset(request, code):
-#     code = Code.get_code(code)
-#     if code is None:
-#         raise Http404('Missing token')
-
-#     errors = []
-#     if request.method == 'POST':
-#         password = request.POST.get('password')
-#         password_verification = request.POST.get('password_verification')
-#         else:
-#             errors.append('Passwords don\'t match')
-#     return render(request, 'password_reset.html', {'errors': errors})
-
-
 @method_decorator(never_cache, name='dispatch')
 class CompleteView(TemplateView):
     template_name = 'accounts/home.html'
