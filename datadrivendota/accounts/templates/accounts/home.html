@@ -3,7 +3,11 @@
 {% block title %}Welcome!{% endblock title %}
 {% block aligned_content %}
     <div class='col-md-12'>
-        <h1>Your Steam ID <small>How we get your data</small></h1>
+        <h1>Your Account </h1>
+        <p>This is where you can specify what what we import for you.</p>
+    </div>
+    <div class='col-md-12'>
+        <h2>Your Steam ID <small>How we get your data</small></h2>
         {% if user.userprofile.steam_id %}
         <p>Your current id is:</p>
             <ul>
@@ -23,34 +27,37 @@
             {{ form }}
             <button type="submit" class="btn btn-default">Submit</button>
         </form>
-        <h2>How do I get my Steam ID?</h2>
-        <p>
-            There are several ways.  In these examples, your steam_id is bold.
-        </p>
-        <p>
-            If you have a steamcommunity url:
-        </p>
-        <blockquote>
-            http://steamcommunity.com/profiles/<strong>76561198057039518</strong>
-        </blockquote>
-        <p>
-            You can get your Steam ID by clicking on your avatar in the Steam Friends window:
-        </p>
+        <h2 data-toggle="collapse" data-target='#get-id' class='collapsed brand-primary'>
+            How do I get my Steam ID?
+        </h2>
+        <div id='get-id' class='collapse' >
+            <p>
+                There are several ways.  In these examples, your steam_id is bold.
+            </p>
+            <p>
+                If you have a steamcommunity url:
+            </p>
+            <blockquote>
+                http://steamcommunity.com/profiles/<strong>76561198057039518</strong>
+            </blockquote>
+            <p>
+                You can get your Steam ID by clicking on your avatar in the Steam Friends window:
+            </p>
 
-        <img class='thumbnail img-responsive' src="{% static 'images/steam_id.png' %}">
-        <p>
-            If you have a YASP url:
-        </p>
-        <blockquote>
-            https://yasp.co/players/<strong>110554529</strong>
-        </blockquote>
-        <h3>
-            But wait, those numbers are different!
-        </h3>
-        <p>
-            Valve uses both 32bit and 64bit player ids, depending on the service.  If you give us either, we can do the work for the other one.  It is confusing, we know.
-        </p>
-
+            <img class='thumbnail img-responsive' src="{% static 'images/steam_id.png' %}">
+            <p>
+                If you have a YASP url:
+            </p>
+            <blockquote>
+                https://yasp.co/players/<strong>110554529</strong>
+            </blockquote>
+            <h3>
+                But wait, those numbers are different!
+            </h3>
+            <p>
+                Valve uses both 32bit and 64bit player ids, depending on the service.  If you give us either, we can do the work for the other one.  It is confusing, we know.
+            </p>
+        </div>
     </div>
     <div class='col-md-12'>
     </div>
