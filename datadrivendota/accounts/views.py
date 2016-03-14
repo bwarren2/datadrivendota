@@ -12,7 +12,11 @@ from django.contrib import messages
 from social.apps.django_app.default.models import Code
 
 from social.backends.utils import load_backends
-from .forms import ForgotPasswordForm, ResetPasswordForm
+from .forms import (
+    ForgotPasswordForm,
+    ResetPasswordForm,
+    SteamIdForm
+)
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -84,19 +88,21 @@ class ResetPasswordView(FormView):
 
 
 @method_decorator(never_cache, name='dispatch')
-class CompleteView(TemplateView):
+class HomeView(FormView):
+    form_class = SteamIdForm
     template_name = 'accounts/home.html'
+    success_url = reverse_lazy('accounts:home')
 
-    def get_context_data(self, **kwargs):
-        kwargs['available_backends'] = load_backends(
-            settings.AUTHENTICATION_BACKENDS
+    def form_valid(self, form):
+        steam_id = int(form.data['steam_id'])
+        userprofile = self.request.user.userprofile
+        userprofile.steam_id = steam_id
+        userprofile.save()
+
+        messages.add_message(
+            self.request, messages.SUCCESS, 'Steam ID Updated!'
         )
-        return kwargs
-
-
-@method_decorator(never_cache, name='dispatch')
-class AccountsHome(TemplateView):
-    template_name = 'accounts/home.html'
+        return super(HomeView, self).form_valid(form)
 
 
 @method_decorator(never_cache, name='dispatch')

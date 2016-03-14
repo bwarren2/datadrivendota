@@ -1,5 +1,61 @@
 {% extends "row_base.html" %}
+{% load static %}
 {% block title %}Welcome!{% endblock title %}
 {% block aligned_content %}
-    <p>We are currently working on adding login-only features related to replay parsing, but they are not quite ready yet.  Check back soon!</p>
+    <div class='col-md-12'>
+        <h1>Your Steam ID <small>How we get your data</small></h1>
+        {% if user.userprofile.steam_id %}
+        <p>Your current id is:</p>
+            <ul>
+                <li> 64 bit ID: {{user.userprofile.big_steam_id}}</li>
+                <li> 32 bit ID: {{user.userprofile.steam_id}}</li>
+            </ul>
+        <p>If <a href="http://steamcommunity.com/profiles/{{user.userprofile.big_steam_id}}">this</a> is your steam profile, you are all set!</p>
+        <p>If you need to change your ID, use this form:</p>
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+            Your Steam ID is not set!  We cannot import your games without it.
+            </div>
+            <p>To change your ID, use this form:</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+        <h2>How do I get my Steam ID?</h2>
+        <p>
+            There are several ways.  In these examples, your steam_id is bold.
+        </p>
+        <p>
+            If you have a steamcommunity url:
+        </p>
+        <blockquote>
+            http://steamcommunity.com/profiles/<strong>76561198057039518</strong>
+        </blockquote>
+        <p>
+            You can get your Steam ID by clicking on your avatar in the Steam Friends window:
+        </p>
+
+        <img class='thumbnail img-responsive' src="{% static 'images/steam_id.png' %}">
+        <p>
+            If you have a YASP url:
+        </p>
+        <blockquote>
+            https://yasp.co/players/<strong>110554529</strong>
+        </blockquote>
+        <h3>
+            But wait, those numbers are different!
+        </h3>
+        <p>
+            Valve uses both 32bit and 64bit player ids, depending on the service.  If you give us either, we can do the work for the other one.  It is confusing, we know.
+        </p>
+
+    </div>
+    <div class='col-md-12'>
+    </div>
+    <div class='col-md-12'>
+        <h2>Contact us</h2>
+        <p>We are actively building new things, and working to make your experience better.  Have thoughts, feelings, desires on what is here?  Email the devs directly at <a href="mailto:contact@datadrivendota.com">contact@datadrivendota.com</a>!</p>
+    </div>
 {% endblock aligned_content %}

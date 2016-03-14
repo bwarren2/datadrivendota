@@ -12,14 +12,15 @@ class PlayerIndexView(ListView):
     """A list of active or paid users."""
 
     paginate_by = 30
-    queryset = queryset = Player.objects.filter(
-        steam_id__in=get_relevant_player_ids()
-    ).annotate(
-        Max('playermatchsummary__match__start_time')
-    ).order_by(
-        '-playermatchsummary__match__start_time__max'
-    )
 
+    def get_queryset(self):
+        return Player.objects.filter(
+            steam_id__in=get_relevant_player_ids()
+        ).annotate(
+            Max('playermatchsummary__match__start_time')
+        ).order_by(
+            '-playermatchsummary__match__start_time__max'
+        )
 
 
 class ProIndexView(ListView):

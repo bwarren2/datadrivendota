@@ -20,3 +20,11 @@ class ResetPasswordForm(forms.Form):
     password_check = PasswordField(
         label='New Password Check',
     )
+
+
+class SteamIdForm(forms.Form):
+    steam_id = forms.IntegerField(
+        label='Your Steam ID',
+        required=True,
+        min_value=1,
+    )

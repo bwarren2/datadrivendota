@@ -77,12 +77,21 @@ class UserProfile(models.Model):
         related_name='requesters'
     )
     request_limit = models.IntegerField(default=10)
+    public = models.BooleanField(default=True)
+
+    @property
+    def big_steam_id(self):
+        return self.steam_id+settings.ADDER_32_BIT
 
     def __unicode__(self):
         return "User:{0}, Player id: {1}".format(
             unicode(self.user),
             unicode(self.steam_id)
         )
+
+    def save(self, *args, **kwargs):
+        self.steam_id = self.steam_id % settings.ADDER_32_BIT
+        super(UserProfile, self).save(*args, **kwargs)
 
 
 class PingRequest(models.Model):
