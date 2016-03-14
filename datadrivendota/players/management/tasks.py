@@ -117,7 +117,7 @@ class MirrorPlayerData(BaseTask):
             logger.error("Needed an account id, had none, failed.")
         player = Player.objects.get_or_create(
             steam_id=api_context.account_id
-        )
+        )[0]
         if api_context.matches_requested is None:
             api_context.matches_requested = 500
 
