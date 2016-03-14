@@ -429,7 +429,7 @@ TESTERS = [
 ]
 
 LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/accounts/done/'
+LOGIN_REDIRECT_URL = '/accounts/'
 SOCIAL_AUTH_EMAIL_VALIDATION_URL = '/accounts/email-sent/'
 EMAIL_FROM = 'noreply@datadrivendota.com'
 
