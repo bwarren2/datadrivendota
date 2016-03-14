@@ -127,6 +127,17 @@ class EmailRequiredView(TemplateView):
         return kwargs
 
 
+@method_decorator(never_cache, name='dispatch')
+class CompleteView(TemplateView):
+    template_name = 'accounts/home.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['available_backends'] = load_backends(
+            settings.AUTHENTICATION_BACKENDS
+        )
+        return kwargs
+
+
 def add_backends(context):
     context['available_backends'] = load_backends(
         settings.AUTHENTICATION_BACKENDS

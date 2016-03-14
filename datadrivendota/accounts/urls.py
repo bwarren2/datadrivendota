@@ -22,4 +22,9 @@ urlpatterns = [
         views.ResetPasswordView.as_view(),
         name='reset_password'
     ),
+    url(
+        r'^complete/(?P<backend>[^/]+)/$',
+        views.CompleteView.as_view(),
+        name='complete'
+    ),
 ]
