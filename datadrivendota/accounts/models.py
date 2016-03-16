@@ -69,7 +69,6 @@ class UserProfile(models.Model):
     steam_id = models.BigIntegerField(
         help_text="The steam id to pull for this user.  Like for players.",
         validators=[validate_32bit],
-        db_index=True,
         null=True
     )
     requested = models.ManyToManyField(
@@ -90,7 +89,8 @@ class UserProfile(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        self.steam_id = self.steam_id % settings.ADDER_32_BIT
+        if self.steam_id is not None:
+            self.steam_id = self.steam_id % settings.ADDER_32_BIT
         super(UserProfile, self).save(*args, **kwargs)
 
 

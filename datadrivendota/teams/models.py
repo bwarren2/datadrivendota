@@ -80,7 +80,10 @@ class Team(models.Model):
         super(Team, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return self.name
+        if self.name is not None:
+            return self.name
+        else:
+            return "ID: {0}".format(self.steam_id)
 
 
 def assemble_pros(teams):

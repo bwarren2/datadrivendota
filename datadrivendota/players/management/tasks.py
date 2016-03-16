@@ -1,9 +1,14 @@
+from datetime import timedelta
+from django.utils import timezone
+from time import mktime
+
 import logging
 from copy import deepcopy
 from time import time
 from celery import Task, chain
 
 from django.conf import settings
+from django.db.models import Q
 
 from players.models import Player
 from teams.models import Team, assemble_pros
@@ -13,6 +18,9 @@ from accounts.models import (
     get_active_user_player_ids,
     get_relevant_player_ids
 )
+
+from leagues.models import League
+from matches.models import Match
 
 from datadrivendota.management.tasks import (
     BaseTask,
@@ -39,9 +47,29 @@ class MirrorClientPersonas(Task):
         list_send_length = 50
         users = get_relevant_player_ids()
 
-        teams = Team.objects.all()
-        pros = assemble_pros(teams)
+        leagues = League.objects.exclude(tier=League.AMATEUR)
+        since = timedelta(days=14)
+        then = timezone.now() - since
 
+        matches = Match.objects.filter(
+            league__in=leagues, start_time__gte=mktime(then.timetuple())
+        )
+        logging.info(
+            "Found {0} matches to update personas on".format(
+                matches.count(),
+            )
+        )
+        teams = Team.objects.filter(
+            Q(radiant_team__in=matches) |
+            Q(dire_team__in=matches),
+        ).distinct()
+        pros = assemble_pros(teams)
+        logging.info(
+            "Found {0} teams ({1} players) to update personas on".format(
+                teams.count(),
+                len(pros)
+            )
+        )
         users.extend(pros)
 
         querylist = []

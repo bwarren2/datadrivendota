@@ -3,7 +3,9 @@ from django.db.models import Max
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 
-from accounts.models import get_relevant_player_ids, get_customer_player_ids
+from accounts.models import (
+    get_relevant_player_ids,
+)
 from .models import Player
 
 
