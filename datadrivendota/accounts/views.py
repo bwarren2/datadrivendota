@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, FormView
@@ -63,6 +64,10 @@ class ResetPasswordView(FormView):
     form_class = ResetPasswordForm
     success_url = reverse_lazy('accounts:login')
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ResetPasswordView, self).dispatch(*args, **kwargs)
+
     def form_valid(self, form):
         password = form.data['password']
         password_check = form.data['password_check']
@@ -92,6 +97,10 @@ class HomeView(FormView):
     form_class = SteamIdForm
     template_name = 'accounts/home.html'
     success_url = reverse_lazy('accounts:home')
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(HomeView, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         steam_id = int(form.data['steam_id'])
@@ -130,6 +139,10 @@ class EmailRequiredView(TemplateView):
 @method_decorator(never_cache, name='dispatch')
 class CompleteView(TemplateView):
     template_name = 'accounts/home.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(CompleteView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs['available_backends'] = load_backends(
