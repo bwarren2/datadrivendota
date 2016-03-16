@@ -51,6 +51,10 @@ class MirrorClientPersonas(Task):
         since = timedelta(days=14)
         then = timezone.now() - since
 
+        logging.info(
+            "Found these users to update personas on: {0}".format(users)
+        )
+
         matches = Match.objects.filter(
             league__in=leagues, start_time__gte=mktime(then.timetuple())
         )
