@@ -124,6 +124,10 @@ class DuelView(TemplateView):
     template_name = 'matches/duel.html'
 
 
+class GhostWalkView(TemplateView):
+    template_name = 'matches/ghostwalk.html'
+
+
 class PerformanceView(TemplateView):
     template_name = 'matches/performance.html'
 
