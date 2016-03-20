@@ -127,6 +127,10 @@ class DuelView(TemplateView):
 class GhostWalkView(TemplateView):
     template_name = 'matches/ghostwalk.html'
 
+    def get_context_data(self, **kwargs):
+        kwargs['show_control_bar'] = True
+        return super(GhostWalkView, self).get_context_data(**kwargs)
+
 
 class PerformanceView(TemplateView):
     template_name = 'matches/performance.html'

@@ -36854,6 +36854,69 @@ $(function () {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
+    var playback = function(start, end, idx){
+
+        var diff = end - start;
+
+        var update = function(tick){
+          idx = (idx + tick).mod(end + 1);
+          $(window).trigger('update', idx);
+        }
+
+        $('#progress-bar-current').html(0);
+        $('#progress-bar-max').html(end);
+
+
+        // Set up timing controls
+        var timer;
+        function runner() {
+          update(1);
+          timer = setTimeout(runner, 1000);
+        }
+        $(window).on('play', function(){
+          runner();
+        });
+        $(window).on('pause', function(){
+           clearTimeout(timer);
+        });
+        $(window).on('forward', function(){
+          update(1);
+        });
+        $(window).on('back', function(){
+          update(-1);
+        });
+        var isDragging = false;
+        $('#progress-bar').mousedown(function (evt) {
+          isDragging = true;
+          // Brittle af
+          var progressBarWidth = $(evt.currentTarget).children('span').width();
+          idx = ((evt.offsetX / progressBarWidth) * diff) | 0;
+          $(window).trigger('update', idx);
+        }).mousemove(function (evt) {
+          if (isDragging) {
+            // Brittle af
+            var progressBarWidth = $(evt.currentTarget).children('span').width();
+            idx = ((evt.offsetX / progressBarWidth) * diff) | 0;
+            $(window).trigger('update', idx);
+          }
+        }).mouseup(function (evt) {
+          isDragging = false;
+        });
+
+        $(window).on('update', function (evt, idx) {
+          // Progbar
+          var width = (idx / diff) * 100;
+          $('#progress-bar').css('width', '' + width + '%');
+          $('#progress-bar').attr('aria-valuenow', width);
+          // Update progress bar time.
+          // @TODO make this show time, not ticks?
+          $('#progress-bar-current').html(idx);
+
+
+        });
+
+    }
+    window.jsUtils.playback = playback;
 
 
 });

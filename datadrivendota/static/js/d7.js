@@ -2207,7 +2207,7 @@ var minimap = function(shards, destination, params){
 
       var faces = d3.select(destination).selectAll('i').data(fetch_data)
         .transition()
-        .duration(100)
+        .duration(1000)
         .style('left', function(d){return xscale(d.x)+'px'})
         .style('bottom', function(d){return yscale(d.y)+'px'})
     })
@@ -2474,14 +2474,11 @@ var stat_card = function(shard, destination, params){
     // Items health mana kda last hits denies
     var update = function(time){
 
-      var context = {
-        title: shard.name
-      }
+      var context = {title: shard.name}
       parameters.reduce(function(a, b){
         a[b[0]] = struct[b[0]][time].toFixed(2);
         return a;
       }, context);
-
       context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(2)
       context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(2)
       context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(2)

@@ -1,11 +1,16 @@
 {% extends "row_base.html" %}
 
 {% block aligned_content %}
-    <div class='col-mid-12' id='target'>
+    <div class='col-md-6' id='target'>
 
     </div>
-    <div class='col-mid-12' id='target2'>
+    <div class='col-md-6' id='target2'>
 
+    </div>
+
+    <div class='col-md-6' id='minimap'>
+    <label></label>
+    <div class='chart vert-md-6'></div>
     </div>
 {% endblock aligned_content %}
 
@@ -33,8 +38,12 @@ $(function(){
       d7.extensions.charts.replays.stat_card(
         pmses[1], '#target2', params
       );
+      d7.extensions.charts.replays.minimap(
+        pmses, '#minimap', params
+      );
 
     }
+    window.jsUtils.playback(0, 1000, 0);
 
 });
 </script>
