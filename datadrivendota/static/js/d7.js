@@ -2329,15 +2329,16 @@ var position_heatmap = function(shards, destination, params){
     $(window).on('shardfilter', function(evt, id, min_time, max_time){
       var shard;
       var test = raw_data.filter(function(d, i){
+        console.log(shards[i].id == id, shards[i].id, id)
         if (shards[i].id == id){
           shard = shards[i];
         }
-        return true;
+        return shards[i].id == id;
       })[0].filter(function(d){
         return d.offset_time > min_time && d.offset_time <= max_time;
       });
       var updata = crosscount(test);
-      // console.log(updata, shard);
+      console.log(updata, shard);
       update_heat(updata, get_label(shard, min_time, max_time));
     })
 
