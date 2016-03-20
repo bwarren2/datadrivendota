@@ -1300,6 +1300,7 @@ module.exports = {
 var utils = require("../utils");
 var tooltips = require("./tooltips");
 var Promise = require("bluebird");
+var Handlebars = window.Handlebars;
 var $ = window.$;
 var nv = window.nv;
 var _ = window._;
@@ -2179,7 +2180,6 @@ var minimap = function(shards, destination, params){
         return prev;
       }, {})
     })
-    // console.log(position_data[0][-30]);
 
     var svg = make_map_background(destination)
     var width = svg.attr('width');
@@ -2399,6 +2399,107 @@ var crosscount = function(series){
     return answers;
 }
 
+var stat_card = function(shard, destination, params){
+
+  var parameters = [
+    ['strength', 'statelog'],
+    ['strength_total', 'statelog'],
+    ['agility', 'statelog'],
+    ['agility_total', 'statelog'],
+    ['intelligence', 'statelog'],
+    ['intelligence_total', 'statelog'],
+    ['base_damage', 'statelog'],
+    ['bonus_damage', 'statelog'],
+    ['total_damage', 'statelog'],
+    ['kills', 'statelog'],
+    ['deaths', 'statelog'],
+    ['assists', 'statelog'],
+    ['health', 'statelog'],
+    ['mana', 'statelog'],
+    ['max_health', 'statelog'],
+    ['max_mana', 'statelog'],
+    ['last_hits', 'statelog'],
+    ['denies', 'statelog'],
+  ];
+
+  var urls = parameters.map(function(pair){
+    var location = utils.parse_urls.url_for(shard, pair[0], pair[1]);
+    return $.getJSON(location);
+  });
+
+  // Get the replay parse info
+  Promise.all(urls).then(function(data){
+
+    var struct = {};
+    data.map(function(d, i){
+      struct[parameters[i][0]] = {};
+      d.map(function(item){
+        var value = parameters[i][0];
+        var time = item['offset_time'];
+
+        struct[value][String(time)] = item[value]
+      })
+    });
+
+    var rawTemplate = `<div class="entry">
+          <h1>{{title}}</h1>
+          <div class="stats">
+            <div>
+              Strength: {{strength}} + {{strength_add}} = {{strength_total}}
+            </div>
+            <div>
+              Intelligence: {{intelligence}} + {{intelligence_add}} = {{intelligence_total}}
+            </div>
+            <div>
+              Agility: {{agility}} + {{agility_add}} = {{agility_total}}
+            </div>
+            <div>
+              Damage: {{base_damage}} + {{bonus_damage}} = {{total_damage}}
+            </div>
+            <div>
+              KDA: {{kills}} / {{deaths}} / {{assists}}
+            </div>
+            <div>
+              Last Hits / Denies: {{last_hits}} / {{denies}}
+            </div>
+            <div>
+              Health: {{health}} / {{max_health}}
+            </div>
+            <div>
+              Mana: {{mana}} / {{max_mana}}
+            </div>
+          </div>
+        </div>`;
+    var compiledTemplate = Handlebars.compile(rawTemplate); // (step 2)
+    // Items health mana kda last hits denies
+    var update = function(time){
+
+      var context = {
+        title: shard.name
+      }
+      parameters.reduce(function(a, b){
+        a[b[0]] = struct[b[0]][time].toFixed(2);
+        return a;
+      }, context);
+
+      context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(2)
+      context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(2)
+      context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(2)
+
+      var html = compiledTemplate(context);
+      $(destination).html(html);
+
+    }
+
+    update(-10);
+    $(window).on('update', function(evt, arg){
+      update(arg);
+    })
+
+  })
+};
+
+
 module.exports = {
   stat_lineup: stat_lineup,
   scatterline: scatterline,
@@ -2407,6 +2508,7 @@ module.exports = {
   multifacet_lineup: multifacet_lineup,
   minimap: minimap,
   position_heatmap: position_heatmap,
+  stat_card: stat_card
 };
 
 

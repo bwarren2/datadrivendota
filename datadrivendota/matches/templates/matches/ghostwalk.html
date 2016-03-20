@@ -1,7 +1,10 @@
 {% extends "row_base.html" %}
 
 {% block aligned_content %}
-    <div class='col-mid-12'>
+    <div class='col-mid-12' id='target'>
+
+    </div>
+    <div class='col-mid-12' id='target2'>
 
     </div>
 {% endblock aligned_content %}
@@ -9,29 +12,27 @@
 {% block extra_js %}
 <script type="text/javascript">
 $(function(){
-    inputs.pms_select2('#shards', true);
 
-    var match_id = window.jsUtils.getParameterByName('match_id');
-    if(match_id!==undefined){
+    var url = '/rest-api/parse-shards/?pms_ids=[20329, 20328]';
+    $.getJSON(
+      url
+    )
+    .success(function(pmses){
 
-      $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
+      var params = {
+        granularity: 30,
+      };
 
-      .success(function(shards){
-
-        var slices = window.jsUtils.getParameterByName('pmses').split(',')
-        var url_shards = shards.filter(function(shard){
-          return slices.includes(shard.dataslice);
-        })
-
-        var params = {
-          granularity: 30,
-        };
-
-        update(url_shards, params);
-      });
-
-    }
+      update(pmses, params);
+    });
     var update = function(pmses, params){
+
+      d7.extensions.charts.replays.stat_card(
+        pmses[0], '#target', params
+      );
+      d7.extensions.charts.replays.stat_card(
+        pmses[1], '#target2', params
+      );
 
     }
 
