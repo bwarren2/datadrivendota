@@ -283,7 +283,7 @@ $(function () {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    var playback = function(start, end, idx){
+    var playback = function(start, end, idx, formatter){
 
         var diff = end - start;
 
@@ -293,7 +293,15 @@ $(function () {
         }
 
         $('#progress-bar-current').html(0);
-        $('#progress-bar-max').html(end);
+
+        console.log(formatter, formatter!==undefined);
+        if (formatter!==undefined) {
+            $('#progress-bar-max').html(formatter(end));
+        }else{
+            $('#progress-bar-max').html(end);
+        }
+
+
 
 
         // Set up timing controls
@@ -339,14 +347,17 @@ $(function () {
           $('#progress-bar').attr('aria-valuenow', width);
           // Update progress bar time.
           // @TODO make this show time, not ticks?
-          $('#progress-bar-current').html(idx);
+          if (formatter!==undefined) {
+              $('#progress-bar-current').html(formatter(idx));
+          }else{
+              $('#progress-bar-current').html(idx);
+          }
 
 
         });
 
     }
     window.jsUtils.playback = playback;
-
 
 });
 

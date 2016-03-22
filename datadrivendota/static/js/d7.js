@@ -1435,7 +1435,6 @@ var stat_lineup = function(shards, facet, destination, params, log){
   if (log===undefined){
     log = 'statelog';
   }
-  console.log(log);
   // Get the replay parse info
   Promise.all(
     shards.map(function(shard){
@@ -1443,7 +1442,6 @@ var stat_lineup = function(shards, facet, destination, params, log){
       return $.getJSON(location);
     })
   ).then(function(facets){
-    console.log(facets);
     var dataset = facets.map(function(dataseries, i){
       var myobj =  {
         'key': shards[i].name,
@@ -2208,8 +2206,22 @@ var minimap = function(shards, destination, params){
       var faces = d3.select(destination).selectAll('i').data(fetch_data)
         .transition()
         .duration(1000)
-        .style('left', function(d){return xscale(d.x)+'px'})
-        .style('bottom', function(d){return yscale(d.y)+'px'})
+        .style('left', function(d){
+          if (d===undefined) {
+            return xscale(0)+'px'
+          }
+          else{
+            return xscale(d.x)+'px'
+          }
+        })
+        .style('bottom', function(d){
+          if (d===undefined) {
+            return yscale(0)+'px'
+          }else{
+            return yscale(d.y)+'px'
+          }
+        })
+
     })
 
   })
@@ -2329,7 +2341,6 @@ var position_heatmap = function(shards, destination, params){
     $(window).on('shardfilter', function(evt, id, min_time, max_time){
       var shard;
       var test = raw_data.filter(function(d, i){
-        console.log(shards[i].id == id, shards[i].id, id)
         if (shards[i].id == id){
           shard = shards[i];
         }
@@ -2338,7 +2349,6 @@ var position_heatmap = function(shards, destination, params){
         return d.offset_time > min_time && d.offset_time <= max_time;
       });
       var updata = crosscount(test);
-      console.log(updata, shard);
       update_heat(updata, get_label(shard, min_time, max_time));
     })
 
@@ -2455,7 +2465,7 @@ var stat_card = function(shard, destination, params){
     })
     var rawTemplate = `<div class="statcard">
       <h2>{{title}} <small><i class='d2mh {{hero_css}}'></i></small></h2>
-
+      <label></label>
           <div class="stats">
             <div class='strength'>
               Strength: {{strength}} + {{strength_add}} = {{strength_total}}
@@ -2515,11 +2525,19 @@ var stat_card = function(shard, destination, params){
     // Items health mana kda last hits denies
     var update = function(time){
 
-      var context = {title: shard.name}
+      var context = {title: shard.name};
+
       parameters.reduce(function(a, b){
-        a[b[0]] = struct[b[0]][time].toFixed(2);
+        var param_name = b[0];
+        if (struct[param_name][time]===undefined) {
+          $(destination).html('Not defined');
+        }else{
+          a[param_name] = struct[param_name][time].toFixed(2);
+        }
         return a;
       }, context);
+
+
       context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(2);
 
       context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(2);
@@ -2527,23 +2545,24 @@ var stat_card = function(shard, destination, params){
       context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(2);
 
       context['hero_css'] = shard.hero_name;
-      console.log(context['hero_css']);
 
       context['total_gold'] = (
         parseInt(context['unreliable_gold']) + parseInt(context['reliable_gold'])
       ).toFixed(2);
 
-      ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'].map(function(d){
-        console.log(d, items_struct[time]);
-        if (items_struct[time][d] === null) {
-          context[d] = 'emptyitembg';
-        }else{
-          context[d] = items_struct[time][d].substring(5);
-        }
-      });
+      if (items_struct[time]!==undefined) {
+        ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'].map(
+          function(d){
+          if (items_struct[time][d] === null) {
+            context[d] = 'emptyitembg';
+          }else{
+            context[d] = items_struct[time][d].substring(5);
+          }
+        });
 
-      var html = compiledTemplate(context);
-      $(destination).html(html);
+        var html = compiledTemplate(context);
+        $(destination).html(html);
+      }
 
     }
 
@@ -2558,6 +2577,38 @@ var stat_card = function(shard, destination, params){
 };
 
 
+var playback_shards = function(shards){
+
+  var urls = shards.map(function(shard){
+    var location = utils.parse_urls.url_for(shard, 'health', 'statelog');
+    return $.getJSON(location);
+  });
+  var min;
+  var max;
+  var start = 0;
+
+  // Get the replay parse info
+  Promise.all(urls).then(function(data){
+    min = d3.min(data, function(series){
+      return d3.min(series, function(x){
+        return x.offset_time
+      })
+    });
+    max = d3.max(data, function(series){
+      return d3.max(series, function(x){
+        return x.offset_time
+      })
+    });
+    window.jsUtils.playback(min, max, 1, utils.axis_format.pretty_times);
+  }).catch(function(e){
+    console.log(e);
+  })
+
+
+
+
+}
+
 module.exports = {
   stat_lineup: stat_lineup,
   scatterline: scatterline,
@@ -2566,7 +2617,8 @@ module.exports = {
   multifacet_lineup: multifacet_lineup,
   minimap: minimap,
   position_heatmap: position_heatmap,
-  stat_card: stat_card
+  stat_card: stat_card,
+  playback_shards: playback_shards
 };
 
 
