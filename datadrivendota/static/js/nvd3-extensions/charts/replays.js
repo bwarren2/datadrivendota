@@ -1123,6 +1123,10 @@ var stat_card = function(shard, destination, params){
     ['max_mana', 'statelog'],
     ['last_hits', 'statelog'],
     ['denies', 'statelog'],
+    ['xp', 'statelog'],
+    ['reliable_gold', 'statelog'],
+    ['unreliable_gold', 'statelog'],
+    ['total_earned_gold', 'statelog'],
   ];
 
   var urls = parameters.map(function(pair){
@@ -1171,6 +1175,12 @@ var stat_card = function(shard, destination, params){
             <div>
               Mana: {{mana}} / {{max_mana}}
             </div>
+            <div>
+              Gold: {{unreliable_gold}} + {{reliable_gold}} = {{total_gold}}
+            </div>
+            <div>
+              Total earned gold: {{total_earned_gold}}
+            </div>
           </div>
         </div>`;
     var compiledTemplate = Handlebars.compile(rawTemplate); // (step 2)
@@ -1185,6 +1195,7 @@ var stat_card = function(shard, destination, params){
       context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(2)
       context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(2)
       context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(2)
+      context['total_gold'] = (context['reliable_gold'] - context['unreliable_gold']).toFixed(2)
 
       var html = compiledTemplate(context);
       $(destination).html(html);
