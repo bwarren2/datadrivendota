@@ -1103,7 +1103,6 @@ var crosscount = function(series){
 }
 
 var stat_card = function(shard, destination, params){
-
   var parameters = [
     ['strength', 'statelog'],
     ['strength_total', 'statelog'],
@@ -1129,6 +1128,7 @@ var stat_card = function(shard, destination, params){
     ['total_earned_gold', 'statelog'],
   ];
 
+  var struct = {};
   var urls = parameters.map(function(pair){
     var location = utils.parse_urls.url_for(shard, pair[0], pair[1]);
     return $.getJSON(location);
@@ -1137,7 +1137,6 @@ var stat_card = function(shard, destination, params){
   // Get the replay parse info
   Promise.all(urls).then(function(data){
 
-    var struct = {};
     data.map(function(d, i){
       struct[parameters[i][0]] = {};
       d.map(function(item){
@@ -1147,40 +1146,71 @@ var stat_card = function(shard, destination, params){
         struct[value][String(time)] = item[value]
       })
     });
+  }).then(function(){
+    var location = utils.parse_urls.url_for(shard, 'items', 'statelog');
+    return $.getJSON(location);
+  }).then(function(items){
+    var items_struct = {};
+    items.map(function(inventory){
+      var time = inventory['offset_time'];
+      items_struct[String(time)] = inventory;
+    })
+    var rawTemplate = `<div class="statcard">
+      <h2>{{title}} <small><i class='d2mh {{hero_css}}'></i></small></h2>
 
-    var rawTemplate = `<div class="entry">
-          <h1>{{title}}</h1>
           <div class="stats">
-            <div>
+            <div class='strength'>
               Strength: {{strength}} + {{strength_add}} = {{strength_total}}
             </div>
-            <div>
+            <div class='intelligence'>
               Intelligence: {{intelligence}} + {{intelligence_add}} = {{intelligence_total}}
             </div>
-            <div>
+            <div class='agility'>
               Agility: {{agility}} + {{agility_add}} = {{agility_total}}
             </div>
-            <div>
+            <div class='damage'>
               Damage: {{base_damage}} + {{bonus_damage}} = {{total_damage}}
             </div>
-            <div>
+            <div class='kda'>
               KDA: {{kills}} / {{deaths}} / {{assists}}
             </div>
-            <div>
+            <div class='last_hits'>
               Last Hits / Denies: {{last_hits}} / {{denies}}
             </div>
-            <div>
+            <div class='health'>
               Health: {{health}} / {{max_health}}
             </div>
-            <div>
+            <div class='mana'>
               Mana: {{mana}} / {{max_mana}}
             </div>
-            <div>
+            <div class='gold'>
               Gold: {{unreliable_gold}} + {{reliable_gold}} = {{total_gold}}
             </div>
-            <div>
+            <div class='total_gold'>
               Total earned gold: {{total_earned_gold}}
             </div>
+
+            <div class='row' id='items'>
+              <div class='col-xs-1' id='item_0'>
+                <i class='d2items {{item_0}}'></i>
+              </div>
+              <div class='col-xs-1' id='item_1'>
+                <i class='d2items {{item_1}}'></i>
+              </div>
+              <div class='col-xs-1' id='item_2'>
+                <i class='d2items {{item_2}}'></i>
+              </div>
+              <div class='col-xs-1' id='item_3'>
+                <i class='d2items {{item_3}}'></i>
+              </div>
+              <div class='col-xs-1' id='item_4'>
+                <i class='d2items {{item_4}}'></i>
+              </div>
+              <div class='col-xs-1' id='item_5'>
+                <i class='d2items {{item_5}}'></i>
+              </div>
+            </div>
+
           </div>
         </div>`;
     var compiledTemplate = Handlebars.compile(rawTemplate); // (step 2)
@@ -1192,21 +1222,40 @@ var stat_card = function(shard, destination, params){
         a[b[0]] = struct[b[0]][time].toFixed(2);
         return a;
       }, context);
-      context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(2)
-      context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(2)
-      context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(2)
-      context['total_gold'] = (context['reliable_gold'] - context['unreliable_gold']).toFixed(2)
+      context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(2);
+
+      context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(2);
+
+      context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(2);
+
+      context['hero_css'] = shard.hero_name;
+      console.log(context['hero_css']);
+
+      context['total_gold'] = (
+        parseInt(context['unreliable_gold']) + parseInt(context['reliable_gold'])
+      ).toFixed(2);
+
+      ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'].map(function(d){
+        console.log(d, items_struct[time]);
+        if (items_struct[time][d] === null) {
+          context[d] = 'emptyitembg';
+        }else{
+          context[d] = items_struct[time][d].substring(5);
+        }
+      });
 
       var html = compiledTemplate(context);
       $(destination).html(html);
 
     }
 
-    update(-10);
+    update(0);
     $(window).on('update', function(evt, arg){
       update(arg);
     })
 
+  }).catch(function(e){
+    console.log(e);
   })
 };
 
