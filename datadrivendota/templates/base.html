@@ -18,7 +18,7 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <link href="//fonts.googleapis.com/css?family=Cinzel+Decorative" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
     <link href="//fonts.googleapis.com/css?family=Droid+Serif" rel="stylesheet" type="text/css">
     <link href="//fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -154,6 +154,11 @@
     <div class='container'>
     {% block content %}
     {% endblock content %}
+    </div>
+
+    <div class='container'>
+    {% block advisory_content %}
+    {% endblock advisory_content %}
     </div>
 
     {% if show_control_bar %}
