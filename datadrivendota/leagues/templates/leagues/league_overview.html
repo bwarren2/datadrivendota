@@ -6,32 +6,30 @@
 {% endblock title %}
 
 {% block content %}
-    <div class='container'>
-        <h2>Leagues by last game played</h2>
-        <h3><a href="{% url "leagues:index" tier='premium'%}">All Premium Leagues</a></h3>
-        <div class='row'>
-            {% for league in premium_list %}
-                <div class='col-md-4'>
-                    {% include "leagues/_league_card.html" %}
-                </div>
-            {% endfor %}
-        </div>
-        <h3><a href="{% url "leagues:index" tier='pro'%}">All Pro Leagues</a></h3>
-        <div class='row'>
-            {% for league in pro_list %}
-                <div class='col-md-4'>
-                    {% include "leagues/_league_card.html" %}
-                </div>
-            {% endfor %}
-        </div>
-        <h3><a href="{% url "leagues:index" tier='am'%}">All Amateur Leagues</a></h3>
-        <div class='row'>
-            {% for league in am_list %}
-                <div class='col-md-4'>
-                    {% include "leagues/_league_card.html" %}
-                </div>
-            {% endfor %}
-        </div>
+    <h2>Leagues by last game played</h2>
+    <h3><a href="{% url "leagues:index" tier='premium'%}">All Premium Leagues</a></h3>
+    <div class='row'>
+        {% for league in premium_list %}
+            <div class='col-md-4'>
+                {% include "leagues/_league_card.html" %}
+            </div>
+        {% endfor %}
+    </div>
+    <h3><a href="{% url "leagues:index" tier='pro'%}">All Pro Leagues</a></h3>
+    <div class='row'>
+        {% for league in pro_list %}
+            <div class='col-md-4'>
+                {% include "leagues/_league_card.html" %}
+            </div>
+        {% endfor %}
+    </div>
+    <h3><a href="{% url "leagues:index" tier='am'%}">All Amateur Leagues</a></h3>
+    <div class='row'>
+        {% for league in am_list %}
+            <div class='col-md-4'>
+                {% include "leagues/_league_card.html" %}
+            </div>
+        {% endfor %}
     </div>
 {% endblock content %}
 

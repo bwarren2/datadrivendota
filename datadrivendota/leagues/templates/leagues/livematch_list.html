@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class='container'>
     <h3> Overall:
         <span class='complete'>{{complete_matches|length}}</span>
         <span class='unready'>{{unready_matches|length}}</span>
@@ -40,7 +39,6 @@
             </div>
         {% endfor %}
     </div>
-</div>
 {% endblock content %}
 
 

@@ -64,10 +64,6 @@ class ResetPasswordView(FormView):
     form_class = ResetPasswordForm
     success_url = reverse_lazy('accounts:login')
 
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(ResetPasswordView, self).dispatch(*args, **kwargs)
-
     def form_valid(self, form):
         password = form.data['password']
         password_check = form.data['password_check']
