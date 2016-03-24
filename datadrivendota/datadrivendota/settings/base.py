@@ -1,6 +1,6 @@
 """Common settings and globals."""
 
-
+from collections import OrderedDict
 from django.contrib.messages import constants as message_constants
 from os.path import abspath, basename, dirname, join, normpath
 from os import getenv
@@ -375,24 +375,25 @@ NOSE_ARGS = [
 STRIPE_PUBLIC_KEY = getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
 
-DJSTRIPE_PLANS = {
-    "monthly": {
-        "stripe_plan_id": "ddd-month",
-        "name": "DDD Pro ($3/month)",
-        "description": "The monthly subscription plan to DataDrivenDota",
-        "price": 300,
-        "interval": "month",
-        "currency": "usd"
-    },
-    "yearly": {
-        "stripe_plan_id": "ddd-year",
-        "name": "DDD Pro ($18/year)",
-        "description": "The annual subscription plan to DataDrivenDota",
-        "price": 1800,
-        "interval": "year",
-        "currency": "usd"
-    }
+DJSTRIPE_PLANS = OrderedDict()
+
+DJSTRIPE_PLANS["monthly"] = {
+    "stripe_plan_id": "ddd-month",
+    "name": "DDD Pro ($3/month)",
+    "description": "The monthly subscription plan to DataDrivenDota",
+    "price": 300,
+    "interval": "month",
+    "currency": "usd"
 }
+DJSTRIPE_PLANS["yearly"] = {
+    "stripe_plan_id": "ddd-year",
+    "name": "DDD Pro ($18/year)",
+    "description": "The annual subscription plan to DataDrivenDota",
+    "price": 1800,
+    "interval": "year",
+    "currency": "usd"
+}
+
 # END STRIPE CONFIGURATION
 
 # START REST CONFIGURATION
