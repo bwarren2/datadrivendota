@@ -123,13 +123,6 @@
             </li>
           {% endif %}
 
-          {% if SHOW_PAYMENTS %}
-            <li class="{% active 'premium' main_nav %}">
-              <a class='brand-primary' href="{% url 'djstripe:subscribe' %}">Premium</a>
-            </li>
-          </ul>
-          {% endif %}
-
           {% if SHOW_AUTH %}
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_active %}
