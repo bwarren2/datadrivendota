@@ -19,6 +19,11 @@ urlpatterns = [
         name="duel"
     ),
     url(
+        r'^ghostwalk/$',
+        views.GhostWalkView.as_view(),
+        name="ghostwalk"
+    ),
+    url(
         r'^performance/$',
         views.PerformanceView.as_view(),
         name="performance"

@@ -1,0 +1,155 @@
+{% extends "row_base.html" %}
+
+{% block aligned_content %}
+
+    <div class='col-md-12'>
+      <h4>Controls</h4>
+      <form>
+      <div class='row'>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Match ID #1</label>
+                <select id='shard_1' style='width:200px'></select>
+            </div>
+        </div>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Match ID #1 Label</label>
+                <input type="textarea" class="form-control" id="label_1" placeholder="(ex 'My Jungle Legion')">
+            </div>
+        </div>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Match ID #2</label>
+                <select id='shard_2' style='width:200px'></select>
+            </div>
+        </div>
+        <div class='col-md-3'>
+            <div class="form-group">
+            <label>Match ID #2 Label</label>
+                <input type="textarea" class="form-control" id="label_2" placeholder="(ex 'Dendi Pudge')">
+            </div>
+        </div>
+
+        <div class='col-md-3' style='margin-top:10px'>
+          <div class="btn-group btn-group-justified" role="group">
+            <div class="btn-group" role="group">
+              <button id='chart-button' type="button" class="btn btn-primary">
+                Chart! <i class="fa fa-line-chart"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    </div>
+
+    <div class='col-md-12'>
+      <div class='row'>
+
+      <div class='col-md-6' id='target'>
+
+      </div>
+      <div class='col-md-6' id='target2'>
+
+      </div>
+
+    </div>
+      <div class='col-md-6' id='minimap'>
+      <label></label>
+      <div class='chart vert-md-6'></div>
+      </div>
+      </div>
+{% endblock aligned_content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+$(function(){
+
+
+    inputs.pms_select2('#shard_1', false);
+    inputs.pms_select2('#shard_2', false);
+
+    $('#chart-button').click(function(){
+
+      $('#target_1').empty()
+      $('#target_2').empty()
+      $('#minimap .chart').empty()
+      $('#minimap i').remove()
+
+      var shard_1 = $('#shard_1').select2('data')[0];
+      var shard_2 = $('#shard_2').select2('data')[0];
+
+      var destination = '#gold';
+      var label_1 = $('#label_1').val();
+      var label_2 = $('#label_2').val();
+
+      var params = {
+        granularity: 30,
+      };
+
+
+      if(shard_1!==undefined){
+        var params = {
+          label: label_1,
+        };
+        d7.extensions.charts.replays.stat_card(
+          shard_1, '#target', params
+        );
+      }
+
+
+      if(shard_2!==undefined){
+        var params = {
+          label: label_2,
+        };
+        d7.extensions.charts.replays.stat_card(
+          shard_2, '#target2', params
+        );
+      }
+
+      var shards = [];
+
+      if(shard_1!==undefined){
+        shards.push(shard_1);
+      }
+      if(shard_2!==undefined){
+        shards.push(shard_2);
+      }
+
+      d7.extensions.charts.replays.minimap(
+        shards, '#minimap', params
+      );
+
+      d7.extensions.charts.replays.playback_shards(shards);
+
+
+    })
+
+    $('#pause-play').click(function(){
+      $('#chart-button').toggle();
+    })
+
+});
+</script>
+{% endblock extra_js %}
+
+{% block extra_css %}
+  <style type="text/css">
+  .strength {
+    color:#FF6666;
+  }
+  .intelligence {
+    color:#666EFF;
+  }
+  .agility {
+    color:#66FF7A;
+  }
+  .health {
+    color: #02B102;
+  }
+  .mana {
+    color: #0A60CB;
+  }
+  </style>
+{% endblock extra_css %}

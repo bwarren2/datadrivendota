@@ -162,7 +162,6 @@ $(function(){
       return faces;
     }
     $(window).on('update', function (evt, idx) {
-      console.log(idx);
       // Progbar
       var width = (idx / match_data.length) * 100;
       $('#progress-bar').css('width', '' + width + '%');

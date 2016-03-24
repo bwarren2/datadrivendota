@@ -193,19 +193,24 @@ $(function(){
     inputs.pms_select2('#shards', true);
 
     var match_id = window.jsUtils.getParameterByName('match_id');
-    if(match_id!==null){
+    if(match_id!==undefined){
+
       $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
 
-        .success(function(shards){
-          var slices = window.jsUtils.getParameterByName('pmses').split(',')
-          var url_shards = shards.filter(function(shard){
-            return slices.includes(shard.dataslice);
-          })
-          var params = {
-            granularity: 30,
-          };
-          draw(url_shards, params);
+      .success(function(shards){
+
+        var slices = window.jsUtils.getParameterByName('pmses').split(',')
+        var url_shards = shards.filter(function(shard){
+          return slices.includes(shard.dataslice);
         })
+
+        var params = {
+          granularity: 30,
+        };
+
+        draw(url_shards, params);
+      });
+
     }
 
     $('#chart-button').click(function(){

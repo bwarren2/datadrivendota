@@ -201,26 +201,52 @@ class ParseShardView(views.APIView):
 
     def get(self, request, *args, **kwargs):
 
-        try:
-            match_id = int(self.request.query_params.get('match_id', None))
-            match = Match.objects.get(steam_id=match_id)
-        except (ValueError, TypeError, Match.DoesNotExist):
-            return Response(
-                JSONRenderer().render([]),
-                status=status.HTTP_404_NOT_FOUND,
-                content_type='application/json'
-            )
+        if self.request.query_params.get('match_id', None):
+            try:
+                match_id = int(self.request.query_params.get('match_id', None))
+                match = Match.objects.get(steam_id=match_id)
+                if match.is_parsed:
+                    queryset = PlayerMatchSummary.objects.filter(
+                        match__steam_id=match_id
+                    )
+                    data = self.jsonify_data(queryset, match_id)
+                    return Response(
+                        data,
+                        status=status.HTTP_200_OK,
+                        content_type='application/json'
+                    )
+                else:
+                    return Response(
+                        JSONRenderer().render([]),
+                        status=status.HTTP_404_NOT_FOUND,
+                        content_type='application/json'
+                    )
 
-        if match.is_parsed:
-            queryset = PlayerMatchSummary.objects.filter(
-                match__steam_id=match_id
-            )
-            data = self.jsonify_data(queryset, match_id)
-            return Response(
-                data,
-                status=status.HTTP_200_OK,
-                content_type='application/json'
-            )
+            except (ValueError, TypeError, Match.DoesNotExist):
+                return Response(
+                    JSONRenderer().render([]),
+                    status=status.HTTP_404_NOT_FOUND,
+                    content_type='application/json'
+                )
+        elif self.request.query_params.get('pms_ids', None):
+            try:
+                ids = self.request.query_params.get('pms_ids', None)
+                queryset = PlayerMatchSummary.objects.filter(
+                    id__in=json.loads(ids)
+                )
+                data = self.jsonify_data(queryset, None)
+                return Response(
+                    data,
+                    status=status.HTTP_200_OK,
+                    content_type='application/json'
+                )
+
+            except (ValueError, TypeError, PlayerMatchSummary.DoesNotExist):
+                return Response(
+                    JSONRenderer().render([]),
+                    status=status.HTTP_404_NOT_FOUND,
+                    content_type='application/json'
+                )
         else:
             return Response(
                 JSONRenderer().render([]),
@@ -235,11 +261,14 @@ class ParseShardView(views.APIView):
             shard.merge_pms(pms)
             data.append(ParseShardSerializer(shard).data)
 
-        radiant_shard = ParseShard('radiant', 'radiant', match_id, 'Radiant')
-        dire_shard = ParseShard('dire', 'dire', match_id, 'Dire')
-        diff_shard = ParseShard('diff', 'diff', match_id, 'Rad-Dire Diff')
+        if match_id is not None:
+            radiant_shard = ParseShard(
+                'radiant', 'radiant', match_id, 'Radiant'
+            )
+            dire_shard = ParseShard('dire', 'dire', match_id, 'Dire')
+            diff_shard = ParseShard('diff', 'diff', match_id, 'Rad-Dire Diff')
 
-        for extra_shard in [radiant_shard, dire_shard, diff_shard]:
-            data.append(ParseShardSerializer(extra_shard).data)
+            for extra_shard in [radiant_shard, dire_shard, diff_shard]:
+                data.append(ParseShardSerializer(extra_shard).data)
 
         return data

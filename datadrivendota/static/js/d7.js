@@ -1300,6 +1300,7 @@ module.exports = {
 var utils = require("../utils");
 var tooltips = require("./tooltips");
 var Promise = require("bluebird");
+var Handlebars = window.Handlebars;
 var $ = window.$;
 var nv = window.nv;
 var _ = window._;
@@ -1434,7 +1435,6 @@ var stat_lineup = function(shards, facet, destination, params, log){
   if (log===undefined){
     log = 'statelog';
   }
-  console.log(log);
   // Get the replay parse info
   Promise.all(
     shards.map(function(shard){
@@ -1442,7 +1442,6 @@ var stat_lineup = function(shards, facet, destination, params, log){
       return $.getJSON(location);
     })
   ).then(function(facets){
-    console.log(facets);
     var dataset = facets.map(function(dataseries, i){
       var myobj =  {
         'key': shards[i].name,
@@ -2179,7 +2178,6 @@ var minimap = function(shards, destination, params){
         return prev;
       }, {})
     })
-    // console.log(position_data[0][-30]);
 
     var svg = make_map_background(destination)
     var width = svg.attr('width');
@@ -2207,9 +2205,23 @@ var minimap = function(shards, destination, params){
 
       var faces = d3.select(destination).selectAll('i').data(fetch_data)
         .transition()
-        .duration(100)
-        .style('left', function(d){return xscale(d.x)+'px'})
-        .style('bottom', function(d){return yscale(d.y)+'px'})
+        .duration(1000)
+        .style('left', function(d){
+          if (d===undefined) {
+            return xscale(0)+'px'
+          }
+          else{
+            return xscale(d.x)+'px'
+          }
+        })
+        .style('bottom', function(d){
+          if (d===undefined) {
+            return yscale(0)+'px'
+          }else{
+            return yscale(d.y)+'px'
+          }
+        })
+
     })
 
   })
@@ -2338,7 +2350,6 @@ var position_heatmap = function(shards, destination, params){
         return d.offset_time > min_time && d.offset_time <= max_time;
       });
       var updata = crosscount(test);
-      console.log(updata, shard);
       update_heat(updata, get_label(shard, min_time, max_time));
     })
 
@@ -2400,6 +2411,205 @@ var crosscount = function(series){
     return answers;
 }
 
+var stat_card = function(shard, destination, params){
+  var parameters = [
+    ['strength', 'statelog'],
+    ['strength_total', 'statelog'],
+    ['agility', 'statelog'],
+    ['agility_total', 'statelog'],
+    ['intelligence', 'statelog'],
+    ['intelligence_total', 'statelog'],
+    ['base_damage', 'statelog'],
+    ['bonus_damage', 'statelog'],
+    ['total_damage', 'statelog'],
+    ['kills', 'statelog'],
+    ['deaths', 'statelog'],
+    ['assists', 'statelog'],
+    ['health', 'statelog'],
+    ['mana', 'statelog'],
+    ['max_health', 'statelog'],
+    ['max_mana', 'statelog'],
+    ['last_hits', 'statelog'],
+    ['denies', 'statelog'],
+    ['xp', 'statelog'],
+    ['reliable_gold', 'statelog'],
+    ['unreliable_gold', 'statelog'],
+    ['total_earned_gold', 'statelog'],
+  ];
+
+  var struct = {};
+  var urls = parameters.map(function(pair){
+    var location = utils.parse_urls.url_for(shard, pair[0], pair[1]);
+    return $.getJSON(location);
+  });
+
+  // Get the replay parse info
+  Promise.all(urls).then(function(data){
+
+    data.map(function(d, i){
+      struct[parameters[i][0]] = {};
+      d.map(function(item){
+        var value = parameters[i][0];
+        var time = item['offset_time'];
+
+        struct[value][String(time)] = item[value]
+      })
+    });
+  }).then(function(){
+    var location = utils.parse_urls.url_for(shard, 'items', 'statelog');
+    return $.getJSON(location);
+  }).then(function(items){
+    var items_struct = {};
+    items.map(function(inventory){
+      var time = inventory['offset_time'];
+      items_struct[String(time)] = inventory;
+    })
+    var rawTemplate = `<div class="statcard">
+      <h2>{{title}} <small><i class='d2mh {{hero_css}}'></i></small></h2>
+      <label></label>
+          <div class="stats">
+            <div class='strength'>
+              Strength: {{strength}} + {{strength_add}} = {{strength_total}}
+            </div>
+            <div class='intelligence'>
+              Intelligence: {{intelligence}} + {{intelligence_add}} = {{intelligence_total}}
+            </div>
+            <div class='agility'>
+              Agility: {{agility}} + {{agility_add}} = {{agility_total}}
+            </div>
+            <div class='damage'>
+              Damage: {{base_damage}} + {{bonus_damage}} = {{total_damage}}
+            </div>
+            <div class='kda'>
+              KDA: {{kills}} / {{deaths}} / {{assists}}
+            </div>
+            <div class='last_hits'>
+              Last Hits / Denies: {{last_hits}} / {{denies}}
+            </div>
+            <div class='health'>
+              Health: {{health}} / {{max_health}}
+            </div>
+            <div class='mana'>
+              Mana: {{mana}} / {{max_mana}}
+            </div>
+            <div class='gold'>
+              Gold: {{unreliable_gold}} + {{reliable_gold}} = {{total_gold}}
+            </div>
+            <div class='total_gold'>
+              Total earned gold: {{total_earned_gold}}
+            </div>
+
+            <div class='row' id='items'>
+              <div class='col-xs-1' id='item_0'>
+                <i class='d2items {{item_0}}'></i>
+              </div>
+              <div class='col-xs-1' id='item_1'>
+                <i class='d2items {{item_1}}'></i>
+              </div>
+              <div class='col-xs-1' id='item_2'>
+                <i class='d2items {{item_2}}'></i>
+              </div>
+              <div class='col-xs-1' id='item_3'>
+                <i class='d2items {{item_3}}'></i>
+              </div>
+              <div class='col-xs-1' id='item_4'>
+                <i class='d2items {{item_4}}'></i>
+              </div>
+              <div class='col-xs-1' id='item_5'>
+                <i class='d2items {{item_5}}'></i>
+              </div>
+            </div>
+
+          </div>
+        </div>`;
+    var compiledTemplate = Handlebars.compile(rawTemplate); // (step 2)
+    // Items health mana kda last hits denies
+    var update = function(time){
+
+      var context = {title: shard.name};
+
+      parameters.reduce(function(a, b){
+        var param_name = b[0];
+        if (struct[param_name][time]===undefined) {
+          $(destination).html('Not defined');
+        }else{
+          a[param_name] = struct[param_name][time].toFixed(2);
+        }
+        return a;
+      }, context);
+
+
+      context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(2);
+
+      context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(2);
+
+      context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(2);
+
+      context['hero_css'] = shard.hero_name;
+
+      context['total_gold'] = (
+        parseInt(context['unreliable_gold']) + parseInt(context['reliable_gold'])
+      ).toFixed(2);
+
+      if (items_struct[time]!==undefined) {
+        ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'].map(
+          function(d){
+          if (items_struct[time][d] === null) {
+            context[d] = 'emptyitembg';
+          }else{
+            context[d] = items_struct[time][d].substring(5);
+          }
+        });
+
+        var html = compiledTemplate(context);
+        $(destination).html(html);
+      }
+
+    }
+
+    update(0);
+    $(window).on('update', function(evt, arg){
+      update(arg);
+    })
+
+  }).catch(function(e){
+    console.log(e);
+  })
+};
+
+
+var playback_shards = function(shards){
+
+  var urls = shards.map(function(shard){
+    var location = utils.parse_urls.url_for(shard, 'health', 'statelog');
+    return $.getJSON(location);
+  });
+  var min;
+  var max;
+  var start = 0;
+
+  // Get the replay parse info
+  Promise.all(urls).then(function(data){
+    min = d3.min(data, function(series){
+      return d3.min(series, function(x){
+        return x.offset_time
+      })
+    });
+    max = d3.max(data, function(series){
+      return d3.max(series, function(x){
+        return x.offset_time
+      })
+    });
+    window.jsUtils.playback(min, max, 1, utils.axis_format.pretty_times);
+  }).catch(function(e){
+    console.log(e);
+  })
+
+
+
+
+}
+
 module.exports = {
   stat_lineup: stat_lineup,
   scatterline: scatterline,
@@ -2408,6 +2618,8 @@ module.exports = {
   multifacet_lineup: multifacet_lineup,
   minimap: minimap,
   position_heatmap: position_heatmap,
+  stat_card: stat_card,
+  playback_shards: playback_shards
 };
 
 
