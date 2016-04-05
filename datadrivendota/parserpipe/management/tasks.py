@@ -22,7 +22,7 @@ from datadrivendota.management.tasks import ValveApiCall, ApiContext
 from matches.management.tasks import UpdateMatch
 from matches.models import Match, PlayerMatchSummary
 from accounts.models import get_customer_player_ids
-
+from leagues.models import League
 
 from .combat_log_filters import combatlog_filter_map
 from .state_log_filters import entitystate_filter_map
@@ -704,8 +704,14 @@ class CreateMatchRequests(Task):
             start_time__gte=since_time
         ).values_list('steam_id', flat=True)
 
+        premium_matches = Match.unparsed.filter(
+            league__tier=League.PREMIUM,
+            start_time__gte=since_time
+        ).values_list('steam_id', flat=True)
+
         return_matches = list(unparsed_client_matches)
         return_matches.extend(list(major_matches))
+        return_matches.extend(list(premium_matches))
         return return_matches
 
     def make_match_requests(self, matches):
