@@ -694,7 +694,7 @@ class CreateMatchRequests(Task):
     def get_match_ids(self, client_ids, since):
         since_time = time.mktime(since.timetuple())
 
-        unparsed_cleint_matches = Match.unparsed.filter(
+        unparsed_client_matches = Match.unparsed.filter(
             playermatchsummary__player__steam_id__in=client_ids,
             start_time__gte=since_time
         ).values_list('steam_id', flat=True)
@@ -704,7 +704,7 @@ class CreateMatchRequests(Task):
             start_time__gte=since_time
         ).values_list('steam_id', flat=True)
 
-        return_matches = list(unparsed_cleint_matches)
+        return_matches = list(unparsed_client_matches)
         return_matches.extend(list(major_matches))
         return return_matches
 
