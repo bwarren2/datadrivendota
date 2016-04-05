@@ -687,6 +687,7 @@ class CreateMatchRequests(Task):
         client_ids = self.get_player_ids()
         matches = self.get_match_ids(client_ids, since)
         self.make_match_requests(matches)
+        self.recur_match_requests()
 
     def get_player_ids(self):
         return get_customer_player_ids()
@@ -725,3 +726,17 @@ class CreateMatchRequests(Task):
 
         if any_created:
             KickoffMatchRequests().delay()
+
+    def recur_match_requests(self):
+        since = timezone.now() - timedelta(days=1)
+        before = timezone.now() - timedelta(hours=2)
+
+        mrs = MatchRequest.objects.filter(
+            creation__gte=since,
+            creation__lte=before,
+            retries__lte=3
+        )
+        for mr in mrs:
+            mr.retries = mr.retries + 1
+            mr.save()
+            mr.status = MatchRequest.SUBMITTED

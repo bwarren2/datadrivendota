@@ -46,6 +46,9 @@ class MatchRequest(models.Model):
     creation = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 
+    # If this has no succeded and older than a few hours, retry it.
+    retries = models.PositiveIntegerField(default=0)
+
     @staticmethod
     def create_for_user(user, match_id):
         try:
