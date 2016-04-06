@@ -17,6 +17,18 @@
 </nav>
 
 <section class='app-section'>
+
+  <div class='row'>
+    <div class='col-md-12'>
+    <h4>Most Recent Match:</h4>
+      {% for match in match_list %}
+          <div class='col-md-12' style='margin-bottom:20px'>
+              {% include "matches/_match_card.html" %}
+          </div>
+      {% endfor %}
+    </div>
+  </div>
+
   <div class='row'>
     <div class='col-md-4'>
         <h4>Hero Pick/Ban Rate</h4>

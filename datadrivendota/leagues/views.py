@@ -91,7 +91,7 @@ class LeagueDetail(DetailView):
         )
 
         match_list = match_list.select_related()\
-            .distinct().order_by('-start_time')
+            .distinct().order_by('-start_time')[:1]
 
         page = self.request.GET.get('page')
         paginator = SmarterPaginator(
