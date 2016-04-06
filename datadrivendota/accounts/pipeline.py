@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.mail import send_mail
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -51,3 +52,11 @@ def make_userprofile(
     request, strategy, backend, user, is_new=False, *args, **kwargs
 ):
     UserProfile.objects.get_or_create(user=user)
+    if is_new:
+        send_mail(
+            'New user!',
+            str(user),
+            settings.EMAIL_FROM,
+            ['ben@datadrivendota.com'],
+            fail_silently=False
+        )
