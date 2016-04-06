@@ -51,11 +51,3 @@ def make_userprofile(
     request, strategy, backend, user, is_new=False, *args, **kwargs
 ):
     UserProfile.objects.get_or_create(user=user)
-    if is_new:
-        send_mail(
-            'New user!',
-            str(user),
-            'from@example.com',
-            ['ben@datadrivendota.com'],
-            fail_silently=False
-        )

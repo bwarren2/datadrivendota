@@ -49,6 +49,8 @@ EMAIL_USE_TLS = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = EMAIL_HOST_USER
+
+DEFAULT_FROM_EMAIL = 'noreply@datadrivendota.com'
 #          END EMAIL CONFIGURATION
 
 #    Setting allowed hosts for security.  Only needed when debug = false
