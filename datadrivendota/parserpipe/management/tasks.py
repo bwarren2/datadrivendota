@@ -735,6 +735,9 @@ class CreateMatchRequests(Task):
             creation__gte=since,
             creation__lte=before,
             retries__lte=3
+        ).exclude(
+            Q(status=MatchRequest.SUBMITTED) |
+            Q(status=MatchRequest.COMPLETE)
         )
         for mr in mrs:
             mr.retries = mr.retries + 1
