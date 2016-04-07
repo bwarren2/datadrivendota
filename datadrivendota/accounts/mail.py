@@ -4,6 +4,11 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.template.loader import get_template
 
+from django.core.mail import send_mail
+
+import logging
+logger = logging.getLogger(__name__)
+
 
 def send_validation(strategy, backend, code):
     url = '{0}?verification_code={1}'.format(
@@ -33,3 +38,13 @@ def send_validation(strategy, backend, code):
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     msg.attach_alternative(html_content, "text/html")
     msg.send()
+
+    logger.warning('New user email validation: {0}'.format(code.email))
+
+    send_mail(
+        'New user!',
+        str(code.email),
+        settings.EMAIL_FROM,
+        ['ben@datadrivendota.com'],
+        fail_silently=False
+    )
