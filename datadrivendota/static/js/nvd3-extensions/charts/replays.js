@@ -922,7 +922,7 @@ var minimap = function(shards, destination, params){
           }else{
             return yscale(d.y)+'px'
           }
-        })
+        }).ease("linear")
 
     })
 
