@@ -92,13 +92,9 @@ if settings.SHOW_SEARCH:
 if settings.SHOW_AUTH:
     urlpatterns += [
         # When django wants a login, redir to social login
-        url(r'^login/(?P<method>[^/]+)/$', LoginView.as_view(), name='login'),
-        url(r'^login/$', LoginView.as_view(), name='login'),
+        # url(r'^login/(?P<method>[^/]+)/$', LoginView.as_view(), name='login'),
+        # url(r'^login/$', LoginView.as_view(), name='login'),
         url(r'', include('social.apps.django_app.urls', namespace='social'))
-        # Wat? Why are we including this at root? Seems risky. --kit 2014-02-16
-        # Docs recommend it :/
-        # https://python-social-auth.readthedocs.org/en/latest/configuration/django.html
-        # Is there a better option?  --ben 2015-04-19
     ]
 
 if settings.DEBUG:

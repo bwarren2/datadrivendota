@@ -51,7 +51,18 @@ def user_password(
 def make_userprofile(
     request, strategy, backend, user, is_new=False, *args, **kwargs
 ):
-    UserProfile.objects.get_or_create(user=user)
+    try:
+        steam_id = int(
+            kwargs.get('details', {}).get('player', {}).get('steamid', None)
+        )
+    except ValueError:
+        steam_id = None
+    UserProfile.objects.get_or_create(
+        user=user,
+        defaults={
+            'steam_id': steam_id,
+        },
+    )
     if is_new:
         send_mail(
             'New user!',
