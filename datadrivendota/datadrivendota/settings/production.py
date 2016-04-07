@@ -29,7 +29,7 @@ MIDDLEWARE_CLASSES += (
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_USE_TLS = True
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "sgbackend.SendGridBackend"
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host
 EMAIL_HOST = getenv('smtp.sendgrid.net')
@@ -39,6 +39,9 @@ EMAIL_HOST_PASSWORD = getenv('SENDGRID_PASSWORD')
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-user
 EMAIL_HOST_USER = getenv('SENDGRID_USERNAME')
+
+SENDGRID_USER = EMAIL_HOST_USER
+SENDGRID_PASSWORD = EMAIL_HOST_PASSWORD
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-port
 EMAIL_PORT = environ.get('EMAIL_PORT', 587)
