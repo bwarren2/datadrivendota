@@ -16,6 +16,13 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
+    <link rel="stylesheet" type="text/css" href="{% static 'dist/styles.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dist/release.css' %}">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+    <link href="//fonts.googleapis.com/css?family=Droid+Serif" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
 
     {% block extra_css %}{% endblock extra_css %}
     {% comment %}
@@ -123,7 +130,7 @@
             <li><a href="{% url 'accounts:home' %}">Data Management</a></li>
             <li><a href="{% url 'logout' %}">Logout, {{user}}?</a></li>
             {% else %}
-            <li><a href="{% url 'login' method='email' %}">Sign in</a></li>
+            <li><a href="{% url 'login' method='email' %}">Log in or sign up</a></li>
             {% endif %}
           </ul>
           {% endif %}
@@ -187,11 +194,5 @@
     {% endblock extra_js %}
 
   </body>
-    <link rel="stylesheet" type="text/css" href="{% static 'dist/styles.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dist/release.css' %}">
-    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
-    <link href="//fonts.googleapis.com/css?family=Droid+Serif" rel="stylesheet" type="text/css">
-    <link href="//fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
 </html>
