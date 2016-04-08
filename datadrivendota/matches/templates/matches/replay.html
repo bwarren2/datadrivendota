@@ -1,0 +1,147 @@
+{% extends "row_base.html" %}
+{% load staticfiles player_extras %}
+
+{% block aligned_content %}
+
+    <div class='col-md-12'>
+      <div class='row'>
+
+        {% for summary in match.radiant.all %}
+          <div class='col-md-2' id='slot-{{summary.player_slot}}'>
+            <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+          </div>
+        {% endfor %}
+      </div>
+      <div class='row'>
+        {% for summary in match.dire.all %}
+          <div class='col-md-2' id='slot-{{summary.player_slot}}'>
+            <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+          </div>
+        {% endfor %}
+      </div>
+
+      </div>
+
+      <div class='col-md-6' id='minimap'>
+        <label></label>
+        <div class='chart vert-md-6'></div>
+      </div>
+
+    </div>
+{% endblock aligned_content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+$(function(){
+
+      var params = {
+        granularity: 30,
+      };
+
+      var unwrapped_shards = [];
+
+      var urls = [
+        {% for summary in match.playermatchsummary_set.all %}
+          '/rest-api/parse-shards/?pms_ids=['+{{summary.id}}+']',
+        {% endfor %}
+      ]
+
+      var positions = [
+        {% for summary in match.playermatchsummary_set.all %}
+          '#slot-{{summary.player_slot}}',
+        {% endfor %}
+      ]
+
+
+      Promise.all(
+        urls.map(function(url){
+          return $.getJSON(url);
+        })
+      )
+      .then(function(shards){
+        shards.map(function(shard, i){
+          shard = shard[0];
+          d7.extensions.charts.replays.stat_card(
+            shard, positions[i], params
+          );
+          unwrapped_shards.push(shard);
+        })
+        d7.extensions.charts.replays.playback_shards(unwrapped_shards);
+        d7.extensions.charts.replays.minimap(unwrapped_shards, '#minimap', params);
+
+      }).catch(function(e){
+        console.log(e);
+      })
+
+    $('#pause-play').click(function(){
+      $('#chart-button').toggle();
+    })
+
+});
+</script>
+{% endblock extra_js %}
+
+{% block extra_css %}
+  <style type="text/css">
+  .strength {
+    color:#FF6666;
+  }
+  .intelligence {
+    color:#666EFF;
+  }
+  .agility {
+    color:#66FF7A;
+  }
+  .health {
+    color: #02B102;
+  }
+  .mana {
+    color: #0A60CB;
+  }
+
+.horizontal .css-progress-bar {
+  float: left;
+  height: 45px;
+  width: 100%;
+  padding: 12px 0;
+  position: inherit
+}
+.css-progress-bar.health{
+  border-style: solid;
+  border-width: 1px;
+  border-color: 'green';
+}
+.css-progress-bar.mana{
+  border-style: solid;
+  border-width: 1px;
+  border-color: 'blue';
+}
+
+.horizontal .css-progress-track {
+  position: relative;
+  width: 100%;
+  height: 20px;
+}
+
+.horizontal .css-progress-fill {
+  // position: relative;
+  height: 20px;
+  width: 50%;
+  color: white;
+  text-align: center;
+  font-family: "Lato","Verdana",sans-serif;
+  font-size: 12px;
+  line-height: 20px;
+}
+.bar-nums{
+  position: absolute;
+  width: 100%;
+  left:0px;
+}
+.rounded .progress-track,
+.rounded .progress-fill {
+  border-radius: 3px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,.2);
+}
+  </style>
+{% endblock extra_css %}

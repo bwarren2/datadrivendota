@@ -926,6 +926,8 @@ var minimap = function(shards, destination, params){
 
     })
 
+  }).catch(function(e){
+    console.log(e);
   })
 };
 
@@ -1162,63 +1164,84 @@ var stat_card = function(shard, destination, params){
     return $.getJSON(location);
   }).then(function(items){
     var items_struct = {};
+
     items.map(function(inventory){
       var time = inventory['offset_time'];
       items_struct[String(time)] = inventory;
-    })
-    var rawTemplate = `<div class="statcard">
-      <h2>{{title}} <small><i class='d2mh {{hero_css}}'></i></small></h2>
+    });
+    var rawTemplate = `<div class="statcard {{css_classes}}">
+      <h2><i class='d2mh {{hero_css}}'></i></h2>
       <label></label>
           <div class="stats">
+            <div class="css-progress-bar horizontal health">
+              <div class="css-progress-track">
+                <div class="css-progress-fill" style='width:{{health_pct}}%; float:left; background: green;'>
+                  <span class='bar-nums'>{{health}} / {{max_health}}</span>
+                </div>
+              </div>
+            </div>
+            <div class='mana'>
+            <div class="css-progress-bar horizontal health">
+              <div class="css-progress-track">
+                <div class="css-progress-fill" style='width:{{mana_pct}}%; float:left; background: blue;'>
+                  <span class='bar-nums'>{{mana}} / {{max_mana}}</span>
+                </div>
+              </div>
+            </div>
+
+
+            </div>
             <div class='strength'>
-              Strength: {{strength}} + {{strength_add}} = {{strength_total}}
+              Str: {{strength}} + {{strength_add}} = {{strength_total}}
             </div>
             <div class='intelligence'>
-              Intelligence: {{intelligence}} + {{intelligence_add}} = {{intelligence_total}}
+              Int: {{intelligence}} + {{intelligence_add}} = {{intelligence_total}}
             </div>
             <div class='agility'>
-              Agility: {{agility}} + {{agility_add}} = {{agility_total}}
+              Agi: {{agility}} + {{agility_add}} = {{agility_total}}
             </div>
             <div class='damage'>
-              Damage: {{base_damage}} + {{bonus_damage}} = {{total_damage}}
+              Dmg: {{base_damage}} + {{bonus_damage}} = {{total_damage}}
             </div>
             <div class='kda'>
               KDA: {{kills}} / {{deaths}} / {{assists}}
             </div>
             <div class='last_hits'>
-              Last Hits / Denies: {{last_hits}} / {{denies}}
-            </div>
-            <div class='health'>
-              Health: {{health}} / {{max_health}}
-            </div>
-            <div class='mana'>
-              Mana: {{mana}} / {{max_mana}}
+              L/H / D: {{last_hits}} / {{denies}}
             </div>
             <div class='gold'>
               Gold: {{unreliable_gold}} + {{reliable_gold}} = {{total_gold}}
             </div>
             <div class='total_gold'>
-              Total earned gold: {{total_earned_gold}}
+              Tot Gold: {{total_earned_gold}}
             </div>
 
-            <div class='row' id='items'>
-              <div class='col-xs-1' id='item_0'>
-                <i class='d2items {{item_0}}'></i>
+            <div class='row' id='items' style='text-align:center'>
+              <div class='col-md-12'>
+                <div class='row'>
+                 <div class='col-xs-1' id='item_0'>
+                    <i class='d2items {{item_0}}'></i>
+                  </div>
+                  <div class='col-xs-1' id='item_1'>
+                    <i class='d2items {{item_1}}'></i>
+                  </div>
+                  <div class='col-xs-1' id='item_2'>
+                    <i class='d2items {{item_2}}'></i>
+                  </div>
+                </div>
               </div>
-              <div class='col-xs-1' id='item_1'>
-                <i class='d2items {{item_1}}'></i>
-              </div>
-              <div class='col-xs-1' id='item_2'>
-                <i class='d2items {{item_2}}'></i>
-              </div>
-              <div class='col-xs-1' id='item_3'>
-                <i class='d2items {{item_3}}'></i>
-              </div>
-              <div class='col-xs-1' id='item_4'>
-                <i class='d2items {{item_4}}'></i>
-              </div>
-              <div class='col-xs-1' id='item_5'>
-                <i class='d2items {{item_5}}'></i>
+              <div class='col-md-12'>
+                <div class='row'>
+                  <div class='col-xs-1' id='item_3'>
+                    <i class='d2items {{item_3}}'></i>
+                  </div>
+                  <div class='col-xs-1' id='item_4'>
+                    <i class='d2items {{item_4}}'></i>
+                  </div>
+                  <div class='col-xs-1' id='item_5'>
+                    <i class='d2items {{item_5}}'></i>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1228,24 +1251,30 @@ var stat_card = function(shard, destination, params){
     // Items health mana kda last hits denies
     var update = function(time){
 
-      var context = {title: shard.name};
+      var context = {
+        title: shard.name,
+        css_classes: shard.css_classes,
+      };
 
       parameters.reduce(function(a, b){
         var param_name = b[0];
         if (struct[param_name][time]===undefined) {
           $(destination).html('Not defined');
         }else{
-          a[param_name] = struct[param_name][time].toFixed(2);
+          a[param_name] = struct[param_name][time].toFixed(0);
         }
         return a;
       }, context);
 
 
-      context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(2);
+      context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(0);
 
-      context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(2);
+      context['health_pct'] = ((context['health'] / context['max_health'])*100).toFixed(0);
+      context['mana_pct'] = ((context['mana'] / context['max_mana'])*100).toFixed(0);
 
-      context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(2);
+      context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(0);
+
+      context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(0);
 
       context['hero_css'] = shard.hero_name;
 
