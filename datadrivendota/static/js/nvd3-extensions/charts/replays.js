@@ -869,13 +869,22 @@ var minimap = function(shards, destination, params){
   // Get the replay parse info
   Promise.all(urls).then(function(data){
 
+    var css_class_swap = function(side){
+      if (side === 'radiant') {
+        return 'radiant-face-glow';
+      }
+      else if (side === 'dire') {
+        return 'dire-face-glow';
+      }
+    }
 
     var position_data =  data.map(function(series, series_idx){
       return series.reduce(function(prev, d){
         prev[String(d.offset_time)] = {
           x: d.x,
           y: d.y,
-          hero_name: shards[series_idx].hero_name
+          hero_name: shards[series_idx].hero_name,
+          css_classes: css_class_swap(shards[series_idx].css_classes)
         }
         return prev;
       }, {})
@@ -895,7 +904,9 @@ var minimap = function(shards, destination, params){
     var faces = d3.select(destination).selectAll('i').data(fetch_data)
       .enter()
       .append('i')
-      .attr('class', function(d){return 'd2mh ' + d.hero_name})
+      .attr('class', function(d){
+        return 'd2mh ' + d.hero_name + ' ' +d.css_classes;
+      })
       .style('left', function(d){return xscale(d.x)+'px'})
       .style('bottom', function(d){return yscale(d.y)+'px'})
       .style('position', 'absolute')
@@ -1169,7 +1180,7 @@ var stat_card = function(shard, destination, params){
       var time = inventory['offset_time'];
       items_struct[String(time)] = inventory;
     });
-    var rawTemplate = `<div class="statcard {{css_classes}}">
+    var rawTemplate = `<div class="statcard {{css_classes}} {{lifestate}}">
     <div>
     <i class='d2mh {{hero_css}}'></i>
       <div style='float:right'>
@@ -1246,6 +1257,8 @@ var stat_card = function(shard, destination, params){
 
 
       context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(0);
+
+      context['lifestate'] = context['health'] > 0 ? 'alive' : 'dead';
 
       context['health_pct'] = ((context['health'] / context['max_health'])*100).toFixed(0);
       context['mana_pct'] = ((context['mana'] / context['max_mana'])*100).toFixed(0);
