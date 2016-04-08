@@ -132,6 +132,17 @@ class GhostWalkView(TemplateView):
         return super(GhostWalkView, self).get_context_data(**kwargs)
 
 
+class ReplayView(DetailView):
+    model = Match
+    slug_url_kwarg = 'match_id'
+    slug_field = 'steam_id'
+    template_name = 'matches/replay.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['show_control_bar'] = True
+        return super(ReplayView, self).get_context_data(**kwargs)
+
+
 class PerformanceView(TemplateView):
     template_name = 'matches/performance.html'
 

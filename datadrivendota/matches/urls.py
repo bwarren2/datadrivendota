@@ -24,6 +24,11 @@ urlpatterns = [
         name="ghostwalk"
     ),
     url(
+        r'^replay/(?P<match_id>[0-9\-]*)$',
+        views.ReplayView.as_view(),
+        name="replay"
+    ),
+    url(
         r'^performance/$',
         views.PerformanceView.as_view(),
         name="performance"

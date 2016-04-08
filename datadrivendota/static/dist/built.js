@@ -36865,7 +36865,6 @@ $(function () {
 
         $('#progress-bar-current').html(0);
 
-        console.log(formatter, formatter!==undefined);
         if (formatter!==undefined) {
             $('#progress-bar-max').html(formatter(end));
         }else{
