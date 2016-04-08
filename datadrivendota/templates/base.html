@@ -123,6 +123,7 @@
               <a href="{% url 'search' %}">Search</a>
             </li>
           {% endif %}
+          </ul>
 
           {% if SHOW_AUTH %}
           <ul class="nav navbar-nav navbar-right">
@@ -130,7 +131,7 @@
             <li><a href="{% url 'accounts:home' %}">Data Management</a></li>
             <li><a href="{% url 'logout' %}">Logout, {{user}}?</a></li>
             {% else %}
-            <li><a href="{% url 'login' method='email' %}">Log in or sign up</a></li>
+            <li><a href="{% url 'social:begin' 'steam' %}"><img src="{% static 'images/sits_small.png' %}" alt="Sign in through Steam"></a></li>
             {% endif %}
           </ul>
           {% endif %}

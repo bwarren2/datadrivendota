@@ -316,10 +316,8 @@ WSGI_APPLICATION = 'wsgi.application'
 # END WSGI CONFIGURATION
 
 # LOGIN CONFIGURATION
-LOGIN_URL = '/login/'
-
 AUTHENTICATION_BACKENDS = (
-    'social.backends.email.EmailAuth',
+    'social.backends.steam.SteamOpenId',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -366,8 +364,22 @@ ITEM_SCHEMA_KEY = 'valve_item_schema_json'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--with-coverage',
-    #techdebt: duplicate listing here and in fabfile
-    '--cover-package=parserpipe,accounts,guilds,health,heroes,items,leagues,matches,players,teams,utils,datadrivendota',
+    # techdebt: duplicate listing here and in fabfile
+    (
+        '--cover-package='
+        'parserpipe,'
+        'accounts,'
+        'guilds,'
+        'health,'
+        'heroes,'
+        'items,'
+        'leagues,'
+        'matches,'
+        'players,'
+        'teams,'
+        'utils,'
+        'datadrivendota'
+    ),
 ]
 
 
@@ -438,7 +450,7 @@ SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = 'accounts.mail.send_validation'
 
 SOCIAL_AUTH_EMAIL_FORM_HTML = 'email_signup.html'
 SOCIAL_AUTH_USERNAME_FORM_HTML = 'username_signup.html'
-SOCIAL_AUTH_URL_NAMESPACE = 'accounts'
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 REPLAY_SERVICE_URL = getenv('REPLAY_SERVICE_URL')
 
