@@ -1181,7 +1181,7 @@ var stat_card = function(shard, destination, params){
               </div>
             </div>
             <div class='mana'>
-            <div class="css-progress-bar horizontal health">
+            <div class="css-progress-bar horizontal mana">
               <div class="css-progress-track">
                 <div class="css-progress-fill" style='width:{{mana_pct}}%; float:left; background: blue;'>
                   <span class='bar-nums'>{{mana}} / {{max_mana}}</span>
