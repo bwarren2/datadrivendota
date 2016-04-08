@@ -1170,8 +1170,13 @@ var stat_card = function(shard, destination, params){
       items_struct[String(time)] = inventory;
     });
     var rawTemplate = `<div class="statcard {{css_classes}}">
-      <h2><i class='d2mh {{hero_css}}'></i></h2>
-      <label></label>
+    <div>
+    <i class='d2mh {{hero_css}}'></i>
+      <div style='float:right'>
+      <div><text>{{kills}} / {{deaths}} / {{assists}}</text></div>
+      <div><text>{{last_hits}} / {{denies}}</text></div>
+      </div>
+    </div>
           <div class="stats">
             <div class="css-progress-bar horizontal health">
               <div class="css-progress-track">
@@ -1187,33 +1192,6 @@ var stat_card = function(shard, destination, params){
                   <span class='bar-nums'>{{mana}} / {{max_mana}}</span>
                 </div>
               </div>
-            </div>
-
-
-            </div>
-            <div class='strength'>
-              Str: {{strength}} + {{strength_add}} = {{strength_total}}
-            </div>
-            <div class='intelligence'>
-              Int: {{intelligence}} + {{intelligence_add}} = {{intelligence_total}}
-            </div>
-            <div class='agility'>
-              Agi: {{agility}} + {{agility_add}} = {{agility_total}}
-            </div>
-            <div class='damage'>
-              Dmg: {{base_damage}} + {{bonus_damage}} = {{total_damage}}
-            </div>
-            <div class='kda'>
-              KDA: {{kills}} / {{deaths}} / {{assists}}
-            </div>
-            <div class='last_hits'>
-              L/H / D: {{last_hits}} / {{denies}}
-            </div>
-            <div class='gold'>
-              Gold: {{unreliable_gold}} + {{reliable_gold}} = {{total_gold}}
-            </div>
-            <div class='total_gold'>
-              Tot Gold: {{total_earned_gold}}
             </div>
 
             <div class='row' id='items' style='text-align:center'>

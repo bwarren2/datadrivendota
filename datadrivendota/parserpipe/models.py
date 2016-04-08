@@ -65,7 +65,7 @@ class MatchRequest(models.Model):
             allowed_to_request = (
                 profile.requested is not None and
                 profile.request_limit > profile.requested.filter(
-                    created__gte=start_of_this_calendar_month,
+                    creation__gte=start_of_this_calendar_month,
                 ).count()
             )
             if allowed_to_request:
