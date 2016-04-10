@@ -144,7 +144,7 @@ class ReplayView(DetailView):
 
         messages.success(
             self.request,
-            'This section is very data intensive and under experimentation; it can take up to a minute to load, based on your connection. '
+            'This section is very data intensive tech still in development; it can take up to a minute to load, based on your connection. '
         )
 
         return super(ReplayView, self).get_context_data(**kwargs)
