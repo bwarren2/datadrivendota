@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.views.generic import View, TemplateView
 from django.views.generic.edit import FormView as DjangoFormView
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation
 
 from .forms import SearchForm
@@ -22,6 +23,11 @@ class LandingView(TemplateView):
         kwargs['blog_entry'] = Entry.public.all().order_by(
             '-created'
         ).first()
+
+        messages.success(
+            self.request,
+            'We are testing free trials!  Want deep processing of your data?  Sign in above and a dev will add you within 2 hours.'
+        )
 
         return super(LandingView, self).get_context_data(**kwargs)
 
