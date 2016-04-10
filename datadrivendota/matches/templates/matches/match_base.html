@@ -28,6 +28,11 @@
           class="{% active 'matches:detail_parsed' %}">
             <a href="{% url "matches:detail_parsed" match_id=match.steam_id %}">Parsed Charts</a>
         </li>
+        <li
+          role="presentation"
+          class="{% active 'matches:replay' %}">
+            <a href="{% url "matches:replay" match_id=match.steam_id %}">(Experimental!) In-browser replay</a>
+        </li>
         {% endif %}
 
       </ul>

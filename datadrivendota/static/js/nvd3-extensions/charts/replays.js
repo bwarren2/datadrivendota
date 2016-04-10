@@ -1204,7 +1204,25 @@ var stat_card = function(shard, destination, params){
                 </div>
               </div>
             </div>
-
+           </div>
+           <div class='strength'>
+             Str: {{strength}} + {{strength_add}} = {{strength_total}}
+           </div>
+           <div class='intelligence'>
+             Int: {{intelligence}} + {{intelligence_add}} = {{intelligence_total}}
+           </div>
+           <div class='agility'>
+             Agi: {{agility}} + {{agility_add}} = {{agility_total}}
+           </div>
+           <div class='damage'>
+             Dmg: {{base_damage}} + {{bonus_damage}} = {{total_damage}}
+           </div>
+           <div class='gold'>
+             Gold: {{unreliable_gold}} + {{reliable_gold}} = {{total_gold}}
+           </div>
+           <div class='total_gold'>
+             Tot Gold: {{total_earned_gold}}
+           </div>
             <div class='row' id='items' style='text-align:center'>
               <div class='col-md-12'>
                 <div class='row'>

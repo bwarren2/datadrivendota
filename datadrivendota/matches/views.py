@@ -1,5 +1,6 @@
 from django.views.generic import DetailView, ListView, TemplateView
 from utils.views import ability_infodict
+from django.contrib import messages
 
 from .models import Match, PlayerMatchSummary, PickBan
 from utils.pagination import SmarterPaginator
@@ -140,6 +141,12 @@ class ReplayView(DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs['show_control_bar'] = True
+
+        messages.success(
+            self.request,
+            'This section is very data intensive and under experimentation; it takes several seconds to load. '
+        )
+
         return super(ReplayView, self).get_context_data(**kwargs)
 
 
