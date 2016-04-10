@@ -31,7 +31,10 @@
         <li
           role="presentation"
           class="{% active 'matches:replay' %}">
-            <a href="{% url "matches:replay" match_id=match.steam_id %}">(Experimental!) In-browser replay</a>
+            <a href="{% url "matches:replay" match_id=match.steam_id %}">
+            In-browser replay
+            <span class="brand-release-mark">alpha</span>
+            </a>
         </li>
         {% endif %}
 
