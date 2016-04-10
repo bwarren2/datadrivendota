@@ -26,13 +26,13 @@ urlpatterns = [
     url(
         r'^replay/(?P<match_id>[0-9\-]*)/$',
         views.ReplayView.as_view(),
-        name="replay"
-    ), # Legacy for the dev forums for 2wks
+        name="legacy-replay"
+    ),  # Legacy for the dev forums for 2wks
     url(
         r'^(?P<match_id>[0-9\-]*)/replay/$',
         views.ReplayView.as_view(),
         name="replay"
-    ),
+    ),  # Matching the rest of the url formatting
     url(
         r'^performance/$',
         views.PerformanceView.as_view(),
