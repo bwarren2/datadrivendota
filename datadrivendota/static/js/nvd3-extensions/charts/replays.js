@@ -133,7 +133,6 @@ var replay_lines = function(dataset, facet, destination, params){
 
 var stat_lineup = function(shards, facet, destination, params, log){
 
-  console.log(log);
   if (log===undefined){
     log = 'statelog';
   }
@@ -1056,7 +1055,6 @@ var position_heatmap = function(shards, destination, params){
     $(window).on('shardfilter', function(evt, id, min_time, max_time){
       var shard;
       var test = raw_data.filter(function(d, i){
-        console.log(shards[i].id == id, shards[i].id, id)
         if (shards[i].id == id){
           shard = shards[i];
         }
@@ -1136,7 +1134,6 @@ var stat_card = function(shard, destination, params){
   // Get the replay parse info
   Promise.all(urls).then(function(data){
     data = data[0];
-    console.log(data);
     data.map(function(item){
       var time = item['offset_time'];
       struct[String(time)] = item;
@@ -1239,10 +1236,7 @@ var stat_card = function(shard, destination, params){
 
       context['lifestate'] = context['health'] > 0 ? 'alive' : 'dead';
 
-      context['health'] = context['health'].toFixed(0);
-      context['max_health'] = context['max_health'].toFixed(0);
-      context['mana'] = context['mana'].toFixed(0);
-      context['max_mana'] = context['max_mana'].toFixed(0);
+
 
       context['health_pct'] = ((context['health'] / context['max_health'])*100).toFixed(0);
       context['mana_pct'] = ((context['mana'] / context['max_mana'])*100).toFixed(0);
@@ -1256,6 +1250,21 @@ var stat_card = function(shard, destination, params){
       context['total_gold'] = (
         parseInt(context['unreliable_gold']) + parseInt(context['reliable_gold'])
       ).toFixed(2);
+
+      [
+        'agility',
+        'agility_total',
+        'strength',
+        'strength_total',
+        'intelligence',
+        'intelligence_total',
+        'health',
+        'max_health',
+        'mana',
+        'max_mana',
+      ].map(function(field){
+        context[field] = context[field].toFixed(0);
+      });
 
       ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'].map(
         function(d){
@@ -1285,7 +1294,7 @@ var stat_card = function(shard, destination, params){
 var playback_shards = function(shards){
 
   var urls = shards.map(function(shard){
-    var location = utils.parse_urls.url_for(shard, 'health', 'statelog');
+    var location = utils.parse_urls.url_for(shard, 'allstate', 'statelog');
     return $.getJSON(location);
   });
   var min;
