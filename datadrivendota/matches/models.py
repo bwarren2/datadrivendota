@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from django.db import models
+from django.conf import settings
 
 from .querysets import PMSQuerySet, MatchFilteredQuerySet, FilteredQuerySet
 from .managers import Unparsed, Parsed
@@ -114,7 +115,7 @@ class Match(models.Model):
 
     @property
     def is_parsed(self):
-        return self.parsed_with is not None
+        return self.parsed_with == settings.PARSER_VERSION
 
     @property
     def hms_duration(self):

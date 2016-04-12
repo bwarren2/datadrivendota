@@ -10,7 +10,7 @@ if (!String.prototype.format) {
   };
 };
 
-var version = 1;
+var version = 2;
 var parse_url = "https://s3.amazonaws.com/datadrivendota/processed_replay_parse/";
 
 // https://s3.amazonaws.com/datadrivendota/processed_replay_parse/2107579100_130_combatlog_item_buys_v1.json.gz
