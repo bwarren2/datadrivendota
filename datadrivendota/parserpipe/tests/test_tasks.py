@@ -283,8 +283,15 @@ class TestMatchRequestCreation(TestCase):
             player=cls.non_client_player
         )
 
-
     def test_match_discovery(self):
         task = CreateMatchRequests()
         found = task.get_match_ids(self.client_ids, self.since)
         self.assertEqual(list(found), [22])
+
+
+class TestUpdateParseEnd(TestCase):
+    task = UpdateParseEnd
+
+    def test_shardstate(self):
+        self.task().aggregate_shards(2288796036, 'allstate', 'statelog')
+

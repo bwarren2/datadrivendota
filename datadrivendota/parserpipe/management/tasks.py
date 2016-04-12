@@ -578,12 +578,12 @@ class UpdateParseEnd(Task):
         :param log_type: {combatlog/statelog/combatseries}
         :returns: a list of lists of dicts, pulled from s3
         """
-        return [
-            requests.get(
-                shard_url(match_id, x, field, logtype)
-            ).json()
-            for x in dataslices
-        ]
+        return_lst = []
+        for x in dataslices:
+            url = shard_url(match_id, x, field, logtype)
+            return_lst.append(requests.get(url).json())
+
+        return return_lst
 
     def rollup_dataseries(self, data, field, operation):
         """
@@ -597,34 +597,72 @@ class UpdateParseEnd(Task):
         data_keys = self.extract_keys(data_dicts)
 
         if operation == 'sum':
-            return [
-                {
-                    'offset_time': x,
-                    field: sum([subdict[x] for subdict in data_dicts])
-                }
-                for x in data_keys
-            ]
+            if field != 'allstate':
+                return [
+                    {
+                        'offset_time': x,
+                        field: sum([subdict[x] for subdict in data_dicts])
+                    }
+                    for x in data_keys
+                ]
+            else:
+                return_lst = []
+                for x in data_keys:
+                    struct = {
+                        'offset_time': data_dicts[0][x]['offset_time']
+                    }
+                    for key in data_dicts[0][x].keys():
+                        if key not in [
+                            'offset_time',
+                            'x',
+                            'y',
+                            'item_0',
+                            'item_1',
+                            'item_2',
+                            'item_3',
+                            'item_4',
+                            'item_5',
+                            'health_pct',
+                            'mana_pct',
+                        ]:
+                            struct[key] = sum(
+                                [subdict[x][key] for subdict in data_dicts]
+                            )
+                            struct['health_pct'] = sum([subdict[x]['health'] for subdict in data_dicts])/sum([subdict[x]['max_health'] for subdict in data_dicts])
+                            struct['mana_pct'] = sum([subdict[x]['mana'] for subdict in data_dicts])/sum([subdict[x]['max_mana'] for subdict in data_dicts])
+
+                    return_lst.append(struct)
+                return return_lst
         elif operation == 'diff':
             if len(data) != 2:
                 raise ValueError(
                     'Taking dicts of more than 2 series undefined.'
                 )
             else:
-                return [
-                    {
-                        'offset_time': x,
-                        field: data_dicts[0][x] - data_dicts[1][x]
-                    }
-                    for x in data_keys
-                ]
+                if field != 'allstate':
+                    return [
+                        {
+                            'offset_time': x,
+                            field: data_dicts[0][x] - data_dicts[1][x]
+                        }
+                        for x in data_keys
+                    ]
+                else:
+                    pass
         else:
             raise ValueError('What is this operation? {0}'.format(operation))
 
     def rehash(self, data, field):
-        return [
-            {x['offset_time']: x[field] for x in dataseries}
-            for dataseries in data
-        ]
+        if field != 'allstate':
+            return [
+                {x['offset_time']: x[field] for x in dataseries}
+                for dataseries in data
+            ]
+        else:
+            return [
+                {x['offset_time']: x for x in dataseries}
+                for dataseries in data
+            ]
 
     def extract_keys(self, data):
         keys_list = [
