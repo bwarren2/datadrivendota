@@ -1127,59 +1127,22 @@ var crosscount = function(series){
 }
 
 var stat_card = function(shard, destination, params){
-  var parameters = [
-    ['strength', 'statelog'],
-    ['strength_total', 'statelog'],
-    ['agility', 'statelog'],
-    ['agility_total', 'statelog'],
-    ['intelligence', 'statelog'],
-    ['intelligence_total', 'statelog'],
-    ['base_damage', 'statelog'],
-    ['bonus_damage', 'statelog'],
-    ['total_damage', 'statelog'],
-    ['kills', 'statelog'],
-    ['deaths', 'statelog'],
-    ['assists', 'statelog'],
-    ['health', 'statelog'],
-    ['mana', 'statelog'],
-    ['max_health', 'statelog'],
-    ['max_mana', 'statelog'],
-    ['last_hits', 'statelog'],
-    ['denies', 'statelog'],
-    ['xp', 'statelog'],
-    ['reliable_gold', 'statelog'],
-    ['unreliable_gold', 'statelog'],
-    ['total_earned_gold', 'statelog'],
-  ];
 
   var struct = {};
-  var urls = parameters.map(function(pair){
-    var location = utils.parse_urls.url_for(shard, pair[0], pair[1]);
-    return $.getJSON(location);
-  });
+  var urls = [
+    $.getJSON(utils.parse_urls.url_for(shard, 'allstate', 'statelog'))
+  ];
 
   // Get the replay parse info
   Promise.all(urls).then(function(data){
-
-    data.map(function(d, i){
-      struct[parameters[i][0]] = {};
-      d.map(function(item){
-        var value = parameters[i][0];
-        var time = item['offset_time'];
-
-        struct[value][String(time)] = item[value]
-      })
+    data = data[0];
+    console.log(data);
+    data.map(function(item){
+      var time = item['offset_time'];
+      struct[String(time)] = item;
     });
-  }).then(function(){
-    var location = utils.parse_urls.url_for(shard, 'items', 'statelog');
-    return $.getJSON(location);
+
   }).then(function(items){
-    var items_struct = {};
-
-    items.map(function(inventory){
-      var time = inventory['offset_time'];
-      items_struct[String(time)] = inventory;
-    });
     var rawTemplate = `<div class="statcard {{css_classes}} {{lifestate}}">
     <div>
     <i class='d2mh {{hero_css}}'></i>
@@ -1263,20 +1226,23 @@ var stat_card = function(shard, destination, params){
         css_classes: shard.css_classes,
       };
 
-      parameters.reduce(function(a, b){
-        var param_name = b[0];
-        if (struct[param_name][time]===undefined) {
-          $(destination).html('Not defined');
-        }else{
-          a[param_name] = struct[param_name][time].toFixed(0);
+      if (struct[time]===undefined) {
+        $(destination).html('Not defined');
+      }else{
+        for (var attrname in struct[String(time)]) {
+          context[attrname] = struct[String(time)][attrname];
         }
-        return a;
-      }, context);
+      }
 
 
       context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(0);
 
       context['lifestate'] = context['health'] > 0 ? 'alive' : 'dead';
+
+      context['health'] = context['health'].toFixed(0);
+      context['max_health'] = context['max_health'].toFixed(0);
+      context['mana'] = context['mana'].toFixed(0);
+      context['max_mana'] = context['max_mana'].toFixed(0);
 
       context['health_pct'] = ((context['health'] / context['max_health'])*100).toFixed(0);
       context['mana_pct'] = ((context['mana'] / context['max_mana'])*100).toFixed(0);
@@ -1291,19 +1257,17 @@ var stat_card = function(shard, destination, params){
         parseInt(context['unreliable_gold']) + parseInt(context['reliable_gold'])
       ).toFixed(2);
 
-      if (items_struct[time]!==undefined) {
-        ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'].map(
-          function(d){
-          if (items_struct[time][d] === null) {
-            context[d] = 'emptyitembg';
-          }else{
-            context[d] = items_struct[time][d].substring(5);
-          }
-        });
+      ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'].map(
+        function(d){
+        if (context[d] === null) {
+          context[d] = 'emptyitembg';
+        }else{
+          context[d] = context[d].substring(5);
+        }
+      });
 
-        var html = compiledTemplate(context);
-        $(destination).html(html);
-      }
+      var html = compiledTemplate(context);
+      $(destination).html(html);
 
     }
 
