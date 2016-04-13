@@ -720,8 +720,8 @@ def save_msgstream(match_id, dataslice, msgs, facet, log_type):
 
 class CreateMatchRequests(Task):
 
-    def run(self):
-        since = timezone.now() - timedelta(days=1)
+    def run(self, days=1):
+        since = timezone.now() - timedelta(days=days)
         client_ids = self.get_player_ids()
         matches = self.get_match_ids(client_ids, since)
         self.make_match_requests(matches)
