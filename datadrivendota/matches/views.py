@@ -1,6 +1,7 @@
 from django.views.generic import DetailView, ListView, TemplateView
 from utils.views import ability_infodict
 from django.contrib import messages
+from parserpipe.models import MatchRequest
 
 from .models import Match, PlayerMatchSummary, PickBan
 from utils.pagination import SmarterPaginator
@@ -10,6 +11,21 @@ class MatchDetail(DetailView):
     model = Match
     slug_url_kwarg = 'match_id'
     slug_field = 'steam_id'
+
+    def get_context_data(self, **kwargs):
+        if self.request.user.is_superuser:
+            try:
+                kwargs['matchrequest'] = MatchRequest.objects.get(
+                    match_id=self.object.steam_id
+                )
+                kwargs['clearname'] = dict(MatchRequest.STATUS_CHOICES)[
+                    kwargs['matchrequest'].status
+                ]
+            except MatchRequest.DoesNotExist:
+                # Not a parsed match
+                kwargs['clearname'] = 'Unparsed'
+
+        return super(MatchDetail, self).get_context_data(**kwargs)
 
 
 class MatchDetailPickban(DetailView):

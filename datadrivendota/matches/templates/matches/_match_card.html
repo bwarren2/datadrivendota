@@ -18,11 +18,13 @@
     {% endif %}
       on {{match.start_time|seconds_to_date|date:'m-d-y'}}
   </small>
-  <small class='text-primary'>
-    {% if match.is_parsed%}
-      Parsed
+    {% if user.is_superuser %}
+      <span class='admin-tag'> {{clearname}}</span>
+    {% elif match.is_parsed%}
+    <small class='text-primary'>
+        Parsed
+    </small>
     {% endif %}
-  </small>
 
 </h2>
 

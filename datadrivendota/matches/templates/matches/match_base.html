@@ -3,7 +3,6 @@
 
 {% block content %}
   {% block match_nav %}
-
   <nav>
       <ul class="nav nav-pills">
         <li role="presentation" class="{% active 'matches:detail' %}">
@@ -43,7 +42,6 @@
   {% endblock match_nav %}
 
   <div class='row'>
-
       {% include "matches/_match_card.html" %}
 
       {% block match_content %}
