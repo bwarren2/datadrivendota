@@ -446,8 +446,8 @@ TESTERS = [
     68083913,
     98090295,
     51753511,
+    88367253, # Yasp's lead dev
     # Def randos here
-    88367253
 ]
 
 LOGIN_URL = '/accounts/login/'
