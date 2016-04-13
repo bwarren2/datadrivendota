@@ -18,7 +18,7 @@
                 </p>
               </div>
               <div class='col-md-12'>
-                <h5>Hero Health, Final Game of Shanghai Major, 10s intervals</h5>
+                <h5>Hero Health in Match# 2291119423, ESL One Frankfurt 2016, 10s intervals</h5>
 
                 <div id='major_chart' class='chart toggling vert-md-6'>
                   <div class='vert-md-6 chart toggling'>
@@ -160,7 +160,7 @@
 
         pingSetup('{{csrf_token}}')
 
-        var match_id = 2201993554;
+        var match_id = 2291119423;
         $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
           .success(function(shards){
             shards = shards.filter(function(d){
