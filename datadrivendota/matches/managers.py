@@ -5,7 +5,7 @@ from django.conf import settings
 class Unparsed(models.Manager):
 
     def get_queryset(self):
-        return super(Unparsed, self).get_queryset().filter(
+        return super(Unparsed, self).get_queryset().exclude(
             parsed_with=settings.PARSER_VERSION
         )
 
@@ -13,6 +13,6 @@ class Unparsed(models.Manager):
 class Parsed(models.Manager):
 
     def get_queryset(self):
-        return super(Parsed, self).get_queryset().exclude(
+        return super(Parsed, self).get_queryset().filter(
             parsed_with=settings.PARSER_VERSION
         )
