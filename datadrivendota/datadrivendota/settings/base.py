@@ -438,7 +438,16 @@ FAILED_LIVEMATCH_KEEP_DAYS = 2
 # End project specific constants used in tasks
 JAVA_QUEUE_DURABILITY = True
 TESTERS = [
-    103611462, 11029080, 66289584, 98193589, 85045426, 68083913, 98090295, 51753511
+    103611462,
+    11029080,
+    66289584,
+    98193589,
+    85045426,
+    68083913,
+    98090295,
+    51753511,
+    # Def randos here
+    88367253
 ]
 
 LOGIN_URL = '/accounts/login/'
