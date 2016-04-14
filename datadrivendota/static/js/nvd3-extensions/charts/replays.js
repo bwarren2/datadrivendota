@@ -14,121 +14,64 @@ var timeToSecs = function(time){
 
 var replay_lines = function(dataset, facet, destination, params){
 
-    var width;
-    var height;
-    var start;
-    var stop;
-    var interpolation;
-    var stride;
-    var chart_destination = destination+" .chart";
-    var label_destination = destination+" label";
-    var x_label = toTitleCase("offset time");
-    var y_label = toTitleCase(facet);
-    var show_legend = false;
-
-    if(params!==undefined){
-
-      if(params.start_time!==undefined&&params.start_time!==""){
-        start = timeToSecs(params.start_time);
-      } else {
-        start = -10000;
-      }
-
-      if(params.end_time!==undefined&&params.end_time!==""){
-        stop = timeToSecs(params.end_time);
-      } else {
-        stop = 10000;
-      }
-
-      if(params.interpolation!==undefined){
-        interpolation = params.interpolation;
-      } else {
-        interpolation = "step-after";
-      }
-
-      if(params.granularity!==undefined){
-        stride = params.granularity;
-      } else {
-        stride = 10;
-      }
-
-      if(params.y_label!==undefined){
-        y_label = params.y_label;
-      }
-      if(params.show_legend!==undefined){
-        show_legend = params.show_legend;
-      }
+  var x_label = toTitleCase("offset time");
+  var y_label = toTitleCase(facet);
+  if (params.label!==undefined) {
+    var y_label = toTitleCase(params.label);
+  }
+  var data = dataset.map(function(series){
+    var x = series.values.map(function(d){
+         var t = new Date(1970, 0, 1); // Epoch
+          t.setSeconds(d.offset_time);
+        return t;
+    })
+    return {
+      type: 'scattergl',
+      x: x,
+      y: series.values.map(function(d){return d[facet]}),
+      name: series.shard.name
     }
+  });
 
-    var plot_data = dataset.map(function(d, i){
-      d.values = d.values.filter(function(x){
-        return x.offset_time <= stop && x.offset_time >= start && x.offset_time.mod(stride) === 0;
-      });
-      return d;
-    });
+  var layout = {
+    xaxis: {
+      title: x_label,
+      autotick: true,
+      tickformat: '%H:%M:%S',
+      nticks: 5,
+    },
+    yaxis: {
+      title: y_label,
+    },
+    margin: {
+      t: 20
+    },
+    hovermode: 'closest'
+  };
+  if(params.inset_legend){
+    layout.legend = {
+    x: 0.1,
+    y: 1,
+    traceorder: 'normal',
+    font: {
+      family: 'sans-serif',
+      size: 12,
+      color: '#FFF'
+    },
+    opacity: .5,
+    borderwidth: 2
+    }
+  }
 
-    $(chart_destination).empty();
-    $(label_destination).html(y_label);
-
-    var svg = utils.svg.square_svg(chart_destination, width, height);
-    nv.addGraph(
-
-      function(){
-        var chart = nv.models.lineWithFocusChart()
-          .margin({
-            left: 50,
-            bottom: 50,
-          })
-          .x(function(d){
-            return d.offset_time;
-          })
-          .y(function(d){
-            return d[facet];
-          })
-          .showLegend(show_legend)
-          .interpolate(interpolation)
-          .forceY(0);
-
-        chart.tooltip.contentGenerator(
-          tooltips.noformat_tooltip('offset_time', facet)
-        );
-
-        if(params !== undefined){
-
-          if(params.height!==undefined){
-            chart.height(params.height);
-          }
-          if(params.width!==undefined){
-            chart.width(params.width);
-          }
-          if(params.forceY!==undefined){
-            chart.forceY(params.forceY);
-          }
-          if(params.forceX!==undefined){
-            chart.forceX(params.forceX);
-          }
-          if(params.contentGenerator!==undefined){
-            chart.tooltip.contentGenerator(params.contentGenerator);
-          }
-        }
-
-        chart.x2Axis.tickFormat(
-          utils.axis_format.pretty_times
-        );
-
-        chart.xAxis.axisLabel(x_label).tickFormat(
-          utils.axis_format.pretty_times
-        );
-
-        chart.yAxis.axisLabel(y_label).axisLabelDistance(-18).tickFormat(
-          utils.axis_format.pretty_numbers
-        );
-
-        var chart_data = svg.datum(plot_data);
-        chart_data.transition().duration(500).call(chart);
-        return chart;
-      }
-    );
+  $('.ajax-loader').remove();
+  Plotly.newPlot(
+    destination.substring(1,100),
+    data,
+    layout,
+    { displaylogo: false,
+      modeBarButtonsToRemove: ['sendDataToCloud'],
+    }
+  );
 }
 
 var stat_lineup = function(shards, facet, destination, params, log){
@@ -148,11 +91,14 @@ var stat_lineup = function(shards, facet, destination, params, log){
       var myobj =  {
         'key': shards[i].name,
         'css_classes': shards[i].css_classes,
-        'values': dataseries
+        'values': dataseries,
+        'shard': shards[i]
       };
       return myobj;
     });
     replay_lines(dataset, facet, destination, params);
+  }).catch(function(e){
+    console.log(e);
   });
 };
 
@@ -182,14 +128,18 @@ var multifacet_lineup = function(shardfacets, destination, params, label){
       var myobj =  {
         'key': shardfacets[i][0].name + ' ' + shardfacets[i][1],
         'css_classes': shardfacets[i][0].css_classes,
-        'values': values
+        'values': values,
+        'shard': shardfacets[i][0]
       };
       return myobj;
     });
+    console.log(label);
     if (typeof label != 'undefined') {
-      params.y_label = label;
+      params.label = label;
     }
     replay_lines(dataset, 'value', destination, params);
+  }).catch(function(e){
+    console.log(e);
   });
 };
 
@@ -1335,5 +1285,3 @@ module.exports = {
   stat_card: stat_card,
   playback_shards: playback_shards
 };
-
-
