@@ -581,8 +581,48 @@ class UpdateParseEnd(Task):
         return_lst = []
         for x in dataslices:
             url = shard_url(match_id, x, field, logtype)
-            return_lst.append(requests.get(url).json())
+            return_lst.append(
+                requests.get(url).json()
+            )
 
+        return return_lst
+
+    def rollup_sum_allstate(self, data_keys, data_dicts):
+        return_lst = []
+        bad_keys = [
+            'offset_time',
+            'x',
+            'y',
+            'item_0',
+            'item_1',
+            'item_2',
+            'item_3',
+            'item_4',
+            'item_5',
+            'health_pct',
+            'mana_pct',
+        ]
+        for x in data_keys:
+            struct = {
+                'offset_time': data_dicts[0][x]['offset_time'],
+            }
+            keys = (k for k in data_dicts[0][x].keys() if k not in bad_keys)
+            health_pct = sum(
+                [subdict[x]['health'] for subdict in data_dicts]
+            ) / sum(
+                [subdict[x]['max_health'] for subdict in data_dicts]
+            )
+            mana_pct = sum(
+                [subdict[x]['mana'] for subdict in data_dicts]
+            ) / sum(
+                [subdict[x]['max_mana'] for subdict in data_dicts]
+            )
+            for key in keys:
+                struct[key] = sum([subdict[x][key] for subdict in data_dicts])
+                struct['health_pct'] = health_pct
+                struct['mana_pct'] = mana_pct
+
+            return_lst.append(struct)
         return return_lst
 
     def rollup_dataseries(self, data, field, operation):
@@ -597,7 +637,9 @@ class UpdateParseEnd(Task):
         data_keys = self.extract_keys(data_dicts)
 
         if operation == 'sum':
-            if field != 'allstate':
+            if field == 'allstate':
+                return self.rollup_sum_allstate(data_keys, data_dicts)
+            else:
                 return [
                     {
                         'offset_time': x,
@@ -605,41 +647,15 @@ class UpdateParseEnd(Task):
                     }
                     for x in data_keys
                 ]
-            else:
-                return_lst = []
-                for x in data_keys:
-                    struct = {
-                        'offset_time': data_dicts[0][x]['offset_time']
-                    }
-                    for key in data_dicts[0][x].keys():
-                        if key not in [
-                            'offset_time',
-                            'x',
-                            'y',
-                            'item_0',
-                            'item_1',
-                            'item_2',
-                            'item_3',
-                            'item_4',
-                            'item_5',
-                            'health_pct',
-                            'mana_pct',
-                        ]:
-                            struct[key] = sum(
-                                [subdict[x][key] for subdict in data_dicts]
-                            )
-                            struct['health_pct'] = sum([subdict[x]['health'] for subdict in data_dicts])/sum([subdict[x]['max_health'] for subdict in data_dicts])
-                            struct['mana_pct'] = sum([subdict[x]['mana'] for subdict in data_dicts])/sum([subdict[x]['max_mana'] for subdict in data_dicts])
-
-                    return_lst.append(struct)
-                return return_lst
         elif operation == 'diff':
             if len(data) != 2:
                 raise ValueError(
                     'Taking dicts of more than 2 series undefined.'
                 )
             else:
-                if field != 'allstate':
+                if field == 'allstate':
+                    pass
+                else:
                     return [
                         {
                             'offset_time': x,
@@ -647,8 +663,6 @@ class UpdateParseEnd(Task):
                         }
                         for x in data_keys
                     ]
-                else:
-                    pass
         else:
             raise ValueError('What is this operation? {0}'.format(operation))
 
