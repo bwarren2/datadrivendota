@@ -97,7 +97,7 @@ class S3WriterTaskMixin(object):
 
     def finalize_write_to_s3(self):
         logger.info("Uploading {} files to S3".format(len(self.upload_queue)))
-        pool = ThreadPool(processes=10)
+        pool = ThreadPool(processes=5)
         pool.map(upload_to_s3, self.upload_queue)
         self.upload_queue = []
 
