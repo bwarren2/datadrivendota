@@ -164,7 +164,7 @@
         $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
           .success(function(shards){
             shards = shards.filter(function(d){
-              return d.dataslice < 150;
+              return d.dataslice == 'radiant' || d.dataslice == 'dire';
             })
             var params = {
               granularity: 10,
