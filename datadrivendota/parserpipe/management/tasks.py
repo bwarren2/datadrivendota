@@ -1,4 +1,5 @@
 import logging
+import gzip
 import time
 import pika
 import sys
@@ -6,7 +7,10 @@ import json
 import requests
 from io import BytesIO
 from collections import Counter
+from contextlib import closing
 from datetime import timedelta
+from multiprocessing.pool import ThreadPool
+from retrying import retry
 
 from celery import Task, chain, chord
 
@@ -16,9 +20,9 @@ from django.db.models import Q
 from django.utils import timezone
 
 from utils import gzip_str, gunzip_str
-from utils.file_management import s3_parse
 from parserpipe.models import MatchRequest
 from datadrivendota.management.tasks import ValveApiCall, ApiContext
+from datadrivendota.s3utils import ParseS3BotoStorage
 from matches.management.tasks import UpdateMatch
 from matches.models import Match, PlayerMatchSummary
 from accounts.models import get_customer_player_ids
@@ -28,6 +32,73 @@ from .combat_log_filters import combatlog_filter_map
 from .state_log_filters import entitystate_filter_map
 
 logger = logging.getLogger(__name__)
+
+
+# This is tightly coupled to the S3WriterTaskMixin.
+#  - It takes a single args tuple, and unpacks it inside the function.
+#  - It assumpes the input buffers are BytesIO objects with a getvalue method.
+# Sometimes boto raises S3ResponseError: 200 OK with an "internal error" msg.
+# Retrying tries to hammer around the problem.
+@retry(stop_max_delay=10000, wait_fixed=2000)
+def upload_to_s3(args):
+    # We have to take and unpack a tuple to play nicely with ThreadPool.map:
+    input_buffer, filename = args
+    with closing(ParseS3BotoStorage().open(filename, 'w')) as f:
+        f.write(input_buffer.getvalue())
+
+
+class S3WriterTaskMixin(object):
+    def __init__(self, *args, **kwargs):
+        ret = super(S3WriterTaskMixin, self).__init__(*args, **kwargs)
+        self.upload_queue = []
+        return ret
+
+    def shard_filename(self, match_id, dataslice, facet, log_type):
+        """
+        Get the filename for shards on s3.
+
+        Because we are effectively using s3 as a great big key-value store,
+            we need a hashing fn.  This is it.
+
+        :param match_id: steam_id for match
+        :param dataslice: player_slot of {radiant/dire/diff}
+        :param log_type: {combatlog/statelog/combatseries}
+        :param facet: the name of a filter fn from that msg type
+        :returns: formatted string
+        """
+        filename = '{0}_{1}_{2}_{3}_v{4}.json.gz'.format(
+            match_id,
+            dataslice,
+            log_type,
+            facet,
+            settings.PARSER_VERSION
+        )
+
+        return filename
+
+    def shard_url(self, match_id, dataslice, facet, log_type):
+        return settings.SHARD_URL_BASE + self.shard_filename(
+            match_id,
+            dataslice,
+            facet,
+            log_type,
+        )
+
+    def save_msgstream(self, match_id, dataslice, msgs, facet, log_type):
+        raw_bytes = BytesIO()
+        gzip_wrapper = gzip.GzipFile(
+            mode='wb',
+            fileobj=raw_bytes,
+        )
+        json.dump(msgs, gzip_wrapper)
+
+        filename = self.shard_filename(match_id, dataslice, facet, log_type)
+        self.upload_queue.append((raw_bytes, filename))
+
+    def finalize_write_to_s3(self):
+        logger.info("Uploading {} files to S3".format(len(self.upload_queue)))
+        pool = ThreadPool(processes=10)
+        pool.map(upload_to_s3, self.upload_queue)
 
 
 class KickoffMatchRequests(Task):
@@ -327,7 +398,7 @@ class MergeMatchRequestReplay(Task):
         chord(header)(callback)  # Queue for postprocessing
 
 
-class UpdatePmsReplays(Task):
+class UpdatePmsReplays(S3WriterTaskMixin, Task):
     ignore_result = False
     soft_time_limit = 180
     time_limit = 185
@@ -351,11 +422,13 @@ class UpdatePmsReplays(Task):
             pms = pms_qs[0]
 
             self.shard(replay, pms, offset, match.steam_id)
+            # TODO something like this, and change save_msgstream to just build
+            # an in-memory buffer in this task?
+            self.finalize_write_to_s3()
             return pms.id
 
         else:
             raise ValueError('What is this dataslice? {0}'.format(data_slice))
-            return None
 
     def convert_stringtables(self, replay):
 
@@ -429,7 +502,7 @@ class UpdatePmsReplays(Task):
             'states': state_list,
             'combat': pms_combat,
         }
-        save_msgstream(match_id, pms.player_slot, all_data, 'all', 'both')
+        self.save_msgstream(match_id, pms.player_slot, all_data, 'all', 'both')
 
     def save_states(self, pms, match_id, replay):
         for field, filter_fn in entitystate_filter_map.iteritems():
@@ -439,7 +512,7 @@ class UpdatePmsReplays(Task):
                 pms.match.steam_id,
             ))
             data = filter_fn(replay['states'], pms)
-            save_msgstream(
+            self.save_msgstream(
                 match_id, pms.player_slot, data, field, 'statelog'
             )
 
@@ -453,7 +526,7 @@ class UpdatePmsReplays(Task):
                 pms.match.steam_id,
             ))
             data = filter_fn(replay['es'], pms, enemies, allies)
-            save_msgstream(
+            self.save_msgstream(
                 match_id, pms.player_slot, data, field, 'combatlog'
             )
             pms_combat[field] = data
@@ -503,12 +576,12 @@ class UpdatePmsReplays(Task):
 
     def save_timeseries(self, match_id, pms, timeseries_log):
         for field, data in timeseries_log.iteritems():
-            save_msgstream(
+            self.save_msgstream(
                 match_id, pms.player_slot, data, field, 'combatseries'
             )
 
 
-class UpdateParseEnd(Task):
+class UpdateParseEnd(S3WriterTaskMixin, Task):
     soft_time_limit = 600
     time_limit = 605
 
@@ -518,7 +591,6 @@ class UpdateParseEnd(Task):
         if all(finished_shards):
 
             for ct, field in enumerate(entitystate_filter_map.keys()):
-
                 # these are not summable
                 if field in [
                     'items', 'position', 'x_position', 'y_position'
@@ -541,6 +613,9 @@ class UpdateParseEnd(Task):
                 self.aggregate_shards(match_id, field, 'combatseries')
 
             self.bookkeep(match_id)
+            # TODO something like this, and change save_msgstream to just build
+            # an in-memory buffer in this task?
+            self.finalize_write_to_s3()
         else:
             raise ValueError("Something failed in the parse chord")
 
@@ -564,9 +639,9 @@ class UpdateParseEnd(Task):
         dire_sum = self.rollup_dataseries(dire, field, 'sum')
         diff = self.rollup_dataseries([radiant_sum, dire_sum], field, 'diff')
 
-        save_msgstream(match_id, 'radiant', radiant_sum, field, logtype)
-        save_msgstream(match_id, 'dire', dire_sum, field, logtype)
-        save_msgstream(match_id, 'diff', diff, field, logtype)
+        self.save_msgstream(match_id, 'radiant', radiant_sum, field, logtype)
+        self.save_msgstream(match_id, 'dire', dire_sum, field, logtype)
+        self.save_msgstream(match_id, 'diff', diff, field, logtype)
 
     def get_files(self, match_id, dataslices, field, logtype):
         """
@@ -580,9 +655,49 @@ class UpdateParseEnd(Task):
         """
         return_lst = []
         for x in dataslices:
-            url = shard_url(match_id, x, field, logtype)
-            return_lst.append(requests.get(url).json())
+            url = self.shard_url(match_id, x, field, logtype)
+            return_lst.append(
+                requests.get(url).json()
+            )
 
+        return return_lst
+
+    def rollup_sum_allstate(self, data_keys, data_dicts):
+        return_lst = []
+        bad_keys = [
+            'offset_time',
+            'x',
+            'y',
+            'item_0',
+            'item_1',
+            'item_2',
+            'item_3',
+            'item_4',
+            'item_5',
+            'health_pct',
+            'mana_pct',
+        ]
+        for x in data_keys:
+            struct = {
+                'offset_time': data_dicts[0][x]['offset_time'],
+            }
+            keys = (k for k in data_dicts[0][x].keys() if k not in bad_keys)
+            health_pct = sum(
+                [subdict[x]['health'] for subdict in data_dicts]
+            ) / sum(
+                [subdict[x]['max_health'] for subdict in data_dicts]
+            )
+            mana_pct = sum(
+                [subdict[x]['mana'] for subdict in data_dicts]
+            ) / sum(
+                [subdict[x]['max_mana'] for subdict in data_dicts]
+            )
+            for key in keys:
+                struct[key] = sum([subdict[x][key] for subdict in data_dicts])
+                struct['health_pct'] = health_pct
+                struct['mana_pct'] = mana_pct
+
+            return_lst.append(struct)
         return return_lst
 
     def rollup_dataseries(self, data, field, operation):
@@ -597,7 +712,9 @@ class UpdateParseEnd(Task):
         data_keys = self.extract_keys(data_dicts)
 
         if operation == 'sum':
-            if field != 'allstate':
+            if field == 'allstate':
+                return self.rollup_sum_allstate(data_keys, data_dicts)
+            else:
                 return [
                     {
                         'offset_time': x,
@@ -605,41 +722,15 @@ class UpdateParseEnd(Task):
                     }
                     for x in data_keys
                 ]
-            else:
-                return_lst = []
-                for x in data_keys:
-                    struct = {
-                        'offset_time': data_dicts[0][x]['offset_time']
-                    }
-                    for key in data_dicts[0][x].keys():
-                        if key not in [
-                            'offset_time',
-                            'x',
-                            'y',
-                            'item_0',
-                            'item_1',
-                            'item_2',
-                            'item_3',
-                            'item_4',
-                            'item_5',
-                            'health_pct',
-                            'mana_pct',
-                        ]:
-                            struct[key] = sum(
-                                [subdict[x][key] for subdict in data_dicts]
-                            )
-                            struct['health_pct'] = sum([subdict[x]['health'] for subdict in data_dicts])/sum([subdict[x]['max_health'] for subdict in data_dicts])
-                            struct['mana_pct'] = sum([subdict[x]['mana'] for subdict in data_dicts])/sum([subdict[x]['max_mana'] for subdict in data_dicts])
-
-                    return_lst.append(struct)
-                return return_lst
         elif operation == 'diff':
             if len(data) != 2:
                 raise ValueError(
                     'Taking dicts of more than 2 series undefined.'
                 )
             else:
-                if field != 'allstate':
+                if field == 'allstate':
+                    pass
+                else:
                     return [
                         {
                             'offset_time': x,
@@ -647,8 +738,6 @@ class UpdateParseEnd(Task):
                         }
                         for x in data_keys
                     ]
-                else:
-                    pass
         else:
             raise ValueError('What is this operation? {0}'.format(operation))
 
@@ -678,44 +767,6 @@ class UpdateParseEnd(Task):
             raise ValueError('Why do we have an noncontinuous dataseries?')
 
         return sorted(eligible_keys)
-
-
-def shard_filename(match_id, dataslice, facet, log_type):
-    """
-    Get the filename for shards on s3.
-
-    Because we are effectively using s3 as a great big key-value store,
-        we need a hashing fn.  This is it.
-
-    :param match_id: steam_id for match
-    :param dataslice: player_slot of {radiant/dire/diff}
-    :param log_type: {combatlog/statelog/combatseries}
-    :param facet: the name of a filter fn from that msg type
-    :returns: formatted string
-    """
-    filename = '{0}_{1}_{2}_{3}_v{4}.json.gz'.format(
-        match_id,
-        dataslice,
-        log_type,
-        facet,
-        settings.PARSER_VERSION
-    )
-
-    return filename
-
-
-def shard_url(match_id, dataslice, facet, log_type):
-    return settings.SHARD_URL_BASE+shard_filename(
-        match_id, dataslice, facet, log_type
-        )
-
-
-def save_msgstream(match_id, dataslice, msgs, facet, log_type):
-    buff = BytesIO(json.dumps(msgs))
-    buff.seek(0)
-
-    filename = shard_filename(match_id, dataslice, facet, log_type)
-    s3_parse(buff, filename)
 
 
 class CreateMatchRequests(Task):
