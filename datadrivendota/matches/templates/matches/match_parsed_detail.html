@@ -9,47 +9,24 @@
 
   <div class="row">
 
-    <div class='col-md-6' id='kda'>
-      <h4>Kills and Assists</h4>
-      <div class='vert-md-6 chart'>
-        <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
-      </div>
+    <div class='col-md-6 vert-md-6' id='kda'>
+      <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
     </div>
 
-    <div class='col-md-6' id='goldxp'>
-      <h4>Gold and XP Difference</h4>
-      <div class='vert-md-6 chart'>
-        <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
-      </div>
+    <div class='col-md-6 vert-md-6' id='goldxp'>
+      <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
     </div>
 
-    <div class='col-md-6' id='hero-kills'>
-      <h4>Kills by Hero</h4>
-      <div class='vert-md-6 chart'>
-        <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
-      </div>
+    <div class='col-md-6 vert-md-6' id='hero-kills'>
+      <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
     </div>
 
-    <div class='col-md-6' id='hero-gold'>
-      <h4>Gold by Hero</h4>
-      <div class='vert-md-6 chart'>
-        <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
-      </div>
+    <div class='col-md-6 vert-md-6' id='hero-gold'>
+      <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
     </div>
 
 
     <div id='matchup-charts' class='col-md-6'>
-      {% comment %}
-
-      <div class='row'>
-        <div class="col-md-6">
-          <h4>Kills vs Damage</h4>
-          <div id='kill_dmg' class='vert-md-3 chart'>
-            <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
-          </div>
-        </div>
-      </div>
-      {% endcomment %}
 
     </div>
   </div>
@@ -89,6 +66,13 @@ $.getJSON('/rest-api/parse-shards/?match_id='+{{match.steam_id}})
       [radiant, 'assists', 'statelog'],
       [dire, 'assists', 'statelog'],
     ]
+
+    var params = {
+      label: 'Kills & Assists',
+      inset_legend: true
+    };
+
+
     d7.extensions.charts.replays.multifacet_lineup(
       shardfacets1, '#kda', params
     );
@@ -97,17 +81,32 @@ $.getJSON('/rest-api/parse-shards/?match_id='+{{match.steam_id}})
       [diff, 'earned_income', 'combatseries'],
       [diff, 'xp', 'statelog']
     ]
+    var params = {
+      label: 'Gold and XP Difference',
+      inset_legend: true
+    };
+
     d7.extensions.charts.replays.multifacet_lineup(
       shardfacets2, '#goldxp', params
     );
 
-   d7.extensions.charts.replays.multifacet_lineup(
+    var params = {
+      label: 'Kills',
+      inset_legend: true
+    };
+
+    d7.extensions.charts.replays.multifacet_lineup(
       heroes.map(function(d){
         return [d, 'kills', 'statelog']
       }), '#hero-kills', params
     );
 
-   d7.extensions.charts.replays.multifacet_lineup(
+    var params = {
+      label: 'Earned Income',
+      inset_legend: true
+    };
+
+    d7.extensions.charts.replays.multifacet_lineup(
       heroes.map(function(d){
         return [d, 'earned_income', 'combatseries']
       }), '#hero-gold', params

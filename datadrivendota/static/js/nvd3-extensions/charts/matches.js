@@ -214,7 +214,6 @@ var pms_bar_chart = function(destination, params, y_var, y_lab){
     var plot_data = [{
         "key": y_lab,
         values: pmses.map(function(d){
-          console.log(d);
           if (d.side=='Dire'){
             var faceclass = 'dire-face-glow'
           } else{
@@ -258,7 +257,6 @@ var pms_bar_chart = function(destination, params, y_var, y_lab){
           .selectAll("text")
           .remove();
 
-        console.log(plot_data);
         var face_data = plot_data[0].values;
 
         var plot_faces = d3.select(destination).selectAll('i').data(
