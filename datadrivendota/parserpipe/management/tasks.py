@@ -51,6 +51,7 @@ class S3WriterTaskMixin(object):
     def __init__(self, *args, **kwargs):
         ret = super(S3WriterTaskMixin, self).__init__(*args, **kwargs)
         self.upload_queue = []
+        self.pool = ThreadPool(processes=10)
         return ret
 
     def shard_filename(self, match_id, dataslice, facet, log_type):
@@ -97,8 +98,7 @@ class S3WriterTaskMixin(object):
 
     def finalize_write_to_s3(self):
         logger.info("Uploading {} files to S3".format(len(self.upload_queue)))
-        pool = ThreadPool(processes=3)
-        pool.map(upload_to_s3, self.upload_queue)
+        self.pool.map(upload_to_s3, self.upload_queue)
         self.upload_queue = []
 
 
