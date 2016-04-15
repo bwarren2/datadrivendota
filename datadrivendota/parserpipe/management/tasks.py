@@ -81,7 +81,7 @@ class CreateMatchParse(Task):
                 self.java_parse_message(replay_url, match_id)
         else:
             raise Exception("We don't have the match we expected: {0}".format(
-                match_id
+                self.match_id
             ))
 
     def have_match(self, match_id):
@@ -104,6 +104,7 @@ class CreateMatchParse(Task):
             ).update(
                 status=MatchRequest.MATCH_NOT_FOUND
             )
+            mr.save()
             return None
 
     def get_replay_url(self, match_id, match_req):

@@ -25,8 +25,7 @@
     "sprintf": "~1.0.2",
     "moment": "~2.10.6",
     "lodash": "~3.10.1",
-    "clipboard": "~1.5.8",
-    "plotlyjs": "plotly#~1.4.1"
+    "clipboard": "~1.5.8"
   },
   "devDependencies": {
     "d3": "~3.5.6",
