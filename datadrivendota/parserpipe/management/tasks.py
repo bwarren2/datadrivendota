@@ -1,4 +1,5 @@
 import logging
+import gzip
 import time
 import pika
 import sys
@@ -6,8 +7,10 @@ import json
 import requests
 from io import BytesIO
 from collections import Counter
+from contextlib import closing
 from datetime import timedelta
 from multiprocessing.pool import ThreadPool
+from retrying import retry
 
 from celery import Task, chain, chord
 
@@ -17,9 +20,9 @@ from django.db.models import Q
 from django.utils import timezone
 
 from utils import gzip_str, gunzip_str
-from utils.file_management import s3_parse
 from parserpipe.models import MatchRequest
 from datadrivendota.management.tasks import ValveApiCall, ApiContext
+from datadrivendota.s3utils import ParseS3BotoStorage
 from matches.management.tasks import UpdateMatch
 from matches.models import Match, PlayerMatchSummary
 from accounts.models import get_customer_player_ids
@@ -31,7 +34,25 @@ from .state_log_filters import entitystate_filter_map
 logger = logging.getLogger(__name__)
 
 
+# This is tightly coupled to the S3WriterTaskMixin.
+#  - It takes a single args tuple, and unpacks it inside the function.
+#  - It assumpes the input buffers are BytesIO objects with a getvalue method.
+# Sometimes boto raises S3ResponseError: 200 OK with an "internal error" msg.
+# Retrying tries to hammer around the problem.
+@retry(stop_max_delay=10000, wait_fixed=2000)
+def upload_to_s3(args):
+    # We have to take and unpack a tuple to play nicely with ThreadPool.map:
+    input_buffer, filename = args
+    with closing(ParseS3BotoStorage().open(filename, 'w')) as f:
+        f.write(input_buffer.getvalue())
+
+
 class S3WriterTaskMixin(object):
+    def __init__(self, *args, **kwargs):
+        ret = super(S3WriterTaskMixin, self).__init__(*args, **kwargs)
+        self.upload_queue = []
+        return ret
+
     def shard_filename(self, match_id, dataslice, facet, log_type):
         """
         Get the filename for shards on s3.
@@ -64,22 +85,20 @@ class S3WriterTaskMixin(object):
         )
 
     def save_msgstream(self, match_id, dataslice, msgs, facet, log_type):
-        buff = BytesIO(json.dumps(msgs))
-        buff.seek(0)
+        raw_bytes = BytesIO()
+        gzip_wrapper = gzip.GzipFile(
+            mode='wb',
+            fileobj=raw_bytes,
+        )
+        json.dump(msgs, gzip_wrapper)
 
         filename = self.shard_filename(match_id, dataslice, facet, log_type)
-        self.add_to_upload_queue(buff, filename)
-
-    def add_to_upload_queue(self, buff, filename):
-        if not hasattr(self, 'upload_queue'):
-            self.upload_queue = []
-        self.upload_queue.append((buff, filename))
+        self.upload_queue.append((raw_bytes, filename))
 
     def finalize_write_to_s3(self):
-        # add_to_upload_queue must have run before this does.
         logger.info("Uploading {} files to S3".format(len(self.upload_queue)))
         pool = ThreadPool(processes=10)
-        pool.map(lambda x: s3_parse(*x), self.upload_queue)
+        pool.map(upload_to_s3, self.upload_queue)
 
 
 class KickoffMatchRequests(Task):
