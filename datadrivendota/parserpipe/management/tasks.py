@@ -9,7 +9,6 @@ from io import BytesIO
 from collections import Counter
 from contextlib import closing
 from datetime import timedelta
-from multiprocessing.pool import ThreadPool
 from retrying import retry
 
 from celery import Task, chain, chord
@@ -51,7 +50,6 @@ class S3WriterTaskMixin(object):
     def __init__(self, *args, **kwargs):
         ret = super(S3WriterTaskMixin, self).__init__(*args, **kwargs)
         self.upload_queue = []
-        self.pool = ThreadPool(processes=10)
         return ret
 
     def shard_filename(self, match_id, dataslice, facet, log_type):
@@ -98,7 +96,7 @@ class S3WriterTaskMixin(object):
 
     def finalize_write_to_s3(self):
         logger.info("Uploading {} files to S3".format(len(self.upload_queue)))
-        self.pool.map(upload_to_s3, self.upload_queue)
+        map(upload_to_s3, self.upload_queue)
         self.upload_queue = []
 
 
