@@ -99,6 +99,7 @@ class S3WriterTaskMixin(object):
         logger.info("Uploading {} files to S3".format(len(self.upload_queue)))
         pool = ThreadPool(processes=10)
         pool.map(upload_to_s3, self.upload_queue)
+        self.upload_queue = []
 
 
 class KickoffMatchRequests(Task):
