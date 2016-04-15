@@ -607,7 +607,7 @@ class UpdateParseEnd(S3WriterTaskMixin, Task):
 
             for ct, field in enumerate(combatlog_filter_map.keys()):
                 logger.info('Doing M#{0}, {1}, {2}.  {3} done.'.format(
-                    match_id, field, 'statelog', ct
+                    match_id, field, 'combatlog', ct
                     )
                 )
 
@@ -730,7 +730,21 @@ class UpdateParseEnd(S3WriterTaskMixin, Task):
                 )
             else:
                 if field == 'allstate':
-                    pass
+                    return_lst = []
+
+                    for time_idx in data_keys:
+                        diff_dict = {
+                            'offset_time': time_idx,
+                        }
+                        for attr in data_dicts[0][time_idx].keys():
+                            if attr in data_dicts[1][time_idx].keys() and attr != 'offset_time':
+                                diff_dict[attr] = (
+                                    data_dicts[0][time_idx][attr] -
+                                    data_dicts[1][time_idx][attr]
+                                )
+                        return_lst.append(diff_dict)
+                    return return_lst
+
                 else:
                     return [
                         {

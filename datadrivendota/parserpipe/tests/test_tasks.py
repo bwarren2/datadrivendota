@@ -146,6 +146,7 @@ class TestAggregateDataseries(TestCase):
     def setUpClass(cls):
         cls.test_shards = [
             [
+                {'all_income': 624, 'offset_time': -2, 'time': 233},
                 {'all_income': 625, 'offset_time': -1, 'time': 234},
                 {'all_income': 625, 'offset_time': 0, 'time': 235},
                 {'all_income': 965, 'offset_time': 1, 'time': 236}
@@ -158,6 +159,7 @@ class TestAggregateDataseries(TestCase):
         ]
         cls.test_hashed = [
             {
+                -2: 624,
                 -1: 625,
                 0: 625,
                 1: 965
@@ -226,9 +228,20 @@ class TestAggregateDataseries(TestCase):
             ]
         )
 
+    def test_allstate_diff(self):
+        t = UpdateParseEnd()
+        data_sum = t.rollup_dataseries(self.test_shards, 'allstate', 'diff')
+        self.assertEqual(
+            data_sum,
+            [
+                {'all_income': 624, 'offset_time': -1, 'time': 0},
+                {'all_income': 623, 'offset_time': 0, 'time': 0},
+                {'all_income': 962, 'offset_time': 1, 'time': 0}
+            ]
+        )
+
 
 class TestMatchRequestCreation(TestCase):
-
 
     @classmethod
     def setUpClass(cls):
