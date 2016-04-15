@@ -114,7 +114,12 @@ var multifacet_lineup = function(shardfacets, destination, params, label){
   // Get the replay parse info
   Promise.all(
     shardfacets.map(function(lst){
-      var location = utils.parse_urls.url_for(lst[0], lst[1], lst[2]);
+      if (lst[2]=='statelog') {
+        var lookup_facet = 'allstate';
+      }else{
+        var lookup_facet = lst[1];
+      }
+      var location = utils.parse_urls.url_for(lst[0], lookup_facet, lst[2]);
       return $.getJSON(location);
     })
   ).then(function(facets){
