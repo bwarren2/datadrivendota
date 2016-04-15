@@ -95,13 +95,19 @@
           <h2>KDA</h2>
         </div>
 
-        <div class='col-md-12 vert-md-4' id='kills'>
+        <div class='col-md-12' id='kills'>
+          <label></label>
+          <div class='vert-md-4 chart'></div>
         </div>
 
-        <div class='col-md-12 vert-md-4' id='deaths'>
+        <div class='col-md-12' id='deaths'>
+          <label></label>
+          <div class='vert-md-4 chart'></div>
         </div>
 
-        <div class='col-md-12 vert-md-4' id='assists'>
+        <div class='col-md-12' id='assists'>
+          <label></label>
+          <div class='vert-md-4 chart'></div>
         </div>
     </div>
 
@@ -114,13 +120,19 @@
           <h2>Gold</h2>
         </div>
 
-        <div class='col-md-12 vert-md-4' id='earned_income'>
+        <div class='col-md-12' id='earned_income'>
+          <label></label>
+          <div class='vert-md-4 chart'></div>
         </div>
 
-        <div class='col-md-12 vert-md-4' id='creep_kill_income'>
+        <div class='col-md-12' id='creep_kill_income'>
+          <label></label>
+          <div class='vert-md-4 chart'></div>
         </div>
 
-        <div class='col-md-12 vert-md-4' id='hero_kill_income'>
+        <div class='col-md-12' id='hero_kill_income'>
+          <label></label>
+          <div class='vert-md-4 chart'></div>
         </div>
     </div>
 
@@ -133,13 +145,19 @@
           <h2>Misc</h2>
         </div>
 
-        <div class='col-md-12 vert-md-4' id='health'>
+        <div class='col-md-12' id='health'>
+          <label></label>
+          <div class='vert-md-4 chart'></div>
         </div>
 
-        <div class='col-md-12 vert-md-4' id='mana'>
+        <div class='col-md-12' id='mana'>
+          <label></label>
+          <div class='vert-md-4 chart'></div>
         </div>
 
-        <div class='col-md-12 vert-md-4' id='total_damage'>
+        <div class='col-md-12' id='total_damage'>
+          <label></label>
+          <div class='vert-md-4 chart'></div>
         </div>
     </div>
 
@@ -199,6 +217,12 @@ $(function(){
 
       var shards = $('#shards').select2('data');
       var labels = $('#labels').val();
+
+      var params = {
+        granularity: parseInt($('#granularity').val()),
+        end_time: $('#end_time').val(),
+        start_time: $('#start_time').val()
+      };
       draw(shards, params);
     })
 

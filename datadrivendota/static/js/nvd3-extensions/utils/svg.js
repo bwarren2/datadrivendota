@@ -7,7 +7,6 @@ function square_svg(destination, width, height){
   }
   return d3.select(destination)
     .append("svg")
-    .attr("class", 'ddd-svg')
     .attr("width", width)
     .attr("height", width);
 }

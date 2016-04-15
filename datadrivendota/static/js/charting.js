@@ -260,7 +260,6 @@ var splash_gimmick = function(){
   var y_domain = [-1, 12];
 
   var svg = mydiv.append('svg')
-      .attr('class', 'ddd-svg')
       .attr('width', width)
       .attr('height', height);
 
