@@ -76,14 +76,18 @@ var replay_lines = function(dataset, facet, destination, params){
 
 var stat_lineup = function(shards, facet, destination, params, log){
 
-  if (log===undefined){log = 'statelog';}
+  if (log===undefined) {log = 'statelog';}
 
-  if (log==='statelog'){facet='allstate';}
+  if (log==='statelog') {
+    var lookup_facet='allstate';
+  }else{
+    var lookup_facet=facet;
+  }
 
   // Get the replay parse info
   Promise.all(
     shards.map(function(shard){
-      var location = utils.parse_urls.url_for(shard, facet, log);
+      var location = utils.parse_urls.url_for(shard, lookup_facet, log);
       return $.getJSON(location);
     })
   ).then(function(facets){
