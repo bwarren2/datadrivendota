@@ -133,9 +133,10 @@ var replay_lines = function(dataset, facet, destination, params){
 
 var stat_lineup = function(shards, facet, destination, params, log){
 
-  if (log===undefined){
-    log = 'statelog';
-  }
+  if (log===undefined){log = 'statelog';}
+
+  if (log==='statelog'){facet='allstate';}
+
   // Get the replay parse info
   Promise.all(
     shards.map(function(shard){
@@ -762,7 +763,7 @@ var item_scatter = function(shards, destination, params){
 var item_inventory = function(shards, destination, labels){
 
   var urls = shards.map(function(shard){
-    var location = utils.parse_urls.url_for(shard, 'items', 'statelog');
+    var location = utils.parse_urls.url_for(shard, 'allstate', 'statelog');
     return $.getJSON(location);
   })
   urls.push($.getJSON('/rest-api/items/'))
@@ -862,7 +863,7 @@ var item_inventory = function(shards, destination, labels){
 var minimap = function(shards, destination, params){
 
   var urls = shards.map(function(shard){
-    var location = utils.parse_urls.url_for(shard, 'position', 'statelog');
+    var location = utils.parse_urls.url_for(shard, 'allstate', 'statelog');
     return $.getJSON(location);
   })
   // Get the replay parse info
@@ -944,7 +945,7 @@ var minimap = function(shards, destination, params){
 
 var position_heatmap = function(shards, destination, params){
   var urls = shards.map(function(shard){
-    var location = utils.parse_urls.url_for(shard, 'position', 'statelog');
+    var location = utils.parse_urls.url_for(shard, 'allstate', 'statelog');
     return $.getJSON(location);
   })
   // Get the replay parse info
