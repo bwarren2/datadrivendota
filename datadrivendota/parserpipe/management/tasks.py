@@ -607,7 +607,7 @@ class UpdateParseEnd(S3WriterTaskMixin, Task):
 
             for ct, field in enumerate(combatlog_filter_map.keys()):
                 logger.info('Doing M#{0}, {1}, {2}.  {3} done.'.format(
-                    match_id, field, 'statelog', ct
+                    match_id, field, 'combatlog', ct
                     )
                 )
 
