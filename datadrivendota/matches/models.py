@@ -205,7 +205,7 @@ class PlayerMatchSummary(models.Model):
     denies = models.IntegerField()
     gold_per_min = models.IntegerField()
     xp_per_min = models.IntegerField()
-    gold_spent = models.IntegerField()
+    gold_spent = models.IntegerField(null=True)
     hero_damage = models.IntegerField()
     tower_damage = models.IntegerField()
     hero_healing = models.IntegerField()

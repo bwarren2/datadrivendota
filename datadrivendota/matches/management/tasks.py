@@ -363,7 +363,7 @@ def upload_match_summary(players, parent_match, refresh_records):
             'denies': player['denies'],
             'gold_per_min': player['gold_per_min'],
             'xp_per_min': player['xp_per_min'],
-            'gold_spent': player['gold_spent'],
+            'gold_spent': player.get('gold_spent', None),
             'hero_damage': player['hero_damage'],
             'tower_damage': player['tower_damage'],
             'hero_healing': player['hero_healing'],
