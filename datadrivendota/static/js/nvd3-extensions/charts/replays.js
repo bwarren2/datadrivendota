@@ -862,13 +862,17 @@ var minimap = function(shards, destination, params){
 
     var faces = d3.select(destination).selectAll('i').data(fetch_data)
       .enter()
-      .append('i')
-      .attr('class', function(d){
+      .append('i');
+
+      faces.attr('class', function(d){
         return 'd2mh ' + d.hero_name + ' ' +d.css_classes;
       })
       .style('left', function(d){return xscale(d.x)+'px'})
       .style('bottom', function(d){return yscale(d.y)+'px'})
       .style('position', 'absolute')
+
+      faces.append('span').attr('class', 'minimap-label');
+
 
     $(window).on('update', function(evt, arg){
       var fetch_data = position_data.map(function(d){
