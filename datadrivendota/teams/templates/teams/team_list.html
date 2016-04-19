@@ -7,7 +7,7 @@
 {% endblock page_title %}
 {% block aligned_content %}
     {% for team in team_list %}
-        <div class='col-md-2'>
+        <div class='col-md-2 team-badge'>
             <a href="{% url 'teams:detail' steam_id=team.steam_id %}" class='thumbnail'>
                 <img  src="{{team.image}}" alt='{{team.name}}'>
             </a>
