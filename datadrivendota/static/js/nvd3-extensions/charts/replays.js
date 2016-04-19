@@ -830,10 +830,10 @@ var minimap = function(shards, destination, params){
 
     var css_class_swap = function(side){
       if (side === 'radiant') {
-        return 'radiant-face-glow';
+        return 'radiant-minimap-glow';
       }
       else if (side === 'dire') {
-        return 'dire-face-glow';
+        return 'dire-minimap-glow';
       }
     }
 

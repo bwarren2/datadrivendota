@@ -16,7 +16,7 @@ var minimap_x = function(width, height){
 
 var minimap_y = function(width, height){
     return d3.scale.linear().domain([68,186]).range([
-        .1*height, .96*height
+        .12*height, 1.03*height
     ]);
 }
 
