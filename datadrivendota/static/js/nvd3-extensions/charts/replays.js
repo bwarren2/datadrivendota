@@ -843,11 +843,13 @@ var minimap = function(shards, destination, params){
           x: d.x,
           y: d.y,
           hero_name: shards[series_idx].hero_name,
-          css_classes: css_class_swap(shards[series_idx].css_classes)
+          css_classes: css_class_swap(shards[series_idx].css_classes),
+          minimap_label: shards[series_idx].minimap_label,
+          health: d.health,
         }
         return prev;
       }, {})
-    })
+    });
 
     var svg = make_map_background(destination)
     var width = svg.attr('width');
@@ -871,7 +873,9 @@ var minimap = function(shards, destination, params){
       .style('bottom', function(d){return yscale(d.y)+'px'})
       .style('position', 'absolute')
 
-      faces.append('span').attr('class', 'minimap-label');
+      faces.append('span').attr('class', 'minimap-label').html(function(d){
+        return d.minimap_label ? d.minimap_label : '';
+      });
 
 
     $(window).on('update', function(evt, arg){
@@ -879,7 +883,16 @@ var minimap = function(shards, destination, params){
         return d[arg]
       });
 
-      var faces = d3.select(destination).selectAll('i').data(fetch_data)
+      var faces = d3.select(destination).selectAll('i').data(fetch_data);
+      faces.classed('dead', function(d){
+        if (d.health===0) {
+          return true;
+        }else{
+          return false;
+        }
+      });
+
+      faces
         .transition()
         .duration(1000)
         .style('left', function(d){
