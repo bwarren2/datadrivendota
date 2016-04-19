@@ -4,9 +4,7 @@
 
 {% block title %}Time Lapse{% endblock title %}
 
-
 {% block aligned_content %}
-
   <div class='col-md-12'>
     <div class='page-header'>
       <h2>
@@ -20,6 +18,8 @@
     {% include "matches/_density_advice.html" %}
   </div>
 
+  {% include "mixins/_match_form.html" %}
+
   <div class='col-md-6'>
       <h4>Controls</h4>
       <form>
@@ -29,6 +29,11 @@
               <label>Match IDs</label>
               <select id='shards' multiple='multiple' style='width:200px'></select>
             </div>
+            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#match-select">
+              Filter Matches
+            </button>
+            <ul id="filtered-matches">
+            </ul>
           </div>
           <div class='col-md-6'>
               <div class='row'>
@@ -222,19 +227,10 @@
 <h2>Want to see your data here?</h2>
   {% include "accounts/mixins/_ping_request.html" %}
 </div>
-
-<style type="text/css">
-  .select2-result-pms__avatar{
-    height:36px;
-    width:64px;
-  }
-  .select2-result-pms__title{
-    color: black;
-  }
-</style>
 {% endblock aligned_content %}
 
 {% block extra_js %}
+<script src="{% static 'js/match-select.js' %}"></script>
 <script type="text/javascript">
   $(function(){
     inputs.pms_select2('#shards', true);
@@ -252,9 +248,25 @@
       };
 
       d7.extensions.charts.replays.stat_lineup(
-        shards, facet, destination, params, 'statelog'
-      );
+          shards,
+          facet,
+          destination,
+          params,
+          'statelog'
+          );
     });
   });
 </script>
 {% endblock extra_js %}
+
+{% block extra_css %}
+<style type="text/css">
+  .select2-result-pms__avatar{
+    height:36px;
+    width:64px;
+  }
+  .select2-result-pms__title{
+    color: black;
+  }
+</style>
+{% endblock extra_css %}

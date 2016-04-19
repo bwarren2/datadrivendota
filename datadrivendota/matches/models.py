@@ -103,8 +103,8 @@ class Match(models.Model):
     )
 
     objects = FilteredQuerySet.as_manager()
-    unparsed = Unparsed()
-    parsed = Parsed()
+    unparsed = Unparsed.as_manager()
+    parsed = Parsed.as_manager()
 
     class Meta:
         verbose_name_plural = 'matches'

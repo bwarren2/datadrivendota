@@ -1,8 +1,9 @@
-from django.db import models
 from django.conf import settings
 
+from .querysets import FilteredQuerySet
 
-class Unparsed(models.Manager):
+
+class Unparsed(FilteredQuerySet):
 
     def get_queryset(self):
         return super(Unparsed, self).get_queryset().exclude(
@@ -10,7 +11,7 @@ class Unparsed(models.Manager):
         )
 
 
-class Parsed(models.Manager):
+class Parsed(FilteredQuerySet):
 
     def get_queryset(self):
         return super(Parsed, self).get_queryset().filter(
