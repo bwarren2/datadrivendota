@@ -4,6 +4,7 @@ from rest_framework import viewsets, filters, views
 from rest_framework_extensions.cache.decorators import cache_response
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import status
 
 from .models import Match, PlayerMatchSummary, PickBan, SkillBuild, GameMode
@@ -17,31 +18,42 @@ from .serializers import (
     PickbanSerializer,
     ParseShardSerializer,
 )
+from .filters import MatchFilter
+
+
+class RawLimitOffsetPagination(LimitOffsetPagination):
+    def get_paginated_response(self, data):
+        return Response(data)
 
 
 class MatchViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Match.objects.all()
+    queryset = Match.parsed.all()
     serializer_class = MatchSerializer
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (
+        filters.DjangoFilterBackend,
+        filters.SearchFilter,
+    )
+    filter_class = MatchFilter
     search_fields = ('name',)
     page_size = 10
     page_size_query_param = 'page_size'
+    pagination_class = RawLimitOffsetPagination
     max_page_size = 400
 
     def get_queryset(self):
-        queryset = Match.objects.all()\
+        queryset = self.queryset\
             .prefetch_related('radiant_team')\
             .prefetch_related('dire_team')\
             .given(self.request)\
-            .order_by('start_time')
+            .order_by('-start_time')
 
-        limit = self.request.query_params.get(self.page_size_query_param)
+        # limit = self.request.query_params.get(self.page_size_query_param)
 
-        if limit is not None:
-            result_limit = min(limit, self.max_page_size)
-            queryset = queryset[:result_limit]
-        else:
-            queryset = queryset[:self.page_size]
+        # if limit is not None:
+        #     result_limit = min(limit, self.max_page_size)
+        #     queryset = queryset[:result_limit]
+        # else:
+        #     queryset = queryset[:self.page_size]
 
         return queryset.select_related()
 
