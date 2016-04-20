@@ -8,39 +8,54 @@
 
         <div class='col-md-12'>
 
-          <div class='jumbotron' style='background-color:inherit'>
-            <div id='foo'>
             <div class='row'>
               <div class='col-md-12 text-center'>
                 <h1 class='brand-primary'>DataDrivenDota</h1>
-                <p>
-                Better Data ➜ Better Analysis ➜ Better Decisions
-                </p>
+                <p>Better Data ➜ Better Analysis ➜ Better Decisions</p>
               </div>
-              <div class='col-md-12'>
-                <h5>Hero Health in Match# 2291119423, ESL One Frankfurt 2016, 10s intervals</h5>
 
-                <div id='major_chart' class='chart toggling vert-md-6'>
-                  <div class='vert-md-6 chart toggling'>
-                    <img class='ajax-loader' src="/assets/images/loading.gif">
-                  </div>
-                </div>
+              <div class='col-md-4'>
+               <button class='btn btn-primary btn-lg btn-block'>See a Premium game in-browser</button>
+              </div>
 
+              <div class='col-md-4'>
+               <button class='btn btn-primary btn-lg btn-block'>Read analysis of a pro game</button>
+              </div>
+
+              <div class='col-md-4'>
+               <button class='btn btn-primary btn-lg btn-block'>Analyze your data with Premium</button>
               </div>
 
             </div>
-            </div>
-          </div>
 
         </div>
       </div>
       <div class='row'>
-      <div class='page-header' id='timeslot'></div>
-        <div class='col-md-3' id='target'>
 
+        <div class='col-md-12'>
+          <h2 class='page-header'>
+            Play like pros
+          </h2>
+          <p>
+            Stop feeling lost or confused.  Overlay your performance with a pro player's directly to see what differences show up and when, so you can change and improve.
+          </p>
         </div>
-        <div class='col-md-3' id='target2'>
+        <div class='col-md-6'>
+          <div class='row'>
+            <div class='col-md-6' id='target'>
 
+            </div>
+            <div class='col-md-6' id='target2'>
+
+            </div>
+            <div class='col-md-12'>
+              <div class='timecard'>
+                <p>Game state at: <span id='timeslot'></span></p>
+                <p>(Playing at 10 second intervals for speed.)</p>
+              </div>
+            </div>
+
+          </div>
         </div>
         <div class='col-md-6' id='minimap'>
           <div class='minimap-chart vert-md-6'></div>
@@ -48,48 +63,28 @@
 
       </div>
 
-      <div class="row">
-        <div class='col-md-6'>
-          <div class='big-d-stats'>
-            <div class='page-header'>
-              <h1>Stats are useful...</h1>
+      <div class='row'>
+        <div class='col-md-12'>
+          <h2 class='page-header'>
+            Drill into the data, not false aggregations
+          </h2>
+          <p>
+            A lot can happen in a minute, so you shouldn't accept rollups of data.  Analyze games down to the second with ease to see what really happened.
+          </p>
+        </div>
+        <div class='col-md-12'>
+          <h5>Hero Health in Match# 2291119423, ESL One Frankfurt 2016, 10s intervals</h5>
+
+          <div id='major_chart' class='chart toggling vert-md-6'>
+            <div class='vert-md-6 chart toggling'>
+              <img class='ajax-loader' src="/assets/images/loading.gif">
             </div>
-            <table class='table'>
-              <thead>
-                <tr>
-                  <td></td>
-                  <td>Avg X</td>
-                  <td>Avg Y</td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class='group-a'>
-                  <td>Group 1</td>
-                  <td id='group-a-x'></td>
-                  <td id='group-a-y'></td>
-                </tr>
-                <tr class='group-b'>
-                  <td>Group 2</td>
-                  <td id='group-b-x'></td>
-                  <td id='group-b-y'></td>
-                </tr>
-                <tr class='group-c'>
-                  <td>Group 3</td>
-                  <td id='group-c-x'></td>
-                  <td id='group-c-y'></td>
-                </tr>
-              </tbody>
-            </table>
           </div>
-        </div>
 
-        <div class='col-md-6'>
-          <div class='page-header'>
-            <h1>...but miss the big picture</h1>
-          </div>
-          <div class='vert-md-3 big-d text-center'></div>
         </div>
+      </div>
 
+      <div class="row">
 
         <div class='col-md-12 text-center'>
           <div class='page-header'>
@@ -170,7 +165,6 @@
   <script type="text/javascript">
     $(function(){
 
-
     var match_id = 2291119423;
     $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
       .success(function(shards){
@@ -193,7 +187,6 @@
         '/rest-api/parse-shards/?pms_ids=[{{pro_pms_id}},{{am_pms_id}}]'
       )
     ).then(function(shards){
-      console.log(shards);
       shard_1 = shards[0];
       shard_2 = shards[1];
       params = {};
@@ -254,5 +247,13 @@
     margin-top: 0px;
     margin-bottom: 0px;
   }
+<<<<<<< dabb7dd40cc3eaaee3862c24dc5c5d24c9543950
+=======
+  .timecard{
+    text-align: center;
+    margin-top: 20px;
+  }
+
+>>>>>>> Spike of homepage
 </style>
 {% endblock extra_css %}
