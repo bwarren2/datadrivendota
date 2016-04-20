@@ -15,7 +15,14 @@
               </div>
 
               <div class='col-md-4'>
-               <button class='btn btn-primary btn-lg btn-block'>See a Premium game in-browser</button>
+              {% if recent_league %}
+
+              <a href="{% url 'matches:replay' match_id=recent_league%}">
+               <button class='btn btn-primary btn-lg btn-block'>See a League game in-browser</button>
+              </a>
+              {% else %}
+               <button class='btn btn-primary btn-lg btn-block'>See a League game in-browser</button>
+              {% endif %}
               </div>
 
               <div class='col-md-4'>
@@ -23,7 +30,7 @@
               </div>
 
               <div class='col-md-4'>
-               <button class='btn btn-primary btn-lg btn-block'>Analyze your data with Premium</button>
+               <button class='btn btn-primary btn-lg btn-block'>Get Gold</button>
               </div>
 
             </div>
@@ -157,11 +164,6 @@
 {% endblock content %}
 
 {% block extra_js %}
-  <script type="text/javascript">
-  $(function(){
-    window.splash_gimmick();
-  })
-  </script>
   <script type="text/javascript">
     $(function(){
 

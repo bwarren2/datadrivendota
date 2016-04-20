@@ -13,7 +13,7 @@ from .forms import SearchForm
 from heroes.models import Hero
 from leagues.models import League
 from blog.models import Entry
-from matches.models import PlayerMatchSummary
+from matches.models import PlayerMatchSummary, Match
 
 
 class LandingView(TemplateView):
@@ -35,6 +35,12 @@ class LandingView(TemplateView):
         )
         kwargs['pro_pms_id'] = pro_pms.id
         kwargs['am_pms_id'] = am_pms.id
+        try:
+            kwargs['recent_league'] = Match.parsed.filter(
+                league__tier=League.PREMIUM
+            ).first().steam_id
+        except AttributeError:
+            pass
 
         messages.success(
             self.request,
