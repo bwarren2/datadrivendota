@@ -1122,6 +1122,7 @@ var stat_card = function(shard, destination, params){
     var rawTemplate = `<div class="statcard {{css_classes}} {{lifestate}}">
     <div>
     <i class='d2mh {{hero_css}}'></i>
+      <span class='statcard-label'>{{label}}</span>
       <div style='float:right'>
       <div><text>{{kills}} / {{deaths}} / {{assists}}</text></div>
       <div><text>{{last_hits}} / {{denies}}</text></div>
@@ -1201,6 +1202,11 @@ var stat_card = function(shard, destination, params){
         title: shard.name,
         css_classes: shard.css_classes,
       };
+      if (shard.stat_label!==undefined) {
+        context.label = shard.stat_label;
+      }else{
+        context.label = "";
+      }
 
       if (struct[time]===undefined) {
         $(destination).html('Not defined');
