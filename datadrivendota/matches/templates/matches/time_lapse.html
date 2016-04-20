@@ -169,29 +169,11 @@
 
                 <div class='col-md-12'>
                   <div class="form-group">
-                    <label >Sample Frequency (s)</label>
-                    <input type="textarea" class="form-control" id="granularity" placeholder="Sample rate (eg 10)" value="10">
-                  </div>
-                </div>
-
-
-                <div class='col-md-12'>
-                  <div class="form-group">
                     <label >Chart Position</label>
                     <select class="form-control" id='destination'>
                       <option value='top'>Top</option>
                       <option value='middle'>Middle</option>
                       <option value='bottom'>Bottom</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class='col-md-12'>
-                  <div class="form-group">
-                    <label >Line Interpolation</label>
-                    <select class="form-control" id='interpolation'>
-                      <option value='step-after'>Stepwise</option>
-                      <option value='linear'>Linear</option>
                     </select>
                   </div>
                 </div>
@@ -241,10 +223,8 @@
       var facet = $('#data :selected').val();
 
       var params = {
-        granularity: parseInt($('#granularity').val()),
         end_time: $('#end_time').val(),
         start_time: $('#start_time').val(),
-        interpolation: $('#interpolation :selected').val(),
       };
 
       d7.extensions.charts.replays.stat_lineup(

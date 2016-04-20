@@ -28,11 +28,9 @@
 {% block extra_js %}
 <script type="text/javascript">
   $(function(){
-    var params = {
-      granularity: 30,
-    };
 
     var unwrapped_shards = [];
+    var params = {};
 
     var urls = [
     {% for summary in match.playermatchsummary_set.all %}

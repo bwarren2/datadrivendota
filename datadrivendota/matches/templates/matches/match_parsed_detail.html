@@ -35,10 +35,7 @@
 {% block extra_js %}
 <script type="text/javascript">
 $(function(){
-  var params = {
-    granularity: 20,
-    interpolation: 'stepwise',
-  };
+  var params = {};
 
   $.getJSON('/rest-api/parse-shards/?match_id='+{{match.steam_id}})
     .success(function(shards){
@@ -105,7 +102,7 @@ $(function(){
           heroes.map(function(d){
             return [d, 'earned_income', 'combatseries']
           }), '#hero-gold', params
-          );
+      );
     });
   });
 </script>

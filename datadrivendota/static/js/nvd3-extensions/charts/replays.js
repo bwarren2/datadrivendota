@@ -18,9 +18,22 @@ var replay_lines = function(dataset, facet, destination, params){
   if (params.label!==undefined) {
     var y_label = toTitleCase(params.label);
   }
+
+  console.log(dataset);
+  if(params.granularity!==undefined){
+    dataset = dataset.map(function(series){
+      series.values = series.values.filter(function(d){
+      return d.offset_time.mod(params.granularity) === 0;
+      })
+      return series;
+    });
+  }
+  console.log(dataset);
+
+
   var data = dataset.map(function(series){
     var x = series.values.map(function(d){
-         var t = new Date(1970, 0, 1); // Epoch
+        var t = new Date(1970, 0, 1); // Epoch
           t.setSeconds(d.offset_time);
         return t;
     })

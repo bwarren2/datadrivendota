@@ -61,14 +61,6 @@
           </div>
         </div>
 
-        <div class='col-md-2'>
-          <div class="form-group">
-            <label >Sample Freq (s)</label>
-            <input type="textarea" class="form-control" id="granularity" placeholder="Sample rate (eg 10)" value="30">
-          </div>
-        </div>
-
-
         <div class='col-md-3' style='margin-top:10px'>
           <div class="btn-group btn-group-justified" role="group">
             <div class="btn-group" role="group">
@@ -211,7 +203,6 @@
       var label_2 = $('#label_2').val();
 
       var params = {
-        granularity: parseInt($('#granularity').val()),
         end_time: $('#end_time').val(),
         start_time: $('#start_time').val(),
         x_label: label_1,

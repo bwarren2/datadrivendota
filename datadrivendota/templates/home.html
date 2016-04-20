@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles navigation_extras steam_extras i18n %}
 
 {% block content %}
 <div id='home'>
@@ -78,9 +79,24 @@
           <p>
             A lot can happen in a minute, so you shouldn't accept rollups of data.  Analyze games down to the second with ease to see what really happened.
           </p>
+          <p class='text-primary' style='text-align:center'>Select an area to zoom</p>
         </div>
-        <div class='col-md-12'>
-          <h5>Hero Health in Match# 2291119423, ESL One Frankfurt 2016, 10s intervals</h5>
+        <div class='col-md-6'>
+          <h5>
+          Hero Health in M#2291119423, ESL One Frankfurt, each second
+          </h5>
+
+          <div id='major_granular_chart' class='chart toggling vert-md-6'>
+            <div class='vert-md-6 chart toggling'>
+              <img class='ajax-loader' src="/assets/images/loading.gif">
+            </div>
+          </div>
+
+        </div>
+        <div class='col-md-6'>
+          <h5>
+          Hero Health in M#2291119423, ESL One Frankfurt, each minute
+          </h5>
 
           <div id='major_chart' class='chart toggling vert-md-6'>
             <div class='vert-md-6 chart toggling'>
@@ -90,6 +106,26 @@
 
         </div>
       </div>
+
+      <div class='row'>
+
+        <div class='col-md-12'>
+          <h2 class='page-header'>
+            Rewatch the moments that matter effortlessly
+          </h2>
+          <p>
+            Let's face it: rewatching games to find improvements or errors is a chore with Valve's interface.  We condense all that information into something you can scroll on-the-fly to focus on what matters.
+          </p>
+        </div>
+
+        <div class='col-md-8'>
+          <img src="{% static 'images/cards.gif' %}">
+        </div>
+        <div class='col-md-4'>
+          <img src="{% static 'images/minimap.gif' %}">
+        </div>
+      </div>
+
 
       <div class="row">
 
@@ -174,14 +210,21 @@
           return d.dataslice == 'radiant' || d.dataslice == 'dire';
         })
         var params = {
-          granularity: 10,
-          interpolation: 'linear',
+          granularity: 60,
           show_legend: true,
           inset_legend: true,
         };
         d7.extensions.charts.replays.stat_lineup(
           shards, 'health', '#major_chart', params, 'statelog'
         );
+        var params = {
+          show_legend: true,
+          inset_legend: true,
+        };
+        d7.extensions.charts.replays.stat_lineup(
+          shards, 'health', '#major_granular_chart', params, 'statelog'
+        );
+
       });
 
     Promise.resolve(
@@ -211,7 +254,6 @@
       var update = function(){
         $(window).trigger('update', time);
         time = (time + 10).mod(max_time);
-        console.log(time);
         $('#timeslot').html(String(time).toHHMMSS());
         setTimeout(update, 1200);
       }
