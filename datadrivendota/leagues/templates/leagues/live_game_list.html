@@ -55,65 +55,8 @@ Current Live Games
 
 {% block extra_css %}
 <style type="text/css">
-.league-logo {
+  .league-logo {
     max-height: 175px;
-}
+  }
 </style>
 {% endblock extra_css %}
-
-{% block extra_js %}
-
-{% comment %}
-
-<script type="text/javascript" src='https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js'></script>
-<script src="http://cdn.jsdelivr.net/handlebarsjs/3.0.0/handlebars.js"></script>
-
-{% endcomment %}
-
-{% comment %}
-    Helperthings!
-<script type="text/x-handlebars-template" id='game-template'>
-{% verbatim %}
-    {{#games}}
-    {{!--
-    <div class="{{summary.hero_safe_name}}_slot {{summary.internal_hero_name}}_slot">
-    <img src="{{ summary.hero_mugshot_url }}" alt="{{ summary.name }}" title="{{ summary.hero.name }}" class="topbar-hero-mugshot thumbnail player-slot-{{summary.slot}}">
-    </div>
-    --}}
-
-        <a href="/leagues/live-game-detail/{{match_id}}">
-        <div id={{league_id}} class='col-md-2'>
-
-            <img id="{{league_id}}" src="{{league_logo_url}}" class='thumbnail'>
-            {{!-- <img id="{{radiant_team.team_id}}"src="{{radiant_team.logo_url}}" class='thumbnail'> --}}
-            <p class='overlayer'>{{match_id}}</p>
-        </div>
-        </a>
-    {{/games}}
-{% endverbatim %}
-</script>
-{% endcomment %}
-
-
-{% comment %}
-<script type="text/javascript">
-
-    Handlebars is a fun exercise, but not required here.
-    var source = $('#game-template').html()
-    var template = Handlebars.compile(source);
-    console.log(template)
-
-    $(function(){
-        var p = Promise.resolve(
-            $.get(
-                "{% url 'leagues:api_live_games_list' %}"
-            )
-        ).then(function(result){
-            console.log(result['data'])
-            $('div#games').html(template({'games': result['data']}))
-        })
-
-    })
-    </script>
-{% endcomment %}
-{% endblock extra_js %}

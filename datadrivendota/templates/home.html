@@ -148,7 +148,6 @@
 {% endblock content %}
 
 {% block extra_js %}
-
   <script type="text/javascript">
   $(function(){
     window.splash_gimmick();
@@ -156,34 +155,30 @@
   </script>
   <script type="text/javascript">
     $(function(){
+      pingSetup('{{csrf_token}}');
 
-
-        pingSetup('{{csrf_token}}')
-
-        var match_id = 2291119423;
-        $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
-          .success(function(shards){
-            shards = shards.filter(function(d){
-              return d.dataslice == 'radiant' || d.dataslice == 'dire';
-            })
-            var params = {
-              granularity: 10,
-              interpolation: 'linear',
-              show_legend: true,
-              inset_legend: true,
-            };
-            d7.extensions.charts.replays.stat_lineup(
-              shards, 'health', '#major_chart', params, 'statelog'
-            );
-          })
-
+      var match_id = 2291119423;
+      $.getJSON(`/rest-api/parse-shards/?match_id=${match_id}`)
+        .success(function(shards){
+          shards = shards.filter(function(d){
+            return d.dataslice == 'radiant' || d.dataslice == 'dire';
+          });
+          var params = {
+            granularity: 10,
+            interpolation: 'linear',
+            show_legend: true,
+            inset_legend: true,
+          };
+          d7.extensions.charts.replays.stat_lineup(
+            shards, 'health', '#major_chart', params, 'statelog'
+          );
+        });
     });
   </script>
 {% endblock extra_js %}
 
 {% block extra_css %}
 <style type="text/css">
-
   .group-a{
     fill:#882d61;
     color:#882d61;
@@ -196,27 +191,18 @@
     fill:#2d862d;
     color:#2d862d;
   }
-
   td{
     font-size: 18px;
   }
-
-/*  #home{
-    background-image: linear-gradient(to top, #000, #222 50%, #000 )
-  }
-*/  .triple-token{
+  .triple-token{
     font-size: 100px;
   }
-
   .jumbotron{
     background-color: inherit;
   }
-
-
   .brand-segment{
     margin-top: 0px;
     margin-bottom: 0px;
   }
-
 </style>
 {% endblock extra_css %}

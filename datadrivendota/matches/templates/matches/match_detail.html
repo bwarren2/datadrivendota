@@ -4,9 +4,7 @@
 
 {% block title %}Match #{{ match.steam_id }}{% endblock title %}
 
-
 {% block match_content %}
-
   <div class="row">
     <div class="col-md-6">
     <h4>Level Progression</h4>
@@ -75,40 +73,37 @@
 {% block extra_js %}
 <script type="text/javascript">
 $(function(){
+  d7.extensions.charts.matches.kill_dmg_scatter(
+    '#kill_dmg', {match_id:{{match.steam_id}}}
+  );
 
-    d7.extensions.charts.matches.kill_dmg_scatter(
-      '#kill_dmg', {match_id:{{match.steam_id}}}
-    );
+  d7.extensions.charts.matches.xpm_gpm_scatter(
+    '#xp_gold', {match_id:{{match.steam_id}}}
+  );
 
-    d7.extensions.charts.matches.xpm_gpm_scatter(
-      '#xp_gold', {match_id:{{match.steam_id}}}
-    );
+  d7.extensions.charts.matches.kill_death_scatter(
+    '#kill_death', {match_id:{{match.steam_id}}}
+  );
 
+  d7.extensions.charts.matches.lh_denies_scatter(
+    '#lh_denies', {match_id:{{match.steam_id}}}
+  );
 
-    d7.extensions.charts.matches.kill_death_scatter(
-      '#kill_death', {match_id:{{match.steam_id}}}
-    );
+  d7.extensions.charts.matches.ability_lines(
+    '#abilities', {match_id:{{match.steam_id}}}
+  );
 
-    d7.extensions.charts.matches.lh_denies_scatter(
-      '#lh_denies', {match_id:{{match.steam_id}}}
-    );
+  d7.extensions.charts.matches.lh_barchart(
+    '#last_hits', {match_id:{{match.steam_id}}}
+  );
 
-    d7.extensions.charts.matches.ability_lines(
-      '#abilities', {match_id:{{match.steam_id}}}
-    );
+  d7.extensions.charts.matches.kda2_barchart(
+    '#kda2', {match_id:{{match.steam_id}}}
+  );
 
-    d7.extensions.charts.matches.lh_barchart(
-      '#last_hits', {match_id:{{match.steam_id}}}
-    );
-
-    d7.extensions.charts.matches.kda2_barchart(
-      '#kda2', {match_id:{{match.steam_id}}}
-    );
-
-    d7.extensions.charts.matches.tower_dmg_barchart(
-      '#tower_damage', {match_id:{{match.steam_id}}}
-    );
-
-})
+  d7.extensions.charts.matches.tower_dmg_barchart(
+    '#tower_damage', {match_id:{{match.steam_id}}}
+  );
+});
 </script>
 {% endblock extra_js %}

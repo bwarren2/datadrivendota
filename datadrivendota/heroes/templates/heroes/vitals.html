@@ -9,12 +9,12 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-    var chart;
-    var chart_data;
-    Promise.resolve(
-        $.ajax('{% url "rest-api:herodossier-list" %}')
-    ).then(function(data){
-        console.log(data)
-    })
+  var chart;
+  var chart_data;
+  Promise.resolve(
+      $.ajax('{% url "rest-api:herodossier-list" %}')
+      ).then(function(data){
+    console.log(data)
+  });
 </script>
 {% endblock extra_js %}

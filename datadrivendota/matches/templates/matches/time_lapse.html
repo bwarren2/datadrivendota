@@ -236,12 +236,10 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-$(function(){
-
+  $(function(){
     inputs.pms_select2('#shards', true);
 
     $('#chart-button').click(function(){
-
       var shards = $('#shards').select2('data');
       var destination = '#'+$('#destination :selected').val();
       var facet = $('#data :selected').val();
@@ -256,14 +254,7 @@ $(function(){
       d7.extensions.charts.replays.stat_lineup(
         shards, facet, destination, params, 'statelog'
       );
-    })
-
-});
-
-
+    });
+  });
 </script>
 {% endblock extra_js %}
-
-{% block extra_css %}
-{% endblock extra_css %}
-

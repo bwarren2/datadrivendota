@@ -63,18 +63,16 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-$(function(){
-
-
+  $(function(){
     inputs.pms_select2('#shard_1', false);
     inputs.pms_select2('#shard_2', false);
 
     $('#chart-button').click(function(){
 
-      $('#target_1').empty()
-      $('#target_2').empty()
-      $('#minimap .chart').empty()
-      $('#minimap i').remove()
+      $('#target_1').empty();
+      $('#target_2').empty();
+      $('#minimap .chart').empty();
+      $('#minimap i').remove();
 
       var shard_1 = $('#shard_1').select2('data')[0];
       var shard_2 = $('#shard_2').select2('data')[0];
@@ -87,17 +85,15 @@ $(function(){
         granularity: 30,
       };
 
-
       if(shard_1!==undefined){
         var params = {
           label: label_1,
         };
         shard_1.minimap_label = label_1;
         d7.extensions.charts.replays.stat_card(
-          shard_1, '#target', params
-        );
+            shard_1, '#target', params
+            );
       }
-
 
       if(shard_2!==undefined){
         var params = {
@@ -106,8 +102,8 @@ $(function(){
 
         shard_2.minimap_label = label_2;
         d7.extensions.charts.replays.stat_card(
-          shard_2, '#target2', params
-        );
+            shard_2, '#target2', params
+            );
       }
 
       var shards = [];
@@ -120,24 +116,21 @@ $(function(){
       }
 
       d7.extensions.charts.replays.minimap(
-        shards, '#minimap', params
-      );
+          shards, '#minimap', params
+          );
 
       d7.extensions.charts.replays.playback_shards(shards);
-
-
-    })
+    });
 
     $('#pause-play').click(function(){
       $('#chart-button').toggle();
-    })
-
-});
+    });
+  });
 </script>
 {% endblock extra_js %}
 
 {% block extra_css %}
-  <style type="text/css">
+<style type="text/css">
   .strength {
     color:#FF6666;
   }
@@ -153,5 +146,5 @@ $(function(){
   .mana {
     color: #0A60CB;
   }
-  </style>
+</style>
 {% endblock extra_css %}

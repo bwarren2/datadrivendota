@@ -1,8 +1,5 @@
 "use strict";
 
-var Promise = require("bluebird");
-
-
 function AjaxCache() {
     this.cache = {};
 }

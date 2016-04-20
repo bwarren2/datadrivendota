@@ -1,12 +1,12 @@
 {% extends "row_base.html" %}
 
 {% load staticfiles player_extras %}
+
 {% block title %}
     {{league.display_name}}
 {% endblock title %}
+
 {% block aligned_content %}
-
-
 <nav class='app-nav'>
   <ul class="nav nav-pills">
     <li role="presentation"><a href="{% url 'leagues:detail' steam_id=league.steam_id %}">Detail</a></li>
@@ -74,176 +74,173 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-$(function(){
+  $(function(){
+    Promise.all([
+        $.ajax(
+          "/rest-api/match-pickban/?" + $.param(
+            {league_id:{{league.steam_id}}, page_size:300}
+            )
+          ),
+        $.ajax("/rest-api/hero-dossiers/")
+    ]).then(function(data){
+      Messenger().post({
+        message: "Use the playback controls to change the charts",
+        type: "info",
+        hideAfter: 5
+      });
 
-  Promise.join(
-    $.ajax(
-      "/rest-api/match-pickban/?" + $.param(
-        {league_id:{{league.steam_id}}, page_size:300}
-      )
-    ),
-    $.ajax("/rest-api/hero-dossiers/")
-  ).then(function(data){
+      match_data = data[0];
+      dossiers = data[1];
+      var idx = 0;
+      var update = function(tick){
+        idx = (idx + tick).mod(match_data.length + 1);
+        $(window).trigger('update', idx);
+      }
 
-    Messenger().post({
-      message: "Use the playback controls to change the charts",
-      type: "info",
-      hideAfter: 5
-    });
-
-    match_data = data[0];
-    dossiers = data[1];
-    var idx = 0;
-    var update = function(tick){
-      idx = (idx + tick).mod(match_data.length + 1);
-      $(window).trigger('update', idx);
-    }
-
-    $('#progress-bar-current').html(0);
-    $('#progress-bar-max').html(match_data.length);
+      $('#progress-bar-current').html(0);
+      $('#progress-bar-max').html(match_data.length);
 
 
-    // Set up timing controls
-    var timer;
-    function runner() {
-      update(1);
-      timer = setTimeout(runner, 1000);
-    }
-    $(window).on('play', function(){
-      runner();
-    });
-    $(window).on('pause', function(){
-       clearTimeout(timer);
-    });
-    $(window).on('forward', function(){
-      update(1);
-    });
-    $(window).on('back', function(){
-      update(-1);
-    });
-    var isDragging = false;
-    $('#progress-bar').mousedown(function (evt) {
-      isDragging = true;
-      // Brittle af
-      var progressBarWidth = $(evt.currentTarget).children('span').width();
-      idx = ((evt.offsetX / progressBarWidth) * match_data.length) | 0;
-      $(window).trigger('update', idx);
-    }).mousemove(function (evt) {
-      if (isDragging) {
+      // Set up timing controls
+      var timer;
+      function runner() {
+        update(1);
+        timer = setTimeout(runner, 1000);
+      }
+      $(window).on('play', function(){
+        runner();
+      });
+      $(window).on('pause', function(){
+        clearTimeout(timer);
+      });
+      $(window).on('forward', function(){
+        update(1);
+      });
+      $(window).on('back', function(){
+        update(-1);
+      });
+      var isDragging = false;
+      $('#progress-bar').mousedown(function (evt) {
+        isDragging = true;
         // Brittle af
         var progressBarWidth = $(evt.currentTarget).children('span').width();
         idx = ((evt.offsetX / progressBarWidth) * match_data.length) | 0;
         $(window).trigger('update', idx);
+      }).mousemove(function (evt) {
+        if (isDragging) {
+          // Brittle af
+          var progressBarWidth = $(evt.currentTarget).children('span').width();
+          idx = ((evt.offsetX / progressBarWidth) * match_data.length) | 0;
+          $(window).trigger('update', idx);
+        }
+      }).mouseup(function (evt) {
+        isDragging = false;
+      });
+
+      doss_map = []
+        dossiers.map(function(d){
+          doss_map[d.hero.steam_id] = d.hero.internal_name
+        })
+
+      var pickfaces = function(idx, team, pick){
+
+        if (team=='Radiant'){
+          var team_id=0;
+        } else if (team=='Dire'){
+          var team_id=1;
+        } else {
+          console.log('What is this team? '+ team)
+        }
+
+        var faces = match_data[idx].pickbans.filter(
+            function(d){return d.team==team_id && d.is_pick==pick}
+            ).map(
+              function(d){return "<span><i class='d2mh "+doss_map[d.hero.steam_id]+"'></i></span>"}
+              ).join(separator='');
+            return faces;
       }
-    }).mouseup(function (evt) {
-      isDragging = false;
+      $(window).on('update', function (evt, idx) {
+        // Progbar
+        var width = (idx / match_data.length) * 100;
+        $('#progress-bar').css('width', '' + width + '%');
+        $('#progress-bar').attr('aria-valuenow', width);
+        // Update progress bar time.
+        // @TODO make this show time, not ticks?
+        $('#progress-bar-current').html(idx);
+
+        //Match card
+        try {
+          var current_match = match_data[idx]
+            $('#match_id').html("Next Match #: " + current_match.steam_id)
+
+            var start_time = moment.unix(current_match.start_time).format("dddd, MMMM Do YYYY, h:mm:ss a");
+          var duration = moment.duration(current_match.duration*1000).asMinutes().toFixed(2);
+
+          $('#duration').html(duration+' minutes');
+          $('#start_time').html(start_time);
+          // $('#teams').html(current_match.radiant_team+' vs. '+current_match.dire_team);
+          $('.radiant-team').html(current_match.radiant_team);
+          $('.dire-team').html(current_match.dire_team);
+
+          $('#radiant-picks').html('Picks: ' + pickfaces(idx, 'Radiant', true));
+          $('#dire-picks').html('Picks: ' + pickfaces(idx, 'Dire', true));
+          $('#radiant-bans').html('Bans: ' + pickfaces(idx, 'Radiant', false));
+          $('#dire-bans').html('Bans: ' + pickfaces(idx, 'Dire', false));
+        } catch (e) {
+          $('#match_id').html("End of Tournament")
+            $('#duration').html("");
+          $('#start_time').html("");
+          $('.radiant-team').html("");
+          $('.dire-team').html("");
+
+          $('#radiant-picks').html("");
+          $('#dire-picks').html("");
+          $('#radiant-bans').html("");
+          $('#dire-bans').html("");
+        }
+      });
+
+      $(window).trigger('update', 0);
+
+      d7.extensions.charts.heroes.pickban_scatter(
+          '#pickban_chart', {league_id:{{league.steam_id}}, page_size:300}
+          );
+      d7.extensions.charts.heroes.winrate_scatter(
+          '#winrate_chart', {league_id:{{league.steam_id}}, page_size:300}
+          );
+      d7.extensions.charts.heroes.quality_barchart(
+          '#strength_barchart', {league_id:{{league.steam_id}}, page_size:300}
+          );
     });
 
-    doss_map = []
-    dossiers.map(function(d){
-        doss_map[d.hero.steam_id] = d.hero.internal_name
-    })
-
-    var pickfaces = function(idx, team, pick){
-
-      if (team=='Radiant'){
-        var team_id=0;
-      } else if (team=='Dire'){
-        var team_id=1;
-      } else {
-        console.log('What is this team? '+ team)
-      }
-
-      var faces = match_data[idx].pickbans.filter(
-          function(d){return d.team==team_id && d.is_pick==pick}
-      ).map(
-      function(d){return "<span><i class='d2mh "+doss_map[d.hero.steam_id]+"'></i></span>"}
-      ).join(separator='');
-      return faces;
-    }
-    $(window).on('update', function (evt, idx) {
-      // Progbar
-      var width = (idx / match_data.length) * 100;
-      $('#progress-bar').css('width', '' + width + '%');
-      $('#progress-bar').attr('aria-valuenow', width);
-      // Update progress bar time.
-      // @TODO make this show time, not ticks?
-      $('#progress-bar-current').html(idx);
-
-      //Match card
-      try {
-        var current_match = match_data[idx]
-        $('#match_id').html("Next Match #: " + current_match.steam_id)
-
-        var start_time = moment.unix(current_match.start_time).format("dddd, MMMM Do YYYY, h:mm:ss a");
-        var duration = moment.duration(current_match.duration*1000).asMinutes().toFixed(2);
-
-        $('#duration').html(duration+' minutes');
-        $('#start_time').html(start_time);
-        // $('#teams').html(current_match.radiant_team+' vs. '+current_match.dire_team);
-        $('.radiant-team').html(current_match.radiant_team);
-        $('.dire-team').html(current_match.dire_team);
-
-        $('#radiant-picks').html('Picks: ' + pickfaces(idx, 'Radiant', true));
-        $('#dire-picks').html('Picks: ' + pickfaces(idx, 'Dire', true));
-        $('#radiant-bans').html('Bans: ' + pickfaces(idx, 'Radiant', false));
-        $('#dire-bans').html('Bans: ' + pickfaces(idx, 'Dire', false));
-      } catch (e) {
-        $('#match_id').html("End of Tournament")
-        $('#duration').html("");
-        $('#start_time').html("");
-        $('.radiant-team').html("");
-        $('.dire-team').html("");
-
-        $('#radiant-picks').html("");
-        $('#dire-picks').html("");
-        $('#radiant-bans').html("");
-        $('#dire-bans').html("");
-
-      }
-
-    });
-
-    $(window).trigger('update', 0);
-
-    d7.extensions.charts.heroes.pickban_scatter(
-      '#pickban_chart', {league_id:{{league.steam_id}}, page_size:300}
-    );
-    d7.extensions.charts.heroes.winrate_scatter(
-      '#winrate_chart', {league_id:{{league.steam_id}}, page_size:300}
-    );
-    d7.extensions.charts.heroes.quality_barchart(
-      '#strength_barchart', {league_id:{{league.steam_id}}, page_size:300}
-    );
-
+    // Highlights
+    $('.chart')
+      .on(
+        "mouseenter",
+        ".nv-point, rect",
+        function (evt) {
+          var hero = $(evt.currentTarget).data('hero');
+          $('[data-hero=' + hero + ']').each(function () {
+            var target = $(this);
+            var classes = target.attr('class').split(' ');
+            classes.push('hover');
+            target.attr('class', classes.join(' '));
+          });
+        }
+      ).on(
+        "mouseleave",
+        ".nv-point, rect",
+        function (evt) {
+          var hero = $(evt.currentTarget).data('hero');
+          $('[data-hero=' + hero + ']').each(function () {
+            var target = $(this);
+            var classes = target.attr('class').split(' ').filter( function (e) {
+              return e !== 'hover';
+            });
+            target.attr('class', classes.join(' '));
+          });
+        }
+      );
   });
-
-  // Highlights
-  $('.chart')
-  .on(
-    "mouseenter", ".nv-point, rect",
-    function (evt) {
-      var hero = $(evt.currentTarget).data('hero');
-      $('[data-hero=' + hero + ']').each(function () {
-        var target = $(this);
-        var classes = target.attr('class').split(' ');
-        classes.push('hover');
-        target.attr('class', classes.join(' '));
-      });
-    }
-  ).on(
-    "mouseleave", ".nv-point, rect",
-    function (evt) {
-      var hero = $(evt.currentTarget).data('hero');
-      $('[data-hero=' + hero + ']').each(function () {
-        var target = $(this);
-        var classes = target.attr('class').split(' ').filter( function (e) {
-            return e !== 'hover';
-        });
-        target.attr('class', classes.join(' '));
-      });
-    }
-  );
-});
 </script>
 {% endblock extra_js %}

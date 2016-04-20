@@ -15,7 +15,6 @@
   ],
   "dependencies": {
     "bootstrap": "~3.3.4",
-    "bluebird": "~2.9.27",
     "jquery": "~2.1.4",
     "messenger": "~1.4.1",
     "handlebars": "~3.0.3",
@@ -30,7 +29,6 @@
   },
   "devDependencies": {
     "d3": "~3.5.6",
-    "bluebird": "~2.9.34",
     "messenger": "~1.4.2",
     "sprintf": "~1.0.3"
   }

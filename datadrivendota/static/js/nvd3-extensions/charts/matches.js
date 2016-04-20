@@ -1,7 +1,6 @@
 "use strict";
 
 var utils = require("../utils");
-var Promise = require("bluebird");
 var models = require("../models");
 var AjaxCache = require("../ajax_cache");
 var $ = window.$;

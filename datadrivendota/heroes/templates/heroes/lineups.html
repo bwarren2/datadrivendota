@@ -61,140 +61,137 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-    var chart;
-    var svg;
-    var api_data;
-    $(function(){
+  var chart;
+  var svg;
+  var api_data;
+  $(function(){
 
-        $('#attributes').select2({
-            placeholder: "Select an attribute",
-        });
-        $('#level').select2({
-            placeholder: "Select a level"
-        });
+    $('#attributes').select2({
+      placeholder: "Select an attribute",
+    });
+    $('#level').select2({
+      placeholder: "Select a level"
+    });
 
+    var fn = window.jsUtils.heroAttribute;
+    var selector = '#chart';
 
-        var fn = window.jsUtils.heroAttribute;
-        var selector = '#chart';
-
-        Promise.resolve(
-            $.ajax('{% url "rest-api:herodossier-list" %}')
+    Promise.resolve(
+        $.ajax('{% url "rest-api:herodossier-list" %}')
         ).then(function(data){
 
-            var attr = $('#attributes').val();
-            var level = $('#level').val();
-            var sorting = $('#sort').prop('checked');
-            api_data = data;
+      var attr = $('#attributes').val();
+      var level = $('#level').val();
+      var sorting = $('#sort').prop('checked');
+      api_data = data;
 
-            var update = function(chart){
-                var attr = $('#attributes').val();
-                var x = chart.discretebar._options.xScale.copy();
-                var y = chart.discretebar._options.yScale.copy();
-                var level = $('#level').val();
-                var sort_by_name = $('#sort').prop('checked');
+      var update = function(chart){
+        var attr = $('#attributes').val();
+        var x = chart.discretebar._options.xScale.copy();
+        var y = chart.discretebar._options.yScale.copy();
+        var level = $('#level').val();
+        var sort_by_name = $('#sort').prop('checked');
 
-                new_data = $.map(api_data, function(v){
-                    return {
-                        'value': fn(attr, level, v),
-                        'name': v.hero.name
-                    }
-                })
-
-                if (sort_by_name){
-                    names = new_data.sort(
-                        function(a, b){return a.name<b.name}
-                    ).map(function(d){ return d.name})
-
-                    x.domain(names)
-                } else {
-                    names = new_data.sort(
-                        function(a, b){
-                            return a.value < b.value
-                        }
-                    ).map(function(d){ return d.name})
-
-                    x.domain(names)
-                }
-
-                y.domain(
-                    [0, d3.max(new_data, function(d){
-                    return d.value})]
-                )
-
-                delay = function(d, i) { return i * 50; };
-
-                bargroups = svg.selectAll(".nv-bar")
-                    .data(new_data, function(d){
-                        return d.name
-                    })
-                    .transition()
-                    .delay(delay)
-                    .attr("transform", function(d, i) {
-                        x_place = x(d.name);
-                        y_place = y(d.value);
-                        return "translate("+x_place+","+y_place+")";
-                    })
-                    .select('rect')
-                    .attr('height', function(d){
-                        return 205-y(d.value);
-                    })
-
-                chart.xAxis.scale(x)
-                d3.select('.nv-x.nv-axis')
-                    .transition()
-                    .call(chart.xAxis);
-
-                chart.yAxis.scale(y)
-                d3.select('.nv-y.nv-axis').call(chart.yAxis);
-                nv.utils.windowResize(chart.update);
-
-            }
-
-            nv.addGraph(function(){
-
-                chart = nv.models.discreteBarChart()
-                    .x(function(d){ return d.name})
-                    .y(function(d){ return d.value})
-                    .margin({bottom:180})
-                    .tooltips(false);
-
-                svg = d3.select(selector)
-                    .append('svg:svg')
-                    .attr('width', $(selector).width())
-                    .attr('height', 400);
-
-                plot_data = [{
-                    key: 'Data',
-                    values: $.map(data, function(v){
-                        return {
-                            'value': fn(attr, level, v),
-                            'name': v.hero.name
-                        }
-                    }).sort(function(a, b){ return a.value < b.value})
-                }]
-
-                svg.datum(plot_data);
-                svg.transition().duration(500).call(chart);
-
-                d3.select('.nv-x.nv-axis > g')
-                .selectAll('g')
-                  .selectAll('text')
-                  .attr('transform', function(d,i,j) { return 'translate (-7, 65) rotate(-90 0,0)' }) ;
-
-                nv.utils.windowResize(chart.update);
-
-                $('#update-button').click(function(){
-                    update(chart);
-                });
-
-                return chart;
-            })
-
-        }).catch(function(e){
-            console.log('Error!');
-            console.log(e);
+        new_data = $.map(api_data, function(v){
+          return {
+            'value': fn(attr, level, v),
+            'name': v.hero.name
+          }
         })
-    })
+
+        if (sort_by_name){
+          names = new_data.sort(
+              function(a, b){return a.name<b.name}
+              ).map(function(d){ return d.name})
+
+            x.domain(names)
+        } else {
+          names = new_data.sort(
+              function(a, b){
+                return a.value < b.value
+              }
+              ).map(function(d){ return d.name})
+
+            x.domain(names)
+        }
+
+        y.domain(
+            [0, d3.max(new_data, function(d){
+              return d.value})]
+            )
+
+          delay = function(d, i) { return i * 50; };
+
+        bargroups = svg.selectAll(".nv-bar")
+          .data(new_data, function(d){
+            return d.name
+          })
+        .transition()
+          .delay(delay)
+          .attr("transform", function(d, i) {
+            x_place = x(d.name);
+            y_place = y(d.value);
+            return "translate("+x_place+","+y_place+")";
+          })
+        .select('rect')
+          .attr('height', function(d){
+            return 205-y(d.value);
+          })
+
+        chart.xAxis.scale(x)
+          d3.select('.nv-x.nv-axis')
+          .transition()
+          .call(chart.xAxis);
+
+        chart.yAxis.scale(y)
+          d3.select('.nv-y.nv-axis').call(chart.yAxis);
+        nv.utils.windowResize(chart.update);
+      }
+
+      nv.addGraph(function(){
+
+        chart = nv.models.discreteBarChart()
+          .x(function(d){ return d.name})
+          .y(function(d){ return d.value})
+          .margin({bottom:180})
+          .tooltips(false);
+
+        svg = d3.select(selector)
+          .append('svg:svg')
+          .attr('width', $(selector).width())
+          .attr('height', 400);
+
+        plot_data = [{
+          key: 'Data',
+          values: $.map(data, function(v){
+            return {
+              'value': fn(attr, level, v),
+              'name': v.hero.name
+            }
+          }).sort(function(a, b){ return a.value < b.value})
+        }]
+
+        svg.datum(plot_data);
+        svg.transition().duration(500).call(chart);
+
+        d3.select('.nv-x.nv-axis > g')
+          .selectAll('g')
+          .selectAll('text')
+          .attr('transform', function(d,i,j) { return 'translate (-7, 65) rotate(-90 0,0)' }) ;
+
+        nv.utils.windowResize(chart.update);
+
+        $('#update-button').click(function(){
+          update(chart);
+        });
+
+        return chart;
+      });
+    }).catch(function(e){
+      console.log('Error!');
+      console.log(e);
+    });
+  });
 </script>
 {% endblock extra_js %}
 

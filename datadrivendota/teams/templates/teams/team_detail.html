@@ -67,33 +67,32 @@
 <script type="text/javascript">
 $(function(){
   Promise.resolve(
-    $.ajax(
-      '{% url "rest-api:hero-winrate-list"%}?'+$.param(
-        {team_id:{{team.steam_id}}}
+      $.ajax(
+        '{% url "rest-api:hero-winrate-list"%}?'+$.param(
+          {team_id:{{team.steam_id}}}
+          )
+        )
       )
-    )
-  )
-  .then(function(data){
+    .then(function(data){
       window.Chartreuse.winrate_scatter(data, '#winrate_chart')
-  })
+    })
   .catch(function(e){
     console.log(e)
   });
 
   Promise.resolve(
-    $.ajax(
-      '{% url "rest-api:hero-pickban-list"%}?'+$.param(
-        {team_id:{{team.steam_id}}}
+      $.ajax(
+        '{% url "rest-api:hero-pickban-list"%}?'+$.param(
+          {team_id:{{team.steam_id}}}
+          )
+        )
       )
-    )
-  )
-  .then(function(data){
+    .then(function(data){
       window.Chartreuse.pickban_scatter(data, '#pick_ban')
-  })
+    })
   .catch(function(e){
     console.log(e)
-  })
-
-})
+  });
+});
 </script>
 {% endblock extra_js %}
