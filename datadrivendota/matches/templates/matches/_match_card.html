@@ -27,29 +27,31 @@
     {% endif %}
 
 </h2>
+  <div class='side'>
+    <div class="row">
 
-  <div class="row">
+      {% for summary in match.playermatchsummary_set.all %}
+            {% if summary.side == 'Radiant' %}
+              {% include "matches/_pms_card.html" %}
+            {% endif %}
+      {% endfor %}
 
-    {% for summary in match.playermatchsummary_set.all %}
-          {% if summary.side == 'Radiant' %}
-            {% include "matches/_pms_card.html" %}
-          {% endif %}
-    {% endfor %}
-
-    {% if match.radiant_team %}
-      <div class="col-md-2 col-xs-6 col-sm-2">
-        <img class='thumbnail league-pip'
-        src="{{match.radiant_team.image}}"
-        alt='{{ match.radiant_team.name }}'
-        title='{{match.radiant_team.name}}'>
-      </div>
-    {% else %}
-      <div class="col-md-2 col-xs-6 col-sm-2">
-        <img class='img-responsive side-icon' src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.side }}'>
-      </div>
-    {% endif %}
+      {% if match.radiant_team %}
+        <div class="col-md-2 col-xs-6 col-sm-2">
+          <img class='thumbnail league-pip'
+          src="{{match.radiant_team.image}}"
+          alt='{{ match.radiant_team.name }}'
+          title='{{match.radiant_team.name}}'>
+        </div>
+      {% else %}
+        <div class="col-md-2 col-xs-6 col-sm-2">
+          <img class='img-responsive side-icon' src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.side }}'>
+        </div>
+      {% endif %}
+    </div>
   </div>
 
+  <div class='side'>
   <div class="row">
     {% for summary in match.playermatchsummary_set.all %}
           {% if summary.side == 'Dire' %}
@@ -67,5 +69,6 @@
       </div>
     {% endif %}
 
+  </div>
 </div>
 

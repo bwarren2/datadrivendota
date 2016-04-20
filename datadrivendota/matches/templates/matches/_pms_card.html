@@ -8,9 +8,9 @@
     {% endif %}
 
     {% if summary.match.is_parsed %}
-        <a class='thumbnail' href="{% url 'matches:performance' %}?match_id={{summary.match.steam_id}}&pmses={{summary.player_slot}}">
+        <a class='thumbnail' style='margin-bottom:0px' href="{% url 'matches:performance' %}?match_id={{summary.match.steam_id}}&pmses={{summary.player_slot}}">
     {% else %}
-    <div class='thumbnail'>
+    <div class='pms-portrait'>
 
     {% endif %}
 
@@ -29,7 +29,7 @@
 
         {% if summary.player.avatar %}
             <img
-                style='position:absolute;left:40%;bottom:10px'
+                style='position:absolute;left:40%;bottom:-10px'
                 class='cast-player-image'
                 src="{{summary.player.avatar}}"
                 title='{{summary.player.display_name}}'
