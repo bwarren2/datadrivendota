@@ -622,7 +622,7 @@
       return minimap_update_fn;
     }
 
-    Promise.join(
+    Promise.all([
         Promise.resolve(
           $.get(
             "{% url 'leagues:api_live_game_detail' match_id=match_id %}"
@@ -637,71 +637,73 @@
           $.get(
             "{% url 'rest-api:item-list' %}"
             )
-          ),
-        function(match_result, hero_result, item_result){
-          match_data = $.parseJSON(match_result['data'])
-            heroes = {}
-          $.each(hero_result, function(i, v){
-            heroes[v['steam_id']] = v
-          })
-          items = {}
-          $.each(item_result, function(i, v){
-            items[v['steam_id']] = v
-          })
-        }
-    )
-      .then(function(){
-        $('#stop-animation').toggle();
-        timeline = match_data['timeline'];
-        tick_idx = match_data['timeline'].length-1;
-        updateTimer(timeline[tick_idx]['states']['duration']);
-
-        data = match_data['timeline'][tick_idx]['players'];
-        xp_update = xpm_chart('div#gpm-xpm-chart', 'gx-chart',
-            {'x_label': 'GPM', 'y_label': 'XPM', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200},
-            data, 'gold_per_min', 'xp_per_min')
-          kd_update = xpm_chart('div#kill-death-chart', 'kd-chart', {'x_label': 'Kills', 'y_label': 'Deaths', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'kills', 'death')
-          lh_update = xpm_chart('div#last-hit-levels', 'lhl-chart', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'level', 'last_hits')
-          minimap_update = miniMap(data, 'div#map', 'minimap', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'interval_duration':200})
-          var update_fn = make_update_trigger(timeline);
-        bind_playback(update_fn);
-
-        bind_autoplay(make_autoplay_trigger(timeline));
-
-        update_table(data);
-
-        $(document).on('update', function(e, timeslice){
-          update_table(timeslice.players);
-          minimap_update(timeslice);
-          necromance(timeslice);
-          lh_update(timeslice);
-          kd_update(timeslice);
-          xp_update(timeslice);
-        });
-
-        if('radiant' in match_data && match_data['radiant']!= null){
-          console.log(Object.keys(match_data));
-          console.log(match_data['radiant']);
-          $('div#logo-lineup div#radiant-logo').append('<a href="/teams/'+match_data.radiant.team_id+'"><img class="thumbnail" src='+match_data.radiant.logo_url+'></a>');
-          $('div#logo-lineup div#radiant-logo').append('<p class="overlayer">'+match_data.radiant.team_name+'</p>');
-        }
-        if('dire' in match_data && match_data['dire']!= null){
-          $('div#logo-lineup div#dire-logo').append('<a href="/teams/'+match_data.dire.team_id+'"><img class="thumbnail" src='+match_data.dire.logo_url+'>')
-            $('div#logo-lineup div#dire-logo').append('<p class="overlayer">'+match_data.dire.team_name+'</p>')
-        }
-        // $('div#logo-lineup div#league-logo').append('<img class="thumbnail" src='+match_data.dire.image+'>')
-        $('div#logo-lineup div#game-facts').append(
-            "<table id='Summary' class='table table-responsive table-condensed'> \
-            <tbody> \
-            <tr><td>Match id:</td> <td>"+match_data.game.match_id+"</tr>\
-            <tr><td>Lobby id:</td> <td>"+match_data.game.lobby_id+"</tr>\
-            <tr><td>Spectators:</td> <td>"+match_data.game.spectators+"</tr>\
-            <tr><td>Stream Delay (s):</td> <td>"+match_data.game.stream_delay_s+"</tr>\
-            </tbody> \
-            <tfoot> \
-            </tfoot> \
-            </table>")
+          )
+    ]).then(function(values){
+      var match_result = values[0];
+      var hero_result = values[1];
+      var item_result = values[2];
+      match_data = $.parseJSON(match_result['data'])
+        heroes = {}
+      $.each(hero_result, function(i, v){
+        heroes[v['steam_id']] = v
       })
+      items = {}
+      $.each(item_result, function(i, v){
+        items[v['steam_id']] = v
+      })
+    }
+    ).then(function(){
+      $('#stop-animation').toggle();
+      timeline = match_data['timeline'];
+      tick_idx = match_data['timeline'].length-1;
+      updateTimer(timeline[tick_idx]['states']['duration']);
+
+      data = match_data['timeline'][tick_idx]['players'];
+      xp_update = xpm_chart('div#gpm-xpm-chart', 'gx-chart',
+          {'x_label': 'GPM', 'y_label': 'XPM', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200},
+          data, 'gold_per_min', 'xp_per_min')
+        kd_update = xpm_chart('div#kill-death-chart', 'kd-chart', {'x_label': 'Kills', 'y_label': 'Deaths', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'kills', 'death')
+        lh_update = xpm_chart('div#last-hit-levels', 'lhl-chart', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'level', 'last_hits')
+        minimap_update = miniMap(data, 'div#map', 'minimap', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'interval_duration':200})
+        var update_fn = make_update_trigger(timeline);
+      bind_playback(update_fn);
+
+      bind_autoplay(make_autoplay_trigger(timeline));
+
+      update_table(data);
+
+      $(document).on('update', function(e, timeslice){
+        update_table(timeslice.players);
+        minimap_update(timeslice);
+        necromance(timeslice);
+        lh_update(timeslice);
+        kd_update(timeslice);
+        xp_update(timeslice);
+      });
+
+      if('radiant' in match_data && match_data['radiant']!= null){
+        console.log(Object.keys(match_data));
+        console.log(match_data['radiant']);
+        $('div#logo-lineup div#radiant-logo').append('<a href="/teams/'+match_data.radiant.team_id+'"><img class="thumbnail" src='+match_data.radiant.logo_url+'></a>');
+        $('div#logo-lineup div#radiant-logo').append('<p class="overlayer">'+match_data.radiant.team_name+'</p>');
+      }
+      if('dire' in match_data && match_data['dire']!= null){
+        $('div#logo-lineup div#dire-logo').append('<a href="/teams/'+match_data.dire.team_id+'"><img class="thumbnail" src='+match_data.dire.logo_url+'>')
+          $('div#logo-lineup div#dire-logo').append('<p class="overlayer">'+match_data.dire.team_name+'</p>')
+      }
+      // $('div#logo-lineup div#league-logo').append('<img class="thumbnail" src='+match_data.dire.image+'>')
+      $('div#logo-lineup div#game-facts').append(
+          "<table id='Summary' class='table table-responsive table-condensed'> \
+          <tbody> \
+          <tr><td>Match id:</td> <td>"+match_data.game.match_id+"</tr>\
+          <tr><td>Lobby id:</td> <td>"+match_data.game.lobby_id+"</tr>\
+          <tr><td>Spectators:</td> <td>"+match_data.game.spectators+"</tr>\
+          <tr><td>Stream Delay (s):</td> <td>"+match_data.game.stream_delay_s+"</tr>\
+          </tbody> \
+          <tfoot> \
+          </tfoot> \
+          </table>")
+    })
     .then(function(){
       setInterval(function(){
         $.get(

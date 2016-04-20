@@ -1,6 +1,5 @@
 "use strict";
 var utils = require("../utils");
-var Promise = require("bluebird");
 var AjaxCache = require("../ajax_cache");
 var models = require("../models");
 var $ = window.$;
@@ -51,14 +50,14 @@ var pickban_scatter = function(destination, params, display_final_product){
   var winrate_data;
   var dossiers;
   var blanks;
-  Promise.join(
+  Promise.all([
     AjaxCache.get(
       "/rest-api/match-pickban/?" + $.param(params)
     ),
     AjaxCache.get(
       "/rest-api/hero-dossiers/"
     )
-  ).then(function(data){
+  ]).then(function(data){
 
     winrate_data = data[0];
     dossiers = data[1];
@@ -145,14 +144,14 @@ var winrate_scatter = function(destination, params, display_final_product){
   var dossiers;
   var blanks;
 
-  Promise.join(
+  Promise.all([
     $.ajax(
       "/rest-api/match-pickban/?" + $.param(params)
     ),
     $.ajax(
       "/rest-api/hero-dossiers/"
     )
-  ).then(function(data){
+  ]).then(function(data){
     winrate_data = data[0];
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);
@@ -249,14 +248,14 @@ var quality_barchart = function(destination, params, display_final_product){
   var dossiers;
   var blanks;
 
-  Promise.join(
+  Promise.all([
     $.ajax(
       "/rest-api/match-pickban/?" + $.param(params)
     ),
     $.ajax(
       "/rest-api/hero-dossiers/"
     )
-  ).then(function(data){
+  ]).then(function(data){
     winrate_data = data[0];
     dossiers = data[1];
     blanks = utils.blanks.blank_hero_pickbans(dossiers);

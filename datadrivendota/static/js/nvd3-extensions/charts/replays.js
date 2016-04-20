@@ -1,7 +1,6 @@
 "use strict";
 var utils = require("../utils");
 var tooltips = require("./tooltips");
-var Promise = require("bluebird");
 var Handlebars = window.Handlebars;
 var $ = window.$;
 var nv = window.nv;

@@ -158,11 +158,11 @@
 {% block extra_js %}
 <script type="text/javascript">
   $(function(){
-    Promise.join(
+    Promise.all([
         $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=1&hero_id={{hero.steam_id}}'),
         $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=2&hero_id={{hero.steam_id}}'),
         $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=3&hero_id={{hero.steam_id}}')
-        ).then(function(data){
+    ]).then(function(data){
       var chart;
       var chart_data;
       params = [

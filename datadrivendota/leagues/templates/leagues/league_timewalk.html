@@ -75,15 +75,14 @@
 {% block extra_js %}
 <script type="text/javascript">
   $(function(){
-    Promise.join(
+    Promise.all([
         $.ajax(
           "/rest-api/match-pickban/?" + $.param(
             {league_id:{{league.steam_id}}, page_size:300}
             )
           ),
         $.ajax("/rest-api/hero-dossiers/")
-        ).then(function(data){
-
+    ]).then(function(data){
       Messenger().post({
         message: "Use the playback controls to change the charts",
         type: "info",
