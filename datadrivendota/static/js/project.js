@@ -382,26 +382,3 @@ String.prototype.toHHMMSS = function () {
     var time    = hours+':'+minutes+':'+seconds;
     return prefix+time;
 }
-
-var pingSetup = function(csrf){
-    $('form#ping-request').submit(function(event){
-        event.preventDefault();
-
-        var formData = {
-            'csrfmiddlewaretoken' : csrf,
-            'email'               : $('input#email').val(),
-            'recurring'      : $('input#recurring').prop('checked')
-        };
-        $.ajax({
-          'type': 'POST',
-          'url': '/rest-api/ping-requests/',
-          'data': formData,
-          'dataType': 'json',
-          'encode': true,
-        }).success(function(data){
-          $('div#feedback').html('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Submission successful!</div>')
-        }).error(function(data, a, b){
-          $('div#feedback').html('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+JSON.parse(data.responseText).email+'</div>')
-        });
-    });
-}
