@@ -13,6 +13,7 @@ from .forms import SearchForm
 from heroes.models import Hero
 from leagues.models import League
 from blog.models import Entry
+from matches.models import PlayerMatchSummary
 
 
 class LandingView(TemplateView):
@@ -23,6 +24,17 @@ class LandingView(TemplateView):
         kwargs['blog_entry'] = Entry.public.all().order_by(
             '-created'
         ).first()
+
+        pro_pms = PlayerMatchSummary.objects.get(
+            match__steam_id=2306177749,
+            hero__name='Juggernaut'
+        )
+        am_pms = PlayerMatchSummary.objects.get(
+            match__steam_id=2284889385,
+            hero__name='Juggernaut'
+        )
+        kwargs['pro_pms_id'] = pro_pms.id
+        kwargs['am_pms_id'] = am_pms.id
 
         messages.success(
             self.request,

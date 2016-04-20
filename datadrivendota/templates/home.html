@@ -33,8 +33,22 @@
           </div>
 
         </div>
+      </div>
+      <div class='row'>
+      <div class='page-header' id='timeslot'></div>
+        <div class='col-md-3' id='target'>
 
+        </div>
+        <div class='col-md-3' id='target2'>
 
+        </div>
+        <div class='col-md-6' id='minimap'>
+          <div class='minimap-chart vert-md-6'></div>
+        </div>
+
+      </div>
+
+      <div class="row">
         <div class='col-md-6'>
           <div class='big-d-stats'>
             <div class='page-header'>
@@ -155,25 +169,59 @@
   </script>
   <script type="text/javascript">
     $(function(){
-      pingSetup('{{csrf_token}}');
 
-      var match_id = 2291119423;
-      $.getJSON(`/rest-api/parse-shards/?match_id=${match_id}`)
-        .success(function(shards){
-          shards = shards.filter(function(d){
-            return d.dataslice == 'radiant' || d.dataslice == 'dire';
-          });
-          var params = {
-            granularity: 10,
-            interpolation: 'linear',
-            show_legend: true,
-            inset_legend: true,
-          };
-          d7.extensions.charts.replays.stat_lineup(
-            shards, 'health', '#major_chart', params, 'statelog'
-          );
-        });
+
+    var match_id = 2291119423;
+    $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
+      .success(function(shards){
+        shards = shards.filter(function(d){
+          return d.dataslice == 'radiant' || d.dataslice == 'dire';
+        })
+        var params = {
+          granularity: 10,
+          interpolation: 'linear',
+          show_legend: true,
+          inset_legend: true,
+        };
+        d7.extensions.charts.replays.stat_lineup(
+          shards, 'health', '#major_chart', params, 'statelog'
+        );
+      });
+
+    Promise.resolve(
+      $.getJSON(
+        '/rest-api/parse-shards/?pms_ids=[{{pro_pms_id}},{{am_pms_id}}]'
+      )
+    ).then(function(shards){
+      console.log(shards);
+      shard_1 = shards[0];
+      shard_2 = shards[1];
+      params = {};
+      shard_1.minimap_label = 'Pro';
+      d7.extensions.charts.replays.stat_card(shard_1, '#target', params);
+
+      shard_2.minimap_label = 'Amateur';
+      d7.extensions.charts.replays.stat_card(shard_2, '#target2', params);
+
+      var shards = [];
+      shards.push(shard_1);
+      shards.push(shard_2);
+
+      d7.extensions.charts.replays.minimap(shards, '#minimap', params);
+
+      var time = 60*10; // Start 10 min in
+      var max_time = 24*60; //Lesser of match lengths
+      var update = function(){
+        $(window).trigger('update', time);
+        time = (time + 10).mod(max_time);
+        console.log(time);
+        $('#timeslot').html(String(time).toHHMMSS());
+        setTimeout(update, 1200);
+      }
+      update();
+
     });
+  });
   </script>
 {% endblock extra_js %}
 
