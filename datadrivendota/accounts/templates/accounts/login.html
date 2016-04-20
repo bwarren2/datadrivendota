@@ -5,9 +5,7 @@
 {% block title %}Account Social Auth{% endblock title %}
 {% block page_title %}Account Social Auth{% endblock page_title %}
 
-
 {% block aligned_content %}
-
     <div class="buttons">
       {% if user.is_authenticated %}
         <div class="user-details">
@@ -18,7 +16,6 @@
           </a>
 
         </div>
-
       {% endif %}
 
       <div class="social">
@@ -150,71 +147,94 @@
 {% endblock aligned_content %}
 
 {% block extra_js %}
+<script type="text/javascript">
+  var loginMethod = "{{ method|escapejs }}";
 
-    <script type="text/javascript">
+  var modalDialog = function (modalId, modalLinkName, submitHandler) {
+    var $modal;
 
-      var loginMethod = "{{ method|escapejs }}";
+    $modal = $(modalId).modal({show: modalLinkName === loginMethod});
 
-      var modalDialog = function (modalId, modalLinkName, submitHandler) {
-        var $modal;
+    $modal.on('click', '.btn-primary', submitHandler || function (event) {
+      $modal.find('form').submit();
+    });
 
-        $modal = $(modalId).modal({show: modalLinkName === loginMethod});
-
-        $modal.on('click', '.btn-primary', submitHandler || function (event) {
-          $modal.find('form').submit();
-        });
-
-        if (modalLinkName) {
-          $('a[name="' + modalLinkName + '"]').on('click', function (event) {
-            event.preventDefault();
-            $modal.modal('toggle');
-          });
-        }
-
-        return $modal;
-      };
-
-      $(function () {
-        $('input#password').keyup(function () {
-          $('#login').prop('disabled', this.value.length >= 8 ? false : true);
-        });
-
-        var $validationModal, $emailRequired;
-
-        modalDialog('#email-modal', 'email');
-        $validationModal = modalDialog('#validation-sent-modal');
-        $emailRequired = modalDialog('#email-required-modal');
-
-        $('.disconnect-form').on('click', 'a.btn', function (event) {
-          event.preventDefault();
-          console.log((event.target).closest('form'));
-          $(event.target).closest('form').submit();
-        });
-
-        {% if validation_sent %}
-          $validationModal.modal('show');
-        {% endif %}
-
-        {% if email_required %}
-          $emailRequired.modal('show');
-        {% endif %}
+    if (modalLinkName) {
+      $(`a[name="${modalLinkName}"]`).on('click', function (event) {
+        event.preventDefault();
+        $modal.modal('toggle');
       });
-    </script>
+    }
+
+    return $modal;
+  };
+
+  $(function () {
+    $('input#password').keyup(function () {
+      $('#login').prop('disabled', this.value.length >= 8 ? false : true);
+    });
+
+    var $validationModal, $emailRequired;
+
+    modalDialog('#email-modal', 'email');
+    $validationModal = modalDialog('#validation-sent-modal');
+    $emailRequired = modalDialog('#email-required-modal');
+
+    $('.disconnect-form').on('click', 'a.btn', function (event) {
+      event.preventDefault();
+      console.log((event.target).closest('form'));
+      $(event.target).closest('form').submit();
+    });
+
+    {% if validation_sent %}
+    $validationModal.modal('show');
+    {% endif %}
+
+    {% if email_required %}
+    $emailRequired.modal('show');
+    {% endif %}
+  });
+</script>
 {% endblock extra_js %}
 
 {% block extra_css %}
-  <style>
-    h1 { padding: 0 30px; }
-    .col-md-2 { width: 18.6667%; }
-    .buttons { display: block; table-layout: fixed; border-radius: 7px; border: 1px solid #ccc;
-               margin: 20px; background: #555; padding: 30px; }
-    .buttons > div:not(:first-child) { margin-top: 10px; border-top: 1px solid #ccc;
-                                       padding-top: 10px; text-align: center; }
-    .user-details { text-align: center; font-size: 16px; font-weight: bold; }
-    .disconnect-form { padding: 0; margin: 0px 10px; }
-    .disconnect-form > a { display: block; margin: 5px 0 !important; }
-    .social { text-align: center; }
-  </style>
-  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-
+<style>
+  h1 {
+    padding: 0 30px;
+  }
+  .col-md-2 {
+    width: 18.6667%;
+  }
+  .buttons {
+    display: block;
+    table-layout: fixed;
+    border-radius: 7px;
+    border: 1px solid #ccc;
+    margin: 20px;
+    background: #555;
+    padding: 30px;
+  }
+  .buttons > div:not(:first-child) {
+    margin-top: 10px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    text-align: center;
+  }
+  .user-details {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .disconnect-form {
+    padding: 0;
+    margin: 0px 10px;
+  }
+  .disconnect-form > a {
+    display: block;
+    margin: 5px 0 !important;
+  }
+  .social {
+    text-align: center;
+  }
+</style>
 {% endblock extra_css %}

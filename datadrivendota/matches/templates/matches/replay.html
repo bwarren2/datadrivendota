@@ -29,51 +29,47 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-$(function(){
+  $(function(){
+    var params = {
+      granularity: 30,
+    };
 
-      var params = {
-        granularity: 30,
-      };
+    var unwrapped_shards = [];
 
-      var unwrapped_shards = [];
+    var urls = [
+    {% for summary in match.playermatchsummary_set.all %}
+    '/rest-api/parse-shards/?pms_ids=['+{{summary.id}}+']',
+    {% endfor %}
+    ];
 
-      var urls = [
-        {% for summary in match.playermatchsummary_set.all %}
-          '/rest-api/parse-shards/?pms_ids=['+{{summary.id}}+']',
-        {% endfor %}
-      ]
+    var positions = [
+    {% for summary in match.playermatchsummary_set.all %}
+    '#slot-{{summary.player_slot}}',
+    {% endfor %}
+    ];
 
-      var positions = [
-        {% for summary in match.playermatchsummary_set.all %}
-          '#slot-{{summary.player_slot}}',
-        {% endfor %}
-      ]
-
-
-      Promise.all(
+    Promise.all(
         urls.map(function(url){
           return $.getJSON(url);
         })
-      )
-      .then(function(shards){
-        shards.map(function(shard, i){
-          shard = shard[0];
-          d7.extensions.charts.replays.stat_card(
+    )
+    .then(function(shards){
+      shards.map(function(shard, i){
+        shard = shard[0];
+        d7.extensions.charts.replays.stat_card(
             shard, positions[i], params
-          );
-          unwrapped_shards.push(shard);
-        })
-        d7.extensions.charts.replays.playback_shards(unwrapped_shards);
-        d7.extensions.charts.replays.minimap(unwrapped_shards, '#minimap', params);
-
-      }).catch(function(e){
-        console.log(e);
-      })
+            );
+        unwrapped_shards.push(shard);
+      });
+      d7.extensions.charts.replays.playback_shards(unwrapped_shards);
+      d7.extensions.charts.replays.minimap(unwrapped_shards, '#minimap', params);
+    }).catch(function(e){
+      console.log(e);
+    });
 
     $('#pause-play').click(function(){
       $('#chart-button').toggle();
-    })
-
-});
+    });
+  });
 </script>
 {% endblock extra_js %}

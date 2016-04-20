@@ -7,7 +7,6 @@
 {% endblock title %}
 
 {% block aligned_content %}
-
 <nav class='app-nav'>
   <ul class="nav nav-pills">
     <li role="presentation" class='active'><a href="{% url 'leagues:detail' steam_id=league.steam_id %}">Detail</a></li>
@@ -86,60 +85,55 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-$(function(){
-
+  $(function(){
     $('#start-date').datepicker(); $('#start-date').val(
-      moment.unix({{max_match_time}}).subtract(10,'days').format("MM/DD/YYYY")
-    );
+        moment.unix({{max_match_time}}).subtract(10,'days').format("MM/DD/YYYY")
+        );
     $('#end-date').datepicker();  $('#end-date').val(
-      moment.unix({{max_match_time}}).add(1,'days').format("MM/DD/YYYY")
-    );
+        moment.unix({{max_match_time}}).add(1,'days').format("MM/DD/YYYY")
+        );
 
     $('button#chart').click(function(){
-
       var start_unix = moment($('#start-date').val(), "MM/DD/YYYY").unix();
       var end_unix = moment($('#end-date').val(), "MM/DD/YYYY").unix();
 
       d7.extensions.charts.heroes.pickban_scatter(
-        '#pick_ban',
-        {
-          league_id:{{league.steam_id}},
-          start_time_gte: start_unix,
-          start_time_lte: end_unix,
-          page_size:300,
-        },
-        true
-      );
+          '#pick_ban',
+          {
+            league_id:{{league.steam_id}},
+            start_time_gte: start_unix,
+            start_time_lte: end_unix,
+            page_size:300,
+          },
+          true
+          );
       d7.extensions.charts.heroes.winrate_scatter(
-        '#winrate_chart', {
-          league_id:{{league.steam_id}},
-          start_time_gte: start_unix,
-          start_time_lte: end_unix,
-          page_size:300
-        }, true
-      );
+          '#winrate_chart', {
+            league_id:{{league.steam_id}},
+            start_time_gte: start_unix,
+            start_time_lte: end_unix,
+            page_size:300
+          }, true
+          );
       d7.extensions.charts.heroes.quality_barchart(
-        '#strength_bars', {
-          league_id:{{league.steam_id}},
-          start_time_gte: start_unix,
-          start_time_lte: end_unix,
-          page_size:300
-        }, true
-      );
+          '#strength_bars', {
+            league_id:{{league.steam_id}},
+            start_time_gte: start_unix,
+            start_time_lte: end_unix,
+            page_size:300
+          }, true
+          );
 
       d7.extensions.charts.matches.match_timeline(
-        '#match_timeline',
-        {
-          league_id:{{league.steam_id}},
-          page_size:10
-        }
-      );
+          '#match_timeline',
+          {
+            league_id:{{league.steam_id}},
+            page_size:10
+          }
+          );
     });
 
-
     $('button#chart').click();
-
-})
+  });
 </script>
 {% endblock extra_js %}
-

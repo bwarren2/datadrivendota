@@ -158,34 +158,33 @@
 {% block extra_js %}
 <script type="text/javascript">
   $(function(){
-
     Promise.join(
-      $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=1&hero_id={{hero.steam_id}}'),
-      $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=2&hero_id={{hero.steam_id}}'),
-      $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=3&hero_id={{hero.steam_id}}')
-    ).then(function(data){
+        $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=1&hero_id={{hero.steam_id}}'),
+        $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=2&hero_id={{hero.steam_id}}'),
+        $.ajax('{% url "rest-api:player-match-summary-list" %}?skill=3&hero_id={{hero.steam_id}}')
+        ).then(function(data){
       var chart;
       var chart_data;
       params = [
-        {
-          'div': '#gold-duration',
-          'param': 'gold_per_min',
-          'y_label': 'Gold Per Min',
-        },
-        {
-          'div': '#xp-duration',
-          'param': 'xp_per_min',
-          'y_label': 'XP Per Min',
-        },
-        {
-          'div': '#twr-dmg-duration',
-          'param': 'tower_damage',
-          'y_label': 'Tower Damage',
-        },
+      {
+        'div': '#gold-duration',
+        'param': 'gold_per_min',
+        'y_label': 'Gold Per Min',
+      },
+      {
+        'div': '#xp-duration',
+        'param': 'xp_per_min',
+        'y_label': 'XP Per Min',
+      },
+      {
+        'div': '#twr-dmg-duration',
+        'param': 'tower_damage',
+        'y_label': 'Tower Damage',
+      },
       ]
-      params.forEach(function(x){
+        params.forEach(function(x){
 
-        var plot_data = [
+          var plot_data = [
           {
             key: 'Average Skill',
             values: data[0].map(function(v){
@@ -213,60 +212,59 @@
               }
             })
           },
-        ]
+          ]
 
-        nv.addGraph(function(){
-          chart = nv.models.scatterChart()
-            .color(d3.scale.category10().range())
-            .margin({
-              bottom:30,
-              right: 50,
-              top: 70,
+            nv.addGraph(function(){
+              chart = nv.models.scatterChart()
+                .color(d3.scale.category10().range())
+                .margin({
+                  bottom:30,
+                  right: 50,
+                  top: 70,
+                })
+              .showLegend(true);
+
+              chart.xAxis.tickFormat(
+                  window.jsUtils.secondstotime
+                  )
+                .axisLabel('Time (ms)')
+
+                chart.yAxis.axisLabel(x.y_label)
+
+                chart.forceY([0, d3.max(plot_data, function(d){
+                  return d3.max(d.values, function(v){
+                    return [x.param]
+                  })
+                })])
+
+              chart_data = d3
+                .select(x.div)
+                .append('svg')
+                .attr('height', 400)
+                .attr('width', 400)
+                .datum(plot_data)
+                .call(chart)
+
+                nv.utils.windowResize(chart.update);
+              return chart;
             })
-            .showLegend(true);
 
-          chart.xAxis.tickFormat(
-            window.jsUtils.secondstotime
-          )
-          .axisLabel('Time (ms)')
-
-          chart.yAxis.axisLabel(x.y_label)
-
-          chart.forceY([0, d3.max(plot_data, function(d){
-            return d3.max(d.values, function(v){
-              return [x.param]
-            })
-          })])
-
-          chart_data = d3
-            .select(x.div)
-            .append('svg')
-            .attr('height', 400)
-            .attr('width', 400)
-            .datum(plot_data)
-            .call(chart)
-
-          nv.utils.windowResize(chart.update);
-          return chart;
         })
-
-      })
 
     }).catch(function(e){
       console.log("Error!");
       console.log(e);
-    })
-
-  })
+    });
+  });
 </script>
 <script type="text/javascript">
   $(function(){
     var url = '{% url "rest-api:player-winrate-list"%}?hero_id={{hero.steam_id}}';
     Promise.resolve($.ajax(url))
-    .then(function(data){
-      var destination = '#pro_winrate';
-      var max_y = 0;
-      var plot_data = [
+      .then(function(data){
+        var destination = '#pro_winrate';
+        var max_y = 0;
+        var plot_data = [
         {
           key: "Winrate",
           values: data.map(function(v){
@@ -276,38 +274,31 @@
               // hero: v.hero,
             };
             max_y = Math.max(max_y, datum.y)
-            return datum;
+              return datum;
           })
         }
-      ];
+        ];
 
-      nv.addGraph(function(data){
+        nv.addGraph(function(data){
 
-        svg = window.make_svg(destination);
+          svg = window.make_svg(destination);
 
-        chart = nv.models.scatterChart()
-        .showLegend(false)
-        .margin({
-          left:60,
-          bottom:40
-        })
-        .forceY(0, 100)
-        .forceX(0, max_y);
+          chart = nv.models.scatterChart()
+            .showLegend(false)
+            .margin({
+              left:60,
+              bottom:40
+            })
+          .forceY(0, 100)
+            .forceX(0, max_y);
 
-        chart.xAxis.axisLabel("# Games").axisLabelDistance(-20);
-        chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
+          chart.xAxis.axisLabel("# Games").axisLabelDistance(-20);
+          chart.yAxis.axisLabel("Win %").axisLabelDistance(-20);
 
-
-        chart_data = svg.datum(plot_data);
-        chart_data.transition().duration(500).call(chart);
-
+          chart_data = svg.datum(plot_data);
+          chart_data.transition().duration(500).call(chart);
+        });
       });
-
-
-    })
-  })
+  });
 </script>
 {% endblock extra_js  %}
-
-
-

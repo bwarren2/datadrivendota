@@ -42,59 +42,59 @@
 {% endblock aligned_content %}
 {% block extra_js %}
 <script type="text/javascript">
-    $(function(){
-        $('#task-form').submit(function(event){
-            event.preventDefault();
+  $(function(){
+    $('#task-form').submit(function(event){
+      event.preventDefault();
 
-            function getCookie(name) {
-                var cookieValue = null;
-                if (document.cookie && document.cookie != '') {
-                    var cookies = document.cookie.split(';');
-                    for (var i = 0; i < cookies.length; i++) {
-                        var cookie = jQuery.trim(cookies[i]);
-                        // Does this cookie string begin with the name we want?
-                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
+      function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
             }
-            var csrftoken = getCookie('csrftoken');
-            var match_id = $('#match_id').val();
-            var filename = $('#filename').val();
-            var task = $('#task :selected').val();
-            var data = {
-                csrfmiddlewaretoken: csrftoken,
-                task: task,
-                match_id: match_id,
-                filename: filename
-            };
-            console.log(data);
-            var resp = $.ajax({
-                    url: '/parserpipe/tasks/',
-                    method: "POST",
-                    data: data,
-            })
-            .success(function(data){
-                console.log(data);
-                Messenger().post({
-                  message: data.result,
-                  type: data.type,
-                  hideAfter: 5
-                });
-            })
-            .fail(function(){
-                Messenger().post({
-                  message: "FAILURE",
-                  type: "error",
-                  hideAfter: 10
-                });
-
-            })
-            console.log(resp);
+          }
+        }
+        return cookieValue;
+      }
+      var csrftoken = getCookie('csrftoken');
+      var match_id = $('#match_id').val();
+      var filename = $('#filename').val();
+      var task = $('#task :selected').val();
+      var data = {
+        csrfmiddlewaretoken: csrftoken,
+        task: task,
+        match_id: match_id,
+        filename: filename
+      };
+      console.log(data);
+      var resp = $.ajax({
+        url: '/parserpipe/tasks/',
+        method: "POST",
+        data: data,
+      })
+      .success(function(data){
+        console.log(data);
+        Messenger().post({
+          message: data.result,
+          type: data.type,
+          hideAfter: 5
         });
+      })
+      .fail(function(){
+        Messenger().post({
+          message: "FAILURE",
+          type: "error",
+          hideAfter: 10
+        });
+
+      })
+      console.log(resp);
     });
+  });
 </script>
 {% endblock extra_js %}

@@ -115,24 +115,18 @@
     <div class='row'>
         <div class='col-md-12' id='chart-new-customers'></div>
     </div>
-
 </div>
-
-
 {% endblock aligned_content %}
 
 {% block extra_js %}
 <script src="https://d26b395fwzu5fz.cloudfront.net/3.2.4/keen.min.js" type="text/javascript"></script>
-
 <script type="text/javascript">
-var client = new Keen({
-  projectId: "{{project_id}}",
-  readKey: "{{read_key}}"
-});
+  var client = new Keen({
+    projectId: "{{project_id}}",
+    readKey: "{{read_key}}"
+  });
 
-Keen.ready(function(){
-
-
+  Keen.ready(function(){
     // ===============================
     // 30D Revenue
     // ===============================
@@ -141,14 +135,14 @@ Keen.ready(function(){
     // Calculate Stripe Revenue Metric
     // ===============================
     var revenue = new Keen.Query('sum', {
-        eventCollection: 'Stripe_Events',
-        timeframe: 'last_30_days',
-        targetProperty: 'data.object.amount',
-        filters: [{
-            'property_name':'type',
-            'operator':'eq',
-            'property_value':'charge.succeeded'
-        }]
+      eventCollection: 'Stripe_Events',
+      timeframe: 'last_30_days',
+      targetProperty: 'data.object.amount',
+      filters: [{
+        'property_name':'type',
+        'operator':'eq',
+        'property_value':'charge.succeeded'
+      }]
     });
     // ===============================
     // Create a new Dataviz instance
@@ -156,21 +150,20 @@ Keen.ready(function(){
     var revMetric = new Keen.Dataviz()
       .el(document.getElementById('chart-30DRev'))
       .chartOptions({
-          prefix: '$'
+        prefix: '$'
       })
-      .prepare(); // start spinner
+    .prepare(); // start spinner
     // ===============================
     // Run query and handle the result
     // ===============================
     client.run(revenue,
         function(err, response){
-        // if (err) throw(err);
-        revMetric
-          .parseRawData({ result: Math.round(response.result/100) })
-          .title('Last 30 Days\' Revenue')
-          .render();
-    });
-
+          // if (err) throw(err);
+          revMetric
+            .parseRawData({ result: Math.round(response.result/100) })
+            .title('Last 30 Days\' Revenue')
+            .render();
+        });
 
     // ===============================
     // Unique Customers
@@ -179,34 +172,34 @@ Keen.ready(function(){
     // Create Unique Paying Customers Line Chart
     // =========================================
     var payingCustomersSeries = new Keen.Query('count_unique', {
-        eventCollection: 'Stripe_Events',
-        timeframe: 'last_6_months',
-        targetProperty: 'data.object.customer',
-        interval: 'monthly',
-        filters: [{
-            'property_name':'type',
-            'operator':'eq',
-            'property_value':'invoice.payment_succeeded'
-        },
-        {
-            'property_name':'data.object.total',
-            'operator':'gt',
-            'property_value': 0
-        }]
+      eventCollection: 'Stripe_Events',
+      timeframe: 'last_6_months',
+      targetProperty: 'data.object.customer',
+      interval: 'monthly',
+      filters: [{
+        'property_name':'type',
+        'operator':'eq',
+        'property_value':'invoice.payment_succeeded'
+      },
+      {
+        'property_name':'data.object.total',
+        'operator':'gt',
+        'property_value': 0
+      }]
     });
     // ===============================
     // Run query and draw the result
     // ===============================
     client.draw(payingCustomersSeries, document.getElementById('chart-customers'), {
-        chartType: 'areachart',
-        title: 'Total Unique Paying Customers',
-        chartOptions: {
-            hAxis: {
-              slantedText: true,
-              slantedTextAngle: 45
-            },
-            legend: { position: 'none' },
-        }
+      chartType: 'areachart',
+      title: 'Total Unique Paying Customers',
+      chartOptions: {
+        hAxis: {
+          slantedText: true,
+          slantedTextAngle: 45
+        },
+        legend: { position: 'none' },
+      }
     });
 
     // ========================================================
@@ -214,41 +207,39 @@ Keen.ready(function(){
     // ========================================================
     var timeframe = 'last_6_months';
     var countNewPayingCustomers = new Keen.Query('count', {
-        eventCollection: 'Stripe_Events',
-        timeframe: timeframe,
-        interval: 'monthly',
-        filters: [{
-            'property_name':'type',
-            'operator':'eq',
-            'property_value':'customer.subscription.updated'
-        },
-        {
-            'property_name':'data.object.plan.amount',
-            'operator':'gt',
-            'property_value': 0
-        },
-        {
-            'property_name':'data.previous_attributes.plan.amount',
-            'operator':'eq',
-            'property_value': 0
-        }]
+      eventCollection: 'Stripe_Events',
+      timeframe: timeframe,
+      interval: 'monthly',
+      filters: [{
+        'property_name':'type',
+        'operator':'eq',
+        'property_value':'customer.subscription.updated'
+      },
+      {
+        'property_name':'data.object.plan.amount',
+        'operator':'gt',
+        'property_value': 0
+      },
+      {
+        'property_name':'data.previous_attributes.plan.amount',
+        'operator':'eq',
+        'property_value': 0
+      }]
     });
     // ===============================
     // Run query and draw the result
     // ===============================
     client.draw(countNewPayingCustomers, document.getElementById('chart-new-customers'), {
-        chartType: 'areachart',
-        title: 'Count of New Customers Paying for the First Time (' + timeframe + ')',
-        chartOptions: {
+      chartType: 'areachart',
+      title: 'Count of New Customers Paying for the First Time (' + timeframe + ')',
+          chartOptions: {
             hAxis: {
               slantedText: true,
               slantedTextAngle: 45
             },
             legend: { position: 'none' }
-        }
-    });
-
-});
+          }
+          });
+      });
 </script>
-
 {% endblock extra_js %}

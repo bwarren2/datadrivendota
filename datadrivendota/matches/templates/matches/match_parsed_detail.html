@@ -30,94 +30,83 @@
 
     </div>
   </div>
-
-
-
 {% endblock match_content %}
 
 {% block extra_js %}
 <script type="text/javascript">
 $(function(){
+  var params = {
+    granularity: 20,
+    interpolation: 'stepwise',
+  };
 
-var params = {
-  granularity: 20,
-  interpolation: 'stepwise',
-};
+  $.getJSON('/rest-api/parse-shards/?match_id='+{{match.steam_id}})
+    .success(function(shards){
+      var diff = shards.filter(function(shard){
+        return shard.dataslice === 'diff';
+      })[0];
+      var radiant = shards.filter(function(shard){
+        return shard.dataslice === 'radiant';
+      })[0];
+      var dire = shards.filter(function(shard){
+        return shard.dataslice === 'dire';
+      })[0];
 
-$.getJSON('/rest-api/parse-shards/?match_id='+{{match.steam_id}})
-  .success(function(shards){
-    var diff = shards.filter(function(shard){
-      return shard.dataslice === 'diff';
-    })[0];
-    var radiant = shards.filter(function(shard){
-      return shard.dataslice === 'radiant';
-    })[0];
-    var dire = shards.filter(function(shard){
-      return shard.dataslice === 'dire';
-    })[0];
+      var heroes = shards.filter(function(shard){
+        return shard.dataslice < 400;
+      });
 
-    var heroes = shards.filter(function(shard){
-      return shard.dataslice < 400;
+      var shardfacets1 = [
+        [radiant, 'kills', 'statelog'],
+        [dire, 'kills', 'statelog'],
+        [radiant, 'assists', 'statelog'],
+        [dire, 'assists', 'statelog'],
+      ];
+
+      var params = {
+        label: 'Kills & Assists',
+        inset_legend: true
+      };
+
+      d7.extensions.charts.replays.multifacet_lineup(
+          shardfacets1, '#kda', params
+          );
+
+      var shardfacets2 = [
+        [diff, 'earned_income', 'combatseries'],
+        [diff, 'xp', 'statelog']
+      ];
+      var params = {
+        label: 'Gold and XP Difference',
+        inset_legend: true
+      };
+
+      d7.extensions.charts.replays.multifacet_lineup(
+          shardfacets2, '#goldxp', params
+          );
+
+      var params = {
+        label: 'Kills',
+        inset_legend: true
+      };
+
+      d7.extensions.charts.replays.multifacet_lineup(
+          heroes.map(function(d){
+            return [d, 'kills', 'statelog']
+          }), '#hero-kills', params
+          );
+
+      var params = {
+        label: 'Earned Income',
+        inset_legend: true
+      };
+
+      d7.extensions.charts.replays.multifacet_lineup(
+          heroes.map(function(d){
+            return [d, 'earned_income', 'combatseries']
+          }), '#hero-gold', params
+          );
     });
-
-    var shardfacets1 = [
-      [radiant, 'kills', 'statelog'],
-      [dire, 'kills', 'statelog'],
-      [radiant, 'assists', 'statelog'],
-      [dire, 'assists', 'statelog'],
-    ]
-
-    var params = {
-      label: 'Kills & Assists',
-      inset_legend: true
-    };
-
-
-    d7.extensions.charts.replays.multifacet_lineup(
-      shardfacets1, '#kda', params
-    );
-
-    var shardfacets2 = [
-      [diff, 'earned_income', 'combatseries'],
-      [diff, 'xp', 'statelog']
-    ]
-    var params = {
-      label: 'Gold and XP Difference',
-      inset_legend: true
-    };
-
-    d7.extensions.charts.replays.multifacet_lineup(
-      shardfacets2, '#goldxp', params
-    );
-
-    var params = {
-      label: 'Kills',
-      inset_legend: true
-    };
-
-    d7.extensions.charts.replays.multifacet_lineup(
-      heroes.map(function(d){
-        return [d, 'kills', 'statelog']
-      }), '#hero-kills', params
-    );
-
-    var params = {
-      label: 'Earned Income',
-      inset_legend: true
-    };
-
-    d7.extensions.charts.replays.multifacet_lineup(
-      heroes.map(function(d){
-        return [d, 'earned_income', 'combatseries']
-      }), '#hero-gold', params
-    );
-
-
   });
-
-
-
-
-})
 </script>
 {% endblock extra_js %}

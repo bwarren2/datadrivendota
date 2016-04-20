@@ -1,7 +1,6 @@
 {% extends "row_base.html" %}
 {% block title %} Match #{{match_id}} {% endblock title %}
 
-
 {% block aligned_content %}
     <div class='col-md-12'>
 
@@ -142,37 +141,15 @@
 
 
 </div>
-
-
-
 {% endblock aligned_content %}
 
-
 {% block extra_js %}
-
-{% comment %}
-
-<script type="text/x-handlebars-template" id='game-template'>
-{% verbatim %}
-    {{#games}}
-        <div id={{league_id}} class='col-md-2'>
-            <img id="{{league_id}}" src="{{league_logo_url}}" class='thumbnail'>
-            {{!-- <img id="{{radiant_team.team_id}}"src="{{radiant_team.image}}" class='thumbnail'> --}}
-            <p class='overlayer'>{{match_id}}</p>
-        </div>
-    {{/games}}
-{% endverbatim %}
-</script>
-{% endcomment %}
-
-
 <script type="text/javascript">
-    var match_data;
-    var heroes;
-    var timeslice;
+  var match_data;
+  var heroes;
+  var timeslice;
 
-$(function(){
-
+  $(function(){
     var interval_duration = 1000;
     var ping_duration = 10000;
     var tick_idx = 0;
@@ -181,424 +158,402 @@ $(function(){
       .style("opacity", 0);
 
     String.prototype.toHHMMSS = function () {
-        var sec_num = parseInt(this, 10); // don't forget the second param
-        var hours   = Math.floor(sec_num / 3600);
-        var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-        var seconds = sec_num - (hours * 3600) - (minutes * 60);
+      var sec_num = parseInt(this, 10); // don't forget the second param
+      var hours   = Math.floor(sec_num / 3600);
+      var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+      var seconds = sec_num - (hours * 3600) - (minutes * 60);
 
-        if (hours   < 10) {hours   = "0"+hours;}
-        if (minutes < 10) {minutes = "0"+minutes;}
-        if (seconds < 10) {seconds = "0"+seconds;}
-        var time    = hours+':'+minutes+':'+seconds;
-        return time;
+      if (hours   < 10) {hours   = "0"+hours;}
+      if (minutes < 10) {minutes = "0"+minutes;}
+      if (seconds < 10) {seconds = "0"+seconds;}
+      var time    = hours+':'+minutes+':'+seconds;
+      return time;
     }
 
     var updateTimer = function(d){
-        $('#time-display').val(String(d).toHHMMSS())
+      $('#time-display').val(String(d).toHHMMSS())
     }
     function smartTicks(d) {
-        if ((d / 1000000) >= 1) {
-            return d / 1000000 + "M";
-        }
-        if ((d / 1000) >= 1) {
-            return d / 1000 + "K";
-        }
-        return d;
+      if ((d / 1000000) >= 1) {
+        return d / 1000000 + "M";
+      }
+      if ((d / 1000) >= 1) {
+        return d / 1000 + "K";
+      }
+      return d;
     }
 
-
     var cloneAndPluck = function(sourceObject, keys) {
-        var newObject = {};
-        keys.forEach(function(key) { newObject[key] = sourceObject[key]; });
-        return newObject;
+      var newObject = {};
+      keys.forEach(function(key) { newObject[key] = sourceObject[key]; });
+      return newObject;
     };
 
     // Handling Handlers
     var bind_playback = function (update_fn){
-        var myhandle
+      var myhandle
         var play = function(){update_fn(1)}
-        var start = function(){myhandle = setInterval(play, interval_duration)}
-        var stop = function (){ clearInterval(myhandle)}
+      var start = function(){myhandle = setInterval(play, interval_duration)}
+      var stop = function (){ clearInterval(myhandle)}
 
-        $('#start-animation').click(
-            function(){
-              $('.animation-button').toggle();
-              start();
-            }
-        );
-        $('#stop-animation').click(function(){
+      $('#start-animation').click(
+          function(){
             $('.animation-button').toggle();
-            stop();
-        })
-        $('#back-animation').click(function(){update_fn(-1);});
-        $('#forward-animation').click(function(){update_fn(1);});
-
+            start();
+          }
+          );
+      $('#stop-animation').click(function(){
+        $('.animation-button').toggle();
+        stop();
+      })
+      $('#back-animation').click(function(){update_fn(-1);});
+      $('#forward-animation').click(function(){update_fn(1);});
     }
     var bind_autoplay = function (update_fn){
-        var myhandle
-        var autoplay = function(){
-            myhandle = setInterval(update_fn, ping_duration)
-        }
-        var stop = function (){ clearInterval(myhandle)}
+      var myhandle
+      var autoplay = function(){
+        myhandle = setInterval(update_fn, ping_duration)
+      }
+      var stop = function (){ clearInterval(myhandle)}
 
-        $('#stop-animation').click(function(){
-            stop();
-        })
-        $('#autoplay-animation').click(function(){
-            $('.animation-button').toggle();
-            autoplay();
-        });
+      $('#stop-animation').click(function(){
+        stop();
+      });
+      $('#autoplay-animation').click(function(){
+        $('.animation-button').toggle();
+        autoplay();
+      });
     }
     // Prep the ticker
     var make_update_trigger = function(timeline){
-        function new_index(adder){
-            // GFD, javascript.  You're drunk.
-            fakemod = function(n, modulus) {
-                return ((n%modulus)+modulus)%modulus;
-            }
-            tick_idx = fakemod((tick_idx+adder), timeline.length)
+      function new_index(adder){
+        // GFD, javascript.  You're drunk.
+        fakemod = function(n, modulus) {
+          return ((n%modulus)+modulus)%modulus;
         }
-        var myfun = function(change){
-            new_index(change)
-            timeslice = timeline[tick_idx];
-            $(document).trigger('update', [timeline[tick_idx]])
-            // console.log(timeline[tick_idx]['states']['duration'])
-            updateTimer(timeline[tick_idx]['states']['duration'])
-        }
-        return myfun;
+        tick_idx = fakemod((tick_idx+adder), timeline.length)
+      }
+      var myfun = function(change){
+        new_index(change)
+          timeslice = timeline[tick_idx];
+        $(document).trigger('update', [timeline[tick_idx]])
+          // console.log(timeline[tick_idx]['states']['duration'])
+          updateTimer(timeline[tick_idx]['states']['duration'])
+      }
+      return myfun;
     }
     var make_autoplay_trigger = function(timeline){
-        var myfun = function(){
-            tick_idx = timeline.length-1
-            timeslice = timeline[tick_idx];
-            $(document).trigger('update', [timeline[tick_idx]])
-            updateTimer(timeline[tick_idx]['states']['duration'])
-        }
-        return myfun;
+      var myfun = function(){
+        tick_idx = timeline.length-1
+          timeslice = timeline[tick_idx];
+        $(document).trigger('update', [timeline[tick_idx]])
+          updateTimer(timeline[tick_idx]['states']['duration'])
+      }
+      return myfun;
     }
 
     var update_table = function(players){
-        var update_data = []
-        $.each(players, function(i, v){
-            update_data.push(
-                cloneAndPluck(v,
-                    ['hero_url', 'name', 'item0', 'item1', 'item2', 'item3', 'item4', 'item5', 'kills', 'death', 'assists', 'kda2',
-                    'gold_per_min', 'xp_per_min']
-                )
+      var update_data = [];
+      $.each(players, function(i, v){
+        update_data.push(
+            cloneAndPluck(v,
+              ['hero_url', 'name', 'item0', 'item1', 'item2', 'item3', 'item4', 'item5', 'kills', 'death', 'assists', 'kda2',
+              'gold_per_min', 'xp_per_min']
+              )
             )
-        })
+      });
 
-        img_list = ['hero_url', 'item0', 'item1', 'item2', 'item3', 'item4', 'item5'];
-        // Select the table element
-        var table = d3.select('table#scoreboard tbody');
-        var rows = table
-                    .selectAll('tr')
-                    .data(update_data)
+      img_list = ['hero_url', 'item0', 'item1', 'item2', 'item3', 'item4', 'item5'];
+      // Select the table element
+      var table = d3.select('table#scoreboard tbody');
+      var rows = table
+        .selectAll('tr')
+        .data(update_data)
 
         // Update
         var cells = rows.selectAll('td').data(function(d){
-            return d3.entries(d);
+          return d3.entries(d);
         });
 
-        cells.attr('class', 'update');
+      cells.attr('class', 'update');
 
-
-        html_from_cell = function(d){
-            // console.log(d)
-            if(img_list.indexOf(d.key)>=0){
-                if (d.key==='hero_url'){
-                    return '<img class="table-face toggleface" src='+d.value+'>'
-                }else{
-                    if(d.value !== undefined){
-                        return '<img class="thumbnail table-item a"'+d.value+' src='+items[d.value].mugshot_url+'>'
-                    }else{
-                        return '<img class="thumbnail" src="">'
-                    }
-                }
+      html_from_cell = function(d){
+        // console.log(d)
+        if(img_list.indexOf(d.key)>=0){
+          if (d.key==='hero_url'){
+            return '<img class="table-face toggleface" src='+d.value+'>'
+          }else{
+            if(d.value !== undefined){
+              return '<img class="thumbnail table-item a"'+d.value+' src='+items[d.value].mugshot_url+'>'
             }else{
-                return d.value
+              return '<img class="thumbnail" src="">'
             }
+          }
+        }else{
+          return d.value
         }
+      }
 
-            // function(d){
-            //     if(d.key!=='hero_url'){
-            //         return d.value
-            //     }else{
-            //         return '<img class="table-face" src='+d.value+'>'
+      cells.html(html_from_cell);
 
-            //     }
-            // }
-
-        cells.html(html_from_cell);
-
-        // Cells exit selection
-        cells.exit()
-          .attr('class', 'exit')
-          .style('opacity', 0.0)
-          .remove();
-
-        // Cells enter selection
-        cells.enter().append('td')
-          .style('opacity', 0.0)
-          .attr('class', 'enter')
-          .style('opacity', 1.0);
-
-
-        // Enter
-        var cells_in_new_rows = rows.enter()
-                            .append('tr')
-                            .selectAll('td')
-                            .data(function(d){
-                                var foo = d3.entries(d)
-                                return foo;
-                            });
-
-        cells_in_new_rows.enter().append('td')
+      // Cells exit selection
+      cells.exit()
+        .attr('class', 'exit')
         .style('opacity', 0.0)
-        .attr('class', function(d){
-            if(d.key!='hero_id'){
-                return 'datum'
-            }else{
-                return 'hero_url'
-            }
-        })
+        .remove();
+
+      // Cells enter selection
+      cells.enter().append('td')
+        .style('opacity', 0.0)
+        .attr('class', 'enter')
         .style('opacity', 1.0);
 
-        cells_in_new_rows.html(html_from_cell);
+      // Enter
+      var cells_in_new_rows = rows.enter()
+        .append('tr')
+        .selectAll('td')
+        .data(function(d){
+          var foo = d3.entries(d)
+            return foo;
+        });
 
+      cells_in_new_rows.enter().append('td')
+        .style('opacity', 0.0)
+        .attr('class', function(d){
+          if(d.key!='hero_id'){
+            return 'datum'
+          }else{
+            return 'hero_url'
+          }
+        })
+      .style('opacity', 1.0);
 
-        // Exit
-        rows.exit()
-          .attr('class', 'exit')
-          .style('opacity', 0.0)
-          .remove();
+      cells_in_new_rows.html(html_from_cell);
+
+      // Exit
+      rows.exit()
+        .attr('class', 'exit')
+        .style('opacity', 0.0)
+        .remove();
 
     }
 
     var xpm_chart = function(target, divname, params, players, x_var, y_var){
-
-    // Setup
-    var selector = target
-    d3.select(selector)
+      // Setup
+      var selector = target
+        d3.select(selector)
         .insert('div').attr('id', divname)
         .attr('class', 'chart');
 
-    selector = '#'+divname
+      selector = '#'+divname;
 
-    var width = $(selector).width()
-    var height = width // Mmm, squares
-    params['width'] = width
-    params['height'] = height
-    if(params.margin !== undefined){
-      var margin = {
-        top: params.margin.top ? params.margin.top : 15,
-        right: params.margin.right ? params.margin.right : 15,
-        bottom: params.margin.bottom ? params.margin.bottom : 25,
-        left: params.margin.left ? params.margin.left : 35}
-
-    } else {
+      var width = $(selector).width();
+      var height = width; // Mmm, squares
+      params['width'] = width;
+      params['height'] = height;
+      if(params.margin !== undefined){
         var margin = {
-            top: 15,
-            right: 15,
-            bottom: 25,
-            left: 35
-        }
-    }
-    if(params.pip_left_offset !== undefined){
-      pip_left_offset = params.pip_left_offset
-    }else{
-      pip_left_offset = margin.left
-    }
+          top: params.margin.top ? params.margin.top : 15,
+          right: params.margin.right ? params.margin.right : 15,
+          bottom: params.margin.bottom ? params.margin.bottom : 25,
+          left: params.margin.left ? params.margin.left : 35
+        };
+      } else {
+        var margin = {
+          top: 15,
+          right: 15,
+          bottom: 25,
+          left: 35
+        };
+      }
+      if(params.pip_left_offset !== undefined){
+        pip_left_offset = params.pip_left_offset;
+      }else{
+        pip_left_offset = margin.left;
+      }
 
-    var width = params.width - margin.right - margin.left,
-        height = params.height - margin.top - margin.bottom;
+      var width = params.width - margin.right - margin.left,
+          height = params.height - margin.top - margin.bottom;
 
-    var x = d3.scale.linear()
+      var x = d3.scale.linear()
         .domain([0, d3.max(players, function(p){
-            return p[x_var]
+          return p[x_var]
         })])
-        .range(
-            [0, width]
-        )
-    var y = d3.scale.linear()
+      .range(
+          [0, width]
+          )
+        var y = d3.scale.linear()
         .domain([0, d3.max(players, function(p){
-            return p[y_var]
+          return p[y_var]
         })])
-        .range(
-            [height, 0]
-        )
+      .range(
+          [height, 0]
+          );
 
-
-    var svg = d3.select(selector).insert('svg')
+      var svg = d3.select(selector).insert('svg')
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform","translate("+margin.left+","+margin.top+")");
 
-    var xAxis = svg
+      var xAxis = svg
         .append('g')
         .attr('class', 'x axis')
         .attr('transform', 'translate(0,'+height+')')
-        .call(
-            x.axis = d3.svg
-            .axis()
-            .scale(x)
-            .orient("bottom")
-            .tickFormat(smartTicks)
-            .ticks(5)
-        );
+            .call(
+              x.axis = d3.svg
+              .axis()
+              .scale(x)
+              .orient("bottom")
+              .tickFormat(smartTicks)
+              .ticks(5)
+              );
 
-    xAxis.append("text")
-        .attr("class", "x-axis-label")
-        .attr("y", -16)
-        .attr("x", width)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text(params['x_label'])
+            xAxis.append("text")
+            .attr("class", "x-axis-label")
+            .attr("y", -16)
+            .attr("x", width)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text(params['x_label'])
 
-    var yAxis = svg.append('g').attr('class', 'y axis')
-        .attr('transform', 'translate(0,0)')
-        .call(
-            y.axis = d3
-                .svg
-                .axis()
-                .scale(y)
-                .orient('left')
-                .tickFormat(smartTicks)
-                .ticks(5)
-        )
+            var yAxis = svg.append('g').attr('class', 'y axis')
+            .attr('transform', 'translate(0,0)')
+            .call(
+              y.axis = d3
+              .svg
+              .axis()
+              .scale(y)
+              .orient('left')
+              .tickFormat(smartTicks)
+              .ticks(5)
+              )
 
-    yAxis.append("text")
-        .attr("class", "y-axis-label")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text(params['y_label']);
+            yAxis.append("text")
+            .attr("class", "y-axis-label")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text(params['y_label']);
 
-    // Put hero icons on dots
-    d3.select(selector).style('position', 'relative')
-    $.each(players, function(idx, val){
+      // Put hero icons on dots
+      d3.select(selector).style('position', 'relative')
+        $.each(players, function(idx, val){
 
-        var pip_class = 'toggleface d2mh '+heroes[val.hero_id]['internal_name']+' '+val['side']
-        d3.select(selector)
+          var pip_class = 'toggleface d2mh '+heroes[val.hero_id]['internal_name']+' '+val['side']
+            d3.select(selector)
             .append('i')
             .attr('class', pip_class)
             .style('position', 'absolute')
             .style("left", pip_left_offset+x(val[x_var])+'px')
             .style("top", margin.top+y(val[y_var])+'px');
-    })
+        })
 
-    svg.selectAll(selector +' circle').data(players)
+      svg.selectAll(selector +' circle').data(players)
         .enter().append("circle")
         .attr("cx", function(d) {
-             return x(d[x_var]);
+          return x(d[x_var]);
         })
-        .attr("cy", function(d) {
-             return y(d[y_var]);
-        })
-        .attr("class", function(d) {
-             myclass = heroes[d.hero_id]['internal_name'] + ' ' + d['side']
-             return myclass;
-        })
-        .attr("r", 3)
+      .attr("cy", function(d) {
+        return y(d[y_var]);
+      })
+      .attr("class", function(d) {
+        myclass = heroes[d.hero_id]['internal_name'] + ' ' + d['side']
+          return myclass;
+      })
+      .attr("r", 3)
         .on("mouseover", function(d) {
-            params.tooltip_div.transition()
-              .duration(interval_duration)
-              .style("opacity", 0.9);
-            params.tooltip_div.html(heroes[d.hero_id]['name'])
-              .style("left", (d3.event.pageX) + "px")
-              .style("top", (d3.event.pageY - 28) + "px");
-            }
+          params.tooltip_div.transition()
+            .duration(interval_duration)
+            .style("opacity", 0.9);
+          params.tooltip_div.html(heroes[d.hero_id]['name'])
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        }
         )
         .on("mouseout", function(d) {
-            params.tooltip_div.transition()
+          params.tooltip_div.transition()
             .duration(interval_duration)
             .style("opacity", 0);
         });
 
-
-    var update_fn = function(timeslice){
-
+      var update_fn = function(timeslice){
         var y_max = d3.max(timeslice.players, function(p){
-            return p[y_var]
+          return p[y_var]
         })
         var y_domain = [0, y_max]
-        y.domain(y_domain);
+          y.domain(y_domain);
         yAxis.transition()
-            .duration(params.interval_duration)
-            .ease('linear')
-            .call(y.axis);
+          .duration(params.interval_duration)
+          .ease('linear')
+          .call(y.axis);
 
         var x_max = d3.max(timeslice.players, function(p){
-            return p[x_var]
+          return p[x_var]
         })
         var x_domain = [0, x_max]
-        x.domain(x_domain);
+          x.domain(x_domain);
         xAxis.transition()
-            .duration(params.interval_duration)
-            .ease('linear')
-            .call(x.axis);
+          .duration(params.interval_duration)
+          .ease('linear')
+          .call(x.axis);
 
         d3.selectAll(selector+' circle')
-        .data(timeslice.players)
-        .transition()
-        .duration(params.interval_duration)
-        .attr("cx", function(d) { return x(d[x_var]); })
-        .attr("cy", function(d) { return y(d[y_var]); })
+          .data(timeslice.players)
+          .transition()
+          .duration(params.interval_duration)
+          .attr("cx", function(d) { return x(d[x_var]); })
+          .attr("cy", function(d) { return y(d[y_var]); })
 
-        // Move heroes on the dots
-        $.each(timeslice.players, function(idx, val){
+          // Move heroes on the dots
+          $.each(timeslice.players, function(idx, val){
             hero_icon = selector+' i.toggleface.d2mh.'+heroes[val.hero_id]['internal_name']
-            d3.select(hero_icon)
-                .transition()
-                .duration(params.interval_duration)
-                .style("left", pip_left_offset+x(val[x_var])+'px')
-                .style("top", margin.top+y(val[y_var])+'px')
-        })
+              d3.select(hero_icon)
+              .transition()
+              .duration(params.interval_duration)
+              .style("left", pip_left_offset+x(val[x_var])+'px')
+              .style("top", margin.top+y(val[y_var])+'px')
+          })
+      }
+      return update_fn;
     }
 
-    return update_fn;
-
-}
-
-var necromance = function(timeline){
-    $.each(timeline.players, function(i, v){
+    var necromance = function(timeline){
+      $.each(timeline.players, function(i, v){
         var hero_id = v['hero_id'];
         var face = '.toggleface.'+heroes[hero_id]['internal_name']
-        if(v['respawn_timer']!=0){
+          if(v['respawn_timer']!=0){
             $(face).addClass('dead')
-        }
-        else{
+          }
+          else{
             $(face).removeClass('dead')
-        }
-    })
-}
+          }
+      })
+    }
 
-
-var miniMap = function(timeslice, target, divname, params){
-
-    // Setup
-    var selector = target
-    d3.select(selector)
+    var miniMap = function(timeslice, target, divname, params){
+      // Setup
+      var selector = target
+        d3.select(selector)
         .insert('div').attr('id', divname)
         .attr('class', 'chart');
 
-    selector = '#'+divname
+      selector = '#'+divname;
 
-    var width = $(selector).width()
-    var height = width
+      var width = $(selector).width();
+      var height = width;
 
-    d3.select(selector).style('position', 'relative')
-    var svg = d3.select(selector)
+      d3.select(selector).style('position', 'relative');
+      var svg = d3.select(selector)
         .append('svg')
         .attr('class', 'testchart')
         .attr('width', width)
-        .attr('height', height)
+        .attr('height', height);
 
-    var defs = svg.append('svg:defs');
+      var defs = svg.append('svg:defs');
 
-    defs.append('svg:pattern')
+      defs.append('svg:pattern')
         .attr('id', 'tile-ww')
         .attr('patternUnits', 'userSpaceOnUse')
         .attr('width', width)
@@ -608,117 +563,107 @@ var miniMap = function(timeslice, target, divname, params){
         .attr('x', 0)
         .attr('y', 0)
         .attr('width', width)
+        .attr('height', height);
+
+      svg.append("rect")
+        .attr("fill", "url(#tile-ww)")
+        .attr('width', width)
         .attr('height', height)
+        .attr('x', 0)
+        .attr('y', 0);
 
-    svg.append("rect")
-       .attr("fill", "url(#tile-ww)")
-       .attr('width', width)
-       .attr('height', height)
-       .attr('x', 0)
-       .attr('y', 0)
-
-    bound = 7500;
-    function transX(xVal){
+      bound = 7500;
+      function transX(xVal){
         left_offset = 0.05 // %ages.  Deduced from testing a few cases
-        total_map = .90
-        presumed_min = -bound;
+          total_map = .90
+          presumed_min = -bound;
         presumed_max = bound;
         ans = (left_offset*width) + (total_map*width)*(xVal-presumed_min)/(presumed_max-presumed_min);
-        return ans
-    }
-    function transY(yVal){
+        return ans;
+      }
+      function transY(yVal){
         bottom_offset = 0.02 // %ages.  Deduced from testing a few cases
-        total_map = .93
-        presumed_min = -bound;
+          total_map = .93
+          presumed_min = -bound;
         presumed_max = bound;
         ans = (bottom_offset*width) + (total_map*width)*(yVal-presumed_min)/(presumed_max-presumed_min);
-        return ans
-    }
+        return ans;
+      }
 
-    $.each(timeslice, function(idx, val){
-
+      $.each(timeslice, function(idx, val){
         var hero_id = val['hero_id'];
         var ypos = transY(val.position_y)+'px';
         var xpos = transX(val.position_x)+'px';
 
-        var icon_class = 'd2mh toggleface '+ heroes[hero_id]['internal_name']+' '+val['side']
-
+        var icon_class = 'd2mh toggleface '+ heroes[hero_id]['internal_name']+' '+val['side'];
         var hero_icon = d3.select(selector).insert("i")
-           .attr('class', icon_class)
-           .style('position', 'absolute')
-           .attr('width', 32)
-           .attr('height', 32)
-           .style('bottom', ypos)
-           .style('left', xpos)
-    })
+          .attr('class', icon_class)
+          .style('position', 'absolute')
+          .attr('width', 32)
+          .attr('height', 32)
+          .style('bottom', ypos)
+          .style('left', xpos);
+      });
 
-    var minimap_update_fn = function(timeslice){
+      var minimap_update_fn = function(timeslice){
         $.each(timeslice.players, function(idx, val){
-            var hero_id = val['hero_id'];
-            var icon_select = selector+' i.d2mh.'+heroes[hero_id]['internal_name']
-            var ypos = transY(val.position_y)+'px';
-            var xpos = transX(val.position_x)+'px';
+          var hero_id = val['hero_id'];
+          var icon_select = selector+' i.d2mh.'+heroes[hero_id]['internal_name'];
+          var ypos = transY(val.position_y)+'px';
+          var xpos = transX(val.position_x)+'px';
 
-            d3.select(icon_select)
-                .transition()
-                .duration(params.interval_duration)
-                .style('bottom', ypos)
-                .style('left', xpos)
-        })
+          d3.select(icon_select)
+            .transition()
+            .duration(params.interval_duration)
+            .style('bottom', ypos)
+            .style('left', xpos)
+        });
+      }
+      return minimap_update_fn;
     }
-
-    return minimap_update_fn;
-}
-
-
 
     Promise.join(
         Promise.resolve(
-            $.get(
-                "{% url 'leagues:api_live_game_detail' match_id=match_id %}"
+          $.get(
+            "{% url 'leagues:api_live_game_detail' match_id=match_id %}"
             )
-        ),
+          ),
         Promise.resolve(
-            $.get(
-                "{% url 'rest-api:hero-list' %}"
+          $.get(
+            "{% url 'rest-api:hero-list' %}"
             )
-        ),
+          ),
         Promise.resolve(
-            $.get(
-                "{% url 'rest-api:item-list' %}"
+          $.get(
+            "{% url 'rest-api:item-list' %}"
             )
-        ),
+          ),
         function(match_result, hero_result, item_result){
-            match_data = $.parseJSON(match_result['data'])
+          match_data = $.parseJSON(match_result['data'])
             heroes = {}
-            $.each(hero_result, function(i, v){
-                heroes[v['steam_id']] = v
-            })
-            items = {}
-            $.each(item_result, function(i, v){
-                items[v['steam_id']] = v
-            })
+          $.each(hero_result, function(i, v){
+            heroes[v['steam_id']] = v
+          })
+          items = {}
+          $.each(item_result, function(i, v){
+            items[v['steam_id']] = v
+          })
         }
     )
-    .then(function(){
+      .then(function(){
         $('#stop-animation').toggle();
-
-        $(document).on('update', function(e, data){
-            // console.log('Updatingu!', data, tick_idx)
-        })
-        timeline = match_data['timeline']
-        tick_idx = match_data['timeline'].length-1
-
-        updateTimer(timeline[tick_idx]['states']['duration'])
+        timeline = match_data['timeline'];
+        tick_idx = match_data['timeline'].length-1;
+        updateTimer(timeline[tick_idx]['states']['duration']);
 
         data = match_data['timeline'][tick_idx]['players'];
         xp_update = xpm_chart('div#gpm-xpm-chart', 'gx-chart',
             {'x_label': 'GPM', 'y_label': 'XPM', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200},
             data, 'gold_per_min', 'xp_per_min')
-        kd_update = xpm_chart('div#kill-death-chart', 'kd-chart', {'x_label': 'Kills', 'y_label': 'Deaths', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'kills', 'death')
-        lh_update = xpm_chart('div#last-hit-levels', 'lhl-chart', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'level', 'last_hits')
-        minimap_update = miniMap(data, 'div#map', 'minimap', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'interval_duration':200})
-        var update_fn = make_update_trigger(timeline);
+          kd_update = xpm_chart('div#kill-death-chart', 'kd-chart', {'x_label': 'Kills', 'y_label': 'Deaths', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'kills', 'death')
+          lh_update = xpm_chart('div#last-hit-levels', 'lhl-chart', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'tooltip_div': tooltip_div, 'interval_duration': 200}, data, 'level', 'last_hits')
+          minimap_update = miniMap(data, 'div#map', 'minimap', {'x_label': 'Level', 'y_label': 'Last Hits', 'pip_left_offset':19, 'interval_duration':200})
+          var update_fn = make_update_trigger(timeline);
         bind_playback(update_fn);
 
         bind_autoplay(make_autoplay_trigger(timeline));
@@ -726,141 +671,128 @@ var miniMap = function(timeslice, target, divname, params){
         update_table(data);
 
         $(document).on('update', function(e, timeslice){
-            update_table(timeslice.players);
-            minimap_update(timeslice);
-            necromance(timeslice);
-            lh_update(timeslice);
-            kd_update(timeslice);
-            xp_update(timeslice);
-        })
+          update_table(timeslice.players);
+          minimap_update(timeslice);
+          necromance(timeslice);
+          lh_update(timeslice);
+          kd_update(timeslice);
+          xp_update(timeslice);
+        });
 
         if('radiant' in match_data && match_data['radiant']!= null){
-            console.log(Object.keys(match_data))
-            console.log(match_data['radiant'])
-            $('div#logo-lineup div#radiant-logo').append('<a href="/teams/'+match_data.radiant.team_id+'"><img class="thumbnail" src='+match_data.radiant.logo_url+'></a>')
-            $('div#logo-lineup div#radiant-logo').append('<p class="overlayer">'+match_data.radiant.team_name+'</p>')
+          console.log(Object.keys(match_data));
+          console.log(match_data['radiant']);
+          $('div#logo-lineup div#radiant-logo').append('<a href="/teams/'+match_data.radiant.team_id+'"><img class="thumbnail" src='+match_data.radiant.logo_url+'></a>');
+          $('div#logo-lineup div#radiant-logo').append('<p class="overlayer">'+match_data.radiant.team_name+'</p>');
         }
         if('dire' in match_data && match_data['dire']!= null){
-            $('div#logo-lineup div#dire-logo').append('<a href="/teams/'+match_data.dire.team_id+'"><img class="thumbnail" src='+match_data.dire.logo_url+'>')
+          $('div#logo-lineup div#dire-logo').append('<a href="/teams/'+match_data.dire.team_id+'"><img class="thumbnail" src='+match_data.dire.logo_url+'>')
             $('div#logo-lineup div#dire-logo').append('<p class="overlayer">'+match_data.dire.team_name+'</p>')
         }
         // $('div#logo-lineup div#league-logo').append('<img class="thumbnail" src='+match_data.dire.image+'>')
         $('div#logo-lineup div#game-facts').append(
             "<table id='Summary' class='table table-responsive table-condensed'> \
-                <tbody> \
-                <tr><td>Match id:</td> <td>"+match_data.game.match_id+"</tr>\
-                    <tr><td>Lobby id:</td> <td>"+match_data.game.lobby_id+"</tr>\
-                    <tr><td>Spectators:</td> <td>"+match_data.game.spectators+"</tr>\
-                    <tr><td>Stream Delay (s):</td> <td>"+match_data.game.stream_delay_s+"</tr>\
-                </tbody> \
-                <tfoot> \
-                </tfoot> \
+            <tbody> \
+            <tr><td>Match id:</td> <td>"+match_data.game.match_id+"</tr>\
+            <tr><td>Lobby id:</td> <td>"+match_data.game.lobby_id+"</tr>\
+            <tr><td>Spectators:</td> <td>"+match_data.game.spectators+"</tr>\
+            <tr><td>Stream Delay (s):</td> <td>"+match_data.game.stream_delay_s+"</tr>\
+            </tbody> \
+            <tfoot> \
+            </tfoot> \
             </table>")
-
-    })
+      })
     .then(function(){
-        setInterval(function(){
-            $.get(
-                "{% url 'leagues:api_live_game_slice' match_id=match_id %}",
-                function(resp){
-                    data = $.parseJSON(resp['data'])
-                    var max_slice = d3.max(timeline, function(d){
-                        return d.states.duration
-                    })
-                    if(data.states.duration > max_slice){
-                        timeline.push({
-                            'players': data.players,
-                            'states': data.states
-                        })
-                    }
-                    // console.log("Slicestate:", data.states, timeline.length-1);
-                })},
-            ping_duration
+      setInterval(function(){
+        $.get(
+            "{% url 'leagues:api_live_game_slice' match_id=match_id %}",
+            function(resp){
+              data = $.parseJSON(resp['data'])
+                var max_slice = d3.max(timeline, function(d){
+                  return d.states.duration
+                })
+              if(data.states.duration > max_slice){
+                timeline.push({
+                  'players': data.players,
+                  'states': data.states
+                })
+              }
+            })},
+        ping_duration
         )
     })
     .catch(TypeError, function(err){
-        console.log(err);
-        $('div#messages').html(
-            '<div class="alert alert-danger" role="alert">Sorry, but this match is unavailable for live viewing!</div>'
-        );
-        $('div#animation-controls').toggle();
-        $('div#bans').toggle();
-        $('div#scoreboard').toggle();
-        $('div#map').toggle();
-        $('div#charts').toggle();
+      console.log(err);
+      $('div#messages').html(
+          '<div class="alert alert-danger" role="alert">Sorry, but this match is unavailable for live viewing!</div>'
+          );
+      $('div#animation-controls').toggle();
+      $('div#bans').toggle();
+      $('div#scoreboard').toggle();
+      $('div#map').toggle();
+      $('div#charts').toggle();
     })
     .catch(function(err){
-        console.log(err);
+      console.log(err);
     })
 
 
     $("#animation-controls").affix({
-        offset: {top: 165}
+      offset: {top: 165}
     });
     var width = $('#main-block').width()
-    $("#animation-controls").width(width);
+      $("#animation-controls").width(width);
     $("#test").width(width);
     $("#test").height($("#animation-controls").height());
-
-})
-
-
+  });
 </script>
 {% endblock extra_js %}
 
 {% block extra_css %}
 <style type="text/css">
-
 .table{
-    font-size:14pt;
+  font-size:14pt;
 }
-/*.chart{
-    padding:20px;
-    margin:20px;
-}*/
 img.table-face{
-    max-height: 40px;
+  max-height: 40px;
 }
 img.table-item{
-    margin: 0px;
-    padding: 0px;
-    height: 40px;
+  margin: 0px;
+  padding: 0px;
+  height: 40px;
 }
-
 #animation-controls{
-    z-index: 1000;
-    /*background: linear-gradient(135deg, red, blue);;*/
+  z-index: 1000;
 }
 .affix {
-    position: fixed;
-    top:0px;
-    margin: 0 auto;
+  position: fixed;
+  top:0px;
+  margin: 0 auto;
 }
-
-.row > div > img { width: 100%; display: block; }
-
+.row > div > img {
+  width: 100%;
+  display: block;
+}
 p.kills{
-    color: @brand-success;
+  color: @brand-success;
 }
 p.deaths{
-    color: @brand-danger;
+  color: @brand-danger;
 }
 p.assists{
-    color: @brand-info;
+  color: @brand-info;
 }
 p.kda2{
-    color: @brand-primary;
+  color: @brand-primary;
 }
 p.gpm{
-    color: #829FB2;
+  color: #829FB2;
 }
 p.xpm{
-    color: #9282B2;
+  color: #9282B2;
 }
 .table tbody>tr>td{
-    vertical-align: middle;
+  vertical-align: middle;
 }
-
-
 </style>
 {% endblock extra_css %}

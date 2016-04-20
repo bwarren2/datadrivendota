@@ -4,9 +4,7 @@
 
 {% block title %}A Duel!{% endblock title %}
 
-
 {% block aligned_content %}
-
   <div class='col-md-12'>
     <div class='page-header'>
       <h2>
@@ -195,25 +193,11 @@
     <h2>Want to see your data here?</h2>
       {% include "accounts/mixins/_ping_request.html" %}
     </div>
-
-<style type="text/css">
-  .select2-result-pms__avatar{
-    height:36px;
-    width:64px;
-  }
-  .select2-result-pms__title{
-    color: black;
-  }
-/*  .col-md-2, .col-md-3, .col-md-4{
-    border: red solid 5px;
-  }
-*/</style>
 {% endblock aligned_content %}
 
 {% block extra_js %}
 <script type="text/javascript">
-$(function(){
-
+  $(function(){
     inputs.pms_select2('#shard_1', false);
     inputs.pms_select2('#shard_2', false);
 
@@ -235,76 +219,80 @@ $(function(){
       };
 
       d7.extensions.charts.replays.item_inventory(
-        [shard_1, shard_2], '#inventory', [label_1, label_2]
-      );
+          [shard_1, shard_2], '#inventory', [label_1, label_2]
+          );
       d7.extensions.charts.replays.item_scatter(
-        [shard_1, shard_2], '#item_buys', params
-      );
+          [shard_1, shard_2], '#item_buys', params
+          );
 
 
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'kills', '#kills', params,  'statelog'
-      );
+          [shard_1, shard_2], 'kills', '#kills', params,  'statelog'
+          );
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'deaths', '#deaths', params,  'statelog'
-      );
+          [shard_1, shard_2], 'deaths', '#deaths', params,  'statelog'
+          );
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'assists', '#assists', params,  'statelog'
-      );
+          [shard_1, shard_2], 'assists', '#assists', params,  'statelog'
+          );
 
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'all_income', destination, params,  'combatseries'
-      );
+          [shard_1, shard_2], 'all_income', destination, params,  'combatseries'
+          );
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'hero_kill_income', '#hero_kill_income',
-        params,  'combatseries'
-      );
+          [shard_1, shard_2], 'hero_kill_income', '#hero_kill_income',
+          params,  'combatseries'
+          );
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'creep_kill_income', '#creep_kill_income',
-        params, 'combatseries'
-      );
+          [shard_1, shard_2], 'creep_kill_income', '#creep_kill_income',
+          params, 'combatseries'
+          );
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'death_expense', '#death_expense',
-        params,  'combatseries'
-      );
+          [shard_1, shard_2], 'death_expense', '#death_expense',
+          params,  'combatseries'
+          );
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'building_income', '#building_income',
-        params, 'combatseries'
-      );
-
-      d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'roshan_kill_income', '#roshan_kill_income',
-        params,  'combatseries'
-      );
+          [shard_1, shard_2], 'building_income', '#building_income',
+          params, 'combatseries'
+          );
 
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'hero_dmg_taken', '#hero_dmg_taken',
-        params,  'combatseries'
-      );
+          [shard_1, shard_2], 'roshan_kill_income', '#roshan_kill_income',
+          params,  'combatseries'
+          );
 
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'hero_dmg_dealt', '#hero_dmg_dealt',
-        params,  'combatseries'
-      );
+          [shard_1, shard_2], 'hero_dmg_taken', '#hero_dmg_taken',
+          params,  'combatseries'
+          );
 
       d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'other_dmg_dealt',  '#other_dmg_dealt',
-        params, 'combatseries'
-      );
+          [shard_1, shard_2], 'hero_dmg_dealt', '#hero_dmg_dealt',
+          params,  'combatseries'
+          );
 
-     d7.extensions.charts.replays.scatterline(
-        [shard_1, shard_2], 'key_bldg_dmg_dealt', '#building_dmg_dealt',
-        params,  'combatseries'
-      );
+      d7.extensions.charts.replays.scatterline(
+          [shard_1, shard_2], 'other_dmg_dealt',  '#other_dmg_dealt',
+          params, 'combatseries'
+          );
 
-    })
-
-});
-
-
+      d7.extensions.charts.replays.scatterline(
+          [shard_1, shard_2], 'key_bldg_dmg_dealt', '#building_dmg_dealt',
+          params,  'combatseries'
+          );
+    });
+  });
 </script>
 {% endblock extra_js %}
 
 {% block extra_css %}
+<style type="text/css">
+  .select2-result-pms__avatar{
+    height:36px;
+    width:64px;
+  }
+  .select2-result-pms__title{
+    color: black;
+  }
+</style>
 {% endblock extra_css %}
-
