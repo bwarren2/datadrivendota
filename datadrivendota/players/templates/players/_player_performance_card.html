@@ -1,13 +1,4 @@
-<a href="{% url 'matches:detail' match_id=pms.match.steam_id %}" class="thumbnail"
-    {% if pms.mag %}
-        style='box-shadow: 0 0 {{pms.mag}}px
-        {% if pms.pos %}
-        rgba(0, 200, 0, 0.7)
-        {% elif pms.neg %}
-        rgba(200, 0, 0, 0.7)
-        {% endif %}'
-    {% endif %}
-    >
+<a href="{% url 'matches:detail' match_id=pms.match.steam_id %}" class="thumbnail">
 
   {% if pms.invalid %}
     <div class='glyphicon glyphicon-remove-circle validity-glyph' title='Invalid Match (Probably Abandon)'></div>
@@ -16,16 +7,12 @@
   {% endif %}
 
   {% if pms.is_win %}
-    <div class='glyphicon glyphicon-ok-circle card-win-pip win-glyph' title='Won'></div>
+    <span class='card-win-pip overlayer-top-left' title='Win'>Win</span>
   {% endif %}
 
   {% if pms.hero.mugshot %}
     <img src="{{ pms.hero.mugshot_url }}" alt="{{ hero.name }}"
-      class="player-match-portrait
-      {% if pms.match.is_parsed %}
-        parsed-match
-      {% endif %}
-      ">
+      class="player-match-portrait">
   {% endif %}
 
 
@@ -34,6 +21,10 @@
     <span class='scorebar'>
       {{ pms.kills }}/{{ pms.deaths }}/{{ pms.assists }}/{{ pms.kda2 }}
     </span>
+    {% if pms.match.is_parsed %}
+      <span class='parsed-tag'>Parsed</span>
+    {% endif %}
+
   </p>
   <p class='overlayer-top-right small-date'>
     {{pms.display_date}}, {{pms.display_duration}}
