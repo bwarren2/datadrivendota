@@ -1,6 +1,6 @@
 {% load navigation_extras %}
-<nav>
-  <ul class="nav nav-tabs">
+<nav class="nav-special-container">
+  <ul class="nav nav-pills nav-special">
     <li role="presentation" class="{% active 'matches:detail' %}">
       <a href="{% url "matches:detail" match_id=match.steam_id %}">Overview</a>
     </li>
