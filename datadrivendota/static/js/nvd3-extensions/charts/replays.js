@@ -141,7 +141,6 @@ var multifacet_lineup = function(shardfacets, destination, params, label){
       };
       return myobj;
     });
-    console.log(label);
     if (typeof label != 'undefined') {
       params.label = label;
     }
@@ -904,7 +903,6 @@ var minimap = function(shards, destination, params){
           }
         })
         .style('top', function(d){
-          console.log(d, yscale(d.y))
           if (d===undefined) {
             return yscale(0)+'px'
           }else{
