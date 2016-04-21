@@ -3,7 +3,9 @@ from redis import StrictRedis
 from os import getenv
 from django.conf import settings
 
-redis_app = StrictRedis().from_url(getenv('REDISTOGO_URL'))
+redis_app = StrictRedis(
+    socket_timeout=settings.REDIS_TIMEOUT
+).from_url(getenv('REDISTOGO_URL'))
 
 
 def get_games():
