@@ -1,44 +1,44 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h3> Overall:
-        <span class='complete'>{{complete_matches|length}}</span>
-        <span class='unready'>{{unready_matches|length}}</span>
-        <span class='incomplete'>{{incomplete_matches|length}}</span>
-        <span class='failed'>{{failed_matches|length}}</span>
-    </h3>
-    <div class='row'>
-        <h4>Complete Matches ({{complete_matches|length}})</h4>
-        {% for x in complete_matches %}
-            <div class='col-md-3'>
-                {% include "leagues/_live_match_card.html" %}
-            </div>
-        {% endfor %}
-    </div>
-    <div class='row'>
-        <h4>Incomplete Matches ({{incomplete_matches|length}})</h4>
-        {% for x in incomplete_matches %}
-            <div class='col-md-3'>
-                {% include "leagues/_live_match_card.html" %}
-            </div>
-        {% endfor %}
-    </div>
-    <div class='row'>
-        <h4>Unready Matches ({{unready_matches|length}})</h4>
-        {% for x in unready_matches %}
-            <div class='col-md-3'>
-                {% include "leagues/_live_match_card.html" %}
-            </div>
-        {% endfor %}
-    </div>
-    <div class='row'>
-        <h4>Failed Matches ({{failed_matches|length}})</h4>
-        {% for x in failed_matches %}
-            <div class='col-md-3'>
-                {% include "leagues/_live_match_card.html" %}
-            </div>
-        {% endfor %}
-    </div>
+<h3> Overall:
+  <span class='complete'>{{complete_matches|length}}</span>
+  <span class='unready'>{{unready_matches|length}}</span>
+  <span class='incomplete'>{{incomplete_matches|length}}</span>
+  <span class='failed'>{{failed_matches|length}}</span>
+</h3>
+<div class='row'>
+  <h4>Complete Matches ({{complete_matches|length}})</h4>
+  {% for x in complete_matches %}
+  <div class='col-md-3'>
+    {% include "leagues/_live_match_card.html" %}
+  </div>
+  {% endfor %}
+</div>
+<div class='row'>
+  <h4>Incomplete Matches ({{incomplete_matches|length}})</h4>
+  {% for x in incomplete_matches %}
+  <div class='col-md-3'>
+    {% include "leagues/_live_match_card.html" %}
+  </div>
+  {% endfor %}
+</div>
+<div class='row'>
+  <h4>Unready Matches ({{unready_matches|length}})</h4>
+  {% for x in unready_matches %}
+  <div class='col-md-3'>
+    {% include "leagues/_live_match_card.html" %}
+  </div>
+  {% endfor %}
+</div>
+<div class='row'>
+  <h4>Failed Matches ({{failed_matches|length}})</h4>
+  {% for x in failed_matches %}
+  <div class='col-md-3'>
+    {% include "leagues/_live_match_card.html" %}
+  </div>
+  {% endfor %}
+</div>
 {% endblock content %}
 
 {% block extra_css %}

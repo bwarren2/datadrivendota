@@ -7,11 +7,11 @@
 {% else %}
 <div class='live-match-card incomplete'>
 {% endif %}
-    <p >League ID: {{x.league_id}}</p>
-    <p >Match ID: {{x.steam_id}}</p>
-    <p >Created at: {{x.created_at|date:'Y-m-d H:i:s'}}</p>
+  <p>League ID: {{x.league_id}}</p>
+  <p>Match ID: {{x.steam_id}}</p>
+  <p>Created at: {{x.created_at|date:'Y-m-d H:i:s'}}</p>
 
-    {% if not x.has_match %}
-        <p >Missing Match</p>
-    {% endif %}
+  {% if not x.has_match %}
+  <p>Missing Match</p>
+  {% endif %}
 </div>
