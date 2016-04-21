@@ -2139,7 +2139,7 @@ var minimap = function(shards, destination, params){
         return prev;
       }, {})
     });
-
+    console.log(destination);
     var svg = make_map_background(destination)
     var width = svg.attr('width');
     var height = svg.attr('height');
@@ -2159,7 +2159,7 @@ var minimap = function(shards, destination, params){
         return 'd2mh ' + d.hero_name + ' ' +d.css_classes;
       })
       .style('left', function(d){return xscale(d.x)+'px'})
-      .style('bottom', function(d){return yscale(d.y)+'px'})
+      .style('top', function(d){return yscale(d.y)+'px'})
       .style('position', 'absolute')
 
       faces.append('span').attr('class', 'minimap-label').html(function(d){
@@ -2192,7 +2192,8 @@ var minimap = function(shards, destination, params){
             return xscale(d.x)+'px'
           }
         })
-        .style('bottom', function(d){
+        .style('top', function(d){
+          console.log(d, yscale(d.y))
           if (d===undefined) {
             return yscale(0)+'px'
           }else{
@@ -2216,7 +2217,7 @@ var position_heatmap = function(shards, destination, params){
   // Get the replay parse info
   Promise.all(urls).then(function(raw_data){
 
-    $(destination+' .chart').empty();
+    $(destination+' .minimap-chart').empty();
     $(destination+' label').empty();
     $(destination+' .legend').empty();
     var svg = make_map_background(destination)
@@ -2253,7 +2254,7 @@ var position_heatmap = function(shards, destination, params){
 
       cards.enter().append("rect")
           .attr("x", function(d) { return xscale(d.x)})
-          .attr("y", function(d) { return height-yscale(d.y) })
+          .attr("y", function(d) { return yscale(d.y) })
           .attr("class", "cell")
           .attr("ddd-ct", function(d) { return d.ct })
           .attr("width", size+2)
@@ -2333,12 +2334,14 @@ var position_heatmap = function(shards, destination, params){
     })
 
 
+  }).catch(function(e){
+    console.log(e);
   })
 
 }
 
 var make_map_background = function(destination){
-    var svg = utils.svg.square_svg(destination+' .chart');
+    var svg = utils.svg.square_svg(destination+' .minimap-chart');
     var width = svg.attr('width');
     var height = svg.attr('height');
 
@@ -4393,14 +4396,16 @@ var pretty_times = function(d){
 }
 
 var minimap_x = function(width, height){
+    width = Math.min(width, height);
     return d3.scale.linear().domain([68,186]).range([
-      .04*width, .96*width
+      .025*width, .96*width
     ]);
 }
 
 var minimap_y = function(width, height){
+    height = Math.min(width, height);
     return d3.scale.linear().domain([68,186]).range([
-        .12*height, 1.03*height
+        .96*height, 0.025*height,
     ]);
 }
 
