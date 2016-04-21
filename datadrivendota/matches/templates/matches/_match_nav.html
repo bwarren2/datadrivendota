@@ -1,0 +1,35 @@
+{% load navigation_extras %}
+<nav>
+  <ul class="nav nav-tabs">
+    <li role="presentation" class="{% active 'matches:detail' %}">
+      <a href="{% url "matches:detail" match_id=match.steam_id %}">Overview</a>
+    </li>
+
+    <li role="presentation" class="{% active 'matches:detail_abilities' %}">
+      <a href="{% url "matches:detail_abilities" match_id=match.steam_id %}">Skillbuilds</a>
+    </li>
+
+    {% if match.game_mode.has_bans %}
+    <li role="presentation" class="{% active 'matches:detail_pickbans' %}">
+      <a href="{% url "matches:detail_pickbans" match_id=match.steam_id %}">Picks &amp; Bans</a>
+    </li>
+    {% endif %}
+
+    <li role="presentation" class="{% active 'matches:detail_scorecard' %}">
+      <a href="{% url "matches:detail_scorecard" match_id=match.steam_id %}">Endgame Scorecard</i></a>
+    </li>
+
+    {% if match.is_parsed %}
+    <li role="presentation" class="{% active 'matches:detail_parsed' %}">
+      <a href="{% url "matches:detail_parsed" match_id=match.steam_id %}">Parsed Charts</a>
+    </li>
+
+    <li role="presentation" class="{% active 'matches:replay' %}">
+      <a href="{% url "matches:replay" match_id=match.steam_id %}">
+        In-browser replay
+        <span class="brand-release-mark">alpha</span>
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
