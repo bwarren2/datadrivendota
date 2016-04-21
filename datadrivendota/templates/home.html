@@ -211,6 +211,7 @@
         })
         var params = {
           granularity: 60,
+          start_time: 60*30,
           show_legend: true,
           inset_legend: true,
         };
@@ -218,6 +219,7 @@
           shards, 'health', '#major_chart', params, 'statelog'
         );
         var params = {
+          start_time: 60*30,
           show_legend: true,
           inset_legend: true,
         };

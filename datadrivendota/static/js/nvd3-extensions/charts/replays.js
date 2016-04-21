@@ -15,21 +15,38 @@ var replay_lines = function(dataset, facet, destination, params){
 
   var x_label = toTitleCase("offset time");
   var y_label = toTitleCase(facet);
+
+  var stride;
+  var start_time;
+  var end_time;
+
   if (params.label!==undefined) {
     var y_label = toTitleCase(params.label);
   }
 
-  console.log(dataset);
   if(params.granularity!==undefined){
-    dataset = dataset.map(function(series){
-      series.values = series.values.filter(function(d){
-      return d.offset_time.mod(params.granularity) === 0;
-      })
-      return series;
-    });
+    stride = params.granularity;
+  }else{
+    stride = 1;
   }
-  console.log(dataset);
 
+  if(params.start_time!==undefined){
+    start_time = params.start_time;
+  }else{
+    start_time = -99999;
+  }
+  if(params.end_time!==undefined){
+    end_time = params.end_time;
+  }else{
+    end_time = 99999999;
+  }
+
+  dataset = dataset.map(function(series){
+    series.values = series.values.filter(function(d){
+      return d.offset_time.mod(stride) === 0 && d.offset_time >= start_time && d.offset_time <= end_time  ;
+    })
+    return series;
+  });
 
   var data = dataset.map(function(series){
     var x = series.values.map(function(d){
