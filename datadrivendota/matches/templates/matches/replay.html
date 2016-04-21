@@ -7,22 +7,21 @@
       <div class='row'>
 
         {% for summary in match.radiant.all %}
-          <div class='col-md-2' id='slot-{{summary.player_slot}}'>
+          <div class='col-md-2 col-xs-6' id='slot-{{summary.player_slot}}'>
             <img class='ajax-loader' style='margin-top:40px;' src="{% static 'images/loading.gif' %}">
           </div>
         {% endfor %}
       </div>
       <div class='row'>
         {% for summary in match.dire.all %}
-          <div class='col-md-2' id='slot-{{summary.player_slot}}'>
+          <div class='col-md-2 col-xs-6' id='slot-{{summary.player_slot}}'>
             <img class='ajax-loader' style='margin-top:40px;' src="{% static 'images/loading.gif' %}">
           </div>
         {% endfor %}
       </div>
 
       <div class='col-md-6' id='minimap'>
-        <label></label>
-        <div class='chart vert-md-6'></div>
+        <div class='minimap-chart'></div>
       </div>
     </div>
 {% endblock aligned_content %}

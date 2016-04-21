@@ -9,14 +9,17 @@ var pretty_times = function(d){
 }
 
 var minimap_x = function(width, height){
+    width = Math.min(width, height);
     return d3.scale.linear().domain([68,186]).range([
-      .04*width, .96*width
+      .025*width, .973*width
     ]);
 }
 
 var minimap_y = function(width, height){
+    height = Math.min(width, height);
     return d3.scale.linear().domain([68,186]).range([
-        .12*height, 1.03*height
+        // .94*height, 0.03*height,
+        .95*height, 0.03*height,
     ]);
 }
 

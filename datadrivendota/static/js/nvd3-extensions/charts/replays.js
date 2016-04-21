@@ -141,7 +141,6 @@ var multifacet_lineup = function(shardfacets, destination, params, label){
       };
       return myobj;
     });
-    console.log(label);
     if (typeof label != 'undefined') {
       params.label = label;
     }
@@ -869,7 +868,7 @@ var minimap = function(shards, destination, params){
         return 'd2mh ' + d.hero_name + ' ' +d.css_classes;
       })
       .style('left', function(d){return xscale(d.x)+'px'})
-      .style('bottom', function(d){return yscale(d.y)+'px'})
+      .style('top', function(d){return yscale(d.y)+'px'})
       .style('position', 'absolute')
 
       faces.append('span').attr('class', 'minimap-label').html(function(d){
@@ -899,14 +898,16 @@ var minimap = function(shards, destination, params){
             return xscale(0)+'px'
           }
           else{
-            return xscale(d.x)+'px'
+            var val = xscale(d.x);
+            return val+'px'
           }
         })
-        .style('bottom', function(d){
+        .style('top', function(d){
           if (d===undefined) {
             return yscale(0)+'px'
           }else{
-            return yscale(d.y)+'px'
+            var val = yscale(d.y) - 10;
+            return val+'px'
           }
         }).ease("linear")
 
@@ -926,7 +927,7 @@ var position_heatmap = function(shards, destination, params){
   // Get the replay parse info
   Promise.all(urls).then(function(raw_data){
 
-    $(destination+' .chart').empty();
+    $(destination+' .minimap-chart').empty();
     $(destination+' label').empty();
     $(destination+' .legend').empty();
     var svg = make_map_background(destination)
@@ -963,7 +964,7 @@ var position_heatmap = function(shards, destination, params){
 
       cards.enter().append("rect")
           .attr("x", function(d) { return xscale(d.x)})
-          .attr("y", function(d) { return height-yscale(d.y) })
+          .attr("y", function(d) { return yscale(d.y) })
           .attr("class", "cell")
           .attr("ddd-ct", function(d) { return d.ct })
           .attr("width", size+2)
@@ -1043,12 +1044,14 @@ var position_heatmap = function(shards, destination, params){
     })
 
 
+  }).catch(function(e){
+    console.log(e);
   })
 
 }
 
 var make_map_background = function(destination){
-    var svg = utils.svg.square_svg(destination+' .chart');
+    var svg = utils.svg.square_svg(destination+' .minimap-chart');
     var width = svg.attr('width');
     var height = svg.attr('height');
 
