@@ -899,7 +899,8 @@ var minimap = function(shards, destination, params){
             return xscale(0)+'px'
           }
           else{
-            return xscale(d.x)+'px'
+            var val = xscale(d.x) -10px;
+            return val+'px'
           }
         })
         .style('top', function(d){
@@ -907,7 +908,8 @@ var minimap = function(shards, destination, params){
           if (d===undefined) {
             return yscale(0)+'px'
           }else{
-            return yscale(d.y)+'px'
+            var val = yscale(d.y) - 10;
+            return val+'px'
           }
         }).ease("linear")
 

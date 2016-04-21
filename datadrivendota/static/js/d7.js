@@ -2197,7 +2197,8 @@ var minimap = function(shards, destination, params){
           if (d===undefined) {
             return yscale(0)+'px'
           }else{
-            return yscale(d.y)+'px'
+            var val = yscale(d.y) - 10;
+            return val+'px'
           }
         }).ease("linear")
 
@@ -4405,7 +4406,8 @@ var minimap_x = function(width, height){
 var minimap_y = function(width, height){
     height = Math.min(width, height);
     return d3.scale.linear().domain([68,186]).range([
-        .95*height, 0.03*height,
+        .94*height, 0.03*height,
+        // .95*height, 0.03*height,
     ]);
 }
 
