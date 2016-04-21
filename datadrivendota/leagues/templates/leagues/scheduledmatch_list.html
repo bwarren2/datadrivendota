@@ -3,12 +3,12 @@
 {% block aligned_content %}
 
 {% for x in object_list %}
-    <div class='col-md-4'>
-        <img class='thumbnail' src="{{x.league.image}}">
-        <p class='overlayer'>
-            {{x.league.display_name}}
-            {{x.start_time|seconds_to_date|date:'Y-m-d H:i:s'}}
-        </p>
-    </div>
+<div class="col-md-4">
+  <img class="thumbnail" src="{{x.league.image}}">
+  <p class="overlayer">
+  {{x.league.display_name}}
+  {{x.start_time|seconds_to_date|date:'Y-m-d H:i:s'}}
+  </p>
+</div>
 {% endfor %}
 {% endblock aligned_content %}

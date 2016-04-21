@@ -146,7 +146,7 @@
           {% if SHOW_AUTH %}
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_active %}
-            <li><a href="{% url 'accounts:home' %}">Data Management</a></li>
+            <li><a href="{% url 'accounts:home' %}"><i class="fa fa-cogs" aria-hidden="true"></i></a></li>
             <li><a href="{% url 'logout' %}">Logout, {{user}}?</a></li>
             {% else %}
             <li><a href="{% url 'social:begin' 'steam' %}"><img src="{% static 'images/sits_small.png' %}" alt="Sign in through Steam"></a></li>

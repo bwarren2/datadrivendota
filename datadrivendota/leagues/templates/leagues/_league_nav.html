@@ -1,0 +1,9 @@
+<nav class='app-nav clearfix'>
+  <ul class="nav nav-tabs navbar-nav">
+    <li role="presentation"{% if active == 'detail' %} class='active'{% endif %}><a href="{% url 'leagues:detail' steam_id=league.steam_id %}">Detail</a></li>
+    <li role="presentation"{% if active == 'timewalk' %} class='active'{% endif %}><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
+  </ul>
+  <ul class="nav nav-tabs navbar-nav navbar-right">
+    <li role="presentation"><a href="{% url 'matches:index'%}?league_id={{league.steam_id}}">Matches</a></li>
+  </ul>
+</nav>

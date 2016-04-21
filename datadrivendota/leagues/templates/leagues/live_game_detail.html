@@ -1,145 +1,110 @@
 {% extends "row_base.html" %}
+
 {% block title %} Match #{{match_id}} {% endblock title %}
 
 {% block aligned_content %}
-    <div class='col-md-12'>
+<div class='col-md-12'>
+  <div id='messages'>
+  </div>
 
-    <div id='messages'>
-    </div>
-
-    <div id='test'>
+  <div id='test'>
     <div id='animation-controls' data-spy="affix" data-offset-top="0">
-        <h2>Animation Controls</h2>
-        <div id='animation-buttons'>
-            <div id='stop-button'>
-                <button id='stop-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Stop</button>
-            </div>
-            <div id='start-button'>
-                <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Start</button>
-            </div>
-            <div id='back-button'>
-                <button id='back-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
-                    <span class="info glyphicon glyphicon-backward">
-                </button>
-            </div>
-            <div id='forward-button'>
-                <button id='forward-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
-                    <span class="info glyphicon glyphicon-forward">
-                </button>
-            </div>
-            <div id='autoplay-button'>
-                <button id='autoplay-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
-                    <span class="info glyphicon glyphicon-refresh">
-                </button>
-            </div>
-            <div id='timer'>
-                <input style='margin-top:5px' id='time-display' class='form-control' type='text' placeholder='Replay Time' readonly>
-            </div>
+      <h2>Animation Controls</h2>
+      <div id='animation-buttons'>
+        <div id='stop-button'>
+          <button id='stop-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Stop</button>
         </div>
+        <div id='start-button'>
+          <button id='start-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">Start</button>
+        </div>
+        <div id='back-button'>
+          <button id='back-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+            <span class="info glyphicon glyphicon-backward">
+          </button>
+        </div>
+        <div id='forward-button'>
+          <button id='forward-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+            <span class="info glyphicon glyphicon-forward">
+          </button>
+        </div>
+        <div id='autoplay-button'>
+          <button id='autoplay-animation' type="button" class="btn btn-primary btn-lg btn-block animation-button">
+            <span class="info glyphicon glyphicon-refresh">
+          </button>
+        </div>
+        <div id='timer'>
+          <input style='margin-top:5px' id='time-display' class='form-control' type='text' placeholder='Replay Time' readonly>
+        </div>
+      </div>
     </div>
-    </div>
+  </div>
 
-    <div id='state'>
-        <div id='matchup'>
-            <h2>Matchup</h2>
-            <div id='logo-lineup'>
-                <div id='radiant-logo'>
-                </div>
-                <div id='dire-logo'>
-                </div>
-                <div id='league-logo'>
-                </div>
-                <div id='game-facts'>
-                </div>
-            </div>
+  <div id='state'>
+    <div id='matchup'>
+      <h2>Matchup</h2>
+      <div id='logo-lineup'>
+        <div id='radiant-logo'>
         </div>
-
-        <div id='map'>
-            <h2>Minimap</h2>
+        <div id='dire-logo'>
         </div>
+        <div id='league-logo'>
+        </div>
+        <div id='game-facts'>
+        </div>
+      </div>
     </div>
 
+    <div id='map'>
+      <h2>Minimap</h2>
+    </div>
+  </div>
 
-    <div id='charts'>
-        <div id='gpm-xpm-chart'>
-        <h2>GPM / XPM</h2>
-        </div>
 
-        <div id='kill-death-chart'>
-        <h2>KDA</h2>
-        </div>
-
-        <div id='last-hit-levels'>
-        <h2>Levels/Last Hits</h2>
-        </div>
-
+  <div id='charts'>
+    <div id='gpm-xpm-chart'>
+      <h2>GPM / XPM</h2>
     </div>
 
-
-    <div id='scoreboard'>
-        <div class="page-header">
-            <h1>Scoreboard</h1>
-        </div>
-            <table id='scoreboard' class='table table-responsive table-condensed'>
-                <thead>
-                    <td>Hero</td>
-                    <td >Name</td>
-                    <td ></td>
-                    <td ></td>
-                    <td ></td>
-                    <td ></td>
-                    <td ></td>
-                    <td ></td>
-                    <td><p class='kills'>K</p></td>
-                    <td><p class='deaths'>D</p></td>
-                    <td><p class='assists'>A</p></td>
-                    <td><p class='kda2'>KDA2</p></td>
-                    <td><p class='gpm'>GPM</p></td>
-                    <td><p class='xpm'>XPM</p></td>
-
-                </thead>
-                <tbody>
-
-                </tbody>
-                <tfoot>
-                </tfoot>
-            </table>
+    <div id='kill-death-chart'>
+      <h2>KDA</h2>
     </div>
 
-{% comment %}
-
-    <div id='bans'>
-
-        <div class="page-header">
-            <h1>Bans</h1>
-        </div>
-
-        <div id='radiant-bans'>
-            <h2>Radiant</h2>
-            <div id='heroes'>
-            {% for pick in pickbans.radiant.bans %}
-                <div class='hero-slot'>
-                    <img class='hero-face ban' src="{{pick.url}}">
-                </div>
-            {% endfor %}
-            </div>
-        </div>
-
-        <div id='dire-bans'>
-            <h2>Dire</h2>
-            <div id='heroes'>
-            {% for pick in pickbans.dire.bans %}
-                <div class='hero-slot'>
-                    <img class='hero-face ban' src="{{pick.url}}">
-                </div>
-            {% endfor %}
-            </div>
-        </div>
-
+    <div id='last-hit-levels'>
+      <h2>Levels/Last Hits</h2>
     </div>
-{% endcomment %}
+
+  </div>
 
 
+  <div id='scoreboard'>
+    <div class="page-header">
+      <h1>Scoreboard</h1>
+    </div>
+    <table id='scoreboard' class='table table-responsive table-condensed'>
+      <thead>
+        <td>Hero</td>
+        <td >Name</td>
+        <td ></td>
+        <td ></td>
+        <td ></td>
+        <td ></td>
+        <td ></td>
+        <td ></td>
+        <td><p class='kills'>K</p></td>
+        <td><p class='deaths'>D</p></td>
+        <td><p class='assists'>A</p></td>
+        <td><p class='kda2'>KDA2</p></td>
+        <td><p class='gpm'>GPM</p></td>
+        <td><p class='xpm'>XPM</p></td>
+
+      </thead>
+      <tbody>
+
+      </tbody>
+      <tfoot>
+      </tfoot>
+    </table>
+  </div>
 </div>
 {% endblock aligned_content %}
 

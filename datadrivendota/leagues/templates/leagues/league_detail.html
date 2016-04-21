@@ -7,16 +7,8 @@
 {% endblock title %}
 
 {% block aligned_content %}
-<nav class='app-nav'>
-  <ul class="nav nav-pills">
-    <li role="presentation" class='active'><a href="{% url 'leagues:detail' steam_id=league.steam_id %}">Detail</a></li>
-    <li role="presentation"><a href="{% url 'leagues:detail-timewalk' steam_id=league.steam_id %}">Time Walk <i class="fa fa-clock-o"></i></a></li>
-    <li role="presentation"><a href="{% url 'matches:index'%}?league_id={{league.steam_id}}">Matches</a></li>
-  </ul>
-</nav>
-
+{% include 'leagues/_league_nav.html' with active='detail' %}
 <section class='app-section'>
-
   <div class='row'>
     <div class='col-md-12'>
     <h4>Most Recent Match:</h4>
