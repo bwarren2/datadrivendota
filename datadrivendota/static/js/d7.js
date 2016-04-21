@@ -1431,7 +1431,6 @@ var multifacet_lineup = function(shardfacets, destination, params, label){
       };
       return myobj;
     });
-    console.log(label);
     if (typeof label != 'undefined') {
       params.label = label;
     }
@@ -2189,11 +2188,11 @@ var minimap = function(shards, destination, params){
             return xscale(0)+'px'
           }
           else{
-            return xscale(d.x)+'px'
+            var val = xscale(d.x);
+            return val+'px'
           }
         })
         .style('top', function(d){
-          console.log(d, yscale(d.y))
           if (d===undefined) {
             return yscale(0)+'px'
           }else{
@@ -4406,8 +4405,8 @@ var minimap_x = function(width, height){
 var minimap_y = function(width, height){
     height = Math.min(width, height);
     return d3.scale.linear().domain([68,186]).range([
-        .94*height, 0.03*height,
-        // .95*height, 0.03*height,
+        // .94*height, 0.03*height,
+        .95*height, 0.03*height,
     ]);
 }
 

@@ -898,7 +898,7 @@ var minimap = function(shards, destination, params){
             return xscale(0)+'px'
           }
           else{
-            var val = xscale(d.x) -10px;
+            var val = xscale(d.x);
             return val+'px'
           }
         })
