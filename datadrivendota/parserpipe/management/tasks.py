@@ -524,9 +524,13 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
                 pms.match.steam_id,
             ))
             data = filter_fn(replay['es'], pms, enemies, allies)
-            self.save_msgstream(
-                match_id, pms.player_slot, data, field, 'combatlog'
-            )
+            if field == 'item_buys':
+                self.save_msgstream(
+                    match_id, pms.player_slot, data, field, 'combatlog'
+                )
+            else:
+                pass  # We are not actually using this data right now.
+                #  We can circle back later on this if there is interest.
             pms_combat[field] = data
 
         return pms_combat
