@@ -849,7 +849,7 @@ var minimap = function(shards, destination, params){
         return prev;
       }, {})
     });
-    console.log(destination);
+
     var svg = make_map_background(destination)
     var width = svg.attr('width');
     var height = svg.attr('height');
