@@ -157,12 +157,6 @@ class ReplayView(DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs['show_control_bar'] = True
-
-        messages.success(
-            self.request,
-            'This section is very data intensive tech still in development; it can take up to a minute to load, based on your connection. '
-        )
-
         return super(ReplayView, self).get_context_data(**kwargs)
 
 

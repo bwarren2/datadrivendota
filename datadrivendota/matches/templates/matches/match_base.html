@@ -6,8 +6,13 @@
   {% endblock match_nav %}
 
   <div class='row'>
-    {% include "matches/_match_card.html" %}
-    {% block match_content %}
-    {% endblock match_content %}
+      {% include "matches/_match_card.html" %}
+
+      {% block match_content %}
+      {% endblock match_content %}
+      <div class='col-md-12'>
+        {% include "accounts/mixins/_login_convert.html" %}
+      </div>
+
   </div>
 {% endblock content %}
