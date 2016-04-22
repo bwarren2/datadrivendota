@@ -6,6 +6,8 @@ from .querysets import (
     PMSQuerySet,
     MatchFilteredQuerySet,
     FilteredQuerySet,
+)
+from .managers import (
     Unparsed,
     Parsed,
 )
@@ -108,8 +110,8 @@ class Match(models.Model):
     )
 
     objects = FilteredQuerySet.as_manager()
-    unparsed = Unparsed.as_manager()
-    parsed = Parsed.as_manager()
+    unparsed = Unparsed()
+    parsed = Parsed()
 
     class Meta:
         verbose_name_plural = 'matches'

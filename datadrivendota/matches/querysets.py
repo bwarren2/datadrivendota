@@ -252,19 +252,3 @@ class FilteredQuerySet(models.QuerySet):
         except TypeError:
             # no parameter named ids
             return queryset
-
-
-class Unparsed(FilteredQuerySet):
-
-    def get_queryset(self):
-        return super(Unparsed, self).get_queryset().exclude(
-            parsed_with=settings.PARSER_VERSION
-        )
-
-
-class Parsed(FilteredQuerySet):
-
-    def get_queryset(self):
-        return super(Parsed, self).get_queryset().filter(
-            parsed_with=settings.PARSER_VERSION
-        )
