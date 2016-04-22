@@ -26,6 +26,7 @@ from matches.management.tasks import UpdateMatch
 from matches.models import Match, PlayerMatchSummary
 from accounts.models import get_customer_player_ids
 from leagues.models import League
+from replay_url_broker.models import ReplayUrlBackend
 
 from .combat_log_filters import combatlog_filter_map
 from .state_log_filters import entitystate_filter_map
@@ -177,50 +178,10 @@ class CreateMatchParse(Task):
             return None
 
     def get_replay_url(self, match_id, match_req):
-
-        url = settings.REPLAY_SERVICE_URL
-        payload = {'match_id': match_id}
-        r = requests.get(url, params=payload)
-        logger.info('Hitting {1} with {0}'.format(payload, url))
-        if r.status_code == 200:
-            logger.info(r.content)
-            try:
-                response_json = r.json()
-
-                if 'error' in response_json:
-                    errorcode = response_json['error']
-                    if errorcode == 'invalid':
-                        raise LookupError(
-                            'Got this json for match_id {1}: {0}'.format(
-                                response_json,
-                                match_id,
-                            )
-                        )
-                    if errorcode == 'notready' or errorcode == 'timeout':
-                        self.retry(countdown=5)
-
-                elif 'replay_url' in response_json:
-                    replay_url = response_json['replay_url']
-                    self._save_url(replay_url, match_req)
-                    return replay_url
-                else:
-                    raise LookupError(
-                        'What is this json? {0}'.format(response_json)
-                    )
-            except ValueError as e:
-                # Usually from jsondecodeerror in simplejson from requests
-                logger.error(
-                    "Exception: {0} for content: {1}".format(
-                        type(e).__name__,
-                        r.content
-                    )
-                )
-
-        else:
-            raise Exception("Got status {0} for MR match_id {1}".format(
-                r.status_code, match_id
-            ))
-            return None
+        replay_url = ReplayUrlBackend.objects.get_replay_url(match_id)
+        if replay_url is not None:
+            self._save_url(replay_url, match_req)
+        return replay_url
 
     def _save_url(self, url, match_request):
         match_request.valve_replay_url = url

@@ -270,6 +270,7 @@ LOCAL_APPS = (
     'teams',
     'accounts',
     'health',
+    'replay_url_broker',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
