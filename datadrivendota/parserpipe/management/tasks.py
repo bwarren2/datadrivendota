@@ -149,7 +149,10 @@ class CreateMatchParse(Task):
             replay_url = self.get_replay_url(match_id, match_req)
 
             if replay_url:
+                logging.info('Got url for {0}'.format(match_id))
                 self.java_parse_message(replay_url, match_id)
+            else:
+                logging.info('Did not get url for {0}'.format(match_id))
         else:
             raise Exception("We don't have the match we expected: {0}".format(
                 match_id
@@ -178,6 +181,7 @@ class CreateMatchParse(Task):
             return None
 
     def get_replay_url(self, match_id, match_req):
+        logging.info('Getting the url for {0}'.format(match_id))
         replay_url = ReplayUrlBackend.objects.get_replay_url(match_id)
         if replay_url is not None:
             self._save_url(replay_url, match_req)
