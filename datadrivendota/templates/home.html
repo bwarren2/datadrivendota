@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles navigation_extras steam_extras i18n %}
 
 {% block content %}
 <div id='home'>
@@ -8,74 +9,138 @@
 
         <div class='col-md-12'>
 
-          <div class='jumbotron' style='background-color:inherit'>
-            <div id='foo'>
             <div class='row'>
               <div class='col-md-12 text-center'>
                 <h1 class='brand-primary'>DataDrivenDota</h1>
-                <p>
-                Better Data ➜ Better Analysis ➜ Better Decisions
-                </p>
-              </div>
-              <div class='col-md-12'>
-                <h5>Hero Health in Match# 2291119423, ESL One Frankfurt 2016, 10s intervals</h5>
-
-                <div id='major_chart' class='chart toggling vert-md-6'>
-                  <div class='vert-md-6 chart toggling'>
-                    <img class='ajax-loader' src="/assets/images/loading.gif">
-                  </div>
-                </div>
-
+                <p>Better Data ➜ Better Analysis ➜ Better Decisions</p>
               </div>
 
+              {% comment %}
+              <div class='col-md-4'>
+              {% if recent_league %}
+
+
+                These belong here, but don't currently work.  We are pushing out the basic version of this page on Apr 22 2016, without these buttons, to see what conversion looks like.  While that is happening, we are working on wiring these up.
+
+              <a href="{% url 'matches:replay' match_id=recent_league%}">
+               <button class='btn btn-primary btn-lg btn-block'>See a League game in-browser</button>
+              </a>
+              {% else %}
+               <button class='btn btn-primary btn-lg btn-block'>See a League game in-browser</button>
+              {% endif %}
+              </div>
+
+              <div class='col-md-4'>
+               <button class='btn btn-primary btn-lg btn-block'>Read analysis of a pro game</button>
+              </div>
+
+              <div class='col-md-4'>
+               <button class='btn btn-primary btn-lg btn-block'>Get Gold</button>
+              </div>
+              {% endcomment %}
+
             </div>
-            </div>
-          </div>
 
         </div>
+      </div>
+      <div class='row'>
 
+        <div class='col-md-12'>
+          <h2 class='page-header'>
+            Play like pros
+            <a href="{% url 'matches:ghostwalk'%}?pms_ids={{pro_pms_id}},{{am_pms_id}}&label_1=Pro&label_2=Amateur">
+            <button class='btn btn-primary'>Play with this tool</button>
+            </a>
 
+          </h2>
+          <p>
+            Stop feeling lost or confused.  Overlay your performance with a pro player's directly to see what differences show up and when, so you can change and improve.
+          </p>
+        </div>
         <div class='col-md-6'>
-          <div class='big-d-stats'>
-            <div class='page-header'>
-              <h1>Stats are useful...</h1>
+          <div class='row'>
+            <div class='col-md-6' id='target'>
+
             </div>
-            <table class='table'>
-              <thead>
-                <tr>
-                  <td></td>
-                  <td>Avg X</td>
-                  <td>Avg Y</td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class='group-a'>
-                  <td>Group 1</td>
-                  <td id='group-a-x'></td>
-                  <td id='group-a-y'></td>
-                </tr>
-                <tr class='group-b'>
-                  <td>Group 2</td>
-                  <td id='group-b-x'></td>
-                  <td id='group-b-y'></td>
-                </tr>
-                <tr class='group-c'>
-                  <td>Group 3</td>
-                  <td id='group-c-x'></td>
-                  <td id='group-c-y'></td>
-                </tr>
-              </tbody>
-            </table>
+            <div class='col-md-6' id='target2'>
+
+            </div>
+            <div class='col-md-12'>
+              <div class='timecard'>
+                <p>Game state at: <span id='timeslot'></span></p>
+                <p>(Playing at 10 second intervals for speed.)</p>
+              </div>
+            </div>
+
           </div>
         </div>
+        <div class='col-md-6' id='minimap'>
+          <div class='minimap-chart vert-md-6'></div>
+        </div>
+      </div>
 
+      <div class='row'>
+        <div class='col-md-12'>
+          <h2 class='page-header'>
+            Drill into the data, not false aggregations
+            <a href="/matches/time-lapse/">
+            <button class='btn btn-primary'>Play with this tool</button>
+            </a>
+
+          </h2>
+
+          <p>
+            A lot can happen in a minute, so you shouldn't accept rollups of data.  Analyze games down to the second with ease to see what really happened.
+          </p>
+          <p class='text-primary' style='text-align:center'>Select an area to zoom</p>
+        </div>
         <div class='col-md-6'>
-          <div class='page-header'>
-            <h1>...but miss the big picture</h1>
+          <h5>
+          Hero Health in M#2291119423, ESL One Frankfurt, each second
+          </h5>
+
+          <div id='major_granular_chart' class='chart toggling vert-md-6'>
+            <div class='vert-md-6 chart toggling'>
+              <img class='ajax-loader' src="/assets/images/loading.gif">
+            </div>
           </div>
-          <div class='vert-md-3 big-d text-center'></div>
+
+        </div>
+        <div class='col-md-6'>
+          <h5>
+          Hero Health in M#2291119423, ESL One Frankfurt, each minute
+          </h5>
+
+          <div id='major_chart' class='chart toggling vert-md-6'>
+            <div class='vert-md-6 chart toggling'>
+              <img class='ajax-loader' src="/assets/images/loading.gif">
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class='row'>
+
+        <div class='col-md-12'>
+          <h2 class='page-header'>
+            Rewatch the moments that matter effortlessly
+          </h2>
+          <p>
+            Let's face it: rewatching games to find improvements or errors is a chore with Valve's interface.  We condense all that information into something you can scroll on-the-fly to focus on what matters.
+          </p>
         </div>
 
+        <div class='col-md-8'>
+          <img src="{% static 'images/cards.gif' %}">
+        </div>
+        <div class='col-md-4'>
+          <img src="{% static 'images/minimap.gif' %}">
+        </div>
+      </div>
+
+
+      <div class="row">
 
         <div class='col-md-12 text-center'>
           <div class='page-header'>
@@ -106,21 +171,8 @@
           </div>
         </div>
 
-        <div class='col-md-12 text-center'>
-
-          <div class='page-header'>
-            <h1>Want to see more?</h1>
-          </div>
-          <div class='row'>
-            <div class='col-md-12'>
-              <p>
-                We are handing out small number of free trials of our deep parsing service!
-              </p>
-              <p>
-                Send an email to <a href="mailto:contact@datadrivendota.com?subject=April Promo">contact@datadrivendota.com</a> with "April Promo" in the subject line and we'll hook you up.
-              </p>
-            </div>
-          </div>
+        <div class='col-md-12'>
+          {% include "accounts/mixins/_login_convert.html" %}
         </div>
 
       </div>
@@ -149,31 +201,68 @@
 
 {% block extra_js %}
   <script type="text/javascript">
-  $(function(){
-    window.splash_gimmick();
-  })
-  </script>
-  <script type="text/javascript">
     $(function(){
-      pingSetup('{{csrf_token}}');
 
-      var match_id = 2291119423;
-      $.getJSON(`/rest-api/parse-shards/?match_id=${match_id}`)
-        .success(function(shards){
-          shards = shards.filter(function(d){
-            return d.dataslice == 'radiant' || d.dataslice == 'dire';
-          });
-          var params = {
-            granularity: 10,
-            interpolation: 'linear',
-            show_legend: true,
-            inset_legend: true,
-          };
-          d7.extensions.charts.replays.stat_lineup(
-            shards, 'health', '#major_chart', params, 'statelog'
-          );
-        });
+    var match_id = 2291119423;
+    $.getJSON('/rest-api/parse-shards/?match_id='+match_id)
+      .success(function(shards){
+        shards = shards.filter(function(d){
+          return d.dataslice == 'radiant' || d.dataslice == 'dire';
+        })
+        var params = {
+          granularity: 60,
+          start_time: 60*30,
+          show_legend: true,
+          inset_legend: true,
+        };
+        d7.extensions.charts.replays.stat_lineup(
+          shards, 'health', '#major_chart', params, 'statelog'
+        );
+        var params = {
+          start_time: 60*30,
+          show_legend: true,
+          inset_legend: true,
+        };
+        d7.extensions.charts.replays.stat_lineup(
+          shards, 'health', '#major_granular_chart', params, 'statelog'
+        );
+
+      });
+
+    Promise.resolve(
+      $.getJSON(
+        '/rest-api/parse-shards/?pms_ids=[{{pro_pms_id}},{{am_pms_id}}]'
+      )
+    ).then(function(shards){
+      shard_1 = shards[0];
+      shard_2 = shards[1];
+      params = {};
+      shard_1.minimap_label = 'Pro';
+      shard_1.stat_label = 'Pro';
+      d7.extensions.charts.replays.stat_card(shard_1, '#target', params);
+
+      shard_2.minimap_label = 'Amateur';
+      shard_2.stat_label = 'Amateur';
+      d7.extensions.charts.replays.stat_card(shard_2, '#target2', params);
+
+      var shards = [];
+      shards.push(shard_1);
+      shards.push(shard_2);
+
+      d7.extensions.charts.replays.minimap(shards, '#minimap', params);
+
+      var time = 60*10; // Start 10 min in
+      var max_time = 24*60; //Lesser of match lengths
+      var update = function(){
+        $(window).trigger('update', time);
+        time = (time + 10).mod(max_time);
+        $('#timeslot').html(String(time).toHHMMSS());
+        setTimeout(update, 1200);
+      }
+      update();
+
     });
+  });
   </script>
 {% endblock extra_js %}
 
@@ -197,12 +286,13 @@
   .triple-token{
     font-size: 100px;
   }
-  .jumbotron{
-    background-color: inherit;
-  }
   .brand-segment{
     margin-top: 0px;
     margin-bottom: 0px;
+  }
+  .timecard{
+    text-align: center;
+    margin-top: 20px;
   }
 </style>
 {% endblock extra_css %}

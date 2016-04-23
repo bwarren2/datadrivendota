@@ -1305,12 +1305,42 @@ var replay_lines = function(dataset, facet, destination, params){
 
   var x_label = toTitleCase("offset time");
   var y_label = toTitleCase(facet);
+
+  var stride;
+  var start_time;
+  var end_time;
+
   if (params.label!==undefined) {
     var y_label = toTitleCase(params.label);
   }
+
+  if(params.granularity!==undefined){
+    stride = params.granularity;
+  }else{
+    stride = 1;
+  }
+
+  if(params.start_time!==undefined){
+    start_time = params.start_time;
+  }else{
+    start_time = -99999;
+  }
+  if(params.end_time!==undefined){
+    end_time = params.end_time;
+  }else{
+    end_time = 99999999;
+  }
+
+  dataset = dataset.map(function(series){
+    series.values = series.values.filter(function(d){
+      return d.offset_time.mod(stride) === 0 && d.offset_time >= start_time && d.offset_time <= end_time  ;
+    })
+    return series;
+  });
+
   var data = dataset.map(function(series){
     var x = series.values.map(function(d){
-         var t = new Date(1970, 0, 1); // Epoch
+        var t = new Date(1970, 0, 1); // Epoch
           t.setSeconds(d.offset_time);
         return t;
     })
@@ -2412,6 +2442,7 @@ var stat_card = function(shard, destination, params){
     var rawTemplate = `<div class="statcard {{css_classes}} {{lifestate}}">
     <div>
     <i class='d2mh {{hero_css}}'></i>
+      <span class='statcard-label'>{{label}}</span>
       <div style='float:right'>
       <div><text>{{kills}} / {{deaths}} / {{assists}}</text></div>
       <div><text>{{last_hits}} / {{denies}}</text></div>
@@ -2491,6 +2522,11 @@ var stat_card = function(shard, destination, params){
         title: shard.name,
         css_classes: shard.css_classes,
       };
+      if (shard.stat_label!==undefined) {
+        context.label = shard.stat_label;
+      }else{
+        context.label = "";
+      }
 
       if (struct[time]===undefined) {
         $(destination).html('Not defined');

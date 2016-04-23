@@ -2,37 +2,53 @@
 {% load staticfiles player_extras %}
 
 {% block aligned_content %}
-<div class='col-md-12'>
-  <div class='row'>
-    {% for summary in match.radiant.all %}
-    <div class='col-md-2 col-xs-6' id='slot-{{summary.player_slot}}'>
-      <img class='ajax-loader' style='margin-top:40px;' src="{% static 'images/loading.gif' %}">
+  <div class='col-md-12'>
+    <div class='page-header'>
+      <h2>
+        Replay
+      </h2>
     </div>
-    {% endfor %}
+    <p>Watch all the players from <a href="{% url 'matches:parsed_index' %}">parsed</a> matches to survey the whole game and understand turning points.</p>
+    <p class='text-warning'>This is very data intensive tech still in development; it can take up to a minute to load, based on your connection.</p>
   </div>
 
-  <div class='row'>
-    {% for summary in match.dire.all %}
-    <div class='col-md-2 col-xs-6' id='slot-{{summary.player_slot}}'>
-      <img class='ajax-loader' style='margin-top:40px;' src="{% static 'images/loading.gif' %}">
+  <div class='col-md-12'>
+    <div class='row'>
+
+      {% for summary in match.radiant.all %}
+        <div class='col-md-2 col-xs-6' id='slot-{{summary.player_slot}}'>
+          <img class='ajax-loader' style='margin-top:40px;' src="{% static 'images/loading.gif' %}">
+        </div>
+      {% endfor %}
     </div>
-    {% endfor %}
+    <div class='row'>
+      {% for summary in match.dire.all %}
+        <div class='col-md-2 col-xs-6' id='slot-{{summary.player_slot}}'>
+          <img class='ajax-loader' style='margin-top:40px;' src="{% static 'images/loading.gif' %}">
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class='col-md-6' id='minimap'>
+      <div class='minimap-chart'></div>
+    </div>
+
+  </div>
+  <div class='col-md-12'>
+    {% include "accounts/mixins/_login_convert.html" %}
   </div>
 
   <div class='col-md-6' id='minimap'>
     <div class='minimap-chart'></div>
   </div>
-</div>
 {% endblock aligned_content %}
 
 {% block extra_js %}
 <script type="text/javascript">
   $(function(){
-    var params = {
-      granularity: 30,
-    };
 
     var unwrapped_shards = [];
+    var params = {};
 
     var urls = [
     {% for summary in match.playermatchsummary_set.all %}

@@ -11,7 +11,7 @@
         Time Lapse
       </h2>
     </div>
-    <p>See data down to the second from <span class='brand-primary'>parsed</span> matches.</p>
+    <p>See data down to the second from <a href="{% url 'matches:parsed_index' %}">parsed</a> matches.</p>
   </div>
 
   <div class='col-md-12'>
@@ -169,29 +169,11 @@
 
                 <div class='col-md-12'>
                   <div class="form-group">
-                    <label >Sample Frequency (s)</label>
-                    <input type="textarea" class="form-control" id="granularity" placeholder="Sample rate (eg 10)" value="10">
-                  </div>
-                </div>
-
-
-                <div class='col-md-12'>
-                  <div class="form-group">
                     <label >Chart Position</label>
                     <select class="form-control" id='destination'>
                       <option value='top'>Top</option>
                       <option value='middle'>Middle</option>
                       <option value='bottom'>Bottom</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class='col-md-12'>
-                  <div class="form-group">
-                    <label >Line Interpolation</label>
-                    <select class="form-control" id='interpolation'>
-                      <option value='step-after'>Stepwise</option>
-                      <option value='linear'>Linear</option>
                     </select>
                   </div>
                 </div>
@@ -224,8 +206,7 @@
   </div>
 
 <div class='col-md-12'>
-<h2>Want to see your data here?</h2>
-  {% include "accounts/mixins/_ping_request.html" %}
+  {% include "accounts/mixins/_login_convert.html" %}
 </div>
 {% endblock aligned_content %}
 
@@ -241,10 +222,8 @@
       var facet = $('#data :selected').val();
 
       var params = {
-        granularity: parseInt($('#granularity').val()),
         end_time: $('#end_time').val(),
         start_time: $('#start_time').val(),
-        interpolation: $('#interpolation :selected').val(),
       };
 
       d7.extensions.charts.replays.stat_lineup(

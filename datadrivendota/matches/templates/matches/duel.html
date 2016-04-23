@@ -12,7 +12,7 @@
       </h2>
     </div>
     <p>
-      Compare <span class='brand-primary'>parsed</span> performance from two players, even in different matches.  Measure up to your friends or steal the builds of your enemies!
+      Compare <a href="{% url 'matches:parsed_index' %}">parsed</a> performance from two players, even in different matches.  Measure up to your friends or steal the builds of your enemies!
     </p>
   </div>
 
@@ -60,14 +60,6 @@
             <input type="textarea" class="form-control" id="end_time" placeholder="End Time (eg 23:10)">
           </div>
         </div>
-
-        <div class='col-md-2'>
-          <div class="form-group">
-            <label >Sample Freq (s)</label>
-            <input type="textarea" class="form-control" id="granularity" placeholder="Sample rate (eg 10)" value="30">
-          </div>
-        </div>
-
 
         <div class='col-md-3' style='margin-top:10px'>
           <div class="btn-group btn-group-justified" role="group">
@@ -190,8 +182,7 @@
     </div>
 
     <div class='col-md-12'>
-    <h2>Want to see your data here?</h2>
-      {% include "accounts/mixins/_ping_request.html" %}
+      {% include "accounts/mixins/_login_convert.html" %}
     </div>
 {% endblock aligned_content %}
 
@@ -211,7 +202,6 @@
       var label_2 = $('#label_2').val();
 
       var params = {
-        granularity: parseInt($('#granularity').val()),
         end_time: $('#end_time').val(),
         start_time: $('#start_time').val(),
         x_label: label_1,
