@@ -27,7 +27,7 @@ class RawLimitOffsetPagination(LimitOffsetPagination):
 
 
 class MatchViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Match.parsed.all()
+    queryset = Match.objects.all()
     serializer_class = MatchSerializer
     filter_backends = (
         filters.DjangoFilterBackend,
