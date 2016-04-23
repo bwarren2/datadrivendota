@@ -7,6 +7,8 @@ import requests
 from django.db import models
 from django.utils import timezone
 
+from django.db.models import Q
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,11 +20,13 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
     def active_urls(self, COOLDOWN=timedelta(hours=24)):
         now = timezone.now()
         return self.filter(
-            last_bad_time__lt=now - COOLDOWN,
+            Q(last_bad_time__lt=now - COOLDOWN) |
+            Q(last_bad_time=None)
         )
 
     def get_replay_url(self, match_id):
         # Constants:
+        MATCH_ID = 'match_id'
         retry_erorrs = ('notready', 'timeout')
         fail_errors = ('invalid',)
         cooldown_errors = (
@@ -44,7 +48,7 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
             resp = requests.get(
                 replay_url.url,
                 params={
-                    self.MATCH_ID: match_id,
+                    MATCH_ID: match_id,
                 },
             )
             try:
@@ -80,9 +84,6 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
 
 
 class ReplayUrlBackend(models.Model):
-    MATCH_ID = 'match_id'
-    COOLDOWN = timedelta(hours=24)
-
     objects = ReplayUrlBackendQuerySet.as_manager()
 
     url = models.URLField()
