@@ -15,10 +15,10 @@ class RateLimitError(Exception):
 
 
 class ReplayUrlBackendQuerySet(models.QuerySet):
-    def active_urls(self):
+    def active_urls(self, COOLDOWN=timedelta(hours=24)):
         now = timezone.now()
         return self.filter(
-            last_bad_time__lt=now - self.COOLDOWN,
+            last_bad_time__lt=now - COOLDOWN,
         )
 
     def get_replay_url(self, match_id):
