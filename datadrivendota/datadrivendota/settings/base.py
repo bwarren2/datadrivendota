@@ -209,6 +209,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     # 'payments.middleware.ActiveSubscriptionMiddleware',
+    'datadrivendota.middleware.SocialAuthExceptionMiddleware',
 )
 # END MIDDLEWARE CONFIGURATION
 
@@ -447,7 +448,7 @@ TESTERS = [
     85045426,
     68083913,
     51753511,
-    88367253, # Yasp's lead dev
+    88367253,  # Yasp's lead dev
     # Def randos here
 ]
 
