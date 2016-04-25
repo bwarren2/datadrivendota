@@ -24,171 +24,183 @@
       <h4>Controls</h4>
       <form>
       <div class='row'>
-          <div class='col-md-6'>
+          <div class='col-md-12'>
             <div class="form-group">
-              <label>Match IDs</label>
-              <select id='shards' multiple='multiple' style='width:200px'></select>
+              <label>
+                Data
+                <i class="fa fa-asterisk required" aria-hidden="true"></i>
+              </label>
+              <select class="form-control" id='data'>
+                <optgroup label='Hero Attributes'>
+                  <option value='agility'>
+                          Agility
+                  </option>
+                  <option value='agility_total'>
+                          Agility Total
+                  </option>
+                  <option value='strength'>
+                          Strength
+                  </option>
+                  <option value='strength_total'>
+                          Strength Total
+                  </option>
+                  <option value='intelligence'>
+                          Intelligence
+                  </option>
+                  <option value='intelligence_total'>
+                          Intelligence Total
+                  </option>
+                  <option value='armor'>
+                          Armor
+                  </option>
+                  <option value='base_damage'>
+                          Base Damage
+                  </option>
+                  <option value='bonus_damage'>
+                          Bonus Damage
+                  </option>
+                  <option value='total_damage'>
+                          Total Damage
+                  </option>
+                  <option value='health'>
+                          Health
+                  </option>
+                  <option value='max_health'>
+                          Max Health
+                  </option>
+                  <option value='pct_health'>
+                          Percent Health
+                  </option>
+                  <option value='mana'>
+                          Mana
+                  </option>
+                  <option value='max_mana'>
+                          Max Mana
+                  </option>
+                  <option value='pct_mana'>
+                          Percent Mana
+                  </option>
+                </optgroup>
+                <optgroup label='Combat'>
+                  <option value='kills'>
+                          Kills
+                  </option>
+                  <option value='deaths'>
+                          Deaths
+                  </option>
+                  <option value='assists'>
+                          Assists
+                  </option>
+                  <option value='last_hits'>
+                          Last Hits
+                  </option>
+                  <option value='denies'>
+                          Denies
+                  </option>
+                  <option value='misses'>
+                          Misses
+                  </option>
+                  <option value='healing'>
+                          Healing
+                  </option>
+                  <option value='roshan_kills'>
+                          Roshan Kills
+                  </option>
+                  <option value='nearby_creep_deaths'>
+                          Nearby Creep Deaths
+                  </option>
+                  <option value='tower_kills'>
+                          Tower Kills
+                  </option>
+                </optgroup>
+                <optgroup label='Gold and XP'>
+                  <option value='shared_gold'>
+                          Shared Gold
+                  </option>
+                  <option value='reliable_gold'>
+                          Reliable Gold
+                  </option>
+                  <option value='total_earned_gold'>
+                          Total Earned Gold
+                  </option>
+                  <option value='unreliable_gold'>
+                          Unreliable Gold
+                  </option>
+                  <option value='creep_kill_gold'>
+                          Creep Kill Gold
+                  </option>
+                  <option value='hero_kill_gold'>
+                          Hero Kill Gold
+                  </option>
+                  <option value='income_gold'>
+                          Income Gold
+                  </option>
+                  <option value='xp'>
+                          Xp
+                  </option>
+                </optgroup>
+              </select>
             </div>
-            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#match-select">
-              Filter Matches
-            </button>
-            <ul id="filtered-matches">
-            </ul>
           </div>
-          <div class='col-md-6'>
-              <div class='row'>
-                <div class='col-md-12'>
-                  <div class="form-group">
-                    <label>Data</label>
-                    <select class="form-control" id='data'>
-                      <optgroup label='Hero Attributes'>
-                        <option value='agility'>
-                                Agility
-                        </option>
-                        <option value='agility_total'>
-                                Agility Total
-                        </option>
-                        <option value='strength'>
-                                Strength
-                        </option>
-                        <option value='strength_total'>
-                                Strength Total
-                        </option>
-                        <option value='intelligence'>
-                                Intelligence
-                        </option>
-                        <option value='intelligence_total'>
-                                Intelligence Total
-                        </option>
-                        <option value='armor'>
-                                Armor
-                        </option>
-                        <option value='base_damage'>
-                                Base Damage
-                        </option>
-                        <option value='bonus_damage'>
-                                Bonus Damage
-                        </option>
-                        <option value='total_damage'>
-                                Total Damage
-                        </option>
-                        <option value='health'>
-                                Health
-                        </option>
-                        <option value='max_health'>
-                                Max Health
-                        </option>
-                        <option value='pct_health'>
-                                Percent Health
-                        </option>
-                        <option value='mana'>
-                                Mana
-                        </option>
-                        <option value='max_mana'>
-                                Max Mana
-                        </option>
-                        <option value='pct_mana'>
-                                Percent Mana
-                        </option>
-                      </optgroup>
-                      <optgroup label='Combat'>
-                        <option value='kills'>
-                                Kills
-                        </option>
-                        <option value='deaths'>
-                                Deaths
-                        </option>
-                        <option value='assists'>
-                                Assists
-                        </option>
-                        <option value='last_hits'>
-                                Last Hits
-                        </option>
-                        <option value='denies'>
-                                Denies
-                        </option>
-                        <option value='misses'>
-                                Misses
-                        </option>
-                        <option value='healing'>
-                                Healing
-                        </option>
-                        <option value='roshan_kills'>
-                                Roshan Kills
-                        </option>
-                        <option value='nearby_creep_deaths'>
-                                Nearby Creep Deaths
-                        </option>
-                        <option value='tower_kills'>
-                                Tower Kills
-                        </option>
-                      </optgroup>
-                      <optgroup label='Gold and XP'>
-                        <option value='shared_gold'>
-                                Shared Gold
-                        </option>
-                        <option value='reliable_gold'>
-                                Reliable Gold
-                        </option>
-                        <option value='total_earned_gold'>
-                                Total Earned Gold
-                        </option>
-                        <option value='unreliable_gold'>
-                                Unreliable Gold
-                        </option>
-                        <option value='creep_kill_gold'>
-                                Creep Kill Gold
-                        </option>
-                        <option value='hero_kill_gold'>
-                                Hero Kill Gold
-                        </option>
-                        <option value='income_gold'>
-                                Income Gold
-                        </option>
-                        <option value='xp'>
-                                Xp
-                        </option>
-                      </optgroup>
-                    </select>
-                  </div>
-                </div>
+          <div class='col-md-7'>
+            <div class="form-group">
+              <label>
+              Match IDs
+                <i class="fa fa-asterisk required" aria-hidden="true"></i>
+              </label>
+              <select id='shards' multiple='multiple' style='width:100%'></select>
+            </div>
+            <div class="form-group">
+              <label>Labels</label>
+                <input type="textarea" class="form-control" id="labels" placeholder="(comma-separated, ex 'Fast Midas,Fast Radiance')">
+            </div>
+          </div>
+          <div class='col-md-5'>
+            <div style='margin-top:20px'>
+              <button type="button" class="btn btn-default btn-lg" data-toggle="modal" data-target="#match-select">
+                Find Matches
+              </button>
+              <ul id="filtered-matches" class="list-unstyled">
+              </ul>
+            </div>
+          </div>
 
-                <div class='col-md-12'>
-                  <div class="form-group">
-                    <label >Start Time</label>
-                    <input type="textarea" class="form-control" id="start_time" placeholder="Start Time (eg 12:41)">
-                  </div>
-                </div>
 
-                <div class='col-md-12'>
-                  <div class="form-group">
-                    <label >End Time</label>
-                    <input type="textarea" class="form-control" id="end_time" placeholder="End Time (eg 23:10)">
-                  </div>
-                </div>
+          <div class='col-md-12'>
+            <div class="form-group">
+              <label >Start Time</label>
+              <input type="textarea" class="form-control" id="start_time" placeholder="Start Time (eg 12:41)">
+            </div>
+          </div>
 
-                <div class='col-md-12'>
-                  <div class="form-group">
-                    <label >Chart Position</label>
-                    <select class="form-control" id='destination'>
-                      <option value='top'>Top</option>
-                      <option value='middle'>Middle</option>
-                      <option value='bottom'>Bottom</option>
-                    </select>
-                  </div>
-                </div>
+          <div class='col-md-12'>
+            <div class="form-group">
+              <label >End Time</label>
+              <input type="textarea" class="form-control" id="end_time" placeholder="End Time (eg 23:10)">
+            </div>
+          </div>
 
+          <div class='col-md-12'>
+            <div class="form-group">
+              <label >Chart Position</label>
+              <select class="form-control" id='destination'>
+                <option value='top'>Top</option>
+                <option value='middle'>Middle</option>
+                <option value='bottom'>Bottom</option>
+              </select>
+            </div>
+          </div>
+      </div>
+      <div class='row'>
+        <div class='col-md-12'>
+            <div class="btn-group btn-group-justified" role="group">
+              <div class="btn-group" role="group">
+                <button id='chart-button' type="button" class="btn btn-primary btn-lg">
+                  Chart! <i class="fa fa-line-chart"></i>
+                </button>
+              </div>
             </div>
         </div>
-      </div>
-      <div class='col-md-12' style='margin-top:10px'>
-          <div class="btn-group btn-group-justified" role="group">
-            <div class="btn-group" role="group">
-              <button id='chart-button' type="button" class="btn btn-default">
-                Chart! <i class="fa fa-line-chart"></i>
-              </button>
-            </div>
-          </div>
       </div>
   </form>
   </div>
@@ -220,19 +232,24 @@
       var shards = $('#shards').select2('data');
       var destination = '#'+$('#destination :selected').val();
       var facet = $('#data :selected').val();
+      var labels = $('#labels').val().split(',');
 
       var params = {
         end_time: $('#end_time').val(),
         start_time: $('#start_time').val(),
       };
 
+      shards.map(function(d, i){
+        d.name = labels[i] ? labels[i] : d.name;
+      })
+
       d7.extensions.charts.replays.stat_lineup(
-          shards,
-          facet,
-          destination,
-          params,
-          'statelog'
-          );
+        shards,
+        facet,
+        destination,
+        params,
+        'statelog'
+      );
     });
   });
 </script>
@@ -246,6 +263,9 @@
   }
   .select2-result-pms__title{
     color: black;
+  }
+  .required{
+    color:#D42E34;
   }
 </style>
 {% endblock extra_css %}

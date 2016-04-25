@@ -192,7 +192,7 @@ $(function () {
             cache: true
           },
           escapeMarkup: function (markup) { return markup; },
-          minimumInputLength: 6,
+          minimumInputLength: 10,
           templateResult: formatPms,
           templateSelection: formatPmsSelection
 
