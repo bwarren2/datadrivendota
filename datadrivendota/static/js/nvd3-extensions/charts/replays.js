@@ -16,29 +16,29 @@ var replay_lines = function(dataset, facet, destination, params){
   var x_label = toTitleCase("offset time");
   var y_label = toTitleCase(facet);
 
-  var stride;
-  var start_time;
-  var end_time;
+  // var stride;
+  // var start_time;
+  // var end_time;
 
   if (params.label!==undefined) {
     var y_label = toTitleCase(params.label);
   }
 
-  if(params.granularity!==undefined){
-    stride = params.granularity;
+  if(params.granularity === parseInt(params.granularity)){
+    var stride = params.granularity;
   }else{
-    stride = 1;
+    var stride = 1;
   }
 
-  if(params.start_time!==undefined){
-    start_time = params.start_time;
+  if(params.start_time === parseInt(params.start_time)){
+    var start_time = params.start_time;
   }else{
-    start_time = -99999;
+    var start_time = -99999;
   }
-  if(params.end_time!==undefined){
-    end_time = params.end_time;
+  if(params.end_time === parseInt(params.end_time)){
+    var end_time = params.end_time;
   }else{
-    end_time = 99999999;
+    var end_time = 99999999;
   }
 
   dataset = dataset.map(function(series){
@@ -75,7 +75,8 @@ var replay_lines = function(dataset, facet, destination, params){
     margin: {
       t: 20
     },
-    hovermode: 'closest'
+    hovermode: 'closest',
+    showLegend: true
   };
   if(params.inset_legend){
     layout.legend = {
