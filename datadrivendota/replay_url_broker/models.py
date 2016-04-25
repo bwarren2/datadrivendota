@@ -17,11 +17,11 @@ class RateLimitError(Exception):
 
 
 class ReplayUrlBackendQuerySet(models.QuerySet):
-    def active_urls(self, COOLDOWN=timedelta(hours=24)):
+    def active_urls(self):
         now = timezone.now()
         return self.filter(
-            Q(last_bad_time__lt=now - COOLDOWN) |
-            Q(last_bad_time=None)
+            Q(do_not_use_before__lte=now) |
+            Q(do_not_use_before=None)
         )
 
     def get_replay_url(self, match_id):
@@ -70,7 +70,7 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
                 self.filter(
                     pk=replay_url.id,
                 ).update(
-                    last_bad_time=now,
+                    do_not_use_before=now + timedelta(hours=24),
                 )
             except ValueError as e:
                 logger.error(
@@ -87,4 +87,4 @@ class ReplayUrlBackend(models.Model):
     objects = ReplayUrlBackendQuerySet.as_manager()
 
     url = models.URLField()
-    last_bad_time = models.DateTimeField(null=True)
+    do_not_use_before = models.DateTimeField(null=True)
