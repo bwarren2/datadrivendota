@@ -20,7 +20,7 @@ class ForceHttps(object):
 class SocialAuthExceptionMiddleware(BaseSocialAuthExceptionMiddleware):
     def get_message(self, request, exception):
         return (
-            "Steam is having a bad day. "
+            "Steam's login endpoint is not cooperating right now. "
             "Please try logging in again in a couple minutes."
         )
 
