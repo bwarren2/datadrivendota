@@ -154,7 +154,7 @@
     });
 
     var pms_ids = window.jsUtils.getParameterByName('pms_ids');
-    if(pms_ids!==undefined){
+    if(pms_ids!==undefined && pms_ids!==null){
       var url = '/rest-api/parse-shards/?pms_ids=['+pms_ids+']';
       console.log(url);
       $.getJSON(url)
