@@ -1,28 +1,38 @@
 {% extends "row_base.html" %}
+{% load staticfiles %}
+
 {% block title %}Match List{% endblock title %}
 
 {% block aligned_content %}
-    <div class='col-md-12'>
 
-    {% if parsed %}
-    <h1> Parsed Matches <small> | <a href="{% url 'matches:index' %}">All Matches</a></small></h1>
-    {% elif all %}
-    <h1> All Matches <small> | <a href="{% url 'matches:parsed_index' %}">Parsed Matches Only</a></small></h1>
-    {% endif %}
+{% include "mixins/_match_form.html" %}
 
-    {% if request.user.is_authenticated %}
-    <p class="">
-      <em>Don't see the match you're looking for? <a href="{% url "parserpipe:import" %}">Import</a> it!</em>
-    </p>
-    {% endif %}
+<div class='col-md-12'>
+  <h1>
+  {% if parsed %}
+  Parsed Matches <small>| <a href="{% url 'matches:index' %}">All Matches</a></small>
+  {% elif all %}
+  All Matches <small>| <a href="{% url 'matches:parsed_index' %}">Parsed Matches Only</a></small>
+  {% endif %}
+  <button type="button" class="btn btn-default btn-lg pull-right" data-toggle="modal" data-target="#match-select">
+    Find Matches
+  </button>
+  </h1>
 
-    </div>
-    {% for match in match_list %}
-        <div class='col-md-12' style='margin-bottom:20px'>
-            {% include "matches/_match_card.html" %}
-        </div>
-    {% endfor %}
+  {% if request.user.is_authenticated %}
+  <p>
+  <em>Don't see the match you're looking for? <a href="{% url "parserpipe:import" %}">Import</a> it!</em>
+  </p>
+  {% endif %}
+</div>
 
-    {% include "_pagination.html" with pages_list=page_obj page_links_to_display=object_list.paginator.page_range_with_ellipses %}
+<div id="match-list">
+  {% for match in match_list %}
+  <div class='col-md-12' style='margin-bottom:20px'>
+    {% include "matches/_match_card.html" %}
+  </div>
+  {% endfor %}
+</div>
 
+{% include "_pagination.html" with pages_list=page_obj page_links_to_display=object_list.paginator.page_range_with_ellipses %}
 {% endblock aligned_content %}

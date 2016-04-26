@@ -1,74 +1,70 @@
 {% load staticfiles player_extras human_seconds %}
 
-
 <h2 class='match-card-header'>
   <a href="/matches/{{match.steam_id}}">Match: {{match.steam_id}}</a>
   <i
-    class="glyphicon glyphicon-copy clippable"
-    title='Copy match id'
-    data-clipboard-text="{{match.steam_id}}"
-  ></i>
+     class="glyphicon glyphicon-copy clippable"
+     title='Copy match id'
+     data-clipboard-text="{{match.steam_id}}"
+     ></i>
 
   <small>
     {% if match.radiant_team.name and match.dire_team.name %}
-      {{match.radiant_team.name}} vs {{match.dire_team.name}}
+    {{match.radiant_team.name}} vs {{match.dire_team.name}}
     {% endif %}
     {% if match.league.name %}
-      at {{match.league.name}}
+    at {{match.league.name}}
     {% endif %}
-      on {{match.start_time|seconds_to_date|date:'m-d-y'}}
+    on {{match.start_time|seconds_to_date|date:'m-d-y'}}
   </small>
-    {% if user.is_superuser %}
-      <span class='admin-tag'> {{clearname}}</span>
-    {% elif match.is_parsed%}
-    <small class='text-primary'>
-        Parsed
-    </small>
-    {% endif %}
+  {% if user.is_superuser %}
+  <span class='admin-tag'> {{clearname}}</span>
+  {% elif match.is_parsed%}
+  <small class='text-primary'>
+    Parsed
+  </small>
+  {% endif %}
 
 </h2>
-  <div class='side'>
-    <div class="row">
-
-      {% for summary in match.playermatchsummary_set.all %}
-            {% if summary.side == 'Radiant' %}
-              {% include "matches/_pms_card.html" %}
-            {% endif %}
-      {% endfor %}
-
-      {% if match.radiant_team %}
-        <div class="col-md-2 col-xs-6 col-sm-2">
-          <img class='thumbnail league-pip'
-          src="{{match.radiant_team.image}}"
-          alt='{{ match.radiant_team.name }}'
-          title='{{match.radiant_team.name}}'>
-        </div>
-      {% else %}
-        <div class="col-md-2 col-xs-6 col-sm-2">
-          <img class='img-responsive side-icon' src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.side }}'>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class='side'>
+<div class='side'>
   <div class="row">
     {% for summary in match.playermatchsummary_set.all %}
-          {% if summary.side == 'Dire' %}
-            {% include "matches/_pms_card.html" %}
-          {% endif %}
+    {% if summary.side == 'Radiant' %}
+    {% include "matches/_pms_card.html" %}
+    {% endif %}
     {% endfor %}
 
-    {% if match.dire_team %}
-      <div class="col-md-2  col-xs-6 col-sm-2">
-        <img class='thumbnail league-pip' src="{{match.dire_team.image}}" alt='{{ match.dire_team.name }}' title='{{match.dire_team.name}}'>
-      </div>
+    {% if match.radiant_team %}
+    <div class="col-md-2 col-xs-6 col-sm-2">
+      <img class='thumbnail league-pip'
+         src="{{match.radiant_team.image}}"
+         alt='{{ match.radiant_team.name }}'
+         title='{{match.radiant_team.name}}'>
+    </div>
     {% else %}
-      <div class="col-md-2 col-xs-6 col-sm-2">
-        <img class='img-responsive side-icon'  src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.side }}'>
-      </div>
+    <div class="col-md-2 col-xs-6 col-sm-2">
+      <img class='img-responsive side-icon' src="{% static 'images/pips/pip_radiant.png' %}" alt='{{ summary.side }}'>
+    </div>
     {% endif %}
-
   </div>
 </div>
 
+<div class='side'>
+  <div class="row">
+    {% for summary in match.playermatchsummary_set.all %}
+    {% if summary.side == 'Dire' %}
+    {% include "matches/_pms_card.html" %}
+    {% endif %}
+    {% endfor %}
+
+    {% if match.dire_team %}
+    <div class="col-md-2  col-xs-6 col-sm-2">
+      <img class='thumbnail league-pip' src="{{match.dire_team.image}}" alt='{{ match.dire_team.name }}' title='{{match.dire_team.name}}'>
+    </div>
+    {% else %}
+    <div class="col-md-2 col-xs-6 col-sm-2">
+      <img class='img-responsive side-icon'  src="{% static 'images/pips/pip_dire.png' %}" alt='{{ summary.side }}'>
+    </div>
+    {% endif %}
+  </div>
+</div>

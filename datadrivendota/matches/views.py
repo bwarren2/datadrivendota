@@ -1,8 +1,8 @@
 from django.views.generic import DetailView, ListView, TemplateView
 from utils.views import ability_infodict
-from django.contrib import messages
 from parserpipe.models import MatchRequest
 
+from .filters import MatchFilter
 from .models import Match, PlayerMatchSummary, PickBan
 from utils.pagination import SmarterPaginator
 
@@ -167,6 +167,7 @@ class PerformanceView(TemplateView):
 class MatchListView(ListView):
     queryset = Match.objects.all()
     paginate_by = 10
+    template_name = 'matches/match_list.html'
 
     def get_queryset(self):
         qs = super(MatchListView, self).get_queryset()
@@ -192,6 +193,12 @@ class MatchListView(ListView):
                 'playermatchsummary_set__player',
                 'playermatchsummary_set__leaver',
             )
+
+        get_keys = set(self.request.GET.keys())
+        filter_keys = set(MatchFilter.declared_filters.keys())
+        if get_keys & filter_keys:
+            matches = MatchFilter(self.request.GET, matches)
+
         return matches
 
     def paginate_queryset(self, queryset, page_size):
@@ -206,7 +213,10 @@ class MatchListView(ListView):
 
     def get_context_data(self, **kwargs):
         kwargs['all'] = True
-        return super(MatchListView, self).get_context_data(**kwargs)
+        ret = super(MatchListView, self).get_context_data(**kwargs)
+        # Let's be gross and undo some of the implicit magic of the generic CBV:
+        ret['match_list'] = ret['object_list']
+        return ret
 
 
 class ParsedMatchListView(MatchListView):
