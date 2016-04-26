@@ -41,7 +41,12 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
         # If we get it, we return early.
         #
         # If we don't get it, we mark that URL for cooldown and try the next.
-        for replay_url in self.active_urls():
+        active_urls = self.active_urls()
+        if not active_urls:
+            logger.warn(
+                'No active replay URLs, things will fail for bad reasons'
+            )
+        for replay_url in active_urls:
             logger.info(
                 'Hitting {0} with {1}'.format(replay_url.url, match_id)
             )
