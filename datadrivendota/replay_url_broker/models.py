@@ -51,6 +51,7 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
                     MATCH_ID: match_id,
                 },
             )
+            logger.info(resp);
             try:
                 # Process:
                 resp.raise_for_status()
