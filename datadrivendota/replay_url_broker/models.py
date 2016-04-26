@@ -45,13 +45,15 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
             logger.info(
                 'Hitting {0} with {1}'.format(replay_url.url, match_id)
             )
+            params = {
+                MATCH_ID: match_id,
+            }
+            logger.info(replay_url.url, params)
             resp = requests.get(
                 replay_url.url,
-                params={
-                    MATCH_ID: match_id,
-                },
+                params,
             )
-            logger.info(resp);
+            logger.info(resp)
             try:
                 # Process:
                 resp.raise_for_status()
