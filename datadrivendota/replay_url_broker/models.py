@@ -30,8 +30,8 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
         retry_erorrs = ('notready', 'timeout')
         fail_errors = ('invalid',)
         cooldown_errors = (
-            requests.exceptions.HTTPError,
-            RateLimitError,
+            # requests.exceptions.HTTPError,
+            # RateLimitError,
         )
 
         # We go through all active URLs, and try to get the replay URL for the
