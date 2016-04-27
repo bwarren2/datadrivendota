@@ -38,8 +38,6 @@ if not CACHE_ENABLED:
 #      #installation
 INSTALLED_APPS += (
     'debug_toolbar',
-    'devserver',
-    # 'template_timings_panel',
     'debug_toolbar_line_profiler',
     'template_profiler_panel',
 )

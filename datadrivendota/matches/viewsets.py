@@ -47,14 +47,6 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
             .given(self.request)\
             .order_by('-start_time')
 
-        # limit = self.request.query_params.get(self.page_size_query_param)
-
-        # if limit is not None:
-        #     result_limit = min(limit, self.max_page_size)
-        #     queryset = queryset[:result_limit]
-        # else:
-        #     queryset = queryset[:self.page_size]
-
         return queryset.select_related()
 
 
