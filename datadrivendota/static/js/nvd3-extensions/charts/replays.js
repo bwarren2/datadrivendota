@@ -106,6 +106,7 @@ var replay_lines = function(dataset, facet, destination, params){
 
 var stat_lineup = function(shards, facet, destination, params, log){
 
+  console.log(log);
   if (log===undefined) {log = 'statelog';}
 
   if (log==='statelog') {
