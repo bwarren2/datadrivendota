@@ -112,19 +112,25 @@
                   <option value='tower_kills'>
                           Tower Kills
                   </option>
+                  <option value='hero_dmg_dealt'>
+                          Hero Damage Dealt
+                  </option>
+                  <option value='hero_dmg_taken'>
+                          Hero Damage Taken
+                  </option>
+                  <option value='other_dmg_taken'>
+                          Other Damage Taken
+                  </option>
+                  <option value='other_dmg_dealt'>
+                          Other Damage Dealt
+                  </option>
+                  <option value='key_bldg_dmg_dealt'>
+                          Key Building Damage Dealt
+                  </option>
                 </optgroup>
                 <optgroup label='Gold and XP'>
-                  <option value='shared_gold'>
-                          Shared Gold
-                  </option>
-                  <option value='reliable_gold'>
-                          Reliable Gold
-                  </option>
                   <option value='total_earned_gold'>
                           Total Earned Gold
-                  </option>
-                  <option value='unreliable_gold'>
-                          Unreliable Gold
                   </option>
                   <option value='creep_kill_gold'>
                           Creep Kill Gold
@@ -135,8 +141,29 @@
                   <option value='income_gold'>
                           Income Gold
                   </option>
+                  <option value='shared_gold'>
+                          Shared Gold
+                  </option>
+                  <option value='reliable_gold'>
+                          Reliable Gold
+                  </option>
+                  <option value='unreliable_gold'>
+                          Unreliable Gold
+                  </option>
+                  <option value='buyback_expense'>
+                          Buyback Gold Lost
+                  </option>
+                  <option value='death_expense'>
+                          Death Gold Lost
+                  </option>
                   <option value='xp'>
-                          Xp
+                          All Xp
+                  </option>
+                  <option value='creep_xp'>
+                          Creep XP
+                  </option>
+                  <option value='hero_xp'>
+                          Hero XP
                   </option>
                 </optgroup>
               </select>
@@ -242,14 +269,40 @@
       shards.map(function(d, i){
         d.name = labels[i] ? labels[i] : d.name;
       })
-
-      d7.extensions.charts.replays.stat_lineup(
-        shards,
-        facet,
-        destination,
-        params,
-        'statelog'
-      );
+      var combatlog_flag = [
+        'buyback_expense',
+        'creep_xp',
+        'death_expense',
+        'hero_dmg_dealt',
+        'hero_dmg_taken',
+        'hero_xp',
+        'key_bldg_dmg_dealt',
+        'other_dmg_dealt',
+        'other_dmg_taken',
+        'reliable_gold',
+        'shared_gold',
+        'unreliable_gold',
+      ].indexOf(facet);
+      console.log(combatlog_flag, facet);
+      if(combatlog_flag===-1){
+        d7.extensions.charts.replays.stat_lineup(
+          shards,
+          facet,
+          destination,
+          params,
+          'statelog'
+        );
+        console.log('a');
+      }else{
+        console.log('b');
+          d7.extensions.charts.replays.stat_lineup(
+          shards,
+          facet,
+          destination,
+          params,
+          'combatseries'
+        );
+      }
     });
   });
 </script>
