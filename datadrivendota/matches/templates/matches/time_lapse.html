@@ -305,7 +305,6 @@ $(document).ready(function() {
         'other_dmg_dealt',
         'other_dmg_taken',
       ].indexOf(facet);
-      console.log(combatlog_flag, facet);
       if(combatlog_flag===-1){
         d7.extensions.charts.replays.stat_lineup(
           shards,
@@ -314,9 +313,7 @@ $(document).ready(function() {
           params,
           'statelog'
         );
-        console.log('a');
       }else{
-        console.log('b');
           d7.extensions.charts.replays.stat_lineup(
           shards,
           facet,
