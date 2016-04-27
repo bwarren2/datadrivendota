@@ -30,7 +30,7 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
         retry_erorrs = ('notready', 'timeout')
         fail_errors = ('invalid',)
         cooldown_errors = (
-            # requests.exceptions.HTTPError,
+            requests.exceptions.HTTPError,
             # RateLimitError,
         )
 
@@ -96,3 +96,16 @@ class ReplayUrlBackend(models.Model):
 
     url = models.URLField()
     do_not_use_before = models.DateTimeField(null=True)
+
+    def __unicode__(self):
+        fragment = self.url[8:self.url.find('.herokuapp')]
+        if timezone.now() > self.do_not_use_before:
+            useable = 'usable'
+        else:
+            useable = 'OUT OF SERVICE'
+
+        return "{0}, {1} ({2})".format(
+            fragment,
+            useable,
+            self.do_not_use_before.strftime("%m-%d %H:%M:%S")
+        )
