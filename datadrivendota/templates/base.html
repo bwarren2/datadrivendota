@@ -108,10 +108,7 @@
 
           {% if SHOW_TEAMS %}
             <li class="dropdown {% active 'teams' main_nav %}">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Teams <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li class="{% active 'teams:index' %}"><a href="{% url 'teams:index' %}">Team Index</a></li>
-              </ul>
+              <li class="{% active 'teams:index' %}"><a href="{% url 'teams:index' %}">Teams</a></li>
             </li>
           {% endif %}
 
