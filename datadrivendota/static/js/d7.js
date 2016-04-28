@@ -1344,12 +1344,19 @@ var replay_lines = function(dataset, facet, destination, params){
           t.setSeconds(d.offset_time);
         return t;
     })
-    return {
+    var data_obj = {
       type: 'scattergl',
       x: x,
       y: series.values.map(function(d){return d[facet]}),
       name: series.shard.name
     }
+    if (series.shard.color) {
+      data_obj.line = {
+        color: series.shard.color,
+      }
+    }
+
+    return data_obj;
   });
 
   var layout = {
