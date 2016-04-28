@@ -4,11 +4,13 @@ from datetime import timedelta
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.conf import settings
 
 from players.validators import validate_32bit
 
 from djstripe.models import Customer
+from djstripe.utils import subscriber_has_active_subscription
 
 
 def get_active_users(since=timedelta(days=14)):
@@ -92,6 +94,20 @@ class UserProfile(models.Model):
         if self.steam_id is not None:
             self.steam_id = self.steam_id % settings.ADDER_32_BIT
         super(UserProfile, self).save(*args, **kwargs)
+
+    @cached_property
+    def has_active_subscription(self):
+        return subscriber_has_active_subscription(self.user)
+
+    def monthly_requests(self, year=None, month=None):
+        if year is None or month is None:
+            now = timezone.now()
+            year = now.year
+            month = now.month
+        return self.requested.filter(
+            creation__year=year,
+            creation__month=month,
+        )
 
 
 class PingRequest(models.Model):

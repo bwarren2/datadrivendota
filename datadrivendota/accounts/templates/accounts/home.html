@@ -1,21 +1,82 @@
 {% extends "row_base.html" %}
-{% load static %}
+
+{% load static humanize %}
+
 {% block title %}Welcome!{% endblock title %}
+
 {% block aligned_content %}
-    <div class='col-md-12'>
-        <h1>Your Account </h1>
-        <p>Let's just make sure that we think you are who you think you are.</p>
-        {% if user.userprofile.steam_id %}
-        <p>Your current id is:</p>
-            <ul>
-                <li> 64 bit ID: {{user.userprofile.big_steam_id}}</li>
-                <li> 32 bit ID: {{user.userprofile.steam_id}}</li>
-            </ul>
-        <p>If <a href="http://steamcommunity.com/profiles/{{user.userprofile.big_steam_id}}">this</a> is your steam profile, you are all set!</p>
-        {% else %}
-            <div class="alert alert-warning" role="alert">
-              Your Steam ID is not set!  We cannot import your games without it.
-            </div>
-        {% endif %}
+<h1>
+  Account
+</h1>
+<div class="row">
+  <div class="col-md-12">
+    <h2>Your data</h2>
+    <p>
+      Please note: we can't do anything with your data unless you have made it
+      public. Instructions on doing so can be found here. TODO.
+    </p>
+    {% if not user.userprofile.has_active_subscription %}
+    <p>
+      You have used {{ user.userprofile.monthly_requests.count }} of your
+      {{ user.userprofile.request_limit }} free imports this month.
+    </p>
+    {% endif %}
+    <p>
+    You have <a href="{% url 'players:id_detail' user.userprofile.steam_id %}">{{ user.userprofile.requested.count|apnumber }} matches imported</a> total.
+    </p>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <h2>While you wait</h2>
+    <p>
+      TODO: Ben should write some insightful copy here.
+    </p>
+  </div>
+</div>
+{% if not user.userprofile.has_active_subscription %}
+<div class="row">
+  <div class="col-md-12">
+    <h2>Get Ultimate</h2>
+    <p>
+    With an Ultimate account, you get more:
+    </p>
+    <ul>
+      <li>All your matches are automatically imported. No more button pressing!</li>
+      <li>
+        And we mean <em>all</em>&mdash;that
+        &ldquo;{{ user.userprofile.request_limit|apnumber }} matches a month&rdquo; limit
+        comes off.
+      </li>
+      <li>Priority import queues mean your matches will come in faster.</li>
+    </ul>
+    <p>
+    So, what are you waiting for?
+    </p>
+    <a href="{% url 'djstripe:subscribe' %}" class="btn btn-primary">
+      Ultimate me!
+    </a>
+  </div>
+</div>
+{% endif %}
+<div class="row">
+  <div class='col-md-12'>
+    <h2>Do we think you are who you think you are?</h2>
+    <p>Let's just make sure that we think you are who you think you are.</p>
+    {% if user.userprofile.steam_id %}
+    <p>Your current id is:</p>
+    <ul>
+      <li>64 bit ID: {{user.userprofile.big_steam_id}}</li>
+      <li>32 bit ID: {{user.userprofile.steam_id}}</li>
+    </ul>
+    <p>
+    If <a href="http://steamcommunity.com/profiles/{{user.userprofile.big_steam_id}}">this</a> is your steam profile, you are all set!
+    </p>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+      Your Steam ID is not set!  We cannot import your games without it.
     </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock aligned_content %}
