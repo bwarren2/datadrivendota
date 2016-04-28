@@ -1,4 +1,5 @@
 import json
+import operator
 
 from rest_framework import viewsets, filters, views
 from rest_framework_extensions.cache.decorators import cache_response
@@ -235,9 +236,16 @@ class ParseShardView(views.APIView):
         elif self.request.query_params.get('pms_ids', None):
             try:
                 ids = self.request.query_params.get('pms_ids', None)
+
                 queryset = PlayerMatchSummary.objects.filter(
                     id__in=json.loads(ids)
                 )
+                real_ids = json.loads(ids)
+
+                queryset = sorted(
+                    queryset, key=lambda x: real_ids.index(getattr(x, 'id'))
+                )
+
                 data = self.jsonify_data(queryset, None)
                 return Response(
                     data,
