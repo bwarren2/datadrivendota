@@ -53,11 +53,22 @@ $(function(){
         return shard.dataslice < 400;
       });
 
+      var radiant_kills = _.clone(radiant);
+      radiant_kills.name = 'Radiant Kills'
+      var radiant_assists = _.clone(radiant);
+      radiant_assists.name = 'Radiant Assists'
+
+
+      var dire_kills = _.clone(dire);
+      dire_kills.name = 'Dire Kills'
+      var dire_assists = _.clone(dire);
+      dire_assists.name = 'Dire Assists'
+
       var shardfacets1 = [
-        [radiant, 'kills', 'statelog'],
-        [dire, 'kills', 'statelog'],
-        [radiant, 'assists', 'statelog'],
-        [dire, 'assists', 'statelog'],
+        [radiant_kills, 'kills', 'statelog'],
+        [dire_kills, 'kills', 'statelog'],
+        [radiant_assists, 'assists', 'statelog'],
+        [dire_assists, 'assists', 'statelog'],
       ];
 
       var params = {
@@ -66,12 +77,16 @@ $(function(){
       };
 
       d7.extensions.charts.replays.multifacet_lineup(
-          shardfacets1, '#kda', params
-          );
+        shardfacets1, '#kda', params
+      );
 
+      var diff_income = _.clone(diff);
+      diff_income.name = 'Rad-Dire Income'
+      var diff_xp = _.clone(diff);
+      diff_xp.name = 'Rad-Dire XP'
       var shardfacets2 = [
-        [diff, 'earned_income', 'combatseries'],
-        [diff, 'xp', 'statelog']
+        [diff_income, 'earned_income', 'combatseries'],
+        [diff_xp, 'xp', 'statelog']
       ];
       var params = {
         label: 'Gold and XP Difference',
