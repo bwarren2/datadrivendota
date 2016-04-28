@@ -450,7 +450,7 @@ TESTERS = [
     51753511,
     88367253,  # Yasp's lead dev
     # Def randos here
-    40460993,  # Jetto
+    # 40460993,  # Jetto, has privacy flag on
 ]
 
 LOGIN_URL = '/accounts/login/'
