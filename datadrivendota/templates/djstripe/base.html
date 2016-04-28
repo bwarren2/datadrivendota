@@ -1,33 +1,34 @@
 {% extends "base.html" %}
+
 {% load static %}
 
-
 {% block content %}
-
-  <!-- Modal for server update -->
-  <div class="modal fade" id="in-progress">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Server Update In-Progress <img class="pull-right" src="{% static 'images/loading.gif' %}" /></h4>
+<!-- Modal for server update -->
+<div class="modal fade" id="in-progress">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">
+          Server Update In-Progress
+          <img class="pull-right" src="{% static 'images/loading.gif' %}" />
+        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="progress">
+          <div class="progress-bar" style="width: 0%;"></div>
         </div>
-        <div class="modal-body">
-            <div class="progress">
-                <div class="progress-bar" style="width: 0%;"></div>
-            </div>
-        </div>
-
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 {% endblock %}
 
 {% block advisory_content %}
 <div class="row">
   <div class='col-xs-12'>
-      <h2>Need help?</h2>
-      <h3>Message us at <a href="mailto:contact@datadrivendota.com">contact@datadrivendota.com</a>.</h3>
-      <p>Mail goes straight to the devs to help fix things faster.</p>
+    <h2>Need help?</h2>
+    <h3>Message us at <a href="mailto:contact@datadrivendota.com">contact@datadrivendota.com</a>.</h3>
+    <p>Mail goes straight to the devs to help fix things faster.</p>
   </div>
 </div>
 {% endblock advisory_content %}
