@@ -24,14 +24,23 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
             Q(do_not_use_before=None)
         )
 
+    def timeout(self, delta, replay_url):
+        now = timezone.now()
+        self.filter(
+            pk=replay_url.id,
+        ).update(
+            do_not_use_before=now + delta,
+        )
+
     def get_replay_url(self, match_id):
         # Constants:
         MATCH_ID = 'match_id'
-        retry_erorrs = ('notready', 'timeout')
-        fail_errors = ('invalid',)
+        retry_errors = ('notready',)    # Service not up.
+        fail_errors = ('invalid',)      # That match ID is no good.
+        fatal_errors = ('timeout', )    # Valve not responding.
         cooldown_errors = (
             requests.exceptions.HTTPError,
-            # RateLimitError,
+            RateLimitError,
         )
 
         # We go through all active URLs, and try to get the replay URL for the
@@ -53,12 +62,16 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
             params = {
                 MATCH_ID: match_id,
             }
-            logger.info(replay_url.url, params)
             resp = requests.get(
                 replay_url.url,
                 params,
             )
-            logger.info(resp)
+            logger.info(
+                "Got {0} from {1} with {2}".format(
+                    resp, replay_url.url, params
+                )
+            )
+
             try:
                 # Process:
                 resp.raise_for_status()
@@ -66,20 +79,22 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
                 resp_json = resp.json()
 
                 error_code = resp_json.get('error')
+
                 if error_code in fail_errors:
-                    raise RateLimitError
-                if error_code in retry_erorrs:
+                    # We wanted an int, you passed us parakeets
+                    return None
+                if error_code in retry_errors:
+                    self.timeout(timedelta(seconds=30), replay_url)
+                if error_code in fatal_errors:
                     # TODO make this route to a shorter cooldown?
                     raise RateLimitError
+
                 return resp_json.get('replay_url')
+
             except cooldown_errors:
                 # mark this URL as bad as of now:
-                now = timezone.now()
-                self.filter(
-                    pk=replay_url.id,
-                ).update(
-                    do_not_use_before=now + timedelta(hours=24),
-                )
+                self.timeout(timedelta(hours=24), replay_url)
+
             except ValueError as e:
                 logger.error(
                     "Exception: {0} for content: {1}".format(
