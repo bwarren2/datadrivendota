@@ -450,6 +450,7 @@ TESTERS = [
     51753511,
     88367253,  # Yasp's lead dev
     # Def randos here
+    40460993,  # Jetto
 ]
 
 LOGIN_URL = '/accounts/login/'
