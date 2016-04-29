@@ -179,7 +179,7 @@ $(function(){
   }
 
   $('#chart-button').click(function(){
-    var params = {}
+    var params = {hide_legend:true}
     var shards = $('#shards').select2('data');
     var labels = $('#labels').val();
     draw(shards, params);

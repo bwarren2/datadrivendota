@@ -1350,6 +1350,7 @@ var replay_lines = function(dataset, facet, destination, params){
       y: series.values.map(function(d){return d[facet]}),
       name: series.shard.name
     }
+
     if (series.shard.color) {
       data_obj.line = {
         color: series.shard.color,
@@ -1373,7 +1374,7 @@ var replay_lines = function(dataset, facet, destination, params){
       t: 20
     },
     hovermode: 'closest',
-    showLegend: true
+    showlegend: true
   };
   if(params.inset_legend){
     layout.legend = {
@@ -1389,7 +1390,11 @@ var replay_lines = function(dataset, facet, destination, params){
     borderwidth: 2
     }
   }
-
+  console.log(params);
+  if(params.hide_legend){
+    layout.showlegend = false;
+  }
+  console.log(layout);
   $('.ajax-loader').remove();
   Plotly.newPlot(
     destination.substring(1,100),
@@ -1691,7 +1696,7 @@ var scatterline = function(shards, facet, destination, params, logtype){
           .y(function(d){
             return d.y;
           })
-          .showLegend(false)
+          .showlegend(false)
           .forceX([true_min, true_max])
           .forceY([true_min, true_max]);
 
@@ -1999,7 +2004,7 @@ var item_scatter = function(shards, destination, params){
           .y(function(d){
             return d.y;
           })
-          .showLegend(false)
+          .showlegend(false)
           .forceX([null_time, time_max])
           .forceY([null_time, time_max]);
 
