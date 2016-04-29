@@ -55,14 +55,18 @@ $(function(){
 
       var radiant_kills = _.clone(radiant);
       radiant_kills.name = 'Radiant Kills'
+      radiant_kills.color = '#80FFAD'
       var radiant_assists = _.clone(radiant);
       radiant_assists.name = 'Radiant Assists'
+      radiant_assists.color = '#00802E'
 
 
       var dire_kills = _.clone(dire);
       dire_kills.name = 'Dire Kills'
+      dire_kills.color = '#FF8080'
       var dire_assists = _.clone(dire);
       dire_assists.name = 'Dire Assists'
+      dire_assists.color = '#800000'
 
       var shardfacets1 = [
         [radiant_kills, 'kills', 'statelog'],
@@ -82,8 +86,11 @@ $(function(){
 
       var diff_income = _.clone(diff);
       diff_income.name = 'Rad-Dire Income'
+      diff_income.color = '#DABF00'
       var diff_xp = _.clone(diff);
       diff_xp.name = 'Rad-Dire XP'
+      diff_xp.color = '#0C61FE'
+
       var shardfacets2 = [
         [diff_income, 'earned_income', 'combatseries'],
         [diff_xp, 'xp', 'statelog']
