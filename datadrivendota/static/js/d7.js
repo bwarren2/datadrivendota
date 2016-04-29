@@ -1542,8 +1542,14 @@ var scatterline_merge = function(data, facet, stride){
   return return_lst;
 }
 
+
 var scatterline = function(shards, facet, destination, params, logtype){
 
+  if (logtype==='statelog') {
+    var lookup_facet = 'allstate'
+  }else{
+    var lookup_facet = facet;
+  }
   // Get the replay parse info
   Promise.all(
     shards.map(function(shard){
