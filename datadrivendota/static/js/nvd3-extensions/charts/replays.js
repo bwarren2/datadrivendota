@@ -412,7 +412,7 @@ var scatterline = function(shards, facet, destination, params, logtype){
           .y(function(d){
             return d.y;
           })
-          .showlegend(false)
+          .showLegend(false)
           .forceX([true_min, true_max])
           .forceY([true_min, true_max]);
 
@@ -720,7 +720,7 @@ var item_scatter = function(shards, destination, params){
           .y(function(d){
             return d.y;
           })
-          .showlegend(false)
+          .showLegend(false)
           .forceX([null_time, time_max])
           .forceY([null_time, time_max]);
 
