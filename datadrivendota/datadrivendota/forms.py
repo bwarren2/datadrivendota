@@ -41,4 +41,8 @@ class FollowMatchForm(forms.Form):
 
 
 class SearchForm(forms.Form):
-    search_string = forms.CharField(required=True, max_length=50)
+    search_string = forms.CharField(
+        required=True,
+        max_length=50,
+        label='Quark',
+    )

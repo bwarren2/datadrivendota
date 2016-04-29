@@ -1,80 +1,78 @@
 {% extends "row_base.html" %}
 
-{% block title %}
-    Search
-{% endblock title %}
+{% block title %}Search{% endblock title %}
 
 {% block aligned_content %}
-    <h1>Search</h1>
-      <div class="col-md-4">
-        <h4>General Lookup</h4>
-        <h5>(Heroes, Teams, Players, etc)</h5>
-        <div class='form-container'>
-            <form class='chart-form' action="" method='POST'>
-              {% include "_form.html" %}
-              {% csrf_token %}
-              <div class="control-group">
-                <div class="controls pull-left">
-                  <button type="submit" class="btn btn-small btn-primary">Submit</button>
-                </div>
-              </div>
-              <div class="clearfix"></div>
-            </form>
+<h1>Search</h1>
+<div class="row">
+  <div>
+    <form class='horizontal-form' action="" method='POST'>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="col-md-6 col-md-offset-3">
+        <input type="{{ field.widget.type }}" class="form-control">
+      </div>
+      {% endfor %}
+      <div class="control-group">
+        <div class="controls">
+          <button type="submit" class="btn btn-small btn-primary">Submit</button>
         </div>
       </div>
-      <div class="col-md-8">
+      <div class="clearfix"></div>
+    </form>
+  </div>
+</div>
 
-        {% if heroes %}
-            <div class='row'>
-                <h4>Heroes</h4>
-                {% for hero in heroes %}
-                    <div class="{{hero.classes}} col-md-3">
-                      <a href="{% url 'heroes:detail' hero_name=hero.machine_name %}" class="thumbnail">
-                        <img src="{{ hero.mugshot_url }}" alt="{{ hero.name }}" class="hero-portrait">
-                        <p class='overlayer'>{{ hero.name }}</p>
-                      </a>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if players %}
-            <div class='row'>
-                <h4>Players by Name</h4>
-                {% for player in players %}
-                    {% include "players/_player_card.html" %}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-
-        {% if pros %}
-            <div class='row'>
-                <h4>Players by Pro Name</h4>
-                {% for player in pros %}
-                    {% include "players/_player_card.html" %}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if teams %}
-            <div class='row'>
-                <h4>Teams</h4>
-                {% for team in teams %}
-                    {% include "teams/_teamdossier_card.html" %}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if leagues %}
-            <div class='row'>
-                <h4>Leagues</h4>
-                {% for league in leagues %}
-                    {% include "leagues/_leaguedossier_card.html" %}
-                {% endfor %}
-            </div>
-        {% endif %}
-      </div>
-
+<div class="row">
+  {% if heroes %}
+  <div class='row'>
+    <h4>Heroes</h4>
+    {% for hero in heroes %}
+    <div class="{{hero.classes}} col-md-3">
+      <a href="{% url 'heroes:detail' hero_name=hero.machine_name %}" class="thumbnail">
+        <img src="{{ hero.mugshot_url }}" alt="{{ hero.name }}" class="hero-portrait">
+        <p class='overlayer'>{{ hero.name }}</p>
+      </a>
     </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if players %}
+  <div class='row'>
+    <h4>Players by Name</h4>
+    {% for player in players %}
+    {% include "players/_player_card.html" %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if pros %}
+  <div class='row'>
+    <h4>Players by Pro Name</h4>
+    {% for player in pros %}
+    {% include "players/_player_card.html" %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if teams %}
+  <div class='row'>
+    <h4>Teams</h4>
+    {% for team in teams %}
+    {% include "teams/_teamdossier_card.html" %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if leagues %}
+  <div class='row'>
+    <h4>Leagues</h4>
+    {% for league in leagues %}
+    {% include "leagues/_leaguedossier_card.html" %}
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+</div>
 {% endblock aligned_content %}
