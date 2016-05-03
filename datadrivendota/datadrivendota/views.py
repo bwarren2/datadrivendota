@@ -44,7 +44,11 @@ class LandingView(TemplateView):
 
         messages.success(
             self.request,
-            'We are testing free trials!  Want deep processing of your data?  Sign in above and a dev will add you within 2 hours.'
+            (
+                "We are launching the full platform within the month. If you "
+                "sign in above, you will be able to get deep processing of "
+                "your data very soon!"
+            )
         )
 
         return super(LandingView, self).get_context_data(**kwargs)
