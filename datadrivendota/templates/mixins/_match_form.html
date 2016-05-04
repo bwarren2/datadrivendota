@@ -1,4 +1,4 @@
-<div class="modal fade" tabindex="-1" role="dialog" id="match-select">
+<div class="modal fade" role="dialog" id="match-select">
   <div class="modal-dialog">
     <div class="modal-content">
       <form class="form-horizontal" method="get" action=".">
@@ -19,7 +19,7 @@
           <div class="form-group">
             <label for="hero" class="col-sm-2 control-label">as Hero:</label>
             <div class="col-sm-10">
-              <input id="hero" name="hero" type="text" class="form-control" placeholder="hero name">
+              <select id="hero" name="hero" class="form-control"></select>
             </div>
           </div>
           <div class="form-group">
@@ -37,19 +37,19 @@
           <div class="form-group">
             <label for="league" class="col-sm-2 control-label">in</label>
             <div class="col-sm-10">
-              <input id="league" name="league" type="text" class="form-control" placeholder="league">
+              <select id="league" name="league" class="form-control"></select>
             </div>
           </div>
           <div class="form-group">
             <label for="radiant_team" class="col-sm-2 control-label">between</label>
             <div class="col-sm-10">
-              <input id="radiant_team" name="radiant_team" type="text" class="form-control" placeholder="Radiant team">
+              <select id="radiant_team" name="radiant_team" class="form-control"></select>
             </div>
           </div>
           <div class="form-group">
             <label for="dire_team" class="col-sm-2 control-label">and</label>
             <div class="col-sm-10">
-              <input id="dire_team" name="dire_team" type="text" class="form-control" placeholder="Dire team">
+              <select id="dire_team" name="dire_team" class="form-control"></select>
             </div>
           </div>
         </div>
@@ -61,3 +61,48 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+<script>
+function addSelect2ToModal (fieldId, placeholder, url, mapping_function) {
+  $(fieldId).select2({
+    placeholder: placeholder,
+    ajax: {
+      url: url,
+      dataType: 'json',
+      delay: 350,
+      data: function (params) {
+        return {
+          search: params.term
+        };
+      },
+      processResults: function (data, params) {
+        return {
+          results: data.map(mapping_function)
+        };
+      },
+      cache: true
+    },
+    minimumInputLength: 1
+  });
+}
+
+function mapDisplayName (e) {
+  return {
+    text: e.display_name,
+    id: e.display_name
+  };
+}
+
+function mapName (e) {
+  return {
+    text: e.name,
+    id: e.name
+  };
+}
+
+$(document).ready(function() {
+  addSelect2ToModal('#hero', 'Hero', '/rest-api/heroes/', mapName);
+  addSelect2ToModal('#league', 'League', '/rest-api/leagues/', mapDisplayName);
+  addSelect2ToModal('#radiant_team', 'Radiant team', '/rest-api/teams/', mapName);
+  addSelect2ToModal('#dire_team', 'Dire team', '/rest-api/teams/', mapName);
+});
+</script>
