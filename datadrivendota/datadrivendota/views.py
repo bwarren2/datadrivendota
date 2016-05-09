@@ -106,6 +106,9 @@ class SearchView(FormView):
             'players': Player.objects.filter(
                 persona_name__icontains=search_str
             )[:10],
+            'pros': Player.objects.filter(
+                pro_name__icontains=search_str
+            )[:10],
             'form': form
         })
         return render(self.request, self.template_name, context)
