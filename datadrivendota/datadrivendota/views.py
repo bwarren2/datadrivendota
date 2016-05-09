@@ -4,7 +4,7 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View, TemplateView
-from django.views.generic.edit import FormView as DjangoFormView
+from django.views.generic.edit import FormView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation
@@ -14,6 +14,8 @@ from heroes.models import Hero
 from leagues.models import League
 from blog.models import Entry
 from matches.models import PlayerMatchSummary, Match
+from teams.models import Team
+from players.models import Player
 
 
 class LandingView(TemplateView):
@@ -86,20 +88,26 @@ class JsonApiView(TemplateView):
         return HttpResponse(data, mimetype)
 
 
-class SearchView(DjangoFormView):
+class SearchView(FormView):
     form_class = SearchForm
     template_name = 'search.html'
 
     def form_valid(self, form):
         search_str = form.cleaned_data['search_string']
 
-        context = {
+        context = self.get_context_data()
+        context.update({
             'leagues': League.objects.filter(
-                name__icontains=(search_str)
+                name__icontains=search_str
+            )[:10],
+            'teams': Team.objects.filter(
+                name__icontains=search_str
+            )[:10],
+            'players': Player.objects.filter(
+                persona_name__icontains=search_str
             )[:10],
             'form': form
-        }
-
+        })
         return render(self.request, self.template_name, context)
 
 
