@@ -10,7 +10,7 @@
 </h1>
 <div class="row">
   <div class="col-md-12">
-    <h2>Your data</h2>
+    <h2 class='page-header'>Your data</h2>
     <p>
       Please note: we can't do anything with your data unless you have made it
       public.  to make that happen:
@@ -72,7 +72,7 @@
 </div>
 <div class="row">
   <div class="col-md-12">
-    <h2>While you wait</h2>
+    <h2 class='page-header'>While you wait</h2>
     <p>
       Getting ideas for improvement is easy.  Find something you want to copy, do a little analysis, then start prioritizing what worked in that example.
     </p>
@@ -104,7 +104,7 @@
 {% if not user.userprofile.has_active_subscription %}
 <div class="row">
   <div class="col-md-12">
-    <h2>Get Ultimate</h2>
+    <h2 class='page-header'>Get Ultimate</h2>
     <p>
     With an Ultimate account, you get more:
     </p>
@@ -128,7 +128,7 @@
 {% endif %}
 <div class="row">
   <div class='col-md-12'>
-    <h2>Do we think you are who you think you are?</h2>
+    <h2  class='page-header'>Do we think you are who you think you are?</h2>
     <p>Let's just make sure that we think you are who you think you are.</p>
     {% if user.userprofile.steam_id %}
     <p>Your current id is:</p>
