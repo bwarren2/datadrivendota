@@ -1390,11 +1390,9 @@ var replay_lines = function(dataset, facet, destination, params){
     borderwidth: 2
     }
   }
-  console.log(params);
   if(params.hide_legend){
     layout.showlegend = false;
   }
-  console.log(layout);
   $('.ajax-loader').remove();
   Plotly.newPlot(
     destination.substring(1,100),
