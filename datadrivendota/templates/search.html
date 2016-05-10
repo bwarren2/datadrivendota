@@ -1,80 +1,103 @@
 {% extends "row_base.html" %}
 
-{% block title %}
-    Search
-{% endblock title %}
+{% block title %}Search{% endblock title %}
 
 {% block aligned_content %}
-    <h1>Search</h1>
-      <div class="col-md-4">
-        <h4>General Lookup</h4>
-        <h5>(Heroes, Teams, Players, etc)</h5>
-        <div class='form-container'>
-            <form class='chart-form' action="" method='POST'>
-              {% include "_form.html" %}
-              {% csrf_token %}
-              <div class="control-group">
-                <div class="controls pull-left">
-                  <button type="submit" class="btn btn-small btn-primary">Submit</button>
-                </div>
-              </div>
-              <div class="clearfix"></div>
-            </form>
+<div class='col-md-12'>
+  <h1>Search</h1>
+  <div>
+    <form class='horizontal-form' action="" method='POST'>
+      {% csrf_token %}
+      <div class="control-group">
+        {{form.as_p}}
+      </div>
+      <div class="control-group">
+        <div class="controls">
+          <button type="submit" class="btn btn-small btn-primary">Submit</button>
         </div>
       </div>
-      <div class="col-md-8">
-
-        {% if heroes %}
-            <div class='row'>
-                <h4>Heroes</h4>
-                {% for hero in heroes %}
-                    <div class="{{hero.classes}} col-md-3">
-                      <a href="{% url 'heroes:detail' hero_name=hero.machine_name %}" class="thumbnail">
-                        <img src="{{ hero.mugshot_url }}" alt="{{ hero.name }}" class="hero-portrait">
-                        <p class='overlayer'>{{ hero.name }}</p>
-                      </a>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if players %}
-            <div class='row'>
-                <h4>Players by Name</h4>
-                {% for player in players %}
-                    {% include "players/_player_card.html" %}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-
-        {% if pros %}
-            <div class='row'>
-                <h4>Players by Pro Name</h4>
-                {% for player in pros %}
-                    {% include "players/_player_card.html" %}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if teams %}
-            <div class='row'>
-                <h4>Teams</h4>
-                {% for team in teams %}
-                    {% include "teams/_teamdossier_card.html" %}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if leagues %}
-            <div class='row'>
-                <h4>Leagues</h4>
-                {% for league in leagues %}
-                    {% include "leagues/_leaguedossier_card.html" %}
-                {% endfor %}
-            </div>
-        {% endif %}
+    </form>
+  </div>
+</div>
+{% if not teams and not leagues and not players %}
+  <div class='col-md-12'>
+    <h4 class='page-header'>Doing Research</h4>
+    <p>
+      Finding games to emulate should be easy, so we offer lookups here.  You can search for some letters, and find matches from:
+    </p>
+    <ul>
+    <li>Teams</li>
+    <li>Leagues</li>
+    <li>Players</li>
+    </ul>
+    <p>with those letters in their name. Do you have target you want to emulate in your play?  Look them up, analyze them, and progress!</p>
+  </div>
+{% else %}
+  {% if heroes %}
+  <div class='col-md-12'>
+    <h4>Heroes</h4>
+    <div class='row'>
+      {% for hero in heroes %}
+      <div class="{{hero.classes}} col-md-3">
+        <a href="{% url 'heroes:detail' hero_name=hero.machine_name %}" class="thumbnail">
+          <img src="{{ hero.mugshot_url }}" alt="{{ hero.name }}" class="hero-portrait">
+          <p class='overlayer'>{{ hero.name }}</p>
+        </a>
       </div>
-
+      {% endfor %}
     </div>
+  </div>
+  {% endif %}
+
+  {% if players %}
+  <div class='col-md-12'>
+    <h4>Players by Name</h4>
+    <div class='row'>
+      {% for player in players %}
+        <div class="col-md-4">
+          {% include "players/_player_card.html" %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if pros %}
+  <div class='col-md-12'>
+    <h4>Players by Pro Name</h4>
+    <div class='row'>
+      {% for player in pros %}
+        <div class="col-md-4">
+          {% include "players/_player_card.html" %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if teams %}
+  <div class='col-md-12'>
+    <h4>Teams</h4>
+    <div class='row'>
+      {% for team in teams %}
+        <div class="col-md-4">
+          {% include "teams/_teamdossier_card.html" %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if leagues %}
+  <div class='col-md-12'>
+    <h4>Leagues</h4>
+    <div class='row'>
+      {% for league in leagues %}
+      {% include "leagues/_leaguedossier_card.html" %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+{% endif %}
+
 {% endblock aligned_content %}

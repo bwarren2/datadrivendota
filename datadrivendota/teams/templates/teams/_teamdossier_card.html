@@ -1,6 +1,4 @@
-<div class="col-md-3">
-  <a href="{% url 'teams:detail' steam_id=team.team.steam_id %}" class="thumbnail">
-    <img src="{{ team.image }}" alt="{{ team.name }}" class="team-portrait">
-    <p class='overlayer'>{{ team.name }}</p>
-  </a>
-</div>
+<a href="{% url 'teams:detail' steam_id=team.steam_id %}" class="thumbnail">
+<img src="{{ team.image }}" alt="{{ team.name }}" class="team-portrait">
+<p class='overlayer'>{{ team.name }}</p>
+</a>
