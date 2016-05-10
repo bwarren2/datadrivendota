@@ -114,7 +114,11 @@ class ReplayUrlBackend(models.Model):
 
     def __unicode__(self):
         fragment = self.url[8:self.url.find('.herokuapp')]
-        if timezone.now() > self.do_not_use_before:
+        usable = (
+            self.do_not_use_before is None or
+            timezone.now() > self.do_not_use_before
+        )
+        if usable:
             useable = 'usable'
         else:
             useable = 'OUT OF SERVICE'
