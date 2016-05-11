@@ -65,9 +65,11 @@
       {{ user.userprofile.request_limit }} free imports this month.
     </p>
     {% endif %}
-    <p>
-    You have <a href="{% url 'players:id_detail' user.userprofile.steam_id %}">{{ user.userprofile.requested.count|apnumber }} matches imported</a> total.
-    </p>
+    {% if user.userprofile.steam_id %}
+      <p>
+      You have <a href="{% url 'players:id_detail' user.userprofile.steam_id %}">{{ user.userprofile.requested.count|apnumber }} matches imported</a> total.
+      </p>
+    {% endif %}
   </div>
 </div>
 <div class="row">
