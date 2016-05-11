@@ -65,9 +65,11 @@
       {{ user.userprofile.request_limit }} free imports this month.
     </p>
     {% endif %}
-    <p>
-    You have <a href="{% url 'players:id_detail' user.userprofile.steam_id %}">{{ user.userprofile.requested.count|apnumber }} matches imported</a> total.
-    </p>
+    {% if user.userprofile.steam_id %}
+      <p>
+      You have <a href="{% url 'players:id_detail' user.userprofile.steam_id %}">{{ user.userprofile.requested.count|apnumber }} matches imported</a> total.
+      </p>
+    {% endif %}
   </div>
 </div>
 <div class="row">
@@ -77,7 +79,7 @@
       Getting ideas for improvement is easy.  Find something you want to copy, do a little analysis, then start prioritizing what worked in that example.
     </p>
     <h3>Read a walkthrough</h3>
-    <p>You can read an example walkthrough of iterating on a hero on our blog.</p>
+    <p>You can read an <a href="https://www.datadrivendota.com/blog/entry/15/">example walkthrough</a> of iterating on a hero on our blog.</p>
     <h3>Try it yourself</h3>
     <ol>
     <li>
