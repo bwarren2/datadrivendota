@@ -398,7 +398,7 @@ $(function () {
                 parent.html('Pending request present')
                 parent.addClass('text-info')
             } else if (d.result=='limit'){
-                parent.html('Monthly limit reached.  Subscribe or wait until the first.')
+                parent.html('Request limit reached :/.  Get more requests next month or by subscribing.')
                 parent.addClass('text-warning')
             }
             parent.addClass('parse-button-msg')
