@@ -82,7 +82,7 @@ class UserProfile(models.Model):
 
     @property
     def big_steam_id(self):
-        return self.steam_id+settings.ADDER_32_BIT
+        return self.steam_id + settings.ADDER_32_BIT
 
     def __unicode__(self):
         return "User:{0}, Player id: {1}".format(
@@ -108,6 +108,24 @@ class UserProfile(models.Model):
             creation__year=year,
             creation__month=month,
         )
+
+    @property
+    def requests_remaining(self):
+        start_of_this_calendar_month = timezone.now().replace(
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+
+        return self.request_limit - self.requested.filter(
+            creation__gte=start_of_this_calendar_month
+        ).count()
+
+    @property
+    def allowed_to_request(self):
+        return self.requests_remaining > 0 or self.has_active_subscription
 
 
 class PingRequest(models.Model):

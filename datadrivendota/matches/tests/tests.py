@@ -1,6 +1,8 @@
 from django.test import TestCase, Client
-from model_mommy import mommy
 from django.core.urlresolvers import reverse
+from django.conf import settings
+
+from model_mommy import mommy
 
 from datadrivendota.management.tasks import ApiContext
 
@@ -229,7 +231,7 @@ class TestMatchManagers(TestCase):
             'matches.match', parsed_with=None
         )
         cls.parsed_match = mommy.make_recipe(
-            'matches.match', parsed_with='1.0'
+            'matches.match', parsed_with=settings.PARSER_VERSION
         )
 
     def test_unparsed(self):

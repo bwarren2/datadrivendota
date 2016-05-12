@@ -42,6 +42,24 @@ $(function () {
 
     window.jsUtils = {};
 
+      function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
+    window.jsUtils.getCookie = getCookie;
+
     function scorebarToggles(){
         $('.scorebar').hide();
         $('.win-glyph').hide();
@@ -357,6 +375,36 @@ $(function () {
 
     }
     window.jsUtils.playback = playback;
+
+    $('.parse-button').click(function(evt){
+        evt.preventDefault();
+        var match_id = $(this).data('match-id');
+        var parent = $(this).parent();
+        $(this).remove();
+
+        var data = {
+            match_id: match_id,
+        };
+        var resp = $.ajax({
+            url: '/parserpipe/ajax-import/',
+            method: "POST",
+            data: data,
+        }).success(function(d){
+            if (d.result=='made') {
+
+                parent.html('Parse request made! '+d.left+' left')
+                parent.addClass('text-success')
+            } else if (d.result=='exists'){
+                parent.html('Pending request present')
+                parent.addClass('text-info')
+            } else if (d.result=='limit'){
+                parent.html('Monthly limit reached.  Subscribe or wait until the first.')
+                parent.addClass('text-warning')
+            }
+            parent.addClass('parse-button-msg')
+        });
+
+    })
 
 });
 

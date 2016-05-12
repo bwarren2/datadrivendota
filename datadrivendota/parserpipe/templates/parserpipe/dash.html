@@ -46,22 +46,7 @@
     $('#task-form').submit(function(event){
       event.preventDefault();
 
-      function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-          var cookies = document.cookie.split(';');
-          for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-              break;
-            }
-          }
-        }
-        return cookieValue;
-      }
-      var csrftoken = getCookie('csrftoken');
+      var csrftoken = window.jsUtils.getCookie('csrftoken');
       var match_id = $('#match_id').val();
       var filename = $('#filename').val();
       var task = $('#task :selected').val();
@@ -71,9 +56,9 @@
         match_id: match_id,
         filename: filename
       };
-      console.log(data);
+
       var resp = $.ajax({
-        url: '/parserpipe/tasks/',
+        url: '/parserpipe/ajax-tasks/',
         method: "POST",
         data: data,
       })
