@@ -1,5 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+
 from model_mommy import mommy
 
 
@@ -19,13 +21,6 @@ class TestUrlconf(TestCase):
         self.match = mommy.make_recipe('matches.match')
         self.pms = mommy.make_recipe('matches.playermatchsummary')
         self.player = mommy.make_recipe('players.player')
-
-    def test_url_redirect(self):
-
-        urls = ['/health/', '/health/styles/', '/health/cards/']
-        for url in urls:
-            resp = self.client.get(url)
-            self.assertRedirects(resp, '/login/')
 
     def test_login_required(self):
         self.client.login(username=self.username, password=self.password)
