@@ -1,9 +1,6 @@
-import re
 from datetime import timedelta
 
-from django.test import TestCase, Client
-from django.core.urlresolvers import reverse
-from django.core import mail
+from django.test import TestCase
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 
@@ -12,7 +9,6 @@ from model_mommy import mommy
 from .models import (
     get_active_users,
     get_inactive_users,
-    UserProfile
 )
 User = get_user_model()
 
