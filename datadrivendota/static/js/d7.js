@@ -1410,7 +1410,9 @@ var stat_lineup = function(shards, facet, destination, params, log){
 
   if (log==='statelog') {
     var lookup_facet='allstate';
-  }else{
+  } else if (log==='combatseries'){
+    var lookup_facet = 'allseries';
+  } else {
     var lookup_facet=facet;
   }
 
@@ -1450,7 +1452,9 @@ var multifacet_lineup = function(shardfacets, destination, params, label){
     shardfacets.map(function(lst){
       if (lst[2]=='statelog') {
         var lookup_facet = 'allstate';
-      }else{
+      }else if (lst[2]==='combatseries'){
+        var lookup_facet = 'allseries';
+      } else{
         var lookup_facet = lst[1];
       }
       var location = utils.parse_urls.url_for(lst[0], lookup_facet, lst[2]);
@@ -1545,7 +1549,9 @@ var scatterline = function(shards, facet, destination, params, logtype){
 
   if (logtype==='statelog') {
     var lookup_facet = 'allstate'
-  }else{
+  } else if (logtype==='combatseries'){
+    var lookup_facet = 'allseries';
+  } else{
     var lookup_facet = facet;
   }
   // Get the replay parse info
