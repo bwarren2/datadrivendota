@@ -17,6 +17,13 @@
     {% endif %}
     on {{match.start_time|seconds_to_date|date:'m-d-y'}}
   </small>
+
+  {% if user.is_authenticated and not match.is_parsed %}
+    {% include "matches/_parse_this.html" %}
+  {% elif not match.is_parsed %}
+    <p>Log in to parse this match!</p>
+  {% endif %}
+
   {% if user.is_superuser %}
   <span class='admin-tag'> {{clearname}}</span>
   {% elif match.is_parsed%}

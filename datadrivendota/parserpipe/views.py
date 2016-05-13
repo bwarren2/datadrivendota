@@ -2,9 +2,10 @@ from json import dumps
 
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse, Http404
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View, TemplateView
-from django.contrib.admin.views.decorators import staff_member_required
 from django.views.generic.edit import FormView
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.contrib import messages
@@ -31,13 +32,53 @@ class DashView(TemplateView):
         return super(DashView, self).dispatch(*args, **kwargs)
 
 
+class MatchRequestCreateView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(MatchRequestCreateView, self).dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+
+        response_data = {}
+        if request.is_ajax() and request.user.is_authenticated():
+            try:
+                match_id = request.POST['match_id']
+                MatchRequest.create_for_user(
+                    request.user,
+                    match_id
+                )
+
+                response_data['result'] = 'made'
+                response_data['type'] = 'success'
+                response_data[
+                    'left'
+                ] = request.user.userprofile.requests_remaining
+
+            except ValidationException:
+                response_data['result'] = 'exists'
+                response_data['type'] = 'warning'
+
+            except DataCapReached:
+                response_data['result'] = 'limit'
+                response_data['type'] = 'warning'
+
+            return HttpResponse(
+                dumps(response_data),
+                content_type="application/json"
+            )
+
+        else:
+            raise Http404
+
+
 class TasksView(View):
 
     def post(self, request, *args, **kwargs):
         if request.is_ajax() and request.user.is_staff:
 
             response_data = {}
-            print request.POST
+
             match_id = request.POST['match_id']
             filename = request.POST['filename']
             task = request.POST['task']

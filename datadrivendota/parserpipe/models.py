@@ -54,21 +54,7 @@ class MatchRequest(models.Model):
         try:
             profile = UserProfile.objects.get(user=user)
 
-            # Is the user allowed to do this?
-            start_of_this_calendar_month = timezone.now().replace(
-                day=1,
-                hour=0,
-                minute=0,
-                second=0,
-                microsecond=0,
-            )
-            allowed_to_request = (
-                profile.requested is not None and
-                profile.request_limit > profile.requested.filter(
-                    creation__gte=start_of_this_calendar_month,
-                ).count()
-            )
-            if allowed_to_request:
+            if profile.allowed_to_request:
                 if not MatchRequest.objects.filter(match_id=match_id).exists():
                     obj = MatchRequest.objects.create(match_id=match_id)
                     profile.requested.add(obj)
