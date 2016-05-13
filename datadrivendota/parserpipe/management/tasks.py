@@ -392,24 +392,18 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
                     match_id, data_slice
                 )
             )
-            if data_slice in Match.PLAYER_SLOTS:
-                pms_qs = PlayerMatchSummary.objects.filter(
-                    match__steam_id=match_id,
-                    player_slot=data_slice
-                ).select_related('hero')
-                pms = pms_qs[0]
+            pms_qs = PlayerMatchSummary.objects.filter(
+                match__steam_id=match_id,
+                player_slot=data_slice
+            ).select_related('hero')
+            pms = pms_qs[0]
 
-                self.shard(replay, pms, offset, match.steam_id)
-                # TODO something like this,
-                # and change save_msgstream to just build
-                # an in-memory buffer in this task?
-                return_pmses.append(pms.id)
-            else:
-                raise ValueError(
-                    'What is this dataslice? {0}'.format(
-                        data_slice
-                    )
-                )
+            self.shard(replay, pms, offset, match.steam_id)
+            # TODO something like this,
+            # and change save_msgstream to just build
+            # an in-memory buffer in this task?
+            return_pmses.append(pms.id)
+
         self.finalize_write_to_s3()
         return return_pmses
 
