@@ -436,8 +436,9 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
 
         enemies = pms.enemies
         allies = pms.allies
-        logging.info("Sharding for {0} in match {1}".format(
-            pms.hero.name, pms.match.steam_id
+        logging.info(
+            "Sharding for {0} in match {1}".format(
+                pms.hero.name, pms.match.steam_id
             )
         )
 
@@ -542,6 +543,7 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
         return combat_timeseries
 
     def save_timeseries(self, match_id, pms, timeseries_log):
+        """ We are rolling this into one file as a speed hack. """
         for field, data in timeseries_log.iteritems():
             self.save_msgstream(
                 match_id, pms.player_slot, data, field, 'combatseries'
