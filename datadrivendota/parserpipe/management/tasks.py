@@ -1,3 +1,4 @@
+import functools as ft
 import logging
 import gzip
 import time
@@ -97,6 +98,12 @@ class S3WriterTaskMixin(object):
 
     def finalize_write_to_s3(self):
         logger.info("Uploading {} files to S3".format(len(self.upload_queue)))
+
+        logger.info("In particular, these:")
+        for a, b in self.upload_queue:
+            logger.info(b)
+
+        logger.info("In particular, these:")
         map(upload_to_s3, self.upload_queue)
         self.upload_queue = []
 
@@ -278,6 +285,8 @@ class ReadParseResults(Task):
 
 
 class MergeMatchRequestReplay(Task):
+    soft_time_limit = 120
+    time_limit = 125
 
     def run(self, json_data):
 
@@ -351,14 +360,12 @@ class MergeMatchRequestReplay(Task):
         match_request.save()
 
     def fan_parsing(self, match_id):
-        callback = UpdateParseEnd().s(match_id=match_id)
         slices = Match.PLAYER_SLOTS
 
-        header = [
-            UpdatePmsReplays().s(match_id=match_id, data_slice=x)
-            for x in slices
-        ]
-        chord(header)(callback)  # Queue for postprocessing
+        chain(
+            UpdatePmsReplays().s(match_id=match_id, data_slices=slices),
+            UpdateParseEnd().s(match_id=match_id)
+        ).delay()  # Queue for postprocessing
 
 
 class UpdatePmsReplays(S3WriterTaskMixin, Task):
@@ -366,9 +373,9 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
     soft_time_limit = 180
     time_limit = 185
 
-    def run(self, match_id, data_slice):
-        logger.info('Sharding replay for {0} {1}'.format(match_id, data_slice))
+    def run(self, match_id, data_slices):
 
+        logger.info('Doing prep for {0}'.format(match_id))
         match = Match.objects.get(steam_id=match_id)
 
         replay = json.loads(gunzip_str(match.compressed_replay.read()))
@@ -376,8 +383,15 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
         offset = self.get_offset(replay, match_id)
         replay = self.convert_times(replay, offset)
         replay = self.convert_stringtables(replay)
+        logger.info('Prep done for {0}'.format(match_id))
+        return_pmses = []
 
-        if data_slice in Match.PLAYER_SLOTS:
+        for data_slice in data_slices:
+            logger.info(
+                'Sharding replay for {0} {1}'.format(
+                    match_id, data_slice
+                )
+            )
             pms_qs = PlayerMatchSummary.objects.filter(
                 match__steam_id=match_id,
                 player_slot=data_slice
@@ -385,13 +399,13 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
             pms = pms_qs[0]
 
             self.shard(replay, pms, offset, match.steam_id)
-            # TODO something like this, and change save_msgstream to just build
+            # TODO something like this,
+            # and change save_msgstream to just build
             # an in-memory buffer in this task?
-            self.finalize_write_to_s3()
-            return pms.id
+            return_pmses.append(pms.id)
 
-        else:
-            raise ValueError('What is this dataslice? {0}'.format(data_slice))
+        self.finalize_write_to_s3()
+        return return_pmses
 
     def convert_stringtables(self, replay):
 
@@ -434,10 +448,17 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
 
     def shard(self, replay, pms, offset, match_id):
 
+        logging.info(
+            'Working on this pms: {0}'.format(
+                pms
+            )
+        )
+
         enemies = pms.enemies
         allies = pms.allies
-        logging.info("Sharding for {0} in match {1}".format(
-            pms.hero.name, pms.match.steam_id
+        logging.info(
+            "Sharding for {0} in match {1}".format(
+                pms.hero.name, pms.match.steam_id
             )
         )
 
@@ -453,6 +474,8 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
             replay['states'] if msg['hero_id'] == pms.hero.steam_id
         ]
 
+        logging.info('State list size: {0}'.format(len(state_list)))
+
         # Get the timing information to make the combat timeseries match states
         min_time = min(x['tick_time'] for x in state_list)
         max_time = max(x['tick_time'] for x in state_list)
@@ -460,12 +483,6 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
             pms_combat, min_time, max_time, offset
         )
         self.save_timeseries(match_id, pms, timeseries_log)
-
-        all_data = {
-            'states': state_list,
-            'combat': pms_combat,
-        }
-        self.save_msgstream(match_id, pms.player_slot, all_data, 'all', 'both')
 
     def save_states(self, pms, match_id, replay):
         for field, filter_fn in entitystate_filter_map.iteritems():
@@ -483,18 +500,15 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
         pms_combat = {}
 
         for field, filter_fn in combatlog_filter_map.iteritems():
-            logging.info("Handling field {0} for {1} (M# {2})".format(
-                field,
-                pms.hero.name,
-                pms.match.steam_id,
-            ))
+
             data = filter_fn(replay['es'], pms, enemies, allies)
             if field == 'item_buys':
                 self.save_msgstream(
                     match_id, pms.player_slot, data, field, 'combatlog'
                 )
             else:
-                pass  # We are not actually using this data right now.
+                pass
+                # We are not actually using this data right now.
                 #  We can circle back later on this if there is interest.
             pms_combat[field] = data
 
@@ -507,7 +521,7 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
 
         combat_timeseries = {}
         for field, data in pms_combat.iteritems():
-            indicies = {n: 0 for n in range(min_time, max_time+1)}
+            indicies = {n: 0 for n in range(min_time, max_time + 1)}
 
             # Sum up the messages occurring at the same time
             for msg in data:
@@ -542,10 +556,24 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
         return combat_timeseries
 
     def save_timeseries(self, match_id, pms, timeseries_log):
-        for field, data in timeseries_log.iteritems():
-            self.save_msgstream(
-                match_id, pms.player_slot, data, field, 'combatseries'
-            )
+        """ We are rolling this into one file as a speed hack. """
+
+        merged_data = [
+            self.merge_combatseries_dicts(idx, timeseries_log)
+            for idx in range(0, len(timeseries_log.values()[0]))
+        ]
+        logging.info('Saving truncated combatseries')
+        self.save_msgstream(
+            match_id, pms.player_slot, merged_data, 'allseries', 'combatseries'
+        )
+
+    def merge_combatseries_dicts(self, idx, datadict):
+        relevant_dicts = [v[idx] for v in datadict.values()]
+        return ft.reduce(
+            lambda a, b: dict(a, **b),
+            relevant_dicts,
+            {}
+        )
 
 
 class UpdateParseEnd(S3WriterTaskMixin, Task):
@@ -564,20 +592,15 @@ class UpdateParseEnd(S3WriterTaskMixin, Task):
                 ]:
                     continue
 
-                logger.info('Doing M#{0}, {1}, {2}.  {3} done.'.format(
-                    match_id, field, 'statelog', ct
+                logger.info(
+                    'Doing M#{0}, {1}, {2}.  {3} done.'.format(
+                        match_id, field, 'statelog', ct
                     )
                 )
 
                 self.aggregate_shards(match_id, field, 'statelog')
 
-            for ct, field in enumerate(combatlog_filter_map.keys()):
-                logger.info('Doing M#{0}, {1}, {2}.  {3} done.'.format(
-                    match_id, field, 'combatlog', ct
-                    )
-                )
-
-                self.aggregate_shards(match_id, field, 'combatseries')
+            self.aggregate_shards(match_id, 'allseries', 'combatseries')
 
             self.bookkeep(match_id)
             # TODO something like this, and change save_msgstream to just build
@@ -649,22 +672,28 @@ class UpdateParseEnd(S3WriterTaskMixin, Task):
                 'offset_time': data_dicts[0][x]['offset_time'],
             }
             keys = (k for k in data_dicts[0][x].keys() if k not in bad_keys)
-            health_pct = sum(
-                [subdict[x]['health'] for subdict in data_dicts]
-            ) / sum(
-                [subdict[x]['max_health'] for subdict in data_dicts]
-            )
-            mana_pct = sum(
-                [subdict[x]['mana'] for subdict in data_dicts]
-            ) / sum(
-                [subdict[x]['max_mana'] for subdict in data_dicts]
-            )
             for key in keys:
                 struct[key] = sum([subdict[x][key] for subdict in data_dicts])
+
+            try:
+                health_pct = sum(
+                    [subdict[x]['health'] for subdict in data_dicts]
+                ) / sum(
+                    [subdict[x]['max_health'] for subdict in data_dicts]
+                )
+                mana_pct = sum(
+                    [subdict[x]['mana'] for subdict in data_dicts]
+                ) / sum(
+                    [subdict[x]['max_mana'] for subdict in data_dicts]
+                )
                 struct['health_pct'] = health_pct
                 struct['mana_pct'] = mana_pct
+            except KeyError:
+                # Health key not present, probably in combatseries.
+                pass
 
             return_lst.append(struct)
+
         return return_lst
 
     def rollup_dataseries(self, data, field, operation):
@@ -679,7 +708,7 @@ class UpdateParseEnd(S3WriterTaskMixin, Task):
         data_keys = self.extract_keys(data_dicts)
 
         if operation == 'sum':
-            if field == 'allstate':
+            if field == 'allstate' or field == 'allseries':
                 return self.rollup_sum_allstate(data_keys, data_dicts)
             else:
                 return [
@@ -695,7 +724,7 @@ class UpdateParseEnd(S3WriterTaskMixin, Task):
                     'Taking dicts of more than 2 series undefined.'
                 )
             else:
-                if field == 'allstate':
+                if field == 'allstate' or field == 'allseries':
                     return_lst = []
 
                     for time_idx in data_keys:
@@ -723,7 +752,7 @@ class UpdateParseEnd(S3WriterTaskMixin, Task):
             raise ValueError('What is this operation? {0}'.format(operation))
 
     def rehash(self, data, field):
-        if field != 'allstate':
+        if field != 'allstate' and field != 'allseries':
             return [
                 {x['offset_time']: x[field] for x in dataseries}
                 for dataseries in data

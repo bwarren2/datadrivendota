@@ -240,6 +240,16 @@ class TestAggregateDataseries(TestCase):
             ]
         )
 
+    def test_combatseries_merge(self):
+        test_data = {
+            'kills': [{'time': 1, 'kills': 1}, {'time': 2, 'kills': 1}],
+            'deaths': [{'time': 1, 'deaths': 1}, {'time': 2, 'deaths': 1}],
+        }
+        t = UpdatePmsReplays()
+        got = t.merge_combatseries_dicts(0, test_data)
+        expected = {'deaths': 1, 'kills': 1, 'time': 1}
+        self.assertEqual(got, expected)
+
 
 class TestMatchRequestCreation(TestCase):
 
