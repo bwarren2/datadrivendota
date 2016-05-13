@@ -1,3 +1,4 @@
+import functools as ft
 import logging
 import gzip
 import time
@@ -544,10 +545,23 @@ class UpdatePmsReplays(S3WriterTaskMixin, Task):
 
     def save_timeseries(self, match_id, pms, timeseries_log):
         """ We are rolling this into one file as a speed hack. """
-        for field, data in timeseries_log.iteritems():
-            self.save_msgstream(
-                match_id, pms.player_slot, data, field, 'combatseries'
-            )
+
+        merged_data = [
+            self.merge_combatseries_dicts(idx, timeseries_log)
+            for idx in timeseries_log[0]
+        ]
+
+        self.save_msgstream(
+            match_id, pms.player_slot, merged_data, 'allseries', 'combatseries'
+        )
+
+    def merge_combatseries_dicts(self, idx, datadict):
+        relevant_dicts = [v[idx] for v in datadict.values()]
+        return ft.reduce(
+            lambda a, b: dict(a, **b),
+            relevant_dicts,
+            {}
+        )
 
 
 class UpdateParseEnd(S3WriterTaskMixin, Task):
