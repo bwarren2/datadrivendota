@@ -38,7 +38,6 @@ class MatchRequestCreateView(View):
     def dispatch(self, *args, **kwargs):
         return super(MatchRequestCreateView, self).dispatch(*args, **kwargs)
 
-    @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
 
         response_data = {}
