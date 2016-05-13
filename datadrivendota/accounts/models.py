@@ -109,7 +109,7 @@ class UserProfile(models.Model):
             creation__month=month,
         )
 
-    @property
+    @cached_property
     def requests_remaining(self):
         start_of_this_calendar_month = timezone.now().replace(
             day=1,
