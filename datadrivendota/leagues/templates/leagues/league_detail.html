@@ -64,12 +64,6 @@
     <div class="col-md-4">
       <p>Charts are capped at 300 matches for now until we optimize performance.  Some leagues include their qualifiers in the same tournament due to a Valve convention, which we are working on splitting out.</p>
     </div>
-    <div class='col-md-12'>
-      <h4>Match Timeline</h4>
-      <div id='match_timeline' class='vert-md-1 chart'>
-        <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
-      </div>
-    </div>
   </div>
 
 </section>
@@ -116,13 +110,6 @@
           }, true
           );
 
-      d7.extensions.charts.matches.match_timeline(
-          '#match_timeline',
-          {
-            league_id:{{league.steam_id}},
-            page_size:10
-          }
-          );
     });
 
     $('button#chart').click();
