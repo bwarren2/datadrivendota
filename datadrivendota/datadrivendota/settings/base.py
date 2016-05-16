@@ -393,19 +393,11 @@ STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')
 DJSTRIPE_PLANS = OrderedDict()
 
 DJSTRIPE_PLANS["monthly"] = {
-    "stripe_plan_id": "ddd-month",
-    "name": "Ultimate ($3/month)",
+    "stripe_plan_id": "ddd-monthly",
+    "name": "Ultimate ($2/month)",
     "description": "The monthly subscription plan to DataDrivenDota",
-    "price": 300,
+    "price": 200,
     "interval": "month",
-    "currency": "usd"
-}
-DJSTRIPE_PLANS["yearly"] = {
-    "stripe_plan_id": "ddd-year",
-    "name": "Ultimate ($30/year)",
-    "description": "The annual subscription plan to DataDrivenDota",
-    "price": 3000,
-    "interval": "year",
     "currency": "usd"
 }
 
