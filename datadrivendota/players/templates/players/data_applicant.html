@@ -7,27 +7,61 @@
 
 {% block aligned_content %}
     {% if success %}
-        <div class = 'alert alert-success'>Congrats!  Your data has been added to the list.</div>
+        <div class = 'alert alert-success'>
+          Congrats! Your data has been added to the list.
+        </div>
     {% elif preexisting%}
-        <div class = 'alert alert-warning'>We already have that ID in the list.  If that's you, rest easy; you are covered.</div>
+        <div class = 'alert alert-warning'>
+          We already have that ID in the list. If that's you, rest easy; you
+          are covered.
+        </div>
     {% elif error%}
-        <div class = 'alert alert-danger'>That form did not validate.  Check the errors!</div>
+        <div class = 'alert alert-danger'>
+          That form did not validate. Check the errors!
+        </div>
     {% endif %}
     <div class='row'>
         <div class='col-md-8'>
             <h3>What we are offering</h3>
             <p>
-            During our beta, we are offering a free one-off 200 match data import by request.  If there is interest, we will add a premium version: no ads, automatic data import, customizable tracker feed, and more at ~$2/month to help cover costs.
+            We offer two tiers of service: a free tier, with a limited number
+            of match imports per month, and the Ultimate tier, which allows
+            unlimited and automatic match imports, for $2 a month.
             </p>
             <p>
-            At the moment, we are rate-limited by Valve's API: we can only import about 50 people per day while keeping up with our other import obligations.  (We are talking to them about this.)  We want to keep things fair, so we are accepting data requests via the form below and choosing randomly from the applicant pool if we have more requests than spaces.  We will email you when your data is being pulled in.
+            At the moment, we are rate-limited by Valve's API: we can only
+            import about 50 people per day while keeping up with our other
+            import obligations. (We are talking to them about this.) We want
+            to keep things fair, so we are accepting data requests via the form
+            below and choosing randomly from the applicant pool if we have more
+            requests than spaces. We will email you when your data is being
+            pulled in.
             </p>
             <h3>Gotchas and howto</h3>
-            <p>Please make sure your data is public, or we cannot pull it for you!</p>
-            <p>(Dota 2 > Settings gear (top left) > Options (middle) > Profile (far right) > Expose Public Data Match.)</p>
-            <p>To get your steam id, use the XXXX in <b><i>your</i></b> steam community URL (ex http://steamcommunity.com/profiles/XXXX), or open your dota 2 profile in-client and take the number on top of your picture, or <a href="http://steamidconverter.com/">http://steamidconverter.com/</a> to get your 64 bit ID from your account name.  (You can use the YYYY in http://steamcommunity.com/id/YYYY to get your account name).  Make sure this points to your account, not someone else's!</p>
+            <p>
+            Please make sure your data is public, or we cannot pull it for you!
+            </p>
+            <p>
+            (Dota 2 &gt; Settings gear (top left) &gt; Options (middle) &gt; Profile
+            (far right) &gt; Expose Public Data Match.)
+            </p>
+            <p>
+            To get your steam id, use the XXXX in
+            <strong><em>your</em></strong> steam community URL (ex
+            http://steamcommunity.com/profiles/XXXX), or open your dota 2
+            profile in-client and take the number on top of your picture, or
+            <a href="http://steamidconverter.com/">http://steamidconverter.com/</a>
+            to get your 64 bit ID from your account name. (You can use the
+            YYYY in http://steamcommunity.com/id/YYYY to get your account
+            name). Make sure this points to your account, not someone else's!
+            </p>
             <h3>HINT</h3>
-            <p>These are one-off data pulls. If you want easily to see what happens when you use our tools, you can play a couple of games based on your inferences <b><i>before</i></b> you make a data request.</p>
+            <p>
+            These are one-off data pulls. If you want easily to see what
+            happens when you use our tools, you can play a couple of games
+            based on your inferences <strong><em>before</em></strong> you make
+            a data request.
+            </p>
         </div>
         <div class='col-md-4'>
             <div class='form-container'>
