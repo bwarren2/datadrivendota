@@ -43,7 +43,7 @@
         <h4>Your Current Plan</h4>
         <div class="btn btn-primary disabled">
       {% else %}
-        {% if customer.current_subscription.amount < plan.price|djdiv:100 %}
+        {% if not customer.current_subscription or customer.current_subscription.amount < plan.price|djdiv:100 %}
           <h4>Upgrade</h4>
         {% elif customer.current_subscription.amount > plan.price|djdiv:100 %}
           <h4>Downgrade</h4>
