@@ -54,7 +54,7 @@ class UpdateLeagueSchedule(ApiFollower):
         """
         logger.info('Deleting unscheduled games')
         impending_matches = []
-        for x in data['games']:
+        for x in data.get('games', []):
             if len(x['teams']) == 2:
                 datum = (
                     x['league_id'],
@@ -97,7 +97,7 @@ class UpdateLeagueSchedule(ApiFollower):
         @todo: make this a bulk_insert for speediness if needed.
         """
         logger.info('Creating scheduled games')
-        for game in data['games']:
+        for game in data.get('games', []):
             league = League.objects.get_or_create(
                 steam_id=game['league_id']
             )[0]
@@ -136,7 +136,7 @@ class UpdateLeagueSchedule(ApiFollower):
 
     def clean_urldata(self, urldata):
         """ Strip out request-level response from valve. """
-        return urldata['result']
+        return urldata.get('result', {})
 
     def _fingerprint(self, scheduled_match):
         """

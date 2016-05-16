@@ -300,4 +300,4 @@ class UpdateLiveGames(ApiFollower):
 
     def _clean_urldata(self, urldata):
         """ Strip out request-level response from valve. """
-        return urldata['result']['games']
+        return urldata.get('result', {}).get('games', [])
