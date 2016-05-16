@@ -86,8 +86,8 @@ class UpdateTeam(ApiFollower):
 
     def run(self, api_context, json_data, response_code, url):
 
-        json_data = json_data['result']
-        for team_data in json_data['teams']:
+        json_data = json_data.get('result', {})
+        for team_data in json_data.get('teams', []):
             team, created = Team.objects.get_or_create(
                 steam_id=team_data['team_id']
             )
