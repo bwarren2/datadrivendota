@@ -21,7 +21,7 @@
 
   {% if request.user.is_authenticated %}
   <p>
-  <em>Don't see the match you're looking for? <a href="{% url "parserpipe:import" %}">Import</a> it!</em>
+  <em>Don't see the match you're looking for? <a href="{% url "parserpipe:user-import" %}">Import</a> it!</em>
   </p>
   {% endif %}
 </div>
