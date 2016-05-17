@@ -44,15 +44,6 @@ class LandingView(TemplateView):
         except AttributeError:
             pass
 
-        messages.success(
-            self.request,
-            (
-                "We are launching the full platform within the month. If you "
-                "sign in above, you will be able to get deep processing of "
-                "your data very soon!"
-            )
-        )
-
         return super(LandingView, self).get_context_data(**kwargs)
 
 
