@@ -422,6 +422,10 @@ class Config(object):
             'task': 'leagues.management.tasks.league.MirrorRecentLeagues',
             'schedule': timedelta(days=1),
         },
+        'mirror-client-matches': {
+            'task': 'players.management.tasks.MirrorClientPersonas',
+            'schedule': timedelta(days=1),
+        },
         # Fast
         'check-match-integrity-hourly': {
             'task': 'matches.management.tasks.CheckMatchIntegrity',
