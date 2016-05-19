@@ -101,7 +101,7 @@
           {% endif %}
 
           {% if SHOW_MATCHES and user.is_authenticated %}
-            <li class="{% active 'matches' main_nav %}">
+            <li>
               <a href="{% url 'matches:index' %}?player={{ user.userprofile.steam_id }}">My Matches</a>
             </li>
           {% endif %}
