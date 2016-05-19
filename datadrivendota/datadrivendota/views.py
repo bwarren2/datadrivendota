@@ -1,13 +1,16 @@
 from json import dumps
 
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse
+from django.http import (
+    HttpResponse,
+    HttpResponseRedirect,
+)
 from django.shortcuts import render
 from django.views.generic import View, TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation
+from django.core.urlresolvers import reverse
 
 from .forms import SearchForm
 from heroes.models import Hero
@@ -20,6 +23,17 @@ from players.models import Player
 
 class LandingView(TemplateView):
     template_name = 'home.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(
+                '{}?player={}'.format(
+                    reverse('matches:index'),
+                    request.user.userprofile.steam_id,
+                )
+            )
+
+        return super(LandingView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
 
