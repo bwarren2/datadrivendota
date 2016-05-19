@@ -100,6 +100,12 @@
             </li>
           {% endif %}
 
+          {% if SHOW_MATCHES and user.is_authenticated %}
+            <li class="{% active 'matches' main_nav %}">
+              <a href="{% url 'matches:index' %}?player={{ user.userprofile.steam_id }}">My Matches</a>
+            </li>
+          {% endif %}
+
           {% if SHOW_PLAYERS %}
             <li class="{% active 'players:index' %}">
               <a href="{% url 'players:index' %}">Players</a>

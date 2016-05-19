@@ -1,6 +1,9 @@
 import time
 
-from django.db.models import F
+from django.db.models import (
+    F,
+    Q,
+)
 
 import django_filters
 from rest_framework import filters
@@ -20,12 +23,14 @@ class MatchFilter(filters.FilterSet):
             hero = self.get_associated_value('hero')
             if hero:
                 queryset = queryset.filter(
-                    playermatchsummary__player__persona_name__icontains=value,
+                    Q(playermatchsummary__player__persona_name__icontains=value)
+                    | Q(playermatchsummary__player__steam_id=value),
                     playermatchsummary__hero__name__icontains=hero,
                 )
             else:
                 queryset = queryset.filter(
-                    playermatchsummary__player__persona_name__icontains=value,
+                    Q(playermatchsummary__player__persona_name__icontains=value)
+                    | Q(playermatchsummary__player__steam_id=value)
                 )
         return queryset
 

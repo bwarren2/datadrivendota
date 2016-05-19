@@ -173,14 +173,12 @@ class MatchListView(ListView):
         qs = super(MatchListView, self).get_queryset()
         filter_league = self.request.GET.get('league_id', None)
 
+        matches = qs.filter(
+            validity=Match.LEGIT,
+        )
         if filter_league:
-            matches = qs.filter(
+            matches = matches.filter(
                 league__steam_id=filter_league,
-                validity=Match.LEGIT
-            )
-        else:
-            matches = qs.filter(
-                validity=Match.LEGIT
             )
 
         matches = matches.select_related(
