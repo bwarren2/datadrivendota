@@ -19,14 +19,20 @@
   </small>
 
   {% if user.is_authenticated and not match.is_parsed %}
-    {% include "matches/_parse_this.html" %}
+    <span class='parse-button-holder' style='float:right'>
+    {% if match.parse_status == 'unrequested' %}
+      <button class='btn btn-primary parse-button' data-match-id={{match.steam_id}}>Parse This Match!</button>
+    {% elif match.parse_status == 'requested' %}
+      <button class='btn btn-primary disabled'>Being processed</button>
+    {% endif %}
+    </span>
   {% elif not match.is_parsed %}
     <p>Log in to parse this match!</p>
   {% endif %}
 
   {% if user.is_superuser %}
   <span class='admin-tag'> {{clearname}}</span>
-  {% elif match.is_parsed%}
+  {% elif match.is_parsed %}
   <small class='text-primary'>
     Parsed
   </small>
