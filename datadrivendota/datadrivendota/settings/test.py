@@ -1,17 +1,13 @@
-from base import *
+from base import *  # NOQA
 
-#   TEST SETTINGS
+# TEST SETTINGS
 DEBUG = False
 SOUTH_TESTS_MIGRATE = False
 
 INSTALLED_APPS += (
-    # 'django_nose',
-    # 'django_behave',
 )
 
-# TEST_RUNNER = 'django_behave.runner.DjangoBehaveTestSuiteRunner'
-
-#   IN-MEMORY TEST DATABASE
+# IN-MEMORY TEST DATABASE
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -23,11 +19,10 @@ DATABASES = {
     },
 }
 
-
-#  STORAGE
+# STORAGE
 STATICFILES_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-#  END STORAGE
+# END STORAGE
 
 SHOW_ACCOUNTS = True
 SHOW_AUTH = True

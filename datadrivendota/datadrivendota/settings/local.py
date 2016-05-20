@@ -1,39 +1,39 @@
 """Development settings and globals."""
-from base import *
+from base import *  # NOQA
 
 
-#   DEBUG CONFIGURATION
+# DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
-#   END DEBUG CONFIGURATION
+# END DEBUG CONFIGURATION
 
 
-#   EMAIL CONFIGURATION
+# EMAIL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-#   END EMAIL CONFIGURATION
+# END EMAIL CONFIGURATION
 
-#   CACHE CONFIGURATION
+# CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         'LOCATION': '127.0.0.1:11211',
+        'TIMEOUT': environ.get('CACHE_MIDDLEWARE_SECONDS', None),
     }
 }
 
 CACHE_ENABLED = getenv('CACHE_ENABLED', False) == 'True'
 if not CACHE_ENABLED:
     CACHES['default']['backend'] = (
-        'django.core.cache.backends'
-        '.dummy.DummyCache'
+        'django.core.cache.backends.dummy.DummyCache'
     )
-#   END CACHE CONFIGURATION
+# END CACHE CONFIGURATION
 
 
-#   TOOLBAR CONFIGURATION
+# TOOLBAR CONFIGURATION
 # See: https://github.com/django-debug-toolbar/django-debug-toolbar/
 #      #installation
 INSTALLED_APPS += (
@@ -51,7 +51,7 @@ INTERNAL_IPS = ('127.0.0.1',)
 MIDDLEWARE_CLASSES += (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
-#   END TOOLBAR CONFIGURATION
+# END TOOLBAR CONFIGURATION
 
 # STATIC CONFIGURATION
 STATIC_URL = '/assets/'
@@ -65,8 +65,6 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 
 DEVSERVER_MODULES = (
-    # 'devserver.modules.sql.SQLRealTimeModule',
-    # 'devserver.modules.sql.SQLSummaryModule',
     'devserver.modules.profile.ProfileSummaryModule',
 
     # Modules not enabled by default
@@ -94,6 +92,5 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.redirects.RedirectsPanel',
     'debug_toolbar_line_profiler.panel.ProfilingPanel',
-    # 'template_timings_panel.panels.TemplateTimings.TemplateTimings',
     'template_profiler_panel.panels.template.TemplateProfilerPanel',
 )

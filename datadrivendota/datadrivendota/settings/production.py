@@ -1,8 +1,6 @@
 """Production settings and globals."""
-
-
 from os import environ
-from base import *
+from base import *  # NOQA
 
 # Normally you should not import ANYTHING from Django directly
 # into your settings, but ImproperlyConfigured is an exception.
@@ -110,8 +108,10 @@ CACHES = {
 }
 
 REST_FRAMEWORK_EXTENSIONS = {
-    'DEFAULT_CACHE_KEY_FUNC':
-    'datadrivendota.caching_keys.rest_key_constructor'
+    'DEFAULT_CACHE_KEY_FUNC': (
+        'datadrivendota.caching_keys.rest_key_constructor'
+    ),
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 15,
 }
 
 #          END CACHE CONFIGURATION
