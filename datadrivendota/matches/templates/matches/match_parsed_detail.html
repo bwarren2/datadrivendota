@@ -25,6 +25,43 @@
       <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
     </div>
 
+    <div class='col-md-12'>
+    <h2>Extra Charting</h2>
+    <p>Want to see some other facet of this match?  Just pick one!</p>
+      <form>
+        <div class='row'>
+          <div class='col-md-6'>
+            <div class="form-group">
+              <label>
+                Data
+              </label>
+              <select class="form-control" id='data'>
+                {% include "matches/_attr_selections.html" %}
+              </select>
+            </div>
+          </div>
+          <div class='col-md-6'>
+            <div class="btn-group btn-group-justified" role="group">
+              <div class="btn-group" role="group">
+                <button id='chart-button' type="button" class="btn btn-primary btn-lg">
+                  Chart! <i class="fa fa-line-chart"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+
+    <div class='col-md-6 vert-md-6' id='custom-hero'>
+      <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+    </div>
+
+    <div class='col-md-6 vert-md-6' id='custom-side'>
+      <img class='ajax-loader' src="{% static 'images/loading.gif' %}">
+    </div>
+
 
     <div id='matchup-charts' class='col-md-6'>
 
@@ -125,6 +162,63 @@ $(function(){
             return [d, 'earned_income', 'combatseries']
           }), '#hero-gold', params
       );
+
+
+      $('#chart-button').click(function(){
+        var facet = $('#data :selected').val();
+
+        var params = {
+          label: facet,
+          inset_legend: true
+        };
+
+        var combatlog_flag = [
+          'buyback_expense',
+          'creep_xp',
+          'death_expense',
+          'hero_dmg_dealt',
+          'hero_dmg_taken',
+          'hero_xp',
+          'key_bldg_dmg_dealt',
+          'other_dmg_dealt',
+          'other_dmg_taken',
+        ].indexOf(facet);
+
+        if(combatlog_flag===-1){
+          d7.extensions.charts.replays.stat_lineup(
+            heroes,
+            facet,
+            '#custom-hero',
+            params,
+            'statelog'
+          );
+          d7.extensions.charts.replays.stat_lineup(
+            [radiant, dire, diff],
+            facet,
+            '#custom-side',
+            params,
+            'statelog'
+          );
+
+        }else{
+          d7.extensions.charts.replays.stat_lineup(
+            heroes,
+            facet,
+            '#custom-hero',
+            params,
+            'combatseries'
+          );
+          d7.extensions.charts.replays.stat_lineup(
+            [radiant, dire, dif],
+            facet,
+            '#custom-side',
+            params,
+            'combatseries'
+          );
+        }
+      });
+
+
     });
   });
 </script>
