@@ -91,17 +91,15 @@ class MatchDetailAbilities(DetailView):
             match=self.object
         ).select_related().order_by('player_slot')
 
-        radiant_summaries = [
-            summary for summary in summaries if summary.side == 'Radiant'
-        ]
+        # Side == 'Radiant' if player_slot__lt=5
+        radiant_summaries = summaries.filter(player_slot__lt=5)
         radiant_infodict = {}
         for summary in radiant_summaries:
             radiant_infodict[summary.player_slot] = ability_infodict(summary)
         kwargs['radiant_infodict'] = radiant_infodict
 
-        dire_summaries = [
-            summary for summary in summaries if summary.side == 'Dire'
-        ]
+        # Side == 'Dire' if player_slot__gte=5
+        dire_summaries = summaries.filter(player_slot__gte=5)
         dire_infodict = {}
         for summary in dire_summaries:
             dire_infodict[summary.player_slot] = ability_infodict(summary)
