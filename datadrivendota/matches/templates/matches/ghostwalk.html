@@ -1,189 +1,217 @@
 {% extends "row_base.html" %}
 
 {% block aligned_content %}
-    <div class='col-md-12'>
-      <div class='page-header'>
-        <h2>
-          Ghostwalk
-        </h2>
-      </div>
-      <p>Superimpose players from <a href="{% url 'matches:parsed_index' %}">parsed</a> matches to spot the differences when they appear.</p>
-    </div>
+<div class='col-md-12'>
+  <div class='page-header'>
+    <h2>
+      Ghostwalk
+    </h2>
+  </div>
+  <p>
+  Superimpose players from
+  <a href="{% url 'matches:parsed_index' %}">parsed</a> matches to spot the
+  differences when they appear.
+  </p>
+</div>
 
-    <div class='col-md-12'>
-      <h4>Controls</h4>
-      <form>
-      <div class='row'>
-        <div class='col-md-3'>
-            <div class="form-group">
-            <label>Match ID #1</label>
-                <select id='shard_1' style='width:200px'></select>
-            </div>
-        </div>
-        <div class='col-md-3'>
-            <div class="form-group">
-            <label>Match ID #1 Label</label>
-                <input type="textarea" class="form-control" id="label_1" placeholder="(ex 'My Jungle Legion')">
-            </div>
-        </div>
-        <div class='col-md-3'>
-            <div class="form-group">
-            <label>Match ID #2</label>
-                <select id='shard_2' style='width:200px'></select>
-            </div>
-        </div>
-        <div class='col-md-3'>
-            <div class="form-group">
-            <label>Match ID #2 Label</label>
-                <input type="textarea" class="form-control" id="label_2" placeholder="(ex 'Dendi Pudge')">
-            </div>
-        </div>
+{% include "mixins/_match_form.html" %}
 
-        <div class='col-md-3'>
-          <div class="btn-group btn-group-justified" role="group">
-            <div class="btn-group" role="group">
-              <button id='chart-button' type="button" class="btn btn-primary">
-                Chart! <i class="fa fa-line-chart"></i>
-              </button>
-            </div>
-          </div>
+<div class='col-md-12'>
+  <h4>
+    Select matches and heroes
+    <button type="button" class="btn btn-default pull-right" data-toggle="modal" data-target="#match-select">
+      Find Matches
+    </button>
+  </h4>
+  <ul id="filtered-matches" class="list-inline"></ul>
+  <form>
+    <div class='row'>
+      <div class='col-md-3'>
+        <div class="form-group">
+          <label>Match ID #1</label>
+          <select id='shard_1' style='width:200px'></select>
         </div>
       </div>
-    </form>
-    </div>
+      <div class='col-md-3'>
+        <div class="form-group">
+          <label>Match ID #1 Label</label>
+          <input type="textarea" class="form-control" id="label_1" placeholder="(ex 'My Jungle Legion')">
+        </div>
+      </div>
+      <div class='col-md-3'>
+        <div class="form-group">
+          <label>Match ID #2</label>
+          <select id='shard_2' style='width:200px'></select>
+        </div>
+      </div>
+      <div class='col-md-3'>
+        <div class="form-group">
+          <label>Match ID #2 Label</label>
+          <input type="textarea" class="form-control" id="label_2" placeholder="(ex 'Dendi Pudge')">
+        </div>
+      </div>
 
-    <div class='col-md-12'>
-      <div style='margin-top:20px'>
-
-        <div class='row'>
-
-          <div class='col-md-3' id='target'>
-
+      <div class='col-md-3'>
+        <div class="btn-group btn-group-justified" role="group">
+          <div class="btn-group" role="group">
+            <button id='chart-button' type="button" class="btn btn-primary">
+              Chart! <i class="fa fa-line-chart"></i>
+            </button>
           </div>
-          <div class='col-md-3' id='target2'>
-
-          </div>
-          <div class='col-md-6' id='minimap'>
-            <div class='minimap-chart'></div>
-          </div>
-
         </div>
       </div>
     </div>
-    <div class='col-md-12'>
-      {% include "accounts/mixins/_login_convert.html" %}
-    </div>
+  </form>
+</div>
 
+<div class='col-md-12'>
+  <div style='margin-top:20px'>
+
+    <div class='row'>
+      <div class='col-md-3' id='target'>
+      </div>
+      <div class='col-md-3' id='target2'>
+      </div>
+      <div class='col-md-6' id='minimap'>
+        <div class='minimap-chart'></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class='col-md-12'>
+  {% include "accounts/mixins/_login_convert.html" %}
+</div>
 {% endblock aligned_content %}
 
 {% block extra_js %}
 <script type="text/javascript">
-  $(function(){
-    inputs.pms_select2('#shard_1', false);
-    inputs.pms_select2('#shard_2', false);
+$(function () {
+  inputs.pms_select2('#shard_1', false);
+  inputs.pms_select2('#shard_2', false);
 
+  var reset_divs = function () {
+    $('#target_1').empty();
+    $('#target_2').empty();
+    $('#minimap .minimap-chart').empty();
+    $('#minimap i').remove();
+  }
 
-    var reset_divs = function(){
-      $('#target_1').empty();
-      $('#target_2').empty();
-      $('#minimap .minimap-chart').empty();
-      $('#minimap i').remove();
+  var draw = function (shard_1, shard_2, label_1, label_2){
+    var params = {};
 
+    if (shard_1 !== undefined) {
+      var params = {
+        label: label_1,
+      };
+      shard_1.minimap_label = label_1;
+      shard_1.stat_label = label_1;
+      d7.extensions.charts.replays.stat_card(
+        shard_1,
+        '#target',
+        params
+      );
     }
 
-    var draw = function(shard_1, shard_2, label_1, label_2){
-      var params = {};
+    if (shard_2 !== undefined) {
+      var params = {
+        label: label_2,
+      };
 
-      if(shard_1!==undefined){
-        var params = {
-          label: label_1,
-        };
-        shard_1.minimap_label = label_1;
-        shard_1.stat_label = label_1;
-        d7.extensions.charts.replays.stat_card(
-            shard_1, '#target', params
-            );
-      }
-
-      if(shard_2!==undefined){
-        var params = {
-          label: label_2,
-        };
-
-        shard_2.minimap_label = label_2;
-        shard_2.stat_label = label_2;
-        d7.extensions.charts.replays.stat_card(
-            shard_2, '#target2', params
-            );
-      }
-
-      var shards = [];
-
-      if(shard_1!==undefined){
-        shards.push(shard_1);
-      }
-      if(shard_2!==undefined){
-        shards.push(shard_2);
-      }
-
-      d7.extensions.charts.replays.minimap(
-          shards, '#minimap', params
-          );
-
-      d7.extensions.charts.replays.playback_shards(shards);
-
+      shard_2.minimap_label = label_2;
+      shard_2.stat_label = label_2;
+      d7.extensions.charts.replays.stat_card(
+        shard_2,
+        '#target2',
+        params
+      );
     }
 
-    $('#chart-button').click(function(){
+    var shards = [];
 
-      reset_divs();
-
-      var shard_1 = $('#shard_1').select2('data')[0];
-      var shard_2 = $('#shard_2').select2('data')[0];
-
-      var destination = '#gold';
-      var label_1 = $('#label_1').val();
-      var label_2 = $('#label_2').val();
-
-      draw(shard_1, shard_2, label_1, label_2);
-
-    });
-
-    $('#pause-play').click(function(){
-      $('#chart-button').toggle();
-    });
-
-    var pms_ids = window.jsUtils.getParameterByName('pms_ids');
-    if(pms_ids!==undefined && pms_ids!==null){
-      var url = '/rest-api/parse-shards/?pms_ids=['+pms_ids+']';
-      console.log(url);
-      $.getJSON(url)
-        .success(function(shards){
-          shard_1 = shards[0];
-          shard_2 = shards[1];
-
-          var label_1 = window.jsUtils.getParameterByName('label_1');
-          var label_2 = window.jsUtils.getParameterByName('label_2');
-          draw(shard_1, shard_2, label_1, label_2);
-
-        });
+    if (shard_1 !== undefined) {
+      shards.push(shard_1);
+    }
+    if (shard_2 !== undefined) {
+      shards.push(shard_2);
     }
 
+    d7.extensions.charts.replays.minimap(
+      shards,
+      '#minimap',
+      params
+    );
 
+    d7.extensions.charts.replays.playback_shards(shards);
+  }
+
+  $('#chart-button').click(function () {
+    reset_divs();
+
+    var shard_1 = $('#shard_1').select2('data')[0];
+    var shard_2 = $('#shard_2').select2('data')[0];
+
+    var destination = '#gold';
+    var label_1 = $('#label_1').val();
+    var label_2 = $('#label_2').val();
+
+    draw(shard_1, shard_2, label_1, label_2);
   });
+
+  $('#pause-play').click(function () {
+    $('#chart-button').toggle();
+  });
+
+  var pms_ids = window.jsUtils.getParameterByName('pms_ids');
+  if (pms_ids !== undefined && pms_ids !== null) {
+    var url = '/rest-api/parse-shards/?pms_ids=['+pms_ids+']';
+    console.log(url);
+    $.getJSON(url)
+      .success(function (shards) {
+        shard_1 = shards[0];
+        shard_2 = shards[1];
+
+        var label_1 = window.jsUtils.getParameterByName('label_1');
+        var label_2 = window.jsUtils.getParameterByName('label_2');
+        draw(shard_1, shard_2, label_1, label_2);
+      });
+  }
+
+  $('#match-select form').submit(function(evt) {
+    evt.preventDefault();
+    var data = {
+      limit: 5
+    };
+    $('#match-select form').serializeArray().map(function(elem) {
+      data[elem.name] = elem.value;
+    });
+    $.ajax('/rest-api/matches/', {
+      data: data,
+      success: function(matches) {
+        $('#filtered-matches').html('');
+        $.each(matches, function(index, elem) {
+          var template = `<li><a href="/matches/${elem.steam_id}/" target="_blank">${elem.steam_id}</a> <i class="glyphicon glyphicon-copy clippable" title="Copy match id" data-clipboard-text="${elem.steam_id}"></i></li>`;
+          $('#filtered-matches').append(
+              $(template)
+              );
+        });
+        $('#match-select').modal('hide');
+      },
+    });
+  });
+});
 </script>
 {% endblock extra_js %}
 
 {% block extra_css %}
 <style type="text/css">
   .strength {
-    color:#FF6666;
+    color: #FF6666;
   }
   .intelligence {
-    color:#666EFF;
+    color: #666EFF;
   }
   .agility {
-    color:#66FF7A;
+    color: #66FF7A;
   }
   .health {
     color: #02B102;
