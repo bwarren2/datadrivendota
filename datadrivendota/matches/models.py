@@ -128,17 +128,23 @@ class Match(models.Model):
     @cached_property
     def parse_status(self):
         from parserpipe.models import MatchRequest
-        statuses = MatchRequest.objects.filter(
+        has_completed_match_request = MatchRequest.objects.filter(
             match_id=self.steam_id,
+            status=MatchRequest.COMPLETE,
+        ).first()
+        if has_completed_match_request:
+            return MatchRequest.STATUS_CHOICES[MatchRequest.COMPLETE]
+        highest_status = MatchRequest.objects.filter(
+            match_id=self.steam_id,
+        ).order_by(
+            '-status',
         ).values_list(
             'status',
             flat=True,
-        )
-        if not statuses:
+        ).first()
+        if not highest_status:
             return 'unrequested'
-        if any(s == 4 for s in statuses):
-            return 'parsed'
-        return 'requested'
+        return dict(MatchRequest.STATUS_CHOICES)[highest_status]
 
     @property
     def hms_duration(self):

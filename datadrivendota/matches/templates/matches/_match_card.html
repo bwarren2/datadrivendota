@@ -22,8 +22,8 @@
     <span class='parse-button-holder' style='float:right'>
     {% if match.parse_status == 'unrequested' %}
       <button class='btn btn-primary parse-button' data-match-id={{match.steam_id}}>Parse This Match!</button>
-    {% elif match.parse_status == 'requested' %}
-      <button class='btn btn-primary disabled'>Being processed</button>
+    {% else %}
+      <button class='btn btn-primary disabled'>{{ match.parse_status }}</button>
     {% endif %}
     </span>
   {% elif not match.is_parsed %}
