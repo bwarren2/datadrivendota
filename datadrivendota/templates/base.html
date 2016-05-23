@@ -95,14 +95,14 @@
           {% endif %}
 
           {% if SHOW_MATCHES %}
-            <li class="{% active 'matches' main_nav %}">
+          <li class="{% active 'matches:index' %} {% active 'matches:parsed_index' %}">
               <a href="{% url 'matches:index' %}">Matches</a>
             </li>
           {% endif %}
 
           {% if SHOW_MATCHES and user.is_authenticated %}
-            <li>
-              <a href="{% url 'matches:index' %}?player={{ user.userprofile.steam_id }}">My Matches</a>
+            <li class="{% active 'matches:index-mine' %}">
+              <a href="{% url 'matches:index-mine' %}">My Matches</a>
             </li>
           {% endif %}
 

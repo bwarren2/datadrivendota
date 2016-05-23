@@ -212,6 +212,22 @@ class MatchListView(ListView):
         ret = super(MatchListView, self).get_context_data(**kwargs)
         # Let's be gross and undo some of the implicit magic of the generic CBV:
         ret['match_list'] = ret['object_list']
+        ret['title_header'] = 'All Matches'
+        return ret
+
+
+class MyMatchListView(MatchListView):
+    def get_queryset(self):
+        steam_id = self.request.user.userprofile.steam_id
+        qs = super(MyMatchListView, self).get_queryset()
+        qs = qs.filter(
+            playermatchsummary__player__steam_id=steam_id,
+        )
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ret = super(MyMatchListView, self).get_context_data(**kwargs)
+        ret['title_header'] = 'My Matches'
         return ret
 
 

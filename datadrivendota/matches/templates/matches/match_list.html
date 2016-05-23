@@ -9,13 +9,17 @@
 
 <div class='col-md-12'>
   <h1>
-  {% if parsed %}
-  Parsed Matches
-  <small>| <a href="{% url 'matches:index' %}?{{ request.GET.urlencode }}">All Matches</a></small>
-  {% elif all %}
-  All Matches
-  <small>| <a href="{% url 'matches:parsed_index' %}?{{ request.GET.urlencode }}">Parsed Matches Only</a></small>
-  {% endif %}
+    {% if title_header == 'All Matches' %}
+      {% if parsed %}
+      Parsed Matches
+      <small>| <a href="{% url 'matches:index' %}?{{ request.GET.urlencode }}">All Matches</a></small>
+      {% elif all %}
+      All Matches
+      <small>| <a href="{% url 'matches:parsed_index' %}?{{ request.GET.urlencode }}">Parsed Matches Only</a></small>
+      {% endif %}
+    {% else %}
+      My Matches
+    {% endif %}
   <button type="button" class="btn btn-default btn-lg pull-right" data-toggle="modal" data-target="#match-select">
     Find Matches
   </button>

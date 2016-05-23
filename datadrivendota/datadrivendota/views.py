@@ -26,12 +26,7 @@ class LandingView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated():
-            return HttpResponseRedirect(
-                '{}?player={}'.format(
-                    reverse('matches:index'),
-                    request.user.userprofile.steam_id,
-                )
-            )
+            return HttpResponseRedirect(reverse('matches:index-mine'))
 
         return super(LandingView, self).get(request, *args, **kwargs)
 
