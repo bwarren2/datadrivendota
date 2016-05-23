@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from django.db import models
 from django.conf import settings
+from django.utils.functional import cached_property
 
 from .querysets import (
     PMSQuerySet,
@@ -123,6 +124,21 @@ class Match(models.Model):
     @property
     def is_parsed(self):
         return self.parsed_with == settings.PARSER_VERSION
+
+    @cached_property
+    def parse_status(self):
+        from parserpipe.models import MatchRequest
+        statuses = MatchRequest.objects.filter(
+            match_id=self.steam_id,
+        ).values_list(
+            'status',
+            flat=True,
+        )
+        if not statuses:
+            return 'unrequested'
+        if any(s == 4 for s in statuses):
+            return 'parsed'
+        return 'requested'
 
     @property
     def hms_duration(self):
