@@ -4,6 +4,11 @@ from matches import views
 urlpatterns = [
     url(r'^$', views.MatchListView.as_view(), name='index'),
     url(
+        r'mine/$',
+        views.MyMatchListView.as_view(),
+        name='index-mine',
+    ),
+    url(
         r'^parsed/$',
         views.ParsedMatchListView.as_view(),
         name='parsed_index'
