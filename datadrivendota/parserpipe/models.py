@@ -27,7 +27,7 @@ class MatchRequest(models.Model):
         (MATCH_FOUND, 'Match Found'),
         (REPLAY_AVAILABLE, 'Replay Available'),
         (REPLAY_NOT_AVAILABLE, 'Replay Not Available'),
-        (PARSED, 'Parsed'),
+        (PARSED, 'First-Pass Parsed'),
         (COMPLETE, 'Complete'),
     )
 
