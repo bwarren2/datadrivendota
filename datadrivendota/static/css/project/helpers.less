@@ -67,7 +67,6 @@
 .overlayer-bottom-right {
   .rounded-corners;
   top: 110px;
-  color: @brand-primary; /* @text-color */
   right: 4px;
   opacity: 0.7;
   padding-left: 4px;
@@ -77,6 +76,20 @@
   font-size: 20px;
 }
 
+.overlayer-clipboard {
+  .overlayer-bottom-right;
+  height: 40px;
+  width: 40px;
+  right: 12px;
+  top: 90px;
+  background-color: #333;
+}
+
+.overlayer-clipboard > i{
+  top: 14px;
+  right: 5px;
+  position: absolute;
+}
 
 .brand-primary {
   color: @brand-primary !important;

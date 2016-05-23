@@ -2,6 +2,7 @@ from django.views.generic import DetailView, ListView, TemplateView
 from utils.views import ability_infodict
 from parserpipe.models import MatchRequest
 
+from .mixins import RecentPmsesMixin
 from .filters import MatchFilter
 from .models import Match, PlayerMatchSummary, PickBan
 from utils.pagination import SmarterPaginator
@@ -131,15 +132,15 @@ class MatchParsedDetail(DetailView):
     template_name = 'matches/match_parsed_detail.html'
 
 
-class TimeLapseView(TemplateView):
+class TimeLapseView(RecentPmsesMixin, TemplateView):
     template_name = 'matches/time_lapse.html'
 
 
-class DuelView(TemplateView):
+class DuelView(RecentPmsesMixin, TemplateView):
     template_name = 'matches/duel.html'
 
 
-class GhostWalkView(TemplateView):
+class GhostWalkView(RecentPmsesMixin, TemplateView):
     template_name = 'matches/ghostwalk.html'
 
     def get_context_data(self, **kwargs):

@@ -1,0 +1,14 @@
+{% if recent_pmses %}
+  <div class='col-md-12'>
+  <h4 class='page-header'>Your recent matches</h4>
+    <div class='row'>
+
+      {% for pms in recent_pmses %}
+        <div class='col-md-3'>
+          {% include "players/_parsed_stat_card.html" %}
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+{% endif %}
