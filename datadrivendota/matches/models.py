@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.conf import settings
 from django.utils.functional import cached_property
+from django.utils import timezone
+import time
 
 from .querysets import (
     PMSQuerySet,
@@ -126,6 +128,28 @@ class Match(models.Model):
     @property
     def is_parsed(self):
         return self.parsed_with == settings.PARSER_VERSION
+
+    @property
+    def is_too_old(self):
+        " Can we expect still valve to have the replay for parsing? "
+        now = timezone.now()
+        one_week_ago = now - timedelta(weeks=1)
+        one_week_ago = time.mktime(one_week_ago.timetuple())
+
+        return self.start_time < one_week_ago
+
+    @property
+    def is_too_new(self):
+        " Can we expect valve to have the replay for parsing yet? "
+        now = timezone.now()
+        ten_min_ago = now - timedelta(minutes=10)
+        ten_min_ago = time.mktime(ten_min_ago.timetuple())
+        return self.start_time > ten_min_ago
+
+    @property
+    def is_parsable(self):
+
+        return not self.is_too_new and not self.is_too_old
 
     @cached_property
     def parse_status(self):
