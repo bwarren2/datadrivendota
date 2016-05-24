@@ -72,6 +72,7 @@ environ['MEMCACHE_SERVERS'] = environ.get(
 environ['MEMCACHE_USERNAME'] = environ.get('MEMCACHIER_USERNAME', '')
 environ['MEMCACHE_PASSWORD'] = environ.get('MEMCACHIER_PASSWORD', '')
 
+CACHE_MIDDLEWARE_SECONDS = environ.get('CACHE_MIDDLEWARE_SECONDS', None)
 
 CACHES = {
     'default': {
