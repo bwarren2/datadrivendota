@@ -83,7 +83,7 @@ CACHES = {
         # TIMEOUT is not the connection timeout! It's the default expiration
         # timeout that should be applied to keys! Setting it to `None`
         # disables expiration.
-        'TIMEOUT': environ.get('CACHE_MIDDLEWARE_SECONDS', None),
+        'TIMEOUT': CACHE_MIDDLEWARE_SECONDS,
         # None is keep forever, 0 is expire immediately, else = seconds
         'OPTIONS': {
             # Enable faster IO
@@ -94,7 +94,7 @@ CACHES = {
             'tcp_keepalive': True,
 
             # Timeout for set/get requests
-            '_poll_timeout': 2000,
+            '_poll_timeout': CACHE_MIDDLEWARE_SECONDS,
 
             # Use consistent hashing for failover
             'ketama': True,
