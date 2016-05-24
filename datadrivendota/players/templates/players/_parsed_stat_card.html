@@ -1,0 +1,32 @@
+<a href="{% url 'matches:detail' match_id=pms.match.steam_id %}" class="thumbnail">
+
+  {% if pms.is_win %}
+    <span class='card-win-pip overlayer-top-left' title='Win'>Win</span>
+  {% endif %}
+
+  {% if pms.hero.mugshot %}
+    <img src="{{ pms.hero.mugshot_url }}" alt="{{ hero.name }}"
+      class="player-match-portrait">
+  {% endif %}
+
+
+  <p class='overlayer'>
+    KDA2:
+    <span class='scorebar'>
+      {{ pms.kills }}/{{ pms.deaths }}/{{ pms.assists }}/{{ pms.kda2 }}
+    </span>
+  </p>
+
+  <p class='overlayer-top-right small-date'>
+    {{pms.display_date}}, {{pms.display_duration}}
+  </p>
+
+</a>
+
+<span class='overlayer-clipboard'>
+  <i
+   class="glyphicon glyphicon-copy clippable"
+   title='Copy match id'
+   data-clipboard-text="{{pms.match.steam_id}}"
+   ></i>
+</span>

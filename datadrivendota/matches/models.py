@@ -11,6 +11,8 @@ from .querysets import (
 from .managers import (
     Unparsed,
     Parsed,
+    ParsedPMS,
+    UnparsedPMS,
 )
 from .model_fields import ReplayFragmentField
 
@@ -251,6 +253,8 @@ class PlayerMatchSummary(models.Model):
     all_data = ReplayFragmentField(max_length=250)
 
     objects = PMSQuerySet.as_manager()
+    unparsed = UnparsedPMS()
+    parsed = ParsedPMS()
 
     class Meta:
         ordering = ['match', 'player_slot']
