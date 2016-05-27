@@ -10,9 +10,9 @@ function smartTicks(d) {
     return d;
 }
 
-function convertToSlug(Text)
+function convertToSlug(text)
 {
-    return Text
+    return text
         .toLowerCase()
         .replace(/ /g,"-")
         .replace(/[^\w-]+/g,"")

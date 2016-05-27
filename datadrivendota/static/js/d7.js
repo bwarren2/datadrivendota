@@ -1302,13 +1302,8 @@ var timeToSecs = function(time){
 };
 
 var replay_lines = function(dataset, facet, destination, params){
-
   var x_label = toTitleCase("offset time");
   var y_label = toTitleCase(facet);
-
-  // var stride;
-  // var start_time;
-  // var end_time;
 
   if (params.label!==undefined) {
     var y_label = toTitleCase(params.label);
@@ -1331,75 +1326,66 @@ var replay_lines = function(dataset, facet, destination, params){
     var end_time = 99999999;
   }
 
-  dataset = dataset.map(function(series){
-    series.values = series.values.filter(function(d){
-      return d.offset_time.mod(stride) === 0 && d.offset_time >= start_time && d.offset_time <= end_time  ;
+  dataset = dataset.map(function (series) {
+    series.values = series.values.filter(function (d) {
+      return (
+        d.offset_time.mod(stride) === 0
+          && d.offset_time >= start_time
+          && d.offset_time <= end_time
+      );
     })
     return series;
   });
 
-  var data = dataset.map(function(series){
-    var x = series.values.map(function(d){
-        var t = new Date(1970, 0, 1); // Epoch
-          t.setSeconds(d.offset_time);
-        return t;
-    })
-    var data_obj = {
-      type: 'scattergl',
-      x: x,
-      y: series.values.map(function(d){return d[facet]}),
-      name: series.shard.name
-    }
-
-    if (series.shard.color) {
-      data_obj.line = {
-        color: series.shard.color,
-      }
-    }
-
-    return data_obj;
+  var data = dataset.map(function (series) {
+    var xSeries = series.values.map(function (d) {
+      var t = new Date(1970, 0, 1);
+      t.setSeconds(d.offset_time);
+      return t;
+    });
+    var ySeries = series.values.map(function (d) {
+      return d[facet];
+    });
+    return {
+      name: series.shard.name,
+      borderColor: series.shard.color,
+      data: xSeries.map(function (elem, index) {
+        return {
+          x: elem,
+          y: ySeries[index]
+        };
+      })
+    };
   });
 
-  var layout = {
-    xaxis: {
-      title: x_label,
-      autotick: true,
-      tickformat: '%H:%M:%S',
-      nticks: 5,
-    },
-    yaxis: {
-      title: y_label,
-    },
-    margin: {
-      t: 20
-    },
-    hovermode: 'closest',
-    showlegend: true
+  var options = {
+    xAxes: [{
+      scaleLabel: {
+        display: true,
+        labelString: x_label
+      }
+    }],
+    yAxes: [{
+      scaleLabel: {
+        display: true,
+        labelString: y_label,
+      }
+    }],
   };
-  if(params.inset_legend){
-    layout.legend = {
-    x: 0.1,
-    y: 1,
-    traceorder: 'normal',
-    font: {
-      family: 'sans-serif',
-      size: 12,
-      color: '#FFF'
-    },
-    opacity: .5,
-    borderwidth: 2
-    }
-  }
-  if(params.hide_legend){
-    layout.showlegend = false;
-  }
   $('.ajax-loader').remove();
-  Plotly.newPlot(
-    destination.substring(1,100),
-    data,
-    layout,
-    { displaylogo: false,
-      modeBarButtonsToRemove: ['sendDataToCloud'],
+
+  // Prime the destination:
+  var width = 50;
+  var height = 50;
+  var innerCanvas = $(`<canvas width="${width}" height="${height}"></canvas>`);
+  $(destination).append(innerCanvas);
+
+  new Chart(
+    innerCanvas,
+    {
+      type: 'line',
+      data: data,
+      options: options
     }
   );
 }
