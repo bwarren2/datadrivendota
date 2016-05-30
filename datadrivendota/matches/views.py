@@ -16,15 +16,16 @@ class MatchDetail(DetailView):
     def get_context_data(self, **kwargs):
         if self.request.user.is_superuser:
             try:
-                kwargs['matchrequest'] = MatchRequest.objects.get(
-                    match_id=self.object.steam_id
-                )
-                kwargs['clearname'] = dict(MatchRequest.STATUS_CHOICES)[
-                    kwargs['matchrequest'].status
-                ]
+                mr = MatchRequest.objects.get(match_id=self.object.steam_id)
+                kwargs['matchrequest'] = mr
+                kwargs['clearname'] = mr.public_status
+
             except MatchRequest.DoesNotExist:
                 # Not a parsed match
-                kwargs['clearname'] = 'Unparsed'
+                if self.object.is_parsed:
+                    kwargs['clearname'] = 'Parsed'
+                else:
+                    kwargs['clearname'] = 'Unparsed'
 
         return super(MatchDetail, self).get_context_data(**kwargs)
 

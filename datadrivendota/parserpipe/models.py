@@ -82,3 +82,9 @@ class MatchRequest(models.Model):
             "https://s3.amazonaws.com/datadrivendota/"
             "raw_replay_parse/{0}"
         ).format(self.raw_parse_url)
+
+    @property
+    def public_status(self):
+        return dict(self.STATUS_CHOICES)[
+            self.status
+        ]
