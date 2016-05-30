@@ -440,6 +440,7 @@ TESTERS = [
     85045426,
     68083913,
     51753511,
+    2392888120, # Amir
     88367253,  # Yasp's lead dev
     # Def randos here
     # 40460993,  # Jetto, has privacy flag on
