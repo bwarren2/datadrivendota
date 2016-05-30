@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 import logging
+from requests.exceptions import ConnectionError
 
 import requests
 from django.db import models
@@ -62,10 +63,13 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
             params = {
                 MATCH_ID: match_id,
             }
-            resp = requests.get(
-                replay_url.url,
-                params,
-            )
+            try:
+                resp = requests.get(
+                    replay_url.url,
+                    params,
+                )
+            except ConnectionError:
+                self.timeout(timedelta(hours=24), replay_url)
             logger.info(
                 "Got {0} from {1} with {2}".format(
                     resp, replay_url.url, params
