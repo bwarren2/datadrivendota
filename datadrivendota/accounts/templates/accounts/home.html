@@ -84,7 +84,7 @@
 
                 <td>
                   {% for pms in match.playermatchsummary_set.all %}
-                    <i class='.d2mh .{{pms.hero.internal_name}}'></i>
+                    <i class='d2mh {{pms.hero.internal_name}}'></i>
                   {% endfor %}
                 </td>
               </tr>
