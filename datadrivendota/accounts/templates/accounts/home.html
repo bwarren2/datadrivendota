@@ -66,6 +66,11 @@
         You have used {{ user.userprofile.monthly_requests.count }} of your
         {{ user.userprofile.request_limit }} free imports this month.
       </p>
+      {% else %}
+      <p>
+        You have used {{ user.userprofile.monthly_requests.count }} of your
+        {{ user.userprofile.request_limit }} subscription imports this month.  As always, your games come in without this cap.
+      </p>
       {% endif %}
 
       <h4 class='page-header'>Recently Finished Imports</h4>
