@@ -12,13 +12,10 @@
   <div class="col-md-12">
     <h2 class='page-header'>
       Your data
-      <button class="btn btn-primary pull-right" data-toggle="collapse" data-target="#how-to-get-data">
-        Why aren't my matches showing up?
-      </button>
     </h2>
     <div class="collapse" id="how-to-get-data">
       <p>
-      Please note: we can't do anything with your data unless you have made it
+      Sadly, we can't do anything with your data unless you have made it
       public. To make that happen:
       </p>
       <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
@@ -63,19 +60,94 @@
     </div>
   </div>
 
-  <div class="col-md-12">
-    {% if not user.userprofile.has_active_subscription %}
-    <p>
-      You have used {{ user.userprofile.monthly_requests.count }} of your
-      {{ user.userprofile.request_limit }} free imports this month.
-    </p>
-    {% endif %}
-    {% if user.userprofile.steam_id %}
+  <div class='col-md-6'>
+      {% if not user.userprofile.has_active_subscription %}
       <p>
-      You have <a href="{% url 'players:id_detail' user.userprofile.steam_id %}">{{ user.userprofile.requested.count|apnumber }} matches imported</a> total.
+        You have used {{ user.userprofile.monthly_requests.count }} of your
+        {{ user.userprofile.request_limit }} free imports this month.
       </p>
-    {% endif %}
+      {% else %}
+      <p>
+        You have used {{ user.userprofile.monthly_requests.count }} of your
+        {{ user.userprofile.request_limit }} subscription imports this month.  As always, your games come in without this cap.
+      </p>
+      {% endif %}
+
+      <h4 class='page-header'>Recently Finished Imports</h4>
+      <table class='table'>
+        <thead>
+          <tr>
+            <td>Match #</td>
+            <td>Radiant</td>
+            <td>Dire</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for match in imported_matches %}
+              <tr>
+                <td>{{match.steam_id}}</td>
+
+                <td>
+                  {% for pms in match.playermatchsummary_set.all %}
+                    <i class='d2mh {{pms.hero.internal_name}}'></i>
+                  {% endfor %}
+                </td>
+              </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
   </div>
+
+  <div class='col-md-6'>
+      {% if user.userprofile.steam_id %}
+        <p>
+          You have {{ user.userprofile.requested.count|apnumber }} matches imported</a> total:
+        </p>
+      {% endif %}
+      <h4 class='page-header'>Pending Imports</h4>
+      <table class='table'>
+        <thead>
+          <tr>
+            <td>Match #</td>
+            <td>Status</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mr in requested_matches %}
+              <tr>
+                <td>{{mr.match_id}}</td>
+                <td>{{mr.public_status}}</td>
+              </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+  </div>
+
+  <div class='col-md-12'>
+    <h2 class='page-header'>Your Recent Matches <small>Import the ones you want on their pages</small></h2>
+    {% if pms_list %}
+      <div class='row'>
+        {% for pms in pms_list %}
+          <div class="col-md-3 player-match-row">
+            {% include "players/_player_performance_card.html" %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+    <p>We don't seem to have the unparsed versions of your matches yet.</p>
+    <p><strong>If you just signed up:</strong> this can take a short while due to Valve's rate limiting.  </p>
+    <p><strong>If it has been longer than a couple of minutes:</strong>
+     you may have your data set to be inaccessible.</p>
+      <button class="btn btn-primary" data-toggle="collapse" data-target="#how-to-get-data">
+        Making your data accessible
+      </button>
+
+    {% endif %}
+
+  </div>
+
 </div>
 <div class="row">
   <div class="col-md-12">

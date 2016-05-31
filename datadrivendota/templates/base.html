@@ -81,40 +81,22 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
 
-          {% if SHOW_HEROES %}
-            <li class="dropdown {% active 'heroes' main_nav %}">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Heroes <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li class="{% active 'heroes:index' %}"><a href="{% url 'heroes:index' %}">Index</a></li>
-                <li role="presentation" class="divider"></li>
-                <li role="presentation" class="dropdown-header">Advanced Charts</li>
-                <li class="{% active 'heroes:vitals' %}"><a href="{% url 'heroes:vitals' %}">Vitals</a></li>
-                <li class="{% active 'heroes:lineup' %}"><a href="{% url 'heroes:lineup' %}">Lineups</a></li>
-              </ul>
-            </li>
-          {% endif %}
 
-          {% if SHOW_MATCHES %}
-          <li class="{% active 'matches:index' %} {% active 'matches:parsed_index' %}">
-              <a href="{% url 'matches:index' %}">Matches</a>
-            </li>
-          {% endif %}
-
-          {% if SHOW_MATCHES and user.is_authenticated %}
+          {% if user.is_authenticated %}
             <li class="{% active 'matches:index-mine' %}">
               <a href="{% url 'matches:index-mine' %}">My Matches</a>
             </li>
           {% endif %}
 
-          {% if SHOW_PLAYERS %}
-            <li class="{% active 'players:index' %}">
-              <a href="{% url 'players:index' %}">Players</a>
+          {% if user.is_superuser %}
+          <li class="{% active 'matches:index' %} {% active 'matches:parsed_index' %}">
+              <a href="{% url 'matches:index' %}">Matches</a>
             </li>
           {% endif %}
 
-          {% if SHOW_TEAMS %}
-            <li class="dropdown {% active 'teams' main_nav %}">
-              <li class="{% active 'teams:index' %}"><a href="{% url 'teams:index' %}">Teams</a></li>
+          {% if user.is_superuser  %}
+            <li class="{% active 'players:index' %}">
+              <a href="{% url 'players:index' %}">Players</a>
             </li>
           {% endif %}
 
@@ -124,11 +106,9 @@
             </li>
           {% endif %}
 
-          {% if SHOW_BLOG %}
-            <li class="{% active 'blog' main_nav %}">
-              <a href="/blog/">Blog</a>
-            </li>
-          {% endif %}
+          <li class="{% active 'blog' main_nav %}">
+            <a href="/blog/">Blog</a>
+          </li>
 
           <li class="{% active 'time_lapse' main_nav %}">
             <a class='brand-primary' href="{% url 'matches:time_lapse' %}">Time Lapse</a>
@@ -219,6 +199,7 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.0.1/Chart.bundle.min.js"></script>
     <script type="text/javascript" src='{% static "dist/built.js" %}'></script>
     <script type="text/javascript" src='{% static "js/d7.js" %}'></script>
 

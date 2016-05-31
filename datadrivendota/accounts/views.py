@@ -11,6 +11,8 @@ from django.http import Http404
 from django.contrib import messages
 
 from social.apps.django_app.default.models import Code
+from parserpipe.models import MatchRequest
+from matches.models import Match, PlayerMatchSummary
 
 from social.backends.utils import load_backends
 from .forms import (
@@ -29,7 +31,7 @@ class LoginView(TemplateView):
             settings.AUTHENTICATION_BACKENDS
         )
         kwargs['method'] = self.kwargs.get('method', None)
-        return kwargs
+        return super(LoginView, self).get_context_data(**kwargs)
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -109,6 +111,32 @@ class HomeView(FormView):
         )
         return super(HomeView, self).form_valid(form)
 
+    def get_context_data(self, **kwargs):
+
+        requested_ids = MatchRequest.objects.filter(
+            requester=self.request.user
+        ).values_list('match_id', flat=True)
+
+        kwargs['imported_matches'] = Match.parsed.filter(
+            steam_id__in=requested_ids
+        )
+
+        imported_match_ids = Match.parsed.filter(
+            steam_id__in=requested_ids
+        ).values_list('steam_id', flat=True)
+
+        kwargs['requested_matches'] = MatchRequest.objects.filter(
+            requester=self.request.user,
+        ).exclude(
+            match_id__in=imported_match_ids
+        )
+
+        kwargs['recent_matches'] = PlayerMatchSummary.objects.filter(
+            player__steam_id=self.request.user.userprofile.steam_id,
+        )
+
+        return super(HomeView, self).get_context_data(**kwargs)
+
 
 @method_decorator(never_cache, name='dispatch')
 class ValidationView(TemplateView):
@@ -118,7 +146,7 @@ class ValidationView(TemplateView):
         kwargs['validation_sent'] = True,
         kwargs['email'] = self.request.session.get('email_validation_address')
         kwargs = add_backends(kwargs)
-        return kwargs
+        return super(ValidationView, self).get_context_data(**kwargs)
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -129,7 +157,7 @@ class EmailRequiredView(TemplateView):
         backend = self.request.session['partial_pipeline']['backend']
         kwargs['email_required'] = True
         kwargs['backend'] = backend
-        return kwargs
+        return super(EmailRequiredView, self).get_context_data(**kwargs)
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -144,7 +172,7 @@ class CompleteView(TemplateView):
         kwargs['available_backends'] = load_backends(
             settings.AUTHENTICATION_BACKENDS
         )
-        return kwargs
+        return super(CompleteView, self).get_context_data(**kwargs)
 
 
 def add_backends(context):
