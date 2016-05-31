@@ -457,7 +457,7 @@ class Config(object):
         },
         'reflect-live-games-fast': {
             'task': 'leagues.management.tasks.live_game.MirrorLiveGames',
-            'schedule': timedelta(minutes=5),
+            'schedule': timedelta(minutes=1),
         },
         'kickoff-requests-fast': {
             'task': 'parserpipe.management.tasks.KickoffMatchRequests',
