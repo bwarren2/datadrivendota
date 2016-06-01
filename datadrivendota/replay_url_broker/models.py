@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import sys, traceback
 from datetime import timedelta
 import logging
 from requests.exceptions import ConnectionError
@@ -42,6 +43,7 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
         cooldown_errors = (
             requests.exceptions.HTTPError,
             RateLimitError,
+            ConnectionError,
         )
 
         # We go through all active URLs, and try to get the replay URL for the
@@ -68,15 +70,13 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
                     replay_url.url,
                     params,
                 )
-            except ConnectionError:
-                self.timeout(timedelta(hours=24), replay_url)
-            logger.info(
-                "Got {0} from {1} with {2}".format(
-                    resp, replay_url.url, params
-                )
-            )
 
-            try:
+                logger.info(
+                    "Got {0} from {1} with {2}".format(
+                        resp, replay_url.url, params
+                    )
+                )
+
                 # Process:
                 resp.raise_for_status()
                 logger.info(resp.content)
@@ -94,8 +94,13 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
                     raise RateLimitError
 
                 return resp_json.get('replay_url')
-
             except cooldown_errors:
+                exc_info = sys.exc_info()
+                logger.error(
+                    "Exception on urlbackend: {0}".format(
+                        traceback.print_exception(exc_info)
+                    )
+                )
                 # mark this URL as bad as of now:
                 self.timeout(timedelta(hours=24), replay_url)
 
