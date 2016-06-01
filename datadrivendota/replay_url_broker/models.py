@@ -94,11 +94,11 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
                     raise RateLimitError
 
                 return resp_json.get('replay_url')
-            except cooldown_errors:
-                exc_info = sys.exc_info()
+            except cooldown_errors as exc:
                 logger.error(
-                    "Exception on urlbackend: {0}".format(
-                        traceback.print_exception(exc_info)
+                    "Exception {0} on urlbackend: {1}".format(
+                        exc,
+                        traceback.print_exc()
                     )
                 )
                 # mark this URL as bad as of now:
