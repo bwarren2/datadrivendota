@@ -11,6 +11,7 @@ from celery.exceptions import (
 )
 
 from datadrivendota.settings.base import STEAM_API_KEY
+from datadrivendota.exceptions import EmptyResponseException
 
 import logging
 logger = logging.getLogger(__name__)
@@ -287,6 +288,10 @@ class ValveApiCall(BaseTask):
             response = self.get_response(api_url, mode)
 
             json_data = self.get_json(response, api_url)
+
+            empty_failure_modes = ['GetMatchDetails', 'GetMatchHistory']
+            if json_data == {} and mode in empty_failure_modes:
+                self.retry(mode=mode, exc=EmptyResponseException)
 
             return {
                 'api_context': api_context,
