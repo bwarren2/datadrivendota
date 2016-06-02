@@ -88,8 +88,12 @@ class UpdateTeam(ApiFollower):
 
         json_data = json_data.get('result', {})
         for team_data in json_data.get('teams', []):
+            # TECHDEBT: Valve broke their API by dropping this field.
+            # Presuming that only one team is in the API call can result in
+            # mismapping.
+            team_id = team_data.get('team_id', api_context.start_at_team_id)
             team, created = Team.objects.get_or_create(
-                steam_id=team_data['team_id']
+                steam_id=team_id
             )
             try:
                 if api_context.refresh_records:
