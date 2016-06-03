@@ -1,4 +1,5 @@
 from json import dumps
+from datetime import datetime, timedelta
 
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse, Http404
@@ -19,6 +20,7 @@ from parserpipe.management.tasks import (
     UpdatePmsReplays,
     MergeMatchRequestReplay
 )
+from replay_url_broker.models import ReplayUrlBackend
 from matches.management.tasks import MirrorMatches
 from datadrivendota.views import LoginRequiredView
 from accounts.exceptions import DataCapReached, ValidationException
@@ -128,6 +130,19 @@ class TasksView(View):
             elif task == 'parse':
                 UpdatePmsReplays().delay(match_id=match_id)
                 response_data['result'] = 'Reading results'
+                response_data['type'] = 'success'
+
+            elif task == 'retry':
+                one_week_ago = datetime.now() - timedelta(weeks=1)
+                updated = MatchRequest.objects.exclude(
+                    status=MatchRequest.SUBMITTED
+                ).filter(creation__gte=one_week_ago).update(
+                    status=MatchRequest.SUBMITTED
+                )
+                ReplayUrlBackend.objects.all().update(
+                    do_not_use_before=one_week_ago
+                )
+                response_data['result'] = 'Reset {0} matches'.format(updated)
                 response_data['type'] = 'success'
 
             return HttpResponse(
