@@ -439,6 +439,7 @@ TESTERS = [
     68083913,
     51753511,
     2392888120, # Amir
+    113079757, # Boris, Free June Parsing (issue tracker suggester)
     88367253,  # Yasp's lead dev
     # Def randos here
     # 40460993,  # Jetto, has privacy flag on
