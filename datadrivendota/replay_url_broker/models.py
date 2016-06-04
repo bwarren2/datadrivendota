@@ -93,7 +93,7 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
                     # TODO make this route to a shorter cooldown?
                     raise RateLimitError
 
-                return resp_json.get('replay_url')
+                return resp_json
             except cooldown_errors as exc:
                 logger.error(
                     "Exception {0} on urlbackend: {1}".format(
