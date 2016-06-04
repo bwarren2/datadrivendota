@@ -163,7 +163,8 @@ class UpdateMatch(ApiFollower):
 
     def create_pickbans(self, data, match):
         if 'picks_bans' in data.keys():
-            for pickban in data['picks_bans']:
+            for idx, pickban in enumerate(data['picks_bans']):
+                inferred_order = pickban.get('order', idx)
                 datadict = {
                     'match': match,
                     'is_pick': pickban['is_pick'],
@@ -171,12 +172,11 @@ class UpdateMatch(ApiFollower):
                         steam_id=pickban['hero_id']
                     )[0],
                     'team': pickban['team'],
-                    'order': pickban['order'],
-
+                    'order': inferred_order,
                 }
                 pb = PickBan.objects.get_or_create(
                     match=match,
-                    order=pickban['order'],
+                    order=inferred_order,
                     defaults=datadict
                 )[0]
                 pb.save()
@@ -191,7 +191,7 @@ class UpdateMatch(ApiFollower):
         return match
 
     def create_guilds(self, data, match):
-        if 'radiant_guild_id' in data.keys():
+        if is_useful_key(data, 'radiant_guild_id'):
             datadict = {
                 'steam_id': data["radiant_guild_id"],
                 'name': data["radiant_guild_name"],
@@ -202,7 +202,7 @@ class UpdateMatch(ApiFollower):
                 defaults=datadict
             )[0]
 
-        if 'dire_guild_id' in data.keys():
+        if is_useful_key(data, 'dire_guild_id'):
             datadict = {
                 'steam_id': data["dire_guild_id"],
                 'name': data["dire_guild_name"],
@@ -214,13 +214,13 @@ class UpdateMatch(ApiFollower):
             )[0]
 
     def merge_guilds(self, data, match):
-        if 'radiant_guild_id' in data.keys():
+        if is_useful_key(data, 'radiant_guild_id'):
             g = Guild.objects.get(
                 steam_id=data["radiant_guild_id"],
             )
             match.radiant_guild = g
 
-        if 'dire_guild_id' in data.keys():
+        if is_useful_key(data, 'dire_guild_id'):
             g = Guild.objects.get(
                 steam_id=data["dire_guild_id"],
             )
@@ -229,26 +229,26 @@ class UpdateMatch(ApiFollower):
         return match
 
     def create_teams(self, data, match):
-        if 'radiant_team_id' in data.keys():
+        if is_useful_key(data, 'radiant_team_id'):
             Team.objects.get_or_create(
                 steam_id=data['radiant_team_id']
             )[0]
 
-        if 'dire_team_id' in data.keys():
+        if is_useful_key(data, 'dire_team_id'):
             Team.objects.get_or_create(
                 steam_id=data['dire_team_id']
             )[0]
 
     def merge_teams(self, data, match):
 
-        if 'radiant_team_id' in data.keys():
+        if is_useful_key(data, 'radiant_team_id'):
             radiant_team = Team.objects.get(
                 steam_id=data['radiant_team_id']
             )
             match.radiant_team = radiant_team
             match.radiant_team_complete = data['radiant_team_complete'] == 1
 
-        if 'dire_team_id' in data.keys():
+        if is_useful_key(data, 'dire_team_id'):
             dire_team = Team.objects.get(
                 steam_id=data['dire_team_id']
             )
@@ -285,6 +285,7 @@ class UpdateMatch(ApiFollower):
             'barracks_status_radiant': data['barracks_status_radiant'],
             'barracks_status_dire': data['barracks_status_dire'],
             'cluster': data['cluster'],
+            'replay_salt': str(data.get('replay_salt', None)),
             'first_blood_time': data['first_blood_time'],
             'lobby_type': LobbyType.objects.get_or_create(
                 steam_id=data['lobby_type']
@@ -310,6 +311,7 @@ class UpdateMatch(ApiFollower):
             )
 
         except Match.DoesNotExist:
+            print kwargs
             match = Match.objects.create(**kwargs)
             match.save()
             upload_match_summary(
@@ -739,3 +741,6 @@ class CycleApiCall(ApiFollower):
                         api_context.account_id
                     )
                 )
+
+def is_useful_key(data, key):
+    return key in data.keys() and data[key] is not None

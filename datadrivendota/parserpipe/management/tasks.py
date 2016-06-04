@@ -12,7 +12,7 @@ from contextlib import closing
 from datetime import timedelta
 from retrying import retry
 
-from celery import Task, chain, chord
+from celery import Task, chain
 
 from django.core.files import File
 from django.conf import settings
@@ -156,7 +156,7 @@ class CreateMatchParse(Task):
 
             if rich_match_data:
                 logging.info('Got url for {0}'.format(match_id))
-                self.make_match(rich_match_data)
+                self.make_match(rich_match_data, match_id)
                 replay_url = Match.objects.get(steam_id=match_id).replay_url
                 self._save_url(replay_url, match_req)
                 self.java_parse_message(replay_url, match_id)
@@ -169,7 +169,44 @@ class CreateMatchParse(Task):
                 )
             )
 
-    def make_match(self, match_data):
+    def make_match(self, raw_data, match_id):
+        """
+        Because valve's data format is inconsistent, we need to munge things
+        to make the normal functions work, then call the internals of that
+        task.  This could be a mixin I guess.
+        """
+
+        # Unwrap the data
+        dataset = raw_data['match']
+
+        for player in dataset['players']:
+            player['xp_per_min'] = player['XP_per_min']
+
+        # Check these!
+        if dataset['match_outcome'] == 2:
+            dataset['radiant_win'] = True
+        elif dataset['match_outcome'] == 2:
+            dataset['radiant_win'] = False
+        else:
+            raise ValueError(
+                'what is this match outcome {0} for match {1}'.format(
+                    dataset['match_outcome'],
+                    match_id
+                )
+            )
+
+        dataset['start_time'] = dataset['startTime']
+        dataset['match_id'] = raw_data['id']
+        dataset['tower_status_radiant'] = dataset['tower_status'][0]
+        dataset['tower_status_dire'] = dataset['tower_status'][1]
+        dataset['barracks_status_radiant'] = dataset[
+            'barracks_status'
+        ][0]
+        dataset['barracks_status_dire'] = dataset['barracks_status'][1]
+
+        c = ApiContext()
+        c.match_id = match_id
+        UpdateMatch().update_match(c, dataset, 200, "")
         pass
 
     def get_rich_data(self, match_id):

@@ -1,12 +1,10 @@
 
 import time
-import responses
 from model_mommy import mommy
 from datetime import timedelta
 
 from django.test import TestCase
 from django.db.models import Q
-from django.utils.decorators import method_decorator
 from django.utils import timezone
 
 from parserpipe.management.tasks import (
@@ -16,7 +14,7 @@ from parserpipe.management.tasks import (
     UpdateParseEnd,
     CreateMatchRequests
 )
-
+from matches.models import Match
 from parserpipe.models import MatchRequest
 
 from .json_samples import all_income, bot_match_details
@@ -39,7 +37,13 @@ class TestParserTask(TestCase):
         )
 
     def test_make_match(self):
-        CreateMatchParse().make_match(bot_match_details, 2410589774)
+        match_id = 2410589774
+        CreateMatchParse().make_match(bot_match_details, match_id)
+        url = Match.objects.get(steam_id=match_id).replay_url
+        self.assertEqual(
+            url,
+            "http://replay134.valve.net/570/2410589774_1651935664.dem.bz2"
+        )
 
 
 class TestKickoffRequestTask(TestCase):
@@ -259,7 +263,7 @@ class TestMatchRequestCreation(TestCase):
             player=cls.client_player
         )
 
-        distant_dt = timezone.now()-timedelta(weeks=10)
+        distant_dt = timezone.now() - timedelta(weeks=10)
         distant_start_time = time.mktime(distant_dt.timetuple())
         cls.distant_match = mommy.make_recipe(
             'matches.match',

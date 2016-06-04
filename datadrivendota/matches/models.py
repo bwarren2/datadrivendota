@@ -29,7 +29,11 @@ class Match(models.Model):
     steam_id = models.BigIntegerField(
         help_text="Valve's id field", unique=True
     )
-    match_seq_num = models.IntegerField(help_text="ID valve's play sequence")
+    match_seq_num = models.IntegerField(
+        help_text="ID valve's play sequence",
+        null=True,
+        blank=True
+    )
     cluster = models.IntegerField()
     start_time = models.IntegerField(help_text='Start time in UTC seconds')
     duration = models.IntegerField()
@@ -99,6 +103,7 @@ class Match(models.Model):
     parsed_with = models.CharField(
         max_length=50, null=True, blank=True, default=None
     )
+    replay_salt = models.CharField(max_length=30, null=True, blank=True)
 
     UNPROCESSED = 0
     LEGIT = 1
@@ -124,6 +129,20 @@ class Match(models.Model):
 
     def __unicode__(self):
         return unicode(self.steam_id)
+
+    @property
+    def replay_url(self):
+        """ Uniqueness prefix from the parsed output hash function. """
+        if (
+            self.cluster is None
+            or self.steam_id  is None
+            or self.replay_salt is None
+        ):
+            return None
+        else:
+            return "http://replay{0}.valve.net/570/{1}_{2}.dem.bz2".format(
+                self.cluster, self.steam_id, self.replay_salt
+            )
 
     @property
     def is_parsed(self):
@@ -267,9 +286,6 @@ class PlayerMatchSummary(models.Model):
     level = models.IntegerField()
     is_win = models.BooleanField()
 
-    cluster = models.CharField(max_length=30, null=True, blank=True)
-    replay_salt = models.CharField(max_length=30, null=True, blank=True)
-
     # Scheduled for deprecation 1-1-2016
     replay_shard = models.FileField(
         upload_to='playermatchsummaries/replays/',
@@ -310,20 +326,6 @@ class PlayerMatchSummary(models.Model):
         return u'Match: {0}, User {1}'.format(
             self.match.steam_id, self.player.steam_id
         )
-
-    @property
-    def replay_url(self):
-        """ Uniqueness prefix from the parsed output hash function. """
-        if (
-            self.cluster is None
-            or self.steam_id  is None
-            or self.replay_salt is None
-        ):
-            return None
-        else:
-            return "http://replay${0}.valve.net/570/${1}_${2}.dem.bz2".format(
-                self.cluster, self.steam_id, self.replay_salt
-            )
 
     @property
     def lookup_pair(self):
