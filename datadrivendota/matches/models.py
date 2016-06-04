@@ -267,6 +267,9 @@ class PlayerMatchSummary(models.Model):
     level = models.IntegerField()
     is_win = models.BooleanField()
 
+    cluster = models.CharField(max_length=30, null=True, blank=True)
+    replay_salt = models.CharField(max_length=30, null=True, blank=True)
+
     # Scheduled for deprecation 1-1-2016
     replay_shard = models.FileField(
         upload_to='playermatchsummaries/replays/',
@@ -307,6 +310,20 @@ class PlayerMatchSummary(models.Model):
         return u'Match: {0}, User {1}'.format(
             self.match.steam_id, self.player.steam_id
         )
+
+    @property
+    def replay_url(self):
+        """ Uniqueness prefix from the parsed output hash function. """
+        if (
+            self.cluster is None
+            or self.steam_id  is None
+            or self.replay_salt is None
+        ):
+            return None
+        else:
+            return "http://replay${0}.valve.net/570/${1}_${2}.dem.bz2".format(
+                self.cluster, self.steam_id, self.replay_salt
+            )
 
     @property
     def lookup_pair(self):
