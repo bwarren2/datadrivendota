@@ -149,50 +149,32 @@ class CreateMatchParse(Task):
     def run(self, api_context):
 
         match_id = api_context.match_id
-
-        match_req = self.have_match(match_id)
+        match_req = MatchRequest.objects.get(match_id=match_id)
 
         if match_req:
-            replay_url = self.get_replay_url(match_id, match_req)
+            rich_match_data = self.get_rich_data(match_id)
 
-            if replay_url:
+            if rich_match_data:
                 logging.info('Got url for {0}'.format(match_id))
+                self.make_match(rich_match_data)
+                replay_url = Match.objects.get(steam_id=match_id).replay_url
+                self._save_url(replay_url, match_req)
                 self.java_parse_message(replay_url, match_id)
             else:
-                logging.info('Did not get url for {0}'.format(match_id))
+                logging.info('Did not get data for {0}'.format(match_id))
         else:
-            raise Exception("We don't have the match we expected: {0}".format(
-                match_id
-            ))
-
-    def have_match(self, match_id):
-        """ Return the match request if we have its match. """
-        try:
-            Match.objects.get(steam_id=match_id)
-
-            MatchRequest.objects.filter(
-                match_id=match_id,
-                status=MatchRequest.FINDING_MATCH
-            ).update(
-                status=MatchRequest.MATCH_FOUND
+            raise Exception(
+                "We don't have the match request we expected: {0}".format(
+                    match_id
+                )
             )
-            mr = MatchRequest.objects.get(match_id=match_id)
-            return mr
 
-        except Match.DoesNotExist:
-            mr = MatchRequest.objects.filter(
-                match_id=match_id
-            ).update(
-                status=MatchRequest.MATCH_NOT_FOUND
-            )
-            return None
+    def make_match(self, match_data):
+        pass
 
-    def get_replay_url(self, match_id, match_req):
+    def get_rich_data(self, match_id):
         logging.info('Getting the url for {0}'.format(match_id))
-        replay_url = ReplayUrlBackend.objects.get_replay_url(match_id)
-        if replay_url is not None:
-            self._save_url(replay_url, match_req)
-        return replay_url
+        return ReplayUrlBackend.objects.get_replay_url(match_id)
 
     def _save_url(self, url, match_request):
         match_request.valve_replay_url = url
