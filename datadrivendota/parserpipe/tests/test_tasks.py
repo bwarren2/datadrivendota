@@ -19,7 +19,7 @@ from parserpipe.management.tasks import (
 
 from parserpipe.models import MatchRequest
 
-from .json_samples import all_income
+from .json_samples import all_income, bot_match_details
 
 
 class TestParserTask(TestCase):
@@ -38,29 +38,8 @@ class TestParserTask(TestCase):
             status=MatchRequest.FINDING_MATCH
         )
 
-    def test_match_check(self):
-        task = CreateMatchParse()
-        self.assertEqual(
-            task.have_match(self.match.steam_id),
-            self.match_request
-        )
-
-    @method_decorator(responses.activate)
-    def test_get_url(self):
-        responses.add(
-            responses.GET,
-            'https://replayurls.herokuapp.com/tools/matchurls?match_id=1615448703',
-             body='{"replay_url": "http://replay121.valve.net/570/1615448703_975041684.dem.bz2"}',
-            status=200,
-            content_type='application/json',
-            match_querystring=True,
-        )
-
-        task = CreateMatchParse()
-        match_req = task.have_match(self.match.steam_id)
-        task.get_replay_url(self.match.steam_id, match_req)
-        mr = MatchRequest.objects.get(match_id=self.match_id)
-        self.assertNotEqual(mr.valve_replay_url, None)
+    def test_make_match(self):
+        CreateMatchParse().make_match(bot_match_details, 2410589774)
 
 
 class TestKickoffRequestTask(TestCase):
@@ -312,9 +291,8 @@ class TestMatchRequestCreation(TestCase):
         self.assertEqual(list(found), [22])
 
 
-class TestUpdateParseEnd(TestCase):
-    task = UpdateParseEnd
+# class TestUpdateParseEnd(TestCase):
+#     task = UpdateParseEnd
 
-    def test_shardstate(self):
-        self.task().aggregate_shards(2288796036, 'allstate', 'statelog')
-
+#     def test_shardstate(self):
+#         self.task().aggregate_shards(2288796036, 'allstate', 'statelog')
