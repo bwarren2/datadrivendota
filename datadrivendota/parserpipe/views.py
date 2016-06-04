@@ -136,6 +136,8 @@ class TasksView(View):
                 one_week_ago = datetime.now() - timedelta(weeks=1)
                 updated = MatchRequest.objects.exclude(
                     status=MatchRequest.SUBMITTED
+                ).exclude(
+                    status=MatchRequest.COMPLETE
                 ).filter(creation__gte=one_week_ago).update(
                     status=MatchRequest.SUBMITTED
                 )
