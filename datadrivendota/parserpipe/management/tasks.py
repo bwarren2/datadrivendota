@@ -130,14 +130,8 @@ class KickoffMatchRequests(Task):
     def chain_updates(self, request):
         c = ApiContext()
         c.match_id = request.match_id
-        vac = ValveApiCall()
-        um = UpdateMatch()
         cmp = CreateMatchParse()
-        chain(
-            vac.s(api_context=c, mode='GetMatchDetails'),
-            um.s(),
-            cmp.s()
-        ).delay()
+        cmp.s(api_context=c).delay()
 
     def mark_finding(self, request):
         request.status = MatchRequest.FINDING_MATCH
@@ -156,7 +150,7 @@ class CreateMatchParse(Task):
 
             if rich_match_data:
                 logging.info('Got url for {0}'.format(match_id))
-                self.make_match(rich_match_data, match_id)
+                self.make_match(rich_match_data, match_id, match_req)
                 replay_url = Match.objects.get(steam_id=match_id).replay_url
                 self._save_url(replay_url, match_req)
                 self.java_parse_message(replay_url, match_id)
@@ -169,7 +163,7 @@ class CreateMatchParse(Task):
                 )
             )
 
-    def make_match(self, raw_data, match_id):
+    def make_match(self, raw_data, match_id, match_req):
         """
         Because valve's data format is inconsistent, we need to munge things
         to make the normal functions work, then call the internals of that
@@ -182,10 +176,9 @@ class CreateMatchParse(Task):
         for player in dataset['players']:
             player['xp_per_min'] = player['XP_per_min']
 
-        # Check these!
         if dataset['match_outcome'] == 2:
             dataset['radiant_win'] = True
-        elif dataset['match_outcome'] == 2:
+        elif dataset['match_outcome'] == 3:
             dataset['radiant_win'] = False
         else:
             raise ValueError(
@@ -206,8 +199,12 @@ class CreateMatchParse(Task):
 
         c = ApiContext()
         c.match_id = match_id
+        # TECHDEBT: calling the internals of a specific other class.
+        # Could it be a mixin?  Probably.  I don't care right now.
         UpdateMatch().update_match(c, dataset, 200, "")
-        pass
+
+        match_req.status = MatchRequest.MATCH_FOUND
+        match_req.save()
 
     def get_rich_data(self, match_id):
         logging.info('Getting the url for {0}'.format(match_id))

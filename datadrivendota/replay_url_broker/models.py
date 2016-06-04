@@ -70,7 +70,8 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
                     replay_url.url,
                     params,
                 )
-
+                logger.info(replay_url.url)
+                logger.info(params)
                 logger.info(
                     "Got {0} from {1} with {2}".format(
                         resp, replay_url.url, params
