@@ -58,7 +58,7 @@ class Config(object):
     )
 
     # What happens if we do not use redis?.
-    CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL')+'?new_join=1'
+    CELERY_RESULT_BACKEND = getenv('REDISTOGO_URL') + '?new_join=1'
 
     # What happens if we do not use redis?.
     CELERY_TIMEZONE = settings.TIME_ZONE
@@ -81,6 +81,8 @@ class Config(object):
 
     # Valve's rate limiting.
     VALVE_RATE = getenv('VALVE_RATE')
+    # For our botnet
+    BOT_RATE = getenv('BOT_RATE')
 
     ADMINS = settings.ADMINS
 
@@ -115,6 +117,11 @@ class Config(object):
             Exchange('parsing'),
             routing_key='parsing'
         ),
+        Queue(
+            'botting',
+            Exchange('botting'),
+            routing_key='botting'
+        ),
         # This is a slower queue for tasks that hit our database or redis.
         # Scaling to keep this moving quickly is allowed, based on conn caps.
         Queue(
@@ -135,11 +142,12 @@ class Config(object):
     TASKS = {
         'parserpipe.management.tasks.CreateMatchParse': {
             'routes': {
-                'exchange': 'parsing',
-                'routing_key': 'parsing'
+                'exchange': 'botting',
+                'routing_key': 'botting'
             },
             'annotations': {
                 'max_retries': 0,
+                "rate_limit": BOT_RATE,
             }
         },
         'parserpipe.management.tasks.KickoffMatchRequests': {
