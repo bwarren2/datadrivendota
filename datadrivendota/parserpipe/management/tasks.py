@@ -21,7 +21,7 @@ from django.utils import timezone
 
 from utils import gzip_str, gunzip_str
 from parserpipe.models import MatchRequest
-from datadrivendota.management.tasks import ValveApiCall, ApiContext
+from datadrivendota.management.tasks import ApiContext
 from datadrivendota.s3utils import ParseS3BotoStorage
 from matches.management.tasks import UpdateMatch
 from matches.models import Match, PlayerMatchSummary
