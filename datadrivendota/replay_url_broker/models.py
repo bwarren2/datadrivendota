@@ -102,8 +102,7 @@ class ReplayUrlBackendQuerySet(models.QuerySet):
                         traceback.print_exc()
                     )
                 )
-                # mark this URL as bad as of now:
-                self.timeout(timedelta(hours=24), replay_url)
+                self.timeout(timedelta(seconds=30), replay_url)
 
             except ValueError as e:
                 logger.error(
