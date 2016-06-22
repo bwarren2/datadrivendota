@@ -108,3 +108,7 @@ def generate_heroku_static_pages():
         "generate_static_error_pages "
         "--settings=datadrivendota.settings.production"
     )
+
+def up():
+    local('docker build -t datadrivendota-web .')
+    local('docker-compose up')

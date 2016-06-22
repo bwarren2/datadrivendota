@@ -132,4 +132,4 @@ def safe_pct(numerator, denominator):
     if denominator == 0:
         return 0
     else:
-        return float(numerator)/denominator
+        return float(numerator) / denominator

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-import sys, traceback
+import traceback
 from datetime import timedelta
 import logging
 from requests.exceptions import ConnectionError
