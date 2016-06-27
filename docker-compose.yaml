@@ -19,20 +19,28 @@ services:
     links:
       - db
       - rabbitmq
-  # celery_parsing:
-  #   image: datadrivendota-web
-  #   env_file: .env
-  #   command: celery worker --app=datadrivendota -E -Q parsing,botting --loglevel=INFO  -c 2  --workdir=datadrivendota
-  #   depends_on:
-  #     - rabbitmq
-  # celery_plain:
-  #   image: datadrivendota-web
-  #   env_file: .env
-  #   command: celery worker --app=datadrivendota -E -Q integrity,default,api_call,rpr,db_upload --loglevel=INFO  -c 6  --workdir=datadrivendota
-  #   depends_on:
-  #     - rabbitmq
+  celery_parsing:
+    image: datadrivendota-celery
+    env_file: .env
+    command: celery worker --app=datadrivendota -E -Q parsing,botting --loglevel=INFO  -c 2  --workdir=datadrivendota
+    depends_on:
+      - rabbitmq
+  celery_plain:
+    image: datadrivendota-celery
+    env_file: .env
+    command: celery worker --app=datadrivendota -E -Q integrity,default,api_call,rpr,db_upload --loglevel=INFO  -c 6  --workdir=datadrivendota
+    depends_on:
+      - rabbitmq
+  javaparse:
+    image: parser
+    env_file: .env
+    environment:
+      PORT: 80
+      CLOUDAMQP_URL: amqp://guest:guest@rabbitmq:5672/%2F
+    depends_on:
+      - rabbitmq
   # celery_beat:
-  #   image: datadrivendota-web
+  #   image: datadrivendota-celery
   #   env_file: .env
   #   command: celery worker --app=datadrivendota -E -Q default,api_call,integrity,rpr,db_upload --loglevel=INFO  -c 6  -B --workdir=datadrivendota
   #   depends_on:

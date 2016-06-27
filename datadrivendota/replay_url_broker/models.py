@@ -4,6 +4,7 @@ import traceback
 from datetime import timedelta
 import logging
 from requests.exceptions import ConnectionError
+from django.utils import timezone
 
 import requests
 from django.db import models
@@ -119,21 +120,24 @@ class ReplayUrlBackend(models.Model):
     objects = ReplayUrlBackendQuerySet.as_manager()
 
     url = models.URLField()
-    do_not_use_before = models.DateTimeField(null=True)
+    do_not_use_before = models.DateTimeField(default=timezone.now)
 
     def __unicode__(self):
-        fragment = self.url[8:self.url.find('.herokuapp')]
-        usable = (
-            self.do_not_use_before is None or
-            timezone.now() > self.do_not_use_before
-        )
-        if usable:
-            useable = 'usable'
+        if getattr(self.do_not_use_before, 'strftime', None) is None:
+            return u"Somehow, this is none."
         else:
-            useable = 'OUT OF SERVICE'
+            fragment = self.url[8:self.url.find('.herokuapp')]
+            usable = (
+                self.do_not_use_before is None or
+                timezone.now() > self.do_not_use_before
+            )
+            if usable:
+                useable = 'usable'
+            else:
+                useable = 'OUT OF SERVICE'
 
-        return "{0}, {1} ({2})".format(
-            fragment,
-            useable,
-            self.do_not_use_before.strftime("%m-%d %H:%M:%S")
-        )
+            return "{0}, {1} ({2})".format(
+                fragment,
+                useable,
+                self.do_not_use_before.strftime("%m-%d %H:%M:%S")
+            )
