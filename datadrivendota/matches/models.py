@@ -29,7 +29,7 @@ class Match(models.Model):
     steam_id = models.BigIntegerField(
         help_text="Valve's id field", unique=True
     )
-    match_seq_num = models.IntegerField(
+    match_seq_num = models.BigIntegerField(
         help_text="ID valve's play sequence",
         null=True,
         blank=True
