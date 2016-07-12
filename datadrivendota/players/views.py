@@ -14,6 +14,9 @@ from .models import Player
 from .management.tasks import MirrorPlayerData
 from datadrivendota.management.tasks import ApiContext
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class PlayerIndexView(ListView):
 
@@ -81,7 +84,6 @@ class TasksView(View):
             player_id = request.POST['player_id']
             match_ct = request.POST['match_ct']
             task = request.POST['task']
-
             if task == 'create':
                 t = MirrorPlayerData()
                 c = ApiContext()
@@ -90,7 +92,9 @@ class TasksView(View):
                 c.account_id = player_id
                 t.delay(api_context=c)
 
-                response_data['result'] = 'Getting player matches'
+                response_data['result'] = "Getting {0} matches for {1}".format(
+                    match_ct, player_id
+                )
                 response_data['type'] = 'success'
 
             return HttpResponse(
