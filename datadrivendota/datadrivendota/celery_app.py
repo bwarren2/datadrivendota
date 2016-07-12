@@ -461,7 +461,7 @@ class Config(object):
         },
         'check-parse-result-fast': {
             'task': 'parserpipe.management.tasks.ReadParseResults',
-            'schedule': timedelta(seconds=3),
+            'schedule': timedelta(seconds=10),
         },
         'reflect-live-games-fast': {
             'task': 'leagues.management.tasks.live_game.MirrorLiveGames',

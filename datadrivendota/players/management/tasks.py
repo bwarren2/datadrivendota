@@ -150,7 +150,6 @@ class MirrorPlayerData(BaseTask):
         player = Player.objects.get_or_create(
             steam_id=api_context.account_id
         )[0]
-        print api_context.matches_desired, api_context.matches_requested
         if api_context.matches_requested is None:
             api_context.matches_requested = 5
 
@@ -160,6 +159,14 @@ class MirrorPlayerData(BaseTask):
 
         if api_context.matches_desired is None:
             api_context.matches_desired = 5
+
+        logger.info(
+            "Getting {0} matches for {1}".format(
+                api_context.matches_desired,
+                api_context.account_id
+            )
+        )
+
         for skill in api_context.skill_levels:
             api_context.skill = skill
 
