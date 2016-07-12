@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
 
+from matches.models import Match
 from accounts.exceptions import DataCapReached, ValidationException
 from accounts.models import UserProfile
 # Create your models here.
@@ -72,8 +72,14 @@ class MatchRequest(models.Model):
 
     def __unicode__(self):
         choices = self.STATUS_CHOICES
-        return "Match#: {0}, status: {1}".format(
-            self.match_id, dict(choices).get(self.status)
+        try:
+            match_date = Match.objects.get(
+                steam_id=self.match_id
+            ).hms_start_time
+        except Match.DoesNotExist:
+            match_date = None
+        return "Match#: {0}, status: {1}, ({2})".format(
+            self.match_id, dict(choices).get(self.status), match_date
         )
 
     @property

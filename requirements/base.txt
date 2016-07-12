@@ -22,6 +22,7 @@ django-bootstrap-form==3.2
 django-braces==1.8.1
 django-cors-headers==1.1.0
 django-filter==0.13.0
+django-taggit==0.20.2
 django-forms-bootstrap==3.0.1
 django-jsonfield==0.9.15
 django-model-utils==2.4
