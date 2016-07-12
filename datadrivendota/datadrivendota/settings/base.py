@@ -246,7 +246,6 @@ DJANGO_APPS = (
 )
 
 THIRD_PARTY_APPS = (
-    'taggit',
     'social.apps.django_app.default',
     'blog',
     'storages',
