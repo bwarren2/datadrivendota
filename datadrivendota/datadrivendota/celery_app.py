@@ -453,7 +453,7 @@ class Config(object):
         },
         'mirror-client-matches': {
             'task': 'players.management.tasks.MirrorClientMatches',
-            'schedule': timedelta(minutes=3),
+            'schedule': timedelta(minutes=20),
         },
         'create-match-requests': {
             'task': 'parserpipe.management.tasks.CreateMatchRequests',
