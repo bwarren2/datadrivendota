@@ -39,6 +39,8 @@ services:
       CLOUDAMQP_URL: amqp://guest:guest@rabbitmq:5672/%2F
     depends_on:
       - rabbitmq
+  # This is commented out because it writes lots of logs, making things hard to keep track of on initial start.  It is mostly useful for running the persistent read/write for parserpipe and periodic syncing with Valve.  You can live without it for now, or uncomment to try it out.
+
   # celery_beat:
   #   image: datadrivendota-celery
   #   env_file: .env
