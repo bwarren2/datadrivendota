@@ -150,15 +150,16 @@ class MirrorPlayerData(BaseTask):
         player = Player.objects.get_or_create(
             steam_id=api_context.account_id
         )[0]
+        print api_context.matches_desired, api_context.matches_requested
         if api_context.matches_requested is None:
-            api_context.matches_requested = 500
+            api_context.matches_requested = 5
 
         api_context.start_scrape_time = time()
         api_context.last_scrape_time = player.last_scrape_time
         api_context.deepycopy = True
 
         if api_context.matches_desired is None:
-            api_context.matches_desired = 500
+            api_context.matches_desired = 5
         for skill in api_context.skill_levels:
             api_context.skill = skill
 

@@ -650,15 +650,15 @@ class CycleApiCall(ApiFollower):
         """ Make match detail calls for each match. """
         for result in json_data['matches']:
             api_context.processed += 1
-            if api_context.processed <= api_context.matches_desired:
+            doing = api_context.processed <= api_context.desired
+            if doing:
 
                 logger.info(
                     "{0}: {1} done, {2} wanted, doing: {3}".format(
                         api_context.account_id,
                         api_context.processed,
-                        api_context.matches_desired,
-                        api_context.processed <=
-                        api_context.matches_desired
+                        api_context.desired,
+                        doing
                     )
                 )
 
@@ -673,21 +673,18 @@ class CycleApiCall(ApiFollower):
 
     def more_results_left(self, json_data, api_context):
         """ Evaluate if more matches need to be queried. """
-        if (json_data['results_remaining'] != 0) \
-                and api_context.processed < \
-                api_context.matches_desired:
+        any_wanted = api_context.processed < api_context.desired
+        if (json_data['results_remaining'] != 0) and any_wanted:
 
             logger.info(
                 (
-                    "Did {0} of {1} for {2}. {3} left.  \n "
-                    "Logic: remaining: {4}, "
+                    "Did {0} of {1} for {2}. {3} left. Logic: remaining: {4}"
                 ).format(
                     api_context.processed,
-                    api_context.matches_desired,
+                    api_context.desired,
                     api_context.account_id,
                     json_data['results_remaining'],
-                    not (json_data['results_remaining'] == 0),
-
+                    any_wanted,
                 )
             )
             return True
@@ -697,7 +694,7 @@ class CycleApiCall(ApiFollower):
             logger.info(
                 "Did {0} of {1} for {2}. {3} left.  Done.".format(
                     api_context.processed,
-                    api_context.matches_desired,
+                    api_context.desired,
                     api_context.account_id,
                     json_data['results_remaining']
                 )

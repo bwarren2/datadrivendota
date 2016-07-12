@@ -237,6 +237,11 @@ class ApiContext(object):
     def __repr__(self):
         return self.__str__()
 
+    @property
+    def desired(self):
+        """ Type info gets lost in deserialization. """
+        return int(self.matches_desired)
+
 
 # Parents
 class BaseTask(Task):

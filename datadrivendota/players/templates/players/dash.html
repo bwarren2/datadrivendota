@@ -1,0 +1,77 @@
+{% extends "row_base.html" %}
+
+
+{% block aligned_content %}
+    <form id='task-form' class='form-horizontal' method='post'>
+        <div class='form-group'>
+            <label class='control-label col-md-2'>Player ID</label>
+            <div class='col-md-10'>
+            <input type='number' id='player_id' class='form-control'>
+            </div>
+        </div>
+        <div class='form-group'>
+            <label class='control-label col-md-2'>Match Count</label>
+            <div class='col-md-10'>
+            <input type='text' value=10 id='match_ct' class='form-control'>
+            </div>
+        </div>
+        <div class='form-group'>
+            <label class='control-label col-md-2'>Task Type</label>
+            <div class='col-md-10'>
+            <select type='text' id='task' class='form-control'>
+                <option value='create'>Import Matches for Player</option>
+            </select>
+            </div>
+        </div>
+        {% csrf_token %}
+        <div class='form-group'>
+            <div class='col-md-offset-2'>
+            <button id='go' class='btn btn-primary' type='submit'>Go!</button>
+            </div>
+        </div>
+
+    </form>
+{% endblock aligned_content %}
+{% block extra_js %}
+<script type="text/javascript">
+  $(function(){
+    $('#task-form').submit(function(event){
+      event.preventDefault();
+
+      var csrftoken = window.jsUtils.getCookie('csrftoken');
+      var player_id = $('#player_id').val();
+      var match_ct = $('#match_ct').val();
+      var task = $('#task :selected').val();
+      var data = {
+        csrfmiddlewaretoken: csrftoken,
+        task: task,
+        player_id: player_id,
+        match_ct: match_ct
+      };
+
+      var resp = $.ajax({
+        url: '/players/ajax-tasks/',
+        method: "POST",
+        data: data,
+      })
+      .success(function(data){
+        console.log(data);
+        Messenger().post({
+          message: data.result,
+          type: data.type,
+          hideAfter: 5
+        });
+      })
+      .fail(function(){
+        Messenger().post({
+          message: "FAILURE",
+          type: "error",
+          hideAfter: 10
+        });
+
+      })
+      console.log(resp);
+    });
+  });
+</script>
+{% endblock extra_js %}
