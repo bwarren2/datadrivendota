@@ -249,7 +249,6 @@ THIRD_PARTY_APPS = (
     'taggit',
     'social.apps.django_app.default',
     'blog',
-    'taggit',
     'storages',
     'bootstrapform',
     'corsheaders',
