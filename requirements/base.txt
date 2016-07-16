@@ -29,7 +29,6 @@ django-model-utils==2.4
 django-pipeline==1.5.4
 django-storages==1.1.8
 django-xmlrpc==0.1.5
-django-taggit==0.20.0
 djangorestframework==3.3.2
 dj-stripe==0.8.0
 docutils==0.12
