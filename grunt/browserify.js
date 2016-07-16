@@ -10,15 +10,4 @@ module.exports = {
           },
         }
     },
-    frontend: {
-        // A single entry point for our app
-        src: 'datadrivendota/static/js/frontend/index.js',
-        // Compile to a single file to add a script tag for in your HTML
-        dest: 'datadrivendota/static/js/frontend.js',
-        options: {
-          browserifyOptions: {
-            standalone: 'frontend'
-          },
-        }
-    },
 }

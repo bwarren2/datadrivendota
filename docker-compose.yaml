@@ -1,0 +1,49 @@
+version: '2'
+services:
+  db:
+    image: postgres
+    expose:
+     - "5432"
+  rabbitmq:
+    image: rabbitmq:management
+    expose:
+     - "5672"
+     - "15672"
+  web:
+    image: datadrivendota-web
+    env_file: .env
+    # command: '/bin/bash'
+    command: python datadrivendota/manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    links:
+      - db
+      - rabbitmq
+  celery_parsing:
+    image: datadrivendota-celery
+    env_file: .env
+    command: celery worker --app=datadrivendota -E -Q parsing,botting --loglevel=INFO  -c 2  --workdir=datadrivendota
+    depends_on:
+      - rabbitmq
+  celery_plain:
+    image: datadrivendota-celery
+    env_file: .env
+    command: celery worker --app=datadrivendota -E -Q integrity,default,api_call,rpr,db_upload --loglevel=INFO  -c 6  --workdir=datadrivendota
+    depends_on:
+      - rabbitmq
+  javaparse:
+    image: parser
+    env_file: .env
+    environment:
+      PORT: 80
+      CLOUDAMQP_URL: amqp://guest:guest@rabbitmq:5672/%2F
+    depends_on:
+      - rabbitmq
+  # This is commented out because it writes lots of logs, making things hard to keep track of on initial start.  It is mostly useful for running the persistent read/write for parserpipe and periodic syncing with Valve.  You can live without it for now, or uncomment to try it out.
+
+  # celery_beat:
+  #   image: datadrivendota-celery
+  #   env_file: .env
+  #   command: celery worker --app=datadrivendota -E -Q default,api_call,integrity,rpr,db_upload --loglevel=INFO  -c 6  -B --workdir=datadrivendota
+  #   depends_on:
+  #     - rabbitmq
