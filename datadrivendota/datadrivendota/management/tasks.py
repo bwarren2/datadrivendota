@@ -57,47 +57,72 @@ class ApiContext(object):
         self.key = STEAM_API_KEY
         super(ApiContext, self).__init__(*args, **kwargs)
 
-    def to_url_dict(self, mode):
+    def to_url_dict(self, mode):  # NOQA: this has high mccabe complexity
         """
         These are hardcoded per the valve spec.  Annoying.
         """
 
         if mode == 'GetPlayerSummaries':
-            valve_url_vars = ['steamids', 'key']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'steamids',
+                'key',
+            ]
         elif mode == 'GetTeamInfoByTeamID':
-            valve_url_vars = ['key', 'start_at_team_id', 'teams_requested']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'key',
+                'start_at_team_id',
+                'teams_requested',
+            ]
         elif mode == 'GetUGCFileDetails':
-            valve_url_vars = ['key', 'ugcid', 'appid']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'key',
+                'ugcid',
+                'appid',
+            ]
         elif mode == 'GetLeagueListing':
-            valve_url_vars = ['key']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'key',
+            ]
         elif mode == 'GetSchema':
-            valve_url_vars = ['key']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'key',
+            ]
         elif mode == 'GetSchemaURL':
-            valve_url_vars = ['key']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'key',
+            ]
         elif mode == 'GetItemIconPath':
-            valve_url_vars = ['key', 'format', 'iconname']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'key',
+                'format',
+                'iconname',
+            ]
         elif mode == 'GetPlayerOfficialInfo':
-            valve_url_vars = ['key', 'AccountID']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'key',
+                'AccountID',
+            ]
         elif mode == 'GetMatchDetails':
-            valve_url_vars = ['match_id', 'key']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'match_id',
+                'key',
+            ]
         elif mode == 'GetTournamentPlayerStats':
-            valve_url_vars = ['league_id', 'account_id', 'key']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'league_id',
+                'account_id',
+                'key',
+            ]
         elif mode == 'GetScheduledLeagueGames':
-            valve_url_vars = ['date_min', 'date_max', 'key']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'date_min',
+                'date_max',
+                'key',
+            ]
         elif mode == 'GetLiveLeagueGames':
-            valve_url_vars = ['key']
-            return self.dict_vars(valve_url_vars)
+            valve_url_vars = [
+                'key',
+            ]
         elif mode == 'GetMatchHistory':
             valve_url_vars = [
                 'account_id',
@@ -110,9 +135,15 @@ class ApiContext(object):
                 'start_at_match_id',
                 'key',
             ]
-            return self.dict_vars(valve_url_vars)
+        elif mode == 'GetMatchHistoryBySequenceNum':
+            valve_url_vars = [
+                'key',
+                'start_at_match_seq_num',
+                'matches_requested',
+            ]
         else:
             logger.warning("I did not understand mode: " + mode)
+        return self.dict_vars(valve_url_vars)
 
     def dict_vars(self, url_vars):
         return_dict = {}
@@ -132,8 +163,8 @@ class ApiContext(object):
                 '/IDOTA2Match_570/GetMatchDetails/v001/'
             ),
             'GetHeroes': (
-                'https://api.steampowered.com/IEconDOTA2_570/'
-                'GetHeroes/v0001/'
+                'https://api.steampowered.com'
+                '/IEconDOTA2_570/GetHeroes/v0001/'
             ),
             'GetPlayerSummaries': (
                 'https://api.steampowered.com'
@@ -168,24 +199,24 @@ class ApiContext(object):
                 '/IEconItems_570/GetSchemaURL/v1/'
             ),
             'GetItemIconPath': (
-                'https://api.steampowered.com/IEconDOTA2_570/'
-                'GetItemIconPath/v1/'
+                'https://api.steampowered.com'
+                '/IEconDOTA2_570/GetItemIconPath/v1/'
             ),
             'GetPlayerOfficialInfo': (
-                'https://api.steampowered.com/IDOTA2Fantasy_570/'
-                'GetPlayerOfficialInfo/v1/'
+                'https://api.steampowered.com'
+                '/IDOTA2Fantasy_570/GetPlayerOfficialInfo/v1/'
             ),
             'GetUGCFileDetails': (
-                'http://api.steampowered.com/ISteamRemoteStorage/'
-                'GetUGCFileDetails/v1/'
+                'http://api.steampowered.com'
+                '/ISteamRemoteStorage/GetUGCFileDetails/v1/'
             ),
             'GetTournamentPlayerStats': (
-                'http://api.steampowered.com/IDOTA2Match_570/'
-                'GetTournamentPlayerStats/v1/'
+                'http://api.steampowered.com'
+                '/IDOTA2Match_570/GetTournamentPlayerStats/v1/'
             ),
             'GetScheduledLeagueGames': (
-                'http://api.steampowered.com/IDOTA2Match_570/'
-                'GetScheduledLeagueGames/V001/'
+                'http://api.steampowered.com'
+                '/IDOTA2Match_570/GetScheduledLeagueGames/V001/'
             ),
 
         }
@@ -281,7 +312,10 @@ class ValveApiCall(BaseTask):
         """
         Ping the valve API for downloading results.
 
-        We have exactly one task that interacts with valve's api to enable rate limiting.  Check celery config/env for that metering.  This task primarily does dumb passthrough; downstream tasks are responsible for interpreting the (various) ways things can fail.
+        We have exactly one task that interacts with valve's api to enable rate
+        limiting.  Check celery config/env for that metering.  This task
+        primarily does dumb passthrough; downstream tasks are responsible for
+        interpreting the (various) ways things can fail.
 
         For lots more docs, see http://dev.dota2.com/showthread.php?t=58317
         """
