@@ -19,6 +19,7 @@ class MatchRequest(models.Model):
     MATCH_NOT_FOUND = 5
     FINDING_MATCH = 6
     MATCH_FOUND = 7
+    ERROR = 8
 
     STATUS_CHOICES = (
         (SUBMITTED, 'Submitted'),
@@ -29,6 +30,7 @@ class MatchRequest(models.Model):
         (REPLAY_NOT_AVAILABLE, 'Replay Not Available'),
         (PARSED, 'First-Pass Parsed'),
         (COMPLETE, 'Complete'),
+        (ERROR, 'Unknown error!'),
     )
 
     # The core components we care about

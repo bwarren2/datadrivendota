@@ -17,8 +17,6 @@ from parserpipe.models import MatchRequest
 from parserpipe.management.tasks import (
     KickoffMatchRequests,
     ReadParseResults,
-    UpdatePmsReplays,
-    MergeMatchRequestReplay
 )
 from replay_url_broker.models import ReplayUrlBackend
 from matches.management.tasks import MirrorMatches
@@ -110,25 +108,6 @@ class TasksView(View):
 
             elif task == 'read_java':
                 ReadParseResults().delay()
-                response_data['result'] = 'Reading results'
-                response_data['type'] = 'success'
-
-            elif task == 'merge_results':
-                json_data = {
-                    'match_id': match_id,
-                    'filename': filename,
-                }
-                MergeMatchRequestReplay().delay(json_data)
-                response_data['result'] = 'Merging results'
-                response_data['type'] = 'success'
-
-            elif task == 'fanout':
-                MergeMatchRequestReplay().fan_parsing(match_id=match_id)
-                response_data['result'] = 'Fanning out'
-                response_data['type'] = 'success'
-
-            elif task == 'parse':
-                UpdatePmsReplays().delay(match_id=match_id)
                 response_data['result'] = 'Reading results'
                 response_data['type'] = 'success'
 
