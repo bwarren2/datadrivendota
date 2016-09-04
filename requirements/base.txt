@@ -12,12 +12,12 @@ boto==2.38.0
 celery==3.1.20
 certifi==2015.9.6.2
 cffi==1.4.1
-cryptography==1.1.2
+cryptography==1.5
 curtsies==0.2.4
 dj-database-url==0.3.0
 Django==1.9.4
 django-appconf==1.0.1
-django-basic-blog==0.10
+django-basic-blog==0.17
 django-bootstrap-form==3.2
 django-braces==1.8.1
 django-cors-headers==1.1.0
