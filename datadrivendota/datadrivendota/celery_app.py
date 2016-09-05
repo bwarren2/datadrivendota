@@ -168,15 +168,6 @@ class Config(object):
                 'max_retries': 0,
             }
         },
-        'parserpipe.management.tasks.MergeMatchRequestReplay': {
-            'routes': {
-                'exchange': 'parsing',
-                'routing_key': 'parsing'
-            },
-            'annotations': {
-                'max_retries': 0,
-            }
-        },
         'parserpipe.management.tasks.ReadParseResults': {
             'routes': {
                 'exchange': 'integrity',
