@@ -1267,58 +1267,57 @@ var stat_card = function(shard, destination, params){
         for (var attrname in struct[String(time)]) {
           context[attrname] = struct[String(time)][attrname];
         }
+
+        context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(0);
+
+        context['lifestate'] = context['health'] > 0 ? 'alive' : 'dead';
+
+
+
+        context['health_pct'] = ((context['health'] / context['max_health'])*100).toFixed(0);
+        context['mana_pct'] = ((context['mana'] / context['max_mana'])*100).toFixed(0);
+
+        context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(0);
+
+        context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(0);
+
+        context['hero_css'] = shard.hero_name;
+
+        context['total_gold'] = (
+          parseInt(context['unreliable_gold']) + parseInt(context['reliable_gold'])
+        ).toFixed(2);
+
+        [
+          'agility',
+          'agility_total',
+          'strength',
+          'strength_total',
+          'intelligence',
+          'intelligence_total',
+          'health',
+          'max_health',
+          'mana',
+          'max_mana',
+        ].map(function(field){
+          if (context[field] === undefined) {
+            console.log(shard, field, time)
+          } else{
+            context[field] = context[field].toFixed(0);
+          }
+        });
+
+        ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'].map(
+          function(d){
+          if (context[d] === null) {
+            context[d] = 'emptyitembg';
+          }else{
+            context[d] = context[d].substring(5);
+          }
+        });
+
+        var html = compiledTemplate(context);
+        $(destination).html(html);
       }
-
-
-      context['strength_add'] = (context['strength_total'] - context['strength']).toFixed(0);
-
-      context['lifestate'] = context['health'] > 0 ? 'alive' : 'dead';
-
-
-
-      context['health_pct'] = ((context['health'] / context['max_health'])*100).toFixed(0);
-      context['mana_pct'] = ((context['mana'] / context['max_mana'])*100).toFixed(0);
-
-      context['agility_add'] = (context['agility_total'] - context['agility']).toFixed(0);
-
-      context['intelligence_add'] = (context['intelligence_total'] - context['intelligence']).toFixed(0);
-
-      context['hero_css'] = shard.hero_name;
-
-      context['total_gold'] = (
-        parseInt(context['unreliable_gold']) + parseInt(context['reliable_gold'])
-      ).toFixed(2);
-
-      [
-        'agility',
-        'agility_total',
-        'strength',
-        'strength_total',
-        'intelligence',
-        'intelligence_total',
-        'health',
-        'max_health',
-        'mana',
-        'max_mana',
-      ].map(function(field){
-        if (context[field] === undefined) {
-          console.log(shard, field, time)
-        } else{
-          context[field] = context[field].toFixed(0);
-        }
-      });
-
-      ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'].map(
-        function(d){
-        if (context[d] === null) {
-          context[d] = 'emptyitembg';
-        }else{
-          context[d] = context[d].substring(5);
-        }
-      });
-
-      var html = compiledTemplate(context);
-      $(destination).html(html);
 
     }
 
