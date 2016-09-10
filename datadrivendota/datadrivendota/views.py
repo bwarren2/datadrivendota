@@ -1,7 +1,7 @@
 from json import dumps
 
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse,
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View, TemplateView
 from django.views.generic.edit import FormView
