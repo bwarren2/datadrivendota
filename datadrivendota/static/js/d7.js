@@ -2592,7 +2592,7 @@ var stat_card = function(shard, destination, params){
         'max_mana',
       ].map(function(field){
         if (context[field] === undefined) {
-          console.log(shard, field)
+          console.log(shard, field, context)
         } else{
           context[field] = context[field].toFixed(0);
         }
