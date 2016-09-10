@@ -1301,7 +1301,11 @@ var stat_card = function(shard, destination, params){
         'mana',
         'max_mana',
       ].map(function(field){
-        context[field] = context[field].toFixed(0);
+        if (context[field] === undefined) {
+          console.log(shard, field)
+        } else{
+          context[field] = context[field].toFixed(0);
+        }
       });
 
       ['item_0', 'item_1', 'item_2', 'item_3', 'item_4', 'item_5'].map(

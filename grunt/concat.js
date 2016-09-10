@@ -29,6 +29,7 @@ module.exports = {
             "bower_components/select2/dist/js/select2.js",
             "bower_components/moment/min/moment.min.js",
             "bower_components/lodash/lodash.min.js",
+            "bower_components/d3-tip/index.js",
             "bower_components/clipboard/dist/clipboard.min.js",
             "js/charting.js",
             "js/project.js",

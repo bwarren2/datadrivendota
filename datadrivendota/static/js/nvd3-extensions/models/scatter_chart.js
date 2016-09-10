@@ -2,7 +2,7 @@
 var models = require("./scatter.js");
 var d3 = window.d3;
 var nv = window.nv;
-var mytip = require("d3-tip")(d3);
+var mytip = window.d3-tip(d3);
 var scatter_chart = function() {
 
     //============================================================
