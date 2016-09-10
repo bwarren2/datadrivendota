@@ -1,16 +1,12 @@
 from json import dumps
 
 from django.utils.decorators import method_decorator
-from django.http import (
-    HttpResponse,
-    HttpResponseRedirect,
-)
+from django.http import HttpResponse,
 from django.shortcuts import render
 from django.views.generic import View, TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
-from django.core.urlresolvers import reverse
 
 from .forms import SearchForm
 from heroes.models import Hero
