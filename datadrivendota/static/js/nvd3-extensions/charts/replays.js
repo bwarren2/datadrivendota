@@ -907,35 +907,44 @@ var minimap = function(shards, destination, params){
     var height = svg.attr('height');
 
     var fetch_data = position_data.map(function(d){
-      return d[0]
+      return d[0];
     });
 
     var xscale = utils.axis_format.minimap_x(width, height);
     var yscale = utils.axis_format.minimap_y(width, height);
 
-    var faces = d3.select(destination).selectAll('i').data(fetch_data)
-      .enter()
-      .append('i');
+    var update_minimap = function(arg){
+
+      var fetch_data = position_data.map(function(d){
+        if (arg in d) {
+          return d[arg]
+        } else {
+          return undefined
+        }
+      }).filter(function(d){ return d!==undefined});
+
+      var selection = d3.select(destination)
+        .selectAll('i')
+        .data(fetch_data, function(d){return d.hero_name});
+
+      selection.exit().remove();
+
+      var faces = selection
+        .enter()
+        .append('i');
 
       faces.attr('class', function(d){
-        return 'd2mh ' + d.hero_name + ' ' +d.css_classes;
-      })
-      .style('left', function(d){return xscale(d.x)+'px'})
-      .style('top', function(d){return yscale(d.y)+'px'})
-      .style('position', 'absolute')
+          return 'd2mh ' + d.hero_name + ' ' +d.css_classes;
+        })
+        .style('left', function(d){return xscale(d.x)+'px'})
+        .style('top', function(d){return yscale(d.y)+'px'})
+        .style('position', 'absolute')
 
       faces.append('span').attr('class', 'minimap-label').html(function(d){
-        return d.minimap_label ? d.minimap_label : '';
+          return d.minimap_label ? d.minimap_label : '';
       });
 
-
-    $(window).on('update', function(evt, arg){
-      var fetch_data = position_data.map(function(d){
-        return d[arg]
-      });
-
-      var faces = d3.select(destination).selectAll('i').data(fetch_data);
-      faces.classed('dead', function(d){
+      selection.classed('dead', function(d){
         if (d.health===0) {
           return true;
         }else{
@@ -943,7 +952,7 @@ var minimap = function(shards, destination, params){
         }
       });
 
-      faces
+      selection
         .transition()
         .duration(1000)
         .style('left', function(d){
@@ -964,7 +973,14 @@ var minimap = function(shards, destination, params){
           }
         }).ease("linear")
 
+    }
+
+
+
+    $(window).on('update', function(evt, arg){
+      update_minimap(arg);
     })
+    update_minimap(0);
 
   }).catch(function(e){
     console.log(e);
