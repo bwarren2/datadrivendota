@@ -7,6 +7,7 @@
     "doc": "docs"
   },
   "dependencies": {
+    "d3": "3.5.17",
     "grunt-concat-css": "^0.3.1",
     "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-uglify": "^0.9.1",

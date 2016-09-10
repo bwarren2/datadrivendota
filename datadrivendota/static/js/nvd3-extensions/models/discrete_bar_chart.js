@@ -1,3 +1,4 @@
+var d3 = window.d3;
 
 var discreteBarChart = function() {
     "use strict";

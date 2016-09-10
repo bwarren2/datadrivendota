@@ -1,3 +1,5 @@
+var d3 = window.d3;
+
 //TODO: consider deprecating by adding necessary features to multiBar model
 var discreteBar = function() {
     "use strict";
