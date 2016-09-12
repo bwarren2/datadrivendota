@@ -2162,12 +2162,10 @@ var item_inventory = function(shards, destination, labels){
 
 var minimap = function(shards, destination, params){
 
-  console.log(shards);
   var urls = shards.map(function(shard){
     var location = utils.parse_urls.url_for(shard, 'allstate', 'statelog');
     return $.getJSON(location);
   })
-  console.log(urls);
   // Get the replay parse info
   Promise.all(urls).then(function(data){
 
@@ -2186,6 +2184,7 @@ var minimap = function(shards, destination, params){
         prev[String(d.offset_time)] = {
           x: d.x,
           y: d.y,
+          id: shards[series_idx].id,
           hero_name: shards[series_idx].hero_name,
           css_classes: css_class_swap(shards[series_idx].css_classes),
           minimap_label: shards[series_idx].minimap_label,
@@ -2218,7 +2217,7 @@ var minimap = function(shards, destination, params){
 
       var selection = d3.select(destination)
         .selectAll('i')
-        .data(fetch_data, function(d){return d.hero_name});
+        .data(fetch_data, function(d){return d.id});
 
       selection.exit().remove();
 
