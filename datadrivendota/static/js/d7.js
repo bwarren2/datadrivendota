@@ -2162,10 +2162,12 @@ var item_inventory = function(shards, destination, labels){
 
 var minimap = function(shards, destination, params){
 
+  console.log(shards);
   var urls = shards.map(function(shard){
     var location = utils.parse_urls.url_for(shard, 'allstate', 'statelog');
     return $.getJSON(location);
   })
+  console.log(urls);
   // Get the replay parse info
   Promise.all(urls).then(function(data){
 
@@ -2178,6 +2180,7 @@ var minimap = function(shards, destination, params){
       }
     }
 
+    console.log(data.length);
     var position_data =  data.map(function(series, series_idx){
       return series.reduce(function(prev, d){
         prev[String(d.offset_time)] = {
