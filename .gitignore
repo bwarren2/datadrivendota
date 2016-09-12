@@ -26,6 +26,7 @@ datadrivendota/static/temp
 
 # Twelve-factor secret settings in the environment:
 .env
+.env*
 
 #Ignore artifacts of local image construction
 1d_*
