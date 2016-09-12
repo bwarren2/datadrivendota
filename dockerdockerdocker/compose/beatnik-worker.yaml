@@ -1,0 +1,9 @@
+omniworker:
+  image: 288612536250.dkr.ecr.us-west-2.amazonaws.com/ddd-omniworker:latest
+  env_file:
+   - ../envs/.env-production
+  command: celery worker --app=datadrivendota -E -B -Q default,api_call,integrity,rpr,db_upload,parsing,botting  --loglevel=INFO  -c 6 --workdir=datadrivendota
+  mem_limit: 536870912
+  log_driver: "syslog"
+  log_opt:
+    syslog-address: "udp://logs.papertrailapp.com:28310"

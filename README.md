@@ -474,3 +474,62 @@ http://api.steampowered.com/ISteamWebAPIUtil/GetSupportedAPIList/v0001/?key=09A6
 
 Other person's example:
 http://dotadb.azurewebsites.net/heroes/32/riki#
+
+
+## Adding processes to ecs
+
+Ensure you are using the right ECS creds and cluster:
+
+>  cat ~/.ecs/config
+
+Make a repo online.
+
+SAMPLE: use the actual values from repo creation
+
+> aws ecr get-login --region us-west-2
+
+> docker build -t ddd-omniworker -f dockerdockerdocker/Dockerfiles/omniworker  .
+> docker tag ddd-omniworker:latest <number>.dkr.ecr.us-west-2.amazonaws.com/ddd-omniworker:latest
+
+> docker push <number>.dkr.ecr.us-west-2.amazonaws.com/ddd-omniworker:latest
+
+Sometimes the push must be retried due to network failures.
+
+
+(Set up creds in ~/.ecs/config)
+`ecs-cli up --keypair ecs-usw2-keypair --capability-iam --size 1 --instance-type t2.medium`
+`ecs-cli compose --file docker-secrets.yaml service up`
+
+### Bringing it down on ECS
+`ecs-cli compose --file docker-secrets.yaml service down`
+`ecs-cli down --force`
+
+
+Note on ECS docker-compose format:  this is fine:
+```
+omniworker:
+  image: 288612536250.dkr.ecr.us-west-2.amazonaws.com/ddd-omniworker:latest
+  env_file:
+   - ../envs/.env-production
+  command: celery worker --app=datadrivendota -E -Q default,api_call,integrity,rpr,db_upload,parsing,botting  --loglevel=INFO  -c 6 --workdir=datadrivendota
+  mem_limit: 536870912
+  log_driver: "syslog"
+  log_opt:
+    syslog-address: "udp://logs.papertrailapp.com:28310"
+```
+
+this is not:
+
+```
+version: '2'
+services:
+  omniworker:
+    image: 288612536250.dkr.ecr.us-west-2.amazonaws.com/ddd-omniworker:latest
+    env_file:
+     - ../envs/.env-production
+    command: celery worker --app=datadrivendota -E -Q default,api_call,integrity,rpr,db_upload,parsing,botting  --loglevel=INFO  -c 6 --workdir=datadrivendota
+    mem_limit: 536870912
+    log_driver: "syslog"
+    log_opt:
+      syslog-address: "udp://logs.papertrailapp.com:28310"
+```
