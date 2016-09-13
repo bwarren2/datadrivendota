@@ -4702,7 +4702,7 @@ var scatter_chart = function() {
                 chart.update();
             });
 
-            var tip = mytip()
+            var tip = d3.tip()
                 .attr("class", "tip")
                 .html(function(d) {
                     return contentGenerator(d);
