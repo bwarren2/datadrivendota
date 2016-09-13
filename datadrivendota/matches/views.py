@@ -133,20 +133,20 @@ class MatchParsedDetail(DetailView):
     template_name = 'matches/match_parsed_detail.html'
 
 
-class TimeLapseView(RecentPmsesMixin, TemplateView):
-    template_name = 'matches/time_lapse.html'
+class AnalyticChartsView(RecentPmsesMixin, TemplateView):
+    template_name = 'matches/analytic_charts.html'
 
 
-class DuelView(RecentPmsesMixin, TemplateView):
-    template_name = 'matches/duel.html'
+class VersusChartsView(RecentPmsesMixin, TemplateView):
+    template_name = 'matches/versus_charts.html'
 
 
-class GhostWalkView(RecentPmsesMixin, TemplateView):
-    template_name = 'matches/ghostwalk.html'
+class ReplayOverlayView(RecentPmsesMixin, TemplateView):
+    template_name = 'matches/replay_overlay.html'
 
     def get_context_data(self, **kwargs):
         kwargs['show_control_bar'] = True
-        return super(GhostWalkView, self).get_context_data(**kwargs)
+        return super(ReplayOverlayView, self).get_context_data(**kwargs)
 
 
 class ReplayView(DetailView):

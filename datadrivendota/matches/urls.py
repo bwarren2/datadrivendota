@@ -14,18 +14,18 @@ urlpatterns = [
         name='parsed_index'
     ),
     url(
-        r'^time-lapse/$',
-        views.TimeLapseView.as_view(),
+        r'^analytic-charts/$',
+        views.AnalyticChartsView.as_view(),
         name="time_lapse"
     ),
     url(
-        r'^duel/$',
-        views.DuelView.as_view(),
+        r'^versus-charts/$',
+        views.VersusChartsView.as_view(),
         name="duel"
     ),
     url(
-        r'^ghostwalk/$',
-        views.GhostWalkView.as_view(),
+        r'^replay-overlay/$',
+        views.ReplayOverlayView.as_view(),
         name="ghostwalk"
     ),
     url(
