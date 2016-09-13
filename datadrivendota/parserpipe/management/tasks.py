@@ -20,6 +20,8 @@ from replay_url_broker.models import ReplayUrlBackend
 
 logger = logging.getLogger(__name__)
 
+logging.getLogger('pika').setLevel(logging.WARNING)
+
 
 class CreateMatchRequests(Task):
 

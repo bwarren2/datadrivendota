@@ -7,7 +7,6 @@ from celery import Celery
 
 app = Celery('datadrivendota')
 
-
 def inferred_annotations(tsk):
     defaults = {
         'acks_late': True,

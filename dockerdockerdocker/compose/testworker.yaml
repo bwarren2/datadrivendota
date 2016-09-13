@@ -1,0 +1,5 @@
+omniworker:
+  image: ddd-production
+  env_file:
+   - ../envs/.env-production
+  command: celery worker --app=datadrivendota -E -Q default,api_call,integrity,rpr,db_upload,parsing,botting  --loglevel=INFO  -c 6 --workdir=datadrivendota
