@@ -32,6 +32,8 @@
     </span>
   {% elif not match.is_parsed %}
     <p>Log in to parse this match!</p>
+  {% elif match.is_parsed %}
+    <span class='parsed-tag'>Parsed!</span>
   {% endif %}
 
   {% if user.is_superuser %}

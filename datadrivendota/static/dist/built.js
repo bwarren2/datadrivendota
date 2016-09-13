@@ -9270,7 +9270,6 @@ $(function () {
             data: data,
         }).success(function(d){
             if (d.result=='made') {
-
                 parent.html('Parse request made! '+d.left+' left')
                 parent.addClass('text-success')
             } else if (d.result=='exists'){
