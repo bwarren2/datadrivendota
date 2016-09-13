@@ -406,7 +406,7 @@ class Config(object):
             'task': (
                 'leagues.management.tasks.league_schedule.'
                 'MirrorLeagueSchedule'
-                ),
+            ),
             'schedule': timedelta(days=1),
         },
         'reflect-item-schema-daily': {
