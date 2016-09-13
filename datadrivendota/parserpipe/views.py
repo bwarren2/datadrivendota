@@ -48,6 +48,7 @@ class MatchRequestCreateView(View):
                     request.user,
                     match_id
                 )
+                KickoffMatchRequests().delay()
 
                 response_data['result'] = 'made'
                 response_data['type'] = 'success'
