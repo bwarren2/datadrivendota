@@ -110,16 +110,16 @@
             <a href="/blog/">Blog</a>
           </li>
 
-          <li class="{% active 'duel' main_nav %}">
-            <a class='brand-primary' href="{% url 'matches:ghostwalk' %}">Replay Overlay</a>
+          <li class="{% active 'matches:replay_overlay' main_nav %}">
+            <a class='brand-primary' href="{% url 'matches:replay_overlay' %}">Replay Overlay</a>
           </li>
 
-          <li class="{% active 'time_lapse' main_nav %}">
-            <a class='brand-primary' href="{% url 'matches:time_lapse' %}">Analytic Charts</a>
+          <li class="{% active 'matches:analytic_charts' main_nav %}">
+            <a class='brand-primary' href="{% url 'matches:analytic_charts' %}">Analytic Charts</a>
           </li>
 
-          <li class="{% active 'duel' main_nav %}">
-            <a class='brand-primary' href="{% url 'matches:duel' %}">Versus Charts</a>
+          <li class="{% active 'matches:versus_charts' main_nav %}">
+            <a class='brand-primary' href="{% url 'matches:versus_charts' %}">Versus Charts</a>
           </li>
 
 
@@ -131,7 +131,7 @@
             </li>
           {% endif %}
 
-          <li class="{% active 'duel' main_nav %}">
+          <li class="{% active 'djstripe:subscribe' main_nav %}">
             <a class='brand-primary' href="{% url 'djstripe:subscribe' %}">Ultimate</a>
           </li>
 

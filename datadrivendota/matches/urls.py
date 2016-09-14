@@ -16,17 +16,17 @@ urlpatterns = [
     url(
         r'^analytic-charts/$',
         views.AnalyticChartsView.as_view(),
-        name="time_lapse"
+        name="analytic_charts"
     ),
     url(
         r'^versus-charts/$',
         views.VersusChartsView.as_view(),
-        name="duel"
+        name="versus_charts"
     ),
     url(
         r'^replay-overlay/$',
         views.ReplayOverlayView.as_view(),
-        name="ghostwalk"
+        name="replay_overlay"
     ),
     url(
         r'^replay/(?P<match_id>[0-9\-]*)/$',
