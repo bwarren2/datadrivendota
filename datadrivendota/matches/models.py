@@ -281,7 +281,7 @@ class PlayerMatchSummary(models.Model):
     xp_per_min = models.IntegerField()
     gold_spent = models.IntegerField(null=True)
     hero_damage = models.IntegerField(null=True)
-    tower_damage = models.IntegerField()
+    tower_damage = models.IntegerField(null=True)
     hero_healing = models.IntegerField()
     level = models.IntegerField()
     is_win = models.BooleanField()
