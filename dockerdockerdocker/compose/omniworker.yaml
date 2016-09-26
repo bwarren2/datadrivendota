@@ -3,7 +3,7 @@ omniworker:
   env_file:
    - ../envs/.env-production
   command: celery worker --app=datadrivendota -E -Q default,api_call,integrity,rpr,db_upload,parsing,botting  --loglevel=INFO  -c 6 --workdir=datadrivendota
-  mem_limit: 536870912
+  mem_limit: 1073741824
   log_driver: "syslog"
   log_opt:
     syslog-address: "udp://logs.papertrailapp.com:28310"
