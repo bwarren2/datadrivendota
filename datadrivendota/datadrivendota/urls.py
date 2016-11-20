@@ -37,6 +37,12 @@ urlpatterns = [
     ),
     # Even if we don't want users to login, SUs need to be able to log out.
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
+    url(r'^.well-known/acme-challenge/pUKzHScY-_arzG29H7mnKwvi3gLEUuuFrOT3xZuqq7I/$',
+        TemplateView.as_view(
+            template_name='acme.txt',
+            content_type='text/plain'
+        ),
+        name='acme'),
 
     url(
         r'^api/combobox_tags/$',
