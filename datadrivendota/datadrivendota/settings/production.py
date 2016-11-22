@@ -19,9 +19,9 @@ def get_env_setting(setting):
         error_msg = "Set the %s env variable" % setting
         raise ImproperlyConfigured(error_msg)
 
-# MIDDLEWARE_CLASSES += (
-#     "datadrivendota.middleware.ForceHttps",
-# )
+MIDDLEWARE_CLASSES += (
+    "datadrivendota.middleware.ForceHttps",
+)
 
 #          EMAIL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
