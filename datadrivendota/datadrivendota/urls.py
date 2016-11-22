@@ -43,6 +43,12 @@ urlpatterns = [
             content_type='text/plain'
         ),
         name='acme'),
+    url(r'^.well-known/acme-challenge/AzYb6F_NusqVhhW-kHgp_ePh0HmKVmS9N5Tb5g3wtBY$',
+        TemplateView.as_view(
+            template_name='acme2.txt',
+            content_type='text/plain'
+        ),
+        name='acme'),
     url(
         r'^api/combobox_tags/$',
         views.ComboboxAjaxView.as_view(),
