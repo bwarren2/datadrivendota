@@ -132,10 +132,10 @@ class ScheduledMatch(models.Model):
 
 
 class LiveMatch(models.Model):
-    league_id = models.PositiveIntegerField()
+    league_id = models.BigIntegerField()
     steam_id = models.BigIntegerField(unique=True)
-    radiant_team = models.PositiveIntegerField(null=True, blank=True)
-    dire_team = models.PositiveIntegerField(null=True, blank=True)
+    radiant_team = models.BigIntegerField(null=True, blank=True)
+    dire_team = models.BigIntegerField(null=True, blank=True)
     radiant_logo_ugc = models.BigIntegerField(null=True, blank=True)
     dire_logo_ugc = models.BigIntegerField(null=True, blank=True)
     failed = models.BooleanField(default=False)
