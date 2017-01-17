@@ -135,6 +135,11 @@ def merge_text(ab, data_dict):
         hero_slug = slugify(
             data_dict['hurl'].replace("_", " ")
         )
+
+        # Valve is inconsistent in the endpoint
+        if hero_slug == "monkeyking":
+            hero_slug = "monkey-king"
+
         hero = Hero.objects.get(machine_name=hero_slug)
         ab.hero = hero
         ab.is_core = True
@@ -164,7 +169,7 @@ def merge_image(ab, ability, data_dict):
 def merge_special_values(ab, data_dict):
     try:
         special_dict = data_dict['AbilitySpecial']
-        for idx, pairs_dict in special_dict.iteritems():
+        for pairs_dict in special_dict:
             for key, value in pairs_dict.iteritems():
                 if key != 'var_type':
                     asv = AbilitySpecialValues.objects.get_or_create(
