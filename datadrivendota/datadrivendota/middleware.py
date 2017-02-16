@@ -11,6 +11,9 @@ class ForceHttps(object):
             request.is_secure(),
             request.META.get("HTTP_X_FORWARDED_PROTO", "").lower() == "https",
         )
+        # I know it is hacky, but the project is ~over.
+        if ".well-known/acme-challenge" in request.build_absolute_uri(request.get_full_path()):
+            return
         if not any(secure_request):
             url = request.build_absolute_uri(request.get_full_path())
             secure_url = url.replace("http://", "https://")
