@@ -33,7 +33,6 @@ if not CACHE_ENABLED:
     )
 # END CACHE CONFIGURATION
 
-
 # TOOLBAR CONFIGURATION
 # See: https://github.com/django-debug-toolbar/django-debug-toolbar/
 #      #installation

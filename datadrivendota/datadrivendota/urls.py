@@ -37,7 +37,7 @@ urlpatterns = [
     ),
     # Even if we don't want users to login, SUs need to be able to log out.
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
-    url(r'^.well-known/acme-challenge/zvFx2llyUrlt3x_o0PUtdodUwd8YVRuSPLesypurYys$',
+    url(r'^.well-known/acme-challenge/9HPQWe8i6qXZLwJnRPxF6ZDH2I0_l4qmc3ypb9uCeRw$',
         TemplateView.as_view(
             template_name='acme.txt',
             content_type='text/plain'
