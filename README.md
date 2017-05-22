@@ -6,7 +6,6 @@
 - [Intro](#intro)
   - [Business Proposition](#business-proposition)
     - [Stretch analogy](#stretch-analogy)
-  - [Napkin math](#napkin-math)
   - [Design Concept](#design-concept)
 - [Setup](#setup)
   - [RabbitMQ](#rabbitmq)
@@ -64,17 +63,6 @@ Magic the Gathering is a game with complimentary modes: multiplayer is a social 
 
 Dota 2 has a multiplayer mode that is highly successful, and has been growing the hairs of community discussion and media.  However, there is no analytic toolkit that quite counts as a single-player mode.  We want to build that, and capitalize on the success of the medium
 
-## Napkin math
-
-We know that Dotabuff, the main existing stat site, employs 3 full time people and 3 part time people.  Assuming they are only paying average US salary (and not dev salary), that 4.5*50K = $225K/yr to cover salary.  Half of that revenue would be more than sufficient to justify this project.
-
-We know that the player base was 6M 2 years ago (or so), and is ~11M now.  0.1% (1 in 1000) of the player base paying $2.49./mo = $22K/mo if $0.49 goes to expenses.  (This is about 10-15 server hours/user/mo.)  22K/mo = $242K/yr, which is sufficient to justify the project.
-
-Amazing case: 1/100 players is $2.42M/yr.  (According to extra credits, in freemium games about 1 in 100 players is a "whale" that spends money profligately.)
-
-Magic Christmasland case: 1/10 players = $24.2M/yr.
-
-Obviously this all varies with price, but dotabuff charges $6/mo.
 
 ## Design Concept
 
@@ -470,7 +458,7 @@ Here is a sample of what the output looks like, minus some deprecation warnings.
 
 Api resource list:
 
-http://api.steampowered.com/ISteamWebAPIUtil/GetSupportedAPIList/v0001/?key=09A6226940EB67F6D844B7D7E3A54186
+http://api.steampowered.com/ISteamWebAPIUtil/GetSupportedAPIList/v0001/?key={key}
 
 Other person's example:
 http://dotadb.azurewebsites.net/heroes/32/riki#
